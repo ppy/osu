@@ -115,8 +115,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            Flush(false, TransformType);
-
             DisplayedCountSpriteText.Text = FormatCount(Current);
         }
 
@@ -210,8 +208,8 @@ namespace osu.Game.Graphics.UserInterface
                     ? GetProportionalDuration(currentValue, newValue)
                     : RollingDuration;
 
-            transform.StartTime = Time.Current;
-            transform.EndTime = Time.Current + rollingTotalDuration;
+            transform.StartTime = TransformStartTime;
+            transform.EndTime = TransformStartTime + rollingTotalDuration;
             transform.StartValue = currentValue;
             transform.EndValue = newValue;
             transform.Easing = RollingEasing;

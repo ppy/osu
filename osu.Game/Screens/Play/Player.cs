@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
 
         public BeatmapInfo BeatmapInfo;
 
-        public bool IsPaused { get; private set; }
+        public bool IsPaused => !interpolatedSourceClock.IsRunning;
 
         public bool HasFailed { get; private set; }
 
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         private const double pause_cooldown = 1000;
         private double lastPauseActionTime;
 
-        private bool canPause => Time.Current >= lastPauseActionTime + pause_cooldown;
+        private bool canPause => ValidForResume && !HasFailed && Time.Current >= lastPauseActionTime + pause_cooldown;
 
         private IAdjustableClock sourceClock;
         private IFrameBasedClock interpolatedSourceClock;
@@ -116,7 +116,12 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 
-            hudOverlay = new StandardHudOverlay();
+            hudOverlay = new StandardHudOverlay()
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            };
+
             hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindHitRenderer(HitRenderer);
@@ -160,7 +165,12 @@ namespace osu.Game.Screens.Play
                 },
                 new HotkeyRetryOverlay
                 {
-                    Action = Restart,
+                    Action = () => {
+                        //we want to hide the hitrenderer immediately (looks better).
+                        //we may be able to remove this once the mouse cursor trail is improved.
+                        HitRenderer?.Hide();
+                        Restart();
+                    },
                 }
             };
         }
@@ -194,19 +204,30 @@ namespace osu.Game.Screens.Play
 
         public void Pause(bool force = false)
         {
-            if (canPause || force)
+            if (!canPause && !force) return;
+
+            // the actual pausing is potentially happening on a different thread.
+            // we want to wait for the source clock to stop so we can be sure all components are in a stable state.
+            if (!IsPaused)
             {
+                sourceClock.Stop();
+
+                Schedule(() => Pause(force));
+                return;
+            }
+
+            // we need to do a final check after all of our children have processed up to the paused clock time.
+            // this is to cover cases where, for instance, the player fails in the last processed frame (which would change canPause).
+            // as the scheduler runs before children updates, let's schedule for the next frame.
+            Schedule(() =>
+            {
+                if (!canPause) return;
+
                 lastPauseActionTime = Time.Current;
                 hudOverlay.KeyCounter.IsCounting = false;
                 pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
-                sourceClock.Stop();
-                IsPaused = true;
-            }
-            else
-            {
-                IsPaused = false;
-            }
+            });
         }
 
         public void Resume()
@@ -215,13 +236,6 @@ namespace osu.Game.Screens.Play
             hudOverlay.KeyCounter.IsCounting = true;
             pauseOverlay.Hide();
             sourceClock.Start();
-            IsPaused = false;
-        }
-
-        public void TogglePaused()
-        {
-            IsPaused = !IsPaused;
-            if (IsPaused) Pause(); else Resume();
         }
 
         public void Restart()
@@ -230,11 +244,11 @@ namespace osu.Game.Screens.Play
 
             var newPlayer = new Player();
 
+            ValidForResume = false;
+
             LoadComponentAsync(newPlayer, delegate
             {
                 newPlayer.RestartCount = RestartCount + 1;
-                ValidForResume = false;
-
                 if (!Push(newPlayer))
                 {
                     // Error(?)
@@ -250,10 +264,11 @@ namespace osu.Game.Screens.Play
             if (scoreProcessor.HasFailed || onCompletionEvent != null)
                 return;
 
+            ValidForResume = false;
+
             Delay(1000);
             onCompletionEvent = Schedule(delegate
             {
-                ValidForResume = false;
                 Push(new Results
                 {
                     Score = scoreProcessor.CreateScore()
@@ -264,8 +279,6 @@ namespace osu.Game.Screens.Play
         private void onFail()
         {
             sourceClock.Stop();
-
-            Delay(500);
 
             HasFailed = true;
             failOverlay.Retries = RestartCount;
@@ -304,32 +317,42 @@ namespace osu.Game.Screens.Play
 
         protected override void OnSuspending(Screen next)
         {
-            Content.FadeOut(350);
-            Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
+            fadeOut();
 
             base.OnSuspending(next);
         }
 
         protected override bool OnExiting(Screen next)
         {
+            if (HasFailed || !ValidForResume)
+                return false;
+
             if (pauseOverlay != null && !HitRenderer.HasReplayLoaded)
             {
                 //pause screen override logic.
                 if (pauseOverlay?.State == Visibility.Hidden && !canPause) return true;
 
-                if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
+                if (!IsPaused) // For if the user presses escape quickly when entering the map
                 {
                     Pause();
                     return true;
                 }
             }
 
-            HitRenderer?.FadeOut(60);
-
-            FadeOut(250);
-            Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
-            Background?.FadeTo(1f, 200);
+            fadeOut();
             return base.OnExiting(next);
+        }
+
+        private void fadeOut()
+        {
+            const float fade_out_duration = 250;
+
+            HitRenderer?.FadeOut(fade_out_duration);
+            Content.FadeOut(fade_out_duration);
+
+            hudOverlay.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
+
+            Background?.FadeTo(1f, fade_out_duration);
         }
 
         private Bindable<bool> mouseWheelDisabled;
