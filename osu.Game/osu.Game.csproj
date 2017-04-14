@@ -92,6 +92,7 @@
     <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
+    <Compile Include="Graphics\UserInterface\SimpleComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
     <Compile Include="Input\Handlers\ReplayInputHandler.cs" />
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />
@@ -336,6 +337,9 @@
     <Compile Include="Screens\Select\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
+    <Compile Include="Screens\Play\SongProgress.cs" />
+    <Compile Include="Screens\Play\SongProgressGraph.cs" />
+    <Compile Include="Screens\Play\SongProgressBar.cs" />
     <Compile Include="Screens\Play\Pause\PauseProgressBar.cs" />
     <Compile Include="Screens\Play\Pause\PauseProgressGraph.cs" />
     <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
