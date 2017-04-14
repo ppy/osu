@@ -46,7 +46,6 @@ namespace osu.Game.Modes.UI
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
-            Y = - TwoLayerButton.SIZE_RETRACTED.Y,
         };
 
         protected override ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
