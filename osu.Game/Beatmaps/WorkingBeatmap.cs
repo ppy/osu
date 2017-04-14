@@ -24,7 +24,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public PlayMode? PreferredPlayMode;
 
-        public PlayMode PlayMode => Beatmap?.BeatmapInfo?.Mode > PlayMode.Osu ? Beatmap.BeatmapInfo.Mode : PreferredPlayMode ?? PlayMode.Osu;
+        public PlayMode PlayMode => Beatmap?.BeatmapInfo?.Mode > (int)PlayMode.Osu ? (PlayMode)Beatmap.BeatmapInfo.Mode : PreferredPlayMode ?? PlayMode.Osu;
 
         public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
 

@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select
             {
                 var set = g.BeatmapSet;
 
-                bool hasCurrentMode = set.Beatmaps.Any(bm => bm.Mode == Mode);
+                bool hasCurrentMode = set.Beatmaps.Any(bm => bm.Mode == (int)Mode);
 
                 bool match = hasCurrentMode;
 

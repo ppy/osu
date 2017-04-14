@@ -9,12 +9,12 @@ using osu.Game.Beatmaps;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
-using osu.Game.Modes;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Osu.Objects;
 using osu.Game.Screens.Play;
 using OpenTK.Graphics;
 using osu.Desktop.VisualTests.Beatmaps;
+using osu.Game.Modes.Osu;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -37,7 +37,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             WorkingBeatmap beatmap = null;
 
-            var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.Mode == PlayMode.Osu);
+            var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.Ruleset is OsuRuleset);
             if (beatmapInfo != null)
                 beatmap = db.GetWorkingBeatmap(beatmapInfo);
 

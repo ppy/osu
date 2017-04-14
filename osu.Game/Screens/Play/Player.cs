@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
         {
-            if (Beatmap.Beatmap.BeatmapInfo?.Mode > PlayMode.Taiko)
+            if (Beatmap.Beatmap.BeatmapInfo?.Mode > (int)PlayMode.Taiko)
             {
                 //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
                 Exit();
