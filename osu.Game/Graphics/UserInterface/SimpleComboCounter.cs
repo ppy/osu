@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
@@ -15,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class SimpleComboCounter : RollingCounter<int>
     {
-        protected override Type TransformType => typeof(TransformCount);
+        protected override Type TransformType => typeof(TransformCounterCount);
 
         protected override double RollingDuration => 750;
 
@@ -39,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
             Current.Value = Current + amount;
         }
 
-        protected class TransformCount : Transform<int>
+        private class TransformCounterCount : Transform<int>
         {
             public override int CurrentValue
             {
