@@ -84,7 +84,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.StackLeniency = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"Mode":
-                    beatmap.BeatmapInfo.Mode = (PlayMode)int.Parse(val);
+                    beatmap.BeatmapInfo.Mode = int.Parse(val);
                     break;
                 case @"LetterboxInBreaks":
                     beatmap.BeatmapInfo.LetterboxInBreaks = int.Parse(val) == 1;

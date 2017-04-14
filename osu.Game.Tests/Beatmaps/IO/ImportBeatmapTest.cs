@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Assert.IsTrue(set.Beatmaps.Count > 0);
 
-            var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.Mode == PlayMode.Osu))?.Beatmap;
+            var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.Ruleset is OsuRuleset))?.Beatmap;
 
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
         }
