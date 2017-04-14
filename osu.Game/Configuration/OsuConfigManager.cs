@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
-using osu.Game.Modes;
 
 namespace osu.Game.Configuration
 {

@@ -6,8 +6,6 @@ using osu.Game.Graphics;
 using osu.Game.Modes.Mods;
 using osu.Game.Modes.UI;
 using osu.Game.Screens.Play;
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using osu.Game.Modes.Scoring;
 
