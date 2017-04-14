@@ -63,7 +63,7 @@ namespace osu.Game.Modes.UI
             Origin = Anchor.BottomLeft,
             RelativeSizeAxes = Axes.X,
         };
-        
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
