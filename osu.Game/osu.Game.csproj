@@ -337,6 +337,9 @@
     <Compile Include="Screens\Select\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
+    <Compile Include="Screens\Play\SongProgress.cs" />
+    <Compile Include="Screens\Play\SongProgressGraph.cs" />
+    <Compile Include="Screens\Play\SongProgressBar.cs" />
     <Compile Include="Screens\Play\Pause\PauseProgressBar.cs" />
     <Compile Include="Screens\Play\Pause\PauseProgressGraph.cs" />
     <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
