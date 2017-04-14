@@ -92,6 +92,7 @@
     <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
     <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
+    <Compile Include="Graphics\UserInterface\SimpleComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
     <Compile Include="Input\Handlers\ReplayInputHandler.cs" />
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />

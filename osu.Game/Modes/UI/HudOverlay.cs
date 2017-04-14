@@ -22,9 +22,9 @@ namespace osu.Game.Modes.UI
 
         private readonly Container content;
         public readonly KeyCounterCollection KeyCounter;
-        public readonly ComboCounter ComboCounter;
+        public readonly RollingCounter<int> ComboCounter;
         public readonly ScoreCounter ScoreCounter;
-        public readonly PercentageCounter AccuracyCounter;
+        public readonly RollingCounter<double> AccuracyCounter;
         public readonly HealthDisplay HealthDisplay;
 
         private Bindable<bool> showKeyCounter;
@@ -33,8 +33,8 @@ namespace osu.Game.Modes.UI
         private static bool hasShownNotificationOnce;
 
         protected abstract KeyCounterCollection CreateKeyCounter();
-        protected abstract ComboCounter CreateComboCounter();
-        protected abstract PercentageCounter CreateAccuracyCounter();
+        protected abstract RollingCounter<int> CreateComboCounter();
+        protected abstract RollingCounter<double> CreateAccuracyCounter();
         protected abstract ScoreCounter CreateScoreCounter();
         protected abstract HealthDisplay CreateHealthDisplay();
 
