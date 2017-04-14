@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Toolbar
         private readonly Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
-        public Action<PlayMode> OnPlayModeChange;
+        public Action<Ruleset> OnRulesetChange;
 
         public ToolbarModeSelector()
         {
@@ -63,15 +63,15 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            foreach (PlayMode m in Ruleset.PlayModes)
+            foreach (var ruleset in RulesetCollection.AllRulesets)
             {
                 modeButtons.Add(new ToolbarModeButton
                 {
-                    Mode = m,
+                    Ruleset = ruleset,
                     Action = delegate
                     {
-                        SetGameMode(m);
-                        OnPlayModeChange?.Invoke(m);
+                        SetGameMode(ruleset);
+                        OnRulesetChange?.Invoke(ruleset);
                     }
                 });
             }
@@ -84,11 +84,11 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
-        public void SetGameMode(PlayMode mode)
+        public void SetGameMode(Ruleset ruleset)
         {
             foreach (ToolbarModeButton m in modeButtons.Children.Cast<ToolbarModeButton>())
             {
-                bool isActive = m.Mode == mode;
+                bool isActive = m.Ruleset == ruleset;
                 m.Active = isActive;
                 if (isActive)
                     activeButton = m;

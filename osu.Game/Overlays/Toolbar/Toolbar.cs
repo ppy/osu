@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Toolbar
         public const float TOOLTIP_HEIGHT = 30;
 
         public Action OnHome;
-        public Action<PlayMode> OnPlayModeChange;
+        public Action<Ruleset> OnRulesetChange;
 
         private readonly ToolbarModeSelector modeSelector;
         private readonly ToolbarUserArea userArea;
@@ -55,9 +55,9 @@ namespace osu.Game.Overlays.Toolbar
                         },
                         modeSelector = new ToolbarModeSelector
                         {
-                            OnPlayModeChange = mode =>
+                            OnRulesetChange = mode =>
                             {
-                                OnPlayModeChange?.Invoke(mode);
+                                OnRulesetChange?.Invoke(mode);
                             }
                         }
                     }
@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
-        public void SetGameMode(PlayMode mode) => modeSelector.SetGameMode(mode);
+        public void SetGameMode(Ruleset ruleset) => modeSelector.SetGameMode(ruleset);
 
         protected override void PopIn()
         {

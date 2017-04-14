@@ -32,8 +32,6 @@ namespace osu.Game.Modes
 
         public abstract ScoreProcessor CreateScoreProcessor();
 
-        protected abstract PlayMode PlayMode { get; }
-
         public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
 
         public abstract string Description { get; }

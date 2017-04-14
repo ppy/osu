@@ -58,7 +58,7 @@ namespace osu.Game
 
         private VolumeControl volume;
 
-        public Bindable<PlayMode> PlayMode;
+        public Bindable<Ruleset> Ruleset;
 
         private readonly string[] args;
 
@@ -88,7 +88,8 @@ namespace osu.Game
 
             Dependencies.Cache(this);
 
-            PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
+            // Todo: I don't think this'll work, need BindableRuleset
+            Ruleset = new Bindable<Ruleset>();
         }
 
         private ScheduledDelegate scoreLoad;
@@ -199,11 +200,11 @@ namespace osu.Game
             {
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
-                OnPlayModeChange = m => PlayMode.Value = m,
+                OnRulesetChange = r => Ruleset.Value = r,
             }, t =>
             {
-                PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
-                PlayMode.TriggerChange();
+                Ruleset.ValueChanged += delegate { Toolbar.SetGameMode(Ruleset.Value); };
+                Ruleset.TriggerChange();
                 overlayContent.Add(Toolbar);
             });
 

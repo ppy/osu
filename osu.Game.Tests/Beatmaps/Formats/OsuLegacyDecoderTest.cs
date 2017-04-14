@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(false, beatmapInfo.Countdown);
                 Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
                 Assert.AreEqual(false, beatmapInfo.SpecialStyle);
-                Assert.AreEqual(PlayMode.Osu, beatmapInfo.Mode);
+                Assert.IsTrue(beatmapInfo.Ruleset is OsuRuleset);
                 Assert.AreEqual(false, beatmapInfo.LetterboxInBreaks);
                 Assert.AreEqual(false, beatmapInfo.WidescreenStoryboard);
             }

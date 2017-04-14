@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Select
         public GroupMode Group;
         public SortMode Sort;
         public string SearchText;
-        public PlayMode Mode;
+        public Ruleset Ruleset;
 
         public void Filter(List<BeatmapGroup> groups)
         {
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select
             {
                 var set = g.BeatmapSet;
 
-                bool hasCurrentMode = set.Beatmaps.Any(bm => bm.Mode == (int)Mode);
+                bool hasCurrentMode = set.Beatmaps.Any(bm => bm.Ruleset == Ruleset);
 
                 bool match = hasCurrentMode;
 

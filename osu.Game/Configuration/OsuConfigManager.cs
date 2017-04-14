@@ -17,8 +17,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.Username, string.Empty);
             Set(OsuConfig.Token, string.Empty);
 
-            Set(OsuConfig.PlayMode, PlayMode.Osu);
-
             Set(OsuConfig.AudioDevice, string.Empty);
             Set(OsuConfig.SavePassword, false);
             Set(OsuConfig.SaveUsername, true);
@@ -196,7 +194,7 @@ namespace osu.Game.Configuration
     public enum OsuConfig
     {
         // New osu:
-        PlayMode,
+        Ruleset,
         Token,
         // Imported from old osu:
         BeatmapDirectory,

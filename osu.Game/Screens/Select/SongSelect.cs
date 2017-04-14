@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
-        private readonly Bindable<PlayMode> playMode = new Bindable<PlayMode>();
+        private readonly Bindable<Ruleset> ruleset = new Bindable<Ruleset>();
         private BeatmapDatabase database;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
@@ -170,8 +170,8 @@ namespace osu.Game.Screens.Select
             if (database == null)
                 database = beatmaps;
 
-            playMode.ValueChanged += val => { if (Beatmap != null) Beatmap.PreferredPlayMode = val; };
-            if (osu != null) playMode.BindTo(osu.PlayMode);
+            if (osu != null)
+                ruleset.BindTo(osu.Ruleset);
 
             database.BeatmapSetAdded += onBeatmapSetAdded;
             database.BeatmapSetRemoved += onBeatmapSetRemoved;
@@ -200,7 +200,6 @@ namespace osu.Game.Screens.Select
         {
             if (Beatmap == null) return;
 
-            Beatmap.PreferredPlayMode = playMode.Value;
             OnSelected();
         }
 

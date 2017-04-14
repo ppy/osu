@@ -18,14 +18,6 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
-        /// <summary>
-        /// A play mode that is preferred for this beatmap. PlayMode will become this mode where conversion is feasible,
-        /// or otherwise to the beatmap's default.
-        /// </summary>
-        public PlayMode? PreferredPlayMode;
-
-        public PlayMode PlayMode => Beatmap?.BeatmapInfo?.Mode > (int)PlayMode.Osu ? (PlayMode)Beatmap.BeatmapInfo.Mode : PreferredPlayMode ?? PlayMode.Osu;
-
         public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
 
         public readonly bool WithStoryboard;

@@ -27,13 +27,15 @@ namespace osu.Game.Overlays.Options
 
             var modes = new List<Drawable>();
 
-            foreach (PlayMode m in Enum.GetValues(typeof(PlayMode)))
+            foreach (var ruleset in RulesetCollection.AllRulesets)
+            {
                 modes.Add(new TextAwesome
                 {
-                    Icon = RulesetCollection.GetRuleset(m).Icon,
+                    Icon = ruleset.Icon,
                     Colour = Color4.Gray,
                     TextSize = 20
                 });
+            }
 
             Children = new Drawable[]
             {

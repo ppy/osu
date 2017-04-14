@@ -37,13 +37,12 @@ namespace osu.Game.Overlays.Mods
 
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
-        public readonly Bindable<PlayMode> PlayMode = new Bindable<PlayMode>();
+        public readonly Bindable<Ruleset> Ruleset = new Bindable<Ruleset>();
 
-        private void modeChanged(PlayMode newMode)
+        private void rulesetChanged(Ruleset newRuleset)
         {
-            var ruleset = RulesetCollection.GetRuleset(newMode);
             foreach (ModSection section in modSectionsContainer.Children)
-                section.Buttons = ruleset.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
+                section.Buttons = newRuleset.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
             refreshSelectedMods();
         }
 
@@ -54,9 +53,9 @@ namespace osu.Game.Overlays.Mods
             highMultiplierColour = colours.Green;
 
             if (osu != null)
-                PlayMode.BindTo(osu.PlayMode);
-            PlayMode.ValueChanged += modeChanged;
-            PlayMode.TriggerChange();
+                Ruleset.BindTo(osu.Ruleset);
+            Ruleset.ValueChanged += rulesetChanged;
+            Ruleset.TriggerChange();
         }
 
         protected override void PopOut()
