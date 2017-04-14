@@ -8,6 +8,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
+using osu.Game.Modes;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -71,7 +72,7 @@ namespace osu.Desktop.VisualTests.Tests
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1234 + i,
-                        Mode = 0,
+                        Ruleset = RulesetCollection.GetRuleset(0),
                         Path = "normal.osu",
                         Version = "Normal",
                         Difficulty = new BeatmapDifficulty
@@ -82,7 +83,7 @@ namespace osu.Desktop.VisualTests.Tests
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1235 + i,
-                        Mode = 0,
+                        Ruleset = RulesetCollection.GetRuleset(0),
                         Path = "hard.osu",
                         Version = "Hard",
                         Difficulty = new BeatmapDifficulty
@@ -93,7 +94,7 @@ namespace osu.Desktop.VisualTests.Tests
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1236 + i,
-                        Mode = 0,
+                        Ruleset = RulesetCollection.GetRuleset(0),
                         Path = "insane.osu",
                         Version = "Insane",
                         Difficulty = new BeatmapDifficulty
