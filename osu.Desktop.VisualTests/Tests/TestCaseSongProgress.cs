@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
+using osu.Framework.Timing;
 using osu.Game.Modes.Objects;
 using osu.Game.Screens.Play;
 
@@ -22,14 +23,16 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(progress = new SongProgress
             {
+                AudioClock = new StopwatchClock(true),
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
             });
 
             AddStep("Toggle Bar", progress.ToggleBar);
             AddWaitStep(5);
-            //AddStep("Toggle Bar", progress.ToggleVisibility);
-            //AddStep("New Values", displayNewValues);
+            AddStep("Toggle Bar", progress.ToggleBar);
+            AddWaitStep(2);
+            AddRepeatStep("New Values", displayNewValues, 5);
 
             displayNewValues();
         }
@@ -37,7 +40,7 @@ namespace osu.Desktop.VisualTests.Tests
         private void displayNewValues()
         {
             List<HitObject> objects = new List<HitObject>();
-            for (double i = 0; i < 2000; i += RNG.NextDouble() * 10 + i / 1000)
+            for (double i = 0; i < 5000; i += RNG.NextDouble() * 10 + i / 1000)
                 objects.Add(new HitObject { StartTime = i });
 
             progress.Objects = objects;
