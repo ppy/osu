@@ -67,6 +67,7 @@ namespace osu.Game.Screens.Menu
         private TrackManager trackManager;
         private BeatmapInfo beatmap;
         private WorkingBeatmap song;
+        private int choosableBeatmapsetAmmout;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, AudioManager audio, OsuConfigManager config, BeatmapDatabase beatmaps)
@@ -76,9 +77,13 @@ namespace osu.Game.Screens.Menu
             if (!menuMusic)
             {
                 trackManager = game.Audio.Track;
-                beatmap = beatmaps.GetWithChildren<BeatmapSetInfo>(RNG.Next(beatmaps.Query<BeatmapSetInfo>().Count() - 1)).Beatmaps[0];
-                song = beatmaps.GetWorkingBeatmap(beatmap);
-                Beatmap = song;
+                choosableBeatmapsetAmmout = beatmaps.Query<BeatmapSetInfo>().Count();
+                if (choosableBeatmapsetAmmout > 0)
+                {
+                    beatmap = beatmaps.GetWithChildren<BeatmapSetInfo>(RNG.Next(1, choosableBeatmapsetAmmout)).Beatmaps[0];
+                    song = beatmaps.GetWorkingBeatmap(beatmap);
+                    Beatmap = song;
+                }
             }
 
             bgm = audio.Track.Get(@"circles");
@@ -100,7 +105,7 @@ namespace osu.Game.Screens.Menu
             {
                 if(menuMusic)
                     bgm.Start();
-                else
+                else if (song != null)
                 {
                     Task.Run(() =>
                     {
@@ -115,7 +120,7 @@ namespace osu.Game.Screens.Menu
 
                 Scheduler.AddDelayed(delegate
                 {
-                    if (!menuMusic)
+                    if (!menuMusic && song != null)
                         Task.Run(() => song.Track.Start());
                     DidLoadMenu = true;
                     Push(mainMenu);
