@@ -58,6 +58,8 @@ namespace osu.Game.Modes.UI
         /// </summary>
         public bool HasReplayLoaded => InputManager.ReplayInputHandler != null;
 
+        public abstract IEnumerable<HitObject> Objects { get; }
+
         /// <summary>
         /// Whether all the HitObjects have been judged.
         /// </summary>
@@ -184,6 +186,8 @@ namespace osu.Game.Modes.UI
         protected Playfield<TObject, TJudgement> Playfield;
 
         private readonly Container content;
+
+        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
 
         protected HitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
