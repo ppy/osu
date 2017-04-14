@@ -10,12 +10,13 @@ using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using System.Linq;
+using osu.Framework.Timing;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Screens.Play
 {
-        public class SongProgress : OverlayContainer
+    public class SongProgress : OverlayContainer
     {
         private const int progress_height = 5;
 
@@ -30,27 +31,21 @@ namespace osu.Game.Screens.Play
 
         public Action<double> OnSeek;
 
-        private double progress;
-        public double Progress
-        {
-            get { return progress; }
-            set
-            {
-                progress = value;
-                updateProgress();
-            }
-        }
+        public IClock AudioClock;
+
+        private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
+
+        private IEnumerable<HitObject> objects;
 
         public IEnumerable<HitObject> Objects
         {
             set
             {
-                var objects = value;
+                objects = value;
 
                 const int granularity = 200;
 
-                var lastHit = ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
-                var interval = lastHit / granularity;
+                var interval = lastHitTime / granularity;
 
                 var values = new int[granularity];
 
@@ -108,12 +103,6 @@ namespace osu.Game.Screens.Play
             State = Visibility.Visible;
         }
 
-        private void updateProgress()
-        {
-            bar.UpdatePosition((float)progress);
-            graph.Progress = (int)(graph.ColumnCount * progress);
-        }
-
         private bool barVisible;
 
         public void ToggleBar()
@@ -143,7 +132,11 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            updateProgress();
+            double progress = (AudioClock?.CurrentTime ?? Time.Current) / lastHitTime;
+
+            bar.UpdatePosition((float)progress);
+            graph.Progress = (int)(graph.ColumnCount * progress);
+
         }
     }
 }

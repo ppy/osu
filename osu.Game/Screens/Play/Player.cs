@@ -125,6 +125,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.BindHitRenderer(HitRenderer);
 
             hudOverlay.Progress.Objects = HitRenderer.Objects;
+            hudOverlay.Progress.AudioClock = interpolatedSourceClock;
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
@@ -173,13 +174,6 @@ namespace osu.Game.Screens.Play
                     },
                 }
             };
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            hudOverlay.Progress.Progress = Beatmap.Track.CurrentTime / Beatmap.Track.Length;
         }
 
         private void initializeSkipButton()

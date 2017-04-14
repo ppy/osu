@@ -41,7 +41,6 @@ namespace osu.Desktop.VisualTests.Tests
                 objects.Add(new HitObject { StartTime = i });
 
             progress.Objects = objects;
-            progress.Progress = RNG.NextDouble();
         }
     }
 }
