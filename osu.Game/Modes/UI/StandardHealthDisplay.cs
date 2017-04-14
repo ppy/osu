@@ -3,8 +3,6 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -12,9 +10,34 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Modes.UI
 {
-    public class StandardHealthDisplay : HealthDisplay
+    public class StandardHealthDisplay : HealthDisplay, IHasAccentColour
     {
         private readonly Container fill;
+
+        public Color4 AccentColour
+        {
+            get { return fill.Colour; }
+            set { fill.Colour = value; }
+        }
+
+        private Color4 glowColour;
+        public Color4 GlowColour
+        {
+            get { return glowColour; }
+            set
+            {
+                if (glowColour == value)
+                    return;
+                glowColour = value;
+
+                fill.EdgeEffect = new EdgeEffect
+                {
+                    Colour = glowColour,
+                    Radius = 8,
+                    Type = EdgeEffectType.Glow
+                };
+            }
+        }
 
         public StandardHealthDisplay()
         {
@@ -38,18 +61,6 @@ namespace osu.Game.Modes.UI
                         }
                     }
                 },
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            fill.Colour = colours.BlueLighter;
-            fill.EdgeEffect = new EdgeEffect
-            {
-                Colour = colours.BlueDarker.Opacity(0.6f),
-                Radius = 8,
-                Type = EdgeEffectType.Glow
             };
         }
 
