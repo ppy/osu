@@ -31,7 +31,9 @@ namespace osu.Game.Screens.Select
                     || (set.Metadata.Artist ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
                     || (set.Metadata.ArtistUnicode ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
                     || (set.Metadata.Title ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (set.Metadata.TitleUnicode ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1;
+                    || (set.Metadata.TitleUnicode ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
+                    || (set.Metadata.Tags ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
+                    || (set.Metadata.Source ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1;
 
                 switch (g.State)
                 {

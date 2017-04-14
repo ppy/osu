@@ -83,10 +83,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Colour = Color4.Black,
             });
 
-            Add(new PlayerLoader(Player = CreatePlayer(beatmap))
-            {
-                Beatmap = beatmap
-            });
+            Add(Player = CreatePlayer(beatmap));
         }
 
         protected virtual Player CreatePlayer(WorkingBeatmap beatmap)
