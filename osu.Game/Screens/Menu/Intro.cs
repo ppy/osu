@@ -63,8 +63,7 @@ namespace osu.Game.Screens.Menu
         }
 
         private Bindable<bool> menuVoice;
-        private Bindable<bool> osuBGM;
-        private BeatmapDatabase beatmaps;
+        private Bindable<bool> menuMusic;
         private TrackManager trackManager;
         private BeatmapInfo beatmap;
         private WorkingBeatmap song;
@@ -73,24 +72,19 @@ namespace osu.Game.Screens.Menu
         private void load(OsuGameBase game, AudioManager audio, OsuConfigManager config, BeatmapDatabase beatmaps)
         {
             menuVoice = config.GetBindable<bool>(OsuConfig.MenuVoice);
-            osuBGM = config.GetBindable<bool>(OsuConfig.MenuMusic);
-
-            if (osuBGM)
+            menuMusic = config.GetBindable<bool>(OsuConfig.MenuMusic);
+            if (!menuMusic)
             {
-                bgm = audio.Track.Get(@"circles");
-                bgm.Looping = true;
-            }
-            else
-            {
-                this.beatmaps = beatmaps;
                 trackManager = game.Audio.Track;
-                beatmap = beatmaps.GetWithChildren<BeatmapSetInfo>(RNG.Next(0, beatmaps.Query<BeatmapSetInfo>().Count() - 1)).Beatmaps[0];
-                song = beatmaps.GetWorkingBeatmap(beatmap, null);
+                beatmap = beatmaps.GetWithChildren<BeatmapSetInfo>(RNG.Next(beatmaps.Query<BeatmapSetInfo>().Count() - 1)).Beatmaps[0];
+                song = beatmaps.GetWorkingBeatmap(beatmap);
                 Beatmap = song;
             }
 
-            welcome = audio.Sample.Get(@"welcome");
+            bgm = audio.Track.Get(@"circles");
+            bgm.Looping = true;
 
+            welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
 
         }
@@ -103,7 +97,7 @@ namespace osu.Game.Screens.Menu
                 welcome.Play();
             Scheduler.AddDelayed(delegate
             {
-                if(osuBGM)
+                if(menuMusic)
                     bgm.Start();
                 else
                 {
@@ -120,7 +114,7 @@ namespace osu.Game.Screens.Menu
 
                 Scheduler.AddDelayed(delegate
                 {
-                    if (!osuBGM)
+                    if (!menuMusic)
                         Task.Run(() => song.Track.Start());
                     DidLoadMenu = true;
                     Push(mainMenu);
