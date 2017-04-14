@@ -104,18 +104,23 @@ namespace osu.Game.Screens.Menu
             {
                 if(osuBGM)
                     bgm.Start();
+                else
+                {
+                    Task.Run(() =>
+                    {
+                        trackManager.SetExclusive(song.Track);
+                        song.Track.Seek(beatmap.Metadata.PreviewTime);
+                        if (beatmap.Metadata.PreviewTime == -1)
+                            song.Track.Seek(song.Track.Length * .4f);
+                    });
+                }
 
                 LoadComponentAsync(mainMenu = new MainMenu());
 
                 Scheduler.AddDelayed(delegate
                 {
                     if (!osuBGM)
-                        Task.Run(() =>
-                        {
-                            trackManager.SetExclusive(song.Track);
-                            song.Track.Seek(beatmap.Metadata.PreviewTime);
-                            song.Track.Start();
-                        });
+                        Task.Run(() => song.Track.Start());
                     DidLoadMenu = true;
                     Push(mainMenu);
                 }, 2300);
