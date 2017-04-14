@@ -86,6 +86,7 @@ namespace osu.Game.Screens.Menu
                 trackManager = game.Audio.Track;
                 beatmap = beatmaps.GetWithChildren<BeatmapSetInfo>(RNG.Next(0, beatmaps.Query<BeatmapSetInfo>().Count() - 1)).Beatmaps[0];
                 song = beatmaps.GetWorkingBeatmap(beatmap, null);
+                Beatmap = song;
             }
 
             welcome = audio.Sample.Get(@"welcome");
