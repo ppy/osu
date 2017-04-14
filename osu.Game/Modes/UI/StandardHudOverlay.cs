@@ -57,6 +57,13 @@ namespace osu.Game.Modes.UI
             Position = new Vector2(0, 30),
         };
 
+        protected override SongProgress CreateProgress() => new SongProgress()
+        {
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+            RelativeSizeAxes = Axes.X,
+        };
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
