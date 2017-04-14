@@ -131,6 +131,7 @@
     <Compile Include="Modes\Objects\Legacy\LegacyHitObjectType.cs" />
     <Compile Include="Modes\Replays\ReplayButtonState.cs" />
     <Compile Include="Modes\Replays\ReplayFrame.cs" />
+    <Compile Include="Modes\RulesetCollection.cs" />
     <Compile Include="Modes\Scoring\Score.cs" />
     <Compile Include="Modes\Scoring\ScoreProcessor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />

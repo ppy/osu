@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Options
             foreach (PlayMode m in Enum.GetValues(typeof(PlayMode)))
                 modes.Add(new TextAwesome
                 {
-                    Icon = Ruleset.GetRuleset(m).Icon,
+                    Icon = RulesetCollection.GetRuleset(m).Icon,
                     Colour = Color4.Gray,
                     TextSize = 20
                 });

@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void SetUp()
         {
             OsuLegacyDecoder.Register();
-            Ruleset.Register(new OsuRuleset());
+            RulesetCollection.Register(typeof(OsuRuleset));
         }
 
         [Test]

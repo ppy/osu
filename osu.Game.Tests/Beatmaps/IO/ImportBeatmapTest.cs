@@ -28,10 +28,10 @@ namespace osu.Game.Tests.Beatmaps.IO
         [OneTimeSetUp]
         public void SetUp()
         {
-            Ruleset.Register(new OsuRuleset());
-            Ruleset.Register(new TaikoRuleset());
-            Ruleset.Register(new ManiaRuleset());
-            Ruleset.Register(new CatchRuleset());
+            RulesetCollection.Register(typeof(OsuRuleset));
+            RulesetCollection.Register(typeof(TaikoRuleset));
+            RulesetCollection.Register(typeof(ManiaRuleset));
+            RulesetCollection.Register(typeof(CatchRuleset));
         }
 
         [Test]
