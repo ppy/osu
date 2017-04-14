@@ -15,6 +15,8 @@ namespace osu.Game.Graphics.UserInterface
         protected override double RollingDuration => 1000;
         protected override EasingTypes RollingEasing => EasingTypes.Out;
 
+        public bool UseCommaSeparator;
+
         /// <summary>
         /// How many leading zeroes the counter has.
         /// </summary>
@@ -41,7 +43,12 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override string FormatCount(double count)
         {
-            return ((long)count).ToString("D" + LeadingZeroes);
+            string format = new string('0', (int)LeadingZeroes);
+            if (UseCommaSeparator)
+                for (int i = format.Length - 3; i > 0; i -= 3)
+                    format = format.Insert(i, @",");
+
+            return ((long)count).ToString(format);
         }
 
         public override void Increment(double amount)

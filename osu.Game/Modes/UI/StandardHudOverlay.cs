@@ -2,8 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
 
@@ -11,19 +14,22 @@ namespace osu.Game.Modes.UI
 {
     public class StandardHudOverlay : HudOverlay
     {
-        protected override PercentageCounter CreateAccuracyCounter() => new PercentageCounter
+        protected override RollingCounter<double> CreateAccuracyCounter() => new PercentageCounter
         {
             Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopCentre,
-            Position = new Vector2(0, 65),
+            Origin = Anchor.TopRight,
+            Position = new Vector2(0, 35),
             TextSize = 20,
-            Margin = new MarginPadding { Right = 5 },
+            Margin = new MarginPadding { Right = 140 },
         };
 
-        protected override ComboCounter CreateComboCounter() => new StandardComboCounter
+        protected override RollingCounter<int> CreateComboCounter() => new SimpleComboCounter
         {
-            Anchor = Anchor.BottomLeft,
-            Origin = Anchor.BottomLeft,
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopLeft,
+            Position = new Vector2(0, 35),
+            Margin = new MarginPadding { Left = 140 },
+            TextSize = 20,
         };
 
         protected override HealthDisplay CreateHealthDisplay() => new StandardHealthDisplay
@@ -49,7 +55,28 @@ namespace osu.Game.Modes.UI
             Origin = Anchor.TopCentre,
             TextSize = 40,
             Position = new Vector2(0, 30),
-            Margin = new MarginPadding { Right = 5 },
         };
+
+        protected override SongProgress CreateProgress() => new SongProgress()
+        {
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+            RelativeSizeAxes = Axes.X,
+        };
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            ComboCounter.AccentColour = colours.BlueLighter;
+            AccuracyCounter.AccentColour = colours.BlueLighter;
+            ScoreCounter.AccentColour = colours.BlueLighter;
+
+            var shd = HealthDisplay as StandardHealthDisplay;
+            if (shd != null)
+            {
+                shd.AccentColour = colours.BlueLighter;
+                shd.GlowColour = colours.BlueDarker.Opacity(0.6f);
+            }
+        }
     }
 }
