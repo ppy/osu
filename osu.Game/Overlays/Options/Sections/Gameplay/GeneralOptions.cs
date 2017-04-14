@@ -50,6 +50,11 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                 },
                 new OsuCheckbox
                 {
+                    LabelText = "Always show song progress",
+                    Bindable = config.GetBindable<bool>(OsuConfig.ShowProgress)
+                },
+                new OsuCheckbox
+                {
                     LabelText = "Show approach circle on first \"Hidden\" object",
                     Bindable = config.GetBindable<bool>(OsuConfig.HiddenShowFirstApproach)
                 },

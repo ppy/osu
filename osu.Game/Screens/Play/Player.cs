@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Play
 
                 lastPauseActionTime = Time.Current;
                 hudOverlay.KeyCounter.IsCounting = false;
-                hudOverlay.Progress.Show();
+                hudOverlay.ShowProgress();
                 pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
             });
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Play
         {
             lastPauseActionTime = Time.Current;
             hudOverlay.KeyCounter.IsCounting = true;
-            hudOverlay.Progress.Hide();
+            hudOverlay.HideProgress();
             pauseOverlay.Hide();
             sourceClock.Start();
         }
@@ -284,6 +284,7 @@ namespace osu.Game.Screens.Play
             sourceClock.Stop();
 
             HasFailed = true;
+            hudOverlay.ShowProgress();
             failOverlay.Retries = RestartCount;
             failOverlay.Show();
         }

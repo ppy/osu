@@ -13,6 +13,7 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using OpenTK;
 
 namespace osu.Game.Modes.UI
 {
@@ -30,8 +31,10 @@ namespace osu.Game.Modes.UI
 
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
+        private Bindable<bool> showProgress;
 
         private static bool hasShownNotificationOnce;
+        private bool hasPaused;
 
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract RollingCounter<int> CreateComboCounter();
@@ -83,6 +86,25 @@ namespace osu.Game.Modes.UI
             };
             showHud.TriggerChange();
 
+            showProgress = config.GetBindable<bool>(OsuConfig.ShowProgress);
+            showProgress.ValueChanged += progressVisibility =>
+            {
+                if (showProgress)
+                {
+                    Progress.FadeIn(duration);
+                    KeyCounter.MoveToY(-TwoLayerButton.SIZE_RETRACTED.Y, duration);
+                }
+                else
+                {
+                    if (!hasPaused)
+                    {
+                        Progress.FadeOut(duration);
+                        KeyCounter.MoveToY(0, duration);
+                    }
+                }
+            };
+            showProgress.TriggerChange();
+
             if (!showHud && !hasShownNotificationOnce)
             {
                 hasShownNotificationOnce = true;
@@ -91,6 +113,23 @@ namespace osu.Game.Modes.UI
                 {
                     Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
                 });
+            }
+        }
+
+        public void ShowProgress()
+        {
+            hasPaused = true;
+            Progress.FadeIn(duration);
+            KeyCounter.MoveToY(-TwoLayerButton.SIZE_RETRACTED.Y, duration);
+        }
+
+        public void HideProgress()
+        {
+            hasPaused = false;
+            if (!showProgress)
+            {
+                Progress.FadeOut(duration);
+                KeyCounter.MoveToY(0, duration);
             }
         }
 
