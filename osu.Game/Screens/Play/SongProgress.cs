@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Play
     {
         private const int progress_height = 5;
 
+        protected override bool HideOnEscape => false;
+
         private static readonly Vector2 handle_size = new Vector2(14, 25);
 
         private const float transition_duration = 200;
@@ -104,7 +106,7 @@ namespace osu.Game.Screens.Play
         protected override void PopIn()
         {
             updateBarVisibility();
-            FadeIn(100);
+            FadeIn(500, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
