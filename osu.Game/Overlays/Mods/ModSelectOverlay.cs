@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Mods
 
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
-        public readonly Bindable<Ruleset> Ruleset = new Bindable<Ruleset>();
+        public readonly Bindable<Ruleset> Ruleset = new Bindable<Ruleset>(RulesetCollection.GetRuleset(0));
 
         private void rulesetChanged(Ruleset newRuleset)
         {

@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private readonly Bindable<Ruleset> ruleset = new Bindable<Ruleset>();
+        private readonly Bindable<Ruleset> ruleset = new Bindable<Ruleset>(RulesetCollection.GetRuleset(0));
 
         [BackgroundDependencyLoader(permitNulls:true)]
         private void load(OsuColour colours, OsuGame osu)

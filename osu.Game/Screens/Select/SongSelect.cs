@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
-        private readonly Bindable<Ruleset> ruleset = new Bindable<Ruleset>();
+        private readonly Bindable<Ruleset> ruleset = new Bindable<Ruleset>(RulesetCollection.GetRuleset(0));
         private BeatmapDatabase database;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 

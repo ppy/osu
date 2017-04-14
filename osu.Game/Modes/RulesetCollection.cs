@@ -8,13 +8,16 @@ using System.Linq;
 
 namespace osu.Game.Modes
 {
+    /// <summary>
+    /// Todo: All of this needs to be moved to a RulesetDatabase.
+    /// </summary>
     public static class RulesetCollection
     {
         private static readonly ConcurrentDictionary<int, Ruleset> available_rulesets = new ConcurrentDictionary<int, Ruleset>();
 
         public static void Register(Type type)
         {
-            Ruleset ruleset = Activator.CreateInstance(type) as Ruleset;
+            var ruleset = Activator.CreateInstance(type) as Ruleset;
 
             if (ruleset == null)
                 return;
@@ -25,9 +28,9 @@ namespace osu.Game.Modes
         public static Ruleset GetRuleset(int rulesetId)
         {
             Ruleset ruleset;
-            
+
             if (!available_rulesets.TryGetValue(rulesetId, out ruleset))
-                throw new InvalidOperationException($"Ruleset id {rulesetId} doesn't exist. How did you trigger this?");
+                return null;
 
             return ruleset;
         }

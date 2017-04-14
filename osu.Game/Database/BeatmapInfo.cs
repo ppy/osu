@@ -56,7 +56,13 @@ namespace osu.Game.Database
         public bool SpecialStyle { get; set; }
 
         public int Mode { get; set; }
-        public Ruleset Ruleset => RulesetCollection.GetRuleset(Mode);
+
+        [Ignore]
+        public Ruleset Ruleset
+        {
+            get { return RulesetCollection.GetRuleset(Mode); }
+            set { Mode = RulesetCollection.GetId(value); }
+        }
         
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
