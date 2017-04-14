@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Modes.Objects;
@@ -38,6 +39,9 @@ namespace osu.Game.Modes.UI
         {
             AlwaysReceiveInput = true;
 
+            // Default height since we force relative size axes
+            Size = Vector2.One;
+
             AddInternal(ScaledContent = new ScaledContainer
             {
                 CustomWidth = customWidth,
@@ -61,6 +65,12 @@ namespace osu.Game.Modes.UI
         private void load()
         {
             Add(HitObjects);
+        }
+
+        public override Axes RelativeSizeAxes
+        {
+            get { return Axes.Both; }
+            set { throw new InvalidOperationException($@"{nameof(Playfield<TObject, TJudgement>)}'s {nameof(RelativeSizeAxes)} should never be changed from {Axes.Both}"); }
         }
 
         /// <summary>

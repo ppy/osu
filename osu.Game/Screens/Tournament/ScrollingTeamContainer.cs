@@ -298,7 +298,7 @@ namespace osu.Game.Screens.Tournament
         private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
             DelayReset();
-            TransformTo(speed, value, duration, easing, new TransformScrollSpeed());
+            TransformTo(() => speed, value, duration, easing, new TransformScrollSpeed());
         }
 
         private enum ScrollState

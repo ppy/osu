@@ -72,7 +72,7 @@ namespace osu.Game.Overlays
         private void updatePosition(float position)
         {
             position = MathHelper.Clamp(position, 0, 1);
-            FillContainer.TransformTo(FillContainer.Width, position, 200, EasingTypes.OutQuint, new TransformSeek());
+            FillContainer.TransformTo(() => FillContainer.Width, position, 200, EasingTypes.OutQuint, new TransformSeek());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)

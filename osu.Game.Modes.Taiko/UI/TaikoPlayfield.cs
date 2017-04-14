@@ -16,21 +16,21 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Primitives;
 using System.Linq;
 using osu.Game.Modes.Taiko.Objects.Drawables;
+using System;
 
 namespace osu.Game.Modes.Taiko.UI
 {
     public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgement>
     {
         /// <summary>
-        /// The play field height. This is relative to the size of hit objects
-        /// such that the playfield is just a bit larger than strong hits.
+        /// The default play field height.
         /// </summary>
-        public const float PLAYFIELD_HEIGHT = TaikoHitObject.CIRCLE_RADIUS * 2 * 2;
+        public const float DEFAULT_PLAYFIELD_HEIGHT = 168f;
 
         /// <summary>
         /// The offset from <see cref="left_area_size"/> which the center of the hit target lies at.
         /// </summary>
-        private const float hit_target_offset = TaikoHitObject.CIRCLE_RADIUS * 1.5f + 40;
+        private const float hit_target_offset = TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER / 2f + 40;
 
         /// <summary>
         /// The size of the left area of the playfield. This area contains the input drum.
@@ -52,13 +52,11 @@ namespace osu.Game.Modes.Taiko.UI
 
         public TaikoPlayfield()
         {
-            RelativeSizeAxes = Axes.X;
-            Height = PLAYFIELD_HEIGHT;
-
             AddInternal(new Drawable[]
             {
                 rightBackgroundContainer = new Container
                 {
+                    Name = "Transparent playfield background",
                     RelativeSizeAxes = Axes.Both,
                     BorderThickness = 2,
                     Masking = true,
@@ -77,76 +75,88 @@ namespace osu.Game.Modes.Taiko.UI
                         },
                     }
                 },
-                new Container
+                new ScaleFixContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = left_area_size },
-                    Children = new Drawable[]
+                    RelativeSizeAxes = Axes.X,
+                    Height = DEFAULT_PLAYFIELD_HEIGHT,
+                    Children = new[]
                     {
                         new Container
                         {
-                            X = hit_target_offset,
+                            Name = "Transparent playfield elements",
                             RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = left_area_size },
                             Children = new Drawable[]
                             {
-                                hitExplosionContainer = new Container<HitExplosion>
+                                new Container
                                 {
-                                    Anchor = Anchor.CentreLeft,
+                                    Name = "Hit target container",
+                                    X = hit_target_offset,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        hitExplosionContainer = new Container<HitExplosion>
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.Centre,
+                                            RelativeSizeAxes = Axes.Y,
+                                            BlendingMode = BlendingMode.Additive
+                                        },
+                                        barLineContainer = new Container<DrawableBarLine>
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new HitTarget
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.Centre,
+                                        },
+                                        hitObjectContainer = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        judgementContainer = new Container<DrawableTaikoJudgement>
+                                        {
+                                            RelativeSizeAxes = Axes.Y,
+                                            BlendingMode = BlendingMode.Additive
+                                        },
+                                    },
+                                },
+                            }
+                        },
+                        leftBackgroundContainer = new Container
+                        {
+                            Name = "Left overlay",
+                            Size = new Vector2(left_area_size, DEFAULT_PLAYFIELD_HEIGHT),
+                            BorderThickness = 1,
+                            Children = new Drawable[]
+                            {
+                                leftBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new InputDrum
+                                {
+                                    Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Size = new Vector2(TaikoHitObject.CIRCLE_RADIUS * 2),
-                                    BlendingMode = BlendingMode.Additive
+                                    RelativePositionAxes = Axes.X,
+                                    Position = new Vector2(0.10f, 0),
+                                    Scale = new Vector2(0.9f)
                                 },
-                                barLineContainer = new Container<DrawableBarLine>
+                                new Box
                                 {
-                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopRight,
+                                    RelativeSizeAxes = Axes.Y,
+                                    Width = 10,
+                                    ColourInfo = Framework.Graphics.Colour.ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.6f), Color4.Black.Opacity(0)),
                                 },
-                                new HitTarget
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.Centre,
-                                },
-                                hitObjectContainer = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                judgementContainer = new Container<DrawableTaikoJudgement>
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    BlendingMode = BlendingMode.Additive
-                                },
-                            },
-                        },
-                    }
-                },
-                leftBackgroundContainer = new Container
-                {
-                    Size = new Vector2(left_area_size, PLAYFIELD_HEIGHT),
-                    BorderThickness = 1,
-                    Children = new Drawable[]
-                    {
-                        leftBackground = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new InputDrum
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativePositionAxes = Axes.X,
-                            Position = new Vector2(0.10f, 0),
-                            Scale = new Vector2(0.9f)
-                        },
-                        new Box
-                        {
-                            Anchor = Anchor.TopRight,
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 10,
-                            ColourInfo = Framework.Graphics.Colour.ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.6f), Color4.Black.Opacity(0)),
+                            }
                         },
                     }
                 },
                 topLevelHitContainer = new Container
                 {
+                    Name = "Top level hit objects",
                     RelativeSizeAxes = Axes.Both,
                 }
             });
@@ -207,6 +217,57 @@ namespace osu.Game.Modes.Taiko.UI
             }
             else
                 hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
+        }
+
+        /// <summary>
+        /// This is a very special type of container. It serves a similar purpose to <see cref="FillMode.Fit"/>, however unlike <see cref="FillMode.Fit"/>,
+        /// this will only adjust the scale relative to the height of its parent and will maintain the original width relative to its parent.
+        /// 
+        /// <para>
+        /// By adjusting the scale relative to the height of its parent, the aspect ratio of this container's children is maintained, however this is undesirable
+        /// in the case where the hit object container should not have its width adjusted by scale. To counteract this, another container is nested inside this
+        /// container which takes care of reversing the width adjustment while appearing transparent to the user.
+        /// </para>
+        /// </summary>
+        private class ScaleFixContainer : Container
+        {
+            protected override Container<Drawable> Content => widthAdjustmentContainer;
+            private readonly WidthAdjustmentContainer widthAdjustmentContainer;
+
+            /// <summary>
+            /// We only want to apply DrawScale in the Y-axis to preserve aspect ratio and <see cref="TaikoPlayfield"/> doesn't care about having its width adjusted.
+            /// </summary>
+            protected override Vector2 DrawScale => Scale * RelativeToAbsoluteFactor.Y / DrawHeight;
+
+            public ScaleFixContainer()
+            {
+                AddInternal(widthAdjustmentContainer = new WidthAdjustmentContainer { ParentDrawScaleReference = () => DrawScale.X });
+            }
+
+            /// <summary>
+            /// The container type that reverses the <see cref="Drawable.DrawScale"/> width adjustment.
+            /// </summary>
+            private class WidthAdjustmentContainer : Container
+            {
+                /// <summary>
+                /// This container needs to know its parent's <see cref="Drawable.DrawScale"/> so it can reverse the width adjustment caused by <see cref="Drawable.DrawScale"/>.
+                /// </summary>
+                public Func<float> ParentDrawScaleReference;
+
+                public WidthAdjustmentContainer()
+                {
+                    // This container doesn't care about height, it should always fill its parent
+                    RelativeSizeAxes = Axes.Y;
+                }
+
+                protected override void Update()
+                {
+                    base.Update();
+
+                    // Reverse the DrawScale adjustment
+                    Width = Parent.DrawSize.X / ParentDrawScaleReference();
+                }
+            }
         }
     }
 }
