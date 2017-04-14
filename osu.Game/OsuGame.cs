@@ -58,7 +58,8 @@ namespace osu.Game
 
         private VolumeControl volume;
 
-        public Bindable<Ruleset> Ruleset;
+        private Bindable<int> configRuleset;
+        public Bindable<Ruleset> Ruleset = new Bindable<Ruleset>();
 
         private readonly string[] args;
 
@@ -88,8 +89,9 @@ namespace osu.Game
 
             Dependencies.Cache(this);
 
-            // Todo: I don't think this'll work, need BindableRuleset
-            Ruleset = new Bindable<Ruleset>();
+            configRuleset = LocalConfig.GetBindable<int>(OsuConfig.Ruleset);
+            Ruleset.Value = RulesetCollection.GetRuleset(configRuleset.Value);
+            Ruleset.ValueChanged += r => configRuleset.Value = RulesetCollection.GetId(r);
         }
 
         private ScheduledDelegate scoreLoad;

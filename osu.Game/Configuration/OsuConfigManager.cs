@@ -17,6 +17,8 @@ namespace osu.Game.Configuration
             Set(OsuConfig.Username, string.Empty);
             Set(OsuConfig.Token, string.Empty);
 
+            Set(OsuConfig.Ruleset, 0, 0, int.MaxValue);
+
             Set(OsuConfig.AudioDevice, string.Empty);
             Set(OsuConfig.SavePassword, false);
             Set(OsuConfig.SaveUsername, true);

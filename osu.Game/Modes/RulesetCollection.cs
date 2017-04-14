@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Modes
 {
@@ -30,6 +31,8 @@ namespace osu.Game.Modes
 
             return ruleset;
         }
+
+        public static int GetId(Ruleset ruleset) => available_rulesets.First(kvp => kvp.Value == ruleset).Key;
 
         public static IEnumerable<Ruleset> AllRulesets => available_rulesets.Values;
     }
