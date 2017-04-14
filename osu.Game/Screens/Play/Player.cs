@@ -126,6 +126,8 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.Progress.Objects = HitRenderer.Objects;
             hudOverlay.Progress.AudioClock = interpolatedSourceClock;
+            if (HitRenderer.HasReplayLoaded)
+                hudOverlay.ShowProgress();
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
