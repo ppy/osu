@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using System;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -15,6 +14,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override double RollingDuration => 1000;
         protected override EasingTypes RollingEasing => EasingTypes.Out;
+
+        public bool UseCommaSeparator;
 
         /// <summary>
         /// How many leading zeroes the counter has.
@@ -43,8 +44,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override string FormatCount(double count)
         {
             string format = new string('0', (int)LeadingZeroes);
-            for (int i = format.Length - 3; i > 0; i -= 3)
-                format = format.Insert(i, @",");
+            if (UseCommaSeparator)
+                for (int i = format.Length - 3; i > 0; i -= 3)
+                    format = format.Insert(i, @",");
 
             return ((long)count).ToString(format);
         }
