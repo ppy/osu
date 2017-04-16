@@ -51,6 +51,7 @@ namespace osu.Game.Screens.Play
 
         private Ruleset ruleset;
         private AudioManager audio;
+        private Track track;
 
         private ScoreProcessor scoreProcessor;
         protected HitRenderer HitRenderer;
@@ -61,6 +62,7 @@ namespace osu.Game.Screens.Play
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
         private Container gameplayContainer;
+        private HotkeyRetryOverlay hotkeyRetryOverlay;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
@@ -104,7 +106,22 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both
             };
 
+            track = Beatmap.Track;
+
+            if (track != null)
+            {
+                audio.Track.SetExclusive(track);
+                sourceClock = track;
+            }
+
+            sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
+
             start();
+
+            Schedule(() =>
+            {
+                sourceClock.Reset();
+            });
 
             Add(new Drawable[]
             {
@@ -124,7 +141,7 @@ namespace osu.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = Exit,
                 },
-                new HotkeyRetryOverlay
+                hotkeyRetryOverlay = new HotkeyRetryOverlay
                 {
                     Action = () => {
                         //we want to hide the hitrenderer immediately (looks better).
@@ -165,23 +182,8 @@ namespace osu.Game.Screens.Play
 
         private void start()
         {
-
-            Track track = Beatmap.Track;
-
-            if (track != null)
-            {
-                audio.Track.SetExclusive(track);
-                sourceClock = track;
-            }
-
-            sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
             interpolatedSourceClock = new InterpolatingFramedClock(sourceClock);
-
-            Schedule(() =>
-            {
-                sourceClock.Reset();
-            });
-
+            track.Reset();
             hudOverlay = new StandardHudOverlay()
             {
                 Anchor = Anchor.Centre,
@@ -270,6 +272,7 @@ namespace osu.Game.Screens.Play
             HasFailed = false;
             RestartCount += 1;
             OnEntering(this);
+            hotkeyRetryOverlay.Reset();
         }
 
         private ScheduledDelegate onCompletionEvent;
