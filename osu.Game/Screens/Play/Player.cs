@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Play
             }
 
             ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
-            
+
             gameplayContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both
