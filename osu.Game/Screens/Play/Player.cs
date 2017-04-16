@@ -50,7 +50,6 @@ namespace osu.Game.Screens.Play
         private IFrameBasedClock interpolatedSourceClock;
 
         private Ruleset ruleset;
-        private AudioManager audio;
         private Track track;
 
         private ScoreProcessor scoreProcessor;
