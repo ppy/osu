@@ -73,6 +73,7 @@ namespace osu.Game.Screens.Play
             base.Update();
             if (!fired && overlay.Alpha == 1)
             {
+                fired = true;
                 retrySample.Play();
                 Action?.Invoke();
             }
