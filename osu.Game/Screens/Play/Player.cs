@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Play
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
 
-            if (Children.Count() > 0)
+            if (Children.Any())
                 Clear();
 
             Add(new Drawable[]
@@ -255,20 +255,11 @@ namespace osu.Game.Screens.Play
 
         public void Restart()
         {
-            sourceClock.Stop(); // If the clock is running and Restart is called the game will lag until relaunch
-
-            var newPlayer = new Player();
-
-            ValidForResume = false;
-
-            LoadComponentAsync(newPlayer, delegate
-            {
-                newPlayer.RestartCount = RestartCount + 1;
-                if (!Push(newPlayer))
-                {
-                    // Error(?)
-                }
-            });
+            start();
+            lastPauseActionTime = 0;
+            HasFailed = false;
+            RestartCount += 1;
+            OnEntering(this);
         }
 
         private ScheduledDelegate onCompletionEvent;
