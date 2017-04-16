@@ -60,6 +60,7 @@ namespace osu.Game.Screens.Play
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
+        private Container gameplayContainer;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
@@ -96,7 +97,43 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
+            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
+            
+            gameplayContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both
+            };
+
             start();
+
+            Add(new Drawable[]
+            {
+                gameplayContainer,
+                pauseOverlay = new PauseOverlay
+                {
+                    OnResume = delegate
+                    {
+                        Delay(400);
+                        Schedule(Resume);
+                    },
+                    OnRetry = Restart,
+                    OnQuit = Exit,
+                },
+                failOverlay = new FailOverlay
+                {
+                    OnRetry = Restart,
+                    OnQuit = Exit,
+                },
+                new HotkeyRetryOverlay
+                {
+                    Action = () => {
+                        //we want to hide the hitrenderer immediately (looks better).
+                        //we may be able to remove this once the mouse cursor trail is improved.
+                        HitRenderer?.Hide();
+                        Restart();
+                    },
+                }
+            });
         }
 
         private void initializeSkipButton()
@@ -126,9 +163,9 @@ namespace osu.Game.Screens.Play
             skipButton.Expire();
         }
 
-        // TODO: Optimize some more
         private void start()
         {
+
             Track track = Beatmap.Track;
 
             if (track != null)
@@ -145,16 +182,14 @@ namespace osu.Game.Screens.Play
                 sourceClock.Reset();
             });
 
-            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
-            HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
-
-            scoreProcessor = HitRenderer.CreateScoreProcessor();
-
             hudOverlay = new StandardHudOverlay()
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             };
+
+            HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+            scoreProcessor = HitRenderer.CreateScoreProcessor();
 
             hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
@@ -169,50 +204,25 @@ namespace osu.Game.Screens.Play
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
 
-            if (Children.Any())
-                Clear();
-
-            Add(new Drawable[]
-            {
-                new Container
+            gameplayContainer.Clear();
+            gameplayContainer.Add(new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Clock = interpolatedSourceClock,
-                    Children = new Drawable[]
+                    new Container
                     {
-                        HitRenderer,
-                        skipButton = new SkipButton
+                        RelativeSizeAxes = Axes.Both,
+                        Clock = interpolatedSourceClock,
+                        Children = new Drawable[]
                         {
-                            Alpha = 0
-                        },
-                    }
-                },
-                hudOverlay,
-                pauseOverlay = new PauseOverlay
-                {
-                    OnResume = delegate
-                    {
-                        Delay(400);
-                        Schedule(Resume);
+                            HitRenderer,
+                            skipButton = new SkipButton
+                            {
+                                Alpha = 0
+                            },
+                        }
                     },
-                    OnRetry = Restart,
-                    OnQuit = Exit,
-                },
-                failOverlay = new FailOverlay
-                {
-                    OnRetry = Restart,
-                    OnQuit = Exit,
-                },
-                new HotkeyRetryOverlay
-                {
-                    Action = () => {
-                        //we want to hide the hitrenderer immediately (looks better).
-                        //we may be able to remove this once the mouse cursor trail is improved.
-                        HitRenderer?.Hide();
-                        Restart();
-                    },
+                    hudOverlay
                 }
-            });
+            );
         }
 
         public void Pause(bool force = false)
