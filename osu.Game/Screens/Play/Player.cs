@@ -50,6 +50,7 @@ namespace osu.Game.Screens.Play
         private IFrameBasedClock interpolatedSourceClock;
 
         private Ruleset ruleset;
+        private AudioManager audio;
 
         private ScoreProcessor scoreProcessor;
         protected HitRenderer HitRenderer;
@@ -63,6 +64,8 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
         {
+            this.audio = audio;
+
             if (Beatmap.Beatmap.BeatmapInfo?.Mode > PlayMode.Taiko)
             {
                 //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
@@ -93,6 +96,39 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
+            start();
+        }
+
+        private void initializeSkipButton()
+        {
+            const double skip_required_cutoff = 3000;
+            const double fade_time = 300;
+
+            double firstHitObject = Beatmap.Beatmap.HitObjects.First().StartTime;
+
+            if (firstHitObject < skip_required_cutoff)
+            {
+                skipButton.Alpha = 0;
+                skipButton.Expire();
+                return;
+            }
+
+            skipButton.FadeInFromZero(fade_time);
+
+            skipButton.Action = () =>
+            {
+                sourceClock.Seek(firstHitObject - skip_required_cutoff - fade_time);
+                skipButton.Action = null;
+            };
+
+            skipButton.Delay(firstHitObject - skip_required_cutoff - fade_time);
+            skipButton.FadeOut(fade_time);
+            skipButton.Expire();
+        }
+
+        // TODO: Optimize some more
+        private void start()
+        {
             Track track = Beatmap.Track;
 
             if (track != null)
@@ -133,7 +169,10 @@ namespace osu.Game.Screens.Play
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
 
-            Children = new Drawable[]
+            if (Children.Count() > 0)
+                Clear();
+
+            Add(new Drawable[]
             {
                 new Container
                 {
@@ -173,34 +212,7 @@ namespace osu.Game.Screens.Play
                         Restart();
                     },
                 }
-            };
-        }
-
-        private void initializeSkipButton()
-        {
-            const double skip_required_cutoff = 3000;
-            const double fade_time = 300;
-
-            double firstHitObject = Beatmap.Beatmap.HitObjects.First().StartTime;
-
-            if (firstHitObject < skip_required_cutoff)
-            {
-                skipButton.Alpha = 0;
-                skipButton.Expire();
-                return;
-            }
-
-            skipButton.FadeInFromZero(fade_time);
-
-            skipButton.Action = () =>
-            {
-                sourceClock.Seek(firstHitObject - skip_required_cutoff - fade_time);
-                skipButton.Action = null;
-            };
-
-            skipButton.Delay(firstHitObject - skip_required_cutoff - fade_time);
-            skipButton.FadeOut(fade_time);
-            skipButton.Expire();
+            });
         }
 
         public void Pause(bool force = false)
