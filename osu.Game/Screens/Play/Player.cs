@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Play
         private void start()
         {
             interpolatedSourceClock = new InterpolatingFramedClock(sourceClock);
-            track.Reset();
+            track?.Reset();
             hudOverlay = new StandardHudOverlay()
             {
                 Anchor = Anchor.Centre,
