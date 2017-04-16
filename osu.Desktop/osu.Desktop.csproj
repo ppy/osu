@@ -63,6 +63,7 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <Commandlineparameters>
     </Commandlineparameters>
+    <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
