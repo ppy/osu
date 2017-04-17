@@ -7,8 +7,8 @@ using System.IO;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Modes.Objects;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps.Formats
 {

@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Game.Modes.Objects;
 using osu.Game.Database;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps.Formats
 {

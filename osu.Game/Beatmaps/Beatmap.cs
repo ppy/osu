@@ -4,8 +4,8 @@
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
-using osu.Game.Modes.Objects;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {

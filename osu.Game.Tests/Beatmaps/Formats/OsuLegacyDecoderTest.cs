@@ -7,9 +7,9 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Tests.Resources;
-using osu.Game.Modes.Objects.Legacy;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {

@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Game.Modes.Objects;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests

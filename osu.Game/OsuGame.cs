@@ -25,8 +25,8 @@ using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Modes.Scoring;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game

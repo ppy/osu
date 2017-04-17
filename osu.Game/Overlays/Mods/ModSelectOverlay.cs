@@ -13,11 +13,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Database;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
 {

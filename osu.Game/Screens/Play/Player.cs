@@ -14,14 +14,14 @@ using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Modes.UI;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
 using osu.Framework.Threading;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play
 {
