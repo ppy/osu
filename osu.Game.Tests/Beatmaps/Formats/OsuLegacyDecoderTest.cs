@@ -6,7 +6,6 @@ using NUnit.Framework;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Modes;
 using osu.Game.Tests.Resources;
 using osu.Game.Modes.Osu;
 using osu.Game.Modes.Objects.Legacy;
@@ -22,7 +21,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void SetUp()
         {
             OsuLegacyDecoder.Register();
-            RulesetCollection.Register(typeof(OsuRuleset));
         }
 
         [Test]
@@ -58,7 +56,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(false, beatmapInfo.Countdown);
                 Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
                 Assert.AreEqual(false, beatmapInfo.SpecialStyle);
-                Assert.IsTrue(beatmapInfo.Ruleset is OsuRuleset);
+                Assert.IsTrue(beatmapInfo.Ruleset.CreateInstance() is OsuRuleset);
                 Assert.AreEqual(false, beatmapInfo.LetterboxInBreaks);
                 Assert.AreEqual(false, beatmapInfo.WidescreenStoryboard);
             }

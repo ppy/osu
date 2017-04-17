@@ -90,5 +90,7 @@ namespace osu.Game.Modes.Catch
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new CatchDifficultyCalculator(beatmap);
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
+
+        public override int LegacyID => 2;
     }
 }

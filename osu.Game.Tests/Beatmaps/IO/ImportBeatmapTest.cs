@@ -12,11 +12,7 @@ using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IPC;
-using osu.Game.Modes;
-using osu.Game.Modes.Catch;
-using osu.Game.Modes.Mania;
 using osu.Game.Modes.Osu;
-using osu.Game.Modes.Taiko;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -24,15 +20,6 @@ namespace osu.Game.Tests.Beatmaps.IO
     public class ImportBeatmapTest
     {
         private const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
-
-        [OneTimeSetUp]
-        public void SetUp()
-        {
-            RulesetCollection.Register(typeof(OsuRuleset));
-            RulesetCollection.Register(typeof(TaikoRuleset));
-            RulesetCollection.Register(typeof(ManiaRuleset));
-            RulesetCollection.Register(typeof(CatchRuleset));
-        }
 
         [Test]
         public void TestImportWhenClosed()
@@ -166,7 +153,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Assert.IsTrue(set.Beatmaps.Count > 0);
 
-            var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.Ruleset is OsuRuleset))?.Beatmap;
+            var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.Ruleset.CreateInstance() is OsuRuleset))?.Beatmap;
 
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
         }

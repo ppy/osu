@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Play
                 sourceClock.Reset();
             });
 
-            ruleset = Beatmap.BeatmapInfo.Ruleset;
+            ruleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance();
 
             // Todo: This should be done as early as possible, and should check if the hit renderer
             // can actually convert the hit objects... Somehow...

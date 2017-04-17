@@ -91,5 +91,7 @@ namespace osu.Game.Modes.Taiko
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new TaikoDifficultyCalculator(beatmap);
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
+
+        public override int LegacyID => 1;
     }
 }

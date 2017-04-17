@@ -4,11 +4,6 @@
 using NUnit.Framework;
 using osu.Desktop.VisualTests;
 using osu.Framework.Desktop.Platform;
-using osu.Game.Modes;
-using osu.Game.Modes.Catch;
-using osu.Game.Modes.Mania;
-using osu.Game.Modes.Osu;
-using osu.Game.Modes.Taiko;
 
 namespace osu.Desktop.Tests
 {
@@ -20,11 +15,6 @@ namespace osu.Desktop.Tests
         {
             using (var host = new HeadlessGameHost())
             {
-                RulesetCollection.Register(typeof(OsuRuleset));
-                RulesetCollection.Register(typeof(TaikoRuleset));
-                RulesetCollection.Register(typeof(ManiaRuleset));
-                RulesetCollection.Register(typeof(CatchRuleset));
-
                 host.Run(new AutomatedVisualTestGame());
             }
         }

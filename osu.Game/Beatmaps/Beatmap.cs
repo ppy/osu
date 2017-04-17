@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps
         /// Calculates the star difficulty for this Beatmap.
         /// </summary>
         /// <returns>The star difficulty.</returns>
-        public double CalculateStarDifficulty() => BeatmapInfo.Ruleset.CreateDifficultyCalculator(this).Calculate();
+        public double CalculateStarDifficulty() => BeatmapInfo.Ruleset.CreateInstance().CreateDifficultyCalculator(this).Calculate();
 
         /// <summary>
         /// Constructs a new beatmap.

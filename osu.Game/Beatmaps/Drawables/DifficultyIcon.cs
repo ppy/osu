@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Origin = Anchor.Centre,
                     TextSize = Size.X,
                     Colour = Color4.White,
-                    Icon = beatmap.Ruleset.Icon
+                    Icon = beatmap.Ruleset.CreateInstance().Icon
                 }
             };
         }

@@ -16,7 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Input;
-using osu.Game.Modes;
+using osu.Game.Database;
 
 namespace osu.Game.Screens.Select
 {
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private readonly Bindable<Ruleset> ruleset = new Bindable<Ruleset>(RulesetCollection.GetRuleset(0));
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         [BackgroundDependencyLoader(permitNulls:true)]
         private void load(OsuColour colours, OsuGame osu)

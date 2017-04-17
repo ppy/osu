@@ -20,7 +20,6 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Modes;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select.Options;
@@ -29,7 +28,7 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
-        private readonly Bindable<Ruleset> ruleset = new Bindable<Ruleset>(RulesetCollection.GetRuleset(0));
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private BeatmapDatabase database;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 

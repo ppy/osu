@@ -79,6 +79,7 @@
     <Compile Include="Beatmaps\Timing\TimingInfo.cs" />
     <Compile Include="Database\BeatmapMetrics.cs" />
     <Compile Include="Database\Database.cs" />
+    <Compile Include="Database\RulesetInfo.cs" />
     <Compile Include="Database\ScoreDatabase.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="IO\Legacy\SerializationWriter.cs" />
     <Compile Include="IO\Serialization\IJsonSerializable.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
+    <Compile Include="Modes\BeatmapStatistic.cs" />
     <Compile Include="Modes\Replays\Replay.cs" />
     <Compile Include="Modes\Judgements\DrawableJudgement.cs" />
     <Compile Include="Modes\Judgements\IPartialJudgement.cs" />
@@ -133,7 +135,7 @@
     <Compile Include="Modes\Objects\Legacy\LegacyHitObjectType.cs" />
     <Compile Include="Modes\Replays\ReplayButtonState.cs" />
     <Compile Include="Modes\Replays\ReplayFrame.cs" />
-    <Compile Include="Modes\RulesetCollection.cs" />
+    <Compile Include="Database\RulesetDatabase.cs" />
     <Compile Include="Modes\Scoring\Score.cs" />
     <Compile Include="Modes\Scoring\ScoreProcessor.cs" />
     <Compile Include="Modes\UI\HealthDisplay.cs" />

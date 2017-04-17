@@ -3,12 +3,13 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Modes;
+using osu.Game.Database;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.Toolbar
         private readonly Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
-        public Action<Ruleset> OnRulesetChange;
+        public Action<RulesetInfo> OnRulesetChange;
 
         public ToolbarModeSelector()
         {
@@ -62,8 +63,12 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             };
+        }
 
-            foreach (var ruleset in RulesetCollection.AllRulesets)
+        [BackgroundDependencyLoader]
+        private void load(RulesetDatabase rulesets)
+        {
+            foreach (var ruleset in rulesets.AllRulesets)
             {
                 modeButtons.Add(new ToolbarModeButton
                 {
@@ -84,11 +89,11 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
-        public void SetGameMode(Ruleset ruleset)
+        public void SetGameMode(RulesetInfo ruleset)
         {
             foreach (ToolbarModeButton m in modeButtons.Children.Cast<ToolbarModeButton>())
             {
-                bool isActive = m.Ruleset == ruleset;
+                bool isActive = m.Ruleset.ID == ruleset.ID;
                 m.Active = isActive;
                 if (isActive)
                     activeButton = m;
