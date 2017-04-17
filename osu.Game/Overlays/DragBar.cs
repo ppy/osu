@@ -13,7 +13,7 @@ namespace osu.Game.Overlays
 {
     public class DragBar : Container
     {
-        private readonly Box fill;
+        protected readonly Container Fill;
 
         public Action<float> SeekRequested;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
             {
                 enabled = value;
                 if (!enabled)
-                    fill.Width = 0;
+                    Fill.Width = 0;
             }
         }
 
@@ -37,12 +37,20 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                fill = new Box
+                Fill = new Container
                 {
-                    Origin = Anchor.CentreLeft,
-                    Anchor = Anchor.CentreLeft,
+                    Name = "FillContainer",
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0
+                    Width = 0,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    }
                 }
             };
         }
@@ -51,21 +59,23 @@ namespace osu.Game.Overlays
         {
             if (IsSeeking || !IsEnabled) return;
 
-            updatePosition(position);
+            updatePosition(position, false);
         }
 
         private void seek(InputState state)
         {
-            if (!IsEnabled) return;
             float seekLocation = state.Mouse.Position.X / DrawWidth;
+
+            if (!IsEnabled) return;
+
             SeekRequested?.Invoke(seekLocation);
             updatePosition(seekLocation);
         }
 
-        private void updatePosition(float position)
+        private void updatePosition(float position, bool easing = true)
         {
             position = MathHelper.Clamp(position, 0, 1);
-            fill.TransformTo(() => fill.Width, position, 200, EasingTypes.OutQuint, new TransformSeek());
+            Fill.TransformTo(() => Fill.Width, position, easing ? 200 : 0, EasingTypes.OutQuint, new TransformSeek());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
