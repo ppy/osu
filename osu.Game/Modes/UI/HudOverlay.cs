@@ -28,12 +28,9 @@ namespace osu.Game.Modes.UI
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
 
-        private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
-        private Bindable<bool> showProgress;
 
         private static bool hasShownNotificationOnce;
-        private bool hasForcedProgressVisibility;
 
         protected abstract KeyCounterCollection CreateKeyCounter();
         protected abstract RollingCounter<int> CreateComboCounter();
@@ -65,16 +62,6 @@ namespace osu.Game.Modes.UI
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, NotificationManager notificationManager)
         {
-            showKeyCounter = config.GetBindable<bool>(OsuConfig.KeyOverlay);
-            showKeyCounter.ValueChanged += keyCounterVisibility =>
-            {
-                if (keyCounterVisibility)
-                    KeyCounter.FadeIn(duration);
-                else
-                    KeyCounter.FadeOut(duration);
-            };
-            showKeyCounter.TriggerChange();
-
             showHud = config.GetBindable<bool>(OsuConfig.ShowInterface);
             showHud.ValueChanged += hudVisibility =>
             {
@@ -85,25 +72,6 @@ namespace osu.Game.Modes.UI
             };
             showHud.TriggerChange();
 
-            showProgress = config.GetBindable<bool>(OsuConfig.ShowProgress);
-            showProgress.ValueChanged += progressVisibility =>
-            {
-                if (progressVisibility)
-                {
-                    Progress.FadeIn(duration);
-                    KeyCounter.MoveToY(-TwoLayerButton.SIZE_RETRACTED.Y, duration);
-                }
-                else
-                {
-                    if (!hasForcedProgressVisibility)
-                    {
-                        Progress.FadeOut(duration);
-                        KeyCounter.MoveToY(0, duration);
-                    }
-                }
-            };
-            showProgress.TriggerChange();
-
             if (!showHud && !hasShownNotificationOnce)
             {
                 hasShownNotificationOnce = true;
@@ -112,23 +80,6 @@ namespace osu.Game.Modes.UI
                 {
                     Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
                 });
-            }
-        }
-
-        public void ForceProgressVisibility()
-        {
-            hasForcedProgressVisibility = true;
-            Progress.FadeIn(duration);
-            KeyCounter.MoveToY(-TwoLayerButton.SIZE_RETRACTED.Y, duration);
-        }
-
-        public void HideProgress()
-        {
-            hasForcedProgressVisibility = false;
-            if (!showProgress)
-            {
-                Progress.FadeOut(duration);
-                KeyCounter.MoveToY(0, duration);
             }
         }
 

@@ -6,17 +6,37 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK.Graphics;
 using osu.Framework.Input;
+using osu.Framework.Allocation;
+using osu.Game.Configuration;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Screens.Play
 {
     public class KeyCounterCollection : FillFlowContainer<KeyCounter>
     {
+        private const int duration = 100;
+        private Bindable<bool> showKeyCounter;
+
         public KeyCounterCollection()
         {
             AlwaysReceiveInput = true;
 
             Direction = FillDirection.Horizontal;
             AutoSizeAxes = Axes.Both;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            showKeyCounter = config.GetBindable<bool>(OsuConfig.KeyOverlay);
+            showKeyCounter.ValueChanged += keyCounterVisibility =>
+            {
+                if (keyCounterVisibility)
+                    FadeIn(duration);
+                else
+                    FadeOut(duration);
+            };
+            showKeyCounter.TriggerChange();
         }
 
         public override void Add(KeyCounter key)
