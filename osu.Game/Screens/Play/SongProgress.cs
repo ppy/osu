@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
         }
 
         private bool hasForcedVisibility;
-        public bool HasForcedVisibility
+        public bool ForceVisibility
         {
             set
             {

@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.Objects = HitRenderer.Objects;
             hudOverlay.Progress.AudioClock = interpolatedSourceClock;
             if (HitRenderer.HasReplayLoaded)
-                hudOverlay.Progress.HasForcedVisibility = true;
+                hudOverlay.Progress.ForceVisibility = true;
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Play
 
                 lastPauseActionTime = Time.Current;
                 hudOverlay.KeyCounter.IsCounting = false;
-                hudOverlay.Progress.HasForcedVisibility = true;
+                hudOverlay.Progress.ForceVisibility = true;
                 pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
             });
@@ -238,7 +238,7 @@ namespace osu.Game.Screens.Play
         {
             lastPauseActionTime = Time.Current;
             hudOverlay.KeyCounter.IsCounting = true;
-            hudOverlay.Progress.HasForcedVisibility = false;
+            hudOverlay.Progress.ForceVisibility = false;
             pauseOverlay.Hide();
             sourceClock.Start();
         }
@@ -286,7 +286,7 @@ namespace osu.Game.Screens.Play
             sourceClock.Stop();
 
             HasFailed = true;
-            hudOverlay.Progress.HasForcedVisibility = true;
+            hudOverlay.Progress.ForceVisibility = true;
             failOverlay.Retries = RestartCount;
             failOverlay.Show();
         }
