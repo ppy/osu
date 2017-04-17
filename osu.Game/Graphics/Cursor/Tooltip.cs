@@ -39,8 +39,28 @@ namespace osu.Game.Graphics.Cursor
             }
         }
 
+        public IMouseState MouseState
+        {
+            set
+            {
+                if (value.Position != value.LastPosition && overhang?.Overhanging != true)
+                {
+                    show?.Cancel();
+                    TooltipText = string.Empty;
+                    IHasTooltip hasTooltip = input.HoveredDrawables.OfType<IHasTooltip>().FirstOrDefault();
+                    if (hasTooltip != null)
+                    {
+                        IHasDelayedTooltip delayedTooltip = hasTooltip as IHasDelayedTooltip;
+                        overhang = hasTooltip as IHasOverhangingTooltip;
+                        show = Scheduler.AddDelayed(() => TooltipText = hasTooltip.Tooltip, delayedTooltip?.Delay ?? 250);
+                    }
+                }
+            }
+        }
+
         public Tooltip()
         {
+            AlwaysPresent = true;
             Children = new[]
             {
                 new Container
@@ -48,7 +68,6 @@ namespace osu.Game.Graphics.Cursor
                     AutoSizeAxes = Axes.Both,
                     CornerRadius = 5,
                     Masking = true,
-                    AlwaysPresent = true,
                     EdgeEffect = new EdgeEffect
                     {
                         Type = EdgeEffectType.Shadow,
@@ -78,23 +97,11 @@ namespace osu.Game.Graphics.Cursor
             tooltipBackground.Colour = colour.Gray3;
         }
 
-        public void UpdateTooltip(InputState state)
+        protected override void Update()
         {
             Scheduler.Update();
             if (overhang?.Overhanging ?? false)
                 TooltipText = overhang.Tooltip;
-            else if (state.Mouse.Position != state.Mouse.LastPosition)
-            {
-                show?.Cancel();
-                TooltipText = string.Empty;
-                IHasTooltip hasTooltip = input.HoveredDrawables.OfType<IHasTooltip>().FirstOrDefault();
-                if (hasTooltip != null)
-                {
-                    IHasDelayedTooltip delayedTooltip = hasTooltip as IHasDelayedTooltip;
-                    overhang = hasTooltip as IHasOverhangingTooltip;
-                    show = Scheduler.AddDelayed(() => TooltipText = hasTooltip.Tooltip, delayedTooltip?.Delay ?? 250);
-                }
-            }
             else if (overhang != null)
             {
                 overhang = null;

@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.Cursor
             }
 
             tooltip.Position = new Vector2(state.Mouse.Position.X,ActiveCursor.BoundingBox.Bottom);
-            tooltip.UpdateTooltip(state);
+            tooltip.MouseState = state.Mouse;
 
             return base.OnMouseMove(state);
         }
