@@ -86,8 +86,8 @@ namespace osu.Game
 
             SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
 
-            Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, connection, Host));
             Dependencies.Cache(RulesetDatabase = new RulesetDatabase(Host.Storage, connection));
+            Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, connection, RulesetDatabase, Host));
             Dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, connection, Host, BeatmapDatabase));
             Dependencies.Cache(new OsuColour());
 

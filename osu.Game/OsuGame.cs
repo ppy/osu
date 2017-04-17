@@ -91,7 +91,7 @@ namespace osu.Game
 
             configRuleset = LocalConfig.GetBindable<int>(OsuConfig.Ruleset);
             Ruleset.Value = RulesetDatabase.GetRuleset(configRuleset.Value);
-            Ruleset.ValueChanged += r => configRuleset.Value = r.ID;
+            Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
         }
 
         private ScheduledDelegate scoreLoad;

@@ -10,7 +10,7 @@ namespace osu.Game.Database
     public class RulesetInfo
     {
         [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
+        public int? ID { get; set; }
 
         public string Name { get; set; }
 

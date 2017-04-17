@@ -49,13 +49,16 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu)
+        private void load(OsuColour colours, OsuGame osu, RulesetDatabase rulesets)
         {
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
 
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
+            else
+                Ruleset.Value = rulesets.AllRulesets.First();
+
             Ruleset.ValueChanged += rulesetChanged;
             Ruleset.TriggerChange();
         }

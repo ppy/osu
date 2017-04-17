@@ -7,7 +7,6 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Tests.Resources;
-using osu.Game.Modes.Osu;
 using osu.Game.Modes.Objects.Legacy;
 using System.Linq;
 using osu.Game.Audio;
@@ -56,7 +55,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(false, beatmapInfo.Countdown);
                 Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
                 Assert.AreEqual(false, beatmapInfo.SpecialStyle);
-                Assert.IsTrue(beatmapInfo.Ruleset.CreateInstance() is OsuRuleset);
+                Assert.IsTrue(beatmapInfo.RulesetID == 0);
                 Assert.AreEqual(false, beatmapInfo.LetterboxInBreaks);
                 Assert.AreEqual(false, beatmapInfo.WidescreenStoryboard);
             }

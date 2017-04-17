@@ -24,9 +24,14 @@ namespace osu.Game.Database
         {
         }
 
-        protected override void Prepare()
+        protected override void Prepare(bool reset = false)
         {
             Connection.CreateTable<RulesetInfo>();
+
+            if (reset)
+            {
+                Connection.DeleteAll<RulesetInfo>();
+            }
 
             List<Ruleset> instances = new List<Ruleset>();
 
@@ -39,8 +44,6 @@ namespace osu.Game.Database
 
                     if (rulesets.Count() != 1)
                         continue;
-
-                    Assembly.LoadFile(file);
 
                     foreach (Type rulesetType in rulesets)
                         instances.Add((Ruleset)Activator.CreateInstance(rulesetType));
@@ -84,8 +87,6 @@ namespace osu.Game.Database
             }
 
             Connection.Commit();
-
-            
         }
 
         private RulesetInfo createRulesetInfo(Ruleset ruleset) => new RulesetInfo
@@ -94,11 +95,6 @@ namespace osu.Game.Database
             InstantiationInfo = ruleset.GetType().AssemblyQualifiedName,
             ID = ruleset.LegacyID
         };
-
-        public override void Reset()
-        {
-            Connection.DeleteAll<RulesetInfo>();
-        }
 
         protected override Type[] ValidTypes => new[] { typeof(RulesetInfo) };
 

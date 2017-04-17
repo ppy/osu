@@ -19,6 +19,7 @@ namespace osu.Game.Database
 {
     public class BeatmapDatabase : Database
     {
+        private readonly RulesetDatabase rulesets;
 
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
@@ -26,8 +27,9 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
 
-        public BeatmapDatabase(Storage storage, SQLiteConnection connection, IIpcHost importHost = null) : base(storage, connection)
+        public BeatmapDatabase(Storage storage, SQLiteConnection connection, RulesetDatabase rulesets, IIpcHost importHost = null) : base(storage, connection)
         {
+            this.rulesets = rulesets;
             if (importHost != null)
                 ipc = new BeatmapIPCChannel(importHost, this);
         }
@@ -64,30 +66,30 @@ namespace osu.Game.Database
             Connection.Query<BeatmapSetInfo>("UPDATE BeatmapSetInfo SET DeletePending = 0 WHERE DeletePending IS NULL");
         }
 
-        protected override void Prepare()
+        protected override void Prepare(bool reset = false)
         {
             Connection.CreateTable<BeatmapMetadata>();
             Connection.CreateTable<BeatmapDifficulty>();
             Connection.CreateTable<BeatmapSetInfo>();
             Connection.CreateTable<BeatmapInfo>();
 
-            deletePending();
-        }
-
-        public override void Reset()
-        {
-            Storage.DeleteDatabase(@"beatmaps");
-
-            foreach (var setInfo in Query<BeatmapSetInfo>())
+            if (reset)
             {
-                if (Storage.Exists(setInfo.Path))
-                    Storage.Delete(setInfo.Path);
+                Storage.DeleteDatabase(@"beatmaps");
+
+                foreach (var setInfo in Query<BeatmapSetInfo>())
+                {
+                    if (Storage.Exists(setInfo.Path))
+                        Storage.Delete(setInfo.Path);
+                }
+
+                Connection.DeleteAll<BeatmapMetadata>();
+                Connection.DeleteAll<BeatmapDifficulty>();
+                Connection.DeleteAll<BeatmapSetInfo>();
+                Connection.DeleteAll<BeatmapInfo>();
             }
 
-            Connection.DeleteAll<BeatmapMetadata>();
-            Connection.DeleteAll<BeatmapDifficulty>();
-            Connection.DeleteAll<BeatmapSetInfo>();
-            Connection.DeleteAll<BeatmapInfo>();
+            deletePending();
         }
 
         protected override Type[] ValidTypes => new[] {
@@ -216,7 +218,10 @@ namespace osu.Game.Database
                         // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                         beatmap.BeatmapInfo.Metadata = null;
 
-                        beatmap.BeatmapInfo.StarDifficulty = beatmap.CalculateStarDifficulty();
+                        // TODO: this should be done in a better place once we actually need to dynamically update it.
+                        beatmap.BeatmapInfo.StarDifficulty = rulesets.Query<RulesetInfo>().FirstOrDefault(r => r.ID == beatmap.BeatmapInfo.RulesetID)?.CreateInstance()?.CreateDifficultyCalculator(beatmap).Calculate() ?? 0;
+
+                        beatmap.BeatmapInfo.Ruleset = null;
 
                         beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                     }
