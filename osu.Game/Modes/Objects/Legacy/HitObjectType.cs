@@ -6,7 +6,7 @@ using System;
 namespace osu.Game.Modes.Objects.Legacy
 {
     [Flags]
-    public enum LegacyHitObjectType
+    public enum HitObjectType
     {
         Circle = 1 << 0,
         Slider = 1 << 1,

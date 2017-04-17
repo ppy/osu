@@ -10,6 +10,8 @@ using osu.Game.Tests.Resources;
 using osu.Game.Modes.Objects.Legacy;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -130,16 +132,22 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             {
                 var beatmap = decoder.Decode(new StreamReader(stream));
-                var slider = beatmap.HitObjects[0] as LegacySlider;
-                Assert.IsNotNull(slider);
-                Assert.AreEqual(new Vector2(192, 168), slider.Position);
-                Assert.AreEqual(956, slider.StartTime);
-                Assert.IsTrue(slider.Samples.Any(s => s.Name == SampleInfo.HIT_NORMAL));
-                var hit = beatmap.HitObjects[1] as LegacyHit;
-                Assert.IsNotNull(hit);
-                Assert.AreEqual(new Vector2(304, 56), hit.Position);
-                Assert.AreEqual(1285, hit.StartTime);
-                Assert.IsTrue(hit.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP));
+
+                var curveData = beatmap.HitObjects[0] as IHasCurve;
+                var positionData = beatmap.HitObjects[0] as IHasPosition;
+
+                Assert.IsNotNull(positionData);
+                Assert.IsNotNull(curveData);
+                Assert.AreEqual(new Vector2(192, 168), positionData.Position);
+                Assert.AreEqual(956, beatmap.HitObjects[0].StartTime);
+                Assert.IsTrue(beatmap.HitObjects[0].Samples.Any(s => s.Name == SampleInfo.HIT_NORMAL));
+
+                positionData = beatmap.HitObjects[1] as IHasPosition;
+
+                Assert.IsNotNull(positionData);
+                Assert.AreEqual(new Vector2(304, 56), positionData.Position);
+                Assert.AreEqual(1285, beatmap.HitObjects[1].StartTime);
+                Assert.IsTrue(beatmap.HitObjects[1].Samples.Any(s => s.Name == SampleInfo.HIT_CLAP));
             }
         }
     }

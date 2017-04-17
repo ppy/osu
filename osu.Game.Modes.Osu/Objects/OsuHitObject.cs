@@ -8,6 +8,7 @@ using osu.Game.Modes.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
+using System;
 
 namespace osu.Game.Modes.Osu.Objects
 {
@@ -21,6 +22,8 @@ namespace osu.Game.Modes.Osu.Objects
         private const double hit_window_300 = 30;
 
         public Vector2 Position { get; set; }
+        public float X => Position.X;
+        public float Y => Position.Y;
 
         public Vector2 StackedPosition => Position + StackOffset;
 
