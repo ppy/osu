@@ -15,9 +15,8 @@ namespace osu.Game.Beatmaps
     public interface IBeatmapConverter<T> where T : HitObject
     {
         /// <summary>
-        /// The type of HitObjects that can be converted to be used for this Beatmap.
+        /// The types of HitObjects that can be converted to be used for this Beatmap.
         /// </summary>
-        /// <returns></returns>
         IEnumerable<Type> ValidConversionTypes { get; }
 
         /// <summary>
@@ -35,7 +34,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="converter">The Converter to use.</param>
         /// <param name="beatmap">The Beatmap to check.</param>
-        /// <returns>Whether the Beatmap can be converted using <paramref name="converter" />.</returns>
+        /// <returns>Whether the Beatmap can be converted using <paramref name="converter"/>.</returns>
         public static bool CanConvert<TObject>(this IBeatmapConverter<TObject> converter, Beatmap beatmap) where TObject : HitObject
             => converter.ValidConversionTypes.All(t => beatmap.HitObjects.Any(h => t.IsAssignableFrom(h.GetType())));
     }

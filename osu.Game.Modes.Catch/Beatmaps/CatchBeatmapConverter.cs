@@ -5,13 +5,13 @@ using osu.Game.Beatmaps;
 using osu.Game.Modes.Catch.Objects;
 using System.Collections.Generic;
 using System;
-using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Catch.Beatmaps
 {
     internal class CatchBeatmapConverter : IBeatmapConverter<CatchBaseHit>
     {
-        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
+        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         public Beatmap<CatchBaseHit> Convert(Beatmap original)
         {
