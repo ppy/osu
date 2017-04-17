@@ -26,7 +26,7 @@ namespace osu.Desktop.VisualTests.Tests
             if (db == null)
             {
                 storage = new TestStorage(@"TestCasePlaySongSelect");
-                db = new BeatmapDatabase(storage);
+                db = new BeatmapDatabase(storage, storage.GetDatabase(@"client"));
 
                 var sets = new List<BeatmapSetInfo>();
 
