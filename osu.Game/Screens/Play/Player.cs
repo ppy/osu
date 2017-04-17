@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Play
                 sourceClock.Reset();
             });
 
-            Add(new Drawable[]
+            Children = new Drawable[]
             {
                 gameplayContainer,
                 pauseOverlay = new PauseOverlay
@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Play
                         Restart();
                     },
                 }
-            });
+            };
         }
 
         private void initializeSkipButton()
