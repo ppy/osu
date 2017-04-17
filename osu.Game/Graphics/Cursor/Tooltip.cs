@@ -99,7 +99,6 @@ namespace osu.Game.Graphics.Cursor
 
         protected override void Update()
         {
-            Scheduler.Update();
             if (overhang?.Overhanging ?? false)
                 TooltipText = overhang.Tooltip;
             else if (overhang != null)
