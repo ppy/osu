@@ -6,9 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Options
     public class OptionsFooter : FillFlowContainer
     {
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuColour colours)
+        private void load(OsuGameBase game, OsuColour colours, RulesetDatabase rulesets)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -26,11 +26,11 @@ namespace osu.Game.Overlays.Options
 
             var modes = new List<Drawable>();
 
-            foreach (var ruleset in RulesetCollection.AllRulesets)
+            foreach (var ruleset in rulesets.AllRulesets)
             {
                 modes.Add(new TextAwesome
                 {
-                    Icon = ruleset.Icon,
+                    Icon = ruleset.CreateInstance().Icon,
                     Colour = Color4.Gray,
                     TextSize = 20
                 });

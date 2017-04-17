@@ -7,11 +7,6 @@ using osu.Desktop.Beatmaps.IO;
 using osu.Framework.Desktop;
 using osu.Framework.Desktop.Platform;
 using osu.Game.IPC;
-using osu.Game.Modes;
-using osu.Game.Modes.Catch;
-using osu.Game.Modes.Mania;
-using osu.Game.Modes.Osu;
-using osu.Game.Modes.Taiko;
 
 namespace osu.Desktop
 {
@@ -41,11 +36,6 @@ namespace osu.Desktop
                 }
                 else
                 {
-                    RulesetCollection.Register(typeof(OsuRuleset));
-                    RulesetCollection.Register(typeof(TaikoRuleset));
-                    RulesetCollection.Register(typeof(ManiaRuleset));
-                    RulesetCollection.Register(typeof(CatchRuleset));
-
                     host.Run(new OsuGameDesktop(args));
                 }
                 return 0;

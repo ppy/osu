@@ -11,13 +11,6 @@ using osu.Game.Modes.Scoring;
 
 namespace osu.Game.Modes
 {
-    public class BeatmapStatistic
-    {
-        public FontAwesome Icon;
-        public string Content;
-        public string Name;
-    }
-
     public abstract class Ruleset
     {
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
@@ -35,5 +28,10 @@ namespace osu.Game.Modes
         public abstract string Description { get; }
 
         public abstract IEnumerable<KeyCounter> CreateGameplayKeys();
+
+        /// <summary>
+        /// Do not override this unless you are a legacy mode.
+        /// </summary>
+        public virtual int LegacyID => -1;
     }
 }

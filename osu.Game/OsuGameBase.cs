@@ -28,6 +28,8 @@ namespace osu.Game
 
         protected BeatmapDatabase BeatmapDatabase;
 
+        protected RulesetDatabase RulesetDatabase;
+
         protected ScoreDatabase ScoreDatabase;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
@@ -85,6 +87,7 @@ namespace osu.Game
             SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
 
             Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, connection, Host));
+            Dependencies.Cache(RulesetDatabase = new RulesetDatabase(Host.Storage, connection));
             Dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, connection, Host, BeatmapDatabase));
             Dependencies.Cache(new OsuColour());
 

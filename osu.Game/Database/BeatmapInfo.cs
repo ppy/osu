@@ -3,7 +3,6 @@
 
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization;
-using osu.Game.Modes;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 using System;
@@ -55,15 +54,12 @@ namespace osu.Game.Database
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
 
-        public int Mode { get; set; }
+        [ForeignKey(typeof(RulesetInfo))]
+        public int RulesetID { get; set; }
 
-        [Ignore]
-        public Ruleset Ruleset
-        {
-            get { return RulesetCollection.GetRuleset(Mode); }
-            set { Mode = RulesetCollection.GetId(value); }
-        }
-        
+        [OneToOne(CascadeOperations = CascadeOperation.All)]
+        public RulesetInfo Ruleset { get; set; }
+
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
 

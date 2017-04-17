@@ -110,5 +110,7 @@ namespace osu.Game.Modes.Osu
         };
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
+
+        public override int LegacyID => 0;
     }
 }

@@ -3,12 +3,12 @@
 
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Platform;
+using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Modes;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -19,6 +19,14 @@ namespace osu.Desktop.VisualTests.Tests
         private PlaySongSelect songSelect;
 
         public override string Description => @"with fake data";
+
+        private RulesetDatabase rulesets;
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetDatabase rulesets)
+        {
+            this.rulesets = rulesets;
+        }
 
         public override void Reset()
         {
@@ -72,7 +80,7 @@ namespace osu.Desktop.VisualTests.Tests
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1234 + i,
-                        Ruleset = RulesetCollection.GetRuleset(0),
+                        Ruleset = rulesets.Query<RulesetInfo>().First(),
                         Path = "normal.osu",
                         Version = "Normal",
                         Difficulty = new BeatmapDifficulty
@@ -83,7 +91,7 @@ namespace osu.Desktop.VisualTests.Tests
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1235 + i,
-                        Ruleset = RulesetCollection.GetRuleset(0),
+                        Ruleset = rulesets.Query<RulesetInfo>().First(),
                         Path = "hard.osu",
                         Version = "Hard",
                         Difficulty = new BeatmapDifficulty
@@ -94,7 +102,7 @@ namespace osu.Desktop.VisualTests.Tests
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1236 + i,
-                        Ruleset = RulesetCollection.GetRuleset(0),
+                        Ruleset = rulesets.Query<RulesetInfo>().First(),
                         Path = "insane.osu",
                         Version = "Insane",
                         Difficulty = new BeatmapDifficulty

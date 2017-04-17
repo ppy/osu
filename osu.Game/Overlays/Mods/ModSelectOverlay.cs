@@ -13,11 +13,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
 using osu.Game.Modes.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Database;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -37,12 +37,14 @@ namespace osu.Game.Overlays.Mods
 
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
-        public readonly Bindable<Ruleset> Ruleset = new Bindable<Ruleset>(RulesetCollection.GetRuleset(0));
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
-        private void rulesetChanged(Ruleset newRuleset)
+        private void rulesetChanged(RulesetInfo newRuleset)
         {
+            var instance = newRuleset.CreateInstance();
+
             foreach (ModSection section in modSectionsContainer.Children)
-                section.Buttons = newRuleset.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
+                section.Buttons = instance.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
             refreshSelectedMods();
         }
 

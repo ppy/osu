@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Modes;
+using osu.Game.Database;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Select
         public GroupMode Group;
         public SortMode Sort;
         public string SearchText;
-        public Ruleset Ruleset;
+        public RulesetInfo Ruleset;
 
         public void Filter(List<BeatmapGroup> groups)
         {

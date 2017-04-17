@@ -105,5 +105,7 @@ namespace osu.Game.Modes.Mania
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new ManiaDifficultyCalculator(beatmap);
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
+
+        public override int LegacyID => 3;
     }
 }

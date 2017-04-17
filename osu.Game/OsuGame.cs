@@ -15,7 +15,6 @@ using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
-using osu.Game.Modes;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
@@ -24,6 +23,7 @@ using System.Linq;
 using osu.Framework.Graphics.Primitives;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Modes.Scoring;
 using osu.Game.Overlays.Notifications;
@@ -59,7 +59,7 @@ namespace osu.Game
         private VolumeControl volume;
 
         private Bindable<int> configRuleset;
-        public Bindable<Ruleset> Ruleset = new Bindable<Ruleset>();
+        public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private readonly string[] args;
 
@@ -90,8 +90,8 @@ namespace osu.Game
             Dependencies.Cache(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuConfig.Ruleset);
-            Ruleset.Value = RulesetCollection.GetRuleset(configRuleset.Value);
-            Ruleset.ValueChanged += r => configRuleset.Value = RulesetCollection.GetId(r);
+            Ruleset.Value = RulesetDatabase.GetRuleset(configRuleset.Value);
+            Ruleset.ValueChanged += r => configRuleset.Value = r.ID;
         }
 
         private ScheduledDelegate scoreLoad;

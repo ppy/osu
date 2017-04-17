@@ -2,9 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using SQLite.Net;
+using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
@@ -24,8 +28,7 @@ namespace osu.Game.Database
             }
             catch (Exception e)
             {
-                Logger.Error(e, @"Failed to initialise the beatmap database! Trying again with a clean database...");
-                storage.DeleteDatabase(@"beatmaps");
+                Logger.Error(e, $@"Failed to initialise the {GetType()}! Trying again with a clean database...");
                 Reset();
                 Prepare();
             }
@@ -40,5 +43,41 @@ namespace osu.Game.Database
         /// Reset this database to a default state. Undo all changes to database and storage backings.
         /// </summary>
         public abstract void Reset();
+
+        public TableQuery<T> Query<T>() where T : class
+        {
+            return Connection.Table<T>();
+        }
+
+        public T GetWithChildren<T>(object id) where T : class
+        {
+            return Connection.GetWithChildren<T>(id);
+        }
+
+        public List<T> GetAllWithChildren<T>(Expression<Func<T, bool>> filter = null, bool recursive = true)
+            where T : class
+        {
+            return Connection.GetAllWithChildren(filter, recursive);
+        }
+
+        public T GetChildren<T>(T item, bool recursive = false)
+        {
+            if (item == null) return default(T);
+
+            Connection.GetChildren(item, recursive);
+            return item;
+        }
+
+        protected abstract Type[] ValidTypes { get; }
+
+        public void Update<T>(T record, bool cascade = true) where T : class
+        {
+            if (ValidTypes.All(t => t != typeof(T)))
+                throw new ArgumentException("Must be a type managed by BeatmapDatabase", nameof(T));
+            if (cascade)
+                Connection.UpdateWithChildren(record);
+            else
+                Connection.Update(record);
+        }
     }
 }

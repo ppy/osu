@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -77,6 +76,8 @@ namespace osu.Game.Database
 
         public override void Reset()
         {
+            Storage.DeleteDatabase(@"beatmaps");
+
             foreach (var setInfo in Query<BeatmapSetInfo>())
             {
                 if (Storage.Exists(setInfo.Path))
@@ -88,6 +89,13 @@ namespace osu.Game.Database
             Connection.DeleteAll<BeatmapSetInfo>();
             Connection.DeleteAll<BeatmapInfo>();
         }
+
+        protected override Type[] ValidTypes => new[] {
+            typeof(BeatmapSetInfo),
+            typeof(BeatmapInfo),
+            typeof(BeatmapMetadata),
+            typeof(BeatmapDifficulty),
+        };
 
         /// <summary>
         /// Import multiple <see cref="BeatmapSetInfo"/> from <paramref name="paths"/>.
@@ -273,47 +281,6 @@ namespace osu.Game.Database
             previous?.TransferTo(working);
 
             return working;
-        }
-
-        public TableQuery<T> Query<T>() where T : class
-        {
-            return Connection.Table<T>();
-        }
-
-        public T GetWithChildren<T>(object id) where T : class
-        {
-            return Connection.GetWithChildren<T>(id);
-        }
-
-        public List<T> GetAllWithChildren<T>(Expression<Func<T, bool>> filter = null, bool recursive = true)
-            where T : class
-        {
-            return Connection.GetAllWithChildren(filter, recursive);
-        }
-
-        public T GetChildren<T>(T item, bool recursive = false)
-        {
-            if (item == null) return default(T);
-
-            Connection.GetChildren(item, recursive);
-            return item;
-        }
-
-        private readonly Type[] validTypes = {
-            typeof(BeatmapSetInfo),
-            typeof(BeatmapInfo),
-            typeof(BeatmapMetadata),
-            typeof(BeatmapDifficulty),
-        };
-
-        public void Update<T>(T record, bool cascade = true) where T : class
-        {
-            if (validTypes.All(t => t != typeof(T)))
-                throw new ArgumentException("Must be a type managed by BeatmapDatabase", nameof(T));
-            if (cascade)
-                Connection.UpdateWithChildren(record);
-            else
-                Connection.Update(record);
         }
 
         public bool Exists(BeatmapSetInfo beatmapSet) => Storage.Exists(beatmapSet.Path);
