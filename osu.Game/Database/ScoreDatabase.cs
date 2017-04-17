@@ -10,10 +10,11 @@ using osu.Game.IPC;
 using osu.Game.Modes;
 using osu.Game.Modes.Scoring;
 using SharpCompress.Compressors.LZMA;
+using SQLite.Net;
 
 namespace osu.Game.Database
 {
-    public class ScoreDatabase
+    public class ScoreDatabase : Database
     {
         private readonly Storage storage;
         private readonly BeatmapDatabase beatmaps;
@@ -23,7 +24,7 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
-        public ScoreDatabase(Storage storage, IIpcHost importHost = null, BeatmapDatabase beatmaps = null)
+        public ScoreDatabase(Storage storage, SQLiteConnection connection, IIpcHost importHost = null, BeatmapDatabase beatmaps = null) : base(storage, connection)
         {
             this.storage = storage;
             this.beatmaps = beatmaps;
@@ -39,7 +40,7 @@ namespace osu.Game.Database
             using (Stream s = storage.GetStream(Path.Combine(replay_folder, replayFilename)))
             using (SerializationReader sr = new SerializationReader(s))
             {
-                var ruleset = RulesetCollection.GetRuleset((int)sr.ReadByte());
+                var ruleset = RulesetCollection.GetRuleset(sr.ReadByte());
                 score = ruleset.CreateScoreProcessor().CreateScore();
 
                 /* score.Pass = true;*/
@@ -106,6 +107,14 @@ namespace osu.Game.Database
             }
 
             return score;
+        }
+
+        protected override void Prepare()
+        {
+        }
+
+        public override void Reset()
+        {
         }
     }
 }

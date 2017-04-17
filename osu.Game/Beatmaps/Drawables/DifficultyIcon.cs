@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
 

@@ -4,7 +4,6 @@
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
-using osu.Game.Modes;
 using osu.Game.Modes.Objects;
 using System.Collections.Generic;
 
