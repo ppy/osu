@@ -29,20 +29,19 @@ namespace osu.Game.Database
             catch (Exception e)
             {
                 Logger.Error(e, $@"Failed to initialise the {GetType()}! Trying again with a clean database...");
-                Reset();
-                Prepare();
+                Prepare(true);
             }
         }
 
         /// <summary>
         /// Prepare this database for use.
         /// </summary>
-        protected abstract void Prepare();
+        protected abstract void Prepare(bool reset = false);
 
         /// <summary>
         /// Reset this database to a default state. Undo all changes to database and storage backings.
         /// </summary>
-        public abstract void Reset();
+        public void Reset() => Prepare(true);
 
         public TableQuery<T> Query<T>() where T : class
         {

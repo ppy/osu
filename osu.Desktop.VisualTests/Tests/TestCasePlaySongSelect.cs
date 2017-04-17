@@ -22,19 +22,17 @@ namespace osu.Desktop.VisualTests.Tests
 
         private RulesetDatabase rulesets;
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets)
-        {
-            this.rulesets = rulesets;
-        }
-
         public override void Reset()
         {
             base.Reset();
             if (db == null)
             {
                 storage = new TestStorage(@"TestCasePlaySongSelect");
-                db = new BeatmapDatabase(storage, storage.GetDatabase(@"client"));
+
+                var backingDatabase = storage.GetDatabase(@"client");
+
+                rulesets = new RulesetDatabase(storage, backingDatabase);
+                db = new BeatmapDatabase(storage, backingDatabase, rulesets);
 
                 var sets = new List<BeatmapSetInfo>();
 

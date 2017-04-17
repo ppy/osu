@@ -111,11 +111,7 @@ namespace osu.Game.Database
             return score;
         }
 
-        protected override void Prepare()
-        {
-        }
-
-        public override void Reset()
+        protected override void Prepare(bool reset = false)
         {
         }
 

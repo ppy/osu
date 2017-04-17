@@ -50,12 +50,6 @@ namespace osu.Game.Beatmaps
     public class Beatmap : Beatmap<HitObject>
     {
         /// <summary>
-        /// Calculates the star difficulty for this Beatmap.
-        /// </summary>
-        /// <returns>The star difficulty.</returns>
-        public double CalculateStarDifficulty() => BeatmapInfo.Ruleset.CreateInstance().CreateDifficultyCalculator(this).Calculate();
-
-        /// <summary>
         /// Constructs a new beatmap.
         /// </summary>
         /// <param name="original">The original beatmap to use the parameters of.</param>
