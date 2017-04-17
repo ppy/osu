@@ -100,6 +100,7 @@ namespace osu.Game.Modes.Objects
             {
                 result = new LegacySpinner
                 {
+                    Position = new Vector2(512, 384) / 2,
                     EndTime = Convert.ToDouble(split[5], CultureInfo.InvariantCulture)
                 };
 

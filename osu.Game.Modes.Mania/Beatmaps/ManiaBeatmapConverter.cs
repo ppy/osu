@@ -4,11 +4,15 @@
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Mania.Objects;
 using System.Collections.Generic;
+using System;
+using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Mania.Beatmaps
 {
     internal class ManiaBeatmapConverter : IBeatmapConverter<ManiaBaseHit>
     {
+        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
+
         public Beatmap<ManiaBaseHit> Convert(Beatmap original)
         {
             return new Beatmap<ManiaBaseHit>(original)

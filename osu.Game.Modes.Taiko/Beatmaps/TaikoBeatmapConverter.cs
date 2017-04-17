@@ -38,6 +38,8 @@ namespace osu.Game.Modes.Taiko.Beatmaps
         /// </summary>
         private const float taiko_base_distance = 100;
 
+        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
+
         public Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
             BeatmapInfo info = original.BeatmapInfo.DeepClone<BeatmapInfo>();
