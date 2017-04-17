@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     Thread.Sleep(50);
             };
 
-            Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(999999999),
+            Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
                 @"BeatmapSet did not import to the database in allocated time.");
 
             //ensure we were stored to beatmap database backing...
