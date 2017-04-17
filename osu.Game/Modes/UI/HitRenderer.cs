@@ -122,6 +122,10 @@ namespace osu.Game.Modes.UI
             IBeatmapConverter<TObject> converter = CreateBeatmapConverter();
             IBeatmapProcessor<TObject> processor = CreateBeatmapProcessor();
 
+            // Check if the beatmap can be converted
+            if (!converter.CanConvert(beatmap.Beatmap))
+                throw new BeatmapInvalidForModeException($"{nameof(Beatmap)} can't be converted to the current mode.");
+
             // Convert the beatmap
             Beatmap = converter.Convert(beatmap.Beatmap);
 
@@ -135,7 +139,6 @@ namespace osu.Game.Modes.UI
             // Add mods, should always be the last thing applied to give full control to mods
             applyMods(beatmap.Mods.Value);
         }
-
 
         /// <summary>
         /// Applies the active mods to this HitRenderer.
@@ -267,5 +270,13 @@ namespace osu.Game.Modes.UI
         /// </summary>
         /// <returns>The Playfield.</returns>
         protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
+    }
+
+    public class BeatmapInvalidForModeException : Exception
+    {
+        public BeatmapInvalidForModeException(string text)
+            : base(text)
+        {
+        }
     }
 }

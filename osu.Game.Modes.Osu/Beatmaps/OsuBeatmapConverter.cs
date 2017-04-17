@@ -9,11 +9,14 @@ using osu.Game.Modes.Osu.Objects.Drawables;
 using System.Collections.Generic;
 using osu.Game.Modes.Objects.Types;
 using System.Linq;
+using System;
 
 namespace osu.Game.Modes.Osu.Beatmaps
 {
     internal class OsuBeatmapConverter : IBeatmapConverter<OsuHitObject>
     {
+        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasPosition) };
+
         public Beatmap<OsuHitObject> Convert(Beatmap original)
         {
             return new Beatmap<OsuHitObject>(original)
@@ -56,8 +59,9 @@ namespace osu.Game.Modes.Osu.Beatmaps
                 {
                     StartTime = original.StartTime,
                     Samples = original.Samples,
-                    Position = new Vector2(512, 384) / 2,
-                    EndTime = endTimeData.EndTime
+                    EndTime = endTimeData.EndTime,
+
+                    Position = positionData?.Position ?? new Vector2(512, 384) / 2,
                 };
             }
 
