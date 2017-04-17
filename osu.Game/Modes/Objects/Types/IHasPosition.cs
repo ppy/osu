@@ -8,7 +8,7 @@ namespace osu.Game.Modes.Objects.Types
     /// <summary>
     /// A HitObject that has a starting position.
     /// </summary>
-    public interface IHasPosition
+    public interface IHasPosition : IHasXPosition, IHasYPosition
     {
         /// <summary>
         /// The starting position of the HitObject.

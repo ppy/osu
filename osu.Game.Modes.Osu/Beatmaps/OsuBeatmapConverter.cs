@@ -36,6 +36,10 @@ namespace osu.Game.Modes.Osu.Beatmaps
 
         private OsuHitObject convertHitObject(HitObject original)
         {
+            OsuHitObject originalOsu = original as OsuHitObject;
+            if (originalOsu != null)
+                return originalOsu;
+
             IHasCurve curveData = original as IHasCurve;
             IHasEndTime endTimeData = original as IHasEndTime;
             IHasPosition positionData = original as IHasPosition;
