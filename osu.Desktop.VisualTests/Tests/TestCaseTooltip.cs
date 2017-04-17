@@ -47,7 +47,6 @@ namespace osu.Desktop.VisualTests.Tests
                 },
             };
 
-
             slider.Current.BindTo(new BindableInt(5)
             {
                 MaxValue = 10,
@@ -72,7 +71,6 @@ namespace osu.Desktop.VisualTests.Tests
                     }
                 };
             }
-
         }
 
         private class TooltipTextbox : OsuTextBox, IHasTooltip
