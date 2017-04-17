@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.Cursor
                 ActiveCursor.RotateTo(degrees, 600, EasingTypes.OutQuint);
             }
 
-            tooltip.Position = new Vector2(state.Mouse.Position.X,ActiveCursor.BoundingBox.Bottom);
+            tooltip.Position = new Vector2(state.Mouse.Position.X,Math.Min(ActiveCursor.BoundingBox.Bottom, state.Mouse.Position.Y + ActiveCursor.DrawHeight));
             tooltip.MouseState = state.Mouse;
 
             return base.OnMouseMove(state);
