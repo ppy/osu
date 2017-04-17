@@ -78,5 +78,11 @@ namespace osu.Game.Screens.Play
                 Action?.Invoke();
             }
         }
+
+        public void Reset()
+        {
+            overlay.Alpha = 0;
+            fired = false;
+        }
     }
 }

@@ -50,6 +50,7 @@ namespace osu.Game.Screens.Play
         private IFrameBasedClock interpolatedSourceClock;
 
         private Ruleset ruleset;
+        private Track track;
 
         private ScoreProcessor scoreProcessor;
         protected HitRenderer HitRenderer;
@@ -59,6 +60,8 @@ namespace osu.Game.Screens.Play
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
+        private Container gameplayContainer;
+        private HotkeyRetryOverlay hotkeyRetryOverlay;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
@@ -93,7 +96,14 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            Track track = Beatmap.Track;
+            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
+
+            gameplayContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both
+            };
+
+            track = Beatmap.Track;
 
             if (track != null)
             {
@@ -102,53 +112,17 @@ namespace osu.Game.Screens.Play
             }
 
             sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
-            interpolatedSourceClock = new InterpolatingFramedClock(sourceClock);
+
+            start();
 
             Schedule(() =>
             {
                 sourceClock.Reset();
             });
 
-            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
-            HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
-
-            scoreProcessor = HitRenderer.CreateScoreProcessor();
-
-            hudOverlay = new StandardHudOverlay()
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
-            };
-
-            hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
-            hudOverlay.BindProcessor(scoreProcessor);
-            hudOverlay.BindHitRenderer(HitRenderer);
-
-            hudOverlay.Progress.Objects = HitRenderer.Objects;
-            hudOverlay.Progress.AudioClock = interpolatedSourceClock;
-
-            //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
-            HitRenderer.OnAllJudged += onCompletion;
-
-            //bind ScoreProcessor to ourselves (for a fail situation)
-            scoreProcessor.Failed += onFail;
-
             Children = new Drawable[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Clock = interpolatedSourceClock,
-                    Children = new Drawable[]
-                    {
-                        HitRenderer,
-                        skipButton = new SkipButton
-                        {
-                            Alpha = 0
-                        },
-                    }
-                },
-                hudOverlay,
+                gameplayContainer,
                 pauseOverlay = new PauseOverlay
                 {
                     OnResume = delegate
@@ -164,7 +138,7 @@ namespace osu.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = Exit,
                 },
-                new HotkeyRetryOverlay
+                hotkeyRetryOverlay = new HotkeyRetryOverlay
                 {
                     Action = () => {
                         //we want to hide the hitrenderer immediately (looks better).
@@ -201,6 +175,53 @@ namespace osu.Game.Screens.Play
             skipButton.Delay(firstHitObject - skip_required_cutoff - fade_time);
             skipButton.FadeOut(fade_time);
             skipButton.Expire();
+        }
+
+        private void start()
+        {
+            interpolatedSourceClock = new InterpolatingFramedClock(sourceClock);
+            track?.Reset();
+            hudOverlay = new StandardHudOverlay()
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            };
+
+            HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+            scoreProcessor = HitRenderer.CreateScoreProcessor();
+
+            hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
+            hudOverlay.BindProcessor(scoreProcessor);
+            hudOverlay.BindHitRenderer(HitRenderer);
+
+            hudOverlay.Progress.Objects = HitRenderer.Objects;
+            hudOverlay.Progress.AudioClock = interpolatedSourceClock;
+
+            //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
+            HitRenderer.OnAllJudged += onCompletion;
+
+            //bind ScoreProcessor to ourselves (for a fail situation)
+            scoreProcessor.Failed += onFail;
+
+            gameplayContainer.Clear();
+            gameplayContainer.Add(new Drawable[]
+                {
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Clock = interpolatedSourceClock,
+                        Children = new Drawable[]
+                        {
+                            HitRenderer,
+                            skipButton = new SkipButton
+                            {
+                                Alpha = 0
+                            },
+                        }
+                    },
+                    hudOverlay
+                }
+            );
         }
 
         public void Pause(bool force = false)
@@ -243,20 +264,12 @@ namespace osu.Game.Screens.Play
 
         public void Restart()
         {
-            sourceClock.Stop(); // If the clock is running and Restart is called the game will lag until relaunch
-
-            var newPlayer = new Player();
-
-            ValidForResume = false;
-
-            LoadComponentAsync(newPlayer, delegate
-            {
-                newPlayer.RestartCount = RestartCount + 1;
-                if (!Push(newPlayer))
-                {
-                    // Error(?)
-                }
-            });
+            start();
+            lastPauseActionTime = 0;
+            HasFailed = false;
+            RestartCount += 1;
+            OnEntering(this);
+            hotkeyRetryOverlay.Reset();
         }
 
         private ScheduledDelegate onCompletionEvent;
