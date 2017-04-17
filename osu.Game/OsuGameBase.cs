@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Reflection;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -18,6 +19,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
+using osu.Game.IO.Stores;
+using System.IO;
 
 namespace osu.Game
 {
@@ -28,6 +31,8 @@ namespace osu.Game
         protected BeatmapDatabase BeatmapDatabase;
 
         protected ScoreDatabase ScoreDatabase;
+
+        protected LocaleStore LocaleStore;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -83,6 +88,17 @@ namespace osu.Game
             Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, Host));
             Dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, Host, BeatmapDatabase));
             Dependencies.Cache(new OsuColour());
+
+            LocaleStore = new LocaleStore();
+            foreach (string file in Assembly.LoadFrom(MainResourceFile).GetManifestResourceNames())
+            {
+                if (file.StartsWith($@"{Path.GetFileNameWithoutExtension(MainResourceFile)}.Localization.") && file.EndsWith(".txt"))
+                {
+                    string locale = file.TrimStart($@"{Path.GetFileNameWithoutExtension(MainResourceFile)}.Localization.".ToArray()).TrimEnd(".txt".ToArray());
+                    LocaleStore.AddStore(locale, new KeywordStore(Resources, $@"Localization/{locale}.txt"));
+                }
+            }
+            Dependencies.Cache(LocaleStore);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 }, true);
