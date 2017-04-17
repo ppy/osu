@@ -12,8 +12,6 @@ using osu.Framework.Input;
 using osu.Game.Configuration;
 using System;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Threading;
-using System.Linq;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -21,44 +19,16 @@ namespace osu.Game.Graphics.Cursor
     {
         protected override Drawable CreateCursor() => new Cursor();
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
-        {
-            this.game = game;
-        }
-
         private bool dragging;
+        private Tooltip tooltip;
 
-        private ScheduledDelegate show;
-        private OsuGameBase game;
-        private IHasOverhangingTooltip overhang;
+        public MenuCursor()
+        {
+            Add(tooltip = new Tooltip());
+        }
 
         protected override bool OnMouseMove(InputState state)
         {
-            Tooltip tooltip = ((Cursor)ActiveCursor).Tooltip;
-            if (overhang?.Overhanging ?? false)
-                tooltip.TooltipText = overhang.Tooltip;
-            else if (state.Mouse.Position != state.Mouse.LastPosition)
-            {
-                show?.Cancel();
-                tooltip.TooltipText = string.Empty;
-                IHasTooltip hasTooltip = null;
-                if (game.InternalChildren.OfType<IContainer>().Any(child => (hasTooltip = searchTooltip(child as IContainerEnumerable<Drawable>)) != null))
-                {
-                    IHasDelayedTooltip delayedTooltip = hasTooltip as IHasDelayedTooltip;
-                    overhang = hasTooltip as IHasOverhangingTooltip;
-                    show = Scheduler.AddDelayed(delegate
-                    {
-                        tooltip.TooltipText = hasTooltip.Tooltip;
-                    }, delayedTooltip?.Delay ?? 250);
-                }
-            }
-            else if(overhang != null)
-            {
-                overhang = null;
-                tooltip.TooltipText = string.Empty;
-            }
-
             if (dragging)
             {
                 Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown ?? state.Mouse.Delta;
@@ -73,19 +43,10 @@ namespace osu.Game.Graphics.Cursor
                 ActiveCursor.RotateTo(degrees, 600, EasingTypes.OutQuint);
             }
 
+            tooltip.Position = new Vector2(state.Mouse.Position.X,ActiveCursor.BoundingBox.Bottom);
+            tooltip.UpdateTooltip(state);
+
             return base.OnMouseMove(state);
-        }
-
-        private IHasTooltip searchTooltip(IContainerEnumerable<Drawable> children)
-        {
-            Drawable next = children.InternalChildren.OrderBy(drawable => drawable.Depth).FirstOrDefault(drawable => drawable.Hovering && !(drawable is CursorContainer));
-
-            IHasTooltip tooltipText = next as IHasTooltip;
-            if (tooltipText != null) return tooltipText;
-
-            if (next is IContainer)
-                return searchTooltip(next as IContainerEnumerable<Drawable>);
-            return null;
         }
 
         protected override bool OnDragStart(InputState state)
@@ -140,14 +101,13 @@ namespace osu.Game.Graphics.Cursor
         public class Cursor : Container
         {
             private Container cursorContainer;
-            public Tooltip Tooltip;
             private Bindable<double> cursorScale;
 
             public Sprite AdditiveLayer;
 
             public Cursor()
             {
-                Size = new Vector2(42);
+                AutoSizeAxes = Axes.Both;
             }
 
             [BackgroundDependencyLoader]
@@ -175,15 +135,10 @@ namespace osu.Game.Graphics.Cursor
                             },
                         }
                     },
-                    Tooltip = new Tooltip
-                    {
-                        Alpha = 0,
-                    },
                 };
 
                 cursorScale = config.GetBindable<double>(OsuConfig.MenuCursorSize);
                 cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale);
-                cursorScale.ValueChanged += newScale => Tooltip.Y = cursorContainer.Height * (float)newScale;
                 cursorScale.TriggerChange();
             }
         }
