@@ -5,13 +5,13 @@ using osu.Game.Beatmaps;
 using osu.Game.Modes.Mania.Objects;
 using System.Collections.Generic;
 using System;
-using osu.Game.Modes.Objects;
+using osu.Game.Modes.Objects.Types;
 
 namespace osu.Game.Modes.Mania.Beatmaps
 {
     internal class ManiaBeatmapConverter : IBeatmapConverter<ManiaBaseHit>
     {
-        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
+        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasColumn) };
 
         public Beatmap<ManiaBaseHit> Convert(Beatmap original)
         {
