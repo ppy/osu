@@ -4,9 +4,9 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using OpenTK;
 
@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Ranking
 {
     internal class ResultsPageRanking : ResultsPage
     {
-        public ResultsPageRanking(Score score, BeatmapInfo beatmap = null) : base(score, beatmap)
+        public ResultsPageRanking(Score score, WorkingBeatmap beatmap = null) : base(score, beatmap)
         {
         }
 
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Ranking
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Beatmap = Beatmap ?? Score.Beatmap,
+                    Beatmap = Beatmap.BeatmapInfo ?? Score.Beatmap,
                     Scale = new Vector2(0.7f)
                 }
             };

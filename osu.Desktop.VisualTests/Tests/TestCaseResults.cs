@@ -3,8 +3,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 
@@ -30,7 +29,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             if (beatmap == null)
             {
-                var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.Mode == PlayMode.Osu);
+                var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.RulesetID == 0);
                 if (beatmapInfo != null)
                     beatmap = db.GetWorkingBeatmap(beatmapInfo);
             }
