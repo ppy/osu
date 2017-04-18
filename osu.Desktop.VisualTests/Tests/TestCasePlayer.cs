@@ -39,7 +39,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             WorkingBeatmap beatmap = null;
 
-            var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.Ruleset.CreateInstance() is OsuRuleset);
+            var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.RulesetID == 0);
             if (beatmapInfo != null)
                 beatmap = db.GetWorkingBeatmap(beatmapInfo);
 
