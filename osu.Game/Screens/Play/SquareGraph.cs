@@ -30,7 +30,6 @@ namespace osu.Game.Screens.Play
             {
                 if (value == progress) return;
                 progress = value;
-
                 redrawProgress();
             }
         }
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Play
             {
                 if (value == values) return;
                 values = value;
-                recreateGraph();
+                layout.Invalidate();
             }
         }
 
@@ -57,7 +56,6 @@ namespace osu.Game.Screens.Play
             {
                 if (value == fillColour) return;
                 fillColour = value;
-
                 redrawFilled();
             }
         }
@@ -65,7 +63,6 @@ namespace osu.Game.Screens.Play
         public SquareGraph()
         {
             CacheDrawnFrameBuffer = true;
-            PixelSnapping = true;
         }
 
         private Cached layout = new Cached();
@@ -89,10 +86,7 @@ namespace osu.Game.Screens.Play
         private void redrawProgress()
         {
             for (int i = 0; i < columns.Length; i++)
-            {
                 columns[i].State = i <= progress ? ColumnState.Lit : ColumnState.Dimmed;
-            }
-
             ForceRedraw();
         }
 
@@ -102,9 +96,8 @@ namespace osu.Game.Screens.Play
         private void redrawFilled()
         {
             for (int i = 0; i < ColumnCount; i++)
-            {
                 columns[i].Filled = calculatedValues.ElementAtOrDefault(i);
-            }
+            ForceRedraw();
         }
 
         /// <summary>
@@ -142,8 +135,9 @@ namespace osu.Game.Screens.Play
 
             for (float x = 0; x < DrawWidth; x += Column.WIDTH)
             {
-                newColumns.Add(new Column(fillColour)
+                newColumns.Add(new Column
                 {
+                    LitColour = fillColour,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Height = DrawHeight,
@@ -162,9 +156,9 @@ namespace osu.Game.Screens.Play
 
         public class Column : Container, IStateful<ColumnState>
         {
-            private readonly Color4 emptyColour = Color4.White.Opacity(100);
-            private readonly Color4 litColour;
-            private readonly Color4 dimmedColour = Color4.White.Opacity(175);
+            protected readonly Color4 EmptyColour = Color4.White.Opacity(20);
+            public Color4 LitColour = Color4.LightBlue;
+            protected readonly Color4 DimmedColour = Color4.White.Opacity(140);
 
             private float cubeCount => DrawHeight / WIDTH;
             private const float cube_size = 4;
@@ -195,14 +189,14 @@ namespace osu.Game.Screens.Play
                     if (value == state) return;
                     state = value;
 
-                    fillActive();
+                    if (IsLoaded)
+                        fillActive();
                 }
             }
 
-            public Column(Color4 litColour)
+            public Column()
             {
                 Width = WIDTH;
-                this.litColour = litColour;
             }
 
             protected override void LoadComplete()
@@ -211,7 +205,6 @@ namespace osu.Game.Screens.Play
                 {
                     drawableRows.Add(new Box
                     {
-                        EdgeSmoothness = new Vector2(padding / 4),
                         Size = new Vector2(cube_size),
                         Position = new Vector2(0, r * WIDTH + padding),
                     });
@@ -227,12 +220,12 @@ namespace osu.Game.Screens.Play
 
             private void fillActive()
             {
-                Color4 colour = State == ColumnState.Lit ? litColour : dimmedColour;
+                Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
                 int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
 
                 for (int i = 0; i < drawableRows.Count; i++)
-                    drawableRows[i].Colour = i < countFilled ? colour : emptyColour;
+                    drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;
             }
         }
 
