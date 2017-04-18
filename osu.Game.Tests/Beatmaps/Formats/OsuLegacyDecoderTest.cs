@@ -9,7 +9,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Tests.Resources;
 using System.Linq;
 using osu.Game.Audio;
-using osu.Game.Modes.Objects.Types;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {

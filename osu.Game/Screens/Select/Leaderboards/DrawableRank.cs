@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Extensions;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
