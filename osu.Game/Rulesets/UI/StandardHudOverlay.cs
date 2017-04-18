@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.UI
             Position = new Vector2(0, 30),
         };
 
-        protected override SongProgress CreateProgress() => new SongProgress()
+        protected override SongProgress CreateProgress() => new SongProgress
         {
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
