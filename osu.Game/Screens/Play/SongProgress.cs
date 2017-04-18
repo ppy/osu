@@ -41,25 +41,7 @@ namespace osu.Game.Screens.Play
         {
             set
             {
-                objects = value;
-
-                const int granularity = 200;
-
-                var interval = lastHitTime / granularity;
-
-                var values = new int[granularity];
-
-                foreach (var h in objects)
-                {
-                    IHasEndTime end = h as IHasEndTime;
-
-                    int startRange = (int)(h.StartTime / interval);
-                    int endRange = (int)((end?.EndTime ?? h.StartTime) / interval);
-                    for (int i = startRange; i <= endRange; i++)
-                        values[i]++;
-                }
-
-                graph.Values = values;
+                graph.Objects = objects = value;
             }
         }
 
@@ -71,7 +53,7 @@ namespace osu.Game.Screens.Play
 
         public SongProgress()
         {
-            Height = bottom_bar_height + SongProgressGraph.Column.HEIGHT + handle_size.Y;
+            Height = bottom_bar_height + SquareGraph.Column.HEIGHT + handle_size.Y;
             Y = bottom_bar_height;
 
             Children = new Drawable[]
@@ -81,10 +63,10 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                    Height = SongProgressGraph.Column.HEIGHT,
+                    Height = SquareGraph.Column.HEIGHT,
                     Margin = new MarginPadding { Bottom = bottom_bar_height },
                 },
-                bar = new SongProgressBar(bottom_bar_height, SongProgressGraph.Column.HEIGHT, handle_size)
+                bar = new SongProgressBar(bottom_bar_height, SquareGraph.Column.HEIGHT, handle_size)
                 {
                     Alpha = 0,
                     Anchor = Anchor.BottomLeft,
@@ -138,7 +120,6 @@ namespace osu.Game.Screens.Play
 
             bar.UpdatePosition((float)progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
-
         }
     }
 }
