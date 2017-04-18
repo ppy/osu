@@ -18,6 +18,7 @@ using osu.Game.Modes.Taiko.Scoring;
 using osu.Game.Modes.UI;
 using osu.Game.Modes.Taiko.Replays;
 using OpenTK;
+using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Taiko.UI
 {
@@ -114,9 +115,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
-        protected override IBeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
-
-        protected override IBeatmapProcessor<TaikoHitObject> CreateBeatmapProcessor() => new TaikoBeatmapProcessor();
+        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
 
         protected override Playfield<TaikoHitObject, TaikoJudgement> CreatePlayfield() => new TaikoPlayfield
         {

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Beatmaps;
 using osu.Game.Modes.Objects.Types;
 using osu.Game.Modes.Osu.Beatmaps;
 using osu.Game.Modes.Osu.Objects;
@@ -180,7 +181,7 @@ namespace osu.Game.Modes.Osu
             return difficulty;
         }
 
-        protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
+        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
 
         // Those values are used as array indices. Be careful when changing them!
         public enum DifficultyType

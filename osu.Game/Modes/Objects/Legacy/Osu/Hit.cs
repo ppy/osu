@@ -4,14 +4,18 @@
 using osu.Game.Modes.Objects.Types;
 using OpenTK;
 
-namespace osu.Game.Modes.Objects.Legacy
+namespace osu.Game.Modes.Objects.Legacy.Osu
 {
     /// <summary>
-    /// Legacy Slider-type, used for parsing Beatmaps.
+    /// Legacy osu! Hit-type, used for parsing Beatmaps.
     /// </summary>
-    public sealed class LegacySlider : CurvedHitObject, IHasPosition, IHasCombo
+    internal sealed class Hit : HitObject, IHasPosition, IHasCombo
     {
         public Vector2 Position { get; set; }
+
+        public float X => Position.X;
+
+        public float Y => Position.Y;
 
         public bool NewCombo { get; set; }
     }

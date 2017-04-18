@@ -23,6 +23,8 @@ namespace osu.Game.Modes.Osu.UI
 
         public override bool ProvidingUserCursor => true;
 
+        public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
+
         public override Vector2 Size
         {
             get
@@ -34,7 +36,7 @@ namespace osu.Game.Modes.Osu.UI
             }
         }
 
-        public OsuPlayfield() : base(512)
+        public OsuPlayfield() : base(BASE_SIZE.X)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

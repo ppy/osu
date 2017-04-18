@@ -4,17 +4,20 @@
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Catch.Objects;
 using System.Collections.Generic;
+using System;
+using osu.Game.Modes.Objects.Types;
+using osu.Game.Modes.Beatmaps;
+using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Catch.Beatmaps
 {
-    internal class CatchBeatmapConverter : IBeatmapConverter<CatchBaseHit>
+    internal class CatchBeatmapConverter : BeatmapConverter<CatchBaseHit>
     {
-        public Beatmap<CatchBaseHit> Convert(Beatmap original)
+        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
+
+        protected override IEnumerable<CatchBaseHit> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
-            return new Beatmap<CatchBaseHit>(original)
-            {
-                HitObjects = new List<CatchBaseHit>() // Todo: Convert HitObjects
-            };
+            yield return null;
         }
     }
 }

@@ -1,15 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps;
 using osu.Game.Modes.Objects;
 
-namespace osu.Game.Beatmaps
+namespace osu.Game.Modes.Beatmaps
 {
     /// <summary>
     /// Processes a post-converted Beatmap.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained in the Beatmap.</typeparam>
-    public interface IBeatmapProcessor<TObject>
+    public class BeatmapProcessor<TObject>
         where TObject : HitObject
     {
         /// <summary>
@@ -19,6 +20,6 @@ namespace osu.Game.Beatmaps
         /// </para>
         /// </summary>
         /// <param name="beatmap">The Beatmap to process.</param>
-        void PostProcess(Beatmap<TObject> beatmap);
+        public virtual void PostProcess(Beatmap<TObject> beatmap) { }
     }
 }

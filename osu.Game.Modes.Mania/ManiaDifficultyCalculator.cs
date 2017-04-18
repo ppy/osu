@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Beatmaps;
 using osu.Game.Modes.Mania.Beatmaps;
 using osu.Game.Modes.Mania.Objects;
 using System.Collections.Generic;
@@ -20,6 +21,6 @@ namespace osu.Game.Modes.Mania
             return 0;
         }
 
-        protected override IBeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
+        protected override BeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
     }
 }

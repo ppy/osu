@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Beatmaps;
 using osu.Game.Modes.Catch.Beatmaps;
 using osu.Game.Modes.Catch.Judgements;
 using osu.Game.Modes.Catch.Objects;
@@ -21,9 +22,7 @@ namespace osu.Game.Modes.Catch.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
 
-        protected override IBeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
-
-        protected override IBeatmapProcessor<CatchBaseHit> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
+        protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
 
         protected override Playfield<CatchBaseHit, CatchJudgement> CreatePlayfield() => new CatchPlayfield();
 

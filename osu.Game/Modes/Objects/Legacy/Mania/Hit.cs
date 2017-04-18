@@ -1,17 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Game.Modes.Objects.Types;
 
-namespace osu.Game.Modes.Objects.Legacy
+namespace osu.Game.Modes.Objects.Legacy.Mania
 {
     /// <summary>
-    /// Legacy Hold-type, used for parsing "specials" in beatmaps.
+    /// Legacy osu!mania Hit-type, used for parsing Beatmaps.
     /// </summary>
-    public sealed class LegacyHold : HitObject, IHasPosition, IHasCombo, IHasHold
+    internal sealed class Hit : HitObject, IHasXPosition, IHasCombo
     {
-        public Vector2 Position { get; set; }
+        public float X { get; set; }
 
         public bool NewCombo { get; set; }
     }

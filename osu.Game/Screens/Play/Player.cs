@@ -60,8 +60,8 @@ namespace osu.Game.Screens.Play
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
         {
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
@@ -76,6 +76,19 @@ namespace osu.Game.Screens.Play
 
                 if (Beatmap == null)
                     throw new Exception("Beatmap was not loaded");
+
+                try
+                {
+                    // Try using the preferred user ruleset
+                    ruleset = osu == null ? Beatmap.BeatmapInfo.Ruleset.CreateInstance() : osu.Ruleset.Value.CreateInstance();
+                    HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+                }
+                catch (BeatmapInvalidForModeException)
+                {
+                    // Default to the beatmap ruleset
+                    ruleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance();
+                    HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+                }
             }
             catch (Exception e)
             {
@@ -101,12 +114,6 @@ namespace osu.Game.Screens.Play
             {
                 sourceClock.Reset();
             });
-
-            ruleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance();
-
-            // Todo: This should be done as early as possible, and should check if the hit renderer
-            // can actually convert the hit objects... Somehow...
-            HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 
