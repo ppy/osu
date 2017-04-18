@@ -18,9 +18,11 @@ using osu.Game.Users;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Play;
 using osu.Game.Rulesets.Scoring;
+using osu.Framework.Graphics.Colour;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -117,15 +119,35 @@ namespace osu.Game.Screens.Ranking
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
-                        new Box
+                        new Container
                         {
+                            RelativeSizeAxes = Axes.X,
+                            Size = new Vector2(0.75f, 1),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Margin = new MarginPadding { Top = 10, Bottom = 10 },
-                            Colour = colours.GrayC,
-                            RelativeSizeAxes = Axes.X,
-                            Size = new Vector2(0.75f, 1),
-                        }
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    ColourInfo = ColourInfo.GradientHorizontal(
+                                        colours.GrayC.Opacity(0),
+                                        colours.GrayC.Opacity(0.9f)),
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(0.5f, 1),
+                                },
+                                new Box
+                                {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    ColourInfo = ColourInfo.GradientHorizontal(
+                                        colours.GrayC.Opacity(0.9f),
+                                        colours.GrayC.Opacity(0)),
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(0.5f, 1),
+                                },
+                            }
+                        },
                     }
                 }
             };
