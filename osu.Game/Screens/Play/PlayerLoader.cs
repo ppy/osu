@@ -33,10 +33,6 @@ namespace osu.Game.Screens.Play
         {
             this.player = player;
 
-            //By default, we want to load the player and never be returned to.
-            //Note that this may change if the player we load requested a re-run.
-            ValidForResume = false;
-
             player.RestartRequested = () => {
                 showOverlays = false;
                 ValidForResume = true;
@@ -77,20 +73,17 @@ namespace osu.Game.Screens.Play
                 RestartCount = player.RestartCount + 1,
                 RestartRequested = player.RestartRequested,
                 Beatmap = player.Beatmap,
-            }, p =>
-            {
-                contentOut();
-
-                if (!Push(player))
-                    Exit();
-                ValidForResume = false;
             });
+
+            Delay(400);
+
+            Schedule(pushWhenLoaded);
         }
 
         private void contentIn()
         {
-            Content.ScaleTo(1, 750, EasingTypes.OutQuint);
-            Content.FadeInFromZero(500);
+            Content.ScaleTo(1, 650, EasingTypes.OutQuint);
+            Content.FadeInFromZero(400);
         }
 
         private void contentOut()
@@ -118,6 +111,14 @@ namespace osu.Game.Screens.Play
 
             Delay(1400, true);
 
+            Schedule(pushWhenLoaded);
+        }
+
+        private void pushWhenLoaded()
+        {
+            if (!player.IsLoaded)
+                Schedule(pushWhenLoaded);
+
             contentOut();
 
             Delay(250);
@@ -128,6 +129,12 @@ namespace osu.Game.Screens.Play
 
                 if (!Push(player))
                     Exit();
+                else
+                {
+                    //By default, we want to load the player and never be returned to.
+                    //Note that this may change if the player we load requested a re-run.
+                    ValidForResume = false;
+                }
             });
         }
 
