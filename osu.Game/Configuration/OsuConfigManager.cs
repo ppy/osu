@@ -36,7 +36,7 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
-            Set(OsuConfig.UserHidden, false);
+            Set(OsuConfig.ShowProgressGraph, false);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
@@ -198,7 +198,7 @@ namespace osu.Game.Configuration
         // New osu:
         Ruleset,
         Token,
-        UserHidden,
+        ShowProgressGraph,
         // Imported from old osu:
         BeatmapDirectory,
         AllowPublicInvites,

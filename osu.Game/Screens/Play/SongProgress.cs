@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
 
         private const float transition_duration = 200;
 
-        private Bindable<bool> userHidden;
+        private Bindable<bool> userVisible;
 
         private readonly SongProgressBar bar;
         private readonly SongProgressGraph graph;
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Play
             set
             {
                 hasForcedVisibility = value;
-                userHidden.TriggerChange();
+                userVisible.TriggerChange();
             }
         }
 
@@ -82,15 +82,15 @@ namespace osu.Game.Screens.Play
         {
             graph.FillColour = bar.FillColour = colours.BlueLighter;
 
-            userHidden = config.GetBindable<bool>(OsuConfig.UserHidden);
-            userHidden.ValueChanged += progressVisibility =>
+            userVisible = config.GetBindable<bool>(OsuConfig.ShowProgressGraph);
+            userVisible.ValueChanged += progressVisibility =>
             {
-                if (userHidden && !hasForcedVisibility)
-                    FadeOut(transition_duration);
-                else
+                if (userVisible || hasForcedVisibility)
                     FadeIn(transition_duration);
+                else
+                    FadeOut(transition_duration);
             };
-            userHidden.TriggerChange();
+            userVisible.TriggerChange();
         }
 
         public SongProgress()
