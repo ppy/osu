@@ -4,17 +4,20 @@
 using osu.Game.Beatmaps;
 using osu.Game.Modes.Mania.Objects;
 using System.Collections.Generic;
+using System;
+using osu.Game.Modes.Objects.Types;
+using osu.Game.Modes.Beatmaps;
+using osu.Game.Modes.Objects;
 
 namespace osu.Game.Modes.Mania.Beatmaps
 {
-    internal class ManiaBeatmapConverter : IBeatmapConverter<ManiaBaseHit>
+    internal class ManiaBeatmapConverter : BeatmapConverter<ManiaBaseHit>
     {
-        public Beatmap<ManiaBaseHit> Convert(Beatmap original)
+        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
+
+        protected override IEnumerable<ManiaBaseHit> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
-            return new Beatmap<ManiaBaseHit>(original)
-            {
-                HitObjects = new List<ManiaBaseHit>() // Todo: Implement
-            };
+            yield return null;
         }
     }
 }

@@ -45,7 +45,7 @@ namespace osu.Desktop.VisualTests.Tests
                 objects.Add(new HitCircle
                 {
                     StartTime = time,
-                    Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384)),
+                    Position = new Vector2(RNG.Next(0, (int)OsuPlayfield.BASE_SIZE.X), RNG.Next(0, (int)OsuPlayfield.BASE_SIZE.Y)),
                     Scale = RNG.NextSingle(0.5f, 1.0f),
                 });
 

@@ -11,10 +11,11 @@ using System.Linq;
 using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Audio;
+using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
 {
-    internal class TaikoBeatmapConverter : IBeatmapConverter<TaikoHitObject>
+    internal class TaikoBeatmapConverter : BeatmapConverter<TaikoHitObject>
     {
         /// <summary>
         /// osu! is generally slower than taiko, so a factor is added to increase
@@ -38,25 +39,30 @@ namespace osu.Game.Modes.Taiko.Beatmaps
         /// </summary>
         private const float taiko_base_distance = 100;
 
-        public Beatmap<TaikoHitObject> Convert(Beatmap original)
+        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
+
+        protected override Beatmap<TaikoHitObject> ConvertBeatmap(Beatmap original)
         {
+            // Rewrite the beatmap info to add the slider velocity multiplier
             BeatmapInfo info = original.BeatmapInfo.DeepClone<BeatmapInfo>();
             info.Difficulty.SliderMultiplier *= legacy_velocity_multiplier;
 
-            return new Beatmap<TaikoHitObject>(original)
+            Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original);
+
+            // Post processing step to transform hit objects with the same start time into strong hits
+            converted.HitObjects = converted.HitObjects.GroupBy(t => t.StartTime).Select(x =>
             {
-                BeatmapInfo = info,
-                HitObjects = original.HitObjects.SelectMany(h => convertHitObject(h, original)).ToList()
-            };
+                TaikoHitObject first = x.First();
+                if (x.Skip(1).Any())
+                    first.IsStrong = true;
+                return first;
+            }).ToList();
+
+            return converted;
         }
 
-        private IEnumerable<TaikoHitObject> convertHitObject(HitObject obj, Beatmap beatmap)
+        protected override IEnumerable<TaikoHitObject> ConvertHitObject(HitObject obj, Beatmap beatmap)
         {
-            // Check if this HitObject is already a TaikoHitObject, and return it if so
-            var originalTaiko = obj as TaikoHitObject;
-            if (originalTaiko != null)
-                yield return originalTaiko;
-
             var distanceData = obj as IHasDistance;
             var repeatsData = obj as IHasRepeats;
             var endTimeData = obj as IHasEndTime;

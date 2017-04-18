@@ -3,6 +3,7 @@
 
 using OpenTK;
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Beatmaps;
 using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Beatmaps;
 using osu.Game.Modes.Osu.Judgements;
@@ -24,9 +25,9 @@ namespace osu.Game.Modes.Osu.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor(this);
 
-        protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
+        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
 
-        protected override IBeatmapProcessor<OsuHitObject> CreateBeatmapProcessor() => new OsuBeatmapProcessor();
+        protected override BeatmapProcessor<OsuHitObject> CreateBeatmapProcessor() => new OsuBeatmapProcessor();
 
         protected override Playfield<OsuHitObject, OsuJudgement> CreatePlayfield() => new OsuPlayfield();
 

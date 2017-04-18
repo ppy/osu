@@ -9,6 +9,7 @@ using osu.Game.Modes.Objects.Drawables;
 using osu.Game.Modes.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Modes.Osu.UI;
 
 namespace osu.Game.Modes.Osu.Objects.Drawables
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Modes.Osu.Objects.Drawables
             Position = s.Position;
 
             //take up full playfield.
-            Size = new Vector2(512);
+            Size = OsuPlayfield.BASE_SIZE;
 
             spinner = s;
 

@@ -17,6 +17,7 @@ using System.Linq;
 using osu.Game.Modes.Replays;
 using osu.Game.Modes.Scoring;
 using OpenTK;
+using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.UI
 {
@@ -119,8 +120,12 @@ namespace osu.Game.Modes.UI
 
             RelativeSizeAxes = Axes.Both;
 
-            IBeatmapConverter<TObject> converter = CreateBeatmapConverter();
-            IBeatmapProcessor<TObject> processor = CreateBeatmapProcessor();
+            BeatmapConverter<TObject> converter = CreateBeatmapConverter();
+            BeatmapProcessor<TObject> processor = CreateBeatmapProcessor();
+
+            // Check if the beatmap can be converted
+            if (!converter.CanConvert(beatmap.Beatmap))
+                throw new BeatmapInvalidForModeException($"{nameof(Beatmap)} can't be converted for the current ruleset.");
 
             // Convert the beatmap
             Beatmap = converter.Convert(beatmap.Beatmap);
@@ -136,7 +141,6 @@ namespace osu.Game.Modes.UI
             applyMods(beatmap.Mods.Value);
         }
 
-
         /// <summary>
         /// Applies the active mods to this HitRenderer.
         /// </summary>
@@ -151,17 +155,17 @@ namespace osu.Game.Modes.UI
         }
 
         /// <summary>
-        /// Creates a converter to convert Beatmap to a specific mode.
-        /// </summary>
-        /// <returns>The Beatmap converter.</returns>
-        protected abstract IBeatmapConverter<TObject> CreateBeatmapConverter();
-
-        /// <summary>
         /// Creates a processor to perform post-processing operations
         /// on HitObjects in converted Beatmaps.
         /// </summary>
         /// <returns>The Beatmap processor.</returns>
-        protected abstract IBeatmapProcessor<TObject> CreateBeatmapProcessor();
+        protected virtual BeatmapProcessor<TObject> CreateBeatmapProcessor() => new BeatmapProcessor<TObject>();
+
+        /// <summary>
+        /// Creates a converter to convert Beatmap to a specific mode.
+        /// </summary>
+        /// <returns>The Beatmap converter.</returns>
+        protected abstract BeatmapConverter<TObject> CreateBeatmapConverter();
     }
 
     /// <summary>
@@ -267,5 +271,13 @@ namespace osu.Game.Modes.UI
         /// </summary>
         /// <returns>The Playfield.</returns>
         protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
+    }
+
+    public class BeatmapInvalidForModeException : Exception
+    {
+        public BeatmapInvalidForModeException(string text)
+            : base(text)
+        {
+        }
     }
 }

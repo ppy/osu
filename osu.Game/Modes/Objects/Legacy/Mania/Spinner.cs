@@ -3,15 +3,17 @@
 
 using osu.Game.Modes.Objects.Types;
 
-namespace osu.Game.Modes.Objects.Legacy
+namespace osu.Game.Modes.Objects.Legacy.Mania
 {
     /// <summary>
-    /// Legacy Spinner-type, used for parsing Beatmaps.
+    /// Legacy osu!mania Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal class LegacySpinner : HitObject, IHasEndTime
+    internal sealed class Spinner : HitObject, IHasEndTime, IHasXPosition
     {
         public double EndTime { get; set; }
 
         public double Duration => EndTime - StartTime;
+
+        public float X { get; set; }
     }
 }
