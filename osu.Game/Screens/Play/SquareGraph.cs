@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
+using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -34,7 +35,8 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private int[] calculatedValues = { }; // values but adjusted to fit the amount of columns
+        private float[] calculatedValues = { }; // values but adjusted to fit the amount of columns
+
         private int[] values;
         public int[] Values
         {
@@ -66,15 +68,19 @@ namespace osu.Game.Screens.Play
             PixelSnapping = true;
         }
 
-        private float lastDrawWidth;
+        private Cached layout = new Cached();
+
+        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+        {
+            if ((invalidation & Invalidation.SizeInParentSpace) > 0)
+                layout.Invalidate();
+            return base.Invalidate(invalidation, source, shallPropagate);
+        }
+
         protected override void Update()
         {
             base.Update();
-
-            // todo: Recreating in update is probably not the best idea
-            if (DrawWidth == lastDrawWidth) return;
-            recreateGraph();
-            lastDrawWidth = DrawWidth;
+            layout.Refresh(recreateGraph);
         }
 
         /// <summary>
@@ -106,7 +112,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void recalculateValues()
         {
-            var newValues = new List<int>();
+            var newValues = new List<float>();
 
             if (values == null)
             {
@@ -116,10 +122,12 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
+            var max = values.Max();
+
             float step = values.Length / (float)ColumnCount;
             for (float i = 0; i < values.Length; i += step)
             {
-                newValues.Add(values[(int)i]);
+                newValues.Add((float)values[(int)i] / max);
             }
 
             calculatedValues = newValues.ToArray();
@@ -138,6 +146,7 @@ namespace osu.Game.Screens.Play
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
+                    Height = DrawHeight,
                     Position = new Vector2(x, 0),
                     State = ColumnState.Dimmed,
                 });
@@ -157,16 +166,15 @@ namespace osu.Game.Screens.Play
             private readonly Color4 litColour;
             private readonly Color4 dimmedColour = Color4.White.Opacity(175);
 
-            private const float cube_count = 6;
+            private float cubeCount => DrawHeight / WIDTH;
             private const float cube_size = 4;
             private const float padding = 2;
             public const float WIDTH = cube_size + padding;
-            public const float HEIGHT = cube_count * WIDTH + padding;
 
             private readonly List<Box> drawableRows = new List<Box>();
 
-            private int filled;
-            public int Filled
+            private float filled;
+            public float Filled
             {
                 get { return filled; }
                 set
@@ -193,10 +201,13 @@ namespace osu.Game.Screens.Play
 
             public Column(Color4 litColour)
             {
-                Size = new Vector2(WIDTH, HEIGHT);
+                Width = WIDTH;
                 this.litColour = litColour;
+            }
 
-                for (int r = 0; r < cube_count; r++)
+            protected override void LoadComplete()
+            {
+                for (int r = 0; r < cubeCount; r++)
                 {
                     drawableRows.Add(new Box
                     {
@@ -210,19 +221,18 @@ namespace osu.Game.Screens.Play
 
                 // Reverse drawableRows so when iterating through them they start at the bottom
                 drawableRows.Reverse();
+
+                fillActive();
             }
 
             private void fillActive()
             {
                 Color4 colour = State == ColumnState.Lit ? litColour : dimmedColour;
 
+                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+
                 for (int i = 0; i < drawableRows.Count; i++)
-                {
-                    if (Filled == 0) // i <= Filled doesn't work for zero fill
-                        drawableRows[i].Colour = emptyColour;
-                    else
-                        drawableRows[i].Colour = i <= Filled ? colour : emptyColour;
-                }
+                    drawableRows[i].Colour = i < countFilled ? colour : emptyColour;
             }
         }
 
