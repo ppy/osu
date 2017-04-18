@@ -6,9 +6,9 @@ using osu.Game.Modes.Objects.Types;
 namespace osu.Game.Modes.Objects.Legacy.Taiko
 {
     /// <summary>
-    /// Legacy Spinner-type, used for parsing Beatmaps.
+    /// Legacy osu!taiko Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal class Spinner : HitObject, IHasEndTime
+    internal sealed class Spinner : HitObject, IHasEndTime
     {
         public double EndTime { get; set; }
 

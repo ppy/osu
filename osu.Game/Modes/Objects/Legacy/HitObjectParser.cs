@@ -11,6 +11,9 @@ using osu.Game.Audio;
 
 namespace osu.Game.Modes.Objects.Legacy
 {
+    /// <summary>
+    /// A HitObjectParser to parse legacy Beatmaps.
+    /// </summary>
     internal abstract class HitObjectParser : Objects.HitObjectParser
     {
         public override HitObject Parse(string text)
@@ -146,10 +149,6 @@ namespace osu.Game.Modes.Objects.Legacy
             return result;
         }
 
-        protected abstract HitObject CreateHit(Vector2 position, bool newCombo);
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount);
-        protected abstract HitObject CreateSpinner(Vector2 position, double endTime);
-
         private void readCustomSampleBanks(string str, ref string normalSampleBank, ref string addSampleBank, ref int sampleVolume)
         {
             if (string.IsNullOrEmpty(str))
@@ -174,6 +173,34 @@ namespace osu.Game.Modes.Objects.Legacy
             addSampleBank = stringAddBank;
             sampleVolume = split.Length > 3 ? int.Parse(split[3]) : 0;
         }
+
+        /// <summary>
+        /// Creates a legacy Hit-type hit object.
+        /// </summary>
+        /// <param name="position">The position of the hit object.</param>
+        /// <param name="newCombo">Whether the hit object creates a new combo.</param>
+        /// <returns>The hit object.</returns>
+        protected abstract HitObject CreateHit(Vector2 position, bool newCombo);
+
+        /// <summary>
+        /// Creats a legacy Slider-type hit object.
+        /// </summary>
+        /// <param name="position">The position of the hit object.</param>
+        /// <param name="newCombo">Whether the hit object creates a new combo.</param>
+        /// <param name="controlPoints">The slider control points.</param>
+        /// <param name="length">The slider length.</param>
+        /// <param name="curveType">The slider curve type.</param>
+        /// <param name="repeatCount">The slider repeat count.</param>
+        /// <returns>The hit object.</returns>
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount);
+
+        /// <summary>
+        /// Creates a legacy Spinner-type hit object.
+        /// </summary>
+        /// <param name="position">The position of the hit object.</param>
+        /// <param name="endTime">The spinner end time.</param>
+        /// <returns>The hit object.</returns>
+        protected abstract HitObject CreateSpinner(Vector2 position, double endTime);
 
         [Flags]
         private enum LegacySoundType

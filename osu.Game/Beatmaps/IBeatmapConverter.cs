@@ -30,9 +30,9 @@ namespace osu.Game.Beatmaps
     public static class BeatmapConverterExtensions
     {
         /// <summary>
-        /// Checks if a Beatmap can be converted using a Beatmap Converter.
+        /// Checks if a Beatmap can be converted using this Beatmap Converter.
         /// </summary>
-        /// <param name="converter">The Converter to use.</param>
+        /// <param name="converter">The Beatmap Converter.</param>
         /// <param name="beatmap">The Beatmap to check.</param>
         /// <returns>Whether the Beatmap can be converted using <paramref name="converter"/>.</returns>
         public static bool CanConvert<TObject>(this IBeatmapConverter<TObject> converter, Beatmap beatmap) where TObject : HitObject

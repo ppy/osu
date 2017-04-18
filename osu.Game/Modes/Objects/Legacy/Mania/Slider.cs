@@ -6,7 +6,7 @@ using osu.Game.Modes.Objects.Types;
 namespace osu.Game.Modes.Objects.Legacy.Mania
 {
     /// <summary>
-    /// Legacy Slider-type, used for parsing Beatmaps.
+    /// Legacy osu!mania Slider-type, used for parsing Beatmaps.
     /// </summary>
     internal sealed class Slider : CurvedHitObject, IHasColumn, IHasCombo
     {

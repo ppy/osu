@@ -6,7 +6,7 @@ using osu.Game.Modes.Objects.Types;
 namespace osu.Game.Modes.Objects.Legacy.Taiko
 {
     /// <summary>
-    /// Legacy Hit-type, used for parsing Beatmaps.
+    /// Legacy osu!taiko Hit-type, used for parsing Beatmaps.
     /// </summary>
     internal sealed class Hit : HitObject, IHasCombo
     {
