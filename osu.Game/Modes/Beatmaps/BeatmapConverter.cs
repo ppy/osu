@@ -32,6 +32,6 @@ namespace osu.Game.Modes.Beatmaps
         /// </summary>
         /// <param name="beatmap">The Beatmap to check.</param>
         /// <returns>Whether the Beatmap can be converted using this Beatmap Converter.</returns>
-        public bool CanConvert(Beatmap beatmap) => ValidConversionTypes.All(t => beatmap.HitObjects.Any(h => h.GetType().IsInstanceOfType(t)));
+        public bool CanConvert(Beatmap beatmap) => ValidConversionTypes.All(t => beatmap.HitObjects.Any(h => t.IsInstanceOfType(h)));
     }
 }
