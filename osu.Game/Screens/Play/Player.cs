@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Play
         private const double pause_cooldown = 1000;
         private double lastPauseActionTime;
 
+        private bool restarting = false;
+
         private bool canPause => ValidForResume && !HasFailed && Time.Current >= lastPauseActionTime + pause_cooldown;
 
         private IAdjustableClock sourceClock;
@@ -245,6 +247,7 @@ namespace osu.Game.Screens.Play
 
         public void Restart()
         {
+            restarting = true;
             OnRestart?.Invoke();
             Exit();
         }
@@ -320,7 +323,7 @@ namespace osu.Game.Screens.Play
             if (HasFailed || !ValidForResume)
                 return false;
 
-            if (pauseOverlay != null && !HitRenderer.HasReplayLoaded)
+            if (pauseOverlay != null && !HitRenderer.HasReplayLoaded && !restarting)
             {
                 //pause screen override logic.
                 if (pauseOverlay?.State == Visibility.Hidden && !canPause) return true;
