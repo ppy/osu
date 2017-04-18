@@ -26,6 +26,7 @@ namespace osu.Desktop.VisualTests.Tests
                 AudioClock = new StopwatchClock(true),
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
+                ForceVisibility = true,
             });
 
             AddStep("Toggle Bar", progress.ToggleBar);

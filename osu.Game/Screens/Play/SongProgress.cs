@@ -13,6 +13,8 @@ using System.Linq;
 using osu.Framework.Timing;
 using osu.Game.Modes.Objects;
 using osu.Game.Modes.Objects.Types;
+using osu.Game.Configuration;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Screens.Play
 {
@@ -25,6 +27,8 @@ namespace osu.Game.Screens.Play
         private static readonly Vector2 handle_size = new Vector2(14, 25);
 
         private const float transition_duration = 200;
+
+        private Bindable<bool> userVisible;
 
         private readonly SongProgressBar bar;
         private readonly SongProgressGraph graph;
@@ -63,10 +67,30 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        private bool hasForcedVisibility;
+        public bool ForceVisibility
+        {
+            set
+            {
+                hasForcedVisibility = value;
+                userVisible?.TriggerChange();
+            }
+        }
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuConfigManager config, OsuColour colours)
         {
             graph.FillColour = bar.FillColour = colours.BlueLighter;
+
+            userVisible = config.GetBindable<bool>(OsuConfig.ShowProgressGraph);
+            userVisible.ValueChanged += progressVisibility =>
+            {
+                if (userVisible || hasForcedVisibility)
+                    FadeIn(transition_duration);
+                else
+                    FadeOut(transition_duration);
+            };
+            userVisible.TriggerChange();
         }
 
         public SongProgress()
@@ -96,10 +120,7 @@ namespace osu.Game.Screens.Play
                     },
                 },
             };
-        }
 
-        protected override void LoadComplete()
-        {
             State = Visibility.Visible;
         }
 
