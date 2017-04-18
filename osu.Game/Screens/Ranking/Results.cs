@@ -15,6 +15,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -99,7 +100,7 @@ namespace osu.Game.Screens.Ranking
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {
@@ -173,7 +174,49 @@ namespace osu.Game.Screens.Ranking
                                     RelativeSizeAxes = Axes.X,
                                     Height = 50,
                                     Margin = new MarginPadding { Bottom = 110 },
-                                }
+                                },
+                                new SpriteText
+                                {
+                                    Text = $"{score.MaxCombo}x",
+                                    TextSize = 40,
+                                    RelativePositionAxes = Axes.X,
+                                    Font = @"Exo2.0-Bold",
+                                    X = 0.1f,
+                                    Colour = colours.BlueDarker,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.BottomCentre,
+                                },
+                                new SpriteText
+                                {
+                                    Text = $"max combo",
+                                    TextSize = 20,
+                                    RelativePositionAxes = Axes.X,
+                                    X = 0.1f,
+                                    Colour = colours.Gray6,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.TopCentre,
+                                },
+                                new SpriteText
+                                {
+                                    Text = $"{score.Accuracy:P2}",
+                                    TextSize = 40,
+                                    RelativePositionAxes = Axes.X,
+                                    Font = @"Exo2.0-Bold",
+                                    X = 0.9f,
+                                    Colour = colours.BlueDarker,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.BottomCentre,
+                                },
+                                new SpriteText
+                                {
+                                    Text = $"accuracy",
+                                    TextSize = 20,
+                                    RelativePositionAxes = Axes.X,
+                                    X = 0.9f,
+                                    Colour = colours.Gray6,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.TopCentre,
+                                },
                             }
                         },
                         circleInner = new CircularContainer
