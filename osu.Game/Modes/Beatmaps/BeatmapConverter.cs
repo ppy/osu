@@ -60,7 +60,7 @@ namespace osu.Game.Modes.Beatmaps
             T tObject = original as T;
             if (tObject != null)
                 yield return tObject;
-            
+
             // Convert the hit object
             foreach (var obj in ConvertHitObject(original, beatmap))
                 yield return obj;
