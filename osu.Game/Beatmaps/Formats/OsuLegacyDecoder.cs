@@ -87,7 +87,7 @@ namespace osu.Game.Beatmaps.Formats
                 case @"Mode":
                     beatmap.BeatmapInfo.RulesetID = int.Parse(val);
 
-                    switch (beatmap.BeatmapInfo.Mode)
+                    switch (beatmap.BeatmapInfo.RulesetID)
                     {
                         case 0:
                             parser = new Modes.Objects.Legacy.Osu.HitObjectParser();
