@@ -71,8 +71,25 @@ namespace osu.Game.Rulesets.Scoring
             Combo = Combo,
             MaxCombo = HighestCombo,
             Accuracy = Accuracy,
+            Rank = rankFrom(Accuracy),
+            Date = DateTime.Now,
             Health = Health,
         };
+
+        private ScoreRank rankFrom(double acc)
+        {
+            if (acc == 1)
+                return ScoreRank.X;
+            if (acc > 0.95)
+                return ScoreRank.S;
+            if (acc > 0.9)
+                return ScoreRank.A;
+            if (acc > 0.8)
+                return ScoreRank.B;
+            if (acc > 0.7)
+                return ScoreRank.C;
+            return ScoreRank.D;
+        }
 
         /// <summary>
         /// Resets this ScoreProcessor to a default state.
