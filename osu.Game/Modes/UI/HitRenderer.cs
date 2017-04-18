@@ -125,7 +125,7 @@ namespace osu.Game.Modes.UI
 
             // Check if the beatmap can be converted
             if (!converter.CanConvert(beatmap.Beatmap))
-                throw new BeatmapInvalidForModeException($"{nameof(Beatmap)} can't be converted to the current mode.");
+                throw new BeatmapInvalidForModeException($"{nameof(Beatmap)} can't be converted for the current ruleset.");
 
             // Convert the beatmap
             Beatmap = converter.Convert(beatmap.Beatmap);
