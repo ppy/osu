@@ -52,9 +52,9 @@ namespace osu.Game.Screens.Ranking
                 {
                     EdgeEffect = new EdgeEffect
                     {
-                        Colour = Color4.Black.Opacity(1),
+                        Colour = colours.GrayF.Opacity(0.8f),
                         Type = EdgeEffectType.Shadow,
-                        Radius = 15,
+                        Radius = 1,
                     },
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     EdgeEffect = new EdgeEffect
                     {
-                        Colour = Color4.Black.Opacity(0.4f),
+                        Colour = Color4.Black.Opacity(0.2f),
                         Type = EdgeEffectType.Shadow,
                         Radius = 15,
                     },
