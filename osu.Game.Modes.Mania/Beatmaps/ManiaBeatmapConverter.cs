@@ -12,7 +12,7 @@ namespace osu.Game.Modes.Mania.Beatmaps
 {
     internal class ManiaBeatmapConverter : BeatmapConverter<ManiaBaseHit>
     {
-        public override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasColumn) };
+        public override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         public override Beatmap<ManiaBaseHit> Convert(Beatmap original)
         {

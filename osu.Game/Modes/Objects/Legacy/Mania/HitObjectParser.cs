@@ -16,6 +16,7 @@ namespace osu.Game.Modes.Objects.Legacy.Mania
         {
             return new Hit
             {
+                X = position.X,
                 NewCombo = newCombo,
             };
         }
@@ -24,6 +25,7 @@ namespace osu.Game.Modes.Objects.Legacy.Mania
         {
             return new Slider
             {
+                X = position.X,
                 NewCombo = newCombo,
                 ControlPoints = controlPoints,
                 Distance = length,
@@ -36,6 +38,7 @@ namespace osu.Game.Modes.Objects.Legacy.Mania
         {
             return new Spinner
             {
+                X = position.X,
                 EndTime = endTime
             };
         }

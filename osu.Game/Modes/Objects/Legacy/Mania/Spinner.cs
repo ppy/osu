@@ -8,12 +8,12 @@ namespace osu.Game.Modes.Objects.Legacy.Mania
     /// <summary>
     /// Legacy osu!mania Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Spinner : HitObject, IHasEndTime, IHasColumn
+    internal sealed class Spinner : HitObject, IHasEndTime, IHasXPosition
     {
         public double EndTime { get; set; }
 
         public double Duration => EndTime - StartTime;
 
-        public int Column { get; set; }
+        public float X { get; set; }
     }
 }

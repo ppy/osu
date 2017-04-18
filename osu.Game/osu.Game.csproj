@@ -117,7 +117,6 @@
     <Compile Include="Modes\Objects\Legacy\Taiko\HitObjectParser.cs" />
     <Compile Include="Modes\Objects\Legacy\Taiko\Slider.cs" />
     <Compile Include="Modes\Objects\Legacy\Taiko\Spinner.cs" />
-    <Compile Include="Modes\Objects\Types\IHasColumn.cs" />
     <Compile Include="Modes\Objects\Types\IHasXPosition.cs" />
     <Compile Include="Modes\Objects\Types\IHasYPosition.cs" />
     <Compile Include="Modes\Replays\Replay.cs" />
