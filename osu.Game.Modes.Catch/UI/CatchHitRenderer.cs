@@ -22,7 +22,7 @@ namespace osu.Game.Modes.Catch.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
 
-        protected override IBeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
+        protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
 
         protected override IBeatmapProcessor<CatchBaseHit> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
 

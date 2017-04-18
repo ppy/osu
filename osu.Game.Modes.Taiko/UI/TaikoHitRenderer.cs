@@ -115,7 +115,7 @@ namespace osu.Game.Modes.Taiko.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
-        protected override IBeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
+        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
 
         protected override IBeatmapProcessor<TaikoHitObject> CreateBeatmapProcessor() => new TaikoBeatmapProcessor();
 

@@ -120,7 +120,7 @@ namespace osu.Game.Modes.UI
 
             RelativeSizeAxes = Axes.Both;
 
-            IBeatmapConverter<TObject> converter = CreateBeatmapConverter();
+            BeatmapConverter<TObject> converter = CreateBeatmapConverter();
             IBeatmapProcessor<TObject> processor = CreateBeatmapProcessor();
 
             // Check if the beatmap can be converted
@@ -158,7 +158,7 @@ namespace osu.Game.Modes.UI
         /// Creates a converter to convert Beatmap to a specific mode.
         /// </summary>
         /// <returns>The Beatmap converter.</returns>
-        protected abstract IBeatmapConverter<TObject> CreateBeatmapConverter();
+        protected abstract BeatmapConverter<TObject> CreateBeatmapConverter();
 
         /// <summary>
         /// Creates a processor to perform post-processing operations

@@ -42,6 +42,6 @@ namespace osu.Game.Beatmaps
         {
         }
 
-        protected abstract IBeatmapConverter<T> CreateBeatmapConverter();
+        protected abstract BeatmapConverter<T> CreateBeatmapConverter();
     }
 }

@@ -21,6 +21,6 @@ namespace osu.Game.Modes.Mania
             return 0;
         }
 
-        protected override IBeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
+        protected override BeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
     }
 }

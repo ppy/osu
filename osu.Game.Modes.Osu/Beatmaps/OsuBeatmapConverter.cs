@@ -14,11 +14,11 @@ using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Osu.Beatmaps
 {
-    internal class OsuBeatmapConverter : IBeatmapConverter<OsuHitObject>
+    internal class OsuBeatmapConverter : BeatmapConverter<OsuHitObject>
     {
-        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasPosition) };
+        public override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasPosition) };
 
-        public Beatmap<OsuHitObject> Convert(Beatmap original)
+        public override Beatmap<OsuHitObject> Convert(Beatmap original)
         {
             return new Beatmap<OsuHitObject>(original)
             {

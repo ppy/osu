@@ -15,7 +15,7 @@ using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
 {
-    internal class TaikoBeatmapConverter : IBeatmapConverter<TaikoHitObject>
+    internal class TaikoBeatmapConverter : BeatmapConverter<TaikoHitObject>
     {
         /// <summary>
         /// osu! is generally slower than taiko, so a factor is added to increase
@@ -39,9 +39,9 @@ namespace osu.Game.Modes.Taiko.Beatmaps
         /// </summary>
         private const float taiko_base_distance = 100;
 
-        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
+        public override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
 
-        public Beatmap<TaikoHitObject> Convert(Beatmap original)
+        public override Beatmap<TaikoHitObject> Convert(Beatmap original)
         {
             BeatmapInfo info = original.BeatmapInfo.DeepClone<BeatmapInfo>();
             info.Difficulty.SliderMultiplier *= legacy_velocity_multiplier;

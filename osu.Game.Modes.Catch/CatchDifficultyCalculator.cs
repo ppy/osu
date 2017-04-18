@@ -20,6 +20,6 @@ namespace osu.Game.Modes.Catch
             return 0;
         }
 
-        protected override IBeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
+        protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
     }
 }

@@ -25,7 +25,7 @@ namespace osu.Game.Modes.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        protected override IBeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
+        protected override BeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
 
         protected override IBeatmapProcessor<ManiaBaseHit> CreateBeatmapProcessor() => new ManiaBeatmapProcessor();
 

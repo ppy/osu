@@ -10,11 +10,11 @@ using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Catch.Beatmaps
 {
-    internal class CatchBeatmapConverter : IBeatmapConverter<CatchBaseHit>
+    internal class CatchBeatmapConverter : BeatmapConverter<CatchBaseHit>
     {
-        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
+        public override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
-        public Beatmap<CatchBaseHit> Convert(Beatmap original)
+        public override Beatmap<CatchBaseHit> Convert(Beatmap original)
         {
             return new Beatmap<CatchBaseHit>(original)
             {
