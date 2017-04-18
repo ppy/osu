@@ -276,8 +276,8 @@ namespace osu.Game.Database
 
             //we need metadata
             GetChildren(beatmapSetInfo);
-            foreach (var b in beatmapSetInfo.Beatmaps)
-                GetChildren(b);
+            //we also need a ruleset
+            GetChildren(beatmapInfo);
 
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapSetInfo.Metadata;
