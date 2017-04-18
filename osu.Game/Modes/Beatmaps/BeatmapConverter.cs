@@ -63,7 +63,12 @@ namespace osu.Game.Modes.Beatmaps
 
             // Convert the hit object
             foreach (var obj in ConvertHitObject(original, beatmap))
+            {
+                if (obj == null)
+                    continue;
+
                 yield return obj;
+            }
         }
 
         /// <summary>
