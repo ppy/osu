@@ -23,6 +23,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(progress = new SongProgress
             {
+                RelativeSizeAxes = Axes.X,
                 AudioClock = new StopwatchClock(true),
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,

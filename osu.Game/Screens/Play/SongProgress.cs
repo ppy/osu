@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using System;
 using System.Collections.Generic;
 using osu.Game.Graphics;
@@ -13,6 +12,7 @@ using System.Linq;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Screens.Play
 {
@@ -71,7 +71,6 @@ namespace osu.Game.Screens.Play
 
         public SongProgress()
         {
-            RelativeSizeAxes = Axes.X;
             Height = progress_height + SongProgressGraph.Column.HEIGHT + handle_size.Y;
             Y = progress_height;
 
