@@ -8,7 +8,6 @@ using osu.Game.Modes.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
-using System;
 
 namespace osu.Game.Modes.Osu.Objects
 {
