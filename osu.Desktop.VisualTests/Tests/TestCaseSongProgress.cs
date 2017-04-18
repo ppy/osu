@@ -16,6 +16,7 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Description => @"With fake data";
 
         private SongProgress progress;
+        private SongProgressGraph graph;
 
         public override void Reset()
         {
@@ -23,9 +24,18 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(progress = new SongProgress
             {
+                RelativeSizeAxes = Axes.X,
                 AudioClock = new StopwatchClock(true),
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
+            });
+
+            Add(graph = new SongProgressGraph
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 200,
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.TopLeft,
             });
 
             AddStep("Toggle Bar", progress.ToggleBar);
@@ -44,6 +54,7 @@ namespace osu.Desktop.VisualTests.Tests
                 objects.Add(new HitObject { StartTime = i });
 
             progress.Objects = objects;
+            graph.Objects = objects;
         }
     }
 }

@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using System;
 using System.Collections.Generic;
 using osu.Game.Graphics;
@@ -13,12 +12,13 @@ using System.Linq;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
     {
-        private const int progress_height = 5;
+        private const int bottom_bar_height = 5;
 
         protected override bool HideOnEscape => false;
 
@@ -41,25 +41,7 @@ namespace osu.Game.Screens.Play
         {
             set
             {
-                objects = value;
-
-                const int granularity = 200;
-
-                var interval = lastHitTime / granularity;
-
-                var values = new int[granularity];
-
-                foreach (var h in objects)
-                {
-                    IHasEndTime end = h as IHasEndTime;
-
-                    int startRange = (int)(h.StartTime / interval);
-                    int endRange = (int)((end?.EndTime ?? h.StartTime) / interval);
-                    for (int i = startRange; i <= endRange; i++)
-                        values[i]++;
-                }
-
-                graph.Values = values;
+                graph.Objects = objects = value;
             }
         }
 
@@ -71,9 +53,10 @@ namespace osu.Game.Screens.Play
 
         public SongProgress()
         {
-            RelativeSizeAxes = Axes.X;
-            Height = progress_height + SongProgressGraph.Column.HEIGHT + handle_size.Y;
-            Y = progress_height;
+            const float graph_height = SquareGraph.Column.WIDTH * 6;
+
+            Height = bottom_bar_height + graph_height + handle_size.Y;
+            Y = bottom_bar_height;
 
             Children = new Drawable[]
             {
@@ -82,10 +65,10 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                    Height = SongProgressGraph.Column.HEIGHT,
-                    Margin = new MarginPadding { Bottom = progress_height },
+                    Height = graph_height,
+                    Margin = new MarginPadding { Bottom = bottom_bar_height },
                 },
-                bar = new SongProgressBar(progress_height, SongProgressGraph.Column.HEIGHT, handle_size)
+                bar = new SongProgressBar(bottom_bar_height, graph_height, handle_size)
                 {
                     Alpha = 0,
                     Anchor = Anchor.BottomLeft,
@@ -114,7 +97,7 @@ namespace osu.Game.Screens.Play
         private void updateBarVisibility()
         {
             bar.FadeTo(barVisible ? 1 : 0, transition_duration, EasingTypes.In);
-            MoveTo(new Vector2(0, barVisible ? 0 : progress_height), transition_duration, EasingTypes.In);
+            MoveTo(new Vector2(0, barVisible ? 0 : bottom_bar_height), transition_duration, EasingTypes.In);
         }
 
         protected override void PopIn()
@@ -132,11 +115,13 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
+            if (objects == null)
+                return;
+
             double progress = (AudioClock?.CurrentTime ?? Time.Current) / lastHitTime;
 
             bar.UpdatePosition((float)progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
-
         }
     }
 }
