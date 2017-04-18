@@ -40,6 +40,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 TotalScore = 2845370,
                 Accuracy = 0.98,
+                MaxCombo = 123,
                 Rank = ScoreRank.A,
                 User = new User
                 {
