@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Ranking
                                     {
                                         new Sprite
                                         {
-                                            Alpha = 0.5f,
+                                            Alpha = 0.2f,
                                             Texture = Beatmap?.Background,
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
