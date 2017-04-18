@@ -22,6 +22,7 @@ using System.Linq;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
@@ -266,7 +267,9 @@ namespace osu.Game.Screens.Play
             Delay(1000);
             onCompletionEvent = Schedule(delegate
             {
-                Push(new Results(scoreProcessor.CreateScore()));
+                var score = scoreProcessor.CreateScore();
+                score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
+                Push(new Results(score));
             });
         }
 
