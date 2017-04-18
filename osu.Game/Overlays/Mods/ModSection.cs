@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes.Mods;
+using osu.Game.Rulesets.Mods;
 using System;
 
 namespace osu.Game.Overlays.Mods

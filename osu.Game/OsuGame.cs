@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
 
@@ -205,7 +205,7 @@ namespace osu.Game
                 OnRulesetChange = r => Ruleset.Value = r,
             }, t =>
             {
-                Ruleset.ValueChanged += delegate { Toolbar.SetGameMode(Ruleset.Value); };
+                Ruleset.ValueChanged += delegate { Toolbar.SetRuleset(Ruleset.Value); };
                 Ruleset.TriggerChange();
                 overlayContent.Add(Toolbar);
             });
@@ -279,7 +279,7 @@ namespace osu.Game
                 return;
             }
 
-            //central game mode change logic.
+            //central game screen change logic.
             if (!currentScreen.ShowOverlays)
             {
                 options.State = Visibility.Hidden;

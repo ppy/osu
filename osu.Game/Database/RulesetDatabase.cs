@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework.Platform;
-using osu.Game.Modes;
+using osu.Game.Rulesets;
 using SQLite.Net;
 
 namespace osu.Game.Database
@@ -35,7 +35,7 @@ namespace osu.Game.Database
 
             List<Ruleset> instances = new List<Ruleset>();
 
-            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, @"osu.Game.Modes.*.dll"))
+            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, @"osu.Game.Rulesets.*.dll"))
             {
                 try
                 {

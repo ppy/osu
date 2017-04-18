@@ -33,7 +33,7 @@ namespace osu.Game.Screens
         {
             base.OnEntering(last);
 
-            //only show the pop button if we are entered form another gamemode.
+            //only show the pop button if we are entered form another screen.
             if (last != null)
                 popButton.Alpha = 1;
 

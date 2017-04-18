@@ -7,7 +7,7 @@ using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.IO.Legacy;
 using osu.Game.IPC;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Scoring;
 using SharpCompress.Compressors.LZMA;
 using SQLite.Net;
 
