@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Play
         {
             base.OnResuming(last);
 
+            contentIn();
+
             //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
             LoadComponentAsync(player = new Player
             {
@@ -77,10 +79,24 @@ namespace osu.Game.Screens.Play
                 Beatmap = player.Beatmap,
             }, p =>
             {
+                contentOut();
+
                 if (!Push(player))
                     Exit();
                 ValidForResume = false;
             });
+        }
+
+        private void contentIn()
+        {
+            Content.ScaleTo(1, 750, EasingTypes.OutQuint);
+            Content.FadeInFromZero(500);
+        }
+
+        private void contentOut()
+        {
+            Content.ScaleTo(0.7f, 300, EasingTypes.InQuint);
+            Content.FadeOut(250);
         }
 
         protected override void OnEntering(Screen last)
@@ -90,20 +106,19 @@ namespace osu.Game.Screens.Play
             Background.FadeTo(0.4f, 250);
 
             Content.ScaleTo(0.7f);
-            Content.ScaleTo(1, 750, EasingTypes.OutQuint);
-            Content.FadeInFromZero(500);
 
-            Delay(1000, true);
+            contentIn();
+
+            Delay(500, true);
 
             logo.MoveToOffset(new Vector2(0, -180), 500, EasingTypes.InOutExpo);
             Delay(250, true);
 
             info.FadeIn(500);
 
-            Delay(2000, true);
+            Delay(1400, true);
 
-            Content.ScaleTo(0.7f, 300, EasingTypes.InQuint);
-            Content.FadeOut(250);
+            contentOut();
 
             Delay(250);
 
