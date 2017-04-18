@@ -8,7 +8,7 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Legacy;
-using osu.Game.Modes.Objects.Legacy;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -90,16 +90,16 @@ namespace osu.Game.Beatmaps.Formats
                     switch (beatmap.BeatmapInfo.RulesetID)
                     {
                         case 0:
-                            parser = new Modes.Objects.Legacy.Osu.HitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Osu.HitObjectParser();
                             break;
                         case 1:
-                            parser = new Modes.Objects.Legacy.Taiko.HitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Taiko.HitObjectParser();
                             break;
                         case 2:
-                            parser = new Modes.Objects.Legacy.Catch.HitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Catch.HitObjectParser();
                             break;
                         case 3:
-                            parser = new Modes.Objects.Legacy.Mania.HitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Mania.HitObjectParser();
                             break;
                     }
                     break;

@@ -18,9 +18,9 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.Objects.Types;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Select
 {

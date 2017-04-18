@@ -5,7 +5,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Database;
-using osu.Game.Modes.Mods;
+using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 
