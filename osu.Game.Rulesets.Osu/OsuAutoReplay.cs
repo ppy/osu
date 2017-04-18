@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets.Osu
 
                 ReplayButtonState button = buttonIndex % 2 == 0 ? ReplayButtonState.Left1 : ReplayButtonState.Right1;
 
-                double hEndTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+                double hEndTime = ((h as IHasEndTime)?.EndTime ?? h.StartTime) + KEY_UP_DELAY;
 
                 ReplayFrame newFrame = new ReplayFrame(h.StartTime, targetPosition.X, targetPosition.Y, button);
                 ReplayFrame endFrame = new ReplayFrame(hEndTime + endDelay, h.EndPosition.X, h.EndPosition.Y, ReplayButtonState.None);
