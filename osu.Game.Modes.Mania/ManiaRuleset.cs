@@ -96,8 +96,6 @@ namespace osu.Game.Modes.Mania
             }
         }
 
-        protected override PlayMode PlayMode => PlayMode.Mania;
-
         public override string Description => "osu!mania";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_mania_o;
@@ -107,5 +105,7 @@ namespace osu.Game.Modes.Mania
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new ManiaDifficultyCalculator(beatmap);
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
+
+        public override int LegacyID => 3;
     }
 }

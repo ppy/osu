@@ -76,8 +76,6 @@ namespace osu.Game.Modes.Catch
             }
         }
 
-        protected override PlayMode PlayMode => PlayMode.Catch;
-
         public override string Description => "osu!catch";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_fruits_o;
@@ -92,5 +90,7 @@ namespace osu.Game.Modes.Catch
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new CatchDifficultyCalculator(beatmap);
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
+
+        public override int LegacyID => 2;
     }
 }
