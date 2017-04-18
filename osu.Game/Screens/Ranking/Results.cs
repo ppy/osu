@@ -254,7 +254,7 @@ namespace osu.Game.Screens.Ranking
 
             modeChangeButtons.AddItem(ResultMode.Summary);
             modeChangeButtons.AddItem(ResultMode.Ranking);
-            modeChangeButtons.AddItem(ResultMode.Share);
+            //modeChangeButtons.AddItem(ResultMode.Share);
 
             modeChangeButtons.Current.ValueChanged += mode =>
             {
