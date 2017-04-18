@@ -2,23 +2,26 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics.Containers;
-using osu.Game.Modes;
+using osu.Game.Database;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarModeButton : ToolbarButton
     {
-        private PlayMode mode;
-        public PlayMode Mode
+        private RulesetInfo ruleset;
+        public RulesetInfo Ruleset
         {
-            get { return mode; }
+            get { return ruleset; }
             set
             {
-                mode = value;
-                TooltipMain = Ruleset.GetRuleset(mode).Description;
-                TooltipSub = $"Play some {Ruleset.GetRuleset(mode).Description}";
-                Icon = Ruleset.GetRuleset(mode).Icon;
+                ruleset = value;
+
+                var rInstance = ruleset.CreateInstance();
+
+                TooltipMain = rInstance.Description;
+                TooltipSub = $"Play some {rInstance.Description}";
+                Icon = rInstance.Icon;
             }
         }
 

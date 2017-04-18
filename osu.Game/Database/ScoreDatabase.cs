@@ -7,26 +7,29 @@ using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.IO.Legacy;
 using osu.Game.IPC;
-using osu.Game.Modes;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Scoring;
 using SharpCompress.Compressors.LZMA;
+using SQLite.Net;
 
 namespace osu.Game.Database
 {
-    public class ScoreDatabase
+    public class ScoreDatabase : Database
     {
         private readonly Storage storage;
+
         private readonly BeatmapDatabase beatmaps;
+        private readonly RulesetDatabase rulesets;
 
         private const string replay_folder = @"replays";
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
-        public ScoreDatabase(Storage storage, IIpcHost importHost = null, BeatmapDatabase beatmaps = null)
+        public ScoreDatabase(Storage storage, SQLiteConnection connection, IIpcHost importHost = null, BeatmapDatabase beatmaps = null, RulesetDatabase rulesets = null) : base(storage, connection)
         {
             this.storage = storage;
             this.beatmaps = beatmaps;
+            this.rulesets = rulesets;
 
             if (importHost != null)
                 ipc = new ScoreIPCChannel(importHost, this);
@@ -39,7 +42,7 @@ namespace osu.Game.Database
             using (Stream s = storage.GetStream(Path.Combine(replay_folder, replayFilename)))
             using (SerializationReader sr = new SerializationReader(s))
             {
-                var ruleset = Ruleset.GetRuleset((PlayMode)sr.ReadByte());
+                var ruleset = rulesets.GetRuleset(sr.ReadByte()).CreateInstance();
                 score = ruleset.CreateScoreProcessor().CreateScore();
 
                 /* score.Pass = true;*/
@@ -107,5 +110,11 @@ namespace osu.Game.Database
 
             return score;
         }
+
+        protected override void Prepare(bool reset = false)
+        {
+        }
+
+        protected override Type[] ValidTypes => new[] { typeof(Score) };
     }
 }
