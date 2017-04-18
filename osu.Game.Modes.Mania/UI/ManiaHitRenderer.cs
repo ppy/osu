@@ -27,8 +27,6 @@ namespace osu.Game.Modes.Mania.UI
 
         protected override BeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
 
-        protected override IBeatmapProcessor<ManiaBaseHit> CreateBeatmapProcessor() => new ManiaBeatmapProcessor();
-
         protected override Playfield<ManiaBaseHit, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(columns);
 
         protected override DrawableHitObject<ManiaBaseHit, ManiaJudgement> GetVisualRepresentation(ManiaBaseHit h) => null;
