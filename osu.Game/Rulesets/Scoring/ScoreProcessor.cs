@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Scoring
 {

@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 new SpriteText
                                 {
-                                    Text = $"max combo",
+                                    Text = "max combo",
                                     TextSize = 20,
                                     RelativePositionAxes = Axes.X,
                                     X = 0.1f,
@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 new SpriteText
                                 {
-                                    Text = $"accuracy",
+                                    Text = "accuracy",
                                     TextSize = 20,
                                     RelativePositionAxes = Axes.X,
                                     X = 0.9f,

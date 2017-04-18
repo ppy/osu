@@ -22,7 +22,6 @@ using System.Linq;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
