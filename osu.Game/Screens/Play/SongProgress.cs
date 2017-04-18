@@ -53,7 +53,9 @@ namespace osu.Game.Screens.Play
 
         public SongProgress()
         {
-            Height = bottom_bar_height + SquareGraph.Column.HEIGHT + handle_size.Y;
+            const float graph_height = SquareGraph.Column.WIDTH * 6;
+
+            Height = bottom_bar_height + graph_height + handle_size.Y;
             Y = bottom_bar_height;
 
             Children = new Drawable[]
@@ -63,10 +65,10 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                    Height = SquareGraph.Column.HEIGHT,
+                    Height = graph_height,
                     Margin = new MarginPadding { Bottom = bottom_bar_height },
                 },
-                bar = new SongProgressBar(bottom_bar_height, SquareGraph.Column.HEIGHT, handle_size)
+                bar = new SongProgressBar(bottom_bar_height, graph_height, handle_size)
                 {
                     Alpha = 0,
                     Anchor = Anchor.BottomLeft,
