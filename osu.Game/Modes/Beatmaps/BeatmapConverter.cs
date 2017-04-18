@@ -59,7 +59,10 @@ namespace osu.Game.Modes.Beatmaps
             // Check if the hitobject is already the converted type
             T tObject = original as T;
             if (tObject != null)
+            {
                 yield return tObject;
+                yield break;
+            }
 
             // Convert the hit object
             foreach (var obj in ConvertHitObject(original, beatmap))
