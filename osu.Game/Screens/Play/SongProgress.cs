@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
     {
-        private const int progress_height = 5;
+        private const int bottom_bar_height = 5;
 
         protected override bool HideOnEscape => false;
 
@@ -71,8 +71,8 @@ namespace osu.Game.Screens.Play
 
         public SongProgress()
         {
-            Height = progress_height + SongProgressGraph.Column.HEIGHT + handle_size.Y;
-            Y = progress_height;
+            Height = bottom_bar_height + SongProgressGraph.Column.HEIGHT + handle_size.Y;
+            Y = bottom_bar_height;
 
             Children = new Drawable[]
             {
@@ -82,9 +82,9 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Height = SongProgressGraph.Column.HEIGHT,
-                    Margin = new MarginPadding { Bottom = progress_height },
+                    Margin = new MarginPadding { Bottom = bottom_bar_height },
                 },
-                bar = new SongProgressBar(progress_height, SongProgressGraph.Column.HEIGHT, handle_size)
+                bar = new SongProgressBar(bottom_bar_height, SongProgressGraph.Column.HEIGHT, handle_size)
                 {
                     Alpha = 0,
                     Anchor = Anchor.BottomLeft,
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Play
         private void updateBarVisibility()
         {
             bar.FadeTo(barVisible ? 1 : 0, transition_duration, EasingTypes.In);
-            MoveTo(new Vector2(0, barVisible ? 0 : progress_height), transition_duration, EasingTypes.In);
+            MoveTo(new Vector2(0, barVisible ? 0 : bottom_bar_height), transition_duration, EasingTypes.In);
         }
 
         protected override void PopIn()
