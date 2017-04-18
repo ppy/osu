@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -42,6 +43,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Accuracy = 0.98,
                 MaxCombo = 123,
                 Rank = ScoreRank.A,
+                Date = DateTime.Now,
                 User = new User
                 {
                     Username = "peppy",
