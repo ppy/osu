@@ -24,8 +24,6 @@ namespace osu.Game.Modes.Catch.UI
 
         protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
 
-        protected override IBeatmapProcessor<CatchBaseHit> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
-
         protected override Playfield<CatchBaseHit, CatchJudgement> CreatePlayfield() => new CatchPlayfield();
 
         protected override DrawableHitObject<CatchBaseHit, CatchJudgement> GetVisualRepresentation(CatchBaseHit h) => null;

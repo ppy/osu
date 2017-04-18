@@ -10,7 +10,7 @@ namespace osu.Game.Modes.Beatmaps
     /// Processes a post-converted Beatmap.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained in the Beatmap.</typeparam>
-    public interface IBeatmapProcessor<TObject>
+    public class BeatmapProcessor<TObject>
         where TObject : HitObject
     {
         /// <summary>
@@ -20,6 +20,6 @@ namespace osu.Game.Modes.Beatmaps
         /// </para>
         /// </summary>
         /// <param name="beatmap">The Beatmap to process.</param>
-        void PostProcess(Beatmap<TObject> beatmap);
+        public virtual void PostProcess(Beatmap<TObject> beatmap) { }
     }
 }

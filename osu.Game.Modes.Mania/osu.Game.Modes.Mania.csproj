@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\ManiaBeatmapConverter.cs" />
-    <Compile Include="Beatmaps\ManiaBeatmapProcessor.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
     <Compile Include="Scoring\ManiaScoreProcessor.cs" />

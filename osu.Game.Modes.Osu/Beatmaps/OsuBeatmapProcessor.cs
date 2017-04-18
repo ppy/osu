@@ -7,9 +7,9 @@ using osu.Game.Modes.Osu.Objects;
 
 namespace osu.Game.Modes.Osu.Beatmaps
 {
-    internal class OsuBeatmapProcessor : IBeatmapProcessor<OsuHitObject>
+    internal class OsuBeatmapProcessor : BeatmapProcessor<OsuHitObject>
     {
-        public void PostProcess(Beatmap<OsuHitObject> beatmap)
+        public override void PostProcess(Beatmap<OsuHitObject> beatmap)
         {
             if (beatmap.ComboColors.Count == 0)
                 return;
