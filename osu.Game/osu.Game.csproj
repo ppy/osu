@@ -72,8 +72,8 @@
     <Compile Include="Audio\SampleInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
-    <Compile Include="Beatmaps\IBeatmapConverter.cs" />
-    <Compile Include="Beatmaps\IBeatmapProcessor.cs" />
+    <Compile Include="Modes\Beatmaps\IBeatmapConverter.cs" />
+    <Compile Include="Modes\Beatmaps\IBeatmapProcessor.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
     <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
     <Compile Include="Beatmaps\Timing\TimingInfo.cs" />

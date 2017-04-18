@@ -17,6 +17,7 @@ using System.Linq;
 using osu.Game.Modes.Replays;
 using osu.Game.Modes.Scoring;
 using OpenTK;
+using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.UI
 {

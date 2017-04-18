@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Modes.Beatmaps;
 using osu.Game.Modes.Taiko.Objects;
 
 namespace osu.Game.Modes.Taiko.Beatmaps

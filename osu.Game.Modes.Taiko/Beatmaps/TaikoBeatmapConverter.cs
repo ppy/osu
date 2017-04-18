@@ -11,6 +11,7 @@ using System.Linq;
 using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Audio;
+using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Taiko.Beatmaps
 {

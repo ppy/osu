@@ -6,6 +6,7 @@ using osu.Game.Modes.Mania.Objects;
 using System.Collections.Generic;
 using System;
 using osu.Game.Modes.Objects.Types;
+using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Mania.Beatmaps
 {

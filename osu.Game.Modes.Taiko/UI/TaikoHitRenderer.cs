@@ -18,6 +18,7 @@ using osu.Game.Modes.Taiko.Scoring;
 using osu.Game.Modes.UI;
 using osu.Game.Modes.Taiko.Replays;
 using OpenTK;
+using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Taiko.UI
 {
