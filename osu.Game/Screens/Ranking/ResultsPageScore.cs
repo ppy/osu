@@ -321,6 +321,7 @@ namespace osu.Game.Screens.Ranking
             public SlowScoreCounter(uint leading = 0) : base(leading)
             {
                 DisplayedCountSpriteText.Shadow = false;
+                UseCommaSeparator = true;
             }
         }
     }
