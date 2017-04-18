@@ -14,14 +14,14 @@ using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Modes.UI;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
 using osu.Framework.Threading;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play
 {
@@ -62,16 +62,9 @@ namespace osu.Game.Screens.Play
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
         {
-            if (Beatmap.Beatmap.BeatmapInfo?.Mode > PlayMode.Taiko)
-            {
-                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
-                Exit();
-                return;
-            }
-
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
@@ -85,6 +78,19 @@ namespace osu.Game.Screens.Play
 
                 if (Beatmap == null)
                     throw new Exception("Beatmap was not loaded");
+
+                try
+                {
+                    // Try using the preferred user ruleset
+                    ruleset = osu == null ? Beatmap.BeatmapInfo.Ruleset.CreateInstance() : osu.Ruleset.Value.CreateInstance();
+                    HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+                }
+                catch (BeatmapInvalidForModeException)
+                {
+                    // Default to the beatmap ruleset
+                    ruleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance();
+                    HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+                }
             }
             catch (Exception e)
             {
@@ -110,9 +116,6 @@ namespace osu.Game.Screens.Play
             {
                 sourceClock.Reset();
             });
-
-            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
-            HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 

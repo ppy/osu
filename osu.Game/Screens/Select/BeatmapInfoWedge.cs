@@ -18,9 +18,9 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.Objects.Types;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Select
 {
@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Select
         }
 
         protected override bool HideOnEscape => false;
+
+        protected override bool BlockPassThroughMouse => false;
 
         protected override void PopIn()
         {
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Select
                 }));
 
                 //get statistics fromt he current ruleset.
-                labels.AddRange(Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
+                labels.AddRange(beatmap.BeatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
             }
 
             AlwaysPresent = true;
