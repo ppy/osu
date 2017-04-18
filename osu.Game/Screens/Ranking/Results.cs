@@ -16,6 +16,7 @@ using osu.Game.Screens.Backgrounds;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -242,7 +243,13 @@ namespace osu.Game.Screens.Ranking
                             }
                         }
                     }
-                }
+                },
+                new BackButton
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Action = Exit
+                },
             };
 
             modeChangeButtons.AddItem(ResultMode.Summary);
