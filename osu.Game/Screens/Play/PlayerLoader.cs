@@ -31,11 +31,16 @@ namespace osu.Game.Screens.Play
 
         public PlayerLoader(Player player)
         {
+            this.player = player;
+
+            //By default, we want to load the player and never be returned to.
+            //Note that this may change if the player we load requested a re-run.
             ValidForResume = false;
 
-            player.OnRestart = restart;
-
-            this.player = player;
+            player.RestartRequested = () => {
+                showOverlays = false;
+                ValidForResume = true;
+            };
 
             Children = new Drawable[]
             {
@@ -45,7 +50,6 @@ namespace osu.Game.Screens.Play
                     Interactive = false,
                 },
             };
-
         }
 
         [BackgroundDependencyLoader]
@@ -64,24 +68,19 @@ namespace osu.Game.Screens.Play
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
-            if (last != player) return;
-            player = new Player
+
+            //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
+            LoadComponentAsync(player = new Player
             {
                 RestartCount = player.RestartCount + 1,
-                OnRestart = restart
-            };
-            LoadComponentAsync(player, delegate
+                RestartRequested = player.RestartRequested,
+                Beatmap = player.Beatmap,
+            }, p =>
             {
                 if (!Push(player))
                     Exit();
                 ValidForResume = false;
             });
-        }
-
-        private void restart()
-        {
-            showOverlays = false;
-            ValidForResume = true;
         }
 
         protected override void OnEntering(Screen last)

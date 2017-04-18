@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
 
         public BeatmapInfo BeatmapInfo;
 
-        public Action OnRestart;
+        public Action RestartRequested;
 
         public bool IsPaused => !interpolatedSourceClock.IsRunning;
 
@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Play
         public void Restart()
         {
             ValidForResume = false;
-            OnRestart?.Invoke();
+            RestartRequested?.Invoke();
             Exit();
         }
 
