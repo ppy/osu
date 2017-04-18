@@ -4,7 +4,7 @@
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
-using osu.Game.Modes.Mods;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Overlays.Mods
 {
