@@ -49,7 +49,13 @@ namespace osu.Game.Modes.Taiko.Beatmaps
             return new Beatmap<TaikoHitObject>(original)
             {
                 BeatmapInfo = info,
-                HitObjects = original.HitObjects.SelectMany(h => convertHitObject(h, original)).ToList()
+                HitObjects = original.HitObjects.SelectMany(h => convertHitObject(h, original)).GroupBy(t => t.StartTime).Select(x =>
+                {
+                    TaikoHitObject first = x.First();
+                    if (x.Skip(1).Any())
+                        first.IsStrong = true;
+                    return first;
+                }).ToList()
             };
         }
 
