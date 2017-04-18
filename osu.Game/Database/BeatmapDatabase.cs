@@ -219,9 +219,8 @@ namespace osu.Game.Database
                         beatmap.BeatmapInfo.Metadata = null;
 
                         // TODO: this should be done in a better place once we actually need to dynamically update it.
+                        beatmap.BeatmapInfo.Ruleset = rulesets.Query<RulesetInfo>().FirstOrDefault(r => r.ID == beatmap.BeatmapInfo.RulesetID);
                         beatmap.BeatmapInfo.StarDifficulty = rulesets.Query<RulesetInfo>().FirstOrDefault(r => r.ID == beatmap.BeatmapInfo.RulesetID)?.CreateInstance()?.CreateDifficultyCalculator(beatmap).Calculate() ?? 0;
-
-                        beatmap.BeatmapInfo.Ruleset = null;
 
                         beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                     }
@@ -239,7 +238,7 @@ namespace osu.Game.Database
 
                 foreach (var s in beatmapSets)
                 {
-                    Connection.InsertWithChildren(s, true);
+                    Connection.InsertOrReplaceWithChildren(s, true);
                     BeatmapSetAdded?.Invoke(s);
                 }
 
