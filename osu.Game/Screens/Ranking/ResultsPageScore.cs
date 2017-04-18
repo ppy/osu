@@ -13,12 +13,14 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Modes.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
+using osu.Game.Beatmaps;
+using osu.Game.Screens.Play;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -26,7 +28,7 @@ namespace osu.Game.Screens.Ranking
     {
         private ScoreCounter scoreCounter;
 
-        public ResultsPageScore(Score score, BeatmapInfo beatmap) : base(score, beatmap) { }
+        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -69,12 +71,29 @@ namespace osu.Game.Screens.Ranking
                             Size = new Vector2(150, 60),
                             Margin = new MarginPadding(20),
                         },
-                        scoreCounter = new SlowScoreCounter(6)
+                        new Container
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Colour = colours.PinkDarker,
-                            TextSize = 50,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 60,
+                            Children = new Drawable[]
+                            {
+                                new SongProgressGraph
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0.5f,
+                                    Objects = Beatmap.Beatmap.HitObjects,
+                                },
+                                scoreCounter = new SlowScoreCounter(6)
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Colour = colours.PinkDarker,
+                                    Y = 10,
+                                    TextSize = 50,
+                                },
+                            }
                         },
                         new OsuSpriteText
                         {
@@ -87,7 +106,7 @@ namespace osu.Game.Screens.Ranking
                             Text = "total score",
                             Margin = new MarginPadding { Bottom = 20 },
                         },
-                        new BeatmapDetails(Beatmap)
+                        new BeatmapDetails(Beatmap.BeatmapInfo)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
