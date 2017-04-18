@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             int currentBeat = 0;
             double time = timingPoints[currentTimingPoint].Time;
             while (time <= lastHitTime)
-            {             
+            {
                 int nextTimingPoint = currentTimingPoint + 1;
                 if (nextTimingPoint < timingPoints.Count && time > timingPoints[nextTimingPoint].Time)
                 {
