@@ -48,20 +48,20 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (timingPoints.Count == 0)
                 return;
 
-            int currentTimingPoint = 0;
+            int currentIndex = 0;
             int currentBeat = 0;
-            double time = timingPoints[currentTimingPoint].Time;
+            double time = timingPoints[currentIndex].Time;
             while (time <= lastHitTime)
             {
-                int nextTimingPoint = currentTimingPoint + 1;
-                if (nextTimingPoint < timingPoints.Count && time > timingPoints[nextTimingPoint].Time)
+                int nextIndex = currentIndex + 1;
+                if (nextIndex < timingPoints.Count && time > timingPoints[nextIndex].Time)
                 {
-                    currentTimingPoint = nextTimingPoint;
-                    time = timingPoints[currentTimingPoint].Time;
+                    currentIndex = nextIndex;
+                    time = timingPoints[currentIndex].Time;
                     currentBeat = 0;
                 }
 
-                var currentPoint = timingPoints[currentTimingPoint];
+                var currentPoint = timingPoints[currentIndex];
 
                 var barLine = new BarLine
                 {
