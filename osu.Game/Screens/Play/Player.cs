@@ -315,24 +315,23 @@ namespace osu.Game.Screens.Play
         protected override void OnSuspending(Screen next)
         {
             fadeOut();
-
             base.OnSuspending(next);
         }
 
         protected override bool OnExiting(Screen next)
         {
-            if (HasFailed || !ValidForResume)
-                return false;
-
-            if (pauseOverlay != null && !HitRenderer.HasReplayLoaded)
+            if (!HasFailed && ValidForResume)
             {
-                //pause screen override logic.
-                if (pauseOverlay?.State == Visibility.Hidden && !canPause) return true;
-
-                if (!IsPaused) // For if the user presses escape quickly when entering the map
+                if (pauseOverlay != null && !HitRenderer.HasReplayLoaded)
                 {
-                    Pause();
-                    return true;
+                    //pause screen override logic.
+                    if (pauseOverlay?.State == Visibility.Hidden && !canPause) return true;
+
+                    if (!IsPaused) // For if the user presses escape quickly when entering the map
+                    {
+                        Pause();
+                        return true;
+                    }
                 }
             }
 
