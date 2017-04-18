@@ -181,7 +181,7 @@ namespace osu.Game.Modes.Osu
             return difficulty;
         }
 
-        protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
+        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
 
         // Those values are used as array indices. Be careful when changing them!
         public enum DifficultyType

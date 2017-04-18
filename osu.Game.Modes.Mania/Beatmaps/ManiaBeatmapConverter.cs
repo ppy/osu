@@ -10,11 +10,11 @@ using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Mania.Beatmaps
 {
-    internal class ManiaBeatmapConverter : IBeatmapConverter<ManiaBaseHit>
+    internal class ManiaBeatmapConverter : BeatmapConverter<ManiaBaseHit>
     {
-        public IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasColumn) };
+        public override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasColumn) };
 
-        public Beatmap<ManiaBaseHit> Convert(Beatmap original)
+        public override Beatmap<ManiaBaseHit> Convert(Beatmap original)
         {
             return new Beatmap<ManiaBaseHit>(original)
             {

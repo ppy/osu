@@ -25,7 +25,7 @@ namespace osu.Game.Modes.Osu.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor(this);
 
-        protected override IBeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
+        protected override BeatmapConverter<OsuHitObject> CreateBeatmapConverter() => new OsuBeatmapConverter();
 
         protected override IBeatmapProcessor<OsuHitObject> CreateBeatmapProcessor() => new OsuBeatmapProcessor();
 

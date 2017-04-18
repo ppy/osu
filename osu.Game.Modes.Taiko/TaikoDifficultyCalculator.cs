@@ -20,6 +20,6 @@ namespace osu.Game.Modes.Taiko
             return 0;
         }
 
-        protected override IBeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
+        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
     }
 }
