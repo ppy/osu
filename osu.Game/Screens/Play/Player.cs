@@ -80,13 +80,13 @@ namespace osu.Game.Screens.Play
                 try
                 {
                     // Try using the preferred user ruleset
-                    ruleset = osu == null ? Beatmap.BeatmapInfo.Ruleset : osu.Ruleset;
+                    ruleset = osu == null ? Beatmap.BeatmapInfo.Ruleset.CreateInstance() : osu.Ruleset.Value.CreateInstance();
                     HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
                 }
                 catch (BeatmapInvalidForModeException)
                 {
                     // Default to the beatmap ruleset
-                    ruleset = Beatmap.BeatmapInfo.Ruleset;
+                    ruleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance();
                     HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
                 }
             }
