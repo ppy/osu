@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Play
             set
             {
                 hasForcedVisibility = value;
-                userVisible.TriggerChange();
+                userVisible?.TriggerChange();
             }
         }
 
