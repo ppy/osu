@@ -92,8 +92,8 @@ namespace osu.Game.Screens.Ranking
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Colour = colours.PinkDarker,
-                                    Y = 10,
-                                    TextSize = 50,
+                                    Y = 5,
+                                    TextSize = 60,
                                 },
                             }
                         },
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Ranking
                             Font = @"Exo2.0-Bold",
                             TextSize = 16,
                             Text = "total score",
-                            Margin = new MarginPadding { Bottom = 20 },
+                            Margin = new MarginPadding { Bottom = 15 },
                         },
                         new BeatmapDetails(Beatmap.BeatmapInfo)
                         {
