@@ -12,8 +12,10 @@ namespace osu.Game.Database
         [PrimaryKey, AutoIncrement]
         public int? ID { get; set; }
 
+        [Indexed(Unique = true)]
         public string Name { get; set; }
 
+        [Indexed(Unique = true)]
         public string InstantiationInfo { get; set; }
 
         [Indexed]
