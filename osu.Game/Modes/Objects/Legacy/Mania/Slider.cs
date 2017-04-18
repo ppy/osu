@@ -8,9 +8,9 @@ namespace osu.Game.Modes.Objects.Legacy.Mania
     /// <summary>
     /// Legacy osu!mania Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Slider : CurvedHitObject, IHasColumn, IHasCombo
+    internal sealed class Slider : CurvedHitObject, IHasXPosition, IHasCombo
     {
-        public int Column { get; set; }
+        public float X { get; set; }
 
         public bool NewCombo { get; set; }
     }

@@ -8,9 +8,9 @@ namespace osu.Game.Modes.Objects.Legacy.Mania
     /// <summary>
     /// Legacy osu!mania Hit-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Hit : HitObject, IHasColumn, IHasCombo
+    internal sealed class Hit : HitObject, IHasXPosition, IHasCombo
     {
-        public int Column { get; set; }
+        public float X { get; set; }
 
         public bool NewCombo { get; set; }
     }
