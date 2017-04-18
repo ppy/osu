@@ -4,9 +4,8 @@
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Modes.Objects;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
@@ -50,12 +49,6 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public class Beatmap : Beatmap<HitObject>
     {
-        /// <summary>
-        /// Calculates the star difficulty for this Beatmap.
-        /// </summary>
-        /// <returns>The star difficulty.</returns>
-        public double CalculateStarDifficulty() => Ruleset.GetRuleset(BeatmapInfo.Mode).CreateDifficultyCalculator(this).Calculate();
-
         /// <summary>
         /// Constructs a new beatmap.
         /// </summary>

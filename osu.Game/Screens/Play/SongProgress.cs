@@ -11,8 +11,8 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using System.Linq;
 using osu.Framework.Timing;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.Objects.Types;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Screens.Play
 {

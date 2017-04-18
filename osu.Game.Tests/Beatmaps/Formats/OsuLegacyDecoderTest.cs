@@ -6,12 +6,10 @@ using NUnit.Framework;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Modes;
 using osu.Game.Tests.Resources;
-using osu.Game.Modes.Osu;
-using osu.Game.Modes.Objects.Legacy;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -22,7 +20,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void SetUp()
         {
             OsuLegacyDecoder.Register();
-            Ruleset.Register(new OsuRuleset());
         }
 
         [Test]
@@ -58,7 +55,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(false, beatmapInfo.Countdown);
                 Assert.AreEqual(0.7f, beatmapInfo.StackLeniency);
                 Assert.AreEqual(false, beatmapInfo.SpecialStyle);
-                Assert.AreEqual(PlayMode.Osu, beatmapInfo.Mode);
+                Assert.IsTrue(beatmapInfo.RulesetID == 0);
                 Assert.AreEqual(false, beatmapInfo.LetterboxInBreaks);
                 Assert.AreEqual(false, beatmapInfo.WidescreenStoryboard);
             }

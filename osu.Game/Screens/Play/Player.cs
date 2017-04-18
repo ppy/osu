@@ -14,14 +14,14 @@ using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Modes.UI;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
 using osu.Framework.Threading;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play
 {
@@ -63,13 +63,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
         {
-            if (Beatmap.Beatmap.BeatmapInfo?.Mode > PlayMode.Taiko)
-            {
-                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
-                Exit();
-                return;
-            }
-
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
@@ -109,7 +102,10 @@ namespace osu.Game.Screens.Play
                 sourceClock.Reset();
             });
 
-            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
+            ruleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance();
+
+            // Todo: This should be done as early as possible, and should check if the hit renderer
+            // can actually convert the hit objects... Somehow...
             HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();

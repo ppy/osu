@@ -12,11 +12,6 @@ using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.IPC;
-using osu.Game.Modes;
-using osu.Game.Modes.Catch;
-using osu.Game.Modes.Mania;
-using osu.Game.Modes.Osu;
-using osu.Game.Modes.Taiko;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -24,15 +19,6 @@ namespace osu.Game.Tests.Beatmaps.IO
     public class ImportBeatmapTest
     {
         private const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
-
-        [OneTimeSetUp]
-        public void SetUp()
-        {
-            Ruleset.Register(new OsuRuleset());
-            Ruleset.Register(new TaikoRuleset());
-            Ruleset.Register(new ManiaRuleset());
-            Ruleset.Register(new CatchRuleset());
-        }
 
         [Test]
         public void TestImportWhenClosed()
@@ -119,6 +105,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 Thread.Sleep(1);
 
             //reset beatmap database (sqlite and storage backing)
+            osu.Dependencies.Get<RulesetDatabase>().Reset();
             osu.Dependencies.Get<BeatmapDatabase>().Reset();
 
             return osu;
@@ -166,8 +153,16 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Assert.IsTrue(set.Beatmaps.Count > 0);
 
-            var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.Mode == PlayMode.Osu))?.Beatmap;
+            var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
+            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
 
+            beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 1))?.Beatmap;
+            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
+
+            beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 2))?.Beatmap;
+            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
+
+            beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 3))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
         }
     }

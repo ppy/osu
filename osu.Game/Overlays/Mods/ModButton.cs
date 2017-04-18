@@ -12,10 +12,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes.Mods;
-using osu.Game.Modes.UI;
 using System;
 using System.Linq;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Overlays.Mods
 {
