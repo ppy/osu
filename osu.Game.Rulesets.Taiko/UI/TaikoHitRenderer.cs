@@ -2,10 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.MathUtils;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
@@ -51,54 +49,36 @@ namespace osu.Game.Rulesets.Taiko.UI
                 return;
 
             int currentIndex = 0;
-
-            while (currentIndex < timingPoints.Count && Precision.AlmostEquals(timingPoints[currentIndex].BeatLength, 0))
-                currentIndex++;
-
-            double time = timingPoints[currentIndex].Time;
-            double measureLength = timingPoints[currentIndex].BeatLength * (int)timingPoints[currentIndex].TimeSignature;
-
-            // Find the bar line time closest to 0
-            time -= measureLength * (int)(time / measureLength);
-
-            // Always start barlines from a positive time
-            while (time < 0)
-                time += measureLength;
-
             int currentBeat = 0;
+            double time = timingPoints[currentIndex].Time;
             while (time <= lastHitTime)
             {
-                ControlPoint current = timingPoints[currentIndex];
-
-                if (time > current.Time || current.OmitFirstBarLine)
+                int nextIndex = currentIndex + 1;
+                if (nextIndex < timingPoints.Count && time > timingPoints[nextIndex].Time)
                 {
-                    bool isMajor = currentBeat % (int)current.TimeSignature == 0;
-
-                    var barLine = new BarLine
-                    {
-                        StartTime = time,
-                    };
-
-                    barLine.ApplyDefaults(Beatmap.TimingInfo, Beatmap.BeatmapInfo.Difficulty);
-
-                    taikoPlayfield.AddBarLine(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));
-
-                    currentBeat++;
+                    currentIndex = nextIndex;
+                    time = timingPoints[currentIndex].Time;
+                    currentBeat = 0;
                 }
 
-                double bl = current.BeatLength;
+                var currentPoint = timingPoints[currentIndex];
 
+                var barLine = new BarLine
+                {
+                    StartTime = time,
+                };
+
+                barLine.ApplyDefaults(Beatmap.TimingInfo, Beatmap.BeatmapInfo.Difficulty);
+
+                bool isMajor = currentBeat % (int)currentPoint.TimeSignature == 0;
+                taikoPlayfield.AddBarLine(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));
+
+                double bl = currentPoint.BeatLength;
                 if (bl < 800)
-                    bl *= (int)current.TimeSignature;
+                    bl *= (int)currentPoint.TimeSignature;
 
                 time += bl;
-
-                if (currentIndex + 1 >= timingPoints.Count || time < timingPoints[currentIndex + 1].Time)
-                    continue;
-
-                currentBeat = 0;
-                currentIndex++;
-                time = timingPoints[currentIndex].Time;
+                currentBeat++;
             }
         }
 
