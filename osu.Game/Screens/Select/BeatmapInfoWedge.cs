@@ -47,6 +47,8 @@ namespace osu.Game.Screens.Select
 
         protected override bool HideOnEscape => false;
 
+        protected override bool BlockPassThroughInput => false;
+
         protected override void PopIn()
         {
             MoveToX(0, 800, EasingTypes.OutQuint);
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Select
                 }));
 
                 //get statistics fromt he current ruleset.
-                labels.AddRange(Ruleset.GetRuleset(beatmap.BeatmapInfo.Mode).GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
+                labels.AddRange(beatmap.BeatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
             }
 
             AlwaysPresent = true;

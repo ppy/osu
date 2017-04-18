@@ -76,8 +76,6 @@ namespace osu.Game.Modes.Taiko
             }
         }
 
-        protected override PlayMode PlayMode => PlayMode.Taiko;
-
         public override string Description => "osu!taiko";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_taiko_o;
@@ -93,5 +91,7 @@ namespace osu.Game.Modes.Taiko
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new TaikoDifficultyCalculator(beatmap);
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
+
+        public override int LegacyID => 1;
     }
 }

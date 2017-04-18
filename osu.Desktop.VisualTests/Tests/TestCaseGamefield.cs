@@ -17,12 +17,21 @@ using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Taiko.UI;
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Beatmaps;
+using osu.Framework.Allocation;
 
 namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseGamefield : TestCase
     {
+        private RulesetDatabase rulesets;
+
         public override string Description => @"Showing hitobjects and what not.";
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetDatabase rulesets)
+        {
+            this.rulesets = rulesets;
+        }
 
         public override void Reset()
         {
@@ -49,6 +58,7 @@ namespace osu.Desktop.VisualTests.Tests
                 BeatmapInfo = new BeatmapInfo
                 {
                     Difficulty = new BeatmapDifficulty(),
+                    Ruleset = rulesets.Query<RulesetInfo>().First(),
                     Metadata = new BeatmapMetadata
                     {
                         Artist = @"Unknown",
