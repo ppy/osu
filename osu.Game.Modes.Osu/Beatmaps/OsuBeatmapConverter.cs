@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using osu.Game.Modes.Objects.Types;
 using System.Linq;
 using System;
+using osu.Game.Modes.Osu.UI;
 using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Osu.Beatmaps
@@ -66,7 +67,7 @@ namespace osu.Game.Modes.Osu.Beatmaps
                     Samples = original.Samples,
                     EndTime = endTimeData.EndTime,
 
-                    Position = positionData?.Position ?? new Vector2(512, 384) / 2,
+                    Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2,
                 };
             }
 
