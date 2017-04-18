@@ -14,7 +14,6 @@ using osu.Game.Modes.Osu.Objects;
 using osu.Game.Screens.Play;
 using OpenTK.Graphics;
 using osu.Desktop.VisualTests.Beatmaps;
-using osu.Game.Modes.Osu;
 
 namespace osu.Desktop.VisualTests.Tests
 {
