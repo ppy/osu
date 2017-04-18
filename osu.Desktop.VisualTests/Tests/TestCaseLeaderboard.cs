@@ -4,9 +4,9 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Modes.Mods;
-using osu.Game.Modes.Osu.Mods;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 

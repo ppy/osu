@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
+using SQLite.Net;
 
 namespace osu.Game
 {
@@ -26,6 +27,8 @@ namespace osu.Game
         protected OsuConfigManager LocalConfig;
 
         protected BeatmapDatabase BeatmapDatabase;
+
+        protected RulesetDatabase RulesetDatabase;
 
         protected ScoreDatabase ScoreDatabase;
 
@@ -80,8 +83,12 @@ namespace osu.Game
         {
             Dependencies.Cache(this);
             Dependencies.Cache(LocalConfig);
-            Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, Host));
-            Dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, Host, BeatmapDatabase));
+
+            SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
+
+            Dependencies.Cache(RulesetDatabase = new RulesetDatabase(Host.Storage, connection));
+            Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, connection, RulesetDatabase, Host));
+            Dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, connection, Host, BeatmapDatabase));
             Dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.

@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
-using osu.Game.Modes;
 
 namespace osu.Game.Configuration
 {
@@ -17,7 +16,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.Username, string.Empty);
             Set(OsuConfig.Token, string.Empty);
 
-            Set(OsuConfig.PlayMode, PlayMode.Osu);
+            Set(OsuConfig.Ruleset, 0, 0, int.MaxValue);
 
             Set(OsuConfig.AudioDevice, string.Empty);
             Set(OsuConfig.SavePassword, false);
@@ -196,7 +195,7 @@ namespace osu.Game.Configuration
     public enum OsuConfig
     {
         // New osu:
-        PlayMode,
+        Ruleset,
         Token,
         // Imported from old osu:
         BeatmapDirectory,
