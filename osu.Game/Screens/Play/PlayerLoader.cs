@@ -19,15 +19,22 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : OsuScreen
     {
-        private readonly Player player;
+        private Player player;
+
         private readonly OsuLogo logo;
         private BeatmapMetadataDisplay info;
+
+        private bool showOverlays = false;
+        internal override bool ShowOverlays => showOverlays;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         public PlayerLoader(Player player)
         {
             ValidForResume = false;
+
+            player.OnRestart = restart;
+
             this.player = player;
 
             Children = new Drawable[]
@@ -38,6 +45,7 @@ namespace osu.Game.Screens.Play
                     Interactive = false,
                 },
             };
+
         }
 
         [BackgroundDependencyLoader]
@@ -51,6 +59,30 @@ namespace osu.Game.Screens.Play
             });
 
             LoadComponentAsync(player);
+        }
+
+        protected override void OnResuming(Screen last)
+        {
+            base.OnResuming(last);
+            if (last != player) return;
+            var newPlayer = new Player
+            {
+                RestartCount = player.RestartCount + 1,
+                OnRestart = restart
+            };
+            player = newPlayer;
+            LoadComponentAsync(newPlayer, delegate
+            {
+                if (!Push(newPlayer))
+                    Exit();
+                ValidForResume = false;
+            });
+        }
+
+        private void restart()
+        {
+            showOverlays = false;
+            ValidForResume = true;
         }
 
         protected override void OnEntering(Screen last)

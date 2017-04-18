@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
 
         public BeatmapInfo BeatmapInfo;
 
+        public Action OnRestart;
+
         public bool IsPaused => !interpolatedSourceClock.IsRunning;
 
         public bool HasFailed { get; private set; }
@@ -243,20 +245,9 @@ namespace osu.Game.Screens.Play
 
         public void Restart()
         {
-            sourceClock.Stop(); // If the clock is running and Restart is called the game will lag until relaunch
-
-            var newPlayer = new Player();
-
-            ValidForResume = false;
-
-            LoadComponentAsync(newPlayer, delegate
-            {
-                newPlayer.RestartCount = RestartCount + 1;
-                if (!Push(newPlayer))
-                {
-                    // Error(?)
-                }
-            });
+            System.Diagnostics.Debug.WriteLine("TEST");
+            OnRestart?.Invoke();
+            Exit();
         }
 
         private ScheduledDelegate onCompletionEvent;
