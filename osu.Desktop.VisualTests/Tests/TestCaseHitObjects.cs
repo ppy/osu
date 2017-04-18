@@ -10,11 +10,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Osu.Judgements;
-using osu.Game.Modes.Osu.Objects;
-using osu.Game.Modes.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using System.Collections.Generic;
 
 namespace osu.Desktop.VisualTests.Tests

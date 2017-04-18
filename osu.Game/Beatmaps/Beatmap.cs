@@ -4,7 +4,7 @@
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
-using osu.Game.Modes.Objects;
+using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
 
 namespace osu.Game.Beatmaps
@@ -56,6 +56,7 @@ namespace osu.Game.Beatmaps
         public Beatmap(Beatmap original = null)
             : base(original)
         {
+            HitObjects = original?.HitObjects;
         }
     }
 }

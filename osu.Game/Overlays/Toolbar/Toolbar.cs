@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Toolbar
             }
         }
 
-        public void SetGameMode(RulesetInfo ruleset) => modeSelector.SetGameMode(ruleset);
+        public void SetRuleset(RulesetInfo ruleset) => modeSelector.SetRuleset(ruleset);
 
         protected override void PopIn()
         {
