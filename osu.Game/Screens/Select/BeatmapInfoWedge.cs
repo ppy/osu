@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select
 
         protected override bool HideOnEscape => false;
 
-        protected override bool BlockPassThroughInput => false;
+        protected override bool BlockPassThroughMouse => false;
 
         protected override void PopIn()
         {
