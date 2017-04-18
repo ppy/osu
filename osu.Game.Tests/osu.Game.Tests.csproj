@@ -63,21 +63,21 @@
       <Project>{c76bf5b3-985e-4d39-95fe-97c9c879b83a}</Project>
       <Name>osu.Framework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Modes.Osu\osu.Game.Modes.Osu.csproj">
+    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
       <Project>{c92a607b-1fdd-4954-9f92-03ff547d9080}</Project>
-      <Name>osu.Game.Modes.Osu</Name>
+      <Name>osu.Game.Rulesets.Osu</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Modes.Catch\osu.Game.Modes.Catch.csproj">
+    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj">
       <Project>{58f6c80c-1253-4a0e-a465-b8c85ebeadf3}</Project>
-      <Name>osu.Game.Modes.Catch</Name>
+      <Name>osu.Game.Rulesets.Catch</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Modes.Mania\osu.Game.Modes.Mania.csproj">
+    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj">
       <Project>{48f4582b-7687-4621-9cbe-5c24197cb536}</Project>
-      <Name>osu.Game.Modes.Mania</Name>
+      <Name>osu.Game.Rulesets.Mania</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Modes.Taiko\osu.Game.Modes.Taiko.csproj">
+    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
       <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
-      <Name>osu.Game.Modes.Taiko</Name>
+      <Name>osu.Game.Rulesets.Taiko</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>

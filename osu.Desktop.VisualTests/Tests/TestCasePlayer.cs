@@ -9,12 +9,12 @@ using osu.Game.Beatmaps;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu.Objects;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Play;
 using OpenTK.Graphics;
 using osu.Desktop.VisualTests.Beatmaps;
-using osu.Game.Modes.Osu.UI;
+using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Desktop.VisualTests.Tests
 {
