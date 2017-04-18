@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using osu.Game.Modes.Objects.Types;
 using System.Linq;
 using System;
+using osu.Game.Modes.Beatmaps;
 
 namespace osu.Game.Modes.Osu.Beatmaps
 {

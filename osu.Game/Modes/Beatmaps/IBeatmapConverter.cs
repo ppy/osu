@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Modes.Objects;
+using osu.Game.Beatmaps;
 
-namespace osu.Game.Beatmaps
+namespace osu.Game.Modes.Beatmaps
 {
     /// <summary>
     /// Converts a Beatmap for another mode.
