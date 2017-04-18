@@ -1,12 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using OpenTK;
 using osu.Game.Modes.Objects.Types;
+using System.Collections.Generic;
 
 namespace osu.Game.Modes.Objects.Legacy.Mania
 {
+    /// <summary>
+    /// A HitObjectParser to parse legacy osu!mania Beatmaps.
+    /// </summary>
     internal class HitObjectParser : Legacy.HitObjectParser
     {
         protected override HitObject CreateHit(Vector2 position, bool newCombo)

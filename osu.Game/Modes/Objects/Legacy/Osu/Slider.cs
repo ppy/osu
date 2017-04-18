@@ -7,7 +7,7 @@ using OpenTK;
 namespace osu.Game.Modes.Objects.Legacy.Osu
 {
     /// <summary>
-    /// Legacy Slider-type, used for parsing Beatmaps.
+    /// Legacy osu! Slider-type, used for parsing Beatmaps.
     /// </summary>
     internal sealed class Slider : CurvedHitObject, IHasPosition, IHasCombo
     {

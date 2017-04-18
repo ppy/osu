@@ -9,6 +9,9 @@ namespace osu.Game.Modes.Objects.Types
     /// </summary>
     public interface IHasXPosition
     {
+        /// <summary>
+        /// The starting X-position of this HitObject.
+        /// </summary>
         float X { get; }
     }
 }

@@ -9,6 +9,9 @@ namespace osu.Game.Modes.Objects.Types
     /// </summary>
     public interface IHasYPosition
     {
+        /// <summary>
+        /// The starting Y-position of this HitObject.
+        /// </summary>
         float Y { get; }
     }
 }

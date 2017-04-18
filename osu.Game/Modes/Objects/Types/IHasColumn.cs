@@ -3,8 +3,14 @@
 
 namespace osu.Game.Modes.Objects.Types
 {
+    /// <summary>
+    /// A HitObject that lies in a column space.
+    /// </summary>
     public interface IHasColumn
     {
+        /// <summary>
+        /// The column which this HitObject lies in.
+        /// </summary>
         int Column { get; }
     }
 }

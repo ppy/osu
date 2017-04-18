@@ -6,9 +6,9 @@ using osu.Game.Modes.Objects.Types;
 namespace osu.Game.Modes.Objects.Legacy.Mania
 {
     /// <summary>
-    /// Legacy Spinner-type, used for parsing Beatmaps.
+    /// Legacy osu!mania Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal class Spinner : HitObject, IHasEndTime, IHasColumn
+    internal sealed class Spinner : HitObject, IHasEndTime, IHasColumn
     {
         public double EndTime { get; set; }
 

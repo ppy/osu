@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 namespace osu.Game.Modes.Objects.Legacy.Taiko
 {
+    /// <summary>
+    /// A HitObjectParser to parse legacy osu!taiko Beatmaps.
+    /// </summary>
     internal class HitObjectParser : Legacy.HitObjectParser
     {
         protected override HitObject CreateHit(Vector2 position, bool newCombo)

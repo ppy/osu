@@ -7,9 +7,9 @@ using OpenTK;
 namespace osu.Game.Modes.Objects.Legacy.Osu
 {
     /// <summary>
-    /// Legacy Spinner-type, used for parsing Beatmaps.
+    /// Legacy osu! Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal class Spinner : HitObject, IHasEndTime, IHasPosition
+    internal sealed class Spinner : HitObject, IHasEndTime, IHasPosition
     {
         public double EndTime { get; set; }
 

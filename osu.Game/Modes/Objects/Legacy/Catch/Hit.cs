@@ -6,7 +6,7 @@ using osu.Game.Modes.Objects.Types;
 namespace osu.Game.Modes.Objects.Legacy.Catch
 {
     /// <summary>
-    /// Legacy Hit-type, used for parsing Beatmaps.
+    /// Legacy osu!catch Hit-type, used for parsing Beatmaps.
     /// </summary>
     internal sealed class Hit : HitObject, IHasCombo, IHasXPosition
     {
