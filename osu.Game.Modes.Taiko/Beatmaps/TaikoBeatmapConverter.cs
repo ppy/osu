@@ -39,33 +39,30 @@ namespace osu.Game.Modes.Taiko.Beatmaps
         /// </summary>
         private const float taiko_base_distance = 100;
 
-        public override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
+        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
 
-        public override Beatmap<TaikoHitObject> Convert(Beatmap original)
+        protected override Beatmap<TaikoHitObject> ConvertBeatmap(Beatmap original)
         {
+            // Rewrite the beatmap info to add the slider velocity multiplier
             BeatmapInfo info = original.BeatmapInfo.DeepClone<BeatmapInfo>();
             info.Difficulty.SliderMultiplier *= legacy_velocity_multiplier;
 
-            return new Beatmap<TaikoHitObject>(original)
+            Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original);
+
+            // Post processing step to transform hit objects with the same start time into strong hits
+            converted.HitObjects = converted.HitObjects.GroupBy(t => t.StartTime).Select(x =>
             {
-                BeatmapInfo = info,
-                HitObjects = original.HitObjects.SelectMany(h => convertHitObject(h, original)).GroupBy(t => t.StartTime).Select(x =>
-                {
-                    TaikoHitObject first = x.First();
-                    if (x.Skip(1).Any())
-                        first.IsStrong = true;
-                    return first;
-                }).ToList()
-            };
+                TaikoHitObject first = x.First();
+                if (x.Skip(1).Any())
+                    first.IsStrong = true;
+                return first;
+            }).ToList();
+
+            return converted;
         }
 
-        private IEnumerable<TaikoHitObject> convertHitObject(HitObject obj, Beatmap beatmap)
+        protected override IEnumerable<TaikoHitObject> ConvertHitObject(HitObject obj, Beatmap beatmap)
         {
-            // Check if this HitObject is already a TaikoHitObject, and return it if so
-            var originalTaiko = obj as TaikoHitObject;
-            if (originalTaiko != null)
-                yield return originalTaiko;
-
             var distanceData = obj as IHasDistance;
             var repeatsData = obj as IHasRepeats;
             var endTimeData = obj as IHasEndTime;

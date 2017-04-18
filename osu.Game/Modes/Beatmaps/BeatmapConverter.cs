@@ -16,22 +16,67 @@ namespace osu.Game.Modes.Beatmaps
     public abstract class BeatmapConverter<T> where T : HitObject
     {
         /// <summary>
-        /// The types of HitObjects that can be converted to be used for this Beatmap.
-        /// </summary>
-        public abstract IEnumerable<Type> ValidConversionTypes { get; }
-
-        /// <summary>
-        /// Converts a Beatmap to another mode.
-        /// </summary>
-        /// <param name="original">The original Beatmap.</param>
-        /// <returns>The converted Beatmap.</returns>
-        public abstract Beatmap<T> Convert(Beatmap original);
-
-        /// <summary>
         /// Checks if a Beatmap can be converted using this Beatmap Converter.
         /// </summary>
         /// <param name="beatmap">The Beatmap to check.</param>
         /// <returns>Whether the Beatmap can be converted using this Beatmap Converter.</returns>
         public bool CanConvert(Beatmap beatmap) => ValidConversionTypes.All(t => beatmap.HitObjects.Any(t.IsInstanceOfType));
+
+        /// <summary>
+        /// Converts a Beatmap using this Beatmap Converter.
+        /// </summary>
+        /// <param name="original">The un-converted Beatmap.</param>
+        /// <returns>The converted Beatmap.</returns>
+        public Beatmap<T> Convert(Beatmap original)
+        {
+            // We always operate on a clone of the original beatmap, to not modify it game-wide
+            return ConvertBeatmap(new Beatmap(original));
+        }
+
+        /// <summary>
+        /// Performs the conversion of a Beatmap using this Beatmap Converter.
+        /// </summary>
+        /// <param name="original">The un-converted Beatmap.</param>
+        /// <returns>The converted Beatmap.</returns>
+        protected virtual Beatmap<T> ConvertBeatmap(Beatmap original)
+        {
+            return new Beatmap<T>
+            {
+                BeatmapInfo = original.BeatmapInfo,
+                TimingInfo = original.TimingInfo,
+                HitObjects = original.HitObjects.SelectMany(h => convert(h, original)).ToList()
+            };
+        }
+
+        /// <summary>
+        /// Converts a hit object.
+        /// </summary>
+        /// <param name="original">The hit object to convert.</param>
+        /// <param name="beatmap">The un-converted Beatmap.</param>
+        /// <returns>The converted hit object.</returns>
+        private IEnumerable<T> convert(HitObject original, Beatmap beatmap)
+        {
+            // Check if the hitobject is already the converted type
+            T tObject = original as T;
+            if (tObject != null)
+                yield return tObject;
+            
+            // Convert the hit object
+            foreach (var obj in ConvertHitObject(original, beatmap))
+                yield return obj;
+        }
+
+        /// <summary>
+        /// The types of HitObjects that can be converted to be used for this Beatmap.
+        /// </summary>
+        protected abstract IEnumerable<Type> ValidConversionTypes { get; }
+
+        /// <summary>
+        /// Performs the conversion of a hit object.
+        /// </summary>
+        /// <param name="original">The hit object to convert.</param>
+        /// <param name="beatmap">The un-converted Beatmap.</param>
+        /// <returns>The converted hit object.</returns>
+        protected abstract IEnumerable<T> ConvertHitObject(HitObject original, Beatmap beatmap);
     }
 }
