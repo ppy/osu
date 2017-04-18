@@ -65,15 +65,14 @@ namespace osu.Game.Screens.Play
         {
             base.OnResuming(last);
             if (last != player) return;
-            var newPlayer = new Player
+            player = new Player
             {
                 RestartCount = player.RestartCount + 1,
                 OnRestart = restart
             };
-            player = newPlayer;
-            LoadComponentAsync(newPlayer, delegate
+            LoadComponentAsync(player, delegate
             {
-                if (!Push(newPlayer))
+                if (!Push(player))
                     Exit();
                 ValidForResume = false;
             });
