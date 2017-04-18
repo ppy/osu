@@ -154,7 +154,15 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(set.Beatmaps.Count > 0);
 
             var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
+            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
 
+            beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 1))?.Beatmap;
+            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
+
+            beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 2))?.Beatmap;
+            Assert.IsTrue(beatmap?.HitObjects.Count > 0);
+
+            beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 3))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
         }
     }
