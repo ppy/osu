@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes.Mods;
+using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;

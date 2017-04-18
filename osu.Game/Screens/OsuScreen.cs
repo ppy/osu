@@ -14,7 +14,7 @@ namespace osu.Game.Screens
         internal BackgroundScreen Background { get; private set; }
 
         /// <summary>
-        /// Override to create a BackgroundMode for the current GameMode.
+        /// Override to create a BackgroundMode for the current screen.
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
@@ -99,7 +99,7 @@ namespace osu.Game.Screens
             if (Background != null && !Background.Equals(nextOsu?.Background))
             {
                 if (nextOsu != null)
-                    //We need to use MakeCurrent in case we are jumping up multiple game modes.
+                    //We need to use MakeCurrent in case we are jumping up multiple game screens.
                     nextOsu.Background?.MakeCurrent();
                 else
                     Background.Exit();

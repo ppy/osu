@@ -6,7 +6,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Modes.Taiko.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Desktop.VisualTests.Tests
 {

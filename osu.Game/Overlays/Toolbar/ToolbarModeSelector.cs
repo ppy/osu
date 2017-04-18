@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Toolbar
                     Ruleset = ruleset,
                     Action = delegate
                     {
-                        SetGameMode(ruleset);
+                        SetRuleset(ruleset);
                         OnRulesetChange?.Invoke(ruleset);
                     }
                 });
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
-        public void SetGameMode(RulesetInfo ruleset)
+        public void SetRuleset(RulesetInfo ruleset)
         {
             foreach (ToolbarModeButton m in modeButtons.Children.Cast<ToolbarModeButton>())
             {

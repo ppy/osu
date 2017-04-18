@@ -7,11 +7,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
-using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Modes.Taiko.Judgements;
-using osu.Game.Modes.Taiko.Objects;
-using osu.Game.Modes.Taiko.Objects.Drawables;
-using osu.Game.Modes.Taiko.UI;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Judgements;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.UI;
 using System;
 
 namespace osu.Desktop.VisualTests.Tests
