@@ -271,11 +271,13 @@ namespace osu.Game.Database
         {
             var beatmapSetInfo = Query<BeatmapSetInfo>().FirstOrDefault(s => s.ID == beatmapInfo.BeatmapSetInfoID);
 
-            //we need metadata
-            GetChildren(beatmapSetInfo);
-
             if (beatmapSetInfo == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
+
+            //we need metadata
+            GetChildren(beatmapSetInfo);
+            foreach (var b in beatmapSetInfo.Beatmaps)
+                GetChildren(b);
 
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapSetInfo.Metadata;
