@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play
         private readonly OsuLogo logo;
         private BeatmapMetadataDisplay info;
 
-        private bool showOverlays = false;
+        private bool showOverlays = true;
         internal override bool ShowOverlays => showOverlays;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
