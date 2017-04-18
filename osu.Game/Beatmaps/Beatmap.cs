@@ -56,6 +56,7 @@ namespace osu.Game.Beatmaps
         public Beatmap(Beatmap original = null)
             : base(original)
         {
+            HitObjects = original?.HitObjects;
         }
     }
 }
