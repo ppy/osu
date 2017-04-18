@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override bool HideOnEscape => false;
 
-        protected override bool BlockPassThroughInput => false;
+        protected override bool BlockPassThroughMouse => false;
 
         private const double transition_time = 500;
 
