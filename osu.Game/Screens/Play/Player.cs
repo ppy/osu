@@ -245,7 +245,6 @@ namespace osu.Game.Screens.Play
 
         public void Restart()
         {
-            System.Diagnostics.Debug.WriteLine("TEST");
             OnRestart?.Invoke();
             Exit();
         }
