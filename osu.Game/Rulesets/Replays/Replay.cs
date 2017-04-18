@@ -7,6 +7,8 @@ namespace osu.Game.Rulesets.Replays
 {
     public class Replay
     {
+        protected const double KEY_UP_DELAY = 50;
+
         public List<ReplayFrame> Frames = new List<ReplayFrame>();
     }
 }
