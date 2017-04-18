@@ -7,7 +7,6 @@ using System.IO;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Modes;
 using osu.Game.Modes.Objects;
 using osu.Game.Beatmaps.Legacy;
 
@@ -84,7 +83,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.StackLeniency = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"Mode":
-                    beatmap.BeatmapInfo.Mode = (PlayMode)int.Parse(val);
+                    beatmap.BeatmapInfo.RulesetID = int.Parse(val);
                     break;
                 case @"LetterboxInBreaks":
                     beatmap.BeatmapInfo.LetterboxInBreaks = int.Parse(val) == 1;

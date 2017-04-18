@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Modes;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -45,7 +44,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Origin = Anchor.Centre,
                     TextSize = Size.X,
                     Colour = Color4.White,
-                    Icon = Ruleset.GetRuleset(beatmap.Mode).Icon
+                    Icon = beatmap.Ruleset.CreateInstance().Icon
                 }
             };
         }

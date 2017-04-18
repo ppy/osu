@@ -63,13 +63,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
         {
-            if (Beatmap.Beatmap.BeatmapInfo?.Mode > PlayMode.Taiko)
-            {
-                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
-                Exit();
-                return;
-            }
-
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
@@ -109,7 +102,10 @@ namespace osu.Game.Screens.Play
                 sourceClock.Reset();
             });
 
-            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
+            ruleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance();
+
+            // Todo: This should be done as early as possible, and should check if the hit renderer
+            // can actually convert the hit objects... Somehow...
             HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
