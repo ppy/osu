@@ -21,19 +21,16 @@ namespace osu.Game.Online.API.Requests
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
-            req.AddParameter(@"c", beatmap.Hash);
-            req.AddParameter(@"f", beatmap.Path);
+            //req.AddParameter(@"c", beatmap.Hash);
+            //req.AddParameter(@"f", beatmap.Path);
             return req;
         }
 
-        protected override string Target => @"beatmaps/scores";
+        protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores";
     }
 
     public class GetScoresResponse
     {
-        [JsonProperty(@"beatmap")]
-        public BeatmapInfo Beatmap;
-
         [JsonProperty(@"scores")]
         public IEnumerable<Score> Scores;
     }
