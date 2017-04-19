@@ -38,6 +38,10 @@ namespace osu.Game.Overlays
 
         private APIAccess api;
 
+        private const int transition_length = 500;
+
+        private GetMessagesRequest fetchReq;
+
         public ChatOverlay()
         {
             RelativeSizeAxes = Axes.X;
@@ -82,94 +86,6 @@ namespace osu.Game.Overlays
             });
         }
 
-        protected override bool OnFocus(InputState state)
-        {
-            //this is necessary as inputTextBox is masked away and therefore can't get focus :(
-            inputTextBox.TriggerFocus();
-            return false;
-        }
-
-        private void postMessage(TextBox sender, bool newText)
-        {
-            var postText = sender.Text;
-
-            if (!string.IsNullOrEmpty(postText) && api.LocalUser.Value != null)
-            {
-                //todo: actually send to server
-                careChannels.FirstOrDefault()?.AddNewMessages(new[]
-                            {
-                                new Message
-                                {
-                                    User = api.LocalUser.Value,
-                                    Timestamp = DateTimeOffset.Now,
-                                    Content = postText
-                                }
-                            });
-            }
-
-            sender.Text = string.Empty;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api)
-        {
-            this.api = api;
-            api.Register(this);
-        }
-
-        private long? lastMessageId;
-
-        private List<Channel> careChannels;
-
-        private void addChannel(Channel channel)
-        {
-            Add(new DrawableChannel(channel));
-            careChannels.Add(channel);
-        }
-
-        private GetMessagesRequest fetchReq;
-
-        public void FetchNewMessages(APIAccess api)
-        {
-            if (fetchReq != null) return;
-
-            fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
-            fetchReq.Success += delegate (List<Message> messages)
-            {
-                var ids = messages.Select(m => m.ChannelId).Distinct();
-
-                //batch messages per channel.
-                foreach (var id in ids)
-                    careChannels.Find(c => c.Id == id)?.AddNewMessages(messages.Where(m => m.ChannelId == id));
-
-                lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
-
-                Debug.Write("success!");
-                fetchReq = null;
-            };
-            fetchReq.Failure += delegate
-            {
-                Debug.Write("failure!");
-                fetchReq = null;
-            };
-
-            api.Queue(fetchReq);
-        }
-
-        private const int transition_length = 500;
-
-        protected override void PopIn()
-        {
-            MoveToY(0, transition_length, EasingTypes.OutQuint);
-            FadeIn(transition_length, EasingTypes.OutQuint);
-        }
-
-        protected override void PopOut()
-        {
-            MoveToY(DrawSize.Y, transition_length, EasingTypes.InSine);
-            FadeOut(transition_length, EasingTypes.InSine);
-        }
-
         public void APIStateChanged(APIAccess api, APIState state)
         {
             switch (state)
@@ -183,19 +99,46 @@ namespace osu.Game.Overlays
             }
         }
 
+        protected override bool OnFocus(InputState state)
+        {
+            //this is necessary as inputTextBox is masked away and therefore can't get focus :(
+            inputTextBox.TriggerFocus();
+            return false;
+        }
+
+        protected override void PopIn()
+        {
+            MoveToY(0, transition_length, EasingTypes.OutQuint);
+            FadeIn(transition_length, EasingTypes.OutQuint);
+        }
+
+        protected override void PopOut()
+        {
+            MoveToY(DrawSize.Y, transition_length, EasingTypes.InSine);
+            FadeOut(transition_length, EasingTypes.InSine);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api)
+        {
+            this.api = api;
+            api.Register(this);
+        }
+
+        private long? lastMessageId;
+
+        private List<Channel> careChannels;
+
         private void initializeChannels()
         {
             Clear();
 
             careChannels = new List<Channel>();
 
-            //if (api.State != APIAccess.APIState.Online)
-            //  return;
-
             SpriteText loading;
             Add(loading = new OsuSpriteText
             {
-                Text = @"Loading available channels...",
+                Text = @"initialising chat...",
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 TextSize = 40,
@@ -211,15 +154,85 @@ namespace osu.Game.Overlays
                 Scheduler.Add(delegate
                 {
                     loading.FadeOut(100);
-                    addChannel(channels.Find(c => c.Name == @"#osu"));
+                    addChannel(channels.Find(c => c.Name == @"#lazer"));
                 });
 
-                //addChannel(channels.Find(c => c.Name == @"#lobby"));
-                //addChannel(channels.Find(c => c.Name == @"#english"));
-
-                messageRequest = Scheduler.AddDelayed(() => FetchNewMessages(api), 1000, true);
+                messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
             };
             api.Queue(req);
+        }
+
+        private void addChannel(Channel channel)
+        {
+            Add(new DrawableChannel(channel));
+            careChannels.Add(channel);
+        }
+
+        private void fetchNewMessages()
+        {
+            if (fetchReq != null) return;
+
+            fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
+            fetchReq.Success += delegate (List<Message> messages)
+            {
+                var ids = messages.Where(m => m.TargetType == TargetType.Channel).Select(m => m.TargetId).Distinct();
+
+                //batch messages per channel.
+                foreach (var id in ids)
+                    careChannels.Find(c => c.Id == id)?.AddNewMessages(messages.Where(m => m.TargetId == id));
+
+                lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
+
+                Debug.Write("success!");
+                fetchReq = null;
+            };
+            fetchReq.Failure += delegate
+            {
+                Debug.Write("failure!");
+                fetchReq = null;
+            };
+
+            api.Queue(fetchReq);
+        }
+
+        private void postMessage(TextBox textbox, bool newText)
+        {
+            var postText = textbox.Text;
+
+            if (!string.IsNullOrEmpty(postText) && api.LocalUser.Value != null)
+            {
+                var currentChannel = careChannels.FirstOrDefault();
+
+                if (currentChannel == null) return;
+
+                var message = new Message
+                {
+                    Sender = api.LocalUser.Value,
+                    Timestamp = DateTimeOffset.Now,
+                    TargetType = TargetType.Channel, //TODO: read this from currentChannel
+                    TargetId = currentChannel.Id,
+                    Content = postText
+                };
+
+                textbox.ReadOnly = true;
+                var req = new PostMessageRequest(message);
+
+                req.Failure += e =>
+                {
+                    textbox.FlashColour(Color4.Red, 1000);
+                    textbox.ReadOnly = false;
+                };
+
+                req.Success += m =>
+                {
+                    currentChannel.AddNewMessages(new[] { m });
+
+                    textbox.ReadOnly = false;
+                    textbox.Text = string.Empty;
+                };
+
+                api.Queue(req);
+            }
         }
     }
 }
