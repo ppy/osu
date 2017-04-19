@@ -92,8 +92,8 @@ namespace osu.Game.Screens.Ranking
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Colour = colours.PinkDarker,
-                                    Y = 5,
-                                    TextSize = 60,
+                                    Y = 10,
+                                    TextSize = 56,
                                 },
                             }
                         },
@@ -321,6 +321,7 @@ namespace osu.Game.Screens.Ranking
             public SlowScoreCounter(uint leading = 0) : base(leading)
             {
                 DisplayedCountSpriteText.Shadow = false;
+                DisplayedCountSpriteText.Font = @"Venera-Light";
                 UseCommaSeparator = true;
             }
         }
