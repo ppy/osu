@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Lists;
 
 namespace osu.Game.Online.Chat
 {
@@ -21,7 +23,7 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"channel_id")]
         public int Id;
 
-        public List<Message> Messages = new List<Message>();
+        public SortedList<Message> Messages = new SortedList<Message>((m1, m2) => m1.Id.CompareTo(m2.Id));
 
         //internal bool Joined;
 
@@ -36,7 +38,10 @@ namespace osu.Game.Online.Chat
 
         public void AddNewMessages(IEnumerable<Message> messages)
         {
+            messages = messages.Except(Messages).ToList();
+
             Messages.AddRange(messages);
+
             purgeOldMessages();
 
             NewMessagesArrived?.Invoke(messages);
