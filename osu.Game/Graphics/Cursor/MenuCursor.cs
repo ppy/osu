@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Cursor
         protected override Drawable CreateCursor() => new Cursor();
 
         private bool dragging;
-        private Tooltip tooltip;
+        private readonly Tooltip tooltip;
 
         public MenuCursor()
         {

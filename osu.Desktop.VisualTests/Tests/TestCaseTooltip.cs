@@ -33,7 +33,10 @@ namespace osu.Desktop.VisualTests.Tests
                     Children = new Drawable[]
                     {
                         new TooltipContainer("Text with some tooltip"),
-                        new TooltipContainer("and another one"),
+                        new TooltipContainer("and another one with a custom delay")
+                        {
+                            TooltipDelay = 1000,
+                        },
                         new TooltipTextbox
                         {
                             Text = "a box with a tooltip",
@@ -54,11 +57,13 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
 
-        private class TooltipContainer : Container, IHasTooltip
+        private class TooltipContainer : Container, IHasTooltipWithCustomDelay
         {
             private readonly OsuSpriteText text;
 
-            public string Tooltip => text.Text;
+            public string TooltipText => text.Text;
+
+            public int TooltipDelay { get; set; } = Tooltip.DEFAULT_APPEAR_DELAY;
 
             public TooltipContainer(string tooltipText)
             {
@@ -75,26 +80,24 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class TooltipTextbox : OsuTextBox, IHasTooltip
         {
-            public string Tooltip => Text;
+            public string TooltipText => Text;
         }
 
-        private class TooltipSlider : OsuSliderBar<int>, IHasDelayedTooltip, IHasOverhangingTooltip
+        private class TooltipSlider : OsuSliderBar<int>, IHasDisappearingTooltip
         {
-            public string Tooltip => Current.Value.ToString();
+            public string TooltipText => Current.Value.ToString();
 
-            int IHasDelayedTooltip.Delay => Overhanging ? 0 : 250;
-
-            public bool Overhanging { get; set; }
+            public bool Disappear { get; set; } = true;
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                Overhanging = true;
+                Disappear = false;
                 return base.OnMouseDown(state, args);
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                Overhanging = false;
+                Disappear = true;
                 return base.OnMouseUp(state, args);
             }
         }
