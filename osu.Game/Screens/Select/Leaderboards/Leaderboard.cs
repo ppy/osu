@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Primitives;
 using System;
 using osu.Framework.Allocation;
 using osu.Game.Database;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 

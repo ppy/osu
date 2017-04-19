@@ -1,7 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Modes.Objects;
+using osu.Game.Rulesets.Beatmaps;
+using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
 
 namespace osu.Game.Beatmaps
@@ -41,6 +42,6 @@ namespace osu.Game.Beatmaps
         {
         }
 
-        protected abstract IBeatmapConverter<T> CreateBeatmapConverter();
+        protected abstract BeatmapConverter<T> CreateBeatmapConverter();
     }
 }

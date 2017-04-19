@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool HideOnEscape => false;
 
+        protected override bool BlockPassThroughKeyboard => true;
+
         public Action OnRetry;
         public Action OnQuit;
 

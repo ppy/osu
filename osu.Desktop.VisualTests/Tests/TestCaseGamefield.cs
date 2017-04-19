@@ -9,20 +9,29 @@ using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Modes.Catch.UI;
-using osu.Game.Modes.Mania.UI;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu.Objects;
-using osu.Game.Modes.Osu.UI;
-using osu.Game.Modes.Taiko.UI;
+using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Taiko.UI;
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Beatmaps;
+using osu.Framework.Allocation;
 
 namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseGamefield : TestCase
     {
+        private RulesetDatabase rulesets;
+
         public override string Description => @"Showing hitobjects and what not.";
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetDatabase rulesets)
+        {
+            this.rulesets = rulesets;
+        }
 
         public override void Reset()
         {
@@ -36,7 +45,7 @@ namespace osu.Desktop.VisualTests.Tests
                 objects.Add(new HitCircle
                 {
                     StartTime = time,
-                    Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384)),
+                    Position = new Vector2(RNG.Next(0, (int)OsuPlayfield.BASE_SIZE.X), RNG.Next(0, (int)OsuPlayfield.BASE_SIZE.Y)),
                     Scale = RNG.NextSingle(0.5f, 1.0f),
                 });
 
@@ -49,6 +58,7 @@ namespace osu.Desktop.VisualTests.Tests
                 BeatmapInfo = new BeatmapInfo
                 {
                     Difficulty = new BeatmapDifficulty(),
+                    Ruleset = rulesets.Query<RulesetInfo>().First(),
                     Metadata = new BeatmapMetadata
                     {
                         Artist = @"Unknown",
