@@ -13,13 +13,33 @@ namespace osu.Game.Users
         [JsonProperty(@"username")]
         public string Username;
 
+        //[JsonProperty(@"country")]
+        [JsonIgnore]
         public Country Country;
 
-        public Team Team;
+        //public Team Team;
 
         [JsonProperty(@"colour")]
         public string Colour;
 
-        public string CoverUrl = @"https://assets.ppy.sh/user-profile-covers/2/08cad88747c235a64fca5f1b770e100f120827ded1ffe3b66bfcd19c940afa65.jpeg";
+        [JsonProperty(@"avatarUrl")]
+        public string AvatarUrl;
+
+        [JsonProperty(@"cover")]
+        public UserCover Cover;
+
+        public class UserCover
+        {
+            [JsonProperty(@"customUrl")]
+            public string CustomUrl;
+
+            [JsonProperty(@"url")]
+            public string Url;
+
+            [JsonProperty(@"id")]
+            public int? Id;
+        }
     }
+
+
 }
