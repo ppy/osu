@@ -15,7 +15,6 @@ using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
-using osu.Game.Modes;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
@@ -24,8 +23,9 @@ using System.Linq;
 using osu.Framework.Graphics.Primitives;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
+using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Screens.Play;
 
@@ -58,7 +58,8 @@ namespace osu.Game
 
         private VolumeControl volume;
 
-        public Bindable<PlayMode> PlayMode;
+        private Bindable<int> configRuleset;
+        public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private readonly string[] args;
 
@@ -88,7 +89,9 @@ namespace osu.Game
 
             Dependencies.Cache(this);
 
-            PlayMode = LocalConfig.GetBindable<PlayMode>(OsuConfig.PlayMode);
+            configRuleset = LocalConfig.GetBindable<int>(OsuConfig.Ruleset);
+            Ruleset.Value = RulesetDatabase.GetRuleset(configRuleset.Value);
+            Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
         }
 
         private ScheduledDelegate scoreLoad;
@@ -199,11 +202,11 @@ namespace osu.Game
             {
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
-                OnPlayModeChange = m => PlayMode.Value = m,
+                OnRulesetChange = r => Ruleset.Value = r,
             }, t =>
             {
-                PlayMode.ValueChanged += delegate { Toolbar.SetGameMode(PlayMode.Value); };
-                PlayMode.TriggerChange();
+                Ruleset.ValueChanged += delegate { Toolbar.SetRuleset(Ruleset.Value); };
+                Ruleset.TriggerChange();
                 overlayContent.Add(Toolbar);
             });
 
@@ -276,7 +279,7 @@ namespace osu.Game
                 return;
             }
 
-            //central game mode change logic.
+            //central game screen change logic.
             if (!currentScreen.ShowOverlays)
             {
                 options.State = Visibility.Hidden;
