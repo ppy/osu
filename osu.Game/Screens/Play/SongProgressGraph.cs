@@ -20,9 +20,12 @@ namespace osu.Game.Screens.Play
 
                 const int granularity = 200;
 
-                var lastHit = ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
+                var lastHit = (objects.Last() as IHasEndTime)?.EndTime ?? 0;
 
-                var interval = lastHit / granularity;
+                if (lastHit == 0)
+                    lastHit = objects.Last().StartTime;
+
+                var interval = (lastHit + 1) / granularity;
 
                 var values = new int[granularity];
 
@@ -31,7 +34,7 @@ namespace osu.Game.Screens.Play
                     IHasEndTime end = h as IHasEndTime;
 
                     int startRange = (int)(h.StartTime / interval);
-                    int endRange = (int)((end?.EndTime ?? h.StartTime) / interval);
+                    int endRange = (int)((end?.EndTime > 0 ? end.EndTime : h.StartTime) / interval);
                     for (int i = startRange; i <= endRange; i++)
                         values[i]++;
                 }
