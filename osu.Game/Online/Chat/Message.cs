@@ -11,7 +11,7 @@ namespace osu.Game.Online.Chat
     public class Message
     {
         [JsonProperty(@"message_id")]
-        public long Id;
+        public readonly long Id;
 
         //todo: this should be inside sender.
         [JsonProperty(@"user_id")]
@@ -35,6 +35,18 @@ namespace osu.Game.Online.Chat
         [JsonConstructor]
         public Message()
         {
+        }
+
+        public override bool Equals(object obj)
+        {
+            var objMessage = obj as Message;
+
+            return Id == objMessage?.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
         }
     }
 

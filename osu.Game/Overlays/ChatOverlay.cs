@@ -89,25 +89,44 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        private void postMessage(TextBox sender, bool newText)
+        private void postMessage(TextBox textbox, bool newText)
         {
-            var postText = sender.Text;
+            var postText = textbox.Text;
 
             if (!string.IsNullOrEmpty(postText) && api.LocalUser.Value != null)
             {
-                //todo: actually send to server
-                careChannels.FirstOrDefault()?.AddNewMessages(new[]
-                            {
-                                new Message
-                                {
-                                    User = api.LocalUser.Value,
-                                    Timestamp = DateTimeOffset.Now,
-                                    Content = postText
-                                }
-                            });
-            }
+                var currentChannel = careChannels.FirstOrDefault();
 
-            sender.Text = string.Empty;
+                if (currentChannel == null) return;
+
+                var message = new Message
+                {
+                    User = api.LocalUser.Value,
+                    Timestamp = DateTimeOffset.Now,
+                    TargetType = TargetType.Channel, //TODO: read this from currentChannel
+                    TargetId = currentChannel.Id,
+                    Content = postText
+                };
+
+                textbox.ReadOnly = true;
+                var req = new PostMessageRequest(message);
+
+                req.Failure += e =>
+                {
+                    textbox.FlashColour(Color4.Red, 1000);
+                    textbox.ReadOnly = false;
+                };
+
+                req.Success += m =>
+                {
+                    currentChannel.AddNewMessages(new[] { m });
+
+                    textbox.ReadOnly = false;
+                    textbox.Text = string.Empty;
+                };
+
+                api.Queue(req);
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -137,7 +156,7 @@ namespace osu.Game.Overlays
             fetchReq.Success += delegate (List<Message> messages)
             {
                 var ids = messages.Where(m => m.TargetType == TargetType.Channel).Select(m => m.TargetId).Distinct();
-            
+
                 //batch messages per channel.
                 foreach (var id in ids)
                     careChannels.Find(c => c.Id == id)?.AddNewMessages(messages.Where(m => m.TargetId == id));
