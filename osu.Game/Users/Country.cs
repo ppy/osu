@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,6 +15,7 @@ namespace osu.Game.Users
         /// <summary>
         /// The name of this country.
         /// </summary>
+        [JsonProperty(@"name")]
         public string FullName;
 
         /// <summary>
@@ -24,6 +26,7 @@ namespace osu.Game.Users
         /// <summary>
         /// Two-letter flag acronym (ISO 3166 standard)
         /// </summary>
+        [JsonProperty(@"code")]
         public string FlagName;
     }
 
