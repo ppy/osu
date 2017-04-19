@@ -22,7 +22,9 @@ namespace osu.Game.Graphics.Cursor
 
         private ScheduledDelegate show;
         private UserInputManager input;
-        private IHasOverhangingTooltip overhang;
+        private IHasDisappearingTooltip disappearingTooltip;
+
+        public const int DEFAULT_APPEAR_DELAY = 250;
 
         public string TooltipText {
             get
@@ -43,16 +45,16 @@ namespace osu.Game.Graphics.Cursor
         {
             set
             {
-                if (value.Position != value.LastPosition && overhang?.Overhanging != true)
+                if (value.Position != value.LastPosition && disappearingTooltip?.Disappear != false)
                 {
                     show?.Cancel();
                     TooltipText = string.Empty;
                     IHasTooltip hasTooltip = input.HoveredDrawables.OfType<IHasTooltip>().FirstOrDefault();
                     if (hasTooltip != null)
                     {
-                        IHasDelayedTooltip delayedTooltip = hasTooltip as IHasDelayedTooltip;
-                        overhang = hasTooltip as IHasOverhangingTooltip;
-                        show = Scheduler.AddDelayed(() => TooltipText = hasTooltip.Tooltip, delayedTooltip?.Delay ?? 250);
+                        IHasTooltipWithCustomDelay delayedTooltip = hasTooltip as IHasTooltipWithCustomDelay;
+                        disappearingTooltip = hasTooltip as IHasDisappearingTooltip;
+                        show = Scheduler.AddDelayed(() => TooltipText = hasTooltip.TooltipText, delayedTooltip?.TooltipDelay ?? DEFAULT_APPEAR_DELAY);
                     }
                 }
             }
@@ -99,11 +101,11 @@ namespace osu.Game.Graphics.Cursor
 
         protected override void Update()
         {
-            if (overhang?.Overhanging ?? false)
-                TooltipText = overhang.Tooltip;
-            else if (overhang != null)
+            if (disappearingTooltip?.Disappear == false)
+                TooltipText = disappearingTooltip.TooltipText;
+            else if (disappearingTooltip != null)
             {
-                overhang = null;
+                disappearingTooltip = null;
                 TooltipText = string.Empty;
             }
         }
