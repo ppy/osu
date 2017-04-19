@@ -14,7 +14,7 @@ namespace osu.Game.Online.Chat
         public readonly long Id;
 
         //todo: this should be inside sender.
-        [JsonProperty(@"user_id")]
+        [JsonProperty(@"sender_id")]
         public int UserId;
 
         [JsonProperty(@"target_type")]
@@ -30,7 +30,7 @@ namespace osu.Game.Online.Chat
         public string Content;
 
         [JsonProperty(@"sender")]
-        public User User;
+        public User Sender;
 
         [JsonConstructor]
         public Message()
