@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
@@ -40,13 +41,17 @@ namespace osu.Desktop.VisualTests.Tests
 
             base.Reset();
 
-            Add(new Results(new Score
+            Add(new Results(new OsuScore
             {
                 TotalScore = 2845370,
                 Accuracy = 0.98,
                 MaxCombo = 123,
                 Rank = ScoreRank.A,
                 Date = DateTime.Now,
+                Count300 = 100,
+                Count100 = 10,
+                Count50 = 1,
+                CountMiss = 2,
                 User = new User
                 {
                     Username = "peppy",

@@ -93,21 +93,6 @@ namespace osu.Game.Rulesets.Scoring
             return new Replay { Frames = frames };
         }
 
-        //  [JsonProperty(@"count50")] 0,
-        //[JsonProperty(@"count100")] 0,
-        //[JsonProperty(@"count300")] 100,
-        //[JsonProperty(@"countmiss")] 0,
-        //[JsonProperty(@"countkatu")] 0,
-        //[JsonProperty(@"countgeki")] 31,
-        //[JsonProperty(@"perfect")] true,
-        //[JsonProperty(@"enabled_mods")] [
-        //  "DT",
-        //  "FL",
-        //  "HD",
-        //  "HR"
-        //],
-        //[JsonProperty(@"rank")] "XH",
-        //[JsonProperty(@"pp")] 26.1816,
-        //[JsonProperty(@"replay")] true
+        public virtual IEnumerable<ScoreStatistic> Statistics => new ScoreStatistic[] { };
     }
 }

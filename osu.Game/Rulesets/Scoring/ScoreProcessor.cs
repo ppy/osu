@@ -65,16 +65,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Creates a Score applicable to the ruleset in which this ScoreProcessor resides.
         /// </summary>
         /// <returns>The Score.</returns>
-        public virtual Score CreateScore() => new Score
-        {
-            TotalScore = TotalScore,
-            Combo = Combo,
-            MaxCombo = HighestCombo,
-            Accuracy = Accuracy,
-            Rank = rankFrom(Accuracy),
-            Date = DateTime.Now,
-            Health = Health,
-        };
+        public virtual Score CreateEmptyScore() => new Score();
 
         private ScoreRank rankFrom(double acc)
         {
@@ -118,6 +109,24 @@ namespace osu.Game.Rulesets.Scoring
 
             alreadyFailed = true;
             Failed?.Invoke();
+        }
+
+        /// <summary>
+        /// Retrieve a score populated with data for the current play this processor is responsible for.
+        /// </summary>
+        public virtual Score GetPopulatedScore()
+        {
+            var score = CreateEmptyScore();
+
+            score.TotalScore = TotalScore;
+            score.Combo = Combo;
+            score.MaxCombo = HighestCombo;
+            score.Accuracy = Accuracy;
+            score.Rank = rankFrom(Accuracy);
+            score.Date = DateTime.Now;
+            score.Health = Health;
+
+            return score;
         }
     }
 

@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Play
             Delay(1000);
             onCompletionEvent = Schedule(delegate
             {
-                var score = scoreProcessor.CreateScore();
+                var score = scoreProcessor.GetPopulatedScore();
                 score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
                 Push(new Results(score));
             });
