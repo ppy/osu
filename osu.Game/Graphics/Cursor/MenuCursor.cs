@@ -20,12 +20,6 @@ namespace osu.Game.Graphics.Cursor
         protected override Drawable CreateCursor() => new Cursor();
 
         private bool dragging;
-        private readonly Tooltip tooltip;
-
-        public MenuCursor()
-        {
-            Add(tooltip = new Tooltip());
-        }
 
         protected override bool OnMouseMove(InputState state)
         {
@@ -42,9 +36,6 @@ namespace osu.Game.Graphics.Cursor
 
                 ActiveCursor.RotateTo(degrees, 600, EasingTypes.OutQuint);
             }
-
-            tooltip.Position = new Vector2(state.Mouse.Position.X,Math.Min(ActiveCursor.BoundingBox.Bottom, state.Mouse.Position.Y + ActiveCursor.DrawHeight));
-            tooltip.MouseState = state.Mouse;
 
             return base.OnMouseMove(state);
         }
@@ -107,7 +98,7 @@ namespace osu.Game.Graphics.Cursor
 
             public Cursor()
             {
-                AutoSizeAxes = Axes.Both;
+                Size = new Vector2(42);
             }
 
             [BackgroundDependencyLoader]

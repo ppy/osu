@@ -32,8 +32,8 @@ namespace osu.Desktop.VisualTests.Tests
                     Spacing = new Vector2(0,10),
                     Children = new Drawable[]
                     {
-                        new TooltipContainer("Text with some tooltip"),
-                        new TooltipContainer("and another one with a custom delay")
+                        new TooltipTextContainer("Text with some tooltip"),
+                        new TooltipTextContainer("and another one with a custom delay")
                         {
                             TooltipDelay = 1000,
                         },
@@ -57,15 +57,15 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
 
-        private class TooltipContainer : Container, IHasTooltipWithCustomDelay
+        private class TooltipTextContainer : Container, IHasTooltipWithCustomDelay
         {
             private readonly OsuSpriteText text;
 
             public string TooltipText => text.Text;
 
-            public int TooltipDelay { get; set; } = Tooltip.DEFAULT_APPEAR_DELAY;
+            public int TooltipDelay { get; set; } = TooltipContainer.DEFAULT_APPEAR_DELAY;
 
-            public TooltipContainer(string tooltipText)
+            public TooltipTextContainer(string tooltipText)
             {
                 AutoSizeAxes = Axes.Both;
                 Children = new[]
