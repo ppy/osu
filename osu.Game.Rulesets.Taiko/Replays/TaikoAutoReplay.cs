@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 else
                     throw new Exception("Unknown hit object type.");
 
-                Frames.Add(new ReplayFrame(endTime + 1, 0, 0, ReplayButtonState.None));
+                Frames.Add(new ReplayFrame(endTime + KEY_UP_DELAY, 0, 0, ReplayButtonState.None));
 
                 if (i < beatmap.HitObjects.Count - 1)
                 {

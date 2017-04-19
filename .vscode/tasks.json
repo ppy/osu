@@ -8,10 +8,7 @@
             "taskName": "build",
             "isShellCommand": true,
             "showOutput": "silent",
-            "command": "xbuild",
-            "windows": {
-                "command": "msbuild"
-            },
+            "command": "msbuild",
             "args": [
                 // Ask msbuild to generate full paths for file names.
                 "/property:GenerateFullPaths=true"

@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Position = s.Position;
 
             //take up full playfield.
-            Size = OsuPlayfield.BASE_SIZE;
+            Size = new Vector2(OsuPlayfield.BASE_SIZE.X);
 
             spinner = s;
 
