@@ -211,7 +211,7 @@ namespace osu.Game.Overlays
                 Scheduler.Add(delegate
                 {
                     loading.FadeOut(100);
-                    addChannel(channels.Find(c => c.Name == @"#osu"));
+                    addChannel(channels.Find(c => c.Name == @"#lazer"));
                 });
 
                 //addChannel(channels.Find(c => c.Name == @"#lobby"));
