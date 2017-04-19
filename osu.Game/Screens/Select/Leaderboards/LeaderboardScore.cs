@@ -204,7 +204,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Children = new Drawable[]
                                                     {
                                                         maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, Score.MaxCombo.ToString()),
-                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? @"{0:0}" : @"{0:0.00}", Score.Accuracy)),
+                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", Score.Accuracy)),
                                                     },
                                                 },
                                             },
