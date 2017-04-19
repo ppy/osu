@@ -19,32 +19,24 @@ namespace osu.Game.Rulesets.Scoring
 
         [JsonProperty(@"score")]
         public double TotalScore { get; set; }
-        public double Accuracy { get; set; }
-        public double Health { get; set; }
 
-        [JsonProperty(@"maxcombo")]
+        [JsonProperty(@"accuracy")]
+        public double Accuracy { get; set; }
+
+        public double Health { get; set; } = 1;
+
+        [JsonProperty(@"combo")]
         public int MaxCombo { get; set; }
+
         public int Combo { get; set; }
+
+        [JsonProperty(@"mods")]
+        protected string[] ModStrings { get; set; } //todo: parse to Mod objects
+
         public Mod[] Mods { get; set; }
 
-        private User user;
-
-        public User User
-        {
-            get
-            {
-                return user ?? new User
-                {
-                    Username = LegacyUsername,
-                    Id = LegacyUserID
-                };
-            }
-
-            set
-            {
-                user = value;
-            }
-        }
+        [JsonProperty(@"user")]
+        public User User;
 
         [JsonProperty(@"replay_data")]
         public Replay Replay;
@@ -54,13 +46,7 @@ namespace osu.Game.Rulesets.Scoring
         [JsonProperty(@"score_id")]
         public long OnlineScoreID;
 
-        [JsonProperty(@"username")]
-        public string LegacyUsername;
-
-        [JsonProperty(@"user_id")]
-        public long LegacyUserID;
-
-        [JsonProperty(@"date")]
+        [JsonProperty(@"created_at")]
         public DateTime Date;
 
         /// <summary>
