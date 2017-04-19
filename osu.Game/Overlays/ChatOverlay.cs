@@ -101,7 +101,7 @@ namespace osu.Game.Overlays
 
                 var message = new Message
                 {
-                    User = api.LocalUser.Value,
+                    Sender = api.LocalUser.Value,
                     Timestamp = DateTimeOffset.Now,
                     TargetType = TargetType.Channel, //TODO: read this from currentChannel
                     TargetId = currentChannel.Id,
