@@ -144,9 +144,10 @@ namespace osu.Game
 
             AddInternal(ratioContainer = new RatioAdjust
             {
-                Children = new[]
+                Children = new Drawable[]
                 {
-                    Cursor = new MenuCursor { Depth = float.MinValue }
+                    Cursor = new MenuCursor { Depth = float.MinValue },
+                    new TooltipContainer(Cursor) { Depth = float.MinValue }
                 }
             });
         }
