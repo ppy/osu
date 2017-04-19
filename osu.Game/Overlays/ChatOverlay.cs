@@ -136,11 +136,11 @@ namespace osu.Game.Overlays
             fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
             fetchReq.Success += delegate (List<Message> messages)
             {
-                var ids = messages.Select(m => m.ChannelId).Distinct();
-
+                var ids = messages.Where(m => m.TargetType == TargetType.Channel).Select(m => m.TargetId).Distinct();
+            
                 //batch messages per channel.
                 foreach (var id in ids)
-                    careChannels.Find(c => c.Id == id)?.AddNewMessages(messages.Where(m => m.ChannelId == id));
+                    careChannels.Find(c => c.Id == id)?.AddNewMessages(messages.Where(m => m.TargetId == id));
 
                 lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
 
