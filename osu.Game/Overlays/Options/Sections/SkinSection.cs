@@ -8,6 +8,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
+using System.Globalization;
 
 namespace osu.Game.Overlays.Options.Sections
 {
@@ -62,12 +63,14 @@ namespace osu.Game.Overlays.Options.Sections
                 new OptionSlider<double>
                 {
                     LabelText = "Menu cursor size",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MenuCursorSize)
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MenuCursorSize),
+                    TooltipText = value => value.ToString(@"0.##x", CultureInfo.InvariantCulture)
                 },
                 new OptionSlider<double>
                 {
                     LabelText = "Gameplay cursor size",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.GameplayCursorSize)
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.GameplayCursorSize),
+                    TooltipText = value => value.ToString(@"0.##x", CultureInfo.InvariantCulture)
                 },
                 new OsuCheckbox
                 {
