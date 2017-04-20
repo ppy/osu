@@ -98,7 +98,12 @@ namespace osu.Game.Graphics.Cursor
 
                     text.Text = value;
                     if (Alpha > 0)
-                        background.FlashColour(Color4.Gray, 200, EasingTypes.Out);
+                    {
+                        AutoSizeDuration = 250;
+                        background.FlashColour(OsuColour.Gray(0.4f), 1000, EasingTypes.OutQuint);
+                    }
+                    else
+                        AutoSizeDuration = 0;
                 }
             }
 
@@ -108,7 +113,6 @@ namespace osu.Game.Graphics.Cursor
 
             public Tooltip()
             {
-                AutoSizeDuration = 250;
                 AutoSizeEasing = EasingTypes.OutQuint;
                 AutoSizeAxes = Axes.Both;
 
