@@ -5,6 +5,7 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -12,7 +13,7 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<T> : SliderBar<T> where T : struct
+    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip where T : struct
     {
         private SampleChannel sample;
         private double lastSampleTime;
@@ -21,6 +22,26 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Nub nub;
         private readonly Box leftBox;
         private readonly Box rightBox;
+
+        public string TooltipText
+        {
+            get
+            {
+                var bindableDouble = CurrentNumber as BindableNumber<double>;
+                if (bindableDouble != null)
+                {
+                    if (bindableDouble.MaxValue == 1 && bindableDouble.MinValue == 0)
+                        return bindableDouble.Value.ToString(@"P0");
+                    return bindableDouble.Value.ToString(@"n1");
+                }
+
+                var bindableInt = CurrentNumber as BindableNumber<int>;
+                if (bindableInt != null)
+                    return bindableInt.Value.ToString(@"n0");
+
+                return Current.Value.ToString();
+            }
+        }
 
         public OsuSliderBar()
         {
