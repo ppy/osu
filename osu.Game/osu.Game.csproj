@@ -156,7 +156,6 @@
     <Compile Include="Database\RulesetDatabase.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
-    <Compile Include="Rulesets\Scoring\ScoreStatistic.cs" />
     <Compile Include="Rulesets\UI\HealthDisplay.cs" />
     <Compile Include="Rulesets\UI\HudOverlay.cs" />
     <Compile Include="Rulesets\UI\StandardHealthDisplay.cs" />
