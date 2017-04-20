@@ -20,6 +20,9 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
             OsuSliderBar<int> slider;
+            OsuSliderBar<double> sliderDouble;
+
+            const float width = 400;
 
             Children = new Drawable[]
             {
@@ -27,19 +30,23 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0,10),
+                    Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
                         new TooltipTextContainer("text with a tooltip"),
                         new TooltipTextContainer("more text with another tooltip"),
                         new TooltipTextbox
                         {
-                            Text = "a box with a tooltip",
-                            Size = new Vector2(300,30),
+                            Text = "a textbox with a tooltip",
+                            Size = new Vector2(width,30),
                         },
                         slider = new OsuSliderBar<int>
                         {
-                            Width = 300,
+                            Width = width,
+                        },
+                        sliderDouble = new OsuSliderBar<double>
+                        {
+                            Width = width,
                         },
                     },
                 },
@@ -48,6 +55,12 @@ namespace osu.Desktop.VisualTests.Tests
             slider.Current.BindTo(new BindableInt(5)
             {
                 MaxValue = 10,
+                MinValue = 0
+            });
+
+            sliderDouble.Current.BindTo(new BindableDouble(0.5)
+            {
+                MaxValue = 1,
                 MinValue = 0
             });
         }
