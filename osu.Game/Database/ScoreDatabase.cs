@@ -108,7 +108,7 @@ namespace osu.Game.Database
 
                     using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
                     using (var reader = new StreamReader(lzma))
-                        score.Replay = createReplay(reader);
+                        score.Replay = createLegacyReplay(reader);
                 }
             }
 
@@ -116,11 +116,11 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Creates a replay which is read from a stream.
+        /// Creates a legacy replay which is read from a stream.
         /// </summary>
         /// <param name="reader">The stream reader.</param>
-        /// <returns>The replay.</returns>
-        private Replay createReplay(StreamReader reader)
+        /// <returns>The legacy replay.</returns>
+        private Replay createLegacyReplay(StreamReader reader)
         {
             var frames = new List<ReplayFrame>();
 
