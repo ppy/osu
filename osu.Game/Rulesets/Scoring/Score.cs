@@ -13,18 +13,16 @@ namespace osu.Game.Rulesets.Scoring
 {
     public class Score
     {
-        [JsonProperty(@"rank")]
         public ScoreRank Rank { get; set; }
 
         [JsonProperty(@"score")]
         public double TotalScore { get; set; }
 
-        [JsonProperty(@"accuracy")]
         public double Accuracy { get; set; }
 
         public double Health { get; set; } = 1;
 
-        [JsonProperty(@"combo")]
+        [JsonProperty(@"max_combo")]
         public int MaxCombo { get; set; }
 
         public int Combo { get; set; }
@@ -49,6 +47,37 @@ namespace osu.Game.Rulesets.Scoring
 
         [JsonProperty(@"created_at")]
         public DateTime Date;
+
+        [JsonProperty(@"statistics")]
+        private Dictionary<string, dynamic> jsonStats
+        {
+            set
+            {
+                foreach (var kvp in value)
+                {
+                    string key = kvp.Key;
+                    switch (key)
+                    {
+                        case @"count_300":
+                            key = @"300";
+                            break;
+                        case @"count_100":
+                            key = @"100";
+                            break;
+                        case @"count_50":
+                            key = @"50";
+                            break;
+                        case @"count_miss":
+                            key = @"x";
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    Statistics.Add(key, kvp.Value);
+                }
+            }
+        }
 
         public Dictionary<string, dynamic> Statistics = new Dictionary<string, dynamic>();
     }
