@@ -24,7 +24,7 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuCursorSize, 1.0, 0.5f, 2);
             Set(OsuConfig.GameplayCursorSize, 1.0, 0.5f, 2);
-            Set(OsuConfig.DimLevel, 30, 0, 100);
+            Set(OsuConfig.DimLevel, 0.3, 0, 1);
 
             Set(OsuConfig.MouseDisableButtons, false);
             Set(OsuConfig.MouseDisableWheel, false);
