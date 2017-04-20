@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Sprites;
-using System;
 using System.Linq;
 
 namespace osu.Game.Graphics.Cursor
