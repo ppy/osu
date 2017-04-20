@@ -44,8 +44,10 @@ namespace osu.Game.Database
             using (Stream s = storage.GetStream(Path.Combine(replay_folder, replayFilename)))
             using (SerializationReader sr = new SerializationReader(s))
             {
-                var ruleset = rulesets.GetRuleset(sr.ReadByte()).CreateInstance();
-                score = new Score();
+                score = new Score
+                {
+                    Ruleset = rulesets.GetRuleset(sr.ReadByte())
+                };
 
                 /* score.Pass = true;*/
                 var version = sr.ReadInt32();

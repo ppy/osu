@@ -81,20 +81,21 @@ namespace osu.Game.Screens.Play
                 if (Beatmap == null)
                     throw new Exception("Beatmap was not loaded");
 
+                ruleset = osu?.Ruleset.Value ?? Beatmap.BeatmapInfo.Ruleset;
+                rulesetInstance = ruleset.CreateInstance();
+
                 try
                 {
-                    // Try using the preferred user ruleset
-                    ruleset = osu == null ? Beatmap.BeatmapInfo.Ruleset : osu.Ruleset.Value;
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
                 }
                 catch (BeatmapInvalidForModeException)
                 {
-                    // Default to the beatmap ruleset
+                    // we may fail to create a HitRenderer if the beatmap cannot be loaded with the user's preferred ruleset
+                    // let's try again forcing the beatmap's ruleset.
                     ruleset = Beatmap.BeatmapInfo.Ruleset;
+                    rulesetInstance = ruleset.CreateInstance();
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
                 }
-
-                rulesetInstance = ruleset.CreateInstance();
-
-                HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
             }
             catch (Exception e)
             {
