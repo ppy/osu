@@ -27,11 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void CheckJudgement(bool userTriggered)
         {
             if (!userTriggered)
-            {
-                if (Judgement.TimeOffset > HitObject.HitWindow)
-                    Judgement.Result = HitResult.Miss;
                 return;
-            }
 
             if (Math.Abs(Judgement.TimeOffset) < HitObject.HitWindow)
             {
