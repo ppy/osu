@@ -13,24 +13,29 @@ namespace osu.Game.Users
         [JsonProperty(@"username")]
         public string Username;
 
-        //[JsonProperty(@"country")]
-        [JsonIgnore]
+        [JsonProperty(@"country_code")]
+        public string CountryCode;
+
+        [JsonProperty(@"country")]
         public Country Country;
 
         //public Team Team;
 
-        [JsonProperty(@"colour")]
+        [JsonProperty(@"profile_colour")]
         public string Colour;
 
-        [JsonProperty(@"avatarUrl")]
+        [JsonProperty(@"avatar_url")]
         public string AvatarUrl;
 
-        [JsonProperty(@"cover")]
-        public UserCover Cover;
+        [JsonProperty(@"cover_url")]
+        public string CoverUrl;
+
+        //[JsonProperty(@"cover")]
+        //public UserCover Cover;
 
         public class UserCover
         {
-            [JsonProperty(@"customUrl")]
+            [JsonProperty(@"custom_url")]
             public string CustomUrl;
 
             [JsonProperty(@"url")]
