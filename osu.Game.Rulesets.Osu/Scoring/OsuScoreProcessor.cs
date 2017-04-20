@@ -53,16 +53,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
             {
                 if (judgement.Result != HitResult.None)
                 {
-                    int count;
-                    if (scoreResultCounts.TryGetValue(judgement.Score, out count))
-                        scoreResultCounts[judgement.Score] = count + 1;
-                    else
-                        scoreResultCounts[judgement.Score] = 0;
-
-                    if (comboResultCounts.TryGetValue(judgement.Combo, out count))
-                        comboResultCounts[judgement.Combo] = count + 1;
-                    else
-                        comboResultCounts[judgement.Combo] = 0;
+                    scoreResultCounts[judgement.Score] = scoreResultCounts.GetOrDefault(judgement.Score) + 1;
+                    comboResultCounts[judgement.Combo] = comboResultCounts.GetOrDefault(judgement.Combo) + 1;
                 }
 
                 switch (judgement.Result)
