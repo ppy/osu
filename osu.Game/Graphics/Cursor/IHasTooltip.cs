@@ -12,26 +12,4 @@ namespace osu.Game.Graphics.Cursor
         /// </summary>
         string TooltipText { get; }
     }
-
-    /// <summary>
-    /// Tooltip with custom appear time
-    /// </summary>
-    public interface IHasTooltipWithCustomDelay : IHasTooltip
-    {
-        /// <summary>
-        /// Time until the tooltip appears (in milliseconds)
-        /// </summary>
-        int TooltipDelay { get; }
-    }
-
-    /// <summary>
-    /// Tooltip which can decide when to disappear
-    /// </summary>
-    public interface IHasDisappearingTooltip : IHasTooltip
-    {
-        /// <summary>
-        /// Should the tooltip disappear?
-        /// </summary>
-        bool Disappear { get; }
-    }
 }

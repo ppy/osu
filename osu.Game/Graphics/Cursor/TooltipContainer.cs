@@ -23,55 +23,68 @@ namespace osu.Game.Graphics.Cursor
         private readonly CursorContainer cursor;
         private readonly Tooltip tooltip;
 
-        private ScheduledDelegate show;
-        private UserInputManager input;
-        private IHasDisappearingTooltip disappearingTooltip;
-        private IHasTooltip hasTooltip;
+        private ScheduledDelegate findTooltipTask;
+        private UserInputManager inputManager;
 
-        public const int DEFAULT_APPEAR_DELAY = 250;
+        private const int default_appear_delay = 250;
+
+        private IHasTooltip currentlyDisplayed;
+
+        private IMouseState lastState;
 
         public TooltipContainer(CursorContainer cursor)
         {
             this.cursor = cursor;
             AlwaysPresent = true;
             RelativeSizeAxes = Axes.Both;
-            Add(tooltip = new Tooltip());
+            Add(tooltip = new Tooltip { Alpha = 0 });
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, UserInputManager input)
         {
-            this.input = input;
+            this.inputManager = input;
         }
 
         protected override void Update()
         {
-            if (tooltip?.IsPresent == true)
-                tooltip.TooltipText = hasTooltip?.TooltipText;
-            else if (disappearingTooltip?.Disappear == true && show?.Completed == true)
+            if (tooltip.IsPresent && lastState != null)
             {
-                disappearingTooltip = null;
-                tooltip.TooltipText = string.Empty;
+                if (currentlyDisplayed != null)
+                    tooltip.TooltipText = currentlyDisplayed.TooltipText;
+
+                //update the position of the displayed tooltip.
+                tooltip.Position = new Vector2(
+                    lastState.Position.X,
+                    Math.Min(cursor.ActiveCursor.BoundingBox.Bottom, lastState.Position.Y + cursor.ActiveCursor.DrawHeight));
             }
         }
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (((hasTooltip as Drawable)?.Hovering != true && disappearingTooltip?.Disappear != false) || show?.Completed != true)
+            lastState = state.Mouse;
+
+            if (currentlyDisplayed?.Hovering != true)
             {
-                show?.Cancel();
-                tooltip.TooltipText = string.Empty;
-                hasTooltip = input.HoveredDrawables.OfType<IHasTooltip>().FirstOrDefault();
-                if (hasTooltip != null)
+                if (currentlyDisplayed != null)
                 {
-                    IHasTooltipWithCustomDelay delayedTooltip = hasTooltip as IHasTooltipWithCustomDelay;
-                    disappearingTooltip = hasTooltip as IHasDisappearingTooltip;
-                    show = Scheduler.AddDelayed(delegate
-                    {
-                        tooltip.TooltipText = hasTooltip.TooltipText;
-                        tooltip.Position = new Vector2(state.Mouse.Position.X, Math.Min(cursor.ActiveCursor.BoundingBox.Bottom, state.Mouse.Position.Y + cursor.ActiveCursor.DrawHeight));
-                    }, delayedTooltip?.TooltipDelay ?? DEFAULT_APPEAR_DELAY);
+                    tooltip.Delay(100);
+                    tooltip.FadeOut(500, EasingTypes.OutQuint);
+                    currentlyDisplayed = null;
                 }
+
+                findTooltipTask?.Cancel();
+                findTooltipTask = Scheduler.AddDelayed(delegate
+                {
+                    var tooltipTarget = inputManager.HoveredDrawables.OfType<IHasTooltip>().FirstOrDefault();
+
+                    if (tooltipTarget == null) return;
+
+                    tooltip.TooltipText = tooltipTarget.TooltipText;
+                    tooltip.FadeIn(500, EasingTypes.OutQuint);
+
+                    currentlyDisplayed = tooltipTarget;
+                }, (1 - tooltip.Alpha) * default_appear_delay);
             }
 
             return base.OnMouseMove(state);
@@ -87,10 +100,6 @@ namespace osu.Game.Graphics.Cursor
                 set
                 {
                     text.Text = value;
-                    if (string.IsNullOrEmpty(value) && !Hovering)
-                        Hide();
-                    else
-                        Show();
                 }
             }
 
@@ -116,7 +125,7 @@ namespace osu.Game.Graphics.Cursor
                     },
                     text = new OsuSpriteText
                     {
-                        Padding = new MarginPadding(3),
+                        Padding = new MarginPadding(5),
                         Font = @"Exo2.0-Regular",
                     }
                 };
