@@ -72,7 +72,6 @@
     <Compile Include="OsuAutoReplay.cs" />
     <Compile Include="OsuDifficultyCalculator.cs" />
     <Compile Include="OsuKeyConversionInputManager.cs" />
-    <Compile Include="Scoring\OsuScore.cs" />
     <Compile Include="Scoring\OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuHitRenderer.cs" />
     <Compile Include="UI\OsuPlayfield.cs" />

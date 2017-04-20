@@ -40,6 +40,4 @@ namespace osu.Game.Users
             public int? Id;
         }
     }
-
-
 }
