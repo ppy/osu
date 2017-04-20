@@ -98,7 +98,7 @@ namespace osu.Game.Graphics.Cursor
 
             public Cursor()
             {
-                Size = new Vector2(42);
+                AutoSizeAxes = Axes.Both;
             }
 
             [BackgroundDependencyLoader]
