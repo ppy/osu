@@ -49,36 +49,6 @@ namespace osu.Game.Rulesets.Scoring
         [JsonProperty(@"created_at")]
         public DateTime Date;
 
-        /// <summary>
-        /// Creates a replay which is read from a stream.
-        /// </summary>
-        /// <param name="reader">The stream reader.</param>
-        /// <returns>The replay.</returns>
-        public virtual Replay CreateReplay(StreamReader reader)
-        {
-            var frames = new List<ReplayFrame>();
-
-            float lastTime = 0;
-
-            foreach (var l in reader.ReadToEnd().Split(','))
-            {
-                var split = l.Split('|');
-
-                if (split.Length < 4 || float.Parse(split[0]) < 0) continue;
-
-                lastTime += float.Parse(split[0]);
-
-                frames.Add(new ReplayFrame(
-                    lastTime,
-                    float.Parse(split[1]),
-                    384 - float.Parse(split[2]),
-                    (ReplayButtonState)int.Parse(split[3])
-                    ));
-            }
-
-            return new Replay { Frames = frames };
-        }
-
         public virtual IEnumerable<ScoreStatistic> Statistics => new ScoreStatistic[] { };
     }
 }
