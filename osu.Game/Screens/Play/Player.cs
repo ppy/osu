@@ -17,11 +17,11 @@ using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -266,10 +266,9 @@ namespace osu.Game.Screens.Play
             Delay(1000);
             onCompletionEvent = Schedule(delegate
             {
-                Push(new Results
-                {
-                    Score = scoreProcessor.CreateScore()
-                });
+                var score = scoreProcessor.CreateScore();
+                score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
+                Push(new Results(score));
             });
         }
 
