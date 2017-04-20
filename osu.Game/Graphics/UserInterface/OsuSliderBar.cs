@@ -12,10 +12,11 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<U> : SliderBar<U> where U : struct
+    public class OsuSliderBar<T> : SliderBar<T> where T : struct
     {
         private SampleChannel sample;
         private double lastSampleTime;
+        private T lastSampleValue;
 
         private readonly Nub nub;
         private readonly Box leftBox;
@@ -84,6 +85,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
                 return;
+
+            if (Current.Value.Equals(lastSampleValue))
+                return;
+
+            lastSampleValue = Current.Value;
+
             lastSampleTime = Clock.CurrentTime;
             sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
 
