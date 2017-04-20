@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.Cursor
 
             if (currentlyDisplayed?.Hovering != true)
             {
-                if (currentlyDisplayed != null)
+                if (currentlyDisplayed != null && !state.Mouse.HasMainButtonPressed)
                 {
                     tooltip.Delay(100);
                     tooltip.FadeOut(500, EasingTypes.OutQuint);
