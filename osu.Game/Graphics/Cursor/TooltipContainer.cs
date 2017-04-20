@@ -55,9 +55,20 @@ namespace osu.Game.Graphics.Cursor
             }
         }
 
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            updateTooltipState(state);
+            return base.OnMouseUp(state, args);
+        }
+
         protected override bool OnMouseMove(InputState state)
         {
+            updateTooltipState(state);
+            return base.OnMouseMove(state);
+        }
 
+        private void updateTooltipState(InputState state)
+        {
             if (currentlyDisplayed?.Hovering != true)
             {
                 if (currentlyDisplayed != null && !state.Mouse.HasMainButtonPressed)
@@ -80,8 +91,6 @@ namespace osu.Game.Graphics.Cursor
                     currentlyDisplayed = tooltipTarget;
                 }, (1 - tooltip.Alpha) * default_appear_delay);
             }
-
-            return base.OnMouseMove(state);
         }
 
         public class Tooltip : Container
