@@ -18,10 +18,10 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new OptionSlider<int>
+                new OptionSlider<double>
                 {
                     LabelText = "Background dim",
-                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.DimLevel)
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.DimLevel)
                 },
                 new OptionEnumDropdown<ProgressBarType>
                 {
