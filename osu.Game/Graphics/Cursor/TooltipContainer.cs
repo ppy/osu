@@ -41,9 +41,9 @@ namespace osu.Game.Graphics.Cursor
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, UserInputManager input)
+        private void load(UserInputManager input)
         {
-            this.inputManager = input;
+            inputManager = input;
         }
 
         protected override void Update()
