@@ -138,8 +138,7 @@ namespace osu.Game.Rulesets.Osu
 
                 if (h is Spinner)
                 {
-                    targetPosition.X = Frames[Frames.Count - 1].Position.X;
-                    targetPosition.Y = Frames[Frames.Count - 1].Position.Y;
+                    targetPosition = Frames[Frames.Count - 1].Position;
 
                     Vector2 difference = spinner_centre - targetPosition;
 
