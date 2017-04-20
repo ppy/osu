@@ -30,8 +30,6 @@ namespace osu.Game.Graphics.Cursor
 
         private IHasTooltip currentlyDisplayed;
 
-        private IMouseState lastState;
-
         public TooltipContainer(CursorContainer cursor)
         {
             this.cursor = cursor;
@@ -48,21 +46,18 @@ namespace osu.Game.Graphics.Cursor
 
         protected override void Update()
         {
-            if (tooltip.IsPresent && lastState != null)
+            if (tooltip.IsPresent)
             {
                 if (currentlyDisplayed != null)
                     tooltip.TooltipText = currentlyDisplayed.TooltipText;
 
                 //update the position of the displayed tooltip.
-                tooltip.Position = new Vector2(
-                    lastState.Position.X,
-                    Math.Min(cursor.ActiveCursor.BoundingBox.Bottom, lastState.Position.Y + cursor.ActiveCursor.DrawHeight));
+                tooltip.Position = ToLocalSpace(cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre) + new Vector2(10);
             }
         }
 
         protected override bool OnMouseMove(InputState state)
         {
-            lastState = state.Mouse;
 
             if (currentlyDisplayed?.Hovering != true)
             {
