@@ -3,15 +3,42 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
+using System;
 
 namespace osu.Game.Rulesets.UI
 {
     public class StandardHealthDisplay : HealthDisplay, IHasAccentColour
     {
+        /// <summary>
+        /// The base opacity of the glow.
+        /// </summary>
+        private const float base_glow_opacity = 0.6f;
+
+        /// <summary>
+        /// The number of sequential hits required within <see cref="glow_fade_delay"/> to reach the maximum glow opacity.
+        /// </summary>
+        private const int glow_max_hits = 8;
+
+        /// <summary>
+        /// The amount of time to delay before fading the glow opacity back to <see cref="base_glow_opacity"/>.
+        /// <para>
+        /// This is calculated to require a stream snapped to 1/4 at 150bpm to reach the maximum glow opacity with <see cref="glow_max_hits"/> hits.
+        /// </para>
+        /// </summary>
+        private const float glow_fade_delay = 100;
+
+        /// <summary>
+        /// The amount of time to fade the glow to <see cref="base_glow_opacity"/> after <see cref="glow_fade_delay"/>.
+        /// </summary>
+        private const double glow_fade_time = 500;
+
         private readonly Container fill;
 
         public Color4 AccentColour
@@ -32,9 +59,10 @@ namespace osu.Game.Rulesets.UI
 
                 fill.EdgeEffect = new EdgeEffect
                 {
-                    Colour = glowColour,
+                    Colour = glowColour.Opacity(base_glow_opacity),
                     Radius = 8,
-                    Type = EdgeEffectType.Glow
+                    Roundness = 4,
+                    Type = EdgeEffectType.Glow,
                 };
             }
         }
@@ -51,7 +79,7 @@ namespace osu.Game.Rulesets.UI
                 fill = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Scale = new Vector2(0, 1),
+                    Size = new Vector2(0, 1),
                     Masking = true,
                     Children = new[]
                     {
@@ -64,6 +92,16 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
-        protected override void SetHealth(float value) => fill.ScaleTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
+        public void Flash(Judgement judgement)
+        {
+            if (judgement.Result == HitResult.Miss)
+                return;
+
+            fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, EasingTypes.OutQuint);
+            fill.Delay(glow_fade_delay);
+            fill.FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, EasingTypes.OutQuint);
+        }
+
+        protected override void SetHealth(float value) => fill.ResizeTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
     }
 }

@@ -98,11 +98,11 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 double osuDuration = distance / osuVelocity;
 
                 // If the drum roll is to be split into hit circles, assume the ticks are 1/8 spaced within the duration of one beat
-                double tickSpacing = Math.Min(speedAdjustedBeatLength / beatmap.BeatmapInfo.Difficulty.SliderTickRate, taikoDuration / repeats) / 8;
+                double tickSpacing = Math.Min(speedAdjustedBeatLength / beatmap.BeatmapInfo.Difficulty.SliderTickRate, taikoDuration / repeats);
 
                 if (tickSpacing > 0 && osuDuration < 2 * speedAdjustedBeatLength)
                 {
-                    for (double j = obj.StartTime; j <= distanceData.EndTime + tickSpacing; j += tickSpacing)
+                    for (double j = obj.StartTime; j <= obj.StartTime + taikoDuration + tickSpacing / 8; j += tickSpacing)
                     {
                         // Todo: This should generate different type of hits (including strongs)
                         // depending on hitobject sound additions (not implemented fully yet)

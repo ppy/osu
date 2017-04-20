@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         /// <summary>
         /// The size of a tick.
         /// </summary>
-        private const float tick_size = TaikoHitObject.DEFAULT_CIRCLE_DIAMETER / 4;
+        private const float tick_size = TaikoHitObject.DEFAULT_CIRCLE_DIAMETER / 6;
 
         private bool filled;
         public bool Filled

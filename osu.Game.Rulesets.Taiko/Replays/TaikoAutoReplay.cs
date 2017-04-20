@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.Taiko.Replays
         {
             bool hitButton = true;
 
-            Frames.Add(new ReplayFrame(-100000, 320, 240, ReplayButtonState.None));
-            Frames.Add(new ReplayFrame(beatmap.HitObjects[0].StartTime - 1000, 320, 240, ReplayButtonState.None));
+            Frames.Add(new ReplayFrame(-100000, null, null, ReplayButtonState.None));
+            Frames.Add(new ReplayFrame(beatmap.HitObjects[0].StartTime - 1000, null, null, ReplayButtonState.None));
 
             for (int i = 0; i < beatmap.HitObjects.Count; i++)
             {
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                                 break;
                         }
 
-                        Frames.Add(new ReplayFrame(j, 0, 0, button));
+                        Frames.Add(new ReplayFrame(j, null, null, button));
                         d = (d + 1) % 4;
                         if (++count > req)
                             break;
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 {
                     foreach (var tick in drumRoll.Ticks)
                     {
-                        Frames.Add(new ReplayFrame(tick.StartTime, 0, 0, hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2));
+                        Frames.Add(new ReplayFrame(tick.StartTime, null, null, hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2));
                         hitButton = !hitButton;
                     }
                 }
@@ -95,18 +95,18 @@ namespace osu.Game.Rulesets.Taiko.Replays
                             button = hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2;
                     }
 
-                    Frames.Add(new ReplayFrame(h.StartTime, 0, 0, button));
+                    Frames.Add(new ReplayFrame(h.StartTime, null, null, button));
                 }
                 else
                     throw new Exception("Unknown hit object type.");
 
-                Frames.Add(new ReplayFrame(endTime + KEY_UP_DELAY, 0, 0, ReplayButtonState.None));
+                Frames.Add(new ReplayFrame(endTime + KEY_UP_DELAY, null, null, ReplayButtonState.None));
 
                 if (i < beatmap.HitObjects.Count - 1)
                 {
                     double waitTime = beatmap.HitObjects[i + 1].StartTime - 1000;
                     if (waitTime > endTime)
-                        Frames.Add(new ReplayFrame(waitTime, 0, 0, ReplayButtonState.None));
+                        Frames.Add(new ReplayFrame(waitTime, null, null, ReplayButtonState.None));
                 }
 
                 hitButton = !hitButton;

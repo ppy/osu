@@ -3,11 +3,11 @@
 
 using OpenTK;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.UI
@@ -75,8 +75,17 @@ namespace osu.Game.Rulesets.UI
             if (shd != null)
             {
                 shd.AccentColour = colours.BlueLighter;
-                shd.GlowColour = colours.BlueDarker.Opacity(0.6f);
+                shd.GlowColour = colours.BlueDarker;
             }
+        }
+
+        public override void BindProcessor(ScoreProcessor processor)
+        {
+            base.BindProcessor(processor);
+
+            var shd = HealthDisplay as StandardHealthDisplay;
+            if (shd != null)
+                processor.NewJudgement += shd.Flash;
         }
     }
 }

@@ -80,6 +80,10 @@ namespace osu.Game.Graphics
         public Color4 GrayE = FromHex(@"eee");
         public Color4 GrayF = FromHex(@"fff");
 
-        public Color4 Red = FromHex(@"fc4549");
+        public Color4 RedLighter = FromHex(@"ffeded");
+        public Color4 RedLight = FromHex(@"ed7787");
+        public Color4 Red = FromHex(@"ed1121");
+        public Color4 RedDark = FromHex(@"ba0011");
+        public Color4 RedDarker = FromHex(@"870000");
     }
 }
