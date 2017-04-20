@@ -18,6 +18,7 @@ using osu.Game.Users;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
+using System.Collections.Generic;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Play;
@@ -187,9 +188,9 @@ namespace osu.Game.Screens.Ranking
 
         private class DrawableScoreStatistic : Container
         {
-            private readonly ScoreStatistic statistic;
+            private readonly KeyValuePair<string, dynamic> statistic;
 
-            public DrawableScoreStatistic(ScoreStatistic statistic)
+            public DrawableScoreStatistic(KeyValuePair<string, dynamic> statistic)
             {
                 this.statistic = statistic;
 
@@ -210,7 +211,7 @@ namespace osu.Game.Screens.Ranking
                         Origin = Anchor.TopCentre,
                     },
                     new SpriteText {
-                        Text = statistic.Name,
+                        Text = statistic.Key,
                         Colour = colours.Gray7,
                         Font = @"Exo2.0-Bold",
                         Y = 26,

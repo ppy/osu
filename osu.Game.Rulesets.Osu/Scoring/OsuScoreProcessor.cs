@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Extensions;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
@@ -36,16 +37,14 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private readonly Dictionary<OsuScoreResult, int> scoreResultCounts = new Dictionary<OsuScoreResult, int>();
         private readonly Dictionary<ComboResult, int> comboResultCounts = new Dictionary<ComboResult, int>();
 
-        public override Score CreateEmptyScore() => new OsuScore();
-
         public override Score GetPopulatedScore()
         {
-            var score = (OsuScore)base.GetPopulatedScore();
+            var score = base.GetPopulatedScore();
 
-            scoreResultCounts.TryGetValue(OsuScoreResult.Hit300, out score.Count300);
-            scoreResultCounts.TryGetValue(OsuScoreResult.Hit100, out score.Count100);
-            scoreResultCounts.TryGetValue(OsuScoreResult.Hit50, out score.Count50);
-            scoreResultCounts.TryGetValue(OsuScoreResult.Miss, out score.CountMiss);
+            score.Statistics[@"300"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit300);
+            score.Statistics[@"100"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit100);
+            score.Statistics[@"50"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit50);
+            score.Statistics[@"x"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Miss);
 
             return score;
         }

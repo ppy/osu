@@ -2,12 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
@@ -41,17 +41,20 @@ namespace osu.Desktop.VisualTests.Tests
 
             base.Reset();
 
-            Add(new Results(new OsuScore
+            Add(new Results(new Score
             {
                 TotalScore = 2845370,
                 Accuracy = 0.98,
                 MaxCombo = 123,
                 Rank = ScoreRank.A,
                 Date = DateTime.Now,
-                Count300 = 100,
-                Count100 = 10,
-                Count50 = 1,
-                CountMiss = 2,
+                Statistics = new Dictionary<string, dynamic>()
+                {
+                    { "300", 50 },
+                    { "100", 20 },
+                    { "50", 50 },
+                    { "x", 1 }
+                },
                 User = new User
                 {
                     Username = "peppy",
@@ -62,4 +65,4 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
     }
- }
+}
