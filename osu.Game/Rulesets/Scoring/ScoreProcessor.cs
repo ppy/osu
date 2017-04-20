@@ -20,6 +20,11 @@ namespace osu.Game.Rulesets.Scoring
         public event Action Failed;
 
         /// <summary>
+        /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by the <see cref="ScoreProcessor"/>.
+        /// </summary>
+        public event Action<Judgement> NewJudgement;
+
+        /// <summary>
         /// The current total score.
         /// </summary>
         public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
@@ -106,6 +111,15 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
+        /// Notifies subscribers of <see cref="NewJudgement"/> that a new judgement has occurred.
+        /// </summary>
+        /// <param name="judgement">The judgement to notify subscribers of.</param>
+        protected void NotifyNewJudgement(Judgement judgement)
+        {
+            NewJudgement?.Invoke(judgement);
+        }
+
+        /// <summary>
         /// Retrieve a score populated with data for the current play this processor is responsible for.
         /// </summary>
         public virtual void PopulateScore(Score score)
@@ -177,6 +191,8 @@ namespace osu.Game.Rulesets.Scoring
 
                 Judgements.Add(judgement);
                 OnNewJudgement(judgement);
+
+                NotifyNewJudgement(judgement);
             }
             else
                 OnJudgementChanged(judgement);
