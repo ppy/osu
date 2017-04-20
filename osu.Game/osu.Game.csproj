@@ -57,6 +57,7 @@
       <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.1.1\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="DotNetZip">

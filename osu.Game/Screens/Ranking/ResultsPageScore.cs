@@ -18,11 +18,13 @@ using osu.Game.Users;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
+using System.Collections.Generic;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Play;
 using osu.Game.Rulesets.Scoring;
 using osu.Framework.Graphics.Colour;
+using System.Linq;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -31,6 +33,8 @@ namespace osu.Game.Screens.Ranking
         private ScoreCounter scoreCounter;
 
         public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { }
+
+        private FillFlowContainer<DrawableScoreStatistic> statisticsContainer;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -148,15 +152,74 @@ namespace osu.Game.Screens.Ranking
                                 },
                             }
                         },
+                        statisticsContainer = new FillFlowContainer<DrawableScoreStatistic>
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Direction = FillDirection.Horizontal,
+                            LayoutDuration = 200,
+                            LayoutEasing = EasingTypes.OutQuint
+                        }
                     }
                 }
             };
+
+            statisticsContainer.Children = Score.Statistics.Select(s => new DrawableScoreStatistic(s));
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Schedule(() => scoreCounter.Increment(Score.TotalScore));
+
+            Schedule(() =>
+            {
+                scoreCounter.Increment(Score.TotalScore);
+
+                int delay = 0;
+                foreach (var s in statisticsContainer.Children)
+                {
+                    s.FadeOut();
+                    s.Delay(delay += 200);
+                    s.FadeIn(300 + delay, EasingTypes.Out);
+                }
+            });
+        }
+
+        private class DrawableScoreStatistic : Container
+        {
+            private readonly KeyValuePair<string, dynamic> statistic;
+
+            public DrawableScoreStatistic(KeyValuePair<string, dynamic> statistic)
+            {
+                this.statistic = statistic;
+
+                AutoSizeAxes = Axes.Both;
+                Margin = new MarginPadding { Left = 5, Right = 5 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Children = new Drawable[]
+                {
+                    new SpriteText {
+                        Text = statistic.Value.ToString().PadLeft(4, '0'),
+                        Colour = colours.Gray7,
+                        TextSize = 30,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                    },
+                    new SpriteText {
+                        Text = statistic.Key,
+                        Colour = colours.Gray7,
+                        Font = @"Exo2.0-Bold",
+                        Y = 26,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                    },
+                };
+            }
         }
 
         private class DateDisplay : Container
