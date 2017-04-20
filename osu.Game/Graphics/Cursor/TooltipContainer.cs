@@ -128,7 +128,8 @@ namespace osu.Game.Graphics.Cursor
                 {
                     background = new Box
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.9f,
                     },
                     text = new OsuSpriteText
                     {
