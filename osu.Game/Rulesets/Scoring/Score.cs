@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
-using System.IO;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Scoring
@@ -49,6 +48,6 @@ namespace osu.Game.Rulesets.Scoring
         [JsonProperty(@"created_at")]
         public DateTime Date;
 
-        public virtual IEnumerable<ScoreStatistic> Statistics => new ScoreStatistic[] { };
+        public Dictionary<string, dynamic> Statistics = new Dictionary<string, dynamic>();
     }
 }
