@@ -80,20 +80,6 @@ namespace osu.Desktop.VisualTests.Tests
         private class TooltipSlider : OsuSliderBar<int>, IHasTooltip
         {
             public string TooltipText => Current.Value.ToString();
-
-            public bool Disappear { get; set; } = true;
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                Disappear = false;
-                return base.OnMouseDown(state, args);
-            }
-
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-            {
-                Disappear = true;
-                return base.OnMouseUp(state, args);
-            }
         }
     }
 }
