@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
         private IAdjustableClock sourceClock;
         private IFrameBasedClock interpolatedSourceClock;
 
-        private Ruleset ruleset;
+        private RulesetInfo ruleset;
 
         private ScoreProcessor scoreProcessor;
         protected HitRenderer HitRenderer;
@@ -68,6 +68,8 @@ namespace osu.Game.Screens.Play
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
+            Ruleset rulesetInstance;
+
             try
             {
                 if (Beatmap == null)
@@ -82,15 +84,17 @@ namespace osu.Game.Screens.Play
                 try
                 {
                     // Try using the preferred user ruleset
-                    ruleset = osu == null ? Beatmap.BeatmapInfo.Ruleset.CreateInstance() : osu.Ruleset.Value.CreateInstance();
-                    HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+                    ruleset = osu == null ? Beatmap.BeatmapInfo.Ruleset : osu.Ruleset.Value;
                 }
                 catch (BeatmapInvalidForModeException)
                 {
                     // Default to the beatmap ruleset
-                    ruleset = Beatmap.BeatmapInfo.Ruleset.CreateInstance();
-                    HitRenderer = ruleset.CreateHitRendererWith(Beatmap);
+                    ruleset = Beatmap.BeatmapInfo.Ruleset;
                 }
+
+                rulesetInstance = ruleset.CreateInstance();
+
+                HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
             }
             catch (Exception e)
             {
@@ -125,7 +129,7 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.Centre
             };
 
-            hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
+            hudOverlay.KeyCounter.Add(rulesetInstance.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindHitRenderer(HitRenderer);
 
@@ -266,7 +270,12 @@ namespace osu.Game.Screens.Play
             Delay(1000);
             onCompletionEvent = Schedule(delegate
             {
-                var score = scoreProcessor.GetPopulatedScore();
+                var score = new Score
+                {
+                    Beatmap = Beatmap.BeatmapInfo,
+                    Ruleset = ruleset
+                };
+                scoreProcessor.PopulateScore(score);
                 score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
                 Push(new Results(score));
             });

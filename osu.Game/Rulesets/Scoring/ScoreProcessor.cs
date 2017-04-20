@@ -61,12 +61,6 @@ namespace osu.Game.Rulesets.Scoring
             Reset();
         }
 
-        /// <summary>
-        /// Creates a Score applicable to the ruleset in which this ScoreProcessor resides.
-        /// </summary>
-        /// <returns>The Score.</returns>
-        public virtual Score CreateEmptyScore() => new Score();
-
         private ScoreRank rankFrom(double acc)
         {
             if (acc == 1)
@@ -114,10 +108,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Retrieve a score populated with data for the current play this processor is responsible for.
         /// </summary>
-        public virtual Score GetPopulatedScore()
+        public virtual void PopulateScore(Score score)
         {
-            var score = CreateEmptyScore();
-
             score.TotalScore = TotalScore;
             score.Combo = Combo;
             score.MaxCombo = HighestCombo;
@@ -125,8 +117,6 @@ namespace osu.Game.Rulesets.Scoring
             score.Rank = rankFrom(Accuracy);
             score.Date = DateTime.Now;
             score.Health = Health;
-
-            return score;
         }
     }
 

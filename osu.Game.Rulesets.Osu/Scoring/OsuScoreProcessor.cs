@@ -37,16 +37,14 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private readonly Dictionary<OsuScoreResult, int> scoreResultCounts = new Dictionary<OsuScoreResult, int>();
         private readonly Dictionary<ComboResult, int> comboResultCounts = new Dictionary<ComboResult, int>();
 
-        public override Score GetPopulatedScore()
+        public override void PopulateScore(Score score)
         {
-            var score = base.GetPopulatedScore();
+            base.PopulateScore(score);
 
             score.Statistics[@"300"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit300);
             score.Statistics[@"100"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit100);
             score.Statistics[@"50"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit50);
             score.Statistics[@"x"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Miss);
-
-            return score;
         }
 
         protected override void OnNewJudgement(OsuJudgement judgement)

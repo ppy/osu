@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Scoring
         [JsonProperty(@"mods")]
         protected string[] ModStrings { get; set; } //todo: parse to Mod objects
 
+        public RulesetInfo Ruleset { get; set; }
+
         public Mod[] Mods { get; set; }
 
         [JsonProperty(@"user")]
