@@ -138,8 +138,7 @@ namespace osu.Game.Rulesets.Osu
 
                 if (h is Spinner)
                 {
-                    targetPosition.X = Frames[Frames.Count - 1].MouseX;
-                    targetPosition.Y = Frames[Frames.Count - 1].MouseY;
+                    targetPosition = Frames[Frames.Count - 1].Position;
 
                     Vector2 difference = spinner_centre - targetPosition;
 
@@ -193,7 +192,7 @@ namespace osu.Game.Rulesets.Osu
                         addFrameToReplay(lastFrame);
                     }
 
-                    Vector2 lastPosition = new Vector2(lastFrame.MouseX, lastFrame.MouseY);
+                    Vector2 lastPosition = lastFrame.Position;
 
                     double timeDifference = applyModsToTime(h.StartTime - lastFrame.Time);
 

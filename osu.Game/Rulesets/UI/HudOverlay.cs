@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        public void BindProcessor(ScoreProcessor processor)
+        public virtual void BindProcessor(ScoreProcessor processor)
         {
             ScoreCounter?.Current.BindTo(processor.TotalScore);
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.UI
             HealthDisplay?.Current.BindTo(processor.Health);
         }
 
-        public void BindHitRenderer(HitRenderer hitRenderer)
+        public virtual void BindHitRenderer(HitRenderer hitRenderer)
         {
             hitRenderer.InputManager.Add(KeyCounter.GetReceptor());
         }

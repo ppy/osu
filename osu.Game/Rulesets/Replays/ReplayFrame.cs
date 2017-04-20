@@ -7,12 +7,12 @@ namespace osu.Game.Rulesets.Replays
 {
     public class ReplayFrame
     {
-        public Vector2 Position => new Vector2(MouseX, MouseY);
+        public Vector2 Position => new Vector2(MouseX ?? 0, MouseY ?? 0);
 
-        public bool IsImportant => MouseLeft || MouseRight;
+        public bool IsImportant => MouseX.HasValue && MouseY.HasValue && (MouseLeft || MouseRight);
 
-        public float MouseX;
-        public float MouseY;
+        public float? MouseX;
+        public float? MouseY;
 
         public bool MouseLeft => MouseLeft1 || MouseLeft2;
         public bool MouseRight => MouseRight1 || MouseRight2;
@@ -55,10 +55,10 @@ namespace osu.Game.Rulesets.Replays
 
         }
 
-        public ReplayFrame(double time, float posX, float posY, ReplayButtonState buttonState)
+        public ReplayFrame(double time, float? mouseX, float? mouseY, ReplayButtonState buttonState)
         {
-            MouseX = posX;
-            MouseY = posY;
+            MouseX = mouseX;
+            MouseY = mouseY;
             ButtonState = buttonState;
             Time = time;
         }
