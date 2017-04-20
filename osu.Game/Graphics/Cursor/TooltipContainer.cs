@@ -68,7 +68,7 @@ namespace osu.Game.Graphics.Cursor
             {
                 if (currentlyDisplayed != null && !state.Mouse.HasMainButtonPressed)
                 {
-                    tooltip.Delay(100);
+                    tooltip.Delay(150);
                     tooltip.FadeOut(500, EasingTypes.OutQuint);
                     currentlyDisplayed = null;
                 }
@@ -92,23 +92,31 @@ namespace osu.Game.Graphics.Cursor
 
         public class Tooltip : Container
         {
-            private readonly Box tooltipBackground;
+            private readonly Box background;
             private readonly OsuSpriteText text;
 
             public string TooltipText
             {
                 set
                 {
+                    if (value == text.Text) return;
+
                     text.Text = value;
+                    if (Alpha > 0)
+                        background.FlashColour(Color4.Gray, 200, EasingTypes.Out);
                 }
             }
 
             public override bool HandleInput => false;
 
+            private const float text_size = 16;
+
             public Tooltip()
             {
-
+                AutoSizeDuration = 250;
+                AutoSizeEasing = EasingTypes.OutQuint;
                 AutoSizeAxes = Axes.Both;
+
                 CornerRadius = 5;
                 Masking = true;
                 EdgeEffect = new EdgeEffect
@@ -119,12 +127,13 @@ namespace osu.Game.Graphics.Cursor
                 };
                 Children = new Drawable[]
                 {
-                    tooltipBackground = new Box
+                    background = new Box
                     {
                         RelativeSizeAxes = Axes.Both
                     },
                     text = new OsuSpriteText
                     {
+                        TextSize = text_size,
                         Padding = new MarginPadding(5),
                         Font = @"Exo2.0-Regular",
                     }
@@ -134,7 +143,7 @@ namespace osu.Game.Graphics.Cursor
             [BackgroundDependencyLoader]
             private void load(OsuColour colour)
             {
-                tooltipBackground.Colour = colour.Gray3;
+                background.Colour = colour.Gray3;
             }
         }
     }
