@@ -91,11 +91,17 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
 
+        public Replay Replay { get; private set; }
+
         /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replay">The replay, null for local input.</param>
-        public void SetReplay(Replay replay) => InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
+        public void SetReplay(Replay replay)
+        {
+            Replay = replay;
+            InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
+        }
     }
 
     /// <summary>
@@ -125,7 +131,7 @@ namespace osu.Game.Rulesets.UI
 
             // Check if the beatmap can be converted
             if (!converter.CanConvert(beatmap.Beatmap))
-                throw new BeatmapInvalidForModeException($"{nameof(Beatmap)} can't be converted for the current ruleset.");
+                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can't be converted for the current ruleset.");
 
             // Convert the beatmap
             Beatmap = converter.Convert(beatmap.Beatmap);
@@ -273,9 +279,9 @@ namespace osu.Game.Rulesets.UI
         protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
     }
 
-    public class BeatmapInvalidForModeException : Exception
+    public class BeatmapInvalidForRulesetException : Exception
     {
-        public BeatmapInvalidForModeException(string text)
+        public BeatmapInvalidForRulesetException(string text)
             : base(text)
         {
         }

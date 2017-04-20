@@ -12,6 +12,7 @@ using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -26,6 +27,11 @@ namespace osu.Game.Rulesets.Osu
         public OsuAutoReplay(Beatmap<OsuHitObject> beatmap)
         {
             this.beatmap = beatmap;
+
+            User = new User
+            {
+                Username = @"Autoplay",
+            };
 
             createAutoReplay();
         }
