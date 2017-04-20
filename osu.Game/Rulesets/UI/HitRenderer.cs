@@ -91,11 +91,17 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
 
+        public Replay Replay { get; private set; }
+
         /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replay">The replay, null for local input.</param>
-        public void SetReplay(Replay replay) => InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
+        public void SetReplay(Replay replay)
+        {
+            Replay = replay;
+            InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
+        }
     }
 
     /// <summary>
