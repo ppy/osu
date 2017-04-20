@@ -86,7 +86,7 @@ namespace osu.Game.Online.Chat.Drawables
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = @"Exo2.0-SemiBold",
-                            Text = $@"{Message.Timestamp.LocalDateTime:hh:mm:ss}",
+                            Text = $@"{Message.Timestamp.LocalDateTime:HH:mm:ss}",
                             FixedWidth = true,
                             TextSize = text_size * 0.75f,
                             Alpha = 0.4f,
