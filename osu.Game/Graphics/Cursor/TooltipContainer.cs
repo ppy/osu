@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.Cursor
         private ScheduledDelegate findTooltipTask;
         private UserInputManager inputManager;
 
-        private const int default_appear_delay = 250;
+        private const int default_appear_delay = 220;
 
         private IHasTooltip currentlyDisplayed;
 
