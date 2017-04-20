@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 
-namespace osu.Game.Graphics.Cursor
+namespace osu.Game.Graphics
 {
     public interface IHasTooltip : IDrawable
     {

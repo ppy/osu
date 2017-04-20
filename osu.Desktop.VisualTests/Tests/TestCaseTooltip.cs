@@ -19,7 +19,7 @@ namespace osu.Desktop.VisualTests.Tests
         public override void Reset()
         {
             base.Reset();
-            TooltipSlider slider;
+            OsuSliderBar<int> slider;
 
             Children = new Drawable[]
             {
@@ -37,7 +37,7 @@ namespace osu.Desktop.VisualTests.Tests
                             Text = "a box with a tooltip",
                             Size = new Vector2(300,30),
                         },
-                        slider = new TooltipSlider
+                        slider = new OsuSliderBar<int>
                         {
                             Width = 300,
                         },
@@ -74,11 +74,6 @@ namespace osu.Desktop.VisualTests.Tests
         private class TooltipTextbox : OsuTextBox, IHasTooltip
         {
             public string TooltipText => Text;
-        }
-
-        private class TooltipSlider : OsuSliderBar<int>, IHasTooltip
-        {
-            public string TooltipText => Current.Value.ToString();
         }
     }
 }
