@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Play
                 {
                     HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
                 }
-                catch (BeatmapInvalidForModeException)
+                catch (BeatmapInvalidForRulesetException)
                 {
                     // we may fail to create a HitRenderer if the beatmap cannot be loaded with the user's preferred ruleset
                     // let's try again forcing the beatmap's ruleset.
