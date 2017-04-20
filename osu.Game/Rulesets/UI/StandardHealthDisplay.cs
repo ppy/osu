@@ -34,7 +34,8 @@ namespace osu.Game.Rulesets.UI
                 {
                     Colour = glowColour,
                     Radius = 8,
-                    Type = EdgeEffectType.Glow
+                    Roundness = 4,
+                    Type = EdgeEffectType.Glow,
                 };
             }
         }
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.UI
                 fill = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Scale = new Vector2(0, 1),
+                    Size = new Vector2(0, 1),
                     Masking = true,
                     Children = new[]
                     {
@@ -64,6 +65,6 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
-        protected override void SetHealth(float value) => fill.ScaleTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
+        protected override void SetHealth(float value) => fill.ResizeTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
     }
 }
