@@ -2,11 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
 using osu.Game.IO.Legacy;
 using osu.Game.IPC;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using SharpCompress.Compressors.LZMA;
 using SQLite.Net;
@@ -42,8 +44,10 @@ namespace osu.Game.Database
             using (Stream s = storage.GetStream(Path.Combine(replay_folder, replayFilename)))
             using (SerializationReader sr = new SerializationReader(s))
             {
-                var ruleset = rulesets.GetRuleset(sr.ReadByte()).CreateInstance();
-                score = ruleset.CreateScoreProcessor().CreateScore();
+                score = new Score
+                {
+                    Ruleset = rulesets.GetRuleset(sr.ReadByte())
+                };
 
                 /* score.Pass = true;*/
                 var version = sr.ReadInt32();
@@ -104,11 +108,41 @@ namespace osu.Game.Database
 
                     using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
                     using (var reader = new StreamReader(lzma))
-                        score.Replay = score.CreateReplay(reader);
+                        score.Replay = createReplay(reader);
                 }
             }
 
             return score;
+        }
+
+        /// <summary>
+        /// Creates a replay which is read from a stream.
+        /// </summary>
+        /// <param name="reader">The stream reader.</param>
+        /// <returns>The replay.</returns>
+        private Replay createReplay(StreamReader reader)
+        {
+            var frames = new List<ReplayFrame>();
+
+            float lastTime = 0;
+
+            foreach (var l in reader.ReadToEnd().Split(','))
+            {
+                var split = l.Split('|');
+
+                if (split.Length < 4 || float.Parse(split[0]) < 0) continue;
+
+                lastTime += float.Parse(split[0]);
+
+                frames.Add(new ReplayFrame(
+                    lastTime,
+                    float.Parse(split[1]),
+                    384 - float.Parse(split[2]),
+                    (ReplayButtonState)int.Parse(split[3])
+                ));
+            }
+
+            return new Replay { Frames = frames };
         }
 
         protected override void Prepare(bool reset = false)

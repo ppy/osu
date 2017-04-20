@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
@@ -47,6 +48,13 @@ namespace osu.Desktop.VisualTests.Tests
                 MaxCombo = 123,
                 Rank = ScoreRank.A,
                 Date = DateTime.Now,
+                Statistics = new Dictionary<string, dynamic>()
+                {
+                    { "300", 50 },
+                    { "100", 20 },
+                    { "50", 50 },
+                    { "x", 1 }
+                },
                 User = new User
                 {
                     Username = "peppy",
@@ -57,4 +65,4 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
     }
- }
+}
