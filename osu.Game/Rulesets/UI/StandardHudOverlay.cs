@@ -84,7 +84,8 @@ namespace osu.Game.Rulesets.UI
             base.BindProcessor(processor);
 
             var shd = HealthDisplay as StandardHealthDisplay;
-            shd?.BindProcessor(processor);
+            if (shd != null)
+                processor.NewJudgement += shd.Flash;
         }
     }
 }
