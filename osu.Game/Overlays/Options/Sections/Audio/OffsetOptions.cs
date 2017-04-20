@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Options.Sections.Audio
                 {
                     LabelText = "Audio Offset",
                     Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.AudioOffset)
+                    TooltipText = value => value.ToString(@"0ms")
                 },
                 new OsuButton
                 {

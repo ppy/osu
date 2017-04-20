@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using System.Globalization;
 
 namespace osu.Game.Overlays.Options.Sections.Gameplay
 {
@@ -20,12 +21,14 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                 new OptionSlider<double>
                 {
                     LabelText = "Display beatmaps from",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.DisplayStarsMinimum)
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.DisplayStarsMinimum),
+                    TooltipText = value => value.ToString(@"0.## stars", CultureInfo.InvariantCulture)
                 },
                 new OptionSlider<double>
                 {
                     LabelText = "up to",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.DisplayStarsMaximum)
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.DisplayStarsMaximum),
+                    TooltipText = value => value.ToString(@"0.## stars", CultureInfo.InvariantCulture)
                 },
             };
         }

@@ -10,6 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using System;
+using System.Globalization;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -23,16 +25,20 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box leftBox;
         private readonly Box rightBox;
 
+        public Func<T, string> TooltipTextFunc { get; set; }
+
         public string TooltipText
         {
             get
             {
+                if (TooltipTextFunc != null) return TooltipTextFunc(Current);
+
                 var bindableDouble = CurrentNumber as BindableNumber<double>;
                 if (bindableDouble != null)
                 {
-                    if (bindableDouble.MaxValue == 1 && bindableDouble.MinValue == 0)
+                    if (bindableDouble.MaxValue == 1 && (bindableDouble.MinValue == 0 || bindableDouble.MinValue == -1))
                         return bindableDouble.Value.ToString(@"P0");
-                    return bindableDouble.Value.ToString(@"n1");
+                    return bindableDouble.Value.ToString(@"n1", CultureInfo.InvariantCulture);
                 }
 
                 var bindableInt = CurrentNumber as BindableNumber<int>;

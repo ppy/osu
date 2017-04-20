@@ -6,15 +6,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using System;
 
 namespace osu.Game.Overlays.Options
 {
     public class OptionSlider<T> : FillFlowContainer where T : struct
     {
-        private readonly SliderBar<T> slider;
+        private readonly OsuSliderBar<T> slider;
         private readonly SpriteText text;
 
         public string LabelText
@@ -35,6 +35,18 @@ namespace osu.Game.Overlays.Options
             {
                 bindable = value;
                 slider.Current.BindTo(bindable);
+            }
+        }
+
+        public Func<T,string> TooltipText
+        {
+            get
+            {
+                return slider.TooltipTextFunc;
+            }
+            set
+            {
+                slider.TooltipTextFunc = value;
             }
         }
 
