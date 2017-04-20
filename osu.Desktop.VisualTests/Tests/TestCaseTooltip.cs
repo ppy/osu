@@ -7,8 +7,8 @@ using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Configuration;
-using osu.Game.Graphics.Cursor;
 using OpenTK;
+using osu.Game.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {

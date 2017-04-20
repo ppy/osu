@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -22,7 +22,25 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box leftBox;
         private readonly Box rightBox;
 
-        public string TooltipText => Current.Value.ToString();
+        public string TooltipText
+        {
+            get
+            {
+                var bindableDouble = CurrentNumber as BindableNumber<double>;
+                if (bindableDouble != null)
+                {
+                    if (bindableDouble.MaxValue == 1 && bindableDouble.MinValue == 0)
+                        return bindableDouble.Value.ToString(@"P0");
+                    return bindableDouble.Value.ToString(@"n1");
+                }
+
+                var bindableInt = CurrentNumber as BindableNumber<int>;
+                if (bindableInt != null)
+                    return bindableInt.Value.ToString(@"n0");
+
+                return Current.Value.ToString();
+            }
+        }
 
         public OsuSliderBar()
         {
