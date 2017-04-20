@@ -45,7 +45,7 @@ namespace osu.Game.Database
             using (SerializationReader sr = new SerializationReader(s))
             {
                 var ruleset = rulesets.GetRuleset(sr.ReadByte()).CreateInstance();
-                score = ruleset.CreateScoreProcessor().CreateEmptyScore();
+                score = new Score();
 
                 /* score.Pass = true;*/
                 var version = sr.ReadInt32();
