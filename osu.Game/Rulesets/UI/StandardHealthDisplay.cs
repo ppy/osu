@@ -93,12 +93,7 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
-        public void BindProcessor(ScoreProcessor processor)
-        {
-            processor.NewJudgement += onNewJudgement;
-        }
-
-        private void onNewJudgement(Judgement judgement)
+        public void Flash(Judgement judgement)
         {
             if (judgement.Result == HitResult.Miss)
                 return;
