@@ -34,8 +34,6 @@ namespace osu.Game.Overlays.Options
             {
                 bindable = value;
                 dropdown.Current.BindTo(bindable);
-                if (value?.Disabled ?? true)
-                    Alpha = 0.3f;
             }
         }
 
@@ -74,6 +72,11 @@ namespace osu.Game.Overlays.Options
                     RelativeSizeAxes = Axes.X,
                     Items = Items,
                 }
+            };
+
+            dropdown.Current.DisabledChanged += disabled =>
+            {
+                Alpha = disabled ? 0.3f : 1;
             };
         }
     }
