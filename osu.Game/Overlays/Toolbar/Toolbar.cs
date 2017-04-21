@@ -20,7 +20,6 @@ namespace osu.Game.Overlays.Toolbar
 
         public Action OnHome;
 
-        private readonly ToolbarModeSelector modeSelector;
         private readonly ToolbarUserArea userArea;
 
         protected override bool HideOnEscape => false;
@@ -51,7 +50,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Action = () => OnHome?.Invoke()
                         },
-                        modeSelector = new ToolbarModeSelector()
+                        new ToolbarModeSelector()
                     }
                 },
                 new FillFlowContainer
