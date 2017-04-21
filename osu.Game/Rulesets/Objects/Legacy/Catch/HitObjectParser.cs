@@ -22,8 +22,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType,
-                                  int repeatCount, List<SampleInfo> headSamples, List<SampleInfo> tailSamples, List<List<SampleInfo>> repeatSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
         {
             return new Slider
             {
@@ -33,8 +32,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
                 Distance = length,
                 CurveType = curveType,
                 RepeatCount = repeatCount,
-                HeadSamples = headSamples,
-                TailSamples = tailSamples,
                 RepeatSamples = repeatSamples
             };
         }
