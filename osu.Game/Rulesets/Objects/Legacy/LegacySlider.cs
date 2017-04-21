@@ -1,21 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
+using System;
 using System.Collections.Generic;
+using OpenTK;
 using osu.Game.Audio;
 
-namespace osu.Game.Rulesets.Objects
+namespace osu.Game.Rulesets.Objects.Legacy
 {
-    public class CurvedHitObject : HitObject, IHasCurve
+    internal class LegacySlider : HitObject, IHasCurve
     {
-        public SliderCurve Curve { get; } = new SliderCurve();
-
-        public int RepeatCount { get; set; } = 1;
-
-        public double EndTime => 0;
-        public double Duration => 0;
+        public SliderCurve Curve { get; set; } = new SliderCurve();
 
         public List<Vector2> ControlPoints
         {
@@ -36,17 +32,24 @@ namespace osu.Game.Rulesets.Objects
         }
 
         public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+        public int RepeatCount { get; set; } = 1;
 
-        public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
+        public double EndTime { get; set; }
+        public double Duration { get; set; }
+
+        public Vector2 PositionAt(double progress)
+        {
+            throw new NotImplementedException();
+        }
 
         public double ProgressAt(double progress)
         {
-            var p = progress * RepeatCount % 1;
-            if (RepeatAt(progress) % 2 == 1)
-                p = 1 - p;
-            return p;
+            throw new NotImplementedException();
         }
 
-        public int RepeatAt(double progress) => (int)(progress * RepeatCount);
+        public int RepeatAt(double progress)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

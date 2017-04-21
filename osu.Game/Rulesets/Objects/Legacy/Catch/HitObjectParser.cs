@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
                 ControlPoints = controlPoints,
                 Distance = length,
                 CurveType = curveType,
-                RepeatCount = repeatCount,
-                RepeatSamples = repeatSamples
+                RepeatSamples = repeatSamples,
+                RepeatCount = repeatCount
             };
         }
 

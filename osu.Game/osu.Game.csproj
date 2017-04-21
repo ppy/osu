@@ -113,6 +113,7 @@
     <Compile Include="Rulesets\Objects\Legacy\Catch\HitObjectParser.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Catch\Slider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Catch\Spinner.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\LegacySlider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\Hit.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\HitObjectParser.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\Slider.cs" />
@@ -134,7 +135,6 @@
     <Compile Include="Rulesets\Objects\Drawables\HitResult.cs" />
     <Compile Include="Rulesets\Objects\BezierApproximator.cs" />
     <Compile Include="Rulesets\Objects\CircularArcApproximator.cs" />
-    <Compile Include="Rulesets\Objects\CurvedHitObject.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\Hit.cs" />
     <Compile Include="Rulesets\Objects\Legacy\HitObjectParser.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Hold.cs" />

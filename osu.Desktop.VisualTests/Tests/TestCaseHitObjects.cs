@@ -62,15 +62,12 @@ namespace osu.Desktop.VisualTests.Tests
                     add(new DrawableSlider(new Slider
                     {
                         StartTime = framedClock.CurrentTime + 600,
-                        CurveObject = new CurvedHitObject
+                        ControlPoints = new List<Vector2>
                         {
-                            ControlPoints = new List<Vector2>
-                            {
-                                new Vector2(-200, 0),
-                                new Vector2(400, 0),
-                            },
-                            Distance = 400
+                            new Vector2(-200, 0),
+                            new Vector2(400, 0),
                         },
+                        Distance = 400,
                         Position = new Vector2(-200, 0),
                         Velocity = 1,
                         TickDistance = 100,

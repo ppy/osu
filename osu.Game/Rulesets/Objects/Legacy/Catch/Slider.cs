@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
     /// <summary>
     /// Legacy osu!catch Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Slider : CurvedHitObject, IHasXPosition, IHasCombo
+    internal sealed class Slider : LegacySlider, IHasXPosition, IHasCombo
     {
         public float X { get; set; }
 
