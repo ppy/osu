@@ -16,6 +16,9 @@ namespace osu.Game.Rulesets.Objects.Types
         /// </summary>
         int RepeatCount { get; }
 
+        /// <summary>
+        /// The samples to be played when each repeat node is hit (0 -> first repeat node, 1 -> second repeat node, etc).
+        /// </summary>
         List<List<SampleInfo>> RepeatSamples { get; }
     }
 }

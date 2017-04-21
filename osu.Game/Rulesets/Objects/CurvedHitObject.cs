@@ -6,8 +6,6 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Audio;
 using System;
-using osu.Game.Beatmaps.Timing;
-using osu.Game.Database;
 
 namespace osu.Game.Rulesets.Objects
 {
@@ -39,6 +37,9 @@ namespace osu.Game.Rulesets.Objects
         }
 
         public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+
+        public List<SampleInfo> HeadSamples { get; set; } = new List<SampleInfo>();
+        public List<SampleInfo> TailSamples { get; set; } = new List<SampleInfo>();
 
         public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
 

@@ -24,6 +24,10 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// The samples to be played when this hit object is hit.
+        /// <para>
+        /// In the case of <see cref="CurvedHitObject"/> types, this is the sample of the curve body
+        /// and can be treated as the default samples for the hit object.
+        /// </para>
         /// </summary>
         public List<SampleInfo> Samples = new List<SampleInfo>();
 
@@ -40,12 +44,16 @@ namespace osu.Game.Rulesets.Objects
             ControlPoint samplePoint = overridePoint ?? timingPoint;
 
             // Initialize first sample
-            foreach (SampleInfo sample in Samples)
-                initializeSampleInfo(sample, samplePoint);
+            Samples.ForEach(s => initializeSampleInfo(s, samplePoint));
 
             // Initialize any repeat samples
             var repeatData = this as IHasRepeats;
             repeatData?.RepeatSamples?.ForEach(r => r.ForEach(s => initializeSampleInfo(s, samplePoint)));
+
+            // Initialize any curved object samples
+            var curvedObject = this as CurvedHitObject;
+            curvedObject?.HeadSamples.ForEach(s => initializeSampleInfo(s, samplePoint));
+            curvedObject?.TailSamples.ForEach(s => initializeSampleInfo(s, samplePoint));
         }
 
         private void initializeSampleInfo(SampleInfo sample, ControlPoint controlPoint)

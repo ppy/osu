@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using OpenTK;
+using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Objects.Types
 {
@@ -25,6 +26,16 @@ namespace osu.Game.Rulesets.Objects.Types
         /// The type of curve.
         /// </summary>
         CurveType CurveType { get; }
+
+        /// <summary>
+        /// The samples to be played when the head of the hit object is hit.
+        /// </summary>
+        List<SampleInfo> HeadSamples { get; }
+        
+        /// <summary>
+        /// The samples to be played when the tail of the hit object is hit.
+        /// </summary>
+        List<SampleInfo> TailSamples { get; }
 
         /// <summary>
         /// Computes the position on the curve at a given progress, accounting for repeat logic.
