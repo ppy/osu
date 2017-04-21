@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Objects.Types
         /// The samples to be played when the head of the hit object is hit.
         /// </summary>
         List<SampleInfo> HeadSamples { get; }
-        
+
         /// <summary>
         /// The samples to be played when the tail of the hit object is hit.
         /// </summary>
