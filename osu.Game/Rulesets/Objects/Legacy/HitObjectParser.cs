@@ -80,8 +80,54 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 if (split.Length > 10)
                     readCustomSampleBanks(split[10], bankInfo);
 
-                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount);
+                // Per-repeat sounds
 
+                // Populate initial bank infos with the default hit object bank
+                List<SampleBankInfo> repeatBankInfos = new List<SampleBankInfo>();
+                for (int i = 0; i <= repeatCount; i++)
+                    repeatBankInfos.Add(bankInfo.Clone());
+
+                // Read any per-repeat banks
+                if (split.Length > 9 && split[9].Length > 0)
+                {
+                    string[] sets = split[9].Split('|');
+                    if (sets.Length > 0)
+                    {
+                        for (int i = 0; i <= repeatCount; i++)
+                        {
+                            if (i >= sets.Length)
+                                break;
+
+                            SampleBankInfo info = repeatBankInfos[i];
+                            readCustomSampleBanks(sets[i], info);
+                        }
+                    }
+                }
+
+                // Read any per-repeat sample infos
+                List<List<SampleInfo>> sounds = new List<List<SampleInfo>>();
+                if (split.Length > 8 && split[8].Length > 0)
+                {
+                    // Per-repeat sample types
+                    string[] adds = split[9].Split('|');
+                    if (adds.Length > 0)
+                    {
+                        for (int i = 0; i <= repeatCount; i++)
+                        {
+                            if (i >= adds.Length)
+                            {
+                                sounds.Add(convertSoundType(soundType, repeatBankInfos[i]));
+                                continue;
+                            }
+
+                            int sound;
+                            int.TryParse(adds[i], out sound);
+                            sounds.Add(convertSoundType((LegacySoundType)sound, repeatBankInfos[i]));
+                        }
+                    }
+                }
+
+                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, sounds);
             }
             else if ((type & HitObjectType.Spinner) > 0)
             {
@@ -157,7 +203,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="curveType">The slider curve type.</param>
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> sounds);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
