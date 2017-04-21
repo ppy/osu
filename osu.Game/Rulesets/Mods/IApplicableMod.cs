@@ -17,6 +17,6 @@ namespace osu.Game.Rulesets.Mods
         /// Applies the mod to a HitRenderer.
         /// </summary>
         /// <param name="hitRenderer">The HitRenderer to apply the mod to.</param>
-        void Apply(HitRenderer<TObject> hitRenderer);
+        void ApplyToHitRenderer(HitRenderer<TObject> hitRenderer);
     }
 }
