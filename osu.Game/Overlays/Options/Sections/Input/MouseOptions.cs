@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 new OptionSlider<double,SensitivitySlider>
                 {
                     LabelText = "Sensitivity",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MouseSpeed)
+                    Bindable = config.GetBindable<double>(OsuConfig.MouseSpeed)
                 },
                 new OsuCheckbox
                 {
