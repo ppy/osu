@@ -66,6 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             var distanceData = obj as IHasDistance;
             var repeatsData = obj as IHasRepeats;
             var endTimeData = obj as IHasEndTime;
+            var curveData = obj as IHasCurve;
 
             // Old osu! used hit sounding to determine various hit type information
             List<SampleInfo> samples = obj.Samples;
@@ -102,16 +103,43 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 if (tickSpacing > 0 && osuDuration < 2 * speedAdjustedBeatLength)
                 {
+                    var allSamples = new List<List<SampleInfo>>();
+
+                    if (curveData != null)
+                    {
+                        allSamples.Add(curveData.HeadSamples);
+                        allSamples.AddRange(curveData.RepeatSamples);
+                        allSamples.Add(curveData.TailSamples);
+                    }
+                    else
+                        allSamples.Add(samples);
+
+                    int i = 0;
                     for (double j = obj.StartTime; j <= obj.StartTime + taikoDuration + tickSpacing / 8; j += tickSpacing)
                     {
-                        // Todo: This should generate different type of hits (including strongs)
-                        // depending on hitobject sound additions (not implemented fully yet)
-                        yield return new CentreHit
+                        List<SampleInfo> currentSamples = allSamples[i];
+                        bool isRim = currentSamples.Any(s => s.Name == SampleInfo.HIT_CLAP || s.Name == SampleInfo.HIT_WHISTLE);
+
+                        if (isRim)
                         {
-                            StartTime = j,
-                            Samples = obj.Samples,
-                            IsStrong = strong,
-                        };
+                            yield return new RimHit
+                            {
+                                StartTime = j,
+                                Samples = currentSamples,
+                                IsStrong = strong
+                            };
+                        }
+                        else
+                        {
+                            yield return new CentreHit
+                            {
+                                StartTime = j,
+                                Samples = currentSamples,
+                                IsStrong = strong,
+                            };
+                        }
+
+                        i = (i + 1) % allSamples.Count;
                     }
                 }
                 else
