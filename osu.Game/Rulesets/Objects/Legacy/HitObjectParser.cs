@@ -108,10 +108,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     nodeSoundTypes.Add(soundType);
 
                 // Read any per-node sound types
-                string[] adds = null;
                 if (split.Length > 8 && split[8].Length > 0)
                 {
-                    adds = split[8].Split('|');
+                    string[] adds = split[8].Split('|');
                     for (int i = 0; i < nodes; i++)
                     {
                         if (i >= adds.Length)
