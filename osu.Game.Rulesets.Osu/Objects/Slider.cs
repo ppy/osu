@@ -34,8 +34,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         public int RepeatAt(double progress) => CurveObject.RepeatAt(progress);
 
         public List<List<SampleInfo>> RepeatSamples => CurveObject.RepeatSamples;
-        public List<SampleInfo> HeadSamples => CurveObject.HeadSamples;
-        public List<SampleInfo> TailSamples => CurveObject.TailSamples;
 
         public List<Vector2> ControlPoints => CurveObject.ControlPoints;
         public CurveType CurveType => CurveObject.CurveType;
