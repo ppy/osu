@@ -18,11 +18,10 @@ namespace osu.Game.Overlays.Options.Sections.Audio
         {
             Children = new Drawable[]
             {
-                new OptionSlider<double>
+                new OptionSlider<double,OffsetSlider>
                 {
                     LabelText = "Audio Offset",
                     Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.AudioOffset)
-                    TooltipText = value => value.ToString(@"0ms")
                 },
                 new OsuButton
                 {
@@ -30,6 +29,11 @@ namespace osu.Game.Overlays.Options.Sections.Audio
                     Text = "Offset wizard"
                 }
             };
+        }
+
+        private class OffsetSlider : OsuSliderBar<double>
+        {
+            public override string TooltipText => Current.Value.ToString(@"0ms");
         }
     }
 }

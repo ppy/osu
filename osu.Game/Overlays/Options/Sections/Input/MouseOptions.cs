@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -19,11 +18,10 @@ namespace osu.Game.Overlays.Options.Sections.Input
         {
             Children = new Drawable[]
             {
-                new OptionSlider<double>
+                new OptionSlider<double,SensitivitySlider>
                 {
                     LabelText = "Sensitivity",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MouseSpeed),
-                    TooltipText = value => value.ToString(@"0.##x", CultureInfo.InvariantCulture)
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MouseSpeed)
                 },
                 new OsuCheckbox
                 {
@@ -56,6 +54,11 @@ namespace osu.Game.Overlays.Options.Sections.Input
                     Bindable = config.GetBindable<bool>(OsuConfig.CursorRipple)
                 },
             };
+        }
+
+        private class SensitivitySlider : OsuSliderBar<double>
+        {
+            public override string TooltipText => Current.Value.ToString(@"0.##x");
         }
     }
 }
