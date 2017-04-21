@@ -30,11 +30,11 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 {
                     StartTime = original.StartTime,
                     Samples = original.Samples,
-                    ControlPoints = curveData?.ControlPoints ?? null,
-                    CurveType = curveData?.CurveType ?? CurveType.Catmull,
-                    Distance = curveData?.Distance ?? 0,
-                    RepeatSamples = curveData?.RepeatSamples ?? null,
-                    RepeatCount = curveData?.RepeatCount ?? 1,
+                    ControlPoints = curveData.ControlPoints,
+                    CurveType = curveData.CurveType,
+                    Distance = curveData.Distance,
+                    RepeatSamples = curveData.RepeatSamples,
+                    RepeatCount = curveData.RepeatCount,
                     Position = positionData?.Position ?? Vector2.Zero,
                     NewCombo = comboData?.NewCombo ?? false
                 };
