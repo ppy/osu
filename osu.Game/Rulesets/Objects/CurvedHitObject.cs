@@ -4,6 +4,10 @@
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
+using osu.Game.Audio;
+using System;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.Database;
 
 namespace osu.Game.Rulesets.Objects
 {
@@ -33,6 +37,8 @@ namespace osu.Game.Rulesets.Objects
             get { return Curve.Distance; }
             set { Curve.Distance = value; }
         }
+
+        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
 
         public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
 
