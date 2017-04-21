@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
                 ControlPoints = controlPoints,
                 Distance = length,
                 CurveType = curveType,
-                RepeatCount = repeatCount,
-                RepeatSamples = repeatSamples
+                RepeatSamples = repeatSamples,
+                RepeatCount = repeatCount
             };
         }
 

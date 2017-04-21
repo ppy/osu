@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
     /// <summary>
     /// Legacy osu!taiko Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Slider : CurvedHitObject, IHasCombo
+    internal sealed class Slider : LegacySlider, IHasCombo
     {
         public bool NewCombo { get; set; }
     }

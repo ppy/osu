@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// <summary>
     /// Legacy osu! Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Slider : CurvedHitObject, IHasPosition, IHasCombo
+    internal sealed class Slider : LegacySlider, IHasPosition, IHasCombo
     {
         public Vector2 Position { get; set; }
 

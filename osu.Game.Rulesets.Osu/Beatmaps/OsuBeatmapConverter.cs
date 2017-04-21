@@ -19,10 +19,10 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
         protected override IEnumerable<OsuHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
-            IHasCurve curveData = original as IHasCurve;
-            IHasEndTime endTimeData = original as IHasEndTime;
-            IHasPosition positionData = original as IHasPosition;
-            IHasCombo comboData = original as IHasCombo;
+            var curveData = original as IHasCurve;
+            var endTimeData = original as IHasEndTime;
+            var positionData = original as IHasPosition;
+            var comboData = original as IHasCombo;
 
             if (curveData != null)
             {
@@ -30,7 +30,11 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 {
                     StartTime = original.StartTime,
                     Samples = original.Samples,
-                    CurveObject = curveData,
+                    ControlPoints = curveData?.ControlPoints ?? null,
+                    CurveType = curveData?.CurveType ?? CurveType.Catmull,
+                    Distance = curveData?.Distance ?? 0,
+                    RepeatSamples = curveData?.RepeatSamples ?? null,
+                    RepeatCount = curveData?.RepeatCount ?? 1,
                     Position = positionData?.Position ?? Vector2.Zero,
                     NewCombo = comboData?.NewCombo ?? false
                 };
