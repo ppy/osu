@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Play
 
         public bool IsPaused => !interpolatedSourceClock.IsRunning;
 
+        internal override bool AllowRulesetChange => false;
+
         public bool HasFailed { get; private set; }
 
         public int RestartCount;
