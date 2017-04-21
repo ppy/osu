@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double ProgressAt(double progress) => CurveObject.ProgressAt(progress);
         public int RepeatAt(double progress) => CurveObject.RepeatAt(progress);
 
+        public List<List<SampleInfo>> RepeatSamples => CurveObject.RepeatSamples;
+
         public List<Vector2> ControlPoints => CurveObject.ControlPoints;
         public CurveType CurveType => CurveObject.CurveType;
         public double Distance => CurveObject.Distance;
