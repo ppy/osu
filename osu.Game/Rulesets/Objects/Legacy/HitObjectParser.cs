@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
-using System.Linq;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -127,14 +126,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 for (int i = 0; i <= repeatCount; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                // Extract the first and last samples for the head and tail respectively
-                List<SampleInfo> headSamples = nodeSamples.First();
-                List<SampleInfo> tailSamples = nodeSamples.Last();
-
-                // Repeat samples are all the samples between head and tail
-                var repeatSamples = nodeSamples.Skip(1).TakeWhile(s => s != tailSamples).ToList();
-
-                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, headSamples, tailSamples, repeatSamples);
+                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, nodeSamples);
             }
             else if ((type & HitObjectType.Spinner) > 0)
             {
@@ -213,8 +205,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="tailSamples">The samples to be played when the tail of the slider is hit.</param>
         /// <param name="repeatSamples">The samples to be played when the repeat nodes are hit.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType,
-                                                  int repeatCount, List<SampleInfo> headSamples, List<SampleInfo> tailSamples, List<List<SampleInfo>> repeatSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.

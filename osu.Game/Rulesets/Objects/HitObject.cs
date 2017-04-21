@@ -49,11 +49,6 @@ namespace osu.Game.Rulesets.Objects
             // Initialize any repeat samples
             var repeatData = this as IHasRepeats;
             repeatData?.RepeatSamples?.ForEach(r => r.ForEach(s => initializeSampleInfo(s, samplePoint)));
-
-            // Initialize any curved object samples
-            var curvedObject = this as CurvedHitObject;
-            curvedObject?.HeadSamples.ForEach(s => initializeSampleInfo(s, samplePoint));
-            curvedObject?.TailSamples.ForEach(s => initializeSampleInfo(s, samplePoint));
         }
 
         private void initializeSampleInfo(SampleInfo sample, ControlPoint controlPoint)

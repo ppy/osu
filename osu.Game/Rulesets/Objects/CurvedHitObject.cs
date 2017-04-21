@@ -37,9 +37,6 @@ namespace osu.Game.Rulesets.Objects
 
         public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
 
-        public List<SampleInfo> HeadSamples { get; set; } = new List<SampleInfo>();
-        public List<SampleInfo> TailSamples { get; set; } = new List<SampleInfo>();
-
         public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
 
         public double ProgressAt(double progress)
