@@ -226,15 +226,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
         {
             var soundTypes = new List<SampleInfo>();
 
-            if ((type & LegacySoundType.Normal) > 0)
+            soundTypes.Add(new SampleInfo
             {
-                soundTypes.Add(new SampleInfo
-                {
-                    Bank = bankInfo.Normal,
-                    Name = SampleInfo.HIT_NORMAL,
-                    Volume = bankInfo.Volume
-                });
-            }
+                Bank = bankInfo.Normal,
+                Name = SampleInfo.HIT_NORMAL,
+                Volume = bankInfo.Volume
+            });
             
             if ((type & LegacySoundType.Finish) > 0)
             {
