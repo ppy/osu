@@ -74,6 +74,11 @@ namespace osu.Game.Graphics.UserInterface
                     Expanded = true,
                 }
             };
+
+            Current.DisabledChanged += disabled =>
+            {
+                Alpha = disabled ? 0.3f : 1;
+            };
         }
 
         [BackgroundDependencyLoader]

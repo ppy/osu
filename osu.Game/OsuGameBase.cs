@@ -147,8 +147,16 @@ namespace osu.Game
             {
                 Children = new Drawable[]
                 {
-                    Cursor = new MenuCursor { Depth = float.MinValue },
-                    new TooltipContainer(Cursor) { Depth = float.MinValue }
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = float.MinValue,
+                        Children = new Drawable[]
+                        {
+                            Cursor = new MenuCursor(),
+                            new TooltipContainer(Cursor) { Depth = -1 },
+                        }
+                    },
                 }
             });
         }
