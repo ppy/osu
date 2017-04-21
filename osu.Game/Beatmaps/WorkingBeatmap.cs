@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
             var t = track;
             if (t == null) return;
 
-            t.ResetRate();
+            t.ResetSpeedAdjustments();
             foreach (var mod in Mods.Value.OfType<IApplicableToClock>())
                 mod.ApplyToClock(t);
         }
