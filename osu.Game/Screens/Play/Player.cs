@@ -20,6 +20,7 @@ using osu.Game.Screens.Backgrounds;
 using System;
 using System.Linq;
 using osu.Framework.Threading;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 
@@ -137,6 +138,8 @@ namespace osu.Game.Screens.Play
             Schedule(() =>
             {
                 sourceClock.Reset();
+                foreach (var mod in Beatmap.Mods.Value.OfType<IApplicableToClock>())
+                    mod.ApplyToClock(sourceClock);
             });
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
