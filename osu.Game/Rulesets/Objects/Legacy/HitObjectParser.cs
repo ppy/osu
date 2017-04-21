@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 Name = SampleInfo.HIT_NORMAL,
                 Volume = bankInfo.Volume
             });
-            
+
             if ((type & LegacySoundType.Finish) > 0)
             {
                 soundTypes.Add(new SampleInfo
