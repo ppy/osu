@@ -209,7 +209,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="length">The slider length.</param>
         /// <param name="curveType">The slider curve type.</param>
         /// <param name="repeatCount">The slider repeat count.</param>
-        /// <param name="repeatSamples">The slider repeat sounds (this includes the end node, but NOT the start node).</param>
+        /// <param name="headSamples">The samples to be played when the head of the slider is hit.</param>
+        /// <param name="tailSamples">The samples to be played when the tail of the slider is hit.</param>
+        /// <param name="repeatSamples">The samples to be played when the repeat nodes are hit.</param>
         /// <returns>The hit object.</returns>
         protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType,
                                                   int repeatCount, List<SampleInfo> headSamples, List<SampleInfo> tailSamples, List<List<SampleInfo>> repeatSamples);
