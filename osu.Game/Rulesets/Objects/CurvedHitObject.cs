@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Audio;
-using System;
 
 namespace osu.Game.Rulesets.Objects
 {

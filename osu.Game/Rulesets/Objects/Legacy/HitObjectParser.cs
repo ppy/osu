@@ -226,14 +226,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         private List<SampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
         {
-            var soundTypes = new List<SampleInfo>();
-
-            soundTypes.Add(new SampleInfo
+            var soundTypes = new List<SampleInfo>
             {
-                Bank = bankInfo.Normal,
-                Name = SampleInfo.HIT_NORMAL,
-                Volume = bankInfo.Volume
-            });
+                new SampleInfo
+                {
+                    Bank = bankInfo.Normal,
+                    Name = SampleInfo.HIT_NORMAL,
+                    Volume = bankInfo.Volume
+                }
+            };
 
             if ((type & LegacySoundType.Finish) > 0)
             {
@@ -270,9 +271,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         private class SampleBankInfo
         {
-            public string Normal = null;
-            public string Add = null;
-            public int Volume = 0;
+            public string Normal;
+            public string Add;
+            public int Volume;
 
             public SampleBankInfo Clone()
             {
