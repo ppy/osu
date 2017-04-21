@@ -23,9 +23,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             bool combo = type.HasFlag(HitObjectType.NewCombo);
             type &= ~HitObjectType.NewCombo;
 
-            int sampleVolume = 0;
-            string normalSampleBank = null;
-            string addSampleBank = null;
+            var soundType = (LegacySoundType)int.Parse(split[4]);
+
+            SampleBankInfo bankInfo = new SampleBankInfo();
 
             HitObject result;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 result = CreateHit(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo);
 
                 if (split.Length > 5)
-                    readCustomSampleBanks(split[5], ref normalSampleBank, ref addSampleBank, ref sampleVolume);
+                    readCustomSampleBanks(split[5], bankInfo);
             }
             else if ((type & HitObjectType.Slider) > 0)
             {
@@ -76,18 +76,19 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 if (split.Length > 7)
                     length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
+                
+                if (split.Length > 10)
+                    readCustomSampleBanks(split[10], bankInfo);
 
                 result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount);
 
-                if (split.Length > 10)
-                    readCustomSampleBanks(split[10], ref normalSampleBank, ref addSampleBank, ref sampleVolume);
             }
             else if ((type & HitObjectType.Spinner) > 0)
             {
                 result = CreateSpinner(new Vector2(512, 384) / 2, Convert.ToDouble(split[5], CultureInfo.InvariantCulture));
 
                 if (split.Length > 6)
-                    readCustomSampleBanks(split[6], ref normalSampleBank, ref addSampleBank, ref sampleVolume);
+                    readCustomSampleBanks(split[6], bankInfo);
             }
             else if ((type & HitObjectType.Hold) > 0)
             {
@@ -106,15 +107,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 throw new InvalidOperationException($@"Unknown hit object type {type}");
 
             result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
-
-            var soundType = (LegacySoundType)int.Parse(split[4]);
-            result.Samples = convertSoundType(soundType, normalSampleBank, addSampleBank);
-            result.Samples.ForEach(s => s.Volume = sampleVolume);
+            result.Samples = convertSoundType(soundType, bankInfo);
 
             return result;
         }
 
-        private void readCustomSampleBanks(string str, ref string normalSampleBank, ref string addSampleBank, ref int sampleVolume)
+        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo)
         {
             if (string.IsNullOrEmpty(str))
                 return;
@@ -134,9 +132,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
             if (stringAddBank == @"none")
                 stringAddBank = null;
 
-            normalSampleBank = stringBank;
-            addSampleBank = stringAddBank;
-            sampleVolume = split.Length > 3 ? int.Parse(split[3]) : 0;
+            bankInfo.Normal = stringBank;
+            bankInfo.Add = stringAddBank;
+
+            if (split.Length > 3)
+                bankInfo.Volume = int.Parse(split[3]);
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <returns>The hit object.</returns>
         protected abstract HitObject CreateSpinner(Vector2 position, double endTime);
 
-        private List<SampleInfo> convertSoundType(LegacySoundType type, string normalSampleBank, string addSampleBank)
+        private List<SampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
         {
             List<SampleInfo> soundTypes = new List<SampleInfo>();
 
@@ -175,8 +175,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 soundTypes.Add(new SampleInfo
                 {
-                    Bank = normalSampleBank,
-                    Name = SampleInfo.HIT_NORMAL
+                    Bank = bankInfo.Normal,
+                    Name = SampleInfo.HIT_NORMAL,
+                    Volume = bankInfo.Volume
                 });
             }
             
@@ -184,8 +185,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 soundTypes.Add(new SampleInfo
                 {
-                    Bank = addSampleBank,
-                    Name = SampleInfo.HIT_FINISH
+                    Bank = bankInfo.Add,
+                    Name = SampleInfo.HIT_FINISH,
+                    Volume = bankInfo.Volume
                 });
             }
 
@@ -193,8 +195,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 soundTypes.Add(new SampleInfo
                 {
-                    Bank = addSampleBank,
-                    Name = SampleInfo.HIT_WHISTLE
+                    Bank = bankInfo.Add,
+                    Name = SampleInfo.HIT_WHISTLE,
+                    Volume = bankInfo.Volume
                 });
             }
 
@@ -202,12 +205,25 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 soundTypes.Add(new SampleInfo
                 {
-                    Bank = addSampleBank,
-                    Name = SampleInfo.HIT_CLAP
+                    Bank = bankInfo.Add,
+                    Name = SampleInfo.HIT_CLAP,
+                    Volume = bankInfo.Volume
                 });
             }
 
             return soundTypes;
+        }
+
+        private class SampleBankInfo
+        {
+            public string Normal = null;
+            public string Add = null;
+            public int Volume = 0;
+
+            public SampleBankInfo Clone()
+            {
+                return (SampleBankInfo)MemberwiseClone();
+            }
         }
 
         [Flags]
