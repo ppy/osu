@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             var soundType = (LegacySoundType)int.Parse(split[4]);
             var bankInfo = new SampleBankInfo();
-            List<SampleInfo> startSamples = null;
 
             HitObject result;
 
@@ -129,13 +128,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 for (int i = 0; i <= repeatCount; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                // Extract the first node as the first sample
-                startSamples = nodeSamples[0];
+                // Extract the first and last samples for the head and tail respectively
+                List<SampleInfo> headSamples = nodeSamples.First();
+                List<SampleInfo> tailSamples = nodeSamples.Last();
 
-                // Repeat samples are all the samples excluding the one from the first node (note this includes the end node)
-                var repeatSamples = nodeSamples.Skip(1).ToList();
+                // Repeat samples are all the samples between head and tail
+                var repeatSamples = nodeSamples.Skip(1).TakeWhile(s => s != tailSamples).ToList();
 
-                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, repeatSamples);
+                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, headSamples, tailSamples, repeatSamples);
             }
             else if ((type & HitObjectType.Spinner) > 0)
             {
@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 throw new InvalidOperationException($@"Unknown hit object type {type}");
 
             result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
-            result.Samples = startSamples ?? convertSoundType(soundType, bankInfo);
+            result.Samples = convertSoundType(soundType, bankInfo);
 
             return result;
         }
@@ -212,7 +212,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="repeatSamples">The slider repeat sounds (this includes the end node, but NOT the start node).</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType,
+                                                  int repeatCount, List<SampleInfo> headSamples, List<SampleInfo> tailSamples, List<List<SampleInfo>> repeatSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
