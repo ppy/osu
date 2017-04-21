@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using OpenTK;
 
@@ -20,7 +19,6 @@ namespace osu.Game.Overlays.Toolbar
         public const float TOOLTIP_HEIGHT = 30;
 
         public Action OnHome;
-        public Action<RulesetInfo> OnRulesetChange;
 
         private readonly ToolbarModeSelector modeSelector;
         private readonly ToolbarUserArea userArea;
@@ -53,13 +51,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Action = () => OnHome?.Invoke()
                         },
-                        modeSelector = new ToolbarModeSelector
-                        {
-                            OnRulesetChange = mode =>
-                            {
-                                OnRulesetChange?.Invoke(mode);
-                            }
-                        }
+                        modeSelector = new ToolbarModeSelector()
                     }
                 },
                 new FillFlowContainer
@@ -129,8 +121,6 @@ namespace osu.Game.Overlays.Toolbar
                 gradientBackground.FadeOut(transition_time, EasingTypes.OutQuint);
             }
         }
-
-        public void SetRuleset(RulesetInfo ruleset) => modeSelector.SetRuleset(ruleset);
 
         protected override void PopIn()
         {
