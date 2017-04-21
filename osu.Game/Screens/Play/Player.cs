@@ -51,13 +51,22 @@ namespace osu.Game.Screens.Play
         private bool canPause => ValidForResume && !HasFailed && Time.Current >= lastPauseActionTime + pause_cooldown;
 
         private IAdjustableClock sourceClock;
+        private OffsetClock offsetClock;
         private IFrameBasedClock interpolatedSourceClock;
 
         private RulesetInfo ruleset;
 
         private ScoreProcessor scoreProcessor;
         protected HitRenderer HitRenderer;
+
+        #region User Settings
+
         private Bindable<int> dimLevel;
+        private Bindable<bool> mouseWheelDisabled;
+        private Bindable<double> userAudioOffset;
+
+        #endregion
+
         private SkipButton skipButton;
 
         private HudOverlay hudOverlay;
@@ -117,7 +126,13 @@ namespace osu.Game.Screens.Play
             }
 
             sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
-            interpolatedSourceClock = new InterpolatingFramedClock(sourceClock);
+            offsetClock = new OffsetClock(sourceClock);
+
+            userAudioOffset = config.GetBindable<double>(OsuConfig.AudioOffset);
+            userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
+            userAudioOffset.TriggerChange();
+
+            interpolatedSourceClock = new InterpolatingFramedClock(offsetClock);
 
             Schedule(() =>
             {
@@ -361,8 +376,6 @@ namespace osu.Game.Screens.Play
 
             Background?.FadeTo(1f, fade_out_duration);
         }
-
-        private Bindable<bool> mouseWheelDisabled;
 
         protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
     }
