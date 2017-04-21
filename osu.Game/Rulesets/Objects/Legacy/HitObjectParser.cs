@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -19,13 +20,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
         public override HitObject Parse(string text)
         {
             string[] split = text.Split(',');
-            var type = (HitObjectType)int.Parse(split[3]) & ~HitObjectType.ColourHax;
+            HitObjectType type = (HitObjectType)int.Parse(split[3]) & ~HitObjectType.ColourHax;
             bool combo = type.HasFlag(HitObjectType.NewCombo);
             type &= ~HitObjectType.NewCombo;
 
             var soundType = (LegacySoundType)int.Parse(split[4]);
-
-            SampleBankInfo bankInfo = new SampleBankInfo();
+            var bankInfo = new SampleBankInfo();
+            List<SampleInfo> startSamples = null;
 
             HitObject result;
 
@@ -80,54 +81,61 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 if (split.Length > 10)
                     readCustomSampleBanks(split[10], bankInfo);
 
-                // Per-repeat sounds
+                // One node for each repeat + the start and end nodes
+                int nodes = repeatCount + 2;
 
-                // Populate initial bank infos with the default hit object bank
-                List<SampleBankInfo> repeatBankInfos = new List<SampleBankInfo>();
-                for (int i = 0; i <= repeatCount; i++)
-                    repeatBankInfos.Add(bankInfo.Clone());
+                // Populate node sample bank infos with the default hit object sample bank
+                var nodeBankInfos = new List<SampleBankInfo>();
+                for (int i = 0; i < nodes; i++)
+                    nodeBankInfos.Add(bankInfo.Clone());
 
-                // Read any per-repeat banks
+                // Read any per-node sample banks
                 if (split.Length > 9 && split[9].Length > 0)
                 {
                     string[] sets = split[9].Split('|');
-                    if (sets.Length > 0)
+                    for (int i = 0; i < nodes; i++)
                     {
-                        for (int i = 0; i <= repeatCount; i++)
-                        {
-                            if (i >= sets.Length)
-                                break;
+                        if (i >= sets.Length)
+                            break;
 
-                            SampleBankInfo info = repeatBankInfos[i];
-                            readCustomSampleBanks(sets[i], info);
-                        }
+                        SampleBankInfo info = nodeBankInfos[i];
+                        readCustomSampleBanks(sets[i], info);
                     }
                 }
 
-                // Read any per-repeat sample infos
-                List<List<SampleInfo>> sounds = new List<List<SampleInfo>>();
+                // Populate node sound types with the default hit object sound type
+                var nodeSoundTypes = new List<LegacySoundType>();
+                for (int i = 0; i < nodes; i++)
+                    nodeSoundTypes.Add(soundType);
+
+                // Read any per-node sound types
+                string[] adds = null;
                 if (split.Length > 8 && split[8].Length > 0)
                 {
-                    // Per-repeat sample types
-                    string[] adds = split[9].Split('|');
-                    if (adds.Length > 0)
+                    adds = split[8].Split('|');
+                    for (int i = 0; i < nodes; i++)
                     {
-                        for (int i = 0; i <= repeatCount; i++)
-                        {
-                            if (i >= adds.Length)
-                            {
-                                sounds.Add(convertSoundType(soundType, repeatBankInfos[i]));
-                                continue;
-                            }
+                        if (i >= adds.Length)
+                            break;
 
-                            int sound;
-                            int.TryParse(adds[i], out sound);
-                            sounds.Add(convertSoundType((LegacySoundType)sound, repeatBankInfos[i]));
-                        }
+                        int sound;
+                        int.TryParse(adds[i], out sound);
+                        nodeSoundTypes[i] = (LegacySoundType)sound;
                     }
                 }
 
-                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, sounds);
+                // Generate the final per-node samples
+                var nodeSamples = new List<List<SampleInfo>>(nodes);
+                for (int i = 0; i <= repeatCount; i++)
+                    nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
+
+                // Extract the first node as the first sample
+                startSamples = nodeSamples[0];
+
+                // Repeat samples are all the samples excluding the one from the first node (note this includes the end node)
+                var repeatSamples = nodeSamples.Skip(1).ToList();
+
+                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, repeatSamples);
             }
             else if ((type & HitObjectType.Spinner) > 0)
             {
@@ -153,7 +161,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 throw new InvalidOperationException($@"Unknown hit object type {type}");
 
             result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
-            result.Samples = convertSoundType(soundType, bankInfo);
+            result.Samples = startSamples ?? convertSoundType(soundType, bankInfo);
 
             return result;
         }
@@ -202,8 +210,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="length">The slider length.</param>
         /// <param name="curveType">The slider curve type.</param>
         /// <param name="repeatCount">The slider repeat count.</param>
+        /// <param name="repeatSamples">The slider repeat sounds (this includes the end node, but NOT the start node).</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> sounds);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
@@ -215,7 +224,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         private List<SampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
         {
-            List<SampleInfo> soundTypes = new List<SampleInfo>();
+            var soundTypes = new List<SampleInfo>();
 
             if ((type & LegacySoundType.Normal) > 0)
             {
