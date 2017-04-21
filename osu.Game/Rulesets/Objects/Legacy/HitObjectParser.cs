@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 if (split.Length > 7)
                     length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
-                
+
                 if (split.Length > 10)
                     readCustomSampleBanks(split[10], bankInfo);
 
