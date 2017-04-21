@@ -108,43 +108,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
             result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
 
             var soundType = (LegacySoundType)int.Parse(split[4]);
-
-            result.Samples.Add(new SampleInfo
-            {
-                Bank = normalSampleBank,
-                Name = SampleInfo.HIT_NORMAL,
-                Volume = sampleVolume
-            });
-
-            if ((soundType & LegacySoundType.Finish) > 0)
-            {
-                result.Samples.Add(new SampleInfo
-                {
-                    Bank = addSampleBank,
-                    Name = SampleInfo.HIT_FINISH,
-                    Volume = sampleVolume
-                });
-            }
-
-            if ((soundType & LegacySoundType.Whistle) > 0)
-            {
-                result.Samples.Add(new SampleInfo
-                {
-                    Bank = addSampleBank,
-                    Name = SampleInfo.HIT_WHISTLE,
-                    Volume = sampleVolume
-                });
-            }
-
-            if ((soundType & LegacySoundType.Clap) > 0)
-            {
-                result.Samples.Add(new SampleInfo
-                {
-                    Bank = addSampleBank,
-                    Name = SampleInfo.HIT_CLAP,
-                    Volume = sampleVolume
-                });
-            }
+            result.Samples = convertSoundType(soundType, normalSampleBank, addSampleBank);
+            result.Samples.ForEach(s => s.Volume = sampleVolume);
 
             return result;
         }
@@ -201,6 +166,49 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="endTime">The spinner end time.</param>
         /// <returns>The hit object.</returns>
         protected abstract HitObject CreateSpinner(Vector2 position, double endTime);
+
+        private List<SampleInfo> convertSoundType(LegacySoundType type, string normalSampleBank, string addSampleBank)
+        {
+            List<SampleInfo> soundTypes = new List<SampleInfo>();
+
+            if ((type & LegacySoundType.Normal) > 0)
+            {
+                soundTypes.Add(new SampleInfo
+                {
+                    Bank = normalSampleBank,
+                    Name = SampleInfo.HIT_NORMAL
+                });
+            }
+            
+            if ((type & LegacySoundType.Finish) > 0)
+            {
+                soundTypes.Add(new SampleInfo
+                {
+                    Bank = addSampleBank,
+                    Name = SampleInfo.HIT_FINISH
+                });
+            }
+
+            if ((type & LegacySoundType.Whistle) > 0)
+            {
+                soundTypes.Add(new SampleInfo
+                {
+                    Bank = addSampleBank,
+                    Name = SampleInfo.HIT_WHISTLE
+                });
+            }
+
+            if ((type & LegacySoundType.Clap) > 0)
+            {
+                soundTypes.Add(new SampleInfo
+                {
+                    Bank = addSampleBank,
+                    Name = SampleInfo.HIT_CLAP
+                });
+            }
+
+            return soundTypes;
+        }
 
         [Flags]
         private enum LegacySoundType
