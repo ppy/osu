@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
         {
             return new Slider
             {
@@ -30,7 +31,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
                 ControlPoints = controlPoints,
                 Distance = length,
                 CurveType = curveType,
-                RepeatCount = repeatCount
+                RepeatCount = repeatCount,
+                RepeatSamples = repeatSamples
             };
         }
 
