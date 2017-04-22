@@ -6,9 +6,9 @@ using osu.Game.Rulesets.Objects.Types;
 namespace osu.Game.Rulesets.Objects.Legacy.Catch
 {
     /// <summary>
-    /// Legacy osu!catch Hit-type, used for parsing Beatmaps.
+    /// Legacy osu!catch Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Hit : HitObject, IHasCombo, IHasXPosition
+    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasXPosition, IHasCombo
     {
         public float X { get; set; }
 

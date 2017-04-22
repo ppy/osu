@@ -9,7 +9,7 @@ using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
-    internal class LegacySlider : HitObject, IHasCurve
+    internal abstract class ConvertSlider : HitObject, IHasCurve
     {
         public List<Vector2> ControlPoints { get; set; }
         public CurveType CurveType { get; set; }
