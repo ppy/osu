@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.UI
                 return;
 
             foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
-                mod.Apply(this);
+                mod.ApplyToHitRenderer(this);
         }
 
         /// <summary>

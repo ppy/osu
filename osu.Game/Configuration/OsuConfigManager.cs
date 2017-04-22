@@ -38,6 +38,8 @@ namespace osu.Game.Configuration
             Set(OsuConfig.KeyOverlay, false);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
+            Set(OsuConfig.AudioOffset, 0, -500.0, 500.0);
+
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
             Set(OsuConfig.BeatmapDirectory, @"Songs").Disabled = true; // TODO: use thi.Disabled = trues
             Set(OsuConfig.AllowPublicInvites, true).Disabled = true;
@@ -103,7 +105,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.ManiaSpeedBPMScale, true).Disabled = true;
             Set(OsuConfig.MenuTip, 0).Disabled = true;
             Set(OsuConfig.MouseSpeed, 1, 0.4, 6).Disabled = true;
-            Set(OsuConfig.Offset, 0, -300, 300).Disabled = true;
             Set(OsuConfig.ScoreMeterScale, 1, 0.5, 2).Disabled = true;
             //Set(OsuConfig.ScoreMeterScale, 1, 0.5, OsuGame.Tournament ? 10 : 2).Disabled = true;
             Set(OsuConfig.DistanceSpacing, 0.8, 0.1, 6).Disabled = true;
@@ -270,7 +271,7 @@ namespace osu.Game.Configuration
         MouseDisableButtons,
         MouseDisableWheel,
         MouseSpeed,
-        Offset,
+        AudioOffset,
         ScoreMeterScale,
         DistanceSpacing,
         EditorBeatDivisor,

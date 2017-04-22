@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Ranking
 
         private ResultModeTabControl modeChangeButtons;
 
+        internal override bool AllowRulesetChange => false;
+
         private Container currentPage;
 
         private static readonly Vector2 background_blur = new Vector2(20);

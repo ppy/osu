@@ -203,13 +203,7 @@ namespace osu.Game
             {
                 Depth = -3,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
-                OnRulesetChange = r => Ruleset.Value = r,
-            }, t =>
-            {
-                Ruleset.ValueChanged += delegate { Toolbar.SetRuleset(Ruleset.Value); };
-                Ruleset.TriggerChange();
-                overlayContent.Add(Toolbar);
-            });
+            }, overlayContent.Add);
 
             options.StateChanged += delegate
             {
