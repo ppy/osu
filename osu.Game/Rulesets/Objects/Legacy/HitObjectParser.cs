@@ -80,7 +80,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     readCustomSampleBanks(split[10], bankInfo);
 
                 // One node for each repeat + the start and end nodes
-                int nodes = repeatCount + 2;
+                // Note that the first length of the slider is considered a repeat, but there are no actual repeats happening
+                int nodes = Math.Max(0, repeatCount - 1) + 2;
 
                 // Populate node sample bank infos with the default hit object sample bank
                 var nodeBankInfos = new List<SampleBankInfo>();
