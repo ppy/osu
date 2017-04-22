@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public SliderCurve Curve { get; } = new SliderCurve();
+        public readonly SliderCurve Curve = new SliderCurve();
 
         public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
         public double Duration => EndTime - StartTime;
