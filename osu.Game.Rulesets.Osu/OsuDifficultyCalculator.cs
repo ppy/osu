@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu
         protected override void PreprocessHitObjects()
         {
             foreach (var h in Objects)
-                (h as IHasCurve)?.Curve?.Calculate();
+                (h as Slider)?.Curve?.Calculate();
         }
 
         protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)

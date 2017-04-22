@@ -11,27 +11,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
 {
     internal class LegacySlider : HitObject, IHasCurve
     {
-        public SliderCurve Curve { get; set; } = new SliderCurve();
+        public List<Vector2> ControlPoints { get; set; }
+        public CurveType CurveType { get; set; }
+        public double Distance { get; set; }
 
-        public List<Vector2> ControlPoints
-        {
-            get { return Curve.ControlPoints; }
-            set { Curve.ControlPoints = value; }
-        }
-
-        public CurveType CurveType
-        {
-            get { return Curve.CurveType; }
-            set { Curve.CurveType = value; }
-        }
-
-        public double Distance
-        {
-            get { return Curve.Distance; }
-            set { Curve.Distance = value; }
-        }
-
-        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<List<SampleInfo>> RepeatSamples { get; set; }
         public int RepeatCount { get; set; } = 1;
 
         public double EndTime { get; set; }
