@@ -3,12 +3,12 @@
 
 using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Catch
+namespace osu.Game.Rulesets.Objects.Legacy.Taiko
 {
     /// <summary>
-    /// Legacy osu!catch Spinner-type, used for parsing Beatmaps.
+    /// Legacy osu!taiko Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Spinner : HitObject, IHasEndTime
+    internal sealed class ConvertSpinner : HitObject, IHasEndTime
     {
         public double EndTime { get; set; }
 

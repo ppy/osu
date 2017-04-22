@@ -6,7 +6,7 @@ using System;
 namespace osu.Game.Rulesets.Objects.Legacy
 {
     [Flags]
-    public enum HitObjectType
+    internal enum ConvertHitObjectType
     {
         Circle = 1 << 0,
         Slider = 1 << 1,

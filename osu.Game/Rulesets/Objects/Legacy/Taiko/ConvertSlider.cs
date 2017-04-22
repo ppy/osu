@@ -3,15 +3,13 @@
 
 using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Mania
+namespace osu.Game.Rulesets.Objects.Legacy.Taiko
 {
     /// <summary>
-    /// Legacy osu!mania Slider-type, used for parsing Beatmaps.
+    /// Legacy osu!taiko Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Slider : LegacySlider, IHasXPosition, IHasCombo
+    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasCombo
     {
-        public float X { get; set; }
-
         public bool NewCombo { get; set; }
     }
 }

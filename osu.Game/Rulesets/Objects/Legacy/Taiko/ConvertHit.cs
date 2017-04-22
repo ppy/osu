@@ -6,9 +6,9 @@ using osu.Game.Rulesets.Objects.Types;
 namespace osu.Game.Rulesets.Objects.Legacy.Taiko
 {
     /// <summary>
-    /// Legacy osu!taiko Slider-type, used for parsing Beatmaps.
+    /// Legacy osu!taiko Hit-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Slider : LegacySlider, IHasCombo
+    internal sealed class ConvertHit : HitObject, IHasCombo
     {
         public bool NewCombo { get; set; }
     }
