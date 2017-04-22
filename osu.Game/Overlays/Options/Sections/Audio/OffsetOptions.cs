@@ -18,10 +18,10 @@ namespace osu.Game.Overlays.Options.Sections.Audio
         {
             Children = new Drawable[]
             {
-                new OptionSlider<int>
+                new OptionSlider<double>
                 {
-                    LabelText = "Universal Offset",
-                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.Offset)
+                    LabelText = "Audio Offset",
+                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.AudioOffset)
                 },
                 new OsuButton
                 {
