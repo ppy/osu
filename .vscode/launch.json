@@ -33,6 +33,11 @@
         },
         {
             "name": "Attach",
+            "windows": {
+                "type": "clr",
+                "request": "attach",
+                "processName": "osu!"
+            },
             "type": "mono",
             "request": "attach",
             "address": "localhost",
