@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapSetInfo;
             WithStoryboard = withStoryboard;
-            
+
             Mods.ValueChanged += mods => applyRateAdjustments();
         }
 
