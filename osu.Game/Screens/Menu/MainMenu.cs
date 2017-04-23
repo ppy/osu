@@ -65,7 +65,6 @@ namespace osu.Game.Screens.Menu
         private TrackManager trackManager;
         private BeatmapInfo beatmap;
         private WorkingBeatmap song;
-        private int choosableBeatmapsetAmmout;
 
         [BackgroundDependencyLoader]
         private void load(OsuGame game, OsuConfigManager config, BeatmapDatabase beatmaps)
@@ -76,10 +75,10 @@ namespace osu.Game.Screens.Menu
             if (!menuMusic)
             {
                 trackManager = game.Audio.Track;
-                choosableBeatmapsetAmmout = beatmaps.Query<BeatmapSetInfo>().Count();
-                if (choosableBeatmapsetAmmout > 0)
+                int choosableBeatmapsetAmmount = beatmaps.Query<BeatmapSetInfo>().Count();
+                if (choosableBeatmapsetAmmount > 0)
                 {
-                    beatmap = beatmaps.GetWithChildren<BeatmapSetInfo>(RNG.Next(1, choosableBeatmapsetAmmout)).Beatmaps[0];
+                    beatmap = beatmaps.GetWithChildren<BeatmapSetInfo>(RNG.Next(1, choosableBeatmapsetAmmount)).Beatmaps[0];
                     song = beatmaps.GetWorkingBeatmap(beatmap);
                     Beatmap = song;
                 }

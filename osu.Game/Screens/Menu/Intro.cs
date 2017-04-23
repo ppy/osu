@@ -1,18 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
-using osu.Framework.MathUtils;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using OpenTK.Graphics;
@@ -64,13 +60,9 @@ namespace osu.Game.Screens.Menu
 
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
-        private TrackManager trackManager;
-        private BeatmapInfo beatmap;
-        private WorkingBeatmap song;
-        private int choosableBeatmapsetAmmout;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, AudioManager audio, OsuConfigManager config, BeatmapDatabase beatmaps)
+        private void load(OsuGameBase game, AudioManager audio, OsuConfigManager config)
         {
             menuVoice = config.GetBindable<bool>(OsuConfig.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuConfig.MenuMusic);
