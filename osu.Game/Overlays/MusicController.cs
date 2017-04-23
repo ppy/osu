@@ -294,7 +294,7 @@ namespace osu.Game.Overlays
                 trackManager.SetExclusive(current.Track);
                 current.Track.Start();
                 beatmapSource.Value = current;
-            }).ContinueWith(task => Schedule(() => task.ThrowIfFaulted()));
+            }).ContinueWith(task => Schedule(() => task.ThrowIfFaulted()), TaskContinuationOptions.OnlyOnFaulted);
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
