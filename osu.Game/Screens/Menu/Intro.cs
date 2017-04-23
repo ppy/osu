@@ -74,17 +74,6 @@ namespace osu.Game.Screens.Menu
         {
             menuVoice = config.GetBindable<bool>(OsuConfig.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuConfig.MenuMusic);
-            if (!menuMusic)
-            {
-                trackManager = game.Audio.Track;
-                choosableBeatmapsetAmmout = beatmaps.Query<BeatmapSetInfo>().Count();
-                if (choosableBeatmapsetAmmout > 0)
-                {
-                    beatmap = beatmaps.GetWithChildren<BeatmapSetInfo>(RNG.Next(1, choosableBeatmapsetAmmout)).Beatmaps[0];
-                    song = beatmaps.GetWorkingBeatmap(beatmap);
-                    Beatmap = song;
-                }
-            }
 
             bgm = audio.Track.Get(@"circles");
             bgm.Looping = true;
@@ -105,23 +94,11 @@ namespace osu.Game.Screens.Menu
             {
                 if(menuMusic)
                     bgm.Start();
-                else if (song != null)
-                {
-                    Task.Run(() =>
-                    {
-                        trackManager.SetExclusive(song.Track);
-                        song.Track.Seek(beatmap.Metadata.PreviewTime);
-                        if (beatmap.Metadata.PreviewTime == -1)
-                            song.Track.Seek(song.Track.Length * .4f);
-                    });
-                }
 
                 LoadComponentAsync(mainMenu = new MainMenu());
 
                 Scheduler.AddDelayed(delegate
                 {
-                    if (!menuMusic && song != null)
-                        Task.Run(() => song.Track.Start());
                     DidLoadMenu = true;
                     Push(mainMenu);
                 }, 2300);
