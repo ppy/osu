@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Menu
         private Bindable<bool> menuMusic;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, AudioManager audio, OsuConfigManager config)
+        private void load(AudioManager audio, OsuConfigManager config)
         {
             menuVoice = config.GetBindable<bool>(OsuConfig.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuConfig.MenuMusic);
