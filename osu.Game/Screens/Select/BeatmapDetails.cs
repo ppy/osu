@@ -92,6 +92,11 @@ namespace osu.Game.Screens.Select
             updateMetrics(requestedBeatmap.Metrics, false);
         }
 
+        /// <summary>
+        /// Update displayed metrics.
+        /// </summary>
+        /// <param name="metrics">New metrics to overwrite the existing display. Can be null.</param>
+        /// <param name="failOnMissing">Whether to hide the display on null or empty metrics. If false, we will dim as if waiting for further updates.</param>
         private void updateMetrics(BeatmapMetrics metrics, bool failOnMissing = true)
         {
             var hasRatings = metrics?.Ratings.Any() ?? false;
