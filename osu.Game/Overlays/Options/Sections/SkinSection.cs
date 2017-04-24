@@ -58,12 +58,12 @@ namespace osu.Game.Overlays.Options.Sections
                     LabelText = "Always use skin cursor",
                     Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor)
                 },
-                new OptionSlider<double,SizeSlider>
+                new OptionSlider<double, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
                     Bindable = config.GetBindable<double>(OsuConfig.MenuCursorSize)
                 },
-                new OptionSlider<double,SizeSlider>
+                new OptionSlider<double, SizeSlider>
                 {
                     LabelText = "Gameplay cursor size",
                     Bindable = config.GetBindable<double>(OsuConfig.GameplayCursorSize)
