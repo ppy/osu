@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Configuration
 {
@@ -33,6 +34,8 @@ namespace osu.Game.Configuration
             Set(OsuConfig.SnakingOutSliders, true);
 
             Set(OsuConfig.MenuParallax, true);
+
+            Set(OsuConfig.BeatmapDetailTab, BeatmapDetailTab.Details);
 
             Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
@@ -316,6 +319,7 @@ namespace osu.Game.Configuration
         MenuMusic,
         MenuVoice,
         MenuParallax,
+        BeatmapDetailTab,
         RawInput,
         AbsoluteToOsuWindow,
         ConfineMouse,
