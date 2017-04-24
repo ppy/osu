@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Options
     {
     }
 
-    public class OptionSlider<T,U> : FillFlowContainer where T : struct where U : SliderBar<T>, new()
+    public class OptionSlider<T, U> : FillFlowContainer where T : struct where U : SliderBar<T>, new()
     {
         private readonly SliderBar<T> slider;
         private readonly SpriteText text;

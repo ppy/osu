@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Options.Sections.Input
         {
             Children = new Drawable[]
             {
-                new OptionSlider<double,SensitivitySlider>
+                new OptionSlider<double, SensitivitySlider>
                 {
                     LabelText = "Sensitivity",
                     Bindable = config.GetBindable<double>(OsuConfig.MouseSpeed)

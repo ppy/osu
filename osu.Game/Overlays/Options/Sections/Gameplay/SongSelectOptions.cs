@@ -17,12 +17,12 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new OptionSlider<double,StarSlider>
+                new OptionSlider<double, StarSlider>
                 {
                     LabelText = "Display beatmaps from",
                     Bindable = config.GetBindable<double>(OsuConfig.DisplayStarsMinimum)
                 },
-                new OptionSlider<double,StarSlider>
+                new OptionSlider<double, StarSlider>
                 {
                     LabelText = "up to",
                     Bindable = config.GetBindable<double>(OsuConfig.DisplayStarsMaximum)
