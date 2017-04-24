@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Select
             var requestedBeatmap = beatmap;
             if (requestedBeatmap.Metrics == null)
             {
-                var lookup = new GetBeatmapDeatilsRequest(requestedBeatmap);
+                var lookup = new GetBeatmapDetailsRequest(requestedBeatmap);
                 lookup.Success += res =>
                 {
                     if (beatmap != requestedBeatmap)

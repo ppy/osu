@@ -9,13 +9,13 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetBeatmapDeatilsRequest : APIRequest<GetBeatmapDeatilsResponse>
+    public class GetBeatmapDetailsRequest : APIRequest<GetBeatmapDeatilsResponse>
     {
         private readonly BeatmapInfo beatmap;
 
         private string lookupString;
 
-        public GetBeatmapDeatilsRequest(BeatmapInfo beatmap)
+        public GetBeatmapDetailsRequest(BeatmapInfo beatmap)
         {
             this.beatmap = beatmap;
         }
