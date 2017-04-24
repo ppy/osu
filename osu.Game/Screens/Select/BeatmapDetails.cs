@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Select
             set
             {
                 beatmap = value;
+
                 if (beatmap == null) return;
 
                 description.Text = beatmap.Version;
@@ -252,7 +253,7 @@ namespace osu.Game.Screens.Select
                                 new Container<BarGraph>
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Size = new Vector2(1/0.6f, 50),
+                                    Size = new Vector2(1 / 0.6f, 50),
                                     Children = new[]
                                     {
                                         retryGraph = new BarGraph
@@ -308,7 +309,7 @@ namespace osu.Game.Screens.Select
                 {
                     difficultyValue = value;
                     bar.Length = value / maxValue;
-                    valueText.Text = value.ToString(CultureInfo.InvariantCulture);
+                    valueText.Text = value.ToString("N1", CultureInfo.CurrentCulture);
                 }
             }
 
