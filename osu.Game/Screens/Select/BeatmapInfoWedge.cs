@@ -206,13 +206,13 @@ namespace osu.Game.Screens.Select
                                             Font = @"Exo2.0-Medium",
                                             Text = "mapped by ",
                                             TextSize = 15,
-                                                },
+                                         },
                                         new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Bold",
                                             Text = metadata.Author,
                                             TextSize = 15,
-                                                },
+                                         },
                                     }
                                 },
                                 new FillFlowContainer
