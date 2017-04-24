@@ -192,6 +192,7 @@ namespace osu.Game.Overlays
 
             beatmapSource = game.Beatmap ?? new Bindable<WorkingBeatmap>();
             playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
+            playList.RemoveAll(x => x.DeletePending);
 
             currentBackground = new MusicControllerBackground();
             dragContainer.Add(currentBackground);
