@@ -11,7 +11,23 @@
             "command": "msbuild",
             "args": [
                 // Ask msbuild to generate full paths for file names.
-                "/property:GenerateFullPaths=true"
+                "/property:GenerateFullPaths=true",
+                "/property:DebugType=portable"
+            ],
+            // Use the standard MS compiler pattern to detect errors, warnings and infos
+            "problemMatcher": "$msCompile",
+            "isBuildCommand": true
+        },
+        {
+            "taskName": "rebuild",
+            "isShellCommand": true,
+            "showOutput": "silent",
+            "command": "msbuild",
+            "args": [
+                // Ask msbuild to generate full paths for file names.
+                "/property:GenerateFullPaths=true",
+                "/property:DebugType=portable",
+                "/target:Clean,Build"
             ],
             // Use the standard MS compiler pattern to detect errors, warnings and infos
             "problemMatcher": "$msCompile",
