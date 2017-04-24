@@ -114,7 +114,6 @@ namespace osu.Game.Screens.Select
                     Direction = FillDirection.Vertical,
                     LayoutDuration = 200,
                     LayoutEasing = EasingTypes.OutQuint,
-                    Padding = new MarginPadding(10) { Top = 25 },
                     Children = new []
                     {
                         description = new MetadataSegment("Description"),
@@ -149,8 +148,8 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0,10),
-                                    Padding = new MarginPadding(15) { Top = 25 },
+                                    Spacing = new Vector2(0,5),
+                                    Padding = new MarginPadding(10),
                                     Children = new []
                                     {
                                         circleSize = new DifficultyRow("Circle Size", 7),
