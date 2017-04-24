@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace osu.Game.Database
 {
@@ -18,11 +19,13 @@ namespace osu.Game.Database
         /// <summary>
         /// Points of failure on a relative time scale (usually 0..100).
         /// </summary>
+        [JsonProperty(@"fail")]
         public IEnumerable<int> Fails { get; set; }
 
         /// <summary>
         /// Points of retry on a relative time scale (usually 0..100).
         /// </summary>
+        [JsonProperty(@"exit")]
         public IEnumerable<int> Retries { get; set; }
     }
 }
