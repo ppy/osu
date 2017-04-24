@@ -41,6 +41,11 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                     LabelText = "osu! music theme",
                     Bindable = config.GetBindable<bool>(OsuConfig.MenuMusic)
                 },
+                new OsuCheckbox
+                {
+                    LabelText = "Confirm exit",
+                    Bindable = config.GetBindable<bool>(OsuConfig.ConfirmExit)
+                },
             };
         }
     }

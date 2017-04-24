@@ -39,6 +39,8 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
+
+            Set(OsuConfig.ConfirmExit, false);
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
             Set(OsuConfig.AudioOffset, 0, -500.0, 500.0);
@@ -64,7 +66,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.ComboBurst, true).Disabled = true;
             Set(OsuConfig.ComboFire, false).Disabled = true;
             Set(OsuConfig.ComboFireHeight, 3).Disabled = true;
-            Set(OsuConfig.ConfirmExit, false).Disabled = true;
             Set(OsuConfig.AutoSendNowPlaying, true).Disabled = true;
             Set(OsuConfig.AutomaticCursorSizing, false).Disabled = true;
             Set(OsuConfig.Display, 1).Disabled = true;
