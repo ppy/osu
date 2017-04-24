@@ -19,16 +19,26 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : OsuScreen
     {
-        private readonly Player player;
+        private Player player;
+
         private readonly OsuLogo logo;
         private BeatmapMetadataDisplay info;
+
+        private bool showOverlays = true;
+        internal override bool ShowOverlays => showOverlays;
+
+        internal override bool AllowRulesetChange => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         public PlayerLoader(Player player)
         {
-            ValidForResume = false;
             this.player = player;
+
+            player.RestartRequested = () => {
+                showOverlays = false;
+                ValidForResume = true;
+            };
 
             Children = new Drawable[]
             {
@@ -53,6 +63,37 @@ namespace osu.Game.Screens.Play
             LoadComponentAsync(player);
         }
 
+        protected override void OnResuming(Screen last)
+        {
+            base.OnResuming(last);
+
+            contentIn();
+
+            //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
+            LoadComponentAsync(player = new Player
+            {
+                RestartCount = player.RestartCount + 1,
+                RestartRequested = player.RestartRequested,
+                Beatmap = player.Beatmap,
+            });
+
+            Delay(400);
+
+            Schedule(pushWhenLoaded);
+        }
+
+        private void contentIn()
+        {
+            Content.ScaleTo(1, 650, EasingTypes.OutQuint);
+            Content.FadeInFromZero(400);
+        }
+
+        private void contentOut()
+        {
+            Content.ScaleTo(0.7f, 300, EasingTypes.InQuint);
+            Content.FadeOut(250);
+        }
+
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
@@ -60,20 +101,27 @@ namespace osu.Game.Screens.Play
             Background.FadeTo(0.4f, 250);
 
             Content.ScaleTo(0.7f);
-            Content.ScaleTo(1, 750, EasingTypes.OutQuint);
-            Content.FadeInFromZero(500);
 
-            Delay(1000, true);
+            contentIn();
+
+            Delay(500, true);
 
             logo.MoveToOffset(new Vector2(0, -180), 500, EasingTypes.InOutExpo);
             Delay(250, true);
 
             info.FadeIn(500);
 
-            Delay(2000, true);
+            Delay(1400, true);
 
-            Content.ScaleTo(0.7f, 300, EasingTypes.InQuint);
-            Content.FadeOut(250);
+            Schedule(pushWhenLoaded);
+        }
+
+        private void pushWhenLoaded()
+        {
+            if (!player.IsLoaded)
+                Schedule(pushWhenLoaded);
+
+            contentOut();
 
             Delay(250);
 
@@ -83,6 +131,12 @@ namespace osu.Game.Screens.Play
 
                 if (!Push(player))
                     Exit();
+                else
+                {
+                    //By default, we want to load the player and never be returned to.
+                    //Note that this may change if the player we load requested a re-run.
+                    ValidForResume = false;
+                }
             });
         }
 

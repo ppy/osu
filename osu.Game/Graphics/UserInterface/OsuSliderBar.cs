@@ -5,6 +5,7 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -12,14 +13,35 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<U> : SliderBar<U> where U : struct
+    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip where T : struct
     {
         private SampleChannel sample;
         private double lastSampleTime;
+        private T lastSampleValue;
 
         private readonly Nub nub;
         private readonly Box leftBox;
         private readonly Box rightBox;
+
+        public string TooltipText
+        {
+            get
+            {
+                var bindableDouble = CurrentNumber as BindableNumber<double>;
+                if (bindableDouble != null)
+                {
+                    if (bindableDouble.MaxValue == 1 && bindableDouble.MinValue == 0)
+                        return bindableDouble.Value.ToString(@"P0");
+                    return bindableDouble.Value.ToString(@"n1");
+                }
+
+                var bindableInt = CurrentNumber as BindableNumber<int>;
+                if (bindableInt != null)
+                    return bindableInt.Value.ToString(@"n0");
+
+                return Current.Value.ToString();
+            }
+        }
 
         public OsuSliderBar()
         {
@@ -51,6 +73,11 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.TopCentre,
                     Expanded = true,
                 }
+            };
+
+            Current.DisabledChanged += disabled =>
+            {
+                Alpha = disabled ? 0.3f : 1;
             };
         }
 
@@ -84,6 +111,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
                 return;
+
+            if (Current.Value.Equals(lastSampleValue))
+                return;
+
+            lastSampleValue = Current.Value;
+
             lastSampleTime = Clock.CurrentTime;
             sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
 

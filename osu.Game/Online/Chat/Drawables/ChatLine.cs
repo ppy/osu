@@ -55,6 +55,9 @@ namespace osu.Game.Online.Chat.Drawables
 
         private Color4 getUsernameColour(Message message)
         {
+            if (!string.IsNullOrEmpty(message.Sender?.Colour))
+                return OsuColour.FromHex(message.Sender.Colour);
+
             //todo: use User instead of Message when user_id is correctly populated.
             return username_colours[message.UserId % username_colours.Length];
         }
@@ -83,7 +86,7 @@ namespace osu.Game.Online.Chat.Drawables
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = @"Exo2.0-SemiBold",
-                            Text = $@"{Message.Timestamp.LocalDateTime:hh:mm:ss}",
+                            Text = $@"{Message.Timestamp.LocalDateTime:HH:mm:ss}",
                             FixedWidth = true,
                             TextSize = text_size * 0.75f,
                             Alpha = 0.4f,
@@ -91,7 +94,7 @@ namespace osu.Game.Online.Chat.Drawables
                         new OsuSpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
-                            Text = $@"{Message.User.Username}:",
+                            Text = $@"{Message.Sender.Username}:",
                             Colour = getUsernameColour(Message),
                             TextSize = text_size,
                             Origin = Anchor.TopRight,
