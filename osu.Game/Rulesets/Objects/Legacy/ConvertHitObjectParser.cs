@@ -14,29 +14,28 @@ namespace osu.Game.Rulesets.Objects.Legacy
     /// <summary>
     /// A HitObjectParser to parse legacy Beatmaps.
     /// </summary>
-    internal abstract class HitObjectParser : Objects.HitObjectParser
+    internal abstract class ConvertHitObjectParser : HitObjectParser
     {
         public override HitObject Parse(string text)
         {
             string[] split = text.Split(',');
-            var type = (HitObjectType)int.Parse(split[3]) & ~HitObjectType.ColourHax;
-            bool combo = type.HasFlag(HitObjectType.NewCombo);
-            type &= ~HitObjectType.NewCombo;
+            ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]) & ~ConvertHitObjectType.ColourHax;
+            bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
+            type &= ~ConvertHitObjectType.NewCombo;
 
-            int sampleVolume = 0;
-            string normalSampleBank = null;
-            string addSampleBank = null;
+            var soundType = (LegacySoundType)int.Parse(split[4]);
+            var bankInfo = new SampleBankInfo();
 
             HitObject result;
 
-            if ((type & HitObjectType.Circle) > 0)
+            if ((type & ConvertHitObjectType.Circle) > 0)
             {
                 result = CreateHit(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo);
 
                 if (split.Length > 5)
-                    readCustomSampleBanks(split[5], ref normalSampleBank, ref addSampleBank, ref sampleVolume);
+                    readCustomSampleBanks(split[5], bankInfo);
             }
-            else if ((type & HitObjectType.Slider) > 0)
+            else if ((type & ConvertHitObjectType.Slider) > 0)
             {
                 CurveType curveType = CurveType.Catmull;
                 double length = 0;
@@ -77,26 +76,74 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 if (split.Length > 7)
                     length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
 
-                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount);
-
                 if (split.Length > 10)
-                    readCustomSampleBanks(split[10], ref normalSampleBank, ref addSampleBank, ref sampleVolume);
+                    readCustomSampleBanks(split[10], bankInfo);
+
+                // One node for each repeat + the start and end nodes
+                // Note that the first length of the slider is considered a repeat, but there are no actual repeats happening
+                int nodes = Math.Max(0, repeatCount - 1) + 2;
+
+                // Populate node sample bank infos with the default hit object sample bank
+                var nodeBankInfos = new List<SampleBankInfo>();
+                for (int i = 0; i < nodes; i++)
+                    nodeBankInfos.Add(bankInfo.Clone());
+
+                // Read any per-node sample banks
+                if (split.Length > 9 && split[9].Length > 0)
+                {
+                    string[] sets = split[9].Split('|');
+                    for (int i = 0; i < nodes; i++)
+                    {
+                        if (i >= sets.Length)
+                            break;
+
+                        SampleBankInfo info = nodeBankInfos[i];
+                        readCustomSampleBanks(sets[i], info);
+                    }
+                }
+
+                // Populate node sound types with the default hit object sound type
+                var nodeSoundTypes = new List<LegacySoundType>();
+                for (int i = 0; i < nodes; i++)
+                    nodeSoundTypes.Add(soundType);
+
+                // Read any per-node sound types
+                if (split.Length > 8 && split[8].Length > 0)
+                {
+                    string[] adds = split[8].Split('|');
+                    for (int i = 0; i < nodes; i++)
+                    {
+                        if (i >= adds.Length)
+                            break;
+
+                        int sound;
+                        int.TryParse(adds[i], out sound);
+                        nodeSoundTypes[i] = (LegacySoundType)sound;
+                    }
+                }
+
+                // Generate the final per-node samples
+                var nodeSamples = new List<List<SampleInfo>>(nodes);
+                for (int i = 0; i <= repeatCount; i++)
+                    nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
+
+                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, nodeSamples);
             }
-            else if ((type & HitObjectType.Spinner) > 0)
+            else if ((type & ConvertHitObjectType.Spinner) > 0)
             {
                 result = CreateSpinner(new Vector2(512, 384) / 2, Convert.ToDouble(split[5], CultureInfo.InvariantCulture));
 
                 if (split.Length > 6)
-                    readCustomSampleBanks(split[6], ref normalSampleBank, ref addSampleBank, ref sampleVolume);
+                    readCustomSampleBanks(split[6], bankInfo);
             }
-            else if ((type & HitObjectType.Hold) > 0)
+            else if ((type & ConvertHitObjectType.Hold) > 0)
             {
                 // Note: Hold is generated by BMS converts
 
                 // Todo: Apparently end time is determined by samples??
                 // Shouldn't need implementation until mania
 
-                result = new Hold
+                result = new ConvertHold
                 {
                     Position = new Vector2(int.Parse(split[0]), int.Parse(split[1])),
                     NewCombo = combo
@@ -106,50 +153,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 throw new InvalidOperationException($@"Unknown hit object type {type}");
 
             result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
-
-            var soundType = (LegacySoundType)int.Parse(split[4]);
-
-            result.Samples.Add(new SampleInfo
-            {
-                Bank = normalSampleBank,
-                Name = SampleInfo.HIT_NORMAL,
-                Volume = sampleVolume
-            });
-
-            if ((soundType & LegacySoundType.Finish) > 0)
-            {
-                result.Samples.Add(new SampleInfo
-                {
-                    Bank = addSampleBank,
-                    Name = SampleInfo.HIT_FINISH,
-                    Volume = sampleVolume
-                });
-            }
-
-            if ((soundType & LegacySoundType.Whistle) > 0)
-            {
-                result.Samples.Add(new SampleInfo
-                {
-                    Bank = addSampleBank,
-                    Name = SampleInfo.HIT_WHISTLE,
-                    Volume = sampleVolume
-                });
-            }
-
-            if ((soundType & LegacySoundType.Clap) > 0)
-            {
-                result.Samples.Add(new SampleInfo
-                {
-                    Bank = addSampleBank,
-                    Name = SampleInfo.HIT_CLAP,
-                    Volume = sampleVolume
-                });
-            }
+            result.Samples = convertSoundType(soundType, bankInfo);
 
             return result;
         }
 
-        private void readCustomSampleBanks(string str, ref string normalSampleBank, ref string addSampleBank, ref int sampleVolume)
+        private void readCustomSampleBanks(string str, SampleBankInfo bankInfo)
         {
             if (string.IsNullOrEmpty(str))
                 return;
@@ -169,9 +178,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
             if (stringAddBank == @"none")
                 stringAddBank = null;
 
-            normalSampleBank = stringBank;
-            addSampleBank = stringAddBank;
-            sampleVolume = split.Length > 3 ? int.Parse(split[3]) : 0;
+            bankInfo.Normal = stringBank;
+            bankInfo.Add = stringAddBank;
+
+            if (split.Length > 3)
+                bankInfo.Volume = int.Parse(split[3]);
         }
 
         /// <summary>
@@ -191,8 +202,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="length">The slider length.</param>
         /// <param name="curveType">The slider curve type.</param>
         /// <param name="repeatCount">The slider repeat count.</param>
+        /// <param name="repeatSamples">The samples to be played when the repeat nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
@@ -201,6 +213,63 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="endTime">The spinner end time.</param>
         /// <returns>The hit object.</returns>
         protected abstract HitObject CreateSpinner(Vector2 position, double endTime);
+
+        private List<SampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
+        {
+            var soundTypes = new List<SampleInfo>
+            {
+                new SampleInfo
+                {
+                    Bank = bankInfo.Normal,
+                    Name = SampleInfo.HIT_NORMAL,
+                    Volume = bankInfo.Volume
+                }
+            };
+
+            if ((type & LegacySoundType.Finish) > 0)
+            {
+                soundTypes.Add(new SampleInfo
+                {
+                    Bank = bankInfo.Add,
+                    Name = SampleInfo.HIT_FINISH,
+                    Volume = bankInfo.Volume
+                });
+            }
+
+            if ((type & LegacySoundType.Whistle) > 0)
+            {
+                soundTypes.Add(new SampleInfo
+                {
+                    Bank = bankInfo.Add,
+                    Name = SampleInfo.HIT_WHISTLE,
+                    Volume = bankInfo.Volume
+                });
+            }
+
+            if ((type & LegacySoundType.Clap) > 0)
+            {
+                soundTypes.Add(new SampleInfo
+                {
+                    Bank = bankInfo.Add,
+                    Name = SampleInfo.HIT_CLAP,
+                    Volume = bankInfo.Volume
+                });
+            }
+
+            return soundTypes;
+        }
+
+        private class SampleBankInfo
+        {
+            public string Normal;
+            public string Add;
+            public int Volume;
+
+            public SampleBankInfo Clone()
+            {
+                return (SampleBankInfo)MemberwiseClone();
+            }
+        }
 
         [Flags]
         private enum LegacySoundType
