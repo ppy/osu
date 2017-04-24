@@ -179,6 +179,7 @@
     <Compile Include="Rulesets\UI\StandardHudOverlay.cs" />
     <Compile Include="Online\API\IOnlineComponent.cs" />
     <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
+    <Compile Include="Online\API\Requests\GetBeatmapDetailsRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
     <Compile Include="Overlays\DragBar.cs" />
     <Compile Include="Overlays\LoginOverlay.cs" />
