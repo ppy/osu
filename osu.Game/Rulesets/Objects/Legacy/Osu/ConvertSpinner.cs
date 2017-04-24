@@ -2,18 +2,23 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Objects.Types;
+using OpenTK;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Mania
+namespace osu.Game.Rulesets.Objects.Legacy.Osu
 {
     /// <summary>
-    /// Legacy osu!mania Spinner-type, used for parsing Beatmaps.
+    /// Legacy osu! Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Spinner : HitObject, IHasEndTime, IHasXPosition
+    internal sealed class ConvertSpinner : HitObject, IHasEndTime, IHasPosition
     {
         public double EndTime { get; set; }
 
         public double Duration => EndTime - StartTime;
 
-        public float X { get; set; }
+        public Vector2 Position { get; set; }
+
+        public float X => Position.X;
+
+        public float Y => Position.Y;
     }
 }
