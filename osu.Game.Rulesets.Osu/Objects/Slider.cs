@@ -20,24 +20,33 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public IHasCurve CurveObject { get; set; }
-
-        public SliderCurve Curve => CurveObject.Curve;
+        public readonly SliderCurve Curve = new SliderCurve();
 
         public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
         public override Vector2 EndPosition => PositionAt(1);
 
-        public Vector2 PositionAt(double progress) => CurveObject.PositionAt(progress);
-        public double ProgressAt(double progress) => CurveObject.ProgressAt(progress);
-        public int RepeatAt(double progress) => CurveObject.RepeatAt(progress);
+        public List<Vector2> ControlPoints
+        {
+            get { return Curve.ControlPoints; }
+            set { Curve.ControlPoints = value; }
+        }
 
-        public List<Vector2> ControlPoints => CurveObject.ControlPoints;
-        public CurveType CurveType => CurveObject.CurveType;
-        public double Distance => CurveObject.Distance;
+        public CurveType CurveType
+        {
+            get { return Curve.CurveType; }
+            set { Curve.CurveType = value; }
+        }
 
-        public int RepeatCount => CurveObject.RepeatCount;
+        public double Distance
+        {
+            get { return Curve.Distance; }
+            set { Curve.Distance = value; }
+        }
+
+        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+        public int RepeatCount { get; set; } = 1;
 
         private int stackHeight;
         public override int StackHeight
@@ -62,6 +71,18 @@ namespace osu.Game.Rulesets.Osu.Objects
             Velocity = scoringDistance / timing.BeatLengthAt(StartTime);
             TickDistance = scoringDistance / difficulty.SliderTickRate;
         }
+
+        public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
+
+        public double ProgressAt(double progress)
+        {
+            double p = progress * RepeatCount % 1;
+            if (RepeatAt(progress) % 2 == 1)
+                p = 1 - p;
+            return p;
+        }
+
+        public int RepeatAt(double progress) => (int)(progress * RepeatCount);
 
         public IEnumerable<SliderTick> Ticks
         {

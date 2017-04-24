@@ -3,12 +3,12 @@
 
 using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Catch
+namespace osu.Game.Rulesets.Objects.Legacy.Mania
 {
     /// <summary>
-    /// Legacy osu!catch Slider-type, used for parsing Beatmaps.
+    /// Legacy osu!mania Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Slider : CurvedHitObject, IHasXPosition, IHasCombo
+    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasXPosition, IHasCombo
     {
         public float X { get; set; }
 
