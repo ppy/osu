@@ -188,6 +188,7 @@
     <Compile Include="Beatmaps\WorkingBeatmap.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
+    <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Rulesets\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitObject.cs" />
