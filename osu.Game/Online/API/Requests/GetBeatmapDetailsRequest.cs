@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using Newtonsoft.Json;
-using osu.Framework.IO.Network;
 using osu.Game.Database;
 
 namespace osu.Game.Online.API.Requests
