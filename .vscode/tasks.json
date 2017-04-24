@@ -12,7 +12,8 @@
             "args": [
                 // Ask msbuild to generate full paths for file names.
                 "/property:GenerateFullPaths=true",
-                "/property:DebugType=portable"
+                "/property:DebugType=portable",
+                "/m"
             ],
             // Use the standard MS compiler pattern to detect errors, warnings and infos
             "problemMatcher": "$msCompile",
@@ -27,7 +28,8 @@
                 // Ask msbuild to generate full paths for file names.
                 "/property:GenerateFullPaths=true",
                 "/property:DebugType=portable",
-                "/target:Clean,Build"
+                "/target:Clean,Build",
+                "/m"
             ],
             // Use the standard MS compiler pattern to detect errors, warnings and infos
             "problemMatcher": "$msCompile",
