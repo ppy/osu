@@ -25,8 +25,6 @@ namespace osu.Game.Graphics.UserInterface
             {
                 bindable = value;
                 Current.BindTo(bindable);
-                if (value?.Disabled ?? true)
-                    Alpha = 0.3f;
             }
         }
 
@@ -83,6 +81,11 @@ namespace osu.Game.Graphics.UserInterface
                     sampleChecked?.Play();
                 else
                     sampleUnchecked?.Play();
+            };
+
+            Current.DisabledChanged += disabled =>
+            {
+                Alpha = disabled ? 0.3f : 1;
             };
         }
 

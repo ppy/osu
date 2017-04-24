@@ -1,10 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Mods;
 using osu.Framework.Testing;
-using osu.Game.Modes;
+using osu.Game.Database;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -13,6 +14,13 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Description => @"Tests the mod select overlay";
 
         private ModSelectOverlay modSelect;
+        private RulesetDatabase rulesets;
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetDatabase rulesets)
+        {
+            this.rulesets = rulesets;
+        }
 
         public override void Reset()
         {
@@ -26,10 +34,9 @@ namespace osu.Desktop.VisualTests.Tests
             });
 
             AddStep("Toggle", modSelect.ToggleVisibility);
-            AddStep("osu!", () => modSelect.PlayMode.Value = PlayMode.Osu);
-            AddStep("osu!taiko", () => modSelect.PlayMode.Value = PlayMode.Taiko);
-            AddStep("osu!catch", () => modSelect.PlayMode.Value = PlayMode.Catch);
-            AddStep("osu!mania", () => modSelect.PlayMode.Value = PlayMode.Mania);
+
+            foreach (var ruleset in rulesets.AllRulesets)
+                AddStep(ruleset.CreateInstance().Description, () => modSelect.Ruleset.Value = ruleset);
         }
     }
 }

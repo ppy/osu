@@ -817,13 +817,13 @@ namespace osu.Game.Graphics
         fa_youtube_play = 0xf16a,
         fa_youtube_square = 0xf166,
 
-        // gamemode icons in circles
+        // ruleset icons in circles
         fa_osu_osu_o = 0xe000,
         fa_osu_mania_o = 0xe001,
         fa_osu_fruits_o = 0xe002,
         fa_osu_taiko_o = 0xe003,
 
-        // gamemode icons without circles
+        // ruleset icons without circles
         fa_osu_filled_circle = 0xe004,
         fa_osu_cross_o = 0xe005,
         fa_osu_logo = 0xe006,
