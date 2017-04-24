@@ -60,6 +60,8 @@ namespace osu.Game.Screens.Select
 
         private void updateStats()
         {
+            if (beatmap == null) return;
+
             description.Text = beatmap.Version;
             source.Text = beatmap.Metadata.Source;
             tags.Text = beatmap.Metadata.Tags;
