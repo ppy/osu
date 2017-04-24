@@ -17,7 +17,6 @@ using System.Linq;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Threading;
-using System;
 
 namespace osu.Game.Screens.Select
 {
@@ -83,9 +82,9 @@ namespace osu.Game.Screens.Select
                             return;
 
                     requestedBeatmap.Metrics = res;
-                    Schedule(() => updateMetrics(res, true));
+                    Schedule(() => updateMetrics(res));
                 };
-                lookup.Failure += e => updateMetrics(null, true);
+                lookup.Failure += e => updateMetrics(null);
 
                 api.Queue(lookup);
             }

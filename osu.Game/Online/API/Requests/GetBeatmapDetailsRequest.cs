@@ -1,11 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Game.Database;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -13,23 +11,11 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly BeatmapInfo beatmap;
 
-        private string lookupString;
+        private string lookupString => beatmap.OnlineBeatmapID > 0 ? beatmap.OnlineBeatmapID.ToString() : $@"lookup?checksum={beatmap.Hash}&filename={beatmap.Path}";
 
         public GetBeatmapDetailsRequest(BeatmapInfo beatmap)
         {
             this.beatmap = beatmap;
-        }
-
-        protected override WebRequest CreateWebRequest()
-        {
-            if (beatmap.OnlineBeatmapID > 0)
-                lookupString = beatmap.OnlineBeatmapID.ToString();
-            else
-                lookupString = $@"lookup?checksum={beatmap.Hash}&filename={beatmap.Path}";
-
-            var req = base.CreateWebRequest();
-
-            return req;
         }
 
         protected override string Target => $@"beatmaps/{lookupString}";
@@ -43,8 +29,8 @@ namespace osu.Game.Online.API.Requests
         {
             set
             {
-                this.Fails = value.Fails;
-                this.Retries = value.Retries;
+                Fails = value.Fails;
+                Retries = value.Retries;
             }
         }
 
@@ -54,7 +40,7 @@ namespace osu.Game.Online.API.Requests
         {
             set
             {
-                this.Ratings = value.Ratings;
+                Ratings = value.Ratings;
             }
         }
     }
