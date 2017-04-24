@@ -7,14 +7,13 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
-using System;
 
 namespace osu.Game.Beatmaps.Drawables
 {
 
     internal class DifficultyIcon : DifficultyColouredContainer
     {
-        private BeatmapInfo beatmap;
+        private readonly BeatmapInfo beatmap;
 
         public DifficultyIcon(BeatmapInfo beatmap) : base(beatmap)
         {
@@ -23,7 +22,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Children = new[]
             {

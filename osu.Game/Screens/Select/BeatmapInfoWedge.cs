@@ -284,7 +284,7 @@ namespace osu.Game.Screens.Select
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
                 const float full_opacity_ratio = 0.7f;
 
