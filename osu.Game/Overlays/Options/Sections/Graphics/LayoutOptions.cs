@@ -12,13 +12,20 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
     {
         protected override string Header => "Layout";
 
+        private OptionSlider<double> letterboxPositionX;
+        private OptionSlider<double> letterboxPositionY;
+
+        private Bindable<bool> letterboxing;
+
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config)
         {
+            letterboxing = config.GetBindable<bool>(FrameworkConfig.Letterboxing);
+
             Children = new Drawable[]
             {
                 new OptionLabel { Text = "Resolution: TODO dropdown" },
-                new OptionEnumDropDown<WindowMode>
+                new OptionEnumDropdown<WindowMode>
                 {
                     LabelText = "Screen mode",
                     Bindable = config.GetBindable<WindowMode>(FrameworkConfig.WindowMode),
@@ -26,19 +33,36 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 new OsuCheckbox
                 {
                     LabelText = "Letterboxing",
-                    Bindable = config.GetBindable<bool>(FrameworkConfig.Letterboxing),
+                    Bindable = letterboxing,
                 },
-                new OptionSlider<int>
+                letterboxPositionX = new OptionSlider<double>
                 {
                     LabelText = "Horizontal position",
-                    Bindable = (BindableInt)config.GetBindable<int>(FrameworkConfig.LetterboxPositionX)
+                    Bindable = config.GetBindable<double>(FrameworkConfig.LetterboxPositionX)
                 },
-                new OptionSlider<int>
+                letterboxPositionY = new OptionSlider<double>
                 {
                     LabelText = "Vertical position",
-                    Bindable = (BindableInt)config.GetBindable<int>(FrameworkConfig.LetterboxPositionY)
+                    Bindable = config.GetBindable<double>(FrameworkConfig.LetterboxPositionY)
                 },
             };
+
+            letterboxing.ValueChanged += visibilityChanged;
+            letterboxing.TriggerChange();
+        }
+
+        private void visibilityChanged(bool newVisibility)
+        {
+            if (newVisibility)
+            {
+                letterboxPositionX.Show();
+                letterboxPositionY.Show();
+            }
+            else
+            {
+                letterboxPositionX.Hide();
+                letterboxPositionY.Hide();
+            }
         }
     }
 }

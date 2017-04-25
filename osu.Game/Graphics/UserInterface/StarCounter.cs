@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using System;
 
@@ -147,7 +146,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private class Star : Container
         {
-            public TextAwesome Icon;
+            public readonly TextAwesome Icon;
             public Star()
             {
                 Size = new Vector2(star_size);

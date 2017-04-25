@@ -5,18 +5,21 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
+using OpenTK;
 
 namespace osu.Game.Overlays
 {
     public class DragBar : Container
     {
-        private Box fill;
+        protected readonly Container Fill;
 
         public Action<float> SeekRequested;
-        private bool isDragging;
 
-        private bool enabled;
+        public bool IsSeeking { get; private set; }
+
+        private bool enabled = true;
         public bool IsEnabled
         {
             get { return enabled; }
@@ -24,7 +27,7 @@ namespace osu.Game.Overlays
             {
                 enabled = value;
                 if (!enabled)
-                    fill.Width = 0;
+                    Fill.Width = 0;
             }
         }
 
@@ -34,29 +37,45 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                fill = new Box
+                Fill = new Container
                 {
-                    Origin = Anchor.CentreLeft,
-                    Anchor = Anchor.CentreLeft,
+                    Name = "FillContainer",
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0
+                    Width = 0,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    }
                 }
             };
         }
 
         public void UpdatePosition(float position)
         {
-            if (isDragging || !IsEnabled) return;
+            if (IsSeeking || !IsEnabled) return;
 
-            fill.Width = position;
+            updatePosition(position, false);
         }
 
         private void seek(InputState state)
         {
-            if (!IsEnabled) return;
             float seekLocation = state.Mouse.Position.X / DrawWidth;
+
+            if (!IsEnabled) return;
+
             SeekRequested?.Invoke(seekLocation);
-            fill.Width = seekLocation;
+            updatePosition(seekLocation);
+        }
+
+        private void updatePosition(float position, bool easing = true)
+        {
+            position = MathHelper.Clamp(position, 0, 1);
+            Fill.TransformTo(() => Fill.Width, position, easing ? 200 : 0, EasingTypes.OutQuint, new TransformSeek());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -71,12 +90,21 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDragStart(InputState state) => isDragging = true;
+        protected override bool OnDragStart(InputState state) => IsSeeking = true;
 
         protected override bool OnDragEnd(InputState state)
         {
-            isDragging = false;
+            IsSeeking = false;
             return true;
+        }
+
+        private class TransformSeek : TransformFloat
+        {
+            public override void Apply(Drawable d)
+            {
+                base.Apply(d);
+                d.Width = CurrentValue;
+            }
         }
     }
 }

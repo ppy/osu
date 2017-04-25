@@ -60,8 +60,8 @@ namespace osu.Game.Graphics.Backgrounds
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            for (int i = 0; i < aimTriangleCount; i++)
-                addTriangle(true);
+
+            addTriangles(true);
         }
 
         private int aimTriangleCount => (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
@@ -83,43 +83,46 @@ namespace osu.Game.Graphics.Backgrounds
                     t.Expire();
             }
 
-            while (CreateNewTriangles && Children.Count() < aimTriangleCount)
-                addTriangle(false);
+            if (CreateNewTriangles)
+                addTriangles(false);
         }
 
         protected virtual Triangle CreateTriangle()
         {
-            float stdDev = 0.16f;
-            float mean = 0.5f;
+            const float std_dev = 0.16f;
+            const float mean = 0.5f;
 
             float u1 = 1 - RNG.NextSingle(); //uniform(0,1] random floats
             float u2 = 1 - RNG.NextSingle();
             float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); //random normal(0,1)
-            var scale = Math.Max(triangleScale * (mean + stdDev * randStdNormal), 0.1f); //random normal(mean,stdDev^2)
+            var scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); //random normal(mean,stdDev^2)
 
             const float size = 100;
 
-            return new Triangle
+            return new EquilateralTriangle
             {
                 Origin = Anchor.TopCentre,
                 RelativePositionAxes = Axes.Both,
+                Size = new Vector2(size),
                 Scale = new Vector2(scale),
                 EdgeSmoothness = new Vector2(1),
                 Colour = GetTriangleShade(),
-                // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
-                Size = new Vector2(size, 0.866f * size),
                 Depth = scale,
             };
         }
 
         protected virtual Color4 GetTriangleShade() => Interpolation.ValueAt(RNG.NextSingle(), ColourDark, ColourLight, 0, 1);
 
-        private void addTriangle(bool randomY)
+        private void addTriangles(bool randomY)
         {
-            var sprite = CreateTriangle();
-            float triangleHeight = sprite.DrawHeight / DrawHeight;
-            sprite.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() * (1 + triangleHeight) - triangleHeight : 1);
-            Add(sprite);
+            int addCount = aimTriangleCount - Children.Count();
+            for (int i = 0; i < addCount; i++)
+            {
+                var sprite = CreateTriangle();
+                float triangleHeight = sprite.DrawHeight / DrawHeight;
+                sprite.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() * (1 + triangleHeight) - triangleHeight : 1);
+                Add(sprite);
+            }
         }
     }
 }

@@ -11,14 +11,14 @@ namespace osu.Game.Overlays.Toolbar
     internal class ToolbarUserArea : Container
     {
         public LoginOverlay LoginOverlay;
-        private ToolbarUserButton button;
+        private readonly ToolbarUserButton button;
 
         public override RectangleF BoundingBox => button.BoundingBox;
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         public ToolbarUserArea()
         {
+            AlwaysReceiveInput = true;
+
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 

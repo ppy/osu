@@ -7,7 +7,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using System;
 
 namespace osu.Game.Overlays
@@ -20,9 +19,12 @@ namespace osu.Game.Overlays
         private const EasingTypes easing_show = EasingTypes.OutSine;
         private const EasingTypes easing_hide = EasingTypes.InSine;
 
-        private Wave firstWave, secondWave, thirdWave, fourthWave;
+        private readonly Wave firstWave;
+        private readonly Wave secondWave;
+        private readonly Wave thirdWave;
+        private readonly Wave fourthWave;
 
-        private Container<Wave> wavesContainer;
+        private readonly Container<Wave> wavesContainer;
 
         private readonly Container contentContainer;
 

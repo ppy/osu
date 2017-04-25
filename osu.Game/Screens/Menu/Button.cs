@@ -26,19 +26,16 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public class Button : Container, IStateful<ButtonState>
     {
-        private Container iconText;
-        private Container box;
-        private Box boxHoverLayer;
-        private TextAwesome icon;
-        private string internalName;
-        private Action clickAction;
-        private Key triggerKey;
+        private readonly Container iconText;
+        private readonly Container box;
+        private readonly Box boxHoverLayer;
+        private readonly TextAwesome icon;
+        private readonly string internalName;
+        private readonly Action clickAction;
+        private readonly Key triggerKey;
         private SampleChannel sampleClick;
 
-        public override bool Contains(Vector2 screenSpacePos)
-        {
-            return box.Contains(screenSpacePos);
-        }
+        protected override bool InternalContains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
 
         public Button(string text, string internalName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
@@ -135,7 +132,7 @@ namespace osu.Game.Screens.Menu
 
             icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
 
-            double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
+            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
             double startTime = Time.Current + offset;
 
             icon.RotateTo(10, offset, EasingTypes.InOutSine);

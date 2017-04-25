@@ -33,6 +33,11 @@ namespace osu.Game.Graphics.UserInterface
             Height = 40;
             TextContainer.Height = 0.5f;
             CornerRadius = 5;
+
+            Current.DisabledChanged += disabled =>
+            {
+                Alpha = disabled ? 0.3f : 1;
+            };
         }
 
         [BackgroundDependencyLoader]

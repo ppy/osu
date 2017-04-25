@@ -18,15 +18,15 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    internal class BeatmapPanel : Panel
+    public class BeatmapPanel : Panel
     {
         public BeatmapInfo Beatmap;
-        private Sprite background;
+        private readonly Sprite background;
 
         public Action<BeatmapPanel> GainedSelection;
         public Action<BeatmapPanel> StartRequested;
-        private Triangles triangles;
-        private StarCounter starCounter;
+        private readonly Triangles triangles;
+        private readonly StarCounter starCounter;
 
         protected override void Selected()
         {
@@ -59,6 +59,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected override void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
         {
+            if (!IsLoaded) return;
+
             base.ApplyState(last);
 
             if (last == PanelSelectedState.Hidden && State != last)
@@ -138,7 +140,7 @@ namespace osu.Game.Beatmaps.Drawables
                                 },
                                 starCounter = new StarCounter
                                 {
-                                    Count = beatmap.StarDifficulty,
+                                    Count = (float)beatmap.StarDifficulty,
                                     Scale = new Vector2(0.8f),
                                 }
                             }

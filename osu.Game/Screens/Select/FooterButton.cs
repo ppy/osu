@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
-using System;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select
             set
             {
                 deselectedColour = value;
-                if(light.Colour != SelectedColour)
+                if (light.Colour != SelectedColour)
                     light.Colour = value;
             }
         }
@@ -50,9 +50,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private SpriteText spriteText;
-        private Box box;
-        private Box light;
+        private readonly SpriteText spriteText;
+        private readonly Box box;
+        private readonly Box light;
 
         public FooterButton()
         {
@@ -83,6 +83,7 @@ namespace osu.Game.Screens.Select
 
         public Action Hovered;
         public Action HoverLost;
+        public Key? Hotkey;
 
         protected override bool OnHover(InputState state)
         {
@@ -119,5 +120,15 @@ namespace osu.Game.Screens.Select
             return base.OnClick(state);
         }
 
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!args.Repeat && args.Key == Hotkey)
+            {
+                OnClick(state);
+                return true;
+            }
+
+            return base.OnKeyDown(state, args);
+        }
     }
 }

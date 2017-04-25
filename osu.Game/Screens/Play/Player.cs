@@ -2,28 +2,27 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Database;
-using osu.Game.Input.Handlers;
-using osu.Game.Modes;
-using osu.Game.Modes.UI;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Ranking;
 using System;
 using System.Linq;
+using osu.Framework.Threading;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
@@ -33,46 +32,55 @@ namespace osu.Game.Screens.Play
 
         internal override bool ShowOverlays => false;
 
+        internal override bool HasLocalCursorDisplayed => !IsPaused && !HasFailed && HitRenderer.ProvidingUserCursor;
+
         public BeatmapInfo BeatmapInfo;
 
-        public bool IsPaused { get; private set; }
+        public Action RestartRequested;
+
+        public bool IsPaused => !interpolatedSourceClock.IsRunning;
+
+        internal override bool AllowRulesetChange => false;
+
+        public bool HasFailed { get; private set; }
 
         public int RestartCount;
 
-        private double pauseCooldown = 1000;
+        private const double pause_cooldown = 1000;
         private double lastPauseActionTime;
 
-        private bool canPause => Time.Current >= lastPauseActionTime + pauseCooldown;
+        private bool canPause => ValidForResume && !HasFailed && Time.Current >= lastPauseActionTime + pause_cooldown;
 
         private IAdjustableClock sourceClock;
+        private OffsetClock offsetClock;
         private IFrameBasedClock interpolatedSourceClock;
 
-        private Ruleset ruleset;
+        private RulesetInfo ruleset;
 
         private ScoreProcessor scoreProcessor;
-        private HitRenderer hitRenderer;
+        protected HitRenderer HitRenderer;
+
+        #region User Settings
+
         private Bindable<int> dimLevel;
+        private Bindable<bool> mouseWheelDisabled;
+        private Bindable<double> userAudioOffset;
+
+        #endregion
+
         private SkipButton skipButton;
 
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
+        private FailOverlay failOverlay;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
         {
-            var beatmap = Beatmap.Beatmap;
-
-            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
-            {
-                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
-                Exit();
-                return;
-            }
-
-            Beatmap.Mods.Value.ForEach(m => m.PlayerLoading(this));
-
             dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
+
+            Ruleset rulesetInstance;
 
             try
             {
@@ -84,6 +92,22 @@ namespace osu.Game.Screens.Play
 
                 if (Beatmap == null)
                     throw new Exception("Beatmap was not loaded");
+
+                ruleset = osu?.Ruleset.Value ?? Beatmap.BeatmapInfo.Ruleset;
+                rulesetInstance = ruleset.CreateInstance();
+
+                try
+                {
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
+                }
+                catch (BeatmapInvalidForRulesetException)
+                {
+                    // we may fail to create a HitRenderer if the beatmap cannot be loaded with the user's preferred ruleset
+                    // let's try again forcing the beatmap's ruleset.
+                    ruleset = Beatmap.BeatmapInfo.Ruleset;
+                    rulesetInstance = ruleset.CreateInstance();
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
+                }
             }
             catch (Exception e)
             {
@@ -103,44 +127,38 @@ namespace osu.Game.Screens.Play
             }
 
             sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
-            interpolatedSourceClock = new InterpolatingFramedClock(sourceClock);
+            offsetClock = new OffsetClock(sourceClock);
+
+            userAudioOffset = config.GetBindable<double>(OsuConfig.AudioOffset);
+            userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
+            userAudioOffset.TriggerChange();
+
+            interpolatedSourceClock = new InterpolatingFramedClock(offsetClock);
 
             Schedule(() =>
             {
                 sourceClock.Reset();
+                foreach (var mod in Beatmap.Mods.Value.OfType<IApplicableToClock>())
+                    mod.ApplyToClock(sourceClock);
             });
 
-            ruleset = Ruleset.GetRuleset(Beatmap.PlayMode);
+            scoreProcessor = HitRenderer.CreateScoreProcessor();
 
-            hudOverlay = new StandardHudOverlay();
-            hudOverlay.KeyCounter.Add(ruleset.CreateGameplayKeys());
-            hudOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
-
-            pauseOverlay = new PauseOverlay
+            hudOverlay = new StandardHudOverlay()
             {
-                Depth = -1,
-                OnResume = delegate
-                {
-                    Delay(400);
-                    Schedule(Resume);
-                },
-                OnRetry = Restart,
-                OnQuit = Exit
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
             };
 
-            hitRenderer = ruleset.CreateHitRendererWith(beatmap);
+            hudOverlay.KeyCounter.Add(rulesetInstance.CreateGameplayKeys());
+            hudOverlay.BindProcessor(scoreProcessor);
+            hudOverlay.BindHitRenderer(HitRenderer);
 
-            if (ReplayInputHandler != null)
-            {
-                ReplayInputHandler.ToScreenSpace = hitRenderer.MapPlayfieldToScreenSpace;
-                hitRenderer.InputManager.ReplayInputHandler = ReplayInputHandler;
-            }
-
-            hudOverlay.BindHitRenderer(hitRenderer);
+            hudOverlay.Progress.Objects = HitRenderer.Objects;
+            hudOverlay.Progress.AudioClock = interpolatedSourceClock;
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
-            hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
-            hitRenderer.OnAllJudged += onPass;
+            HitRenderer.OnAllJudged += onCompletion;
 
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
@@ -153,7 +171,7 @@ namespace osu.Game.Screens.Play
                     Clock = interpolatedSourceClock,
                     Children = new Drawable[]
                     {
-                        hitRenderer,
+                        HitRenderer,
                         skipButton = new SkipButton
                         {
                             Alpha = 0
@@ -161,7 +179,30 @@ namespace osu.Game.Screens.Play
                     }
                 },
                 hudOverlay,
-                pauseOverlay
+                pauseOverlay = new PauseOverlay
+                {
+                    OnResume = delegate
+                    {
+                        Delay(400);
+                        Schedule(Resume);
+                    },
+                    OnRetry = Restart,
+                    OnQuit = Exit,
+                },
+                failOverlay = new FailOverlay
+                {
+                    OnRetry = Restart,
+                    OnQuit = Exit,
+                },
+                new HotkeyRetryOverlay
+                {
+                    Action = () => {
+                        //we want to hide the hitrenderer immediately (looks better).
+                        //we may be able to remove this once the mouse cursor trail is improved.
+                        HitRenderer?.Hide();
+                        Restart();
+                    },
+                }
             };
         }
 
@@ -194,78 +235,80 @@ namespace osu.Game.Screens.Play
 
         public void Pause(bool force = false)
         {
-            if (canPause || force)
+            if (!canPause && !force) return;
+
+            // the actual pausing is potentially happening on a different thread.
+            // we want to wait for the source clock to stop so we can be sure all components are in a stable state.
+            if (!IsPaused)
             {
+                sourceClock.Stop();
+
+                Schedule(() => Pause(force));
+                return;
+            }
+
+            // we need to do a final check after all of our children have processed up to the paused clock time.
+            // this is to cover cases where, for instance, the player fails in the last processed frame (which would change canPause).
+            // as the scheduler runs before children updates, let's schedule for the next frame.
+            Schedule(() =>
+            {
+                if (!canPause) return;
+
                 lastPauseActionTime = Time.Current;
                 hudOverlay.KeyCounter.IsCounting = false;
+                hudOverlay.Progress.Show();
                 pauseOverlay.Retries = RestartCount;
                 pauseOverlay.Show();
-                sourceClock.Stop();
-                IsPaused = true;
-            }
-            else
-            {
-                IsPaused = false;
-            }
+            });
         }
 
         public void Resume()
         {
             lastPauseActionTime = Time.Current;
             hudOverlay.KeyCounter.IsCounting = true;
+            hudOverlay.Progress.Hide();
             pauseOverlay.Hide();
             sourceClock.Start();
-            IsPaused = false;
-        }
-
-        public void TogglePaused()
-        {
-            IsPaused = !IsPaused;
-            if (IsPaused) Pause(); else Resume();
         }
 
         public void Restart()
         {
-            sourceClock.Stop(); // If the clock is running and Restart is called the game will lag until relaunch
-
-            var newPlayer = new Player();
-
-            newPlayer.LoadAsync(Game, delegate
-            {
-                newPlayer.RestartCount = RestartCount + 1;
-                ValidForResume = false;
-
-                if (!Push(newPlayer))
-                {
-                    // Error(?)
-                }
-            });
+            ValidForResume = false;
+            RestartRequested?.Invoke();
+            Exit();
         }
 
-        private void onPass()
+        private ScheduledDelegate onCompletionEvent;
+
+        private void onCompletion()
         {
+            // Only show the completion screen if the player hasn't failed
+            if (scoreProcessor.HasFailed || onCompletionEvent != null)
+                return;
+
+            ValidForResume = false;
+
             Delay(1000);
-            Schedule(delegate
+            onCompletionEvent = Schedule(delegate
             {
-                ValidForResume = false;
-                Push(new Results
+                var score = new Score
                 {
-                    Score = scoreProcessor.GetScore()
-                });
+                    Beatmap = Beatmap.BeatmapInfo,
+                    Ruleset = ruleset
+                };
+                scoreProcessor.PopulateScore(score);
+                score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
+                Push(new Results(score));
             });
         }
 
         private void onFail()
         {
-            Content.FadeColour(Color4.Red, 500);
             sourceClock.Stop();
 
-            Delay(500);
-            Schedule(delegate
-            {
-                ValidForResume = false;
-                Push(new FailDialog());
-            });
+            HasFailed = true;
+            failOverlay.Retries = RestartCount;
+            failOverlay.Show();
         }
 
         protected override void OnEntering(Screen last)
@@ -276,7 +319,8 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo((100f - dimLevel) / 100, 1500, EasingTypes.OutQuint);
 
             Content.Alpha = 0;
-            dimLevel.ValueChanged += dimChanged;
+
+            dimLevel.ValueChanged += newDim => Background?.FadeTo((100f - newDim) / 100, 800);
 
             Content.ScaleTo(0.7f);
 
@@ -291,48 +335,50 @@ namespace osu.Game.Screens.Play
                 sourceClock.Start();
                 initializeSkipButton();
             });
+
+            //keep in mind this is using the interpolatedSourceClock so won't be run as early as we may expect.
+            HitRenderer.Alpha = 0;
+            HitRenderer.FadeIn(750, EasingTypes.OutQuint);
         }
 
         protected override void OnSuspending(Screen next)
         {
-            Content.FadeOut(350);
-            Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
-
+            fadeOut();
             base.OnSuspending(next);
         }
 
         protected override bool OnExiting(Screen next)
         {
-            if (pauseOverlay == null) return false;
-
-            if (ReplayInputHandler != null) return false;
-
-            if (pauseOverlay.State != Visibility.Visible && !canPause) return true;
-
-            if (!IsPaused && sourceClock.IsRunning) // For if the user presses escape quickly when entering the map
+            if (!HasFailed && ValidForResume)
             {
-                Pause();
-                return true;
-            }
-            else
-            {
-                FadeOut(250);
-                Content.ScaleTo(0.7f, 750, EasingTypes.InQuint);
+                if (pauseOverlay != null && !HitRenderer.HasReplayLoaded)
+                {
+                    //pause screen override logic.
+                    if (pauseOverlay?.State == Visibility.Hidden && !canPause) return true;
 
-                dimLevel.ValueChanged -= dimChanged;
-                Background?.FadeTo(1f, 200);
-                return base.OnExiting(next);
+                    if (!IsPaused) // For if the user presses escape quickly when entering the map
+                    {
+                        Pause();
+                        return true;
+                    }
+                }
             }
+
+            fadeOut();
+            return base.OnExiting(next);
         }
 
-        private void dimChanged(object sender, EventArgs e)
+        private void fadeOut()
         {
-            Background?.FadeTo((100f - dimLevel) / 100, 800);
+            const float fade_out_duration = 250;
+
+            HitRenderer?.FadeOut(fade_out_duration);
+            Content.FadeOut(fade_out_duration);
+
+            hudOverlay.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
+
+            Background?.FadeTo(1f, fade_out_duration);
         }
-
-        private Bindable<bool> mouseWheelDisabled;
-
-        public ReplayInputHandler ReplayInputHandler;
 
         protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
     }

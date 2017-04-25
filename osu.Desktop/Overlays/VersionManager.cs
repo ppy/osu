@@ -189,19 +189,24 @@ namespace osu.Desktop.Overlays
 
         private class UpdateProgressNotification : ProgressNotification
         {
+            private OsuGame game;
+
             protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification()
             {
                 Text = @"Update ready to install. Click to restart!",
                 Activated = () =>
                 {
-                    UpdateManager.RestartApp();
+                    UpdateManager.RestartAppWhenExited();
+                    game.GracefullyExit();
                     return true;
                 }
             };
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, OsuGame game)
             {
+                this.game = game;
+
                 IconContent.Add(new Drawable[]
                 {
                     new Box
@@ -215,6 +220,7 @@ namespace osu.Desktop.Overlays
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_upload,
                         Colour = Color4.White,
+                        TextSize = 20
                     }
                 });
             }

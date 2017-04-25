@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using OpenTK;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Backgrounds
                 {
                     var newBackground = beatmap == null ? new Background(@"Backgrounds/bg1") : new BeatmapBackground(beatmap);
 
-                    newBackground.LoadAsync(Game, delegate
+                    LoadComponentAsync(newBackground, delegate
                     {
                         float newDepth = 0;
                         if (background != null)
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private class BeatmapBackground : Background
         {
-            private WorkingBeatmap beatmap;
+            private readonly WorkingBeatmap beatmap;
 
             public BeatmapBackground(WorkingBeatmap beatmap)
             {

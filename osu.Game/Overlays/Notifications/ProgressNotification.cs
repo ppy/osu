@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
@@ -104,12 +103,12 @@ namespace osu.Game.Overlays.Notifications
 
         public override bool DisplayOnTop => false;
 
-        private ProgressBar progressBar;
+        private readonly ProgressBar progressBar;
         private Color4 colourQueued;
         private Color4 colourActive;
         private Color4 colourCancelled;
 
-        private SpriteText textDrawable;
+        private readonly SpriteText textDrawable;
 
         public ProgressNotification()
         {

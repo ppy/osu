@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Options.Sections.General
     public class LanguageOptions : OptionsSubsection
     {
         protected override string Header => "Language";
-        
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {

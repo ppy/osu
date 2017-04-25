@@ -14,8 +14,8 @@ namespace osu.Game.Overlays.Options
 {
     public class OptionSlider<T> : FillFlowContainer where T : struct
     {
-        private SliderBar<T> slider;
-        private SpriteText text;
+        private readonly SliderBar<T> slider;
+        private readonly SpriteText text;
 
         public string LabelText
         {
@@ -27,14 +27,14 @@ namespace osu.Game.Overlays.Options
             }
         }
 
-        public BindableNumber<T> Bindable
+        private Bindable<T> bindable;
+
+        public Bindable<T> Bindable
         {
-            get { return slider.Bindable; }
             set
             {
-                slider.Bindable = value;
-                if (value?.Disabled ?? true)
-                    Alpha = 0.3f;
+                bindable = value;
+                slider.Current.BindTo(bindable);
             }
         }
 

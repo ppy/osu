@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Options.Sections.Online
     public class PrivacyOptions : OptionsSubsection
     {
         protected override string Header => "Privacy";
-    
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {

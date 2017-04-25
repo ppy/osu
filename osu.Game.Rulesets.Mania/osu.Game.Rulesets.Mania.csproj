@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{48F4582B-7687-4621-9CBE-5C24197CB536}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>osu.Game.Rulesets.Mania</RootNamespace>
+    <AssemblyName>osu.Game.Rulesets.Mania</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.2.0.50727.1341\lib\net45\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Beatmaps\ManiaBeatmapConverter.cs" />
+    <Compile Include="Judgements\ManiaJudgement.cs" />
+    <Compile Include="ManiaDifficultyCalculator.cs" />
+    <Compile Include="Scoring\ManiaScoreProcessor.cs" />
+    <Compile Include="Objects\Drawable\DrawableNote.cs" />
+    <Compile Include="Objects\HoldNote.cs" />
+    <Compile Include="Objects\ManiaBaseHit.cs" />
+    <Compile Include="Objects\Note.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\ManiaHitRenderer.cs" />
+    <Compile Include="UI\ManiaPlayfield.cs" />
+    <Compile Include="ManiaRuleset.cs" />
+    <Compile Include="Mods\ManiaMod.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
+      <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
+      <Name>osu.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
+      <Project>{C92A607B-1FDD-4954-9F92-03FF547D9080}</Project>
+      <Name>osu.Game.Rulesets.Osu</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
+      <Project>{F167E17A-7DE6-4AF5-B920-A5112296C695}</Project>
+      <Name>osu.Game.Rulesets.Taiko</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
+      <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>
+      <Name>osu.Game</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\osu.licenseheader">
+      <Link>osu.licenseheader</Link>
+    </None>
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
