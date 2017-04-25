@@ -86,18 +86,28 @@ namespace osu.Game.Screens.Play
             State = Visibility.Visible;
         }
 
-        private bool barVisible;
+        private bool allowSeeking;
 
-        public void ToggleBar()
+        public bool AllowSeeking
         {
-            barVisible = !barVisible;
-            updateBarVisibility();
+            get
+            {
+                return allowSeeking;
+            }
+
+            set
+            {
+                if (allowSeeking == value) return;
+
+                allowSeeking = value;
+                updateBarVisibility();
+            }
         }
 
         private void updateBarVisibility()
         {
-            bar.FadeTo(barVisible ? 1 : 0, transition_duration, EasingTypes.In);
-            MoveTo(new Vector2(0, barVisible ? 0 : bottom_bar_height), transition_duration, EasingTypes.In);
+            bar.FadeTo(allowSeeking ? 1 : 0, transition_duration, EasingTypes.In);
+            MoveTo(new Vector2(0, allowSeeking ? 0 : bottom_bar_height), transition_duration, EasingTypes.In);
         }
 
         protected override void PopIn()
