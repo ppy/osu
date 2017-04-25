@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Play
 
         #region User Settings
 
-        private Bindable<int> dimLevel;
+        private Bindable<double> dimLevel;
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
 
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
         {
-            dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
+            dimLevel = config.GetBindable<double>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
             Ruleset rulesetInstance;
@@ -316,11 +316,11 @@ namespace osu.Game.Screens.Play
             base.OnEntering(last);
 
             (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, EasingTypes.OutQuint);
-            Background?.FadeTo((100f - dimLevel) / 100, 1500, EasingTypes.OutQuint);
+            Background?.FadeTo(1 - (float)dimLevel, 1500, EasingTypes.OutQuint);
 
             Content.Alpha = 0;
 
-            dimLevel.ValueChanged += newDim => Background?.FadeTo((100f - newDim) / 100, 800);
+            dimLevel.ValueChanged += newDim => Background?.FadeTo(1 - (float)newDim, 800);
 
             Content.ScaleTo(0.7f);
 
