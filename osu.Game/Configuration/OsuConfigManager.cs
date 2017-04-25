@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Configuration
 {
@@ -34,8 +35,7 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuParallax, true);
 
-            Set(OsuConfig.MenuVoice, true);
-            Set(OsuConfig.MenuMusic, true);
+            Set(OsuConfig.BeatmapDetailTab, BeatmapDetailTab.Details);
 
             Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
@@ -148,6 +148,8 @@ namespace osu.Game.Configuration
             Set(OsuConfig.YahooIntegration, false).Disabled = true;
             Set(OsuConfig.ForceFrameFlush, false).Disabled = true;
             Set(OsuConfig.DetectPerformanceIssues, true).Disabled = true;
+            Set(OsuConfig.MenuMusic, true).Disabled = true;
+            Set(OsuConfig.MenuVoice, true).Disabled = true;
             Set(OsuConfig.RawInput, false).Disabled = true;
             Set(OsuConfig.AbsoluteToOsuWindow, Get<bool>(OsuConfig.RawInput)).Disabled = true;
             Set(OsuConfig.ShowMenuTips, true).Disabled = true;
@@ -317,6 +319,7 @@ namespace osu.Game.Configuration
         MenuMusic,
         MenuVoice,
         MenuParallax,
+        BeatmapDetailTab,
         RawInput,
         AbsoluteToOsuWindow,
         ConfineMouse,
