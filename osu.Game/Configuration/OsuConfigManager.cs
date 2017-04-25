@@ -35,12 +35,15 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuParallax, true);
 
+            Set(OsuConfig.MenuVoice, true);
+            Set(OsuConfig.MenuMusic, true);
+
             Set(OsuConfig.BeatmapDetailTab, BeatmapDetailTab.Details);
 
             Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
-            //todo: implement all settings below this line (remove the Disabled set when doing so).
 
+            //todo: implement all settings below this line (remove the Disabled set when doing so).
             Set(OsuConfig.AudioOffset, 0, -500.0, 500.0);
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
@@ -148,8 +151,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.YahooIntegration, false).Disabled = true;
             Set(OsuConfig.ForceFrameFlush, false).Disabled = true;
             Set(OsuConfig.DetectPerformanceIssues, true).Disabled = true;
-            Set(OsuConfig.MenuMusic, true).Disabled = true;
-            Set(OsuConfig.MenuVoice, true).Disabled = true;
             Set(OsuConfig.RawInput, false).Disabled = true;
             Set(OsuConfig.AbsoluteToOsuWindow, Get<bool>(OsuConfig.RawInput)).Disabled = true;
             Set(OsuConfig.ShowMenuTips, true).Disabled = true;
@@ -178,7 +179,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.CanForceOptimusCompatibility, true).Disabled = true;
             Set(OsuConfig.ConfineMouse, Get<bool>(OsuConfig.ConfineMouseToFullscreen) ?
                 ConfineMouseMode.Fullscreen : ConfineMouseMode.Never).Disabled = true;
-
 
             GetOriginalBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
             {
@@ -344,6 +344,5 @@ namespace osu.Game.Configuration
         Ticker,
         CompatibilityContext,
         CanForceOptimusCompatibility,
-
     }
 }
