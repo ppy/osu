@@ -16,7 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Input;
-using osu.Game.Modes;
+using osu.Game.Database;
 
 namespace osu.Game.Screens.Select
 {
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select
             Group = group,
             Sort = sort,
             SearchText = searchTextBox.Text,
-            Mode = playMode
+            Ruleset = ruleset
         };
 
         public Action Exit;
@@ -163,16 +163,17 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private readonly Bindable<PlayMode> playMode = new Bindable<PlayMode>();
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         [BackgroundDependencyLoader(permitNulls:true)]
         private void load(OsuColour colours, OsuGame osu)
         {
             sortTabs.AccentColour = colours.GreenLight;
 
-            if (osu != null) playMode.BindTo(osu.PlayMode);
-            playMode.ValueChanged += val => FilterChanged?.Invoke(CreateCriteria());
-            playMode.TriggerChange();
+            if (osu != null)
+                ruleset.BindTo(osu.Ruleset);
+            ruleset.ValueChanged += val => FilterChanged?.Invoke(CreateCriteria());
+            ruleset.TriggerChange();
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;

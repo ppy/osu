@@ -35,8 +35,6 @@ namespace osu.Game.Overlays.Options
             {
                 bindable = value;
                 slider.Current.BindTo(bindable);
-                if (value?.Disabled ?? true)
-                    Alpha = 0.3f;
             }
         }
 

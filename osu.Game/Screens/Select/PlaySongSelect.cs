@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Select
 {
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.Select
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding { Top = 10, Right = 5 },
             });
+
+            beatmapDetails.Leaderboard.ScoreSelected += s => Push(new Results(s));
         }
 
         [BackgroundDependencyLoader]

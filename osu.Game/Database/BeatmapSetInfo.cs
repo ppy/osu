@@ -26,6 +26,7 @@ namespace osu.Game.Database
 
         public double MaxStarDifficulty => Beatmaps.Max(b => b.StarDifficulty);
 
+        [Indexed]
         public bool DeletePending { get; set; }
 
         public string Hash { get; set; }

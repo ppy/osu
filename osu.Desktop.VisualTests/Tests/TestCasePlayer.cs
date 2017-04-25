@@ -9,12 +9,12 @@ using osu.Game.Beatmaps;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu.Objects;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Play;
 using OpenTK.Graphics;
 using osu.Desktop.VisualTests.Beatmaps;
+using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -22,12 +22,14 @@ namespace osu.Desktop.VisualTests.Tests
     {
         protected Player Player;
         private BeatmapDatabase db;
+        private RulesetDatabase rulesets;
 
         public override string Description => @"Showing everything to play the game.";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDatabase db)
+        private void load(BeatmapDatabase db, RulesetDatabase rulesets)
         {
+            this.rulesets = rulesets;
             this.db = db;
         }
 
@@ -37,7 +39,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             WorkingBeatmap beatmap = null;
 
-            var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.Mode == PlayMode.Osu);
+            var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.RulesetID == 0);
             if (beatmapInfo != null)
                 beatmap = db.GetWorkingBeatmap(beatmapInfo);
 
@@ -51,8 +53,8 @@ namespace osu.Desktop.VisualTests.Tests
                     objects.Add(new HitCircle
                     {
                         StartTime = time,
-                        Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : 512,
-                        i % 4 < 2 ? 0 : 384),
+                        Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : OsuPlayfield.BASE_SIZE.X,
+                        i % 4 < 2 ? 0 : OsuPlayfield.BASE_SIZE.Y),
                         NewCombo = i % 4 == 0
                     });
 
@@ -65,6 +67,7 @@ namespace osu.Desktop.VisualTests.Tests
                     BeatmapInfo = new BeatmapInfo
                     {
                         Difficulty = new BeatmapDifficulty(),
+                        Ruleset = rulesets.Query<RulesetInfo>().First(),
                         Metadata = new BeatmapMetadata
                         {
                             Artist = @"Unknown",

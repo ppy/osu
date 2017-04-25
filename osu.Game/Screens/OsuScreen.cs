@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens
@@ -14,7 +15,7 @@ namespace osu.Game.Screens
         internal BackgroundScreen Background { get; private set; }
 
         /// <summary>
-        /// Override to create a BackgroundMode for the current GameMode.
+        /// Override to create a BackgroundMode for the current screen.
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
@@ -25,7 +26,11 @@ namespace osu.Game.Screens
 
         internal virtual bool HasLocalCursorDisplayed => false;
 
+        internal virtual bool AllowRulesetChange => true;
+
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public WorkingBeatmap Beatmap
         {
@@ -40,7 +45,7 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGameBase game)
+        private void load(OsuGameBase game, OsuGame osuGame)
         {
             if (game != null)
             {
@@ -52,11 +57,23 @@ namespace osu.Game.Screens
             }
 
             beatmap.ValueChanged += OnBeatmapChanged;
+
+            if (osuGame != null)
+                ruleset.BindTo(osuGame.Ruleset);
         }
 
+        /// <summary>
+        /// The global Beatmap was changed.
+        /// </summary>
         protected virtual void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
+        }
 
+        protected override void Update()
+        {
+            if (!IsCurrentScreen) return;
+
+            ruleset.Disabled = !AllowRulesetChange;
         }
 
         protected override void OnEntering(Screen last)
@@ -99,7 +116,7 @@ namespace osu.Game.Screens
             if (Background != null && !Background.Equals(nextOsu?.Background))
             {
                 if (nextOsu != null)
-                    //We need to use MakeCurrent in case we are jumping up multiple game modes.
+                    //We need to use MakeCurrent in case we are jumping up multiple game screens.
                     nextOsu.Background?.MakeCurrent();
                 else
                     Background.Exit();
