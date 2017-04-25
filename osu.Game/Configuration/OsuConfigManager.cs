@@ -163,16 +163,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.UpdateFailCount, 0).Disabled = true;
             //Set(OsuConfig.TreeSortMode, TreeGroupMode.Show_All).Disabled = true;
             //Set(OsuConfig.TreeSortMode2, TreeSortMode.Title).Disabled = true;
-            bool unicodeDefault = false;
-            switch (Get<string>(OsuConfig.Language))
-            {
-                case @"zh":
-                case @"ja":
-                case @"ko":
-                    unicodeDefault = true;
-                    break;
-            }
-            Set(OsuConfig.ShowUnicode, unicodeDefault);
             Set(OsuConfig.PermanentSongInfo, false).Disabled = true;
             Set(OsuConfig.Ticker, false).Disabled = true;
             Set(OsuConfig.CompatibilityContext, false).Disabled = true;
@@ -339,7 +329,6 @@ namespace osu.Game.Configuration
         SaveUsername,
         TreeSortMode,
         TreeSortMode2,
-        ShowUnicode,
         PermanentSongInfo,
         Ticker,
         CompatibilityContext,

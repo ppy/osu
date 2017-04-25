@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -13,7 +14,7 @@ namespace osu.Game.Overlays.Options.Sections.General
         protected override string Header => "Language";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager osuConfig, FrameworkConfigManager frameworkConfig)
         {
             Children = new Drawable[]
             {
@@ -21,12 +22,12 @@ namespace osu.Game.Overlays.Options.Sections.General
                 new OsuCheckbox
                 {
                     LabelText = "Prefer metadata in original language",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ShowUnicode)
+                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkConfig.ShowUnicode)
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Use alternative font for chat display",
-                    Bindable = config.GetBindable<bool>(OsuConfig.AlternativeChatFont)
+                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.AlternativeChatFont)
                 },
             };
         }
