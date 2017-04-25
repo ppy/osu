@@ -7,9 +7,8 @@ using System.IO;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Modes;
-using osu.Game.Modes.Objects;
 using osu.Game.Beatmaps.Legacy;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -29,6 +28,8 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<OsuLegacyDecoder>(@"osu file format v5");
             // TODO: Not sure how far back to go, or differences between versions
         }
+
+        private HitObjectParser parser;
 
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
@@ -84,7 +85,23 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.StackLeniency = float.Parse(val, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"Mode":
-                    beatmap.BeatmapInfo.Mode = (PlayMode)int.Parse(val);
+                    beatmap.BeatmapInfo.RulesetID = int.Parse(val);
+
+                    switch (beatmap.BeatmapInfo.RulesetID)
+                    {
+                        case 0:
+                            parser = new Rulesets.Objects.Legacy.Osu.HitObjectParser();
+                            break;
+                        case 1:
+                            parser = new Rulesets.Objects.Legacy.Taiko.HitObjectParser();
+                            break;
+                        case 2:
+                            parser = new Rulesets.Objects.Legacy.Catch.HitObjectParser();
+                            break;
+                        case 3:
+                            parser = new Rulesets.Objects.Legacy.Mania.HitObjectParser();
+                            break;
+                    }
                     break;
                 case @"LetterboxInBreaks":
                     beatmap.BeatmapInfo.LetterboxInBreaks = int.Parse(val) == 1;
@@ -303,8 +320,6 @@ namespace osu.Game.Beatmaps.Formats
         protected override void ParseFile(StreamReader stream, Beatmap beatmap)
         {
             beatmap.BeatmapInfo.BeatmapVersion = beatmapVersion;
-
-            HitObjectParser parser = new LegacyHitObjectParser();
 
             Section section = Section.None;
             bool hasCustomColours = false;

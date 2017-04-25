@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Primitives;
 using System;
 using osu.Framework.Allocation;
 using osu.Game.Database;
-using osu.Game.Modes.Scoring;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 
@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Select.Leaderboards
     {
         private readonly ScrollContainer scrollContainer;
         private readonly FillFlowContainer<LeaderboardScore> scrollFlow;
+
+        public Action<Score> ScoreSelected;
 
         private IEnumerable<Score> scores;
         public IEnumerable<Score> Scores
@@ -52,6 +54,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     var ls = new LeaderboardScore(s, 1 + i)
                     {
                         AlwaysPresent = true,
+                        Action = () => ScoreSelected?.Invoke(s),
                         State = Visibility.Hidden,
                     };
                     scrollFlow.Add(ls);
