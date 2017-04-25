@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps.Samples;
-using osu.Game.Modes;
+using Newtonsoft.Json;
+using osu.Game.IO.Serialization;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 using System;
@@ -10,10 +10,13 @@ using System.Linq;
 
 namespace osu.Game.Database
 {
-    public class BeatmapInfo : IEquatable<BeatmapInfo>
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable
     {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
+
+        //TODO: should be in database
+        public int BeatmapVersion;
 
         public int? OnlineBeatmapID { get; set; }
 
@@ -31,40 +34,45 @@ namespace osu.Game.Database
         [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BeatmapMetadata Metadata { get; set; }
 
-        [ForeignKey(typeof(BaseDifficulty)), NotNull]
+        [ForeignKey(typeof(BeatmapDifficulty)), NotNull]
         public int BaseDifficultyID { get; set; }
 
         [OneToOne(CascadeOperations = CascadeOperation.All)]
-        public BaseDifficulty BaseDifficulty { get; set; }
+        public BeatmapDifficulty Difficulty { get; set; }
+
+        [Ignore]
+        public BeatmapMetrics Metrics { get; set; }
 
         public string Path { get; set; }
 
+        [JsonProperty("file_md5")]
         public string Hash { get; set; }
 
         // General
         public int AudioLeadIn { get; set; }
         public bool Countdown { get; set; }
-        public SampleSet SampleSet { get; set; }
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
-        public PlayMode Mode { get; set; }
+
+        [ForeignKey(typeof(RulesetInfo))]
+        public int RulesetID { get; set; }
+
+        [OneToOne(CascadeOperations = CascadeOperation.All)]
+        public RulesetInfo Ruleset { get; set; }
+
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
         public string StoredBookmarks { get; internal set; }
+
         [Ignore]
+        [JsonIgnore]
         public int[] Bookmarks
         {
-            get
-            {
-                return StoredBookmarks.Split(',').Select(int.Parse).ToArray();
-            }
-            set
-            {
-                StoredBookmarks = string.Join(",", value);
-            }
+            get { return StoredBookmarks.Split(',').Select(int.Parse).ToArray(); }
+            set { StoredBookmarks = string.Join(",", value); }
         }
 
         public double DistanceSpacing { get; set; }
@@ -75,16 +83,7 @@ namespace osu.Game.Database
         // Metadata
         public string Version { get; set; }
 
-        private float starDifficulty = -1;
-        public float StarDifficulty
-        {
-            get
-            {
-                return starDifficulty < 0 ? (BaseDifficulty?.OverallDifficulty ?? 5) : starDifficulty;
-            }
-
-            set { starDifficulty = value; }
-        }
+        public double StarDifficulty { get; set; }
 
         public bool Equals(BeatmapInfo other)
         {
@@ -92,7 +91,7 @@ namespace osu.Game.Database
         }
 
         public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-            BeatmapSet.Path == other.BeatmapSet.Path &&
-            (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
+                                                      BeatmapSet.Path == other.BeatmapSet.Path &&
+                                                      (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
     }
 }

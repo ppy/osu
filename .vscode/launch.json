@@ -3,6 +3,9 @@
     "configurations": [
         {
             "name": "Launch VisualTests",
+            "windows": {
+                "type": "clr"
+            },
             "type": "mono",
             "request": "launch",
             "program": "${workspaceRoot}/osu.Desktop.VisualTests/bin/Debug/osu!.exe",
@@ -11,10 +14,13 @@
             "preLaunchTask": "build",
             "runtimeExecutable": null,
             "env": {},
-            "externalConsole": false
+            "console": "internalConsole"
         },
         {
             "name": "Launch Desktop",
+            "windows": {
+                "type": "clr"
+            },
             "type": "mono",
             "request": "launch",
             "program": "${workspaceRoot}/osu.Desktop/bin/Debug/osu!.exe",
@@ -23,10 +29,15 @@
             "preLaunchTask": "build",
             "runtimeExecutable": null,
             "env": {},
-            "externalConsole": false
+            "console": "internalConsole"
         },
         {
             "name": "Attach",
+            "windows": {
+                "type": "clr",
+                "request": "attach",
+                "processName": "osu!"
+            },
             "type": "mono",
             "request": "attach",
             "address": "localhost",

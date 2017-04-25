@@ -16,11 +16,11 @@ namespace osu.Game.Overlays.Options
 {
     public class SidebarButton : Container
     {
-        private TextAwesome drawableIcon;
-        private SpriteText headerText;
-        private Box backgroundBox;
-        private Box selectionIndicator;
-        private Container text;
+        private readonly TextAwesome drawableIcon;
+        private readonly SpriteText headerText;
+        private readonly Box backgroundBox;
+        private readonly Box selectionIndicator;
+        private readonly Container text;
         public Action Action;
 
         private OptionsSection section;
@@ -87,6 +87,7 @@ namespace osu.Game.Overlays.Options
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            TextSize = 20
                         },
                     }
                 },

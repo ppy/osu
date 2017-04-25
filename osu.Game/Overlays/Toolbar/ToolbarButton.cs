@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -63,9 +62,9 @@ namespace osu.Game.Overlays.Toolbar
         protected TextAwesome DrawableIcon;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
-        private FillFlowContainer tooltipContainer;
-        private SpriteText tooltip1;
-        private SpriteText tooltip2;
+        private readonly FillFlowContainer tooltipContainer;
+        private readonly SpriteText tooltip1;
+        private readonly SpriteText tooltip2;
         protected FillFlowContainer Flow;
         private SampleChannel sampleClick;
 
@@ -98,6 +97,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            TextSize = 20
                         },
                         DrawableText = new OsuSpriteText
                         {

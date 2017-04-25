@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -12,19 +10,20 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
-using osu.Game.Modes.UI;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
+using System;
+using System.Linq;
 
 namespace osu.Game.Overlays.Mods
 {
     public class ModButton : FillFlowContainer
     {
         private ModIcon foregroundIcon { get; set; }
-        private SpriteText text;
-        private Container<ModIcon> iconsContainer;
+        private readonly SpriteText text;
+        private readonly Container<ModIcon> iconsContainer;
         private SampleChannel sampleOn, sampleOff;
 
         public Action<Mod> Action; // Passed the selected mod or null if none

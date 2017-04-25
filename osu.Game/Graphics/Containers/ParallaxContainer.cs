@@ -6,22 +6,21 @@ using osu.Framework.Graphics;
 using osu.Framework.Input;
 using OpenTK;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Configuration;
 using osu.Framework.Configuration;
 
 namespace osu.Game.Graphics.Containers
 {
-    internal class ParallaxContainer : Container
+    internal class ParallaxContainer : Container, IRequireHighFrequencyMousePosition
     {
         public float ParallaxAmount = 0.02f;
 
         private Bindable<bool> parallaxEnabled;
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         public ParallaxContainer()
         {
+            AlwaysReceiveInput = true;
+
             RelativeSizeAxes = Axes.Both;
             AddInternal(content = new Container
             {
@@ -31,7 +30,7 @@ namespace osu.Game.Graphics.Containers
             });
         }
 
-        private Container content;
+        private readonly Container content;
         private InputManager input;
 
         protected override Container<Drawable> Content => content;
@@ -57,8 +56,8 @@ namespace osu.Game.Graphics.Containers
         {
             base.Update();
 
-            if (parallaxEnabled) 
-            { 
+            if (parallaxEnabled)
+            {
                 Vector2 offset = input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2;
                 content.MoveTo(offset * ParallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
                 content.Scale = new Vector2(1 + ParallaxAmount);

@@ -12,12 +12,13 @@ using osu.Framework.Configuration;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Online.API.Requests;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API
 {
     public class APIAccess : IUpdateable
     {
-        private OAuth authentication;
+        private readonly OAuth authentication;
 
         public string Endpoint = @"https://new.ppy.sh";
         private const string client_id = @"5";
@@ -44,9 +45,9 @@ namespace osu.Game.Online.API
         protected bool HasLogin => Token != null || !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
 
         // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable (should dispose of this or at very least keep a reference).
-        private Thread thread;
+        private readonly Thread thread;
 
-        private Logger log;
+        private readonly Logger log;
 
         public APIAccess()
         {
@@ -57,7 +58,7 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        private List<IOnlineComponent> components = new List<IOnlineComponent>();
+        private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
         public void Register(IOnlineComponent component)
         {
@@ -118,7 +119,7 @@ namespace osu.Game.Online.API
                             //todo: this fails even on network-related issues. we should probably handle those differently.
                             //NotificationManager.ShowMessage("Login failed!");
                             log.Add(@"Login failed!");
-                            clearCredentials();
+                            Password = null;
                             continue;
                         }
 

@@ -2,14 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Screens;
-using osu.Framework.Screens.Testing;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multiplayer;
 using OpenTK;
 using osu.Game.Screens.Select;
@@ -21,11 +20,12 @@ namespace osu.Game.Screens.Menu
 {
     public class MainMenu : OsuScreen
     {
-        private ButtonSystem buttons;
+        private readonly ButtonSystem buttons;
 
         internal override bool ShowOverlays => buttons.State != MenuState.Initial;
 
-        private BackgroundScreen background;
+        private readonly BackgroundScreen background;
+        private Screen songSelect;
 
         protected override BackgroundScreen CreateBackground() => background;
 
@@ -44,10 +44,9 @@ namespace osu.Game.Screens.Menu
                         {
                             OnChart = delegate { Push(new ChartListing()); },
                             OnDirect = delegate { Push(new OnlineListing()); },
-                            OnEdit = delegate { Push(new EditSongSelect()); },
-                            OnSolo = delegate { Push(new PlaySongSelect()); },
+                            OnEdit = delegate { Push(new Editor()); },
+                            OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
-                            OnTest  = delegate { Push(new TestBrowser()); },
                             OnExit = delegate { Exit(); },
                         }
                     }
@@ -58,9 +57,24 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuGame game)
         {
-            background.LoadAsync(game);
+            LoadComponentAsync(background);
 
             buttons.OnSettings = game.ToggleOptions;
+
+            preloadSongSelect();
+        }
+
+        private void preloadSongSelect()
+        {
+            if (songSelect == null)
+                LoadComponentAsync(songSelect = new PlaySongSelect());
+        }
+
+        private Screen consumeSongSelect()
+        {
+            var s = songSelect;
+            songSelect = null;
+            return s;
         }
 
         protected override void OnEntering(Screen last)
@@ -84,6 +98,9 @@ namespace osu.Game.Screens.Menu
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
+
+            //we may have consumed our preloaded instance, so let's make another.
+            preloadSongSelect();
 
             const float length = 300;
 

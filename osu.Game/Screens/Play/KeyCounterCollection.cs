@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 
@@ -14,6 +13,8 @@ namespace osu.Game.Screens.Play
     {
         public KeyCounterCollection()
         {
+            AlwaysReceiveInput = true;
+
             Direction = FillDirection.Horizontal;
             AutoSizeAxes = Axes.Both;
         }
@@ -32,8 +33,6 @@ namespace osu.Game.Screens.Play
             foreach (var counter in Children)
                 counter.ResetCount();
         }
-
-        public override bool Contains(Vector2 screenSpacePos) => true;
 
         //further: change default values here and in KeyCounter if needed, instead of passing them in every constructor
         private bool isCounting;
@@ -107,15 +106,14 @@ namespace osu.Game.Screens.Play
 
         public class Receptor : Drawable
         {
-            private KeyCounterCollection target;
+            private readonly KeyCounterCollection target;
 
             public Receptor(KeyCounterCollection target)
             {
+                AlwaysReceiveInput = true;
                 RelativeSizeAxes = Axes.Both;
                 this.target = target;
             }
-
-            public override bool Contains(Vector2 screenSpacePos) => true;
 
             public override bool HandleInput => true;
 

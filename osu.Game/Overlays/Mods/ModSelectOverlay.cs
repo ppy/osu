@@ -1,23 +1,23 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Modes;
+using osu.Game.Rulesets.Mods;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using osu.Game.Database;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -29,33 +29,38 @@ namespace osu.Game.Overlays.Mods
 
         private Color4 lowMultiplierColour, highMultiplierColour;
 
-        private OsuSpriteText rankedLabel, multiplierLabel;
-        private FillFlowContainer rankedMultiplerContainer;
+        private readonly OsuSpriteText rankedLabel;
+        private readonly OsuSpriteText multiplierLabel;
+        private readonly FillFlowContainer rankedMultiplerContainer;
 
-        private FillFlowContainer<ModSection> modSectionsContainer;
+        private readonly FillFlowContainer<ModSection> modSectionsContainer;
 
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
-        public readonly Bindable<PlayMode> PlayMode = new Bindable<PlayMode>();
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
-        private void modeChanged(object sender, EventArgs eventArgs)
+        private void rulesetChanged(RulesetInfo newRuleset)
         {
-            var ruleset = Ruleset.GetRuleset(PlayMode);
+            var instance = newRuleset.CreateInstance();
+
             foreach (ModSection section in modSectionsContainer.Children)
-                section.Buttons = ruleset.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
+                section.Buttons = instance.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
             refreshSelectedMods();
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu)
+        private void load(OsuColour colours, OsuGame osu, RulesetDatabase rulesets)
         {
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
 
             if (osu != null)
-                PlayMode.BindTo(osu.PlayMode);
-            PlayMode.ValueChanged += modeChanged;
-            modeChanged(null, null);
+                Ruleset.BindTo(osu.Ruleset);
+            else
+                Ruleset.Value = rulesets.AllRulesets.First();
+
+            Ruleset.ValueChanged += rulesetChanged;
+            Ruleset.TriggerChange();
         }
 
         protected override void PopOut()

@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -18,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public class PasswordMaskChar : Container
         {
-            private CircularContainer circle;
+            private readonly CircularContainer circle;
 
             public PasswordMaskChar(float size)
             {
@@ -28,6 +27,8 @@ namespace osu.Game.Graphics.UserInterface
                     circle = new CircularContainer
                     {
                         Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Masking = true,
                         Alpha = 0,
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.8f, 0),

@@ -2,25 +2,46 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<U> : SliderBar<U> where U : struct
+    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip where T : struct
     {
         private SampleChannel sample;
         private double lastSampleTime;
+        private T lastSampleValue;
 
-        private Nub nub;
-        private Box leftBox, rightBox;
+        private readonly Nub nub;
+        private readonly Box leftBox;
+        private readonly Box rightBox;
+
+        public string TooltipText
+        {
+            get
+            {
+                var bindableDouble = CurrentNumber as BindableNumber<double>;
+                if (bindableDouble != null)
+                {
+                    if (bindableDouble.MaxValue == 1 && bindableDouble.MinValue == 0)
+                        return bindableDouble.Value.ToString(@"P0");
+                    return bindableDouble.Value.ToString(@"n1");
+                }
+
+                var bindableInt = CurrentNumber as BindableNumber<int>;
+                if (bindableInt != null)
+                    return bindableInt.Value.ToString(@"n0");
+
+                return Current.Value.ToString();
+            }
+        }
 
         public OsuSliderBar()
         {
@@ -50,9 +71,13 @@ namespace osu.Game.Graphics.UserInterface
                 nub = new Nub
                 {
                     Origin = Anchor.TopCentre,
-                    State = CheckBoxState.Unchecked,
                     Expanded = true,
                 }
+            };
+
+            Current.DisabledChanged += disabled =>
+            {
+                Alpha = disabled ? 0.3f : 1;
             };
         }
 
@@ -62,15 +87,6 @@ namespace osu.Game.Graphics.UserInterface
             sample = audio.Sample.Get(@"Sliderbar/sliderbar");
             leftBox.Colour = colours.Pink;
             rightBox.Colour = colours.Pink;
-        }
-
-        private void playSample()
-        {
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
-                return;
-            lastSampleTime = Clock.CurrentTime;
-            sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
-            sample.Play();
         }
 
         protected override bool OnHover(InputState state)
@@ -85,35 +101,43 @@ namespace osu.Game.Graphics.UserInterface
             base.OnHoverLost(state);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override void OnUserChange()
         {
-            if (args.Key == Key.Left || args.Key == Key.Right)
-                playSample();
-            return base.OnKeyDown(state, args);
+            base.OnUserChange();
+            playSample();
+        }
+
+        private void playSample()
+        {
+            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
+                return;
+
+            if (Current.Value.Equals(lastSampleValue))
+                return;
+
+            lastSampleValue = Current.Value;
+
+            lastSampleTime = Clock.CurrentTime;
+            sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
+
+            if (NormalizedValue == 0)
+                sample.Frequency.Value -= 0.4f;
+            else if (NormalizedValue == 1)
+                sample.Frequency.Value += 0.4f;
+
+            sample.Play();
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            nub.State = CheckBoxState.Checked;
+            nub.Current.Value = true;
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            nub.State = CheckBoxState.Unchecked;
+            nub.Current.Value = false;
             return base.OnMouseUp(state, args);
-        }
-
-        protected override bool OnClick(InputState state)
-        {
-            playSample();
-            return base.OnClick(state);
-        }
-
-        protected override bool OnDrag(InputState state)
-        {
-            playSample();
-            return base.OnDrag(state);
         }
 
         protected override void UpdateAfterChildren()
