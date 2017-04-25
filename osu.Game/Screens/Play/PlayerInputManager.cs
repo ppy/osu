@@ -36,6 +36,38 @@ namespace osu.Game.Screens.Play
             Clock = new FramedClock(clock);
         }
 
+        /// <summary>
+        /// Whether we running up-to-date with our parent clock.
+        /// If not, we will need to keep processing children until we catch up.
+        /// </summary>
+        private bool requireMoreUpdateLoops;
+
+        /// <summary>
+        /// Whether we in a valid state (ie. should we keep processing children frames).
+        /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
+        /// </summary>
+        private bool validState;
+
+        protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
+
+        private bool isAttached => replayInputHandler != null && !UseParentState;
+
+        private const int max_catch_up_updates_per_frame = 50;
+
+        public override bool UpdateSubTree()
+        {
+            requireMoreUpdateLoops = true;
+            validState = true;
+
+            int loops = 0;
+
+            while (validState && requireMoreUpdateLoops && loops++ < 50)
+                if (!base.UpdateSubTree())
+                    return false;
+
+            return true;
+        }
+
         protected override void Update()
         {
             if (parentClock == null) return;
@@ -43,28 +75,26 @@ namespace osu.Game.Screens.Play
             clock.Rate = parentClock.Rate;
             clock.IsRunning = parentClock.IsRunning;
 
-            //if a replayHandler is not attached, we should just pass-through.
-            if (UseParentState || replayInputHandler == null)
+            if (!isAttached)
             {
                 clock.CurrentTime = parentClock.CurrentTime;
-                base.Update();
-                return;
             }
-
-            while (true)
+            else
             {
                 double? newTime = replayInputHandler.SetFrameFromTime(parentClock.CurrentTime);
 
                 if (newTime == null)
-                    //we shouldn't execute for this time value
-                    break;
-
-                if (clock.CurrentTime == parentClock.CurrentTime)
-                    break;
+                {
+                    // we shouldn't execute for this time value. probably waiting on more replay data.
+                    validState = false;
+                    return;
+                }
 
                 clock.CurrentTime = newTime.Value;
-                base.Update();
             }
+
+            requireMoreUpdateLoops = clock.CurrentTime != parentClock.CurrentTime;
+            base.Update();
         }
     }
 }
