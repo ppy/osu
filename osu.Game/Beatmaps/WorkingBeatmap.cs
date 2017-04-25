@@ -18,7 +18,7 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
-        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
+        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
         public readonly bool WithStoryboard;
 
