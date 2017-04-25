@@ -6,12 +6,14 @@ using osu.Game.Rulesets.Objects.Types;
 namespace osu.Game.Rulesets.Objects.Legacy.Mania
 {
     /// <summary>
-    /// Legacy osu!mania Slider-type, used for parsing Beatmaps.
+    /// Legacy osu!mania Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Slider : CurvedHitObject, IHasXPosition, IHasCombo
+    internal sealed class ConvertSpinner : HitObject, IHasEndTime, IHasXPosition
     {
-        public float X { get; set; }
+        public double EndTime { get; set; }
 
-        public bool NewCombo { get; set; }
+        public double Duration => EndTime - StartTime;
+
+        public float X { get; set; }
     }
 }

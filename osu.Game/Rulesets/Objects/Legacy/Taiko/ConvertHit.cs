@@ -3,15 +3,13 @@
 
 using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Catch
+namespace osu.Game.Rulesets.Objects.Legacy.Taiko
 {
     /// <summary>
-    /// Legacy osu!catch Hit-type, used for parsing Beatmaps.
+    /// Legacy osu!taiko Hit-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Hit : HitObject, IHasCombo, IHasXPosition
+    internal sealed class ConvertHit : HitObject, IHasCombo
     {
-        public float X { get; set; }
-
         public bool NewCombo { get; set; }
     }
 }
