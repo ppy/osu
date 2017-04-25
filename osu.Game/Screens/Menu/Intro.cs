@@ -72,19 +72,18 @@ namespace osu.Game.Screens.Menu
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
-
         }
 
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
-            if(menuVoice)
+            if (menuVoice)
                 welcome.Play();
 
             Scheduler.AddDelayed(delegate
             {
-                if(menuMusic)
+                if (menuMusic)
                     bgm.Start();
 
                 LoadComponentAsync(mainMenu = new MainMenu());

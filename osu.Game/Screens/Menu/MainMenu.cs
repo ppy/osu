@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Menu
         {
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
-            if(last is Intro && song != null)
+            if (last is Intro && song != null)
                 Task.Run(() =>
                 {
                     trackManager.SetExclusive(song.Track);
