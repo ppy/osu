@@ -105,14 +105,16 @@ namespace osu.Game.Screens.Menu
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
             if (last is Intro && song != null)
+            {
                 Task.Run(() =>
                 {
                     trackManager.SetExclusive(song.Track);
                     song.Track.Seek(song.Beatmap.Metadata.PreviewTime);
                     if (song.Beatmap.Metadata.PreviewTime == -1)
-                        song.Track.Seek(song.Track.Length * .4f);
+                        song.Track.Seek(song.Track.Length * 0.4f);
                     song.Track.Start();
                 });
+            }
         }
 
         protected override void OnSuspending(Screen next)
