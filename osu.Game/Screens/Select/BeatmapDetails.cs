@@ -14,6 +14,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Globalization;
 using System.Linq;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Select
 {
@@ -39,58 +42,106 @@ namespace osu.Game.Screens.Select
         private readonly BarGraph retryGraph;
         private readonly BarGraph failGraph;
 
+        private ScheduledDelegate pendingBeatmapSwitch;
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
-            get
-            {
-                return beatmap;
-            }
+            get { return beatmap; }
             set
             {
                 beatmap = value;
-                if (beatmap == null) return;
 
-                description.Text = beatmap.Version;
-                source.Text = beatmap.Metadata.Source;
-                tags.Text = beatmap.Metadata.Tags;
-
-                circleSize.Value = beatmap.Difficulty.CircleSize;
-                drainRate.Value = beatmap.Difficulty.DrainRate;
-                overallDifficulty.Value = beatmap.Difficulty.OverallDifficulty;
-                approachRate.Value = beatmap.Difficulty.ApproachRate;
-                stars.Value = (float)beatmap.StarDifficulty;
-
-                if (beatmap.Metrics?.Ratings.Any() ?? false)
-                {
-                    var ratings = beatmap.Metrics.Ratings.ToList();
-                    ratingsContainer.Show();
-
-                    negativeRatings.Text = ratings.GetRange(0, ratings.Count / 2).Sum().ToString();
-                    positiveRatings.Text = ratings.GetRange(ratings.Count / 2, ratings.Count / 2).Sum().ToString();
-                    ratingsBar.Length = (float)ratings.GetRange(0, ratings.Count / 2).Sum() / ratings.Sum();
-
-                    ratingsGraph.Values = ratings.Select(rating => (float)rating);
-                }
-                else
-                    ratingsContainer.Hide();
-
-                if ((beatmap.Metrics?.Retries.Any() ?? false) && beatmap.Metrics.Fails.Any())
-                {
-                    var retries = beatmap.Metrics.Retries;
-                    var fails = beatmap.Metrics.Fails;
-                    retryFailContainer.Show();
-
-                    float maxValue = fails.Zip(retries, (fail, retry) => fail + retry).Max();
-                    failGraph.MaxValue = maxValue;
-                    retryGraph.MaxValue = maxValue;
-
-                    failGraph.Values = fails.Select(fail => (float)fail);
-                    retryGraph.Values = retries.Zip(fails, (retry, fail) => retry + MathHelper.Clamp(fail, 0, maxValue));
-                }
-                else
-                    retryFailContainer.Hide();
+                pendingBeatmapSwitch?.Cancel();
+                pendingBeatmapSwitch = Schedule(updateStats);
             }
+        }
+
+        private void updateStats()
+        {
+            if (beatmap == null) return;
+
+            description.Text = beatmap.Version;
+            source.Text = beatmap.Metadata.Source;
+            tags.Text = beatmap.Metadata.Tags;
+
+            circleSize.Value = beatmap.Difficulty.CircleSize;
+            drainRate.Value = beatmap.Difficulty.DrainRate;
+            overallDifficulty.Value = beatmap.Difficulty.OverallDifficulty;
+            approachRate.Value = beatmap.Difficulty.ApproachRate;
+            stars.Value = (float)beatmap.StarDifficulty;
+
+            var requestedBeatmap = beatmap;
+            if (requestedBeatmap.Metrics == null)
+            {
+                var lookup = new GetBeatmapDetailsRequest(requestedBeatmap);
+                lookup.Success += res =>
+                {
+                    if (beatmap != requestedBeatmap)
+                            //the beatmap has been changed since we started the lookup.
+                            return;
+
+                    requestedBeatmap.Metrics = res;
+                    Schedule(() => updateMetrics(res));
+                };
+                lookup.Failure += e => updateMetrics(null);
+
+                api.Queue(lookup);
+            }
+
+            updateMetrics(requestedBeatmap.Metrics, false);
+        }
+
+        /// <summary>
+        /// Update displayed metrics.
+        /// </summary>
+        /// <param name="metrics">New metrics to overwrite the existing display. Can be null.</param>
+        /// <param name="failOnMissing">Whether to hide the display on null or empty metrics. If false, we will dim as if waiting for further updates.</param>
+        private void updateMetrics(BeatmapMetrics metrics, bool failOnMissing = true)
+        {
+            var hasRatings = metrics?.Ratings.Any() ?? false;
+            var hasRetriesFails = (metrics?.Retries.Any() ?? false) && metrics.Fails.Any();
+
+            if (hasRatings)
+            {
+                var ratings = metrics.Ratings.ToList();
+                ratingsContainer.Show();
+
+                negativeRatings.Text = ratings.GetRange(0, ratings.Count / 2).Sum().ToString();
+                positiveRatings.Text = ratings.GetRange(ratings.Count / 2, ratings.Count / 2).Sum().ToString();
+                ratingsBar.Length = (float)ratings.GetRange(0, ratings.Count / 2).Sum() / ratings.Sum();
+
+                ratingsGraph.Values = ratings.Select(rating => (float)rating);
+
+                ratingsContainer.FadeColour(Color4.White, 500, EasingTypes.Out);
+            }
+            else if (failOnMissing)
+                ratingsGraph.Values = new float[10];
+            else
+                ratingsContainer.FadeColour(Color4.Gray, 500, EasingTypes.Out);
+
+            if (hasRetriesFails)
+            {
+                var retries = metrics.Retries;
+                var fails = metrics.Fails;
+                retryFailContainer.Show();
+
+                float maxValue = fails.Zip(retries, (fail, retry) => fail + retry).Max();
+                failGraph.MaxValue = maxValue;
+                retryGraph.MaxValue = maxValue;
+
+                failGraph.Values = fails.Select(fail => (float)fail);
+                retryGraph.Values = retries.Zip(fails, (retry, fail) => retry + MathHelper.Clamp(fail, 0, maxValue));
+
+                retryFailContainer.FadeColour(Color4.White, 500, EasingTypes.Out);
+            }
+            else if (failOnMissing)
+            {
+                failGraph.Values = new float[100];
+                retryGraph.Values = new float[100];
+            }
+            else
+                retryFailContainer.FadeColour(Color4.Gray, 500, EasingTypes.Out);
         }
 
         public BeatmapDetails()
@@ -113,7 +164,6 @@ namespace osu.Game.Screens.Select
                     Direction = FillDirection.Vertical,
                     LayoutDuration = 200,
                     LayoutEasing = EasingTypes.OutQuint,
-                    Padding = new MarginPadding(10) { Top = 25 },
                     Children = new []
                     {
                         description = new MetadataSegment("Description"),
@@ -148,8 +198,8 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0,10),
-                                    Padding = new MarginPadding(15) { Top = 25 },
+                                    Spacing = new Vector2(0,5),
+                                    Padding = new MarginPadding(10),
                                     Children = new []
                                     {
                                         circleSize = new DifficultyRow("Circle Size", 7),
@@ -252,7 +302,7 @@ namespace osu.Game.Screens.Select
                                 new Container<BarGraph>
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Size = new Vector2(1/0.6f, 50),
+                                    Size = new Vector2(1 / 0.6f, 50),
                                     Children = new[]
                                     {
                                         retryGraph = new BarGraph
@@ -272,9 +322,13 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        private APIAccess api;
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OsuColour colour, APIAccess api)
         {
+            this.api = api;
+
             description.AccentColour = colour.GrayB;
             source.AccentColour = colour.GrayB;
             tags.AccentColour = colour.YellowLight;
@@ -308,7 +362,7 @@ namespace osu.Game.Screens.Select
                 {
                     difficultyValue = value;
                     bar.Length = value / maxValue;
-                    valueText.Text = value.ToString(CultureInfo.InvariantCulture);
+                    valueText.Text = value.ToString("N1", CultureInfo.CurrentCulture);
                 }
             }
 
