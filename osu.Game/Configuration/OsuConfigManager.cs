@@ -151,8 +151,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.YahooIntegration, false).Disabled = true;
             Set(OsuConfig.ForceFrameFlush, false).Disabled = true;
             Set(OsuConfig.DetectPerformanceIssues, true).Disabled = true;
-            Set(OsuConfig.MenuMusic, true).Disabled = true;
-            Set(OsuConfig.MenuVoice, true).Disabled = true;
             Set(OsuConfig.RawInput, false).Disabled = true;
             Set(OsuConfig.AbsoluteToOsuWindow, Get<bool>(OsuConfig.RawInput)).Disabled = true;
             Set(OsuConfig.ShowMenuTips, true).Disabled = true;
@@ -181,7 +179,7 @@ namespace osu.Game.Configuration
             Set(OsuConfig.CanForceOptimusCompatibility, true).Disabled = true;
             Set(OsuConfig.ConfineMouse, Get<bool>(OsuConfig.ConfineMouseToFullscreen) ?
                 ConfineMouseMode.Fullscreen : ConfineMouseMode.Never).Disabled = true;
-            
+
             GetOriginalBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
             {
                 if (Get<bool>(OsuConfig.SavePassword)) Set(OsuConfig.SaveUsername, true);
