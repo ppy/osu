@@ -5,7 +5,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects.Types;
-using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Objects
 {
