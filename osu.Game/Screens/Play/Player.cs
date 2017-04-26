@@ -20,6 +20,7 @@ using osu.Game.Screens.Backgrounds;
 using System;
 using System.Linq;
 using osu.Framework.Threading;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 
@@ -39,6 +40,8 @@ namespace osu.Game.Screens.Play
 
         public bool IsPaused => !interpolatedSourceClock.IsRunning;
 
+        internal override bool AllowRulesetChange => false;
+
         public bool HasFailed { get; private set; }
 
         public int RestartCount;
@@ -49,13 +52,22 @@ namespace osu.Game.Screens.Play
         private bool canPause => ValidForResume && !HasFailed && Time.Current >= lastPauseActionTime + pause_cooldown;
 
         private IAdjustableClock sourceClock;
+        private OffsetClock offsetClock;
         private IFrameBasedClock interpolatedSourceClock;
 
         private RulesetInfo ruleset;
 
         private ScoreProcessor scoreProcessor;
         protected HitRenderer HitRenderer;
-        private Bindable<int> dimLevel;
+
+        #region User Settings
+
+        private Bindable<double> dimLevel;
+        private Bindable<bool> mouseWheelDisabled;
+        private Bindable<double> userAudioOffset;
+
+        #endregion
+
         private SkipButton skipButton;
 
         private HudOverlay hudOverlay;
@@ -65,7 +77,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
         {
-            dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
+            dimLevel = config.GetBindable<double>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
 
             Ruleset rulesetInstance;
@@ -115,11 +127,19 @@ namespace osu.Game.Screens.Play
             }
 
             sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
-            interpolatedSourceClock = new InterpolatingFramedClock(sourceClock);
+            offsetClock = new OffsetClock(sourceClock);
+
+            userAudioOffset = config.GetBindable<double>(OsuConfig.AudioOffset);
+            userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
+            userAudioOffset.TriggerChange();
+
+            interpolatedSourceClock = new InterpolatingFramedClock(offsetClock);
 
             Schedule(() =>
             {
                 sourceClock.Reset();
+                foreach (var mod in Beatmap.Mods.Value.OfType<IApplicableToClock>())
+                    mod.ApplyToClock(sourceClock);
             });
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
@@ -296,11 +316,11 @@ namespace osu.Game.Screens.Play
             base.OnEntering(last);
 
             (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, EasingTypes.OutQuint);
-            Background?.FadeTo((100f - dimLevel) / 100, 1500, EasingTypes.OutQuint);
+            Background?.FadeTo(1 - (float)dimLevel, 1500, EasingTypes.OutQuint);
 
             Content.Alpha = 0;
 
-            dimLevel.ValueChanged += newDim => Background?.FadeTo((100f - newDim) / 100, 800);
+            dimLevel.ValueChanged += newDim => Background?.FadeTo(1 - (float)newDim, 800);
 
             Content.ScaleTo(0.7f);
 
@@ -359,8 +379,6 @@ namespace osu.Game.Screens.Play
 
             Background?.FadeTo(1f, fade_out_duration);
         }
-
-        private Bindable<bool> mouseWheelDisabled;
 
         protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !IsPaused;
     }

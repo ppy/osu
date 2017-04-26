@@ -38,8 +38,6 @@ namespace osu.Game.Screens.Play
 
         protected override void Update()
         {
-            base.Update();
-
             if (parentClock == null) return;
 
             clock.Rate = parentClock.Rate;

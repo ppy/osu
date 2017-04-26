@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -18,10 +17,10 @@ namespace osu.Game.Overlays.Options.Sections.Audio
         {
             Children = new Drawable[]
             {
-                new OptionSlider<int>
+                new OptionSlider<double, OffsetSlider>
                 {
-                    LabelText = "Universal Offset",
-                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.Offset)
+                    LabelText = "Audio Offset",
+                    Bindable = config.GetBindable<double>(OsuConfig.AudioOffset)
                 },
                 new OsuButton
                 {
@@ -29,6 +28,11 @@ namespace osu.Game.Overlays.Options.Sections.Audio
                     Text = "Offset wizard"
                 }
             };
+        }
+
+        private class OffsetSlider : OsuSliderBar<double>
+        {
+            public override string TooltipText => Current.Value.ToString(@"0ms");
         }
     }
 }

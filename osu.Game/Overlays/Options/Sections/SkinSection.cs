@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -59,15 +58,15 @@ namespace osu.Game.Overlays.Options.Sections
                     LabelText = "Always use skin cursor",
                     Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor)
                 },
-                new OptionSlider<double>
+                new OptionSlider<double, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.MenuCursorSize)
+                    Bindable = config.GetBindable<double>(OsuConfig.MenuCursorSize)
                 },
-                new OptionSlider<double>
+                new OptionSlider<double, SizeSlider>
                 {
                     LabelText = "Gameplay cursor size",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.GameplayCursorSize)
+                    Bindable = config.GetBindable<double>(OsuConfig.GameplayCursorSize)
                 },
                 new OsuCheckbox
                 {
@@ -75,6 +74,11 @@ namespace osu.Game.Overlays.Options.Sections
                     Bindable = config.GetBindable<bool>(OsuConfig.AutomaticCursorSizing)
                 },
             };
+        }
+
+        private class SizeSlider : OsuSliderBar<double>
+        {
+            public override string TooltipText => Current.Value.ToString(@"0.##x");
         }
     }
 }

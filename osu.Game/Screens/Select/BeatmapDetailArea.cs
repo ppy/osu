@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select
             {
                 beatmap = value;
                 Leaderboard.Beatmap = beatmap?.BeatmapInfo;
-                Details.Beatmap = beatmap?.Beatmap.BeatmapInfo;
+                Details.Beatmap = beatmap?.BeatmapInfo;
             }
         }
 
@@ -66,14 +66,14 @@ namespace osu.Game.Screens.Select
             {
                 Details = new BeatmapDetails
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(5),
+                    RelativeSizeAxes = Axes.X,
+                    Masking = true,
+                    Height = 352,
                     Alpha = 0,
                 },
                 Leaderboard = new Leaderboard
                 {
                     RelativeSizeAxes = Axes.Both,
-
                 }
             });
         }

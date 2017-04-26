@@ -8,6 +8,7 @@ using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Beatmaps
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
-        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
+        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
         public readonly bool WithStoryboard;
 
@@ -26,6 +27,18 @@ namespace osu.Game.Beatmaps
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapSetInfo;
             WithStoryboard = withStoryboard;
+
+            Mods.ValueChanged += mods => applyRateAdjustments();
+        }
+
+        private void applyRateAdjustments()
+        {
+            var t = track;
+            if (t == null) return;
+
+            t.ResetSpeedAdjustments();
+            foreach (var mod in Mods.Value.OfType<IApplicableToClock>())
+                mod.ApplyToClock(t);
         }
 
         protected abstract Beatmap GetBeatmap();
@@ -66,7 +79,11 @@ namespace osu.Game.Beatmaps
             {
                 lock (trackLock)
                 {
-                    return track ?? (track = GetTrack());
+                    if (track != null) return track;
+
+                    track = GetTrack();
+                    applyRateAdjustments();
+                    return track;
                 }
             }
         }

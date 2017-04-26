@@ -22,6 +22,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Overlays
@@ -293,7 +294,7 @@ namespace osu.Game.Overlays
                 trackManager.SetExclusive(current.Track);
                 current.Track.Start();
                 beatmapSource.Value = current;
-            });
+            }).ContinueWith(task => Schedule(task.ThrowIfFaulted), TaskContinuationOptions.OnlyOnFaulted);
             updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 

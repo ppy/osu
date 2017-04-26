@@ -12,8 +12,8 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
     {
         protected override string Header => "Layout";
 
-        private OptionSlider<int> letterboxPositionX;
-        private OptionSlider<int> letterboxPositionY;
+        private OptionSlider<double> letterboxPositionX;
+        private OptionSlider<double> letterboxPositionY;
 
         private Bindable<bool> letterboxing;
 
@@ -35,15 +35,15 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                     LabelText = "Letterboxing",
                     Bindable = letterboxing,
                 },
-                letterboxPositionX = new OptionSlider<int>
+                letterboxPositionX = new OptionSlider<double>
                 {
                     LabelText = "Horizontal position",
-                    Bindable = (BindableInt)config.GetBindable<int>(FrameworkConfig.LetterboxPositionX)
+                    Bindable = config.GetBindable<double>(FrameworkConfig.LetterboxPositionX)
                 },
-                letterboxPositionY = new OptionSlider<int>
+                letterboxPositionY = new OptionSlider<double>
                 {
                     LabelText = "Vertical position",
-                    Bindable = (BindableInt)config.GetBindable<int>(FrameworkConfig.LetterboxPositionY)
+                    Bindable = config.GetBindable<double>(FrameworkConfig.LetterboxPositionY)
                 },
             };
 

@@ -3,14 +3,13 @@
 
 using System;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
     public class ElongatedCirclePiece : CirclePiece
     {
         /// <summary>
-        /// As we are being used to define the absolute size of hits, we need to be given a relative reference of our containing <see cref="TaikoPlayfield"/>.
+        /// As we are being used to define the absolute size of hits, we need to be given a relative reference of our containing playfield container.
         /// </summary>
         public Func<float> PlayfieldLengthReference;
 
