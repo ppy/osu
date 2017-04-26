@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             set { Curve.Distance = value; }
         }
 
-        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<SampleInfoList> RepeatSamples { get; set; } = new List<SampleInfoList>();
         public int RepeatCount { get; set; } = 1;
 
         private int stackHeight;
@@ -117,12 +117,12 @@ namespace osu.Game.Rulesets.Osu.Objects
                             StackHeight = StackHeight,
                             Scale = Scale,
                             ComboColour = ComboColour,
-                            Samples = Samples.Select(s => new SampleInfo
+                            Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
                             {
                                 Bank = s.Bank,
                                 Name = @"slidertick",
                                 Volume = s.Volume
-                            }).ToList()
+                            }))
                         };
                     }
                 }
