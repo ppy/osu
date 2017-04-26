@@ -165,9 +165,9 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.Objects = HitRenderer.Objects;
             hudOverlay.Progress.AudioClock = decoupledClock;
             hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
-            hudOverlay.Progress.OnSeek = progress =>
+            hudOverlay.Progress.OnSeek = pos =>
             {
-                sourceClock.Seek(progress * track.Length);
+                decoupledClock.Seek(pos);
             };
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
