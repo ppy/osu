@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko
         /// <summary>
         /// HitObjects are stored as a member variable.
         /// </summary>
-        private List<TaikoHitObjectDifficulty> difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
+        private readonly List<TaikoHitObjectDifficulty> difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
 
         public TaikoDifficultyCalculator(Beatmap beatmap)
             : base(beatmap)
@@ -64,22 +64,22 @@ namespace osu.Game.Rulesets.Taiko
         private bool calculateStrainValues()
         {
             // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
-            List<TaikoHitObjectDifficulty>.Enumerator hitObjectsEnumerator = difficultyHitObjects.GetEnumerator();
-
-            if (!hitObjectsEnumerator.MoveNext()) return false;
-
-            TaikoHitObjectDifficulty currentHitObject = hitObjectsEnumerator.Current;
-            TaikoHitObjectDifficulty nextHitObject;
-
-            // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
-            while (hitObjectsEnumerator.MoveNext())
+            using (List<TaikoHitObjectDifficulty>.Enumerator hitObjectsEnumerator = difficultyHitObjects.GetEnumerator())
             {
-                nextHitObject = hitObjectsEnumerator.Current;
-                nextHitObject.CalculateStrains(currentHitObject, TimeRate);
-                currentHitObject = nextHitObject;
-            }
+                if (!hitObjectsEnumerator.MoveNext()) return false;
 
-            return true;
+                TaikoHitObjectDifficulty current = hitObjectsEnumerator.Current;
+
+                // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
+                while (hitObjectsEnumerator.MoveNext())
+                {
+                    var next = hitObjectsEnumerator.Current;
+                    next?.CalculateStrains(current, TimeRate);
+                    current = next;
+                }
+
+                return true;
+            }
         }
 
         private double calculateDifficulty()
