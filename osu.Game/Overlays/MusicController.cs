@@ -24,6 +24,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays
 {
@@ -41,9 +42,9 @@ namespace osu.Game.Overlays
 
         private TrackManager trackManager;
         private Bindable<WorkingBeatmap> beatmapSource;
-        private Bindable<bool> preferUnicode;
         private WorkingBeatmap current;
         private BeatmapDatabase beatmaps;
+        private LocalisationEngine localisation;
 
         private Container dragContainer;
 
@@ -81,7 +82,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuConfigManager config, BeatmapDatabase beatmaps, OsuColour colours)
+        private void load(OsuGameBase game, BeatmapDatabase beatmaps, OsuColour colours, LocalisationEngine localisation)
         {
             Children = new Drawable[]
             {
@@ -187,8 +188,7 @@ namespace osu.Game.Overlays
 
             this.beatmaps = beatmaps;
             trackManager = game.Audio.Track;
-            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
-            preferUnicode.ValueChanged += unicode => updateDisplay(current, TransformDirection.None);
+            this.localisation = localisation;
 
             beatmapSource = game.Beatmap ?? new Bindable<WorkingBeatmap>();
             playList = beatmaps.GetAllWithChildren<BeatmapSetInfo>();
@@ -308,16 +308,19 @@ namespace osu.Game.Overlays
             {
                 Task.Run(() =>
                 {
-                    if (beatmap?.Beatmap == null)
+                    if (beatmap?.Beatmap == null) //this is not needed if a placeholder exists
                     {
+                        title.Current = null;
                         title.Text = @"Nothing to play";
+
+                        artist = null;
                         artist.Text = @"Nothing to play";
                     }
                     else
                     {
                         BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
-                        title.Text = preferUnicode ? metadata.TitleUnicode : metadata.Title;
-                        artist.Text = preferUnicode ? metadata.ArtistUnicode : metadata.Artist;
+                        title.Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
+                        artist.Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
                     }
                 });
 
