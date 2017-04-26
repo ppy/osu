@@ -92,9 +92,6 @@ namespace osu.Game.Screens.Play
                 if (Beatmap?.Beatmap == null)
                     throw new Exception("Beatmap was not loaded");
 
-                if (Beatmap?.Beatmap?.HitObjects.Count == 0)
-                    throw new Exception("No valid objects were found!");
-
                 ruleset = osu?.Ruleset.Value ?? Beatmap.BeatmapInfo.Ruleset;
                 rulesetInstance = ruleset.CreateInstance();
 
@@ -110,6 +107,9 @@ namespace osu.Game.Screens.Play
                     rulesetInstance = ruleset.CreateInstance();
                     HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
                 }
+
+                if (!HitRenderer.Objects.Any())
+                    throw new Exception("Beatmap contains no hit objects!");
             }
             catch (Exception e)
             {
@@ -167,10 +167,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.Objects = HitRenderer.Objects;
             hudOverlay.Progress.AudioClock = decoupledClock;
             hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
-            hudOverlay.Progress.OnSeek = pos =>
-            {
-                decoupledClock.Seek(pos);
-            };
+            hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
@@ -355,7 +352,6 @@ namespace osu.Game.Screens.Play
                 initializeSkipButton();
             });
 
-            //keep in mind this is using the interpolatedSourceClock so won't be run as early as we may expect.
             hitRendererContainer.Alpha = 0;
             hitRendererContainer.FadeIn(750, EasingTypes.OutQuint);
         }
