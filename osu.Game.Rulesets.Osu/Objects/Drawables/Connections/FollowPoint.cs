@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             base.LoadComplete();
 
+            Delay(-TransformStartTime); // So our follow points start their transforms from t=0 (the start of the map), rather from the lead in time (where the clock is right now).
             Delay(StartTime);
             FadeIn(DrawableOsuHitObject.TIME_FADEIN);
             ScaleTo(1.5f);
