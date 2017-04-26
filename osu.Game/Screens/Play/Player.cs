@@ -89,11 +89,11 @@ namespace osu.Game.Screens.Play
                 if (Beatmap == null)
                     Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
 
-                if ((Beatmap?.Beatmap?.HitObjects.Count ?? 0) == 0)
-                    throw new Exception("No valid objects were found!");
-
-                if (Beatmap == null)
+                if (Beatmap?.Beatmap == null)
                     throw new Exception("Beatmap was not loaded");
+
+                if (Beatmap?.Beatmap?.HitObjects.Count == 0)
+                    throw new Exception("No valid objects were found!");
 
                 ruleset = osu?.Ruleset.Value ?? Beatmap.BeatmapInfo.Ruleset;
                 rulesetInstance = ruleset.CreateInstance();
