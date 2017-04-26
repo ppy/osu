@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
 
         public Action RestartRequested;
 
-        public bool IsPaused => !interpolatedSourceClock.IsRunning;
+        public bool IsPaused => !decoupledClock.IsRunning;
 
         internal override bool AllowRulesetChange => false;
 
@@ -51,9 +51,9 @@ namespace osu.Game.Screens.Play
 
         private bool canPause => ValidForResume && !HasFailed && Time.Current >= lastPauseActionTime + pause_cooldown;
 
-        private IAdjustableClock sourceClock;
-        private OffsetClock offsetClock;
-        private IFrameBasedClock interpolatedSourceClock;
+        private IAdjustableClock adjustableSourceClock;
+        private FramedOffsetClock offsetClock;
+        private DecoupleableInterpolatingFramedClock decoupledClock;
 
         private RulesetInfo ruleset;
 
@@ -123,23 +123,31 @@ namespace osu.Game.Screens.Play
             if (track != null)
             {
                 audio.Track.SetExclusive(track);
-                sourceClock = track;
+                adjustableSourceClock = track;
             }
 
-            sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
-            offsetClock = new OffsetClock(sourceClock);
+            adjustableSourceClock = (IAdjustableClock)track ?? new StopwatchClock();
+
+            decoupledClock = new DecoupleableInterpolatingFramedClock();
+            decoupledClock.ChangeSource(adjustableSourceClock);
+            decoupledClock.IsCoupled = false;
+
+            offsetClock = new FramedOffsetClock(decoupledClock);
 
             userAudioOffset = config.GetBindable<double>(OsuConfig.AudioOffset);
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
-            interpolatedSourceClock = new InterpolatingFramedClock(offsetClock);
-
             Schedule(() =>
             {
-                sourceClock.Reset();
+                adjustableSourceClock.Reset();
+
+                var firstObjectTime = HitRenderer.Objects.First().StartTime;
+
+                decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(Beatmap.Beatmap.TimingInfo.BeatLengthAt(firstObjectTime) * 2, Beatmap.BeatmapInfo.AudioLeadIn)));
+
                 foreach (var mod in Beatmap.Mods.Value.OfType<IApplicableToClock>())
-                    mod.ApplyToClock(sourceClock);
+                    mod.ApplyToClock(adjustableSourceClock);
             });
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
@@ -155,7 +163,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.BindHitRenderer(HitRenderer);
 
             hudOverlay.Progress.Objects = HitRenderer.Objects;
-            hudOverlay.Progress.AudioClock = interpolatedSourceClock;
+            hudOverlay.Progress.AudioClock = decoupledClock;
             hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
             hudOverlay.Progress.OnSeek = progress =>
             {
@@ -173,7 +181,7 @@ namespace osu.Game.Screens.Play
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = interpolatedSourceClock,
+                    Clock = offsetClock,
                     Children = new Drawable[]
                     {
                         HitRenderer,
@@ -229,7 +237,7 @@ namespace osu.Game.Screens.Play
 
             skipButton.Action = () =>
             {
-                sourceClock.Seek(firstHitObject - skip_required_cutoff - fade_time);
+                decoupledClock.Seek(firstHitObject - skip_required_cutoff - fade_time);
                 skipButton.Action = null;
             };
 
@@ -246,7 +254,7 @@ namespace osu.Game.Screens.Play
             // we want to wait for the source clock to stop so we can be sure all components are in a stable state.
             if (!IsPaused)
             {
-                sourceClock.Stop();
+                decoupledClock.Stop();
 
                 Schedule(() => Pause(force));
                 return;
@@ -273,7 +281,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.KeyCounter.IsCounting = true;
             hudOverlay.Progress.Hide();
             pauseOverlay.Hide();
-            sourceClock.Start();
+            decoupledClock.Start();
         }
 
         public void Restart()
@@ -309,7 +317,7 @@ namespace osu.Game.Screens.Play
 
         private void onFail()
         {
-            sourceClock.Stop();
+            decoupledClock.Stop();
 
             HasFailed = true;
             failOverlay.Retries = RestartCount;
@@ -337,7 +345,7 @@ namespace osu.Game.Screens.Play
             Delay(750);
             Schedule(() =>
             {
-                sourceClock.Start();
+                decoupledClock.Start();
                 initializeSkipButton();
             });
 
