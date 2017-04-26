@@ -27,14 +27,14 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         internal double Strain = 1;
 
-        private double timeElapsed = 0;
+        private double timeElapsed;
         private int sameTypeSince = 1;
 
         private bool isRim => BaseHitObject is RimHit;
 
         public TaikoHitObjectDifficulty(TaikoHitObject baseHitObject)
         {
-            this.BaseHitObject = baseHitObject;
+            BaseHitObject = baseHitObject;
         }
 
         internal void CalculateStrains(TaikoHitObjectDifficulty previousHitObject, double timeRate)
