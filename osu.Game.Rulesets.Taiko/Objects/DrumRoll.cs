@@ -82,12 +82,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
                     TickSpacing = tickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong,
-                    Samples = Samples.Select(s => new SampleInfo
+                    Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
                     {
                         Bank = s.Bank,
                         Name = @"slidertick",
                         Volume = s.Volume
-                    }).ToList()
+                    }))
                 });
 
                 first = false;

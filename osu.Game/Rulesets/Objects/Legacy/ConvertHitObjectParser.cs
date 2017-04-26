@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 // Generate the final per-node samples
-                var nodeSamples = new List<List<SampleInfo>>(nodes);
+                var nodeSamples = new List<SampleInfoList>(nodes);
                 for (int i = 0; i <= repeatCount; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="repeatSamples">The samples to be played when the repeat nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<SampleInfoList> repeatSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
@@ -214,9 +214,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <returns>The hit object.</returns>
         protected abstract HitObject CreateSpinner(Vector2 position, double endTime);
 
-        private List<SampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
+        private SampleInfoList convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
         {
-            var soundTypes = new List<SampleInfo>
+            var soundTypes = new SampleInfoList
             {
                 new SampleInfo
                 {
