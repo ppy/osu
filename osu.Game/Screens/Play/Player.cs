@@ -130,8 +130,7 @@ namespace osu.Game.Screens.Play
 
             adjustableSourceClock = (IAdjustableClock)track ?? new StopwatchClock();
 
-            decoupledClock = new DecoupleableInterpolatingFramedClock();
-            decoupledClock.IsCoupled = false;
+            decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             var firstObjectTime = HitRenderer.Objects.First().StartTime;
             decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(Beatmap.Beatmap.TimingInfo.BeatLengthAt(firstObjectTime) * 4, Beatmap.BeatmapInfo.AudioLeadIn)));
