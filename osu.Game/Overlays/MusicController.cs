@@ -10,21 +10,20 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.Localisation;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays
 {
@@ -313,7 +312,7 @@ namespace osu.Game.Overlays
                         title.Current = null;
                         title.Text = @"Nothing to play";
 
-                        artist = null;
+                        artist.Current = null;
                         artist.Text = @"Nothing to play";
                     }
                     else
