@@ -70,6 +70,8 @@ namespace osu.Game.Screens.Play
 
         private SkipButton skipButton;
 
+        private Container hitRendererContainer;
+
         private HudOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
@@ -129,8 +131,11 @@ namespace osu.Game.Screens.Play
             adjustableSourceClock = (IAdjustableClock)track ?? new StopwatchClock();
 
             decoupledClock = new DecoupleableInterpolatingFramedClock();
-            decoupledClock.ChangeSource(adjustableSourceClock);
             decoupledClock.IsCoupled = false;
+
+            var firstObjectTime = HitRenderer.Objects.First().StartTime;
+            decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(Beatmap.Beatmap.TimingInfo.BeatLengthAt(firstObjectTime) * 4, Beatmap.BeatmapInfo.AudioLeadIn)));
+            decoupledClock.ProcessFrame();
 
             offsetClock = new FramedOffsetClock(decoupledClock);
 
@@ -142,12 +147,10 @@ namespace osu.Game.Screens.Play
             {
                 adjustableSourceClock.Reset();
 
-                var firstObjectTime = HitRenderer.Objects.First().StartTime;
-
-                decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(Beatmap.Beatmap.TimingInfo.BeatLengthAt(firstObjectTime) * 2, Beatmap.BeatmapInfo.AudioLeadIn)));
-
                 foreach (var mod in Beatmap.Mods.Value.OfType<IApplicableToClock>())
                     mod.ApplyToClock(adjustableSourceClock);
+
+                decoupledClock.ChangeSource(adjustableSourceClock);
             });
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
@@ -178,16 +181,20 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                new Container
+                hitRendererContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = offsetClock,
                     Children = new Drawable[]
                     {
-                        HitRenderer,
-                        skipButton = new SkipButton
+                        new Container
                         {
-                            Alpha = 0
+                            RelativeSizeAxes = Axes.Both,
+                            Clock = offsetClock,
+                            Children = new Drawable[]
+                            {
+                                HitRenderer,
+                                skipButton = new SkipButton { Alpha = 0 },
+                            }
                         },
                     }
                 },
@@ -350,8 +357,8 @@ namespace osu.Game.Screens.Play
             });
 
             //keep in mind this is using the interpolatedSourceClock so won't be run as early as we may expect.
-            HitRenderer.Alpha = 0;
-            HitRenderer.FadeIn(750, EasingTypes.OutQuint);
+            hitRendererContainer.Alpha = 0;
+            hitRendererContainer.FadeIn(750, EasingTypes.OutQuint);
         }
 
         protected override void OnSuspending(Screen next)
