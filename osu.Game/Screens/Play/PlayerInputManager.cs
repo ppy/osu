@@ -19,7 +19,10 @@ namespace osu.Game.Screens.Play
         private ReplayInputHandler replayInputHandler;
         public ReplayInputHandler ReplayInputHandler
         {
-            get { return replayInputHandler; }
+            get
+            {
+                return replayInputHandler;
+            }
             set
             {
                 if (replayInputHandler != null) RemoveHandler(replayInputHandler);
