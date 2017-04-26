@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Objects
         /// and can be treated as the default samples for the hit object.
         /// </para>
         /// </summary>
-        public List<SampleInfo> Samples = new List<SampleInfo>();
+        public SampleInfoList Samples = new SampleInfoList();
 
         /// <summary>
         /// Applies default values to this HitObject.
