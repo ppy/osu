@@ -1,8 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Input;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Input;
 using osu.Framework.Timing;
+using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 
 namespace osu.Game.Screens.Play
@@ -15,7 +19,10 @@ namespace osu.Game.Screens.Play
         private ReplayInputHandler replayInputHandler;
         public ReplayInputHandler ReplayInputHandler
         {
-            get { return replayInputHandler; }
+            get
+            {
+                return replayInputHandler;
+            }
             set
             {
                 if (replayInputHandler != null) RemoveHandler(replayInputHandler);
@@ -26,6 +33,14 @@ namespace osu.Game.Screens.Play
                 if (replayInputHandler != null)
                     AddHandler(replayInputHandler);
             }
+        }
+
+        private Bindable<bool> mouseDisabled;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            mouseDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableButtons);
         }
 
         protected override void LoadComplete()
@@ -95,6 +110,25 @@ namespace osu.Game.Screens.Play
 
             requireMoreUpdateLoops = clock.CurrentTime != parentClock.CurrentTime;
             base.Update();
+        }
+
+        protected override void TransformState(InputState state)
+        {
+            base.TransformState(state);
+
+            // we don't want to transform the state if a replay is present (for now, at least).
+            if (replayInputHandler != null) return;
+
+            var mouse = state.Mouse as Framework.Input.MouseState;
+
+            if (mouse != null)
+            {
+                if (mouseDisabled.Value)
+                {
+                    mouse.SetPressed(MouseButton.Left, false);
+                    mouse.SetPressed(MouseButton.Right, false);
+                }
+            }
         }
     }
 }
