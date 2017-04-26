@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The samples to be played when this hit object is hit.
         /// <para>
-        /// In the case of <see cref="CurvedHitObject"/> types, this is the sample of the curve body
+        /// In the case of <see cref="IHasRepeats"/> types, this is the sample of the curve body
         /// and can be treated as the default samples for the hit object.
         /// </para>
         /// </summary>

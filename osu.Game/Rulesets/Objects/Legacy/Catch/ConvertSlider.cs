@@ -6,12 +6,12 @@ using osu.Game.Rulesets.Objects.Types;
 namespace osu.Game.Rulesets.Objects.Legacy.Catch
 {
     /// <summary>
-    /// Legacy osu!catch Spinner-type, used for parsing Beatmaps.
+    /// Legacy osu!catch Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class Spinner : HitObject, IHasEndTime
+    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasXPosition, IHasCombo
     {
-        public double EndTime { get; set; }
+        public float X { get; set; }
 
-        public double Duration => EndTime - StartTime;
+        public bool NewCombo { get; set; }
     }
 }

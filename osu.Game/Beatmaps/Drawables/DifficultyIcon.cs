@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using OpenTK;
@@ -11,23 +10,20 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    internal class DifficultyIcon : Container
+
+    internal class DifficultyIcon : DifficultyColouredContainer
     {
         private readonly BeatmapInfo beatmap;
-        private OsuColour palette;
 
-        public DifficultyIcon(BeatmapInfo beatmap)
+        public DifficultyIcon(BeatmapInfo beatmap) : base(beatmap)
         {
             this.beatmap = beatmap;
-            const float size = 20;
-            Size = new Vector2(size);
+            Size = new Vector2(20);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour palette)
+        private void load()
         {
-            this.palette = palette;
-
             Children = new[]
             {
                 new TextAwesome
@@ -35,7 +31,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     TextSize = Size.X,
-                    Colour = getColour(beatmap),
+                    Colour = AccentColour,
                     Icon = FontAwesome.fa_circle
                 },
                 new TextAwesome
@@ -47,44 +43,6 @@ namespace osu.Game.Beatmaps.Drawables
                     Icon = beatmap.Ruleset.CreateInstance().Icon
                 }
             };
-        }
-
-        private enum DifficultyRating
-        {
-            Easy,
-            Normal,
-            Hard,
-            Insane,
-            Expert
-        }
-
-        private DifficultyRating getDifficultyRating(BeatmapInfo beatmap)
-        {
-            var rating = beatmap.StarDifficulty;
-
-            if (rating < 1.5) return DifficultyRating.Easy;
-            if (rating < 2.25) return DifficultyRating.Normal;
-            if (rating < 3.75) return DifficultyRating.Hard;
-            if (rating < 5.25) return DifficultyRating.Insane;
-            return DifficultyRating.Expert;
-        }
-
-        private Color4 getColour(BeatmapInfo beatmap)
-        {
-            switch (getDifficultyRating(beatmap))
-            {
-                case DifficultyRating.Easy:
-                    return palette.Green;
-                default:
-                case DifficultyRating.Normal:
-                    return palette.Yellow;
-                case DifficultyRating.Hard:
-                    return palette.Pink;
-                case DifficultyRating.Insane:
-                    return palette.Purple;
-                case DifficultyRating.Expert:
-                    return palette.Gray0;
-            }
         }
     }
 }

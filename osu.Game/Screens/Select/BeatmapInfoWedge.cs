@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -148,11 +149,16 @@ namespace osu.Game.Screens.Select
                                 },
                             },
                         },
-                        // Text for beatmap info
+                        new DifficultyColourBar(beatmap.BeatmapInfo)
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 20,
+                        },
                         new FillFlowContainer
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Name = "Top-aligned metadata",
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
                             Direction = FillDirection.Vertical,
                             Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                             AutoSizeAxes = Axes.Both,
@@ -161,16 +167,32 @@ namespace osu.Game.Screens.Select
                                 new OsuSpriteText
                                 {
                                     Font = @"Exo2.0-MediumItalic",
-                                    Text = metadata.Artist + " -- " + metadata.Title,
+                                    Text = beatmapInfo.Version,
+                                    TextSize = 24,
+                                },
+                            }
+                        },
+                        new FillFlowContainer
+                        {
+                            Name = "Bottom-aligned metadata",
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Direction = FillDirection.Vertical,
+                            Margin = new MarginPadding { Top = 15, Left = 25, Right = 10, Bottom = 20 },
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Font = @"Exo2.0-MediumItalic",
+                                    Text = !string.IsNullOrEmpty(metadata.Source) ? metadata.Source + " — " + metadata.Title : metadata.Title,
                                     TextSize = 28,
-                                    Shadow = true,
                                 },
                                 new OsuSpriteText
                                 {
                                     Font = @"Exo2.0-MediumItalic",
-                                    Text = beatmapInfo.Version,
+                                    Text = metadata.Artist,
                                     TextSize = 17,
-                                    Shadow = true,
                                 },
                                 new FillFlowContainer
                                 {
@@ -184,20 +206,18 @@ namespace osu.Game.Screens.Select
                                             Font = @"Exo2.0-Medium",
                                             Text = "mapped by ",
                                             TextSize = 15,
-                                            Shadow = true,
-                                        },
+                                         },
                                         new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Bold",
                                             Text = metadata.Author,
                                             TextSize = 15,
-                                            Shadow = true,
-                                        },
+                                         },
                                     }
                                 },
                                 new FillFlowContainer
                                 {
-                                    Margin = new MarginPadding { Top = 20 },
+                                    Margin = new MarginPadding { Top = 20, Left = 10 },
                                     Spacing = new Vector2(40, 0),
                                     AutoSizeAxes = Axes.Both,
                                     Children = labels
@@ -253,6 +273,38 @@ namespace osu.Game.Screens.Select
                         TextSize = 17,
                         Origin = Anchor.CentreLeft
                     },
+                };
+            }
+        }
+
+        private class DifficultyColourBar : DifficultyColouredContainer
+        {
+            public DifficultyColourBar(BeatmapInfo beatmap) : base(beatmap)
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                const float full_opacity_ratio = 0.7f;
+
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = AccentColour,
+                        Width = full_opacity_ratio,
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RelativePositionAxes = Axes.Both,
+                        Colour = AccentColour,
+                        Alpha = 0.5f,
+                        X = full_opacity_ratio,
+                        Width = 1 - full_opacity_ratio,
+                    }
                 };
             }
         }

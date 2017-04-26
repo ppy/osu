@@ -11,11 +11,11 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// <summary>
     /// A HitObjectParser to parse legacy osu! Beatmaps.
     /// </summary>
-    internal class HitObjectParser : Legacy.HitObjectParser
+    internal class ConvertHitObjectParser : Legacy.ConvertHitObjectParser
     {
         protected override HitObject CreateHit(Vector2 position, bool newCombo)
         {
-            return new Hit
+            return new ConvertHit
             {
                 Position = position,
                 NewCombo = newCombo,
@@ -24,21 +24,21 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
 
         protected override HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
         {
-            return new Slider
+            return new ConvertSlider
             {
                 Position = position,
                 NewCombo = newCombo,
                 ControlPoints = controlPoints,
                 Distance = length,
                 CurveType = curveType,
-                RepeatCount = repeatCount,
-                RepeatSamples = repeatSamples
+                RepeatSamples = repeatSamples,
+                RepeatCount = repeatCount
             };
         }
 
         protected override HitObject CreateSpinner(Vector2 position, double endTime)
         {
-            return new Spinner
+            return new ConvertSpinner
             {
                 Position = position,
                 EndTime = endTime
