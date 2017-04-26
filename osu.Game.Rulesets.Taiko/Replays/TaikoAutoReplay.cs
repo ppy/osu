@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Taiko.Replays
 {
     public class TaikoAutoReplay : Replay
     {
+        private const double swell_hit_speed = 50;
+
         private readonly Beatmap<TaikoHitObject> beatmap;
 
         public TaikoAutoReplay(Beatmap<TaikoHitObject> beatmap)
@@ -45,12 +47,13 @@ namespace osu.Game.Rulesets.Taiko.Replays
                     int d = 0;
                     int count = 0;
                     int req = swell.RequiredHits;
-                    double hitRate = swell.Duration / req;
+                    double hitRate = Math.Min(swell_hit_speed, swell.Duration / req);
                     for (double j = h.StartTime; j < endTime; j += hitRate)
                     {
                         switch (d)
                         {
                             default:
+                            case 0:
                                 button = ReplayButtonState.Left1;
                                 break;
                             case 1:
@@ -66,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
                         Frames.Add(new ReplayFrame(j, null, null, button));
                         d = (d + 1) % 4;
-                        if (++count > req)
+                        if (++count == req)
                             break;
                     }
                 }
