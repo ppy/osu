@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
 
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
 
+        private double firstHitTime => objects.First().StartTime;
+
         private IEnumerable<HitObject> objects;
 
         public IEnumerable<HitObject> Objects
@@ -75,7 +77,7 @@ namespace osu.Game.Screens.Play
                     Origin =  Anchor.BottomLeft,
                     SeekRequested = delegate (float position)
                     {
-                        OnSeek?.Invoke(position);
+                        OnSeek?.Invoke(firstHitTime + position * (lastHitTime - firstHitTime));
                     },
                 },
             };
@@ -128,7 +130,7 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            double progress = (AudioClock?.CurrentTime ?? Time.Current) / lastHitTime;
+            double progress = ((AudioClock?.CurrentTime ?? Time.Current) - firstHitTime) / lastHitTime;
 
             bar.UpdatePosition((float)progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
