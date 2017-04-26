@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
 
             int loops = 0;
 
-            while (validState && requireMoreUpdateLoops && loops++ < 50)
+            while (validState && requireMoreUpdateLoops && loops++ < max_catch_up_updates_per_frame)
                 if (!base.UpdateSubTree())
                     return false;
 
