@@ -48,7 +48,9 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             parentClock = Clock;
+            clock.CurrentTime = parentClock.CurrentTime;
             Clock = new FramedClock(clock);
+            Clock.ProcessFrame();
         }
 
         /// <summary>
