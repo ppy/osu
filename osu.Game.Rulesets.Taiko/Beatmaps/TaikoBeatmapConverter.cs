@@ -114,6 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                     {
                         List<SampleInfo> currentSamples = allSamples[i];
                         bool isRim = currentSamples.Any(s => s.Name == SampleInfo.HIT_CLAP || s.Name == SampleInfo.HIT_WHISTLE);
+                        strong = currentSamples.Any(s => s.Name == SampleInfo.HIT_FINISH);
 
                         if (isRim)
                         {
