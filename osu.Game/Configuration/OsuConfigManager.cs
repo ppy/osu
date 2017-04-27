@@ -92,7 +92,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.IgnoreBeatmapSamples, false).Disabled = true;
             Set(OsuConfig.IgnoreBeatmapSkins, false).Disabled = true;
             Set(OsuConfig.IgnoreList, string.Empty).Disabled = true;
-            Set(OsuConfig.Language, @"unknown").Disabled = true;
             Set(OsuConfig.AllowNowPlayingHighlights, false).Disabled = true;
             Set(OsuConfig.LastVersion, string.Empty).Disabled = true;
             Set(OsuConfig.LastVersionPermissionsFailed, string.Empty).Disabled = true;
