@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Tournament
                         speedTo(0f, 2000);
                         tracker.FadeIn(200);
 
-                        delayedStateChangeDelegate = Delay(2300).Schedule(() => scrollState = ScrollState.Stopped);
+                        delayedStateChangeDelegate = Scheduler.AddDelayed(() => scrollState = ScrollState.Stopped, 2300);
                         break;
                     case ScrollState.Stopped:
                         // Find closest to center
@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Tournament
                         st.Selected = true;
                         OnSelected?.Invoke(st.Team);
 
-                        delayedStateChangeDelegate = Delay(10000).Schedule(() => scrollState = ScrollState.Idle);
+                        delayedStateChangeDelegate = Scheduler.AddDelayed(() => scrollState = ScrollState.Idle, 10000);
                         break;
                     case ScrollState.Idle:
                         resetSelected();
@@ -295,11 +295,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None)
-        {
-            DelayReset();
-            TransformTo(() => speed, value, duration, easing, new TransformScrollSpeed());
-        }
+        private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None) => TransformTo(() => speed, value, duration, easing, new TransformScrollSpeed());
 
         private enum ScrollState
         {
