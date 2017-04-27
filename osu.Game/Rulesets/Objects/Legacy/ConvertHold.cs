@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
+using osu.Game.Rulesets.Objects.Types;
 
-namespace osu.Game.Rulesets.Objects.Legacy.Osu
+namespace osu.Game.Rulesets.Objects.Legacy
 {
     /// <summary>
-    /// Legacy osu! Hit-type, used for parsing Beatmaps.
+    /// Legacy Hold-type, used for parsing "specials" in beatmaps.
     /// </summary>
-    internal sealed class Hit : HitObject, IHasPosition, IHasCombo
+    internal sealed class ConvertHold : HitObject, IHasPosition, IHasCombo, IHasHold
     {
         public Vector2 Position { get; set; }
 

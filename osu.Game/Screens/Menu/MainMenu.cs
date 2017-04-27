@@ -2,8 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
@@ -15,6 +21,7 @@ using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
 using osu.Framework.Input;
 using OpenTK.Input;
+using System.Threading.Tasks;
 
 namespace osu.Game.Screens.Menu
 {
@@ -54,10 +61,26 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        private Bindable<bool> menuMusic;
+        private TrackManager trackManager;
+        private WorkingBeatmap song;
+
         [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        private void load(OsuGame game, OsuConfigManager config, BeatmapDatabase beatmaps)
         {
+            menuMusic = config.GetBindable<bool>(OsuConfig.MenuMusic);
             LoadComponentAsync(background);
+
+            if (!menuMusic)
+            {
+                trackManager = game.Audio.Track;
+                int choosableBeatmapsetAmmount = beatmaps.Query<BeatmapSetInfo>().Count();
+                if (choosableBeatmapsetAmmount > 0)
+                {
+                    song = beatmaps.GetWorkingBeatmap(beatmaps.GetWithChildren<BeatmapSetInfo>(RNG.Next(1, choosableBeatmapsetAmmount)).Beatmaps[0]);
+                    Beatmap = song;
+                }
+            }
 
             buttons.OnSettings = game.ToggleOptions;
 
@@ -81,6 +104,17 @@ namespace osu.Game.Screens.Menu
         {
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
+            if (last is Intro && song != null)
+            {
+                Task.Run(() =>
+                {
+                    trackManager.SetExclusive(song.Track);
+                    song.Track.Seek(song.Beatmap.Metadata.PreviewTime);
+                    if (song.Beatmap.Metadata.PreviewTime == -1)
+                        song.Track.Seek(song.Track.Length * 0.4f);
+                    song.Track.Start();
+                });
+            }
         }
 
         protected override void OnSuspending(Screen next)

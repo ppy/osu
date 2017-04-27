@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Configuration
 {
@@ -24,7 +25,7 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuCursorSize, 1.0, 0.5f, 2);
             Set(OsuConfig.GameplayCursorSize, 1.0, 0.5f, 2);
-            Set(OsuConfig.DimLevel, 30, 0, 100);
+            Set(OsuConfig.DimLevel, 0.3, 0, 1);
 
             Set(OsuConfig.MouseDisableButtons, false);
             Set(OsuConfig.MouseDisableWheel, false);
@@ -34,10 +35,15 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuParallax, true);
 
+            Set(OsuConfig.MenuVoice, true);
+            Set(OsuConfig.MenuMusic, true);
+
+            Set(OsuConfig.BeatmapDetailTab, BeatmapDetailTab.Details);
+
             Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
-            //todo: implement all settings below this line (remove the Disabled set when doing so).
 
+            //todo: implement all settings below this line (remove the Disabled set when doing so).
             Set(OsuConfig.AudioOffset, 0, -500.0, 500.0);
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
@@ -145,8 +151,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.YahooIntegration, false).Disabled = true;
             Set(OsuConfig.ForceFrameFlush, false).Disabled = true;
             Set(OsuConfig.DetectPerformanceIssues, true).Disabled = true;
-            Set(OsuConfig.MenuMusic, true).Disabled = true;
-            Set(OsuConfig.MenuVoice, true).Disabled = true;
             Set(OsuConfig.RawInput, false).Disabled = true;
             Set(OsuConfig.AbsoluteToOsuWindow, Get<bool>(OsuConfig.RawInput)).Disabled = true;
             Set(OsuConfig.ShowMenuTips, true).Disabled = true;
@@ -175,7 +179,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.CanForceOptimusCompatibility, true).Disabled = true;
             Set(OsuConfig.ConfineMouse, Get<bool>(OsuConfig.ConfineMouseToFullscreen) ?
                 ConfineMouseMode.Fullscreen : ConfineMouseMode.Never).Disabled = true;
-
 
             GetOriginalBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
             {
@@ -316,6 +319,7 @@ namespace osu.Game.Configuration
         MenuMusic,
         MenuVoice,
         MenuParallax,
+        BeatmapDetailTab,
         RawInput,
         AbsoluteToOsuWindow,
         ConfineMouse,
@@ -340,6 +344,5 @@ namespace osu.Game.Configuration
         Ticker,
         CompatibilityContext,
         CanForceOptimusCompatibility,
-
     }
 }
