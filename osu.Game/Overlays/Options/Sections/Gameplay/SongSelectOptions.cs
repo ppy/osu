@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Gameplay
 {
@@ -17,17 +17,22 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new OptionSlider<double>
+                new OptionSlider<double, StarSlider>
                 {
                     LabelText = "Display beatmaps from",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.DisplayStarsMinimum)
+                    Bindable = config.GetBindable<double>(OsuConfig.DisplayStarsMinimum)
                 },
-                new OptionSlider<double>
+                new OptionSlider<double, StarSlider>
                 {
                     LabelText = "up to",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.DisplayStarsMaximum)
+                    Bindable = config.GetBindable<double>(OsuConfig.DisplayStarsMaximum)
                 },
             };
+        }
+
+        private class StarSlider : OsuSliderBar<double>
+        {
+            public override string TooltipText => Current.Value.ToString(@"0.## stars");
         }
     }
 }
