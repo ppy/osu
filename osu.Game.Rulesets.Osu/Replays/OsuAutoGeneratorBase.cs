@@ -2,69 +2,51 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
-    public abstract class OsuAutoReplayBase : Replay
+    public abstract class OsuAutoGeneratorBase : AutoGenerator<OsuHitObject>
     {
         #region Constants
 
         /// <summary>
         /// Constants (for spinners).
         /// </summary>
-        protected static readonly Vector2 spinner_centre = new Vector2(256, 192);
-        protected const float spin_radius = 50;
-
-        /// <summary>
-        /// The beatmap we're making a replay out of.
-        /// </summary>
-        protected readonly Beatmap<OsuHitObject> beatmap;
+        protected static readonly Vector2 SPINNER_CENTRE = new Vector2(256, 192);
+        protected const float SPIN_RADIUS = 50;
 
         /// <summary>
         /// The time in ms between each ReplayFrame.
         /// </summary>
-        protected double frameDelay;
+        protected readonly double frameDelay;
 
         #endregion
 
-        #region Construction
+        #region Construction / Initialisation
 
-        public OsuAutoReplayBase(Beatmap<OsuHitObject> beatmap)
-        {
-            this.beatmap = beatmap;
-            Initialise();
-            CreateAutoReplay();
-        }
+        protected Replay Replay;
+        protected List<ReplayFrame> Frames => Replay.Frames;
 
-        /// <summary>
-        /// Initialise this instance. Called before CreateAutoReplay.
-        /// </summary>
-        protected virtual void Initialise()
+        protected OsuAutoGeneratorBase(Beatmap<OsuHitObject> beatmap)
+            : base(beatmap)
         {
-            User = new User
+            Replay = new Replay
             {
-                Username = @"Autoplay",
+                User = new User
+                {
+                    Username = @"Autoplay",
+                }
             };
 
             // We are using ApplyModsToRate and not ApplyModsToTime to counteract the speed up / slow down from HalfTime / DoubleTime so that we remain at a constant framerate of 60 fps.
             frameDelay = applyModsToRate(1000.0 / 60.0);
         }
-
-        /// <summary>
-        /// Creates the auto replay. Every OsuAutoReplayBase subclass should implement this!
-        /// </summary>
-        protected abstract void CreateAutoReplay();
 
         #endregion
 

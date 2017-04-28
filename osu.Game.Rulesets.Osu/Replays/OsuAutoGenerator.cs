@@ -7,80 +7,82 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
-    public class OsuAutoReplay : OsuAutoReplayBase
+    public class OsuAutoGenerator : OsuAutoGeneratorBase
     {
-        // Options
+        #region Parameters
 
         /// <summary>
         /// If delayed movements should be used, causing the cursor to stay on each hitobject for as long as possible.
         /// Mainly for Autopilot.
         /// </summary>
-        public readonly bool DelayedMovements; // ModManager.CheckActive(Mods.Relax2);
+        public bool DelayedMovements; // ModManager.CheckActive(Mods.Relax2);
 
+        #endregion
 
-        // Local constants
+        #region Constants
 
         /// <summary>
         /// The "reaction time" in ms between "seeing" a new hit object and moving to "react" to it.
         /// </summary>
-        private double reactionTime;
+        private readonly double reactionTime;
 
         /// <summary>
         /// What easing to use when moving between hitobjects
         /// </summary>
         private EasingTypes preferredEasing => DelayedMovements ? EasingTypes.InOutCubic : EasingTypes.Out;
 
+        #endregion
+
+        #region Construction / Initialisation
+
+        public OsuAutoGenerator(Beatmap<OsuHitObject> beatmap)
+            : base(beatmap)
+        {
+            // Already superhuman, but still somewhat realistic
+            reactionTime = applyModsToRate(100);
+        }
+
+        #endregion
+
+        #region Generator
+
         /// <summary>
         /// Which button (left or right) to use for the current hitobject.
         /// Even means LMB will be used to click, odd means RMB will be used.
         /// This keeps track of the button previously used for alt/singletap logic.
         /// </summary>
-
         private int buttonIndex;
 
-        public OsuAutoReplay(Beatmap<OsuHitObject> beatmap)
-            : base(beatmap)
-        {
-        }
-
-        protected override void Initialise()
-        {
-            base.Initialise();
-
-            // Already superhuman, but still somewhat realistic
-            reactionTime = applyModsToRate(100);
-        }
-
-        protected override void CreateAutoReplay()
+        public override Replay Generate()
         {
             buttonIndex = 0;
 
             addFrameToReplay(new ReplayFrame(-100000, 256, 500, ReplayButtonState.None));
-            addFrameToReplay(new ReplayFrame(beatmap.HitObjects[0].StartTime - 1500, 256, 500, ReplayButtonState.None));
-            addFrameToReplay(new ReplayFrame(beatmap.HitObjects[0].StartTime - 1000, 256, 192, ReplayButtonState.None));
+            addFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, 256, 500, ReplayButtonState.None));
+            addFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1000, 256, 192, ReplayButtonState.None));
 
 
-            for (int i = 0; i < beatmap.HitObjects.Count; i++)
+            for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
-                OsuHitObject h = beatmap.HitObjects[i];
+                OsuHitObject h = Beatmap.HitObjects[i];
 
                 if (DelayedMovements && i > 0)
                 {
-                    OsuHitObject prev = beatmap.HitObjects[i - 1];
+                    OsuHitObject prev = Beatmap.HitObjects[i - 1];
                     addDelayedMovements(h, prev);
                 }
 
                 addHitObjectReplay(h);
             }
+
+            return Replay;
         }
 
         private void addDelayedMovements(OsuHitObject h, OsuHitObject prev)
@@ -119,9 +121,9 @@ namespace osu.Game.Rulesets.Osu.Replays
             {
                 calcSpinnerStartPosAndDirection(Frames[Frames.Count - 1].Position, out startPosition, out spinnerDirection);
 
-                Vector2 spinCentreOffset = spinner_centre - Frames[Frames.Count - 1].Position;
+                Vector2 spinCentreOffset = SPINNER_CENTRE - Frames[Frames.Count - 1].Position;
 
-                if (spinCentreOffset.Length > spin_radius)
+                if (spinCentreOffset.Length > SPIN_RADIUS)
                 {
                     // If moving in from the outside, don't ease out (default eases out). This means auto will "start" spinning immediately after moving into position.
                     easing = EasingTypes.In;
@@ -139,19 +141,22 @@ namespace osu.Game.Rulesets.Osu.Replays
             addHitObjectClickFrames(h, startPosition, spinnerDirection);
         }
 
+        #endregion
+
+        #region Helper subroutines
 
         private static void calcSpinnerStartPosAndDirection(Vector2 prevPos, out Vector2 startPosition, out float spinnerDirection)
         {
-            Vector2 spinCentreOffset = spinner_centre - prevPos;
+            Vector2 spinCentreOffset = SPINNER_CENTRE - prevPos;
             float distFromCentre = spinCentreOffset.Length;
-            float distToTangentPoint = (float)Math.Sqrt(distFromCentre * distFromCentre - spin_radius * spin_radius);
+            float distToTangentPoint = (float)Math.Sqrt(distFromCentre * distFromCentre - SPIN_RADIUS * SPIN_RADIUS);
 
-            if (distFromCentre > spin_radius)
+            if (distFromCentre > SPIN_RADIUS)
             {
                 // Previous cursor position was outside spin circle, set startPosition to the tangent point.
 
                 // Angle between centre offset and tangent point offset.
-                float angle = (float)Math.Asin(spin_radius / distFromCentre);
+                float angle = (float)Math.Asin(SPIN_RADIUS / distFromCentre);
 
                 if (angle > 0)
                 {
@@ -176,13 +181,13 @@ namespace osu.Game.Rulesets.Osu.Replays
             else if (spinCentreOffset.Length > 0)
             {
                 // Previous cursor position was inside spin circle, set startPosition to the nearest point on spin circle.
-                startPosition = spinner_centre - spinCentreOffset * (spin_radius / spinCentreOffset.Length);
+                startPosition = SPINNER_CENTRE - spinCentreOffset * (SPIN_RADIUS / spinCentreOffset.Length);
                 spinnerDirection = 1;
             }
             else
             {
                 // Degenerate case where cursor position is exactly at the centre of the spin circle.
-                startPosition = spinner_centre + new Vector2(0, -spin_radius);
+                startPosition = SPINNER_CENTRE + new Vector2(0, -SPIN_RADIUS);
                 spinnerDirection = 1;
             }
         }
@@ -283,7 +288,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             {
                 Spinner s = h as Spinner;
 
-                Vector2 difference = startPosition - spinner_centre;
+                Vector2 difference = startPosition - SPINNER_CENTRE;
 
                 float radius = difference.Length;
                 float angle = radius == 0 ? 0 : (float)Math.Atan2(difference.Y, difference.X);
@@ -294,12 +299,12 @@ namespace osu.Game.Rulesets.Osu.Replays
                 {
                     t = applyModsToTime(j - h.StartTime) * spinnerDirection;
 
-                    Vector2 pos = spinner_centre + circlePosition(t / 20 + angle, spin_radius);
+                    Vector2 pos = SPINNER_CENTRE + circlePosition(t / 20 + angle, SPIN_RADIUS);
                     addFrameToReplay(new ReplayFrame((int)j, pos.X, pos.Y, button));
                 }
 
                 t = applyModsToTime(s.EndTime - h.StartTime) * spinnerDirection;
-                Vector2 endPosition = spinner_centre + circlePosition(t / 20 + angle, spin_radius);
+                Vector2 endPosition = SPINNER_CENTRE + circlePosition(t / 20 + angle, SPIN_RADIUS);
 
                 addFrameToReplay(new ReplayFrame(s.EndTime, endPosition.X, endPosition.Y, button));
 
@@ -323,5 +328,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             if (Frames[Frames.Count - 1].Time <= endFrame.Time)
                 addFrameToReplay(endFrame);
         }
+
+        #endregion
     }
 }

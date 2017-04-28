@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override Score CreateReplayScore(Beatmap<OsuHitObject> beatmap) => new Score
         {
-            Replay = new OsuAutoReplay(beatmap)
+            Replay = new OsuAutoGenerator(beatmap).Generate()
         };
     }
 
