@@ -68,7 +68,6 @@ namespace osu.Game.Rulesets.Osu.Replays
             AddFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1500, 256, 500, ReplayButtonState.None));
             AddFrameToReplay(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1000, 256, 192, ReplayButtonState.None));
 
-
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
                 OsuHitObject h = Beatmap.HitObjects[i];
@@ -129,7 +128,6 @@ namespace osu.Game.Rulesets.Osu.Replays
                     easing = EasingTypes.In;
                 }
             }
-
 
             // Do some nice easing for cursor movements
             if (Frames.Count > 0)
@@ -256,7 +254,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                 // If a button is already held, then we simply alternate
                 if (previousButton != ReplayButtonState.None)
                 {
-                    Debug.Assert(previousButton != (ReplayButtonState.Left1 | ReplayButtonState.Right1));
+                    Debug.Assert(previousButton != (ReplayButtonState.Left1 | ReplayButtonState.Right1), "Previous button state was not Left1 nor Right1 despite only using those two states.");
 
                     // Force alternation if we have the same button. Otherwise we can just keep the naturally to us assigned button.
                     if (previousButton == button)
