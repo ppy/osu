@@ -331,6 +331,8 @@ namespace osu.Game.Screens.Select
             if (panel == null)
                 panel = group.BeatmapPanels.First();
 
+            if (selectedPanel == panel) return;
+
             Trace.Assert(group.BeatmapPanels.Contains(panel), @"Selected panel must be in provided group");
 
             if (selectedGroup != null && selectedGroup != group && selectedGroup.State != BeatmapGroupState.Hidden)
