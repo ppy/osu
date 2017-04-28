@@ -343,11 +343,6 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void selectBeatmap(BeatmapSetInfo beatmapSet = null)
-        {
-            carousel.SelectBeatmap(beatmapSet != null ? beatmapSet.Beatmaps.First() : Beatmap?.BeatmapInfo);
-        }
-
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             carousel.RemoveBeatmap(beatmapSet);
