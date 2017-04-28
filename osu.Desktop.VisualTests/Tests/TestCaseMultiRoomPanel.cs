@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -28,8 +28,7 @@ namespace osu.Desktop.VisualTests.Tests
             switch (action)
             {
                 case 0:
-                    if (test.Status == 0) test.Status = 1;
-                    else test.Status = 0;
+                    test.State = test.State == MultiRoomPanel.PanelState.Free ? MultiRoomPanel.PanelState.Busy : MultiRoomPanel.PanelState.Free;
                     break;
             }
         }
