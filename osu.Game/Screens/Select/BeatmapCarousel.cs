@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Select
 
         public void RemoveBeatmap(BeatmapSetInfo info) => removeGroup(groups.Find(b => b.BeatmapSet.ID == info.ID));
 
-        public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
+        public Action<BeatmapInfo> SelectionChanged;
 
         public Action StartRequested;
 
@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Select
 
             return new BeatmapGroup(beatmapSet, database)
             {
-                SelectionChanged = SelectionChanged,
+                SelectionChanged = (g, p) => selectGroup(g, p),
                 StartRequested = b => StartRequested?.Invoke(),
                 State = BeatmapGroupState.Collapsed
             };
@@ -345,6 +345,8 @@ namespace osu.Game.Screens.Select
 
             float selectedY = computeYPositions(animated);
             ScrollTo(selectedY, animated);
+
+            SelectionChanged?.Invoke(panel.Beatmap);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

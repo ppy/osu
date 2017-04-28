@@ -300,7 +300,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// selection has been changed as the result of interaction with the carousel.
         /// </summary>
-        private void selectionChanged(BeatmapGroup group, BeatmapInfo beatmap)
+        private void selectionChanged(BeatmapInfo beatmap)
         {
             bool beatmapSetChange = false;
 
