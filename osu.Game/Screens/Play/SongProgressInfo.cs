@@ -12,9 +12,9 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressInfo : Container
     {
-        private InfoText timeCurrent;
-        private InfoText timeLeft;
-        private InfoText progress;
+        private readonly InfoText timeCurrent;
+        private readonly InfoText timeLeft;
+        private readonly InfoText progress;
 
         private const int margin = 10;
 
