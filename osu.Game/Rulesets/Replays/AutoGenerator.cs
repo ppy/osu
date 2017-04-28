@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Replays
 
         #endregion
 
-        public AutoGenerator(Beatmap<T> beatmap)
+        protected AutoGenerator(Beatmap<T> beatmap)
         {
             Beatmap = beatmap;
         }
