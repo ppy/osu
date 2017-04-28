@@ -17,7 +17,6 @@ using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -298,7 +297,7 @@ namespace osu.Game.Screens.Select
             carousel.SelectBeatmap(beatmap?.BeatmapInfo);
         }
 
-        ScheduledDelegate selectionChangedDebounce;
+        private ScheduledDelegate selectionChangedDebounce;
 
         // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
         private BeatmapInfo selectionChangeNoBounce;
