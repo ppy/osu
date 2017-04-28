@@ -14,94 +14,50 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Users;
 
-namespace osu.Game.Rulesets.Osu
+namespace osu.Game.Rulesets.Osu.Replays
 {
-    public class OsuAutoReplay : Replay
+    public class OsuAutoReplay : OsuAutoReplayBase
     {
-        private static readonly Vector2 spinner_centre = new Vector2(256, 192);
+        // Options
 
-        private const float spin_radius = 50;
+        /// <summary>
+        /// If delayed movements should be used, causing the cursor to stay on each hitobject for as long as possible.
+        /// Mainly for Autopilot.
+        /// </summary>
+        public readonly bool DelayedMovements; // ModManager.CheckActive(Mods.Relax2);
 
-        private readonly Beatmap<OsuHitObject> beatmap;
 
-        // ms between each ReplayFrame
-        private readonly float frameDelay;
+        // Local constants
 
-        // ms between 'seeing' a new hitobject and auto moving to 'react' to it
-        private readonly int reactionTime;
+        /// <summary>
+        /// The "reaction time" in ms between "seeing" a new hit object and moving to "react" to it.
+        /// </summary>
+        private double reactionTime;
 
-        // What easing to use when moving between hitobjects
-        private EasingTypes preferredEasing;
+        /// <summary>
+        /// What easing to use when moving between hitobjects
+        /// </summary>
+        private EasingTypes preferredEasing => DelayedMovements ? EasingTypes.InOutCubic : EasingTypes.Out;
 
-        // Even means LMB will be used to click, odd means RMB will be used.
-        // This keeps track of the button previously used for alt/singletap logic.
+        /// <summary>
+        /// Which button (left or right) to use for the current hitobject.
+        /// Even means LMB will be used to click, odd means RMB will be used.
+        /// This keeps track of the button previously used for alt/singletap logic.
+        /// </summary>
+
         private int buttonIndex;
 
-        public OsuAutoReplay(Beatmap<OsuHitObject> beatmap)
+        protected override void Initialise()
         {
-            this.beatmap = beatmap;
-
-            User = new User
-            {
-                Username = @"Autoplay",
-            };
-
-            // We are using ApplyModsToRate and not ApplyModsToTime to counteract the speed up / slow down from HalfTime / DoubleTime so that we remain at a constant framerate of 60 fps.
-            frameDelay = (float)applyModsToRate(1000.0 / 60.0);
+            base.Initialise();
 
             // Already superhuman, but still somewhat realistic
-            reactionTime = (int)applyModsToRate(100);
-
-            createAutoReplay();
+            reactionTime = applyModsToRate(100);
         }
 
-        private class ReplayFrameComparer : IComparer<ReplayFrame>
-        {
-            public int Compare(ReplayFrame f1, ReplayFrame f2)
-            {
-                if (f1 == null) throw new NullReferenceException($@"{nameof(f1)} cannot be null");
-                if (f2 == null) throw new NullReferenceException($@"{nameof(f2)} cannot be null");
-
-                return f1.Time.CompareTo(f2.Time);
-            }
-        }
-
-        private static readonly IComparer<ReplayFrame> replay_frame_comparer = new ReplayFrameComparer();
-
-        private int findInsertionIndex(ReplayFrame frame)
-        {
-            int index = Frames.BinarySearch(frame, replay_frame_comparer);
-
-            if (index < 0)
-            {
-                index = ~index;
-            }
-            else
-            {
-                // Go to the first index which is actually bigger
-                while (index < Frames.Count && frame.Time == Frames[index].Time)
-                {
-                    ++index;
-                }
-            }
-
-            return index;
-        }
-
-        private void addFrameToReplay(ReplayFrame frame) => Frames.Insert(findInsertionIndex(frame), frame);
-
-        private static Vector2 circlePosition(double t, double radius) => new Vector2((float)(Math.Cos(t) * radius), (float)(Math.Sin(t) * radius));
-
-        private double applyModsToTime(double v) => v;
-        private double applyModsToRate(double v) => v;
-
-        public bool DelayedMovements; // ModManager.CheckActive(Mods.Relax2);
-
-        private void createAutoReplay()
+        protected override void CreateAutoReplay()
         {
             buttonIndex = 0;
-
-            preferredEasing = DelayedMovements ? EasingTypes.InOutCubic : EasingTypes.Out;
 
             addFrameToReplay(new ReplayFrame(-100000, 256, 500, ReplayButtonState.None));
             addFrameToReplay(new ReplayFrame(beatmap.HitObjects[0].StartTime - 1500, 256, 500, ReplayButtonState.None));
@@ -112,12 +68,6 @@ namespace osu.Game.Rulesets.Osu
             {
                 OsuHitObject h = beatmap.HitObjects[i];
 
-                //if (h.EndTime < InputManager.ReplayStartTime)
-                //{
-                //    h.IsHit = true;
-                //    continue;
-                //}
-
                 if (DelayedMovements && i > 0)
                 {
                     OsuHitObject prev = beatmap.HitObjects[i - 1];
@@ -126,9 +76,6 @@ namespace osu.Game.Rulesets.Osu
 
                 addHitObjectReplay(h);
             }
-
-            //Player.currentScore.Replay = InputManager.ReplayScore.Replay;
-            //Player.currentScore.PlayerName = "osu!";
         }
 
         private void addDelayedMovements(OsuHitObject h, OsuHitObject prev)
