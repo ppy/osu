@@ -328,25 +328,31 @@ namespace osu.Game.Screens.Select
 
         private void selectGroup(BeatmapGroup group, BeatmapPanel panel = null, bool animated = true)
         {
-            if (panel == null)
-                panel = group.BeatmapPanels.First();
+            try
+            {
+                if (panel == null)
+                    panel = group.BeatmapPanels.First();
 
-            if (selectedPanel == panel) return;
+                if (selectedPanel == panel) return;
 
-            Trace.Assert(group.BeatmapPanels.Contains(panel), @"Selected panel must be in provided group");
+                Trace.Assert(group.BeatmapPanels.Contains(panel), @"Selected panel must be in provided group");
 
-            if (selectedGroup != null && selectedGroup != group && selectedGroup.State != BeatmapGroupState.Hidden)
-                selectedGroup.State = BeatmapGroupState.Collapsed;
+                if (selectedGroup != null && selectedGroup != group && selectedGroup.State != BeatmapGroupState.Hidden)
+                    selectedGroup.State = BeatmapGroupState.Collapsed;
 
-            group.State = BeatmapGroupState.Expanded;
-            selectedGroup = group;
-            panel.State = PanelSelectedState.Selected;
-            selectedPanel = panel;
+                group.State = BeatmapGroupState.Expanded;
+                panel.State = PanelSelectedState.Selected;
 
-            float selectedY = computeYPositions(animated);
-            ScrollTo(selectedY, animated);
+                selectedPanel = panel;
+                selectedGroup = group;
 
-            SelectionChanged?.Invoke(panel.Beatmap);
+                SelectionChanged?.Invoke(panel.Beatmap);
+            }
+            finally
+            {
+                float selectedY = computeYPositions(animated);
+                ScrollTo(selectedY, animated);
+            }
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
