@@ -12,9 +12,9 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressInfo : Container
     {
-        private readonly InfoText timeCurrent;
-        private readonly InfoText timeLeft;
-        private readonly InfoText progress;
+        private OsuSpriteText timeCurrent;
+        private OsuSpriteText timeLeft;
+        private OsuSpriteText progress;
 
         private const int margin = 10;
 
@@ -41,50 +41,41 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public SongProgressInfo()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {
-                timeCurrent = new InfoText
+                timeCurrent = new OsuSpriteText
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
+                    Colour = colours.BlueLighter,
+                    Font = @"Venera",
                     Margin = new MarginPadding
                     {
                         Left = margin,
                     },
                 },
-                progress = new InfoText
+                progress = new OsuSpriteText
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
+                    Colour = colours.BlueLighter,
+                    Font = @"Venera",
                 },
-                timeLeft = new InfoText
+                timeLeft = new OsuSpriteText
                 {
                     Origin = Anchor.BottomRight,
                     Anchor = Anchor.BottomRight,
+                    Colour = colours.BlueLighter,
+                    Font = @"Venera",
                     Margin = new MarginPadding
                     {
                         Right = margin,
                     }
                 }
             };
-        }
-
-        private class InfoText : OsuSpriteText
-        {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Colour = colours.BlueLighter;
-                Font = @"Venera";
-                EdgeEffect = new EdgeEffect
-                {
-                    Colour = colours.BlueDarker,
-                    Type = EdgeEffectType.Glow,
-                    Radius = 5,
-                };
-            }
         }
     }
 }
