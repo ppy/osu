@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// <summary>
         /// The time in ms between each ReplayFrame.
         /// </summary>
-        protected readonly double frameDelay;
+        protected readonly double FrameDelay;
 
         #endregion
 
@@ -45,14 +45,14 @@ namespace osu.Game.Rulesets.Osu.Replays
             };
 
             // We are using ApplyModsToRate and not ApplyModsToTime to counteract the speed up / slow down from HalfTime / DoubleTime so that we remain at a constant framerate of 60 fps.
-            frameDelay = applyModsToRate(1000.0 / 60.0);
+            FrameDelay = ApplyModsToRate(1000.0 / 60.0);
         }
 
         #endregion
 
         #region Utilities
-        protected double applyModsToTime(double v) => v;
-        protected double applyModsToRate(double v) => v;
+        protected double ApplyModsToTime(double v) => v;
+        protected double ApplyModsToRate(double v) => v;
 
         private class ReplayFrameComparer : IComparer<ReplayFrame>
         {
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private static readonly IComparer<ReplayFrame> replay_frame_comparer = new ReplayFrameComparer();
 
-        protected int findInsertionIndex(ReplayFrame frame)
+        protected int FindInsertionIndex(ReplayFrame frame)
         {
             int index = Frames.BinarySearch(frame, replay_frame_comparer);
 
@@ -87,9 +87,9 @@ namespace osu.Game.Rulesets.Osu.Replays
             return index;
         }
 
-        protected void addFrameToReplay(ReplayFrame frame) => Frames.Insert(findInsertionIndex(frame), frame);
+        protected void AddFrameToReplay(ReplayFrame frame) => Frames.Insert(FindInsertionIndex(frame), frame);
 
-        protected static Vector2 circlePosition(double t, double radius) => new Vector2((float)(Math.Cos(t) * radius), (float)(Math.Sin(t) * radius));
+        protected static Vector2 CirclePosition(double t, double radius) => new Vector2((float)(Math.Cos(t) * radius), (float)(Math.Sin(t) * radius));
 
         #endregion
     }
