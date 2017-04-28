@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.Hit300 };
 
-        protected override sealed void UpdateState(ArmedState state)
+        protected sealed override void UpdateState(ArmedState state)
         {
             Flush();
 
