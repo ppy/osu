@@ -175,7 +175,6 @@ namespace osu.Game.Screens.Play
                         }
                     };
                 }
-
             }
 
             private readonly SpriteText title;
