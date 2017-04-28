@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -14,8 +15,35 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Multiplayer
 {
-    public class MultiRoomPanel : ClickableContainer
+    public class MultiRoomPanel : ClickableContainer, IStateful<MultiRoomPanel.PanelState>
     {
+        private PanelState state;
+        public PanelState State
+        {
+            get { return state; }
+            set
+            {
+                if (state == value)
+                    return;
+
+                state = value;
+                switch (state)
+                {
+                    case PanelState.Free:
+                        statusColour = ColourFree;
+                        statusString = "Welcoming Players";
+                        UpdatePanel(this);
+                        break;
+
+                    case PanelState.Busy:
+                        statusColour = ColourBusy;
+                        statusString = "Now Playing";
+                        UpdatePanel(this);
+                        break;
+                }
+            }
+        }
+
         private bool didClick;
         private string roomName;
         private string hostName;
@@ -29,14 +57,11 @@ namespace osu.Game.Screens.Multiplayer
         private OsuSpriteText statusSprite;
         private OsuSpriteText roomSprite;
 
-        public const int BORDER_SIZE = 3;
         public const int PANEL_HEIGHT = 90;
-        
+        public const int CONTENT_PADDING = 5;
 
         public Color4 ColourFree = new Color4(166, 204, 0, 255);
         public Color4 ColourBusy = new Color4(135, 102, 237, 255);
-
-        public int CONTENT_PADDING = 5;
 
         public bool Clicked
         {
@@ -44,29 +69,6 @@ namespace osu.Game.Screens.Multiplayer
             set
             {
                 didClick = value;
-            }
-        }
-
-        public int Status
-        {
-            get { return roomStatus; }
-            set
-            {
-                roomStatus = value;
-                if (roomStatus == 0)
-                {
-                    statusColour = ColourFree;
-                    statusString = "Welcoming Players";
-
-                    UpdatePanel(this);
-                }
-                else
-                {
-                    statusColour = ColourBusy;
-                    statusString = "Now Playing";
-
-                    UpdatePanel(this);
-                }
             }
         }
 
@@ -256,6 +258,12 @@ namespace osu.Game.Screens.Multiplayer
             BorderThickness = 3;
             didClick = true;
             return base.OnMouseUp(state, args);
+        }
+
+        public enum PanelState
+        {
+            Free,
+            Busy
         }
     }
 }
