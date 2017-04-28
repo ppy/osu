@@ -12,16 +12,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
     public class FollowPoint : Container
     {
-        public double StartTime;
-        public double EndTime;
-        public Vector2 EndPosition;
-
         private const float width = 8;
 
         public FollowPoint()
         {
             Origin = Anchor.Centre;
-            Alpha = 0;
 
             Masking = true;
             AutoSizeAxes = Axes.Both;
@@ -44,23 +39,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     Alpha = 0.5f,
                 },
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Delay(StartTime);
-            FadeIn(DrawableOsuHitObject.TIME_FADEIN);
-            ScaleTo(1.5f);
-            ScaleTo(1, DrawableOsuHitObject.TIME_FADEIN, EasingTypes.Out);
-            MoveTo(EndPosition, DrawableOsuHitObject.TIME_FADEIN, EasingTypes.Out);
-
-            Delay(EndTime - StartTime);
-            FadeOut(DrawableOsuHitObject.TIME_FADEIN);
-
-            Delay(DrawableOsuHitObject.TIME_FADEIN);
-            Expire(true);
         }
     }
 }
