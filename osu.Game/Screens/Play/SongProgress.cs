@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            double currentTime = (AudioClock?.CurrentTime ?? Time.Current);
+            double currentTime = AudioClock?.CurrentTime ?? Time.Current;
             double progress = (currentTime - firstHitTime) / lastHitTime;
 
             bar.UpdatePosition((float)progress);
