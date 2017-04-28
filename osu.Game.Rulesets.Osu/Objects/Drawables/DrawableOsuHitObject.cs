@@ -21,17 +21,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.Hit300 };
 
-        protected override void UpdateState(ArmedState state)
+        protected sealed override void UpdateState(ArmedState state)
         {
             Flush();
 
             UpdateInitialState();
 
-            Delay(HitObject.StartTime - Time.Current - TIME_PREEMPT + Judgement.TimeOffset, true);
+            using (BeginAbsoluteSequence(HitObject.StartTime - TIME_PREEMPT, true))
+            {
+                UpdatePreemptState();
 
-            UpdatePreemptState();
+                using (BeginDelayedSequence(TIME_PREEMPT + Judgement.TimeOffset, true))
+                    UpdateCurrentState(state);
+            }
+        }
 
-            Delay(TIME_PREEMPT, true);
+        protected virtual void UpdateCurrentState(ArmedState state)
+        {
         }
 
         protected virtual void UpdatePreemptState()
