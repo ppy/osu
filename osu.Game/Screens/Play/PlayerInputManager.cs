@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerInputManager : PassThroughInputManager
     {
-        private readonly ManualClock clock = new ManualClock();
+        private ManualClock clock;
         private IFrameBasedClock parentClock;
 
         private ReplayInputHandler replayInputHandler;
@@ -47,8 +47,14 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
+            //our clock will now be our parent's clock, but we want to replace this to allow manual control.
             parentClock = Clock;
-            Clock = new FramedClock(clock);
+
+            Clock = new FramedClock(clock = new ManualClock
+            {
+                CurrentTime = parentClock.CurrentTime,
+                Rate = parentClock.Rate,
+            });
         }
 
         /// <summary>
