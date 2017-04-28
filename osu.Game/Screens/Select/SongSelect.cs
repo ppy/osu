@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -297,6 +298,11 @@ namespace osu.Game.Screens.Select
             carousel.SelectBeatmap(beatmap?.BeatmapInfo);
         }
 
+        ScheduledDelegate selectionChangedDebounce;
+
+        // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
+        private BeatmapInfo selectionChangeNoBounce;
+
         /// <summary>
         /// selection has been changed as the result of interaction with the carousel.
         /// </summary>
@@ -306,16 +312,23 @@ namespace osu.Game.Screens.Select
 
             if (!beatmap.Equals(Beatmap?.BeatmapInfo))
             {
-                if (beatmap.BeatmapSetInfoID == Beatmap?.BeatmapInfo.BeatmapSetInfoID)
+                if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
                     sampleChangeDifficulty.Play();
                 else
                 {
                     sampleChangeBeatmap.Play();
                     beatmapSetChange = true;
                 }
-                Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
             }
-            ensurePlayingSelected(beatmapSetChange);
+
+            selectionChangeNoBounce = beatmap;
+
+            selectionChangedDebounce?.Cancel();
+            selectionChangedDebounce = Scheduler.AddDelayed(delegate
+            {
+                Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
+                ensurePlayingSelected(beatmapSetChange);
+            }, 100);
         }
 
         private void ensurePlayingSelected(bool preview = false)
