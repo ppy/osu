@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Play
 
         private readonly SongProgressBar bar;
         private readonly SongProgressGraph graph;
+        private readonly SongProgressInfo info;
 
         public Action<double> OnSeek;
 
@@ -62,6 +63,14 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
+                info = new SongProgressInfo
+                {
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Y = -(bottom_bar_height + graph_height),
+                },
                 graph = new SongProgressGraph
                 {
                     RelativeSizeAxes = Axes.X,
@@ -130,10 +139,15 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            double progress = ((AudioClock?.CurrentTime ?? Time.Current) - firstHitTime) / lastHitTime;
+            double currentTime = (AudioClock?.CurrentTime ?? Time.Current);
+            double progress = (currentTime - firstHitTime) / lastHitTime;
 
             bar.UpdatePosition((float)progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
+
+            info.TimeCurrent = TimeSpan.FromMilliseconds(currentTime).ToString(@"m\:ss");
+            info.TimeLeft = TimeSpan.FromMilliseconds(lastHitTime - currentTime).ToString(@"m\:ss");
+            info.Progress = ((int)(currentTime / lastHitTime * 100)).ToString();
         }
     }
 }
