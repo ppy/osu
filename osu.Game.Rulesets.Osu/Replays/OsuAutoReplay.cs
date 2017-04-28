@@ -47,6 +47,11 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private int buttonIndex;
 
+        public OsuAutoReplay(Beatmap<OsuHitObject> beatmap)
+            : base(beatmap)
+        {
+        }
+
         protected override void Initialise()
         {
             base.Initialise();
