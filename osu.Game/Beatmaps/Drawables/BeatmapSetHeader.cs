@@ -81,10 +81,8 @@ namespace osu.Game.Beatmaps.Drawables
         [BackgroundDependencyLoader]
         private void load(LocalisationEngine localisation)
         {
-            title.Current = localisation.GetUnicodePreference(
-                beatmap.BeatmapSetInfo.Metadata.TitleUnicode, beatmap.BeatmapSetInfo.Metadata.Title);
-            artist.Current = localisation.GetUnicodePreference(
-                beatmap.BeatmapSetInfo.Metadata.ArtistUnicode, beatmap.BeatmapSetInfo.Metadata.Artist);
+            title.Current = localisation.GetUnicodePreference(beatmap.BeatmapSetInfo.Metadata.TitleUnicode, beatmap.BeatmapSetInfo.Metadata.Title);
+            artist.Current = localisation.GetUnicodePreference(beatmap.BeatmapSetInfo.Metadata.ArtistUnicode, beatmap.BeatmapSetInfo.Metadata.Artist);
         }
 
         private class PanelBackground : BufferedContainer
