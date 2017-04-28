@@ -52,10 +52,10 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// </summary>
         protected virtual void Initialise()
         {
-			User = new User
-			{
-				Username = @"Autoplay",
-			};
+            User = new User
+            {
+                Username = @"Autoplay",
+            };
 
             // We are using ApplyModsToRate and not ApplyModsToTime to counteract the speed up / slow down from HalfTime / DoubleTime so that we remain at a constant framerate of 60 fps.
             frameDelay = applyModsToRate(1000.0 / 60.0);
