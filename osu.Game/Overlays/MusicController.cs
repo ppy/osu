@@ -183,7 +183,7 @@ namespace osu.Game.Overlays
                                                                 play(playList.First().Beatmaps[0], true);
                                                             else
                                                                 return;
-                                                        }    
+                                                        }
                                                         if (current.Track.IsRunning)
                                                             current.Track.Stop();
                                                         else
