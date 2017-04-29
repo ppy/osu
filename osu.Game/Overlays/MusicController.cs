@@ -185,9 +185,9 @@ namespace osu.Game.Overlays
                                                                 return;
                                                         }
                                                         if (current?.Track?.IsRunning ?? false)
-                                                            current.Track.Stop();
+                                                            current?.Track?.Stop();
                                                         else
-                                                            current.Track.Start();
+                                                            current?.Track?.Start();
                                                     },
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
