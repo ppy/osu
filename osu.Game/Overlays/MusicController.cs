@@ -184,7 +184,7 @@ namespace osu.Game.Overlays
                                                             else
                                                                 return;
                                                         }
-                                                        if (current.Track.IsRunning)
+                                                        if (current?.Track?.IsRunning ?? false)
                                                             current.Track.Stop();
                                                         else
                                                             current.Track.Start();
