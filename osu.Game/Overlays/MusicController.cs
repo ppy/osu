@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
     public class MusicController : FocusedOverlayContainer
     {
         private const float player_height = 130;
-        private const float playlist_height = 510;  
+        private const float playlist_height = 510;
         private Drawable currentBackground;
         private DragBar progress;
         private Button playButton;
@@ -292,7 +292,7 @@ namespace osu.Game.Overlays
 
             int n = playListIndex + 1;
             if (n >= playList.Count)
-				n = 0;
+                n = 0;
 
             play(playList[n].Beatmaps[0], true);
             playListIndex = n;
