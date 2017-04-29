@@ -24,9 +24,9 @@ namespace osu.Game.Overlays
     {
         private const float transition_duration = 800;
 
-        private Box bg;
-        private FilterControl filter;
-        private Playlist list;
+        private readonly Box bg;
+        private readonly FilterControl filter;
+        private readonly Playlist list;
 
         public BeatmapSetInfo[] List
         {
@@ -216,7 +216,7 @@ namespace osu.Game.Overlays
 
         private class Playlist : Container
         {
-            private FillFlowContainer<PlaylistItem> items;
+            private readonly FillFlowContainer<PlaylistItem> items;
 
             private BeatmapSetInfo[] sets = { };
             public BeatmapSetInfo[] Sets
@@ -299,7 +299,7 @@ namespace osu.Game.Overlays
                 private const float fade_duration = 100;
                 private Color4 currentColour;
 
-                private TextAwesome icon;
+                private readonly TextAwesome icon;
                 private readonly IEnumerable<OsuSpriteText> title, artist;
 
                 public readonly int Index;
