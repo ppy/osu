@@ -23,19 +23,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
-                if (bindable != null)
-                    bindable.ValueChanged -= bindableValueChanged;
                 bindable = value;
-                if (bindable != null)
-                {
-                    bool state = State == CheckboxState.Checked;
-                    if (state != bindable.Value)
-                        State = bindable.Value ? CheckboxState.Checked : CheckboxState.Unchecked;
-                    bindable.ValueChanged += bindableValueChanged;
-                }
-
-                if (bindable?.Disabled ?? true)
-                    Alpha = 0.3f;
+                Current.BindTo(bindable);
             }
         }
 
@@ -83,18 +72,21 @@ namespace osu.Game.Graphics.UserInterface
                     Margin = new MarginPadding { Right = 5 },
                 }
             };
-        }
 
-        private void bindableValueChanged(bool isChecked)
-        {
-            State = isChecked ? CheckboxState.Checked : CheckboxState.Unchecked;
-        }
+            nub.Current.BindTo(Current);
 
-        protected override void Dispose(bool isDisposing)
-        {
-            if (bindable != null)
-                bindable.ValueChanged -= bindableValueChanged;
-            base.Dispose(isDisposing);
+            Current.ValueChanged += newValue =>
+            {
+                if (newValue)
+                    sampleChecked?.Play();
+                else
+                    sampleUnchecked?.Play();
+            };
+
+            Current.DisabledChanged += disabled =>
+            {
+                Alpha = disabled ? 0.3f : 1;
+            };
         }
 
         protected override bool OnHover(InputState state)
@@ -116,24 +108,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             sampleChecked = audio.Sample.Get(@"Checkbox/check-on");
             sampleUnchecked = audio.Sample.Get(@"Checkbox/check-off");
-        }
-
-        protected override void OnChecked()
-        {
-            sampleChecked?.Play();
-            nub.State = CheckboxState.Checked;
-
-            if (bindable != null)
-                bindable.Value = true;
-        }
-
-        protected override void OnUnchecked()
-        {
-            sampleUnchecked?.Play();
-            nub.State = CheckboxState.Unchecked;
-
-            if (bindable != null)
-                bindable.Value = false;
         }
     }
 }

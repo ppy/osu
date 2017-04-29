@@ -4,11 +4,12 @@
 using System;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -22,15 +23,22 @@ namespace osu.Game.Screens.Select
 
         public Action<BeatmapDetailTab, bool> OnFilter; //passed the selected tab and if mods is checked
 
+        private Bindable<BeatmapDetailTab> selectedTab;
+
         private void invokeOnFilter()
         {
-            OnFilter?.Invoke(tabs.SelectedItem, modsCheckbox.State == CheckboxState.Checked);
+            OnFilter?.Invoke(tabs.Current, modsCheckbox.Current);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OsuColour colour, OsuConfigManager config)
         {
             modsCheckbox.AccentColour = tabs.AccentColour = colour.YellowLight;
+
+            selectedTab = config.GetBindable<BeatmapDetailTab>(OsuConfig.BeatmapDetailTab);
+
+            tabs.Current.BindTo(selectedTab);
+            tabs.Current.TriggerChange();
         }
 
         public BeatmapDetailAreaTabControl()
@@ -61,10 +69,8 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            tabs.SelectedItem.ValueChanged += item => invokeOnFilter();
-            modsCheckbox.Action += (sender, e) => invokeOnFilter();
-
-            tabs.SelectedItem.Value = BeatmapDetailTab.Global;
+            tabs.Current.ValueChanged += item => invokeOnFilter();
+            modsCheckbox.Current.ValueChanged += item => invokeOnFilter();
         }
     }
 

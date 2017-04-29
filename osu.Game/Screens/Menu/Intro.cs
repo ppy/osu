@@ -5,8 +5,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using OpenTK.Graphics;
@@ -56,25 +58,33 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        private Bindable<bool> menuVoice;
+        private Bindable<bool> menuMusic;
+
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, OsuConfigManager config)
         {
-            welcome = audio.Sample.Get(@"welcome");
-            seeya = audio.Sample.Get(@"seeya");
+            menuVoice = config.GetBindable<bool>(OsuConfig.MenuVoice);
+            menuMusic = config.GetBindable<bool>(OsuConfig.MenuMusic);
 
             bgm = audio.Track.Get(@"circles");
             bgm.Looping = true;
+
+            welcome = audio.Sample.Get(@"welcome");
+            seeya = audio.Sample.Get(@"seeya");
         }
 
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
-            welcome.Play();
+            if (menuVoice)
+                welcome.Play();
 
             Scheduler.AddDelayed(delegate
             {
-                bgm.Start();
+                if (menuMusic)
+                    bgm.Start();
 
                 LoadComponentAsync(mainMenu = new MainMenu());
 
@@ -109,15 +119,17 @@ namespace osu.Game.Screens.Menu
             if (!(last is MainMenu))
                 Content.FadeIn(300);
 
+            double fadeOutTime = 2000;
             //we also handle the exit transition.
-            seeya.Play();
+            if (menuVoice)
+                seeya.Play();
+            else
+                fadeOutTime = 500;
 
-            const double fade_out_time = 2000;
-
-            Scheduler.AddDelayed(Exit, fade_out_time);
+            Scheduler.AddDelayed(Exit, fadeOutTime);
 
             //don't want to fade out completely else we will stop running updates and shit will hit the fan.
-            Game.FadeTo(0.01f, fade_out_time);
+            Game.FadeTo(0.01f, fadeOutTime);
 
             base.OnResuming(last);
         }

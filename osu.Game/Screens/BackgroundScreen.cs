@@ -28,7 +28,7 @@ namespace osu.Game.Screens
 
         public override bool Push(Screen screen)
         {
-            // When trying to push a non-loaded GameMode, load it asynchronously and re-invoke Push
+            // When trying to push a non-loaded screen, load it asynchronously and re-invoke Push
             // once it's done.
             if (screen.LoadState == LoadState.NotLoaded)
             {
@@ -36,7 +36,7 @@ namespace osu.Game.Screens
                 return true;
             }
 
-            // Make sure the in-progress loading is complete before pushing the GameMode.
+            // Make sure the in-progress loading is complete before pushing the screen.
             while (screen.LoadState < LoadState.Loaded)
                 Thread.Sleep(1);
 

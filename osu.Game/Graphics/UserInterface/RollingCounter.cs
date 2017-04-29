@@ -10,10 +10,11 @@ using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class RollingCounter<T> : Container
+    public abstract class RollingCounter<T> : Container, IHasAccentColour
     {
         /// <summary>
         /// The current value.
@@ -80,6 +81,12 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        public Color4 AccentColour
+        {
+            get { return DisplayedCountSpriteText.Colour; }
+            set { DisplayedCountSpriteText.Colour = value; }
+        }
+
         /// <summary>
         /// Skeleton of a numeric counter which value rolls over time.
         /// </summary>
@@ -108,11 +115,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            Flush(false, TransformType);
-
             DisplayedCountSpriteText.Text = FormatCount(Current);
-            DisplayedCountSpriteText.Anchor = Anchor;
-            DisplayedCountSpriteText.Origin = Origin;
         }
 
         /// <summary>
@@ -205,8 +208,8 @@ namespace osu.Game.Graphics.UserInterface
                     ? GetProportionalDuration(currentValue, newValue)
                     : RollingDuration;
 
-            transform.StartTime = Time.Current;
-            transform.EndTime = Time.Current + rollingTotalDuration;
+            transform.StartTime = TransformStartTime;
+            transform.EndTime = TransformStartTime + rollingTotalDuration;
             transform.StartValue = currentValue;
             transform.EndValue = newValue;
             transform.Easing = RollingEasing;
