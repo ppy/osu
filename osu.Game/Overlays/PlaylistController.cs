@@ -236,7 +236,7 @@ namespace osu.Game.Overlays
                     {
                         newItems.Add(new PlaylistItem(value[i], i)
                         {
-                        	OnSelect = OnSelect,
+                            OnSelect = OnSelect,
                         });
                     }
 
@@ -380,7 +380,7 @@ namespace osu.Game.Overlays
                 {
                     foreach (OsuSpriteText t in artist)
                         t.Colour = colours.Gray9;
-                    
+
                     icon.Colour = colours.Gray5;
                     currentColour = colours.Yellow;
                 }
