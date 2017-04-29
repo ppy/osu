@@ -16,6 +16,31 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuButton : Button
     {
         private Box hover;
+        private Triangles triangles;
+
+        public Color4 TrianglesColourLight
+        {
+            get 
+            {
+                return triangles.ColourLight;
+            }
+            set 
+            {
+                triangles.ColourLight = value;
+            }
+        }
+
+        public Color4 TrianglesColourDark
+        {
+            get
+            {
+                return triangles.ColourDark;
+            }
+            set
+            {
+                triangles.ColourDark = value;
+            }
+        }
 
         public OsuButton()
         {
@@ -45,7 +70,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Add(new Drawable[]
             {
-                new Triangles
+                triangles = new Triangles
                 {
                     RelativeSizeAxes = Axes.Both,
                     ColourDark = colours.BlueDarker,
