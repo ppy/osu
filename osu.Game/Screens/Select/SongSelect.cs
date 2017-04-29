@@ -196,6 +196,11 @@ namespace osu.Game.Screens.Select
 
         private void raiseSelect()
         {
+            var pendingSelection = selectionChangedDebounce;
+            selectionChangedDebounce = null;
+
+            pendingSelection?.RunTask();
+
             if (Beatmap == null) return;
 
             OnSelected();
