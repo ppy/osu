@@ -1,16 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Modes;
+using osu.Game.Database;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.Toolbar
         private readonly Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
-        public Action<PlayMode> OnPlayModeChange;
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public ToolbarModeSelector()
         {
@@ -62,33 +63,43 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             };
+        }
 
-            foreach (PlayMode m in Ruleset.PlayModes)
+        [BackgroundDependencyLoader]
+        private void load(RulesetDatabase rulesets, OsuGame game)
+        {
+            foreach (var r in rulesets.AllRulesets)
             {
                 modeButtons.Add(new ToolbarModeButton
                 {
-                    Mode = m,
+                    Ruleset = r,
                     Action = delegate
                     {
-                        SetGameMode(m);
-                        OnPlayModeChange?.Invoke(m);
+                        ruleset.Value = r;
                     }
                 });
             }
+
+            ruleset.ValueChanged += rulesetChanged;
+            ruleset.DisabledChanged += disabledChanged;
+            ruleset.BindTo(game.Ruleset);
         }
+
+        public override bool HandleInput => !ruleset.Disabled;
+
+        private void disabledChanged(bool isDisabled) => FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
 
         protected override void Update()
         {
             base.Update();
-
             Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
-        public void SetGameMode(PlayMode mode)
+        private void rulesetChanged(RulesetInfo ruleset)
         {
             foreach (ToolbarModeButton m in modeButtons.Children.Cast<ToolbarModeButton>())
             {
-                bool isActive = m.Mode == mode;
+                bool isActive = m.Ruleset.ID == ruleset.ID;
                 m.Active = isActive;
                 if (isActive)
                     activeButton = m;

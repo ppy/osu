@@ -3,7 +3,6 @@
 
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization;
-using osu.Game.Modes;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 using System;
@@ -41,8 +40,12 @@ namespace osu.Game.Database
         [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BeatmapDifficulty Difficulty { get; set; }
 
+        [Ignore]
+        public BeatmapMetrics Metrics { get; set; }
+
         public string Path { get; set; }
 
+        [JsonProperty("file_md5")]
         public string Hash { get; set; }
 
         // General
@@ -50,7 +53,13 @@ namespace osu.Game.Database
         public bool Countdown { get; set; }
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
-        public PlayMode Mode { get; set; }
+
+        [ForeignKey(typeof(RulesetInfo))]
+        public int RulesetID { get; set; }
+
+        [OneToOne(CascadeOperations = CascadeOperation.All)]
+        public RulesetInfo Ruleset { get; set; }
+
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
 

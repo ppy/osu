@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Modes;
+using osu.Game.Database;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select
@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Select
         public GroupMode Group;
         public SortMode Sort;
         public string SearchText;
-        public PlayMode Mode;
+        public RulesetInfo Ruleset;
 
         public void Filter(List<BeatmapGroup> groups)
         {
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Select
             {
                 var set = g.BeatmapSet;
 
-                bool hasCurrentMode = set.Beatmaps.Any(bm => bm.Mode == Mode);
+                bool hasCurrentMode = set.Beatmaps.Any(bm => bm.RulesetID == (Ruleset?.ID ?? 0));
 
                 bool match = hasCurrentMode;
 
@@ -31,7 +31,9 @@ namespace osu.Game.Screens.Select
                     || (set.Metadata.Artist ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
                     || (set.Metadata.ArtistUnicode ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
                     || (set.Metadata.Title ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (set.Metadata.TitleUnicode ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1;
+                    || (set.Metadata.TitleUnicode ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
+                    || (set.Metadata.Tags ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
+                    || (set.Metadata.Source ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1;
 
                 switch (g.State)
                 {

@@ -12,7 +12,11 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionSlider<T> : FillFlowContainer where T : struct
+    public class OptionSlider<T> : OptionSlider<T, OsuSliderBar<T>> where T: struct
+    {
+    }
+
+    public class OptionSlider<T, U> : FillFlowContainer where T : struct where U : SliderBar<T>, new()
     {
         private readonly SliderBar<T> slider;
         private readonly SpriteText text;
@@ -27,14 +31,14 @@ namespace osu.Game.Overlays.Options
             }
         }
 
-        public BindableNumber<T> Bindable
+        private Bindable<T> bindable;
+
+        public Bindable<T> Bindable
         {
-            get { return slider.Value; }
             set
             {
-                slider.Value = value;
-                if (value?.Disabled ?? true)
-                    Alpha = 0.3f;
+                bindable = value;
+                slider.Current.BindTo(bindable);
             }
         }
 
@@ -50,7 +54,7 @@ namespace osu.Game.Overlays.Options
                 {
                     Alpha = 0,
                 },
-                slider = new OsuSliderBar<T>
+                slider = new U()
                 {
                     Margin = new MarginPadding { Top = 5, Bottom = 5 },
                     RelativeSizeAxes = Axes.X

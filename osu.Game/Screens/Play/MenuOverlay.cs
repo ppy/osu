@@ -13,10 +13,11 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class MenuOverlay : OverlayContainer
+    public abstract class MenuOverlay : OverlayContainer, IRequireHighFrequencyMousePosition
     {
         private const int transition_duration = 200;
         private const int button_height = 70;
@@ -24,13 +25,15 @@ namespace osu.Game.Screens.Play
 
         protected override bool HideOnEscape => false;
 
+        protected override bool BlockPassThroughKeyboard => true;
+
         public Action OnRetry;
         public Action OnQuit;
 
         public abstract string Header { get; }
         public abstract string Description { get; }
 
-        private FillFlowContainer buttons;
+        protected FillFlowContainer<DialogButton> Buttons;
 
         public int Retries
         {
@@ -80,11 +83,13 @@ namespace osu.Game.Screens.Play
         // Don't let mouse down events through the overlay or people can click circles while paused.
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
+
         protected override bool OnMouseMove(InputState state) => true;
 
         protected void AddButton(string text, Color4 colour, Action action)
         {
-            buttons.Add(new PauseButton
+            Buttons.Add(new PauseButton
             {
                 Text = text,
                 ButtonColour = colour,
@@ -151,7 +156,7 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        buttons = new FillFlowContainer
+                        Buttons = new FillFlowContainer<DialogButton>
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,

@@ -1,19 +1,18 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Configuration;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -22,8 +21,6 @@ namespace osu.Game.Beatmaps.Drawables
         public Action<BeatmapSetHeader> GainedSelection;
         private readonly SpriteText title;
         private readonly SpriteText artist;
-
-        private Bindable<bool> preferUnicode;
 
         private readonly WorkingBeatmap beatmap;
         private readonly FillFlowContainer difficultyIcons;
@@ -82,15 +79,10 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(LocalisationEngine localisation)
         {
-            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
-            preferUnicode.ValueChanged += unicode =>
-            {
-                title.Text =  unicode ? beatmap.BeatmapSetInfo.Metadata.TitleUnicode : beatmap.BeatmapSetInfo.Metadata.Title;
-                artist.Text = unicode ? beatmap.BeatmapSetInfo.Metadata.ArtistUnicode : beatmap.BeatmapSetInfo.Metadata.Artist;
-            };
-            preferUnicode.TriggerChange();
+            title.Current = localisation.GetUnicodePreference(beatmap.BeatmapSetInfo.Metadata.TitleUnicode, beatmap.BeatmapSetInfo.Metadata.Title);
+            artist.Current = localisation.GetUnicodePreference(beatmap.BeatmapSetInfo.Metadata.ArtistUnicode, beatmap.BeatmapSetInfo.Metadata.Artist);
         }
 
         private class PanelBackground : BufferedContainer
@@ -112,7 +104,7 @@ namespace osu.Game.Beatmaps.Drawables
                         Depth = -1,
                         Direction = FillDirection.Horizontal,
                         RelativeSizeAxes = Axes.Both,
-                        // This makes the gradient not be perfectly horizontal, but diagonal at a ~40� angle
+                        // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
                         Alpha = 0.5f,
                         Children = new[]

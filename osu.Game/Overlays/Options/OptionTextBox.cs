@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
@@ -15,38 +14,9 @@ namespace osu.Game.Overlays.Options
         {
             set
             {
-                if (bindable != null)
-                    bindable.ValueChanged -= bindableValueChanged;
                 bindable = value;
-                if (bindable != null)
-                {
-                    Text = bindable.Value;
-                    bindable.ValueChanged += bindableValueChanged;
-                }
-
-                if (bindable?.Disabled ?? true)
-                    Alpha = 0.3f;
+                Current.BindTo(bindable);
             }
-        }
-
-        public OptionTextBox()
-        {
-            OnChange += onChange;
-        }
-
-        private void onChange(TextBox sender, bool newText)
-        {
-            if (bindable != null)
-                bindable.Value = Text;
-        }
-
-        private void bindableValueChanged(string newValue) => Text = newValue;
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (bindable != null)
-                bindable.ValueChanged -= bindableValueChanged;
-            base.Dispose(isDisposing);
         }
     }
 }
