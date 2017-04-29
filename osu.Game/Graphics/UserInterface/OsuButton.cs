@@ -20,11 +20,11 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 TrianglesColourLight
         {
-            get 
+            get
             {
                 return triangles.ColourLight;
             }
-            set 
+            set
             {
                 triangles.ColourLight = value;
             }
