@@ -20,22 +20,26 @@ namespace osu.Game.Overlays.Options.Sections.Online
                 new OsuCheckbox
                 {
                     LabelText = "Filter offensive words",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ChatFilter)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ChatFilter),
+                    TooltipText = "Attempts to remove words that may be offensive to specific cultures and younger age groups."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Filter foreign characters",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ChatRemoveForeign)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ChatRemoveForeign),
+                    TooltipText = "Removes any characters outside the standart ASCII (English) range.\nUseful if you experience lag from these"
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Log private messages",
-                    Bindable = config.GetBindable<bool>(OsuConfig.LogPrivateMessages)
+                    Bindable = config.GetBindable<bool>(OsuConfig.LogPrivateMessages),
+                    TooltipText = "Enabling this option will automatically log all private messages sent and received to the Chat folder in \"(user).txt\" format."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Block private messages from non-friends",
-                    Bindable = config.GetBindable<bool>(OsuConfig.BlockNonFriendPM)
+                    Bindable = config.GetBindable<bool>(OsuConfig.BlockNonFriendPM),
+                    TooltipText = "You will not receive any private messages from users who are not on your friends list if this option is enabled."
                 },
                 new OptionLabel { Text = "Chat ignore list (space-seperated list)" },
                 new OptionTextBox {

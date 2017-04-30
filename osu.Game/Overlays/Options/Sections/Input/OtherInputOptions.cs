@@ -20,12 +20,14 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 new OsuCheckbox
                 {
                     LabelText = "OS TabletPC support",
-                    Bindable = config.GetBindable<bool>(OsuConfig.Tablet)
+                    Bindable = config.GetBindable<bool>(OsuConfig.Tablet),
+                    TooltipText = "Enable this if you are running a Tablet PC or using a graphics tablet and your clicks aren't handled correctly."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Wiimote/TaTaCon Drum Support",
-                    Bindable = config.GetBindable<bool>(OsuConfig.Wiimote)
+                    Bindable = config.GetBindable<bool>(OsuConfig.Wiimote),
+                    TooltipText = "Enable support for the Wii Taiko drum controller and Wiimote.\nMake sure you have paired you Wiimote via bluetooth before enabling." //Is this going to be supported by osu?
                 },
             };
         }

@@ -29,16 +29,19 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 {
                     LabelText = "Show FPS counter",
                     Bindable = osuConfig.GetBindable<bool>(OsuConfig.FpsCounter),
+                    TooltipText = "Show a subtle FPS counter in the bottom right corner of the screen."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Reduce dropped frames",
                     Bindable = osuConfig.GetBindable<bool>(OsuConfig.ForceFrameFlush),
+                    TooltipText = "User which experience regular dropped/stutter frames should try turning this on. May reduce frame rate slightly."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Detect performance issues",
                     Bindable = osuConfig.GetBindable<bool>(OsuConfig.DetectPerformanceIssues),
+                    TooltipText = "osu! will actively look for and alert you of issues with your PC which could be hurting your game performance"
                 },
             };
         }

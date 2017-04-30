@@ -20,12 +20,14 @@ namespace osu.Game.Overlays.Options.Sections.Online
                 new OsuCheckbox
                 {
                     LabelText = "Share your city location with others",
-                    Bindable = config.GetBindable<bool>(OsuConfig.DisplayCityLocation)
+                    Bindable = config.GetBindable<bool>(OsuConfig.DisplayCityLocation),
+                    TooltipText = "By default, other users will only be able to see yourr country. Enabling this adds your city to the publicly visible location.\nThis is usually quite accurate."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Allow multiplayer game invites from all users",
-                    Bindable = config.GetBindable<bool>(OsuConfig.AllowPublicInvites)
+                    Bindable = config.GetBindable<bool>(OsuConfig.AllowPublicInvites),
+                    TooltipText = "Uncheck this to limit incoming invites to friends only."
                 },
             };
         }

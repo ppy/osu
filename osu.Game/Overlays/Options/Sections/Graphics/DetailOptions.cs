@@ -20,42 +20,50 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 new OsuCheckbox
                 {
                     LabelText = "Snaking in sliders",
-                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingInSliders)
+                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingInSliders),
+                    TooltipText = "Sliders gradually snake in from their starting point.\nThis should run fine unless you have a low-end PC."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Snaking out sliders",
-                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingOutSliders)
+                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingOutSliders),
+                    TooltipText = "Sliders gradually snake out from their starting point.\nThis should run fine unless you have a low-end PC."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Background video",
-                    Bindable = config.GetBindable<bool>(OsuConfig.Video)
+                    Bindable = config.GetBindable<bool>(OsuConfig.Video),
+                    TooltipText = "Enables background video playback.\nIf you get a large amount of lag on beatmaps with video, try disabling this feature."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Storyboards",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ShowStoryboard)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ShowStoryboard),
+                    TooltipText = "Show storyboards in the background of beatmaps. These usually contain story elements, lyrics or special effects."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Combo bursts",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ComboBurst)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ComboBurst),
+                    TooltipText = "A character image burst from the side of the screen at combo milestones."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Hit lighting",
-                    Bindable = config.GetBindable<bool>(OsuConfig.HitLighting)
+                    Bindable = config.GetBindable<bool>(OsuConfig.HitLighting),
+                    TooltipText = "Adds a subtle glow behind hit explosions which lights the playfield."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Shaders",
-                    Bindable = config.GetBindable<bool>(OsuConfig.Bloom)
+                    Bindable = config.GetBindable<bool>(OsuConfig.Bloom),
+                    TooltipText = "Enables shader special effects in gameplay (epic flashes, blurring, tinting and more!).\nHighly recommended, but requires Pixel Shader 2.0 support and a relatively powerful graphics card.\nIf your card is unsupported, this will be automatically disabled."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Softening filter",
-                    Bindable = config.GetBindable<bool>(OsuConfig.BloomSoftening)
+                    Bindable = config.GetBindable<bool>(OsuConfig.BloomSoftening),
+                    TooltipText = "Adds a softening touch to visual game-wide. Some people like this, others hate it ;)"
                 },
                 new OptionEnumDropdown<ScreenshotFormat>
                 {

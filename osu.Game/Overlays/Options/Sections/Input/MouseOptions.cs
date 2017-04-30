@@ -25,12 +25,14 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 new OsuCheckbox
                 {
                     LabelText = "Raw input",
-                    Bindable = config.GetBindable<bool>(OsuConfig.RawInput)
+                    Bindable = config.GetBindable<bool>(OsuConfig.RawInput),
+                    TooltipText = "Raw input will bypass Windows acceleration and provide the most accurate mouse movement." //This should be less Windows specific
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Map absolute raw input to the osu! window",
-                    Bindable = config.GetBindable<bool>(OsuConfig.AbsoluteToOsuWindow)
+                    Bindable = config.GetBindable<bool>(OsuConfig.AbsoluteToOsuWindow),
+                    TooltipText = "Input devices with absolute positioning such as tablets usually affect the entire screen area.\nThis allows your tablet screen area to be entirely dedicated to the osu! window."
                 },
                 new OptionEnumDropdown<ConfineMouseMode>
                 {
@@ -40,17 +42,20 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 new OsuCheckbox
                 {
                     LabelText = "Disable mouse wheel in play mode",
-                    Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableWheel)
+                    Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableWheel),
+                    TooltipText = "During play, you can use the mouse wheel to adjust the volume and pause the game.\nThis will disable that functionality."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Disable mouse buttons in play mode",
-                    Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableButtons)
+                    Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableButtons),
+                    TooltipText = "This option will disable all mouse buttons.\nSpecifically for people who use their keyboard to click."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Cursor ripples",
-                    Bindable = config.GetBindable<bool>(OsuConfig.CursorRipple)
+                    Bindable = config.GetBindable<bool>(OsuConfig.CursorRipple),
+                    TooltipText = "The cursor will ripple outwards on clicking." //Is this going to be implemented?!?
                 },
             };
         }

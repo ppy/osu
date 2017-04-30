@@ -15,7 +15,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuCheckbox : Checkbox
+    public class OsuCheckbox : Checkbox, IHasTooltip
     {
         private Bindable<bool> bindable;
 
@@ -51,6 +51,8 @@ namespace osu.Game.Graphics.UserInterface
                     labelSpriteText.Padding = value;
             }
         }
+
+        public string TooltipText { get; set; }
 
         private readonly Nub nub;
         private readonly SpriteText labelSpriteText;
