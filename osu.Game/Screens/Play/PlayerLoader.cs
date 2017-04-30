@@ -179,19 +179,18 @@ namespace osu.Game.Screens.Play
 
             private readonly SpriteText title;
             private readonly SpriteText artist;
-            private readonly WorkingBeatmap beatmap;
+            private readonly BeatmapMetadata metadata;
 
             [BackgroundDependencyLoader]
             private void load(LocalisationEngine localisation)
             {
-                title.Current = localisation.GetUnicodePreference(beatmap.BeatmapSetInfo.Metadata.TitleUnicode, beatmap.BeatmapSetInfo.Metadata.Title);
-                artist.Current = localisation.GetUnicodePreference(beatmap.BeatmapSetInfo.Metadata.ArtistUnicode, beatmap.BeatmapSetInfo.Metadata.Artist);
+                title.Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
+                artist.Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
             }
 
             public BeatmapMetadataDisplay(WorkingBeatmap beatmap)
             {
-                this.beatmap = beatmap;
-                var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+                metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
