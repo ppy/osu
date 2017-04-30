@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.UI
         public readonly RollingCounter<double> AccuracyCounter;
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
+        public readonly ModsContainer ModsContainer;
 
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
@@ -39,6 +40,7 @@ namespace osu.Game.Rulesets.UI
         protected abstract ScoreCounter CreateScoreCounter();
         protected abstract HealthDisplay CreateHealthDisplay();
         protected abstract SongProgress CreateProgress();
+        protected abstract ModsContainer CreateModsContainer();
 
         protected HudOverlay()
         {
@@ -56,6 +58,7 @@ namespace osu.Game.Rulesets.UI
                     AccuracyCounter = CreateAccuracyCounter(),
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
+                    ModsContainer = CreateModsContainer(),
                 }
             });
         }
