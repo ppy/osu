@@ -58,13 +58,21 @@ namespace osu.Game.Overlays.Music
 
         public class FilterTextBox : SearchTextBox
         {
-            protected override Color4 BackgroundUnfocused => OsuColour.FromHex(@"222222");
-            protected override Color4 BackgroundFocused => OsuColour.FromHex(@"222222");
+            private Color4 backgroundColour;
+
+            protected override Color4 BackgroundUnfocused => backgroundColour;
+            protected override Color4 BackgroundFocused => backgroundColour;
 
             public FilterTextBox()
             {
                 Masking = true;
                 CornerRadius = 5;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                backgroundColour = colours.Gray2;
             }
         }
 
