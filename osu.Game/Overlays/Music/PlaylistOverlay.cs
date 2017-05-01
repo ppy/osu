@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Music
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            beatmapBacking.ValueChanged += b => list.Current = b?.BeatmapSetInfo;
+            beatmapBacking.ValueChanged += b => list.SelectedItem = b?.BeatmapSetInfo;
             beatmapBacking.TriggerChange();
         }
 
@@ -96,7 +96,6 @@ namespace osu.Game.Overlays.Music
         {
             filter.Search.HoldFocus = true;
             filter.Search.TriggerFocus();
-
 
             ResizeTo(new Vector2(1, playlist_height), transition_duration, EasingTypes.OutQuint);
             FadeIn(transition_duration, EasingTypes.OutQuint);
@@ -111,7 +110,7 @@ namespace osu.Game.Overlays.Music
             FadeOut(transition_duration);
         }
 
-        private void itemSelected(BeatmapSetInfo set, int index)
+        private void itemSelected(BeatmapSetInfo set)
         {
             if (set.ID == (beatmapBacking.Value?.BeatmapSetInfo?.ID ?? -1))
             {

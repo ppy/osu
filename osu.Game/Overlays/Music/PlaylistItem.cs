@@ -23,29 +23,28 @@ namespace osu.Game.Overlays.Music
         private readonly TextAwesome icon;
         private readonly IEnumerable<OsuSpriteText> title, artist;
 
-        public readonly int Index;
-        public readonly BeatmapSetInfo RepresentedSet;
-        public Action<BeatmapSetInfo, int> OnSelect;
+        public readonly BeatmapSetInfo BeatmapSetInfo;
 
-        private bool current;
-        public bool Current
+        public Action<BeatmapSetInfo> OnSelect;
+
+        private bool selected;
+        public bool Selected
         {
-            get { return current; }
+            get { return selected; }
             set
             {
-                if (value == current) return;
-                current = value;
+                if (value == selected) return;
+                selected = value;
 
                 Flush(true);
                 foreach (OsuSpriteText t in title)
-                    t.FadeColour(Current ? currentColour : Color4.White, fade_duration);
+                    t.FadeColour(Selected ? currentColour : Color4.White, fade_duration);
             }
         }
 
-        public PlaylistItem(BeatmapSetInfo set, int index)
+        public PlaylistItem(BeatmapSetInfo setInfo)
         {
-            Index = index;
-            RepresentedSet = set;
+            BeatmapSetInfo = setInfo;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -74,8 +73,8 @@ namespace osu.Game.Overlays.Music
                 textContainer,
             };
 
-            textContainer.Add(title = splitText(RepresentedSet.Metadata.Title, 16, @"Exo2.0-Regular", new MarginPadding(0)));
-            textContainer.Add(artist = splitText(RepresentedSet.Metadata.Artist, 14, @"Exo2.0-Bold", new MarginPadding { Top = 1 }));
+            textContainer.Add(title = splitText(BeatmapSetInfo.Metadata.Title, 16, @"Exo2.0-Regular", new MarginPadding(0)));
+            textContainer.Add(artist = splitText(BeatmapSetInfo.Metadata.Artist, 14, @"Exo2.0-Bold", new MarginPadding { Top = 1 }));
         }
 
         private IEnumerable<OsuSpriteText> splitText(string text, int textSize, string font, MarginPadding padding)
@@ -120,7 +119,7 @@ namespace osu.Game.Overlays.Music
 
         protected override bool OnClick(Framework.Input.InputState state)
         {
-            OnSelect?.Invoke(RepresentedSet, Index);
+            OnSelect?.Invoke(BeatmapSetInfo);
             return true;
         }
     }
