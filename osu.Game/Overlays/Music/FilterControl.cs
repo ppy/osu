@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select;
 using OpenTK;
 using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Overlays.Music
 {
@@ -35,6 +36,7 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
+                            Exit = () => ExitRequested?.Invoke(),
                         },
                         new CollectionsDropdown<PlaylistCollection>
                         {
@@ -45,6 +47,8 @@ namespace osu.Game.Overlays.Music
                 },
             };
         }
+
+        public Action ExitRequested;
 
         public class FilterTextBox : SearchTextBox
         {
