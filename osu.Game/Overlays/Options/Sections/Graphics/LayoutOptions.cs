@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 {
                     LabelText = "Letterboxing",
                     Bindable = letterboxing,
-                    TooltipText = "Always use the full native resolution but display osu! in a smaller centered portion of the screen.\nUsefull to get the low latency of full screen with a smaller game resolution."
+                    TooltipText = "Always use the full native resolution but display osu! in a smaller centered portion of the screen. Usefull to get the low latency of full screen with a smaller game resolution."
                 },
                 letterboxPositionX = new OptionSlider<double>
                 {

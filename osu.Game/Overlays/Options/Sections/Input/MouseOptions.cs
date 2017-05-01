@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 {
                     LabelText = "Map absolute raw input to the osu! window",
                     Bindable = config.GetBindable<bool>(OsuConfig.AbsoluteToOsuWindow),
-                    TooltipText = "Input devices with absolute positioning such as tablets usually affect the entire screen area.\nThis allows your tablet screen area to be entirely dedicated to the osu! window."
+                    TooltipText = "Input devices with absolute positioning such as tablets usually affect the entire screen area. This allows your tablet screen area to be entirely dedicated to the osu! window."
                 },
                 new OptionEnumDropdown<ConfineMouseMode>
                 {
@@ -43,13 +43,13 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 {
                     LabelText = "Disable mouse wheel in play mode",
                     Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableWheel),
-                    TooltipText = "During play, you can use the mouse wheel to adjust the volume and pause the game.\nThis will disable that functionality."
+                    TooltipText = "During play, you can use the mouse wheel to adjust the volume and pause the game. This will disable that functionality."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Disable mouse buttons in play mode",
                     Bindable = config.GetBindable<bool>(OsuConfig.MouseDisableButtons),
-                    TooltipText = "This option will disable all mouse buttons.\nSpecifically for people who use their keyboard to click."
+                    TooltipText = "This option will disable all mouse buttons. Specifically for people who use their keyboard to click."
                 },
                 new OsuCheckbox
                 {

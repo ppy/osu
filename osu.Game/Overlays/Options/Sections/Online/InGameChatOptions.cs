@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Options.Sections.Online
                 {
                     LabelText = "Filter foreign characters",
                     Bindable = config.GetBindable<bool>(OsuConfig.ChatRemoveForeign),
-                    TooltipText = "Removes any characters outside the standart ASCII (English) range.\nUseful if you experience lag from these"
+                    TooltipText = "Removes any characters outside the standart ASCII (English) range. Useful if you experience lag from these"
                 },
                 new OsuCheckbox
                 {

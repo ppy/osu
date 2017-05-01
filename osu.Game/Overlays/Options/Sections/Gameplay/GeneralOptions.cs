@@ -47,13 +47,13 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                 {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuConfig.KeyOverlay),
-                    TooltipText = "Show the key status overlay even when playing locally.\nHandy for recording or streaming your play."
+                    TooltipText = "Show the key status overlay even when playing locally. Handy for recording or streaming your play."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show approach circle on first \"Hidden\" object",
                     Bindable = config.GetBindable<bool>(OsuConfig.HiddenShowFirstApproach),
-                    TooltipText = "Sometimes it can be hard to judge when to click the first hitobject when playing with Hidden on.\nThis allows you to see the first hitobject's approach circle."
+                    TooltipText = "Sometimes it can be hard to judge when to click the first hitobject when playing with Hidden on. This allows you to see the first hitobject's approach circle."
                 },
                 new OsuCheckbox
                 {

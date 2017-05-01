@@ -21,19 +21,19 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 {
                     LabelText = "Snaking in sliders",
                     Bindable = config.GetBindable<bool>(OsuConfig.SnakingInSliders),
-                    TooltipText = "Sliders gradually snake in from their starting point.\nThis should run fine unless you have a low-end PC."
+                    TooltipText = "Sliders gradually snake in from their starting point. This should run fine unless you have a low-end PC."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Snaking out sliders",
                     Bindable = config.GetBindable<bool>(OsuConfig.SnakingOutSliders),
-                    TooltipText = "Sliders gradually snake out from their starting point.\nThis should run fine unless you have a low-end PC."
+                    TooltipText = "Sliders gradually snake out from their starting point. This should run fine unless you have a low-end PC."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Background video",
                     Bindable = config.GetBindable<bool>(OsuConfig.Video),
-                    TooltipText = "Enables background video playback.\nIf you get a large amount of lag on beatmaps with video, try disabling this feature."
+                    TooltipText = "Enables background video playback. If you get a large amount of lag on beatmaps with video, try disabling this feature."
                 },
                 new OsuCheckbox
                 {
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 {
                     LabelText = "Shaders",
                     Bindable = config.GetBindable<bool>(OsuConfig.Bloom),
-                    TooltipText = "Enables shader special effects in gameplay (epic flashes, blurring, tinting and more!).\nHighly recommended, but requires Pixel Shader 2.0 support and a relatively powerful graphics card.\nIf your card is unsupported, this will be automatically disabled."
+                    TooltipText = "Enables shader special effects in gameplay (epic flashes, blurring, tinting and more!). Highly recommended, but requires Pixel Shader 2.0 support and a relatively powerful graphics card. If your card is unsupported, this will be automatically disabled."
                 },
                 new OsuCheckbox
                 {

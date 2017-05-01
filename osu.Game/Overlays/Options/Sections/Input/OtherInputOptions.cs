@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 {
                     LabelText = "Wiimote/TaTaCon Drum Support",
                     Bindable = config.GetBindable<bool>(OsuConfig.Wiimote),
-                    TooltipText = "Enable support for the Wii Taiko drum controller and Wiimote.\nMake sure you have paired you Wiimote via bluetooth before enabling." //Is this going to be supported by osu?
+                    TooltipText = "Enable support for the Wii Taiko drum controller and Wiimote. Make sure you have paired you Wiimote via bluetooth before enabling." //Is this going to be supported by osu?
                 },
             };
         }

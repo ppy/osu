@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Options.Sections.Online
                 {
                     LabelText = "Share your city location with others",
                     Bindable = config.GetBindable<bool>(OsuConfig.DisplayCityLocation),
-                    TooltipText = "By default, other users will only be able to see yourr country. Enabling this adds your city to the publicly visible location.\nThis is usually quite accurate."
+                    TooltipText = "By default, other users will only be able to see yourr country. Enabling this adds your city to the publicly visible location. This is usually quite accurate."
                 },
                 new OsuCheckbox
                 {
