@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Menu;
 using OpenTK;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Play
 {
@@ -174,10 +175,17 @@ namespace osu.Game.Screens.Play
                         }
                     };
                 }
-
             }
 
+            private readonly WorkingBeatmap beatmap;
+
             public BeatmapMetadataDisplay(WorkingBeatmap beatmap)
+            {
+                this.beatmap = beatmap;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(LocalisationEngine localisation)
             {
                 var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
@@ -194,7 +202,7 @@ namespace osu.Game.Screens.Play
                         {
                             new OsuSpriteText
                             {
-                                Text = metadata.Title,
+                                Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title),
                                 TextSize = 36,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,
@@ -202,7 +210,7 @@ namespace osu.Game.Screens.Play
                             },
                             new OsuSpriteText
                             {
-                                Text = metadata.Artist,
+                                Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist),
                                 TextSize = 26,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,
