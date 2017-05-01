@@ -75,6 +75,9 @@
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
+    <Compile Include="Overlays\Music\FilterControl.cs" />
+    <Compile Include="Overlays\Music\PlaylistItem.cs" />
+    <Compile Include="Overlays\Music\PlaylistList.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
@@ -421,6 +424,7 @@
     <Compile Include="Screens\Select\BeatmapDetailArea.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControlCheckbox.cs" />
     <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
+    <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
   </ItemGroup>
