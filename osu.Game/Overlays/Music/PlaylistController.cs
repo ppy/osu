@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -26,25 +28,17 @@ namespace osu.Game.Overlays.Music
 
         private const float playlist_height = 510;
 
-        private readonly Box bg;
-        private readonly FilterControl filter;
-        private readonly Playlist list;
+        private FilterControl filter;
+        private Playlist list;
 
         public BeatmapSetInfo[] List => list.Sets;
 
-        public Action<BeatmapSetInfo, int> OnSelect
-        {
-            get { return list.OnSelect; }
-            set { list.OnSelect = value; }
-        }
+        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-        public BeatmapSetInfo Current
-        {
-            get { return list.Current; }
-            set { list.Current = value; }
-        }
+        public Action<BeatmapSetInfo, int> OnSelect;
 
-        public PlaylistController()
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase game, OsuColour colours, BeatmapDatabase beatmaps)
         {
             Children = new Drawable[]
             {
@@ -61,8 +55,9 @@ namespace osu.Game.Overlays.Music
                     },
                     Children = new Drawable[]
                     {
-                        bg = new Box
+                        new Box
                         {
+                            Colour = colours.Gray3,
                             RelativeSizeAxes = Axes.Both,
                         },
                         list = new Playlist
@@ -80,15 +75,17 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            filter.Search.Exit = Hide;
-            //todo: play the first displayed song on commit when searching is implemented
+            list.Sets = beatmaps.GetAllWithChildren<BeatmapSetInfo>().ToArray();
+            list.OnSelect = (beatmap, index) => OnSelect?.Invoke(beatmap, index);
+
+            beatmapBacking.BindTo(game.Beatmap);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, BeatmapDatabase beatmaps)
+        protected override void LoadComplete()
         {
-            bg.Colour = colours.Gray3;
-            list.Sets = beatmaps.GetAllWithChildren<BeatmapSetInfo>().ToArray();
+            base.LoadComplete();
+            beatmapBacking.ValueChanged += b => list.Current = b?.BeatmapSetInfo;
+            beatmapBacking.TriggerChange();
         }
 
         protected override void PopIn()
