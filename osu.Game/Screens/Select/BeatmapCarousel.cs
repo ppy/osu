@@ -343,6 +343,8 @@ namespace osu.Game.Screens.Select
                 group.State = BeatmapGroupState.Expanded;
                 panel.State = PanelSelectedState.Selected;
 
+                if (selectedPanel == panel) return;
+
                 selectedPanel = panel;
                 selectedGroup = group;
 
