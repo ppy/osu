@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using System;
 
 namespace osu.Game.Screens.Play
 {
@@ -18,28 +19,9 @@ namespace osu.Game.Screens.Play
 
         private const int margin = 10;
 
-        public string TimeCurrent
-        {
-            set
-            {
-                timeCurrent.Text = value;
-            }
-        }
-
-        public string TimeLeft
-        {
-            set
-            {
-                timeLeft.Text = @"-" + value;
-            }
-        }
-        public string Progress
-        {
-            set
-            {
-                progress.Text = value + @"%";
-            }
-        }
+        public double TimeCurrent { set { timeCurrent.Text = TimeSpan.FromMilliseconds(value).ToString(@"m\:ss"); } }
+        public double TimeLeft { set { timeLeft.Text = @"- " + TimeSpan.FromMilliseconds(value).ToString(@"m\:ss"); } }
+        public int Progress { set { progress.Text = value.ToString() + @"%"; } }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

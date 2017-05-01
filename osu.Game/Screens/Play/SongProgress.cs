@@ -145,9 +145,9 @@ namespace osu.Game.Screens.Play
             bar.UpdatePosition((float)progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
 
-            info.TimeCurrent = TimeSpan.FromMilliseconds(currentTime).ToString(@"m\:ss");
-            info.TimeLeft = TimeSpan.FromMilliseconds(lastHitTime - currentTime).ToString(@"m\:ss");
-            info.Progress = ((int)(currentTime / lastHitTime * 100)).ToString();
+            info.TimeCurrent = currentTime;
+            info.TimeLeft = lastHitTime - currentTime;
+            info.Progress = (int)(currentTime / lastHitTime * 100);
         }
     }
 }
