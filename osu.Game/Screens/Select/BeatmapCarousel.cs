@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Select
 
         public void RemoveBeatmap(BeatmapSetInfo info) => removeGroup(groups.Find(b => b.BeatmapSet.ID == info.ID));
 
-        public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
+        public Action<BeatmapInfo> SelectionChanged;
 
         public Action StartRequested;
 
@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Select
 
             return new BeatmapGroup(beatmapSet, database)
             {
-                SelectionChanged = SelectionChanged,
+                SelectionChanged = (g, p) => selectGroup(g, p),
                 StartRequested = b => StartRequested?.Invoke(),
                 State = BeatmapGroupState.Collapsed
             };
@@ -328,21 +328,33 @@ namespace osu.Game.Screens.Select
 
         private void selectGroup(BeatmapGroup group, BeatmapPanel panel = null, bool animated = true)
         {
-            if (panel == null)
-                panel = group.BeatmapPanels.First();
+            try
+            {
+                if (panel == null)
+                    panel = group.BeatmapPanels.First();
 
-            Trace.Assert(group.BeatmapPanels.Contains(panel), @"Selected panel must be in provided group");
+                if (selectedPanel == panel) return;
 
-            if (selectedGroup != null && selectedGroup != group && selectedGroup.State != BeatmapGroupState.Hidden)
-                selectedGroup.State = BeatmapGroupState.Collapsed;
+                Trace.Assert(group.BeatmapPanels.Contains(panel), @"Selected panel must be in provided group");
 
-            group.State = BeatmapGroupState.Expanded;
-            selectedGroup = group;
-            panel.State = PanelSelectedState.Selected;
-            selectedPanel = panel;
+                if (selectedGroup != null && selectedGroup != group && selectedGroup.State != BeatmapGroupState.Hidden)
+                    selectedGroup.State = BeatmapGroupState.Collapsed;
 
-            float selectedY = computeYPositions(animated);
-            ScrollTo(selectedY, animated);
+                group.State = BeatmapGroupState.Expanded;
+                panel.State = PanelSelectedState.Selected;
+
+                if (selectedPanel == panel) return;
+
+                selectedPanel = panel;
+                selectedGroup = group;
+
+                SelectionChanged?.Invoke(panel.Beatmap);
+            }
+            finally
+            {
+                float selectedY = computeYPositions(animated);
+                ScrollTo(selectedY, animated);
+            }
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
