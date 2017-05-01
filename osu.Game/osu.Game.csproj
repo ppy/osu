@@ -425,6 +425,8 @@
     <Compile Include="Graphics\UserInterface\OsuTabControlCheckbox.cs" />
     <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
+    <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
+    <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
