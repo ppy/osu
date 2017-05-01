@@ -14,8 +14,8 @@ namespace osu.Game.Database
     {
         private readonly BeatmapDatabase database;
 
-        public DatabaseWorkingBeatmap(BeatmapDatabase database, BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, bool withStoryboard = false)
-            : base(beatmapInfo, beatmapSetInfo, withStoryboard)
+        public DatabaseWorkingBeatmap(BeatmapDatabase database, BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo = null, BeatmapMetadata metadata = null, bool withStoryboard = false)
+            : base(beatmapInfo, beatmapSetInfo, metadata, withStoryboard)
         {
             this.database = database;
         }
