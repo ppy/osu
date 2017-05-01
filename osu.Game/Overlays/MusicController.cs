@@ -2,15 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,7 +20,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using System.Linq;
 using osu.Framework.Threading;
 using osu.Game.Overlays.Music;
 
@@ -47,13 +43,8 @@ namespace osu.Game.Overlays
 
         private SpriteText title, artist;
 
-        private PlaylistController playlist;
+        private PlaylistOverlay playlist;
 
-        private List<BeatmapSetInfo> playList;
-        private int playListIndex = -1;
-
-        private TrackManager trackManager;
-        private BeatmapDatabase beatmaps;
         private LocalisationEngine localisation;
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
@@ -89,10 +80,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, BeatmapDatabase beatmaps, OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuGameBase game, OsuColour colours, LocalisationEngine localisation)
         {
-            this.beatmaps = beatmaps;
-            trackManager = game.Audio.Track;
             this.localisation = localisation;
 
             Children = new Drawable[]
@@ -105,22 +94,10 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        playlist = new PlaylistController
+                        playlist = new PlaylistOverlay
                         {
                             RelativeSizeAxes = Axes.X,
                             Y = player_height + 10,
-                            //todo: this is the logic I expect, but maybe not others
-                            OnSelect = (set, index) =>
-                            {
-                                if (set.ID == (current?.BeatmapSetInfo?.ID ?? -1))
-                                {
-                                    current?.Track?.Seek(0);
-                                    return;
-                                }
-
-                                playListIndex = index;
-                                playSpecified(set.Beatmaps[0]);
-                            },
                         },
                         playerContainer = new Container
                         {
@@ -229,8 +206,6 @@ namespace osu.Game.Overlays
             beatmapBacking.ValueChanged += beatmapChanged;
             beatmapBacking.TriggerChange();
 
-            playList = playlist.List.ToList();
-
             base.LoadComplete();
         }
 
@@ -263,14 +238,8 @@ namespace osu.Game.Overlays
 
             if (track == null)
             {
-                if (playList.Count > 0)
-                {
-                    playSpecified(playList.First().Beatmaps[0]);
-
-                    if ((track = current?.Track) == null) return;
-                }
-                else
-                    return;
+                playlist.PlayNext();
+                return;
             }
 
             if (track.IsRunning)
@@ -281,42 +250,14 @@ namespace osu.Game.Overlays
 
         private void prev()
         {
-            if (playList.Count == 0) return;
-            if (beatmapBacking != null && playList.Count == 1) return;
-
-            int n = playListIndex - 1;
-            if (n < 0)
-                n = playList.Count - 1;
-
-            playSpecified(playList[n].Beatmaps[0], TransformDirection.Prev);
-            playListIndex = n;
+            queuedDirection = TransformDirection.Prev;
+            playlist.PlayPrevious();
         }
 
         private void next()
         {
-            if (playList.Count == 0) return;
-            if (beatmapBacking != null && playList.Count == 1) return;
-
-            int n = playListIndex + 1;
-            if (n >= playList.Count)
-                n = 0;
-
-            playSpecified(playList[n].Beatmaps[0]);
-            playListIndex = n;
-        }
-
-        private void playSpecified(BeatmapInfo info, TransformDirection direction = TransformDirection.Next)
-        {
-            queuedDirection = direction;
-
-            beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
-
-            Task.Run(() =>
-            {
-                var track = beatmapBacking.Value.Track;
-                trackManager.SetExclusive(track);
-                track.Start();
-            }).ContinueWith(task => Schedule(task.ThrowIfFaulted), TaskContinuationOptions.OnlyOnFaulted);
+            queuedDirection = TransformDirection.Next;
+            playlist.PlayNext();
         }
 
         private WorkingBeatmap current;
