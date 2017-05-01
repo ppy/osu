@@ -177,13 +177,17 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            private readonly SpriteText title;
-            private readonly SpriteText artist;
-            private readonly BeatmapMetadata metadata;
+            private readonly WorkingBeatmap beatmap;
 
             public BeatmapMetadataDisplay(WorkingBeatmap beatmap)
             {
-                metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+                this.beatmap = beatmap;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(LocalisationEngine localisation)
+            {
+                var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
@@ -196,17 +200,17 @@ namespace osu.Game.Screens.Play
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            title = new OsuSpriteText
+                            new OsuSpriteText
                             {
-                                Text = metadata.Title,
+                                Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title),
                                 TextSize = 36,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
-                            artist = new OsuSpriteText
+                            new OsuSpriteText
                             {
-                                Text = metadata.Artist,
+                                Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist),
                                 TextSize = 26,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,
@@ -261,13 +265,6 @@ namespace osu.Game.Screens.Play
                         },
                     }
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(LocalisationEngine localisation)
-            {
-                title.Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
-                artist.Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
             }
         }
     }
