@@ -46,9 +46,15 @@ namespace osu.Game.Overlays.Music
                     },
                 },
             };
+
+            Search.Current.ValueChanged += current_ValueChanged;
         }
 
+        private void current_ValueChanged(string newValue) => FilterChanged?.Invoke(newValue);
+
         public Action ExitRequested;
+
+        public Action<string> FilterChanged;
 
         public class FilterTextBox : SearchTextBox
         {
