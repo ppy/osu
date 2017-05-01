@@ -73,13 +73,14 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            ExitRequested = () => State = Visibility.Hidden,
                             Padding = new MarginPadding(10),
                         },
                     },
                 },
             };
 
-            
+
             list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>().ToList();
 
             beatmapBacking.BindTo(game.Beatmap);
@@ -95,7 +96,7 @@ namespace osu.Game.Overlays.Music
         protected override void PopIn()
         {
             filter.Search.HoldFocus = true;
-            filter.Search.TriggerFocus();
+            Schedule(() => filter.Search.TriggerFocus());
 
             ResizeTo(new Vector2(1, playlist_height), transition_duration, EasingTypes.OutQuint);
             FadeIn(transition_duration, EasingTypes.OutQuint);
@@ -104,7 +105,6 @@ namespace osu.Game.Overlays.Music
         protected override void PopOut()
         {
             filter.Search.HoldFocus = false;
-            filter.Search.TriggerFocusLost();
 
             ResizeTo(new Vector2(1, 0), transition_duration, EasingTypes.OutQuint);
             FadeOut(transition_duration);
