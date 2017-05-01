@@ -16,6 +16,8 @@ using System.Threading.Tasks;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -60,11 +62,18 @@ namespace osu.Desktop.VisualTests.Tests
                 new Color4(17, 136, 170, 255)
             };
 
+            var keys = new Key[] { Key.S, Key.D, Key.F, Key.Space, Key.J, Key.K, Key.L };
+
             int num_columns = 7;
             int half_columns = num_columns / 2;
 
             for (int i = 0; i < num_columns; i++)
-                columns.Add(new Column());
+            {
+                columns.Add(new Column
+                {
+                    Key = keys[i]
+                });
+            }
 
             for (int i = 0; i < half_columns; i++)
             {
@@ -122,7 +131,9 @@ namespace osu.Desktop.VisualTests.Tests
             }
         }
 
-        private Box foreground;
+        public Key Key;
+
+        private Box background;
         private Container hitTargetBar;
         private Container keyIcon;
 
@@ -133,7 +144,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             Children = new Drawable[]
             {
-                foreground = new Box
+                background = new Box
                 {
                     Name = "Foreground",
                     RelativeSizeAxes = Axes.Both,
@@ -164,11 +175,6 @@ namespace osu.Desktop.VisualTests.Tests
                                     RelativeSizeAxes = Axes.Both,
                                     ColourInfo = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0)),
                                     Alpha = 0.5f
-                                },
-                                new Box
-                                {
-                                    Name = "Key down foreground",
-                                    Alpha = 0f,
                                 },
                                 keyIcon = new Container
                                 {
@@ -232,7 +238,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void setAccentColour()
         {
-            foreground.Colour = AccentColour;
+            background.Colour = AccentColour;
 
             hitTargetBar.EdgeEffect = new EdgeEffect
             {
@@ -247,6 +253,28 @@ namespace osu.Desktop.VisualTests.Tests
                 Radius = 5,
                 Colour = AccentColour.Opacity(0.5f),
             };
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Key == Key && !args.Repeat)
+            {
+                background.FadeTo(background.Alpha + 0.2f, 50, EasingTypes.OutQuint);
+                keyIcon.ScaleTo(1.4f, 50, EasingTypes.OutQuint);
+            }
+
+            return false;
+        }
+
+        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        {
+            if (args.Key == Key)
+            {
+                background.FadeTo(0.2f, 800, EasingTypes.OutQuart);
+                keyIcon.ScaleTo(1f, 400, EasingTypes.OutQuart);
+            }
+
+            return false;
         }
     }
 }
