@@ -181,13 +181,6 @@ namespace osu.Game.Screens.Play
             private readonly SpriteText artist;
             private readonly BeatmapMetadata metadata;
 
-            [BackgroundDependencyLoader]
-            private void load(LocalisationEngine localisation)
-            {
-                title.Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
-                artist.Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
-            }
-
             public BeatmapMetadataDisplay(WorkingBeatmap beatmap)
             {
                 metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
@@ -268,6 +261,13 @@ namespace osu.Game.Screens.Play
                         },
                     }
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(LocalisationEngine localisation)
+            {
+                title.Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
+                artist.Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
             }
         }
     }
