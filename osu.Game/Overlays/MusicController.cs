@@ -32,6 +32,12 @@ namespace osu.Game.Overlays
     {
         private const float player_height = 130;
 
+        private const float transition_length = 800;
+
+        private const float progress_height = 10;
+
+        private const float bottom_black_area_height = 55;
+
         private Drawable currentBackground;
         private DragBar progress;
         private Button playButton;
@@ -44,17 +50,12 @@ namespace osu.Game.Overlays
         private int playListIndex = -1;
 
         private TrackManager trackManager;
-        private Bindable<WorkingBeatmap> beatmapSource;
-        private WorkingBeatmap current;
+        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
         private BeatmapDatabase beatmaps;
         private LocalisationEngine localisation;
 
         private Container dragContainer;
         private Container playerContainer;
-
-        private const float progress_height = 10;
-
-        private const float bottom_black_area_height = 55;
 
         public MusicController()
         {
@@ -109,7 +110,7 @@ namespace osu.Game.Overlays
                                     current?.Track?.Seek(0);
 
                                 playListIndex = index;
-                                play(set.Beatmaps[0], true);
+                                playSpecified(set.Beatmaps[0], true);
                             },
                         },
                         playerContainer = new Container
@@ -173,20 +174,8 @@ namespace osu.Game.Overlays
                                                 {
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
-                                                    Action = () =>
-                                                    {
-                                                        if (current?.Track == null)
-                                                        {
-                                                            if (playList.Count > 0)
-                                                                play(playList.First().Beatmaps[0], true);
-                                                            else
-                                                                return;
-                                                        }
-                                                        if (current?.Track?.IsRunning ?? false)
-                                                            current?.Track?.Stop();
-                                                        else
-                                                            current?.Track?.Start();
-                                                    },
+                                                    Action = play
+                                                    ,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
                                                 new Button
@@ -224,17 +213,40 @@ namespace osu.Game.Overlays
             trackManager = game.Audio.Track;
             this.localisation = localisation;
 
-            beatmapSource = game.Beatmap ?? new Bindable<WorkingBeatmap>();
+            beatmapBacking.BindTo(game.Beatmap);
 
             currentBackground = new MusicControllerBackground();
             playerContainer.Add(currentBackground);
-            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible? activeColour : Color4.White, 200, EasingTypes.OutQuint);
+            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? activeColour : Color4.White, 200, EasingTypes.OutQuint);
+        }
+
+        private void play()
+        {
+            var track = current?.Track;
+
+            if (track == null)
+            {
+                if (playList.Count > 0)
+                {
+                    playSpecified(playList.First().Beatmaps[0], true);
+
+                    if ((track = current?.Track) == null) return;
+                }
+                else
+                    return;
+            }
+
+            if (track.IsRunning)
+                track.Stop();
+            else
+                track.Start();
         }
 
         protected override void LoadComplete()
         {
-            beatmapSource.ValueChanged += workingChanged;
-            beatmapSource.TriggerChange();
+            beatmapBacking.ValueChanged += beatmapChanged;
+            beatmapBacking.TriggerChange();
+
             playList = playlist.List.ToList();
 
             base.LoadComplete();
@@ -258,60 +270,66 @@ namespace osu.Game.Overlays
 
             if (current?.TrackLoaded ?? false)
             {
-                progress.UpdatePosition(current.Track.Length == 0 ? 0 : (float)(current.Track.CurrentTime / current.Track.Length));
-                playButton.Icon = current.Track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+                var track = current.Track;
 
-                if (current.Track.HasCompleted && !current.Track.Looping) next();
+                progress.UpdatePosition(track.Length == 0 ? 0 : (float)(track.CurrentTime / track.Length));
+                playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+
+                if (track.HasCompleted && !track.Looping) next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
         }
 
-        private void workingChanged(WorkingBeatmap beatmap)
+        private WorkingBeatmap current;
+
+        private void beatmapChanged(WorkingBeatmap beatmap)
         {
             progress.IsEnabled = beatmap != null;
-            if (beatmap == current) return;
-            bool audioEquals = current?.BeatmapInfo?.AudioEquals(beatmap?.BeatmapInfo) ?? false;
-            current = beatmap;
-            updateDisplay(current, audioEquals ? TransformDirection.None : TransformDirection.Next);
+
+            bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
+            current = beatmapBacking.Value;
+
+            updateDisplay(beatmapBacking, audioEquals ? TransformDirection.None : TransformDirection.Next);
         }
 
         private void prev()
         {
             if (playList.Count == 0) return;
-            if (current != null && playList.Count == 1) return;
+            if (beatmapBacking != null && playList.Count == 1) return;
 
             int n = playListIndex - 1;
             if (n < 0)
                 n = playList.Count - 1;
 
-            play(playList[n].Beatmaps[0], false);
+            playSpecified(playList[n].Beatmaps[0], false);
             playListIndex = n;
         }
 
         private void next()
         {
             if (playList.Count == 0) return;
-            if (current != null && playList.Count == 1) return;
+            if (beatmapBacking != null && playList.Count == 1) return;
 
             int n = playListIndex + 1;
             if (n >= playList.Count)
                 n = 0;
 
-            play(playList[n].Beatmaps[0], true);
+            playSpecified(playList[n].Beatmaps[0], true);
             playListIndex = n;
         }
 
-        private void play(BeatmapInfo info, bool isNext)
+        private void playSpecified(BeatmapInfo info, bool isNext)
         {
-            current = beatmaps.GetWorkingBeatmap(info, current);
+            beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
             Task.Run(() =>
             {
-                trackManager.SetExclusive(current.Track);
-                current.Track.Start();
-                beatmapSource.Value = current;
+                var track = beatmapBacking.Value.Track;
+                trackManager.SetExclusive(track);
+                track.Start();
+                beatmapBacking.Value = beatmapBacking;
             }).ContinueWith(task => Schedule(task.ThrowIfFaulted), TaskContinuationOptions.OnlyOnFaulted);
-            updateDisplay(current, isNext ? TransformDirection.Next : TransformDirection.Prev);
+            updateDisplay(beatmapBacking, isNext ? TransformDirection.Next : TransformDirection.Prev);
         }
 
         private Action pendingBeatmapSwitch;
@@ -337,7 +355,6 @@ namespace osu.Game.Overlays
                         BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
                         title.Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
                         artist.Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
-                        playlist.Current = beatmap.BeatmapSetInfo;
                     }
                 });
 
@@ -370,11 +387,9 @@ namespace osu.Game.Overlays
 
         private void seek(float position)
         {
-            current?.Track?.Seek(current.Track.Length * position);
-            current?.Track?.Start();
+            var track = current?.Track;
+            track?.Seek(track.Length * position);
         }
-
-        private const float transition_length = 800;
 
         protected override void PopIn()
         {
