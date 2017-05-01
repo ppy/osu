@@ -23,14 +23,63 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Mania playfield";
 
+        private FlowContainer<Column> columns;
+
         public override void Reset()
         {
             base.Reset();
 
-            Add(new Column
+            Add(new Container
             {
-                AccentColour = new Color4(187, 17, 119, 255)
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Y,
+                AutoSizeAxes = Axes.X,
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black
+                    },
+                    columns = new FillFlowContainer<Column>
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        AutoSizeAxes = Axes.X,
+                        Direction = FillDirection.Horizontal,
+                        Padding = new MarginPadding { Left = 1, Right = 1 },
+                        Spacing = new Vector2(1, 0)
+                    }
+                }
             });
+
+            var colours = new Color4[]
+            {
+                new Color4(187, 17, 119, 255),
+                new Color4(96, 204, 0, 255),
+                new Color4(17, 136, 170, 255)
+            };
+
+            int num_columns = 7;
+            int half_columns = num_columns / 2;
+
+            for (int i = 0; i < num_columns; i++)
+                columns.Add(new Column());
+
+            for (int i = 0; i < half_columns; i++)
+            {
+                Color4 accent = colours[i % 2];
+                columns.Children.ElementAt(i).AccentColour = accent;
+                columns.Children.ElementAt(num_columns - 1 - i).AccentColour = accent;
+            }
+
+            bool hasSpecial = half_columns * 2 < num_columns;
+            if (hasSpecial)
+            {
+                Column specialColumn = columns.Children.ElementAt(half_columns);
+                specialColumn.IsSpecialColumn = true;
+                specialColumn.AccentColour = colours[2];
+            }
         }
     }
 
@@ -84,25 +133,11 @@ namespace osu.Desktop.VisualTests.Tests
 
             Children = new Drawable[]
             {
-                new Box
+                foreground = new Box
                 {
-                    Name = "Background",
+                    Name = "Foreground",
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = 1, Right = 1 },
-                    Children = new[]
-                    {
-                        foreground = new Box
-                        {
-                            Name = "Foreground",
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.2f
-                        },
-                    }
+                    Alpha = 0.2f
                 },
                 new FillFlowContainer
                 {
