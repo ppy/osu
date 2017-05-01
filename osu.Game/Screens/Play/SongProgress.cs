@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
 
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
 
+        private double firstHitTime => objects.First().StartTime;
+
         private IEnumerable<HitObject> objects;
 
         public IEnumerable<HitObject> Objects
@@ -75,7 +77,7 @@ namespace osu.Game.Screens.Play
                     Origin =  Anchor.BottomLeft,
                     SeekRequested = delegate (float position)
                     {
-                        OnSeek?.Invoke(position);
+                        OnSeek?.Invoke(firstHitTime + position * (lastHitTime - firstHitTime));
                     },
                 },
             };
@@ -86,18 +88,28 @@ namespace osu.Game.Screens.Play
             State = Visibility.Visible;
         }
 
-        private bool barVisible;
+        private bool allowSeeking;
 
-        public void ToggleBar()
+        public bool AllowSeeking
         {
-            barVisible = !barVisible;
-            updateBarVisibility();
+            get
+            {
+                return allowSeeking;
+            }
+
+            set
+            {
+                if (allowSeeking == value) return;
+
+                allowSeeking = value;
+                updateBarVisibility();
+            }
         }
 
         private void updateBarVisibility()
         {
-            bar.FadeTo(barVisible ? 1 : 0, transition_duration, EasingTypes.In);
-            MoveTo(new Vector2(0, barVisible ? 0 : bottom_bar_height), transition_duration, EasingTypes.In);
+            bar.FadeTo(allowSeeking ? 1 : 0, transition_duration, EasingTypes.In);
+            MoveTo(new Vector2(0, allowSeeking ? 0 : bottom_bar_height), transition_duration, EasingTypes.In);
         }
 
         protected override void PopIn()
@@ -118,7 +130,7 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            double progress = (AudioClock?.CurrentTime ?? Time.Current) / lastHitTime;
+            double progress = ((AudioClock?.CurrentTime ?? Time.Current) - firstHitTime) / lastHitTime;
 
             bar.UpdatePosition((float)progress);
             graph.Progress = (int)(graph.ColumnCount * progress);

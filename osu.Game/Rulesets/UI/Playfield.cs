@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.UI
                 {
                     content = new Container
                     {
+                        AlwaysReceiveInput = true,
                         RelativeSizeAxes = Axes.Both,
                     }
                 }

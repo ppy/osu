@@ -1,30 +1,29 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Configuration;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
-using OpenTK;
-using OpenTK.Graphics;
-using System;
-using System.Collections.Generic;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Beatmaps;
-using osu.Game.Screens.Play;
-using osu.Game.Rulesets.Scoring;
-using osu.Framework.Graphics.Colour;
-using System.Linq;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -272,8 +271,6 @@ namespace osu.Game.Screens.Ranking
         {
             private readonly BeatmapInfo beatmap;
 
-            private Bindable<bool> preferUnicode;
-
             private readonly OsuSpriteText title;
             private readonly OsuSpriteText artist;
             private readonly OsuSpriteText versionMapper;
@@ -323,20 +320,14 @@ namespace osu.Game.Screens.Ranking
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, OsuConfigManager config)
+            private void load(OsuColour colours, LocalisationEngine localisation)
             {
                 title.Colour = artist.Colour = colours.BlueDarker;
                 versionMapper.Colour = colours.Gray8;
 
                 versionMapper.Text = $"{beatmap.Version} - mapped by {beatmap.Metadata.Author}";
-
-                preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
-                preferUnicode.ValueChanged += unicode =>
-                {
-                    title.Text = unicode ? beatmap.Metadata.TitleUnicode : beatmap.Metadata.Title;
-                    artist.Text = unicode ? beatmap.Metadata.ArtistUnicode : beatmap.Metadata.Artist;
-                };
-                preferUnicode.TriggerChange();
+                title.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
+                artist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
             }
         }
 

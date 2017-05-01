@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -18,10 +17,10 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
         {
             Children = new Drawable[]
             {
-                new OptionSlider<int>
+                new OptionSlider<double>
                 {
                     LabelText = "Background dim",
-                    Bindable = (BindableInt)config.GetBindable<int>(OsuConfig.DimLevel)
+                    Bindable = config.GetBindable<double>(OsuConfig.DimLevel)
                 },
                 new OptionEnumDropdown<ProgressBarType>
                 {
@@ -36,7 +35,7 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                 new OptionSlider<double>
                 {
                     LabelText = "Score meter size",
-                    Bindable = (BindableDouble)config.GetBindable<double>(OsuConfig.ScoreMeterScale)
+                    Bindable = config.GetBindable<double>(OsuConfig.ScoreMeterScale)
                 },
                 new OsuCheckbox
                 {

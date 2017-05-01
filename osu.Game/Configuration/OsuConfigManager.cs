@@ -25,7 +25,7 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuCursorSize, 1.0, 0.5f, 2);
             Set(OsuConfig.GameplayCursorSize, 1.0, 0.5f, 2);
-            Set(OsuConfig.DimLevel, 30, 0, 100);
+            Set(OsuConfig.DimLevel, 0.3, 0, 1);
 
             Set(OsuConfig.MouseDisableButtons, false);
             Set(OsuConfig.MouseDisableWheel, false);
@@ -92,7 +92,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.IgnoreBeatmapSamples, false).Disabled = true;
             Set(OsuConfig.IgnoreBeatmapSkins, false).Disabled = true;
             Set(OsuConfig.IgnoreList, string.Empty).Disabled = true;
-            Set(OsuConfig.Language, @"unknown").Disabled = true;
             Set(OsuConfig.AllowNowPlayingHighlights, false).Disabled = true;
             Set(OsuConfig.LastVersion, string.Empty).Disabled = true;
             Set(OsuConfig.LastVersionPermissionsFailed, string.Empty).Disabled = true;
@@ -163,16 +162,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.UpdateFailCount, 0).Disabled = true;
             //Set(OsuConfig.TreeSortMode, TreeGroupMode.Show_All).Disabled = true;
             //Set(OsuConfig.TreeSortMode2, TreeSortMode.Title).Disabled = true;
-            bool unicodeDefault = false;
-            switch (Get<string>(OsuConfig.Language))
-            {
-                case @"zh":
-                case @"ja":
-                case @"ko":
-                    unicodeDefault = true;
-                    break;
-            }
-            Set(OsuConfig.ShowUnicode, unicodeDefault);
             Set(OsuConfig.PermanentSongInfo, false).Disabled = true;
             Set(OsuConfig.Ticker, false).Disabled = true;
             Set(OsuConfig.CompatibilityContext, false).Disabled = true;
@@ -339,7 +328,6 @@ namespace osu.Game.Configuration
         SaveUsername,
         TreeSortMode,
         TreeSortMode2,
-        ShowUnicode,
         PermanentSongInfo,
         Ticker,
         CompatibilityContext,
