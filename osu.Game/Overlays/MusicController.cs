@@ -161,8 +161,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
-                                                    Action = play
-                                                    ,
+                                                    Action = play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
                                                 new Button
