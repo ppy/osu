@@ -274,6 +274,8 @@ namespace osu.Game.Database
             if (beatmapSetInfo == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
 
+            beatmapInfo.BeatmapSet = beatmapSetInfo;
+
             //we need metadata
             GetChildren(beatmapSetInfo);
             //we also need a ruleset
@@ -282,7 +284,7 @@ namespace osu.Game.Database
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapSetInfo.Metadata;
 
-            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo, beatmapSetInfo, withStoryboard);
+            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo, withStoryboard: withStoryboard);
 
             previous?.TransferTo(working);
 
