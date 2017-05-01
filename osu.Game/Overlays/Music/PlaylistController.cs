@@ -3,8 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -17,26 +15,24 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Music
 {
     public class PlaylistController : OverlayContainer
     {
-        private const float transition_duration = 800;
+        private const float transition_duration = 600;
+
+        private const float playlist_height = 510;
 
         private readonly Box bg;
         private readonly FilterControl filter;
         private readonly Playlist list;
 
-        public BeatmapSetInfo[] List
-        {
-            get
-            {
-                return list.Sets;
-            }
-        }
+        public BeatmapSetInfo[] List => list.Sets;
 
-        public Action<BeatmapSetInfo,int> OnSelect
+        public Action<BeatmapSetInfo, int> OnSelect
         {
             get { return list.OnSelect; }
             set { list.OnSelect = value; }
@@ -100,8 +96,9 @@ namespace osu.Game.Overlays
             filter.Search.HoldFocus = true;
             filter.Search.TriggerFocus();
 
-            list.ScrollContainer.ScrollDraggerVisible = true;
-            ResizeTo(new Vector2(1f), transition_duration, EasingTypes.OutQuint);
+
+            ResizeTo(new Vector2(1, playlist_height), transition_duration, EasingTypes.OutQuint);
+            FadeIn(transition_duration, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
@@ -109,8 +106,8 @@ namespace osu.Game.Overlays
             filter.Search.HoldFocus = false;
             filter.Search.TriggerFocusLost();
 
-            list.ScrollContainer.ScrollDraggerVisible = false;
-            ResizeTo(new Vector2(1f, 0f), transition_duration, EasingTypes.OutQuint);
+            ResizeTo(new Vector2(1, 0), transition_duration, EasingTypes.OutQuint);
+            FadeOut(transition_duration);
         }
 
         private class FilterControl : Container
@@ -236,7 +233,7 @@ namespace osu.Game.Overlays
                     {
                         newItems.Add(new PlaylistItem(value[i], i)
                         {
-                            OnSelect = OnSelect,
+                            OnSelect = itemSelected,
                         });
                     }
 
@@ -244,22 +241,9 @@ namespace osu.Game.Overlays
                 }
             }
 
-            // exposed so PlaylistController can hide the scroll dragger when hidden
-            // because the scroller can be seen when scrolled to the bottom and PlaylistController is closed
-            public readonly ScrollContainer ScrollContainer;
+            private void itemSelected(BeatmapSetInfo arg1, int arg2) => OnSelect?.Invoke(arg1, arg2);
 
-            private Action<BeatmapSetInfo,int> onSelect;
-            public Action<BeatmapSetInfo,int> OnSelect
-            {
-                get { return onSelect; }
-                set
-                {
-                    onSelect = value;
-
-                    foreach (PlaylistItem s in items.Children)
-                        s.OnSelect = value;
-                }
-            }
+            public Action<BeatmapSetInfo, int> OnSelect;
 
             private BeatmapSetInfo current;
             public BeatmapSetInfo Current
@@ -279,7 +263,7 @@ namespace osu.Game.Overlays
             {
                 Children = new Drawable[]
                 {
-                    ScrollContainer = new ScrollContainer
+                    new ScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -304,7 +288,7 @@ namespace osu.Game.Overlays
 
                 public readonly int Index;
                 public readonly BeatmapSetInfo RepresentedSet;
-                public Action<BeatmapSetInfo,int> OnSelect;
+                public Action<BeatmapSetInfo, int> OnSelect;
 
                 private bool current;
                 public bool Current

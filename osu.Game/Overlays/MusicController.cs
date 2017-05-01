@@ -24,13 +24,14 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System.Linq;
+using osu.Game.Overlays.Music;
 
 namespace osu.Game.Overlays
 {
     public class MusicController : FocusedOverlayContainer
     {
         private const float player_height = 130;
-        private const float playlist_height = 510;
+
         private Drawable currentBackground;
         private DragBar progress;
         private Button playButton;
@@ -58,12 +59,8 @@ namespace osu.Game.Overlays
         public MusicController()
         {
             Width = 400;
-            Height = player_height + playlist_height;
-
             Margin = new MarginPadding(10);
         }
-
-        protected override bool InternalContains(Vector2 screenSpacePos) => playlist.State == Visibility.Visible ? dragContainer.Contains(screenSpacePos) : playerContainer.Contains(screenSpacePos);
 
         protected override bool OnDragStart(InputState state) => true;
 
@@ -97,13 +94,14 @@ namespace osu.Game.Overlays
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
                         playlist = new PlaylistController
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = player_height + 10 },
+                            RelativeSizeAxes = Axes.X,
+                            Y = player_height + 10,
                             //todo: this is the logic I expect, but maybe not others
                             OnSelect = (set, index) =>
                             {
@@ -230,7 +228,7 @@ namespace osu.Game.Overlays
 
             currentBackground = new MusicControllerBackground();
             playerContainer.Add(currentBackground);
-            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible? activeColour : Color4.White, transition_length, EasingTypes.OutQuint);
+            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible? activeColour : Color4.White, 200, EasingTypes.OutQuint);
         }
 
         protected override void LoadComplete()
@@ -240,6 +238,12 @@ namespace osu.Game.Overlays
             playList = playlist.List.ToList();
 
             base.LoadComplete();
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            Height = dragContainer.Height;
         }
 
         protected override void Update()
