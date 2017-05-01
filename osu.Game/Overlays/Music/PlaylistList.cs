@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
@@ -17,34 +18,24 @@ namespace osu.Game.Overlays.Music
         {
             set
             {
-                List<PlaylistItem> newItems = new List<PlaylistItem>();
-
-                int i = 0;
-                foreach (var item in value)
-                {
-                    newItems.Add(new PlaylistItem(item, i++)
-                    {
-                        OnSelect = (b, idx) => OnSelect?.Invoke(b, idx)
-                    });
-                }
-
-                items.Children = newItems;
+                items.Children = value.Select(item => new PlaylistItem(item) { OnSelect = itemSelected }).ToList();
             }
         }
 
-        public Action<BeatmapSetInfo, int> OnSelect;
-
-        private BeatmapSetInfo current;
-        public BeatmapSetInfo Current
+        private void itemSelected(BeatmapSetInfo b)
         {
-            get { return current; }
+            OnSelect?.Invoke(b);
+        }
+
+        public Action<BeatmapSetInfo> OnSelect;
+
+        public BeatmapSetInfo SelectedItem
+        {
+            get { return items.Children.FirstOrDefault(i => i.Selected)?.BeatmapSetInfo; }
             set
             {
-                if (value == current) return;
-                current = value;
-
                 foreach (PlaylistItem s in items.Children)
-                    s.Current = s.RepresentedSet.ID == value.ID;
+                    s.Selected = s.BeatmapSetInfo.ID == value?.ID;
             }
         }
 
