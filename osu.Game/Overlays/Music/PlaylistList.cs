@@ -73,7 +73,14 @@ namespace osu.Game.Overlays.Music
         private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
         {
             public string[] FilterTerms => new string[] { };
-            public bool MatchingCurrentFilter { set { } }
+            public bool MatchingCurrentFilter
+            {
+                set
+                {
+                    if (value)
+                        InvalidateLayout();
+                }
+            }
 
             public IEnumerable<IFilterable> FilterableChildren => Children;
 
