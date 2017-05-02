@@ -5,11 +5,21 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Tournament.Teams
 {
-    public class Team : Country
+    public class Team
     {
+        /// <summary>
+        /// The name of this team.
+        /// </summary>
+        public string FullName;
+
         /// <summary>
         /// Short acronym which appears in the group boxes post-selection.
         /// </summary>
         public string Acronym;
+
+        /// <summary>
+        /// Name of the file containing the flag.
+        /// </summary>
+        public string FlagName;
     }
 }
