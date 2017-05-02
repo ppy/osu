@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Overlays.Options.Sections.Online;
 
 namespace osu.Game.Overlays.Options.Sections
 {
@@ -16,10 +15,6 @@ namespace osu.Game.Overlays.Options.Sections
         {
             Children = new Drawable[]
             {
-                new InGameChatOptions(),
-                new PrivacyOptions(),
-                new NotificationsOptions(),
-                new IntegrationOptions(),
             };
         }
     }

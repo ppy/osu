@@ -19,21 +19,6 @@ namespace osu.Game.Overlays.Options.Sections.Input
         {
             Children = new Drawable[]
             {
-                new OptionSlider<double, SensitivitySlider>
-                {
-                    LabelText = "Sensitivity",
-                    Bindable = osuConfig.GetBindable<double>(OsuConfig.MouseSpeed)
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Raw input",
-                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.RawInput)
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Map absolute raw input to the osu! window",
-                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.AbsoluteToOsuWindow)
-                },
                 new OptionEnumDropdown<ConfineMouseMode>
                 {
                     LabelText = "Confine mouse cursor",
@@ -48,11 +33,6 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 {
                     LabelText = "Disable mouse buttons during gameplay",
                     Bindable = osuConfig.GetBindable<bool>(OsuConfig.MouseDisableButtons)
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Cursor ripples",
-                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.CursorRipple)
                 },
             };
         }
