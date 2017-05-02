@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
 using osu.Game.Screens.Tournament.Teams;
-using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Screens.Tournament
 {
