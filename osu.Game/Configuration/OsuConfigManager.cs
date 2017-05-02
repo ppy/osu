@@ -24,14 +24,14 @@ namespace osu.Game.Configuration
             Set(OsuConfig.Username, string.Empty);
             Set(OsuConfig.Token, string.Empty);
 
-            Set(OsuConfig.SavePassword, false).ValueChanged += delegate
+            Set(OsuConfig.SavePassword, false).ValueChanged += val =>
             {
-                if (Get<bool>(OsuConfig.SavePassword)) Set(OsuConfig.SaveUsername, true);
+                if (val) Set(OsuConfig.SaveUsername, true);
             };
 
-            Set(OsuConfig.SaveUsername, true).ValueChanged += delegate
+            Set(OsuConfig.SaveUsername, true).ValueChanged += val =>
             {
-                if (!Get<bool>(OsuConfig.SaveUsername)) Set(OsuConfig.SavePassword, false);
+                if (!val) Set(OsuConfig.SavePassword, false);
             };
 
             // Audio
