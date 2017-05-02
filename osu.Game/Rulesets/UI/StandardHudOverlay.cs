@@ -64,7 +64,15 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.X,
         };
 
-        [BackgroundDependencyLoader]
+        protected override ModsContainer CreateModsContainer() => new ModsContainer
+        {
+            Anchor = Anchor.TopRight,
+            Origin = Anchor.TopRight,
+            AutoSizeAxes = Axes.Both,
+            Position = new Vector2(0, 30),
+        };
+
+    [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             ComboCounter.AccentColour = colours.BlueLighter;
