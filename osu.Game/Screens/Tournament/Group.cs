@@ -73,9 +73,9 @@ namespace osu.Game.Screens.Tournament
             };
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(Team team, TextureStore flagStore)
         {
-            GroupTeam gt = new GroupTeam(team);
+            GroupTeam gt = new GroupTeam(team, flagStore);
 
             if (TeamsCount < 8)
             {
@@ -127,8 +127,12 @@ namespace osu.Game.Screens.Tournament
             private readonly FillFlowContainer innerContainer;
             private readonly Sprite flagSprite;
 
-            public GroupTeam(Team team)
+            private readonly TextureStore flagStore;
+
+            public GroupTeam(Team team, TextureStore flagStore)
             {
+                this.flagStore = flagStore;
+
                 Team = team;
 
                 Width = 36;
@@ -178,9 +182,9 @@ namespace osu.Game.Screens.Tournament
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load()
             {
-                flagSprite.Texture = textures.Get($@"Flags/{Team.FlagName}");
+                flagSprite.Texture = flagStore.Get($@"Flags/{Team.FlagName}");
             }
         }
     }

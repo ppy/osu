@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
 using osu.Game.Screens.Tournament.Teams;
+using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -19,8 +20,12 @@ namespace osu.Game.Screens.Tournament
         private readonly int maxTeams;
         private int currentGroup;
 
-        public GroupContainer(int numGroups, int teamsPerGroup)
+        private readonly TextureStore flagStore;
+
+        public GroupContainer(int numGroups, int teamsPerGroup, TextureStore flagStore)
         {
+            this.flagStore = flagStore;
+
             FlowContainer<Group> bottomGroups;
             FlowContainer<Group> topGroups;
 
@@ -69,7 +74,7 @@ namespace osu.Game.Screens.Tournament
             if (groups[currentGroup].TeamsCount == maxTeams)
                 return;
 
-            groups[currentGroup].AddTeam(team);
+            groups[currentGroup].AddTeam(team, flagStore);
 
             currentGroup = (currentGroup + 1) % groups.Count;
         }
