@@ -3,7 +3,7 @@
 
 namespace osu.Game.Users
 {
-    public class Team
+    public class Team : Country
     {
         public string Name;
     }
