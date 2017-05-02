@@ -18,7 +18,6 @@ namespace osu.Game.Overlays.Options.Sections
             {
                 new MouseOptions(),
                 new KeyboardOptions(),
-                new OtherInputOptions(),
             };
         }
     }
