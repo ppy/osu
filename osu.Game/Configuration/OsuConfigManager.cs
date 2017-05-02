@@ -56,12 +56,16 @@ namespace osu.Game.Configuration
             Set(OsuConfig.SnakingInSliders, true);
             Set(OsuConfig.SnakingOutSliders, true);
 
-            // Gameplay 
+            // Gameplay
 
             Set(OsuConfig.DimLevel, 0.3, 0, 1);
 
             Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
+
+            // Update
+
+            Set(OsuConfig.ReleaseStream, ReleaseStream.Lazer);
 
             //todo: implement all settings below this line (remove the Disabled set when doing so).
 
@@ -177,7 +181,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.AlternativeChatFont, false).Disabled = true;
             Set(OsuConfig.DisplayStarsMaximum, 10.0, 0.0, 10.0).Disabled = true;
             Set(OsuConfig.DisplayStarsMinimum, 0.0, 0.0, 10.0).Disabled = true;
-            Set(OsuConfig.ReleaseStream, ReleaseStream.Lazer).Disabled = true;
             Set(OsuConfig.UpdateFailCount, 0).Disabled = true;
             //Set(OsuConfig.TreeSortMode, TreeGroupMode.Show_All).Disabled = true;
             //Set(OsuConfig.TreeSortMode2, TreeSortMode.Title).Disabled = true;
