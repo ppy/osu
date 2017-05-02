@@ -25,7 +25,7 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuCursorSize, 1.0, 0.5f, 2);
             Set(OsuConfig.GameplayCursorSize, 1.0, 0.5f, 2);
-            Set(OsuConfig.DimLevel, 30, 0, 100);
+            Set(OsuConfig.DimLevel, 0.3, 0, 1);
 
             Set(OsuConfig.MouseDisableButtons, false);
             Set(OsuConfig.MouseDisableWheel, false);
@@ -35,12 +35,15 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuParallax, true);
 
+            Set(OsuConfig.MenuVoice, true);
+            Set(OsuConfig.MenuMusic, true);
+
             Set(OsuConfig.BeatmapDetailTab, BeatmapDetailTab.Details);
 
             Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
-            //todo: implement all settings below this line (remove the Disabled set when doing so).
 
+            //todo: implement all settings below this line (remove the Disabled set when doing so).
             Set(OsuConfig.AudioOffset, 0, -500.0, 500.0);
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
@@ -89,7 +92,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.IgnoreBeatmapSamples, false).Disabled = true;
             Set(OsuConfig.IgnoreBeatmapSkins, false).Disabled = true;
             Set(OsuConfig.IgnoreList, string.Empty).Disabled = true;
-            Set(OsuConfig.Language, @"unknown").Disabled = true;
             Set(OsuConfig.AllowNowPlayingHighlights, false).Disabled = true;
             Set(OsuConfig.LastVersion, string.Empty).Disabled = true;
             Set(OsuConfig.LastVersionPermissionsFailed, string.Empty).Disabled = true;
@@ -148,8 +150,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.YahooIntegration, false).Disabled = true;
             Set(OsuConfig.ForceFrameFlush, false).Disabled = true;
             Set(OsuConfig.DetectPerformanceIssues, true).Disabled = true;
-            Set(OsuConfig.MenuMusic, true).Disabled = true;
-            Set(OsuConfig.MenuVoice, true).Disabled = true;
             Set(OsuConfig.RawInput, false).Disabled = true;
             Set(OsuConfig.AbsoluteToOsuWindow, Get<bool>(OsuConfig.RawInput)).Disabled = true;
             Set(OsuConfig.ShowMenuTips, true).Disabled = true;
@@ -162,23 +162,12 @@ namespace osu.Game.Configuration
             Set(OsuConfig.UpdateFailCount, 0).Disabled = true;
             //Set(OsuConfig.TreeSortMode, TreeGroupMode.Show_All).Disabled = true;
             //Set(OsuConfig.TreeSortMode2, TreeSortMode.Title).Disabled = true;
-            bool unicodeDefault = false;
-            switch (Get<string>(OsuConfig.Language))
-            {
-                case @"zh":
-                case @"ja":
-                case @"ko":
-                    unicodeDefault = true;
-                    break;
-            }
-            Set(OsuConfig.ShowUnicode, unicodeDefault);
             Set(OsuConfig.PermanentSongInfo, false).Disabled = true;
             Set(OsuConfig.Ticker, false).Disabled = true;
             Set(OsuConfig.CompatibilityContext, false).Disabled = true;
             Set(OsuConfig.CanForceOptimusCompatibility, true).Disabled = true;
             Set(OsuConfig.ConfineMouse, Get<bool>(OsuConfig.ConfineMouseToFullscreen) ?
                 ConfineMouseMode.Fullscreen : ConfineMouseMode.Never).Disabled = true;
-
 
             GetOriginalBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
             {
@@ -339,11 +328,9 @@ namespace osu.Game.Configuration
         SaveUsername,
         TreeSortMode,
         TreeSortMode2,
-        ShowUnicode,
         PermanentSongInfo,
         Ticker,
         CompatibilityContext,
         CanForceOptimusCompatibility,
-
     }
 }

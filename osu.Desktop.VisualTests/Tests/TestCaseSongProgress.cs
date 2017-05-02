@@ -38,9 +38,9 @@ namespace osu.Desktop.VisualTests.Tests
                 Origin = Anchor.TopLeft,
             });
 
-            AddStep("Toggle Bar", progress.ToggleBar);
+            AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
             AddWaitStep(5);
-            AddStep("Toggle Bar", progress.ToggleBar);
+            AddStep("Toggle Bar", () => progress.AllowSeeking = !progress.AllowSeeking);
             AddWaitStep(2);
             AddRepeatStep("New Values", displayNewValues, 5);
 

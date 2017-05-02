@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.UI
         where TObject : HitObject
     {
         /// <summary>
-        /// The Beatmap 
+        /// The Beatmap
         /// </summary>
         public Beatmap<TObject> Beatmap;
 

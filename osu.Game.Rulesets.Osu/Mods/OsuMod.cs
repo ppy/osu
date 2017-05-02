@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
@@ -95,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override Score CreateReplayScore(Beatmap<OsuHitObject> beatmap) => new Score
         {
-            Replay = new OsuAutoReplay(beatmap)
+            Replay = new OsuAutoGenerator(beatmap).Generate()
         };
     }
 
