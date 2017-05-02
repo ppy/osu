@@ -5,6 +5,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -13,7 +14,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuButton : Button
+    public class OsuButton : Button, IFilterable
     {
         private Box hover;
 
@@ -31,6 +32,15 @@ namespace osu.Game.Graphics.UserInterface
         };
 
         public override bool HandleInput => Action != null;
+
+        public string[] FilterTerms => new[] { Text };
+        public bool MatchingCurrentFilter
+        {
+            set
+            {
+                FadeTo(value ? 1 : 0, 250);
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

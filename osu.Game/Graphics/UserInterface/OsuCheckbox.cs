@@ -12,10 +12,11 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuCheckbox : Checkbox
+    public class OsuCheckbox : Checkbox, IFilterable
     {
         private Bindable<bool> bindable;
 
@@ -49,6 +50,14 @@ namespace osu.Game.Graphics.UserInterface
             {
                 if (labelSpriteText != null)
                     labelSpriteText.Padding = value;
+            }
+        }
+        public string[] FilterTerms => new[] { LabelText };
+        public bool MatchingCurrentFilter
+        {
+            set
+            {
+                FadeTo(value ? 1 : 0, 250);
             }
         }
 
@@ -85,7 +94,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Current.DisabledChanged += disabled =>
             {
-                Alpha = disabled ? 0.3f : 1;
+                Colour = disabled ? new Color4(255, 255, 255, 77) : Color4.White;
             };
         }
 

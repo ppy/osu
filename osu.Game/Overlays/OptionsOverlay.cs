@@ -13,6 +13,9 @@ using System;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Options.Sections;
+using osu.Game.Graphics.UserInterface;
+using OpenTK;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays
 {
@@ -33,6 +36,7 @@ namespace osu.Game.Overlays
         private SidebarButton[] sidebarButtons;
         private OptionsSection[] sections;
         private float lastKnownScroll;
+        private SearchContainer searchContainer;
 
         public OptionsOverlay()
         {
@@ -43,6 +47,8 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGame game, OsuColour colours)
         {
+            OsuTextBox searchBox;
+
             sections = new OptionsSection[]
             {
                 new GeneralSection(),
@@ -91,14 +97,29 @@ namespace osu.Game.Overlays
                                     Colour = colours.Pink,
                                     Text = "Change the way osu! behaves",
                                     TextSize = 18,
-                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
+                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 10 },
                                 },
-                                new FillFlowContainer
+                                searchBox = new OsuTextBox
+                                {
+                                    Size = new Vector2(width - CONTENT_MARGINS * 2, 30),
+                                    Margin = new MarginPadding { Left = CONTENT_MARGINS },
+                                    PlaceholderText = "Type to search!",
+                                },
+                                searchContainer = new SearchContainer
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
-                                    Direction = FillDirection.Vertical,
-                                    Children = sections,
+                                    Children = new[]
+                                    {
+                                        new FilterableFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                            Direction = FillDirection.Vertical,
+                                            Children = sections,
+                                        },
+
+                                    }
                                 },
                                 new OptionsFooter()
                             }
@@ -118,6 +139,7 @@ namespace osu.Game.Overlays
                     ).ToArray()
                 }
             };
+            searchBox.Current.ValueChanged += newValue => searchContainer.SearchTerm = newValue;
 
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
@@ -167,6 +189,20 @@ namespace osu.Game.Overlays
             scrollContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(0, TRANSITION_LENGTH / 2);
+        }
+
+        private class FilterableFlowContainer : FillFlowContainer, IHasFilterableChildren
+        {
+            public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
+
+            public string[] FilterTerms => new string[0];
+
+            public bool MatchingCurrentFilter
+            {
+                set
+                {
+                }
+            }
         }
     }
 }

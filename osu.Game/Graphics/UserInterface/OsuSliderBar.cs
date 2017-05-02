@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -77,7 +78,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Current.DisabledChanged += disabled =>
             {
-                Alpha = disabled ? 0.3f : 1;
+                Colour = disabled ? new Color4(255, 255, 255, 77) : Color4.White;
             };
         }
 
