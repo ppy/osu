@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Options.Sections
         {
             Children = new Drawable[]
             {
-                new AudioDevicesOptions { Alpha = RuntimeInfo.IsWindows ? 1 : 0 },
+                new AudioDevicesOptions(),
                 new VolumeOptions(),
                 new OffsetOptions(),
             };
