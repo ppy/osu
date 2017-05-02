@@ -47,16 +47,17 @@ namespace osu.Game.Screens.Tournament
 
         public ITeamList TeamList;
 
+        protected override DependencyContainer CreateLocalDependencies(DependencyContainer parent) => new DependencyContainer(parent);
+
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, Storage storage)
+        private void load(TextureStore textures, Storage storage, DependencyContainer dependencies)
         {
             this.storage = storage;
 
-            // Todo: The way this is done is a haaaaaaaaaaaaaaack.
-            // Currently this store is being passed down all the way to ScrollingTeam/GroupTeam
-            // but it should replace the TextureStore DI item instead. This is pending some significant DI improvements.
             TextureStore flagStore = new TextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
             flagStore.AddStore(textures);
+
+            dependencies.Cache(flagStore);
 
             if (TeamList == null)
                 TeamList = new StorageBackedTeamList(storage);
@@ -110,7 +111,7 @@ namespace osu.Game.Screens.Tournament
                                     Lines = 6
                                 },
                                 // Groups
-                                groupsContainer = new GroupContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup), flagStore)
+                                groupsContainer = new GroupContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup))
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
@@ -125,7 +126,7 @@ namespace osu.Game.Screens.Tournament
                                     }
                                 },
                                 // Scrolling teams
-                                teamsContainer = new ScrollingTeamContainer(flagStore)
+                                teamsContainer = new ScrollingTeamContainer
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,

@@ -20,12 +20,8 @@ namespace osu.Game.Screens.Tournament
         private readonly int maxTeams;
         private int currentGroup;
 
-        private readonly TextureStore flagStore;
-
-        public GroupContainer(int numGroups, int teamsPerGroup, TextureStore flagStore)
+        public GroupContainer(int numGroups, int teamsPerGroup)
         {
-            this.flagStore = flagStore;
-
             FlowContainer<Group> bottomGroups;
             FlowContainer<Group> topGroups;
 
@@ -74,7 +70,7 @@ namespace osu.Game.Screens.Tournament
             if (groups[currentGroup].TeamsCount == maxTeams)
                 return;
 
-            groups[currentGroup].AddTeam(team, flagStore);
+            groups[currentGroup].AddTeam(team);
 
             currentGroup = (currentGroup + 1) % groups.Count;
         }
