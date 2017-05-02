@@ -22,5 +22,15 @@ namespace osu.Game.Database
         public int PreviewTime { get; set; }
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
+
+        public string[] SearchableTerms => new[]
+        {
+            Artist,
+            ArtistUnicode,
+            Title,
+            TitleUnicode,
+            Source,
+            Tags
+        };
     }
 }
