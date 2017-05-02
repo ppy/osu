@@ -39,8 +39,12 @@ namespace osu.Game.Screens.Tournament
 
         private ScheduledDelegate delayedStateChangeDelegate;
 
-        public ScrollingTeamContainer()
+        private TextureStore flagStore;
+
+        public ScrollingTeamContainer(TextureStore flagStore)
         {
+            this.flagStore = flagStore;
+
             AutoSizeAxes = Axes.Y;
 
             Children = new Drawable[]
@@ -272,7 +276,7 @@ namespace osu.Game.Screens.Tournament
         {
             foreach (Team t in availableTeams)
             {
-                Add(new ScrollingTeam(t)
+                Add(new ScrollingTeam(t, flagStore)
                 {
                     X = leftPos + DrawWidth
                 });
@@ -340,8 +344,12 @@ namespace osu.Game.Screens.Tournament
                 }
             }
 
-            public ScrollingTeam(Team team)
+            private TextureStore flagStore;
+
+            public ScrollingTeam(Team team, TextureStore flagStore)
             {
+                this.flagStore = flagStore;
+
                 Team = team;
 
                 Anchor = Anchor.CentreLeft;
@@ -371,9 +379,9 @@ namespace osu.Game.Screens.Tournament
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load()
             {
-                flagSprite.Texture = textures.Get($@"Flags/{Team.FlagName}");
+                flagSprite.Texture = flagStore.Get($@"Flags/{Team.FlagName}");
             }
         }
     }

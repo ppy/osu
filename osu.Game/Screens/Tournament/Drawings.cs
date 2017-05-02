@@ -52,6 +52,12 @@ namespace osu.Game.Screens.Tournament
         {
             this.storage = storage;
 
+            // Todo: The way this is done is a haaaaaaaaaaaaaaack.
+            // Currently this store is being passed down all the way to ScrollingTeam/GroupTeam
+            // but it should replace the TextureStore DI item instead. This is pending some significant DI improvements.
+            TextureStore flagStore = new TextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
+            flagStore.AddStore(textures);
+
             if (TeamList == null)
                 TeamList = new StorageBackedTeamList(storage);
 
@@ -104,7 +110,7 @@ namespace osu.Game.Screens.Tournament
                                     Lines = 6
                                 },
                                 // Groups
-                                groupsContainer = new GroupContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup))
+                                groupsContainer = new GroupContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup), flagStore)
                                 {
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
@@ -119,7 +125,7 @@ namespace osu.Game.Screens.Tournament
                                     }
                                 },
                                 // Scrolling teams
-                                teamsContainer = new ScrollingTeamContainer
+                                teamsContainer = new ScrollingTeamContainer(flagStore)
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
