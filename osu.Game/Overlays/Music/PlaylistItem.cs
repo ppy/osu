@@ -15,7 +15,7 @@ using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Music
 {
-    internal class PlaylistItem : Container
+    internal class PlaylistItem : Container, IFilterable
     {
         private const float fade_duration = 100;
 
@@ -55,6 +55,8 @@ namespace osu.Game.Overlays.Music
         private void load(OsuColour colours, LocalisationEngine localisation)
         {
             BeatmapMetadata metadata = BeatmapSetInfo.Metadata;
+
+            FilterTerms = metadata.SearchableTerms;
 
             Children = new Drawable[]
             {
@@ -114,6 +116,22 @@ namespace osu.Game.Overlays.Music
         {
             OnSelect?.Invoke(BeatmapSetInfo);
             return true;
+        }
+
+        public string[] FilterTerms { get; private set; }
+
+        private bool matching = true;
+
+        public bool MatchingCurrentFilter
+        {
+            set
+            {
+                if (matching == value) return;
+
+                matching = value;
+
+                FadeTo(matching ? 1 : 0, 200);
+            }
         }
     }
 }
