@@ -76,10 +76,10 @@ namespace osu.Game.Screens.Menu
             if (!menuMusic)
             {
                 trackManager = game.Audio.Track;
-                List<BeatmapSetInfo> choosableBeatmapsets = beatmaps.Query<BeatmapSetInfo>().ToList();
-                if (choosableBeatmapsets.Count > 0)
+                List<BeatmapSetInfo> choosableBeatmapSets = beatmaps.Query<BeatmapSetInfo>().ToList();
+                if (choosableBeatmapSets.Count > 0)
                 {
-                    song = beatmaps.GetWorkingBeatmap(beatmaps.GetWithChildren<BeatmapSetInfo>(choosableBeatmapsets[RNG.Next(0, choosableBeatmapsets.Count - 1)].ID).Beatmaps[0]);
+                    song = beatmaps.GetWorkingBeatmap(beatmaps.GetWithChildren<BeatmapSetInfo>(choosableBeatmapSets[RNG.Next(0, choosableBeatmapSets.Count - 1)].ID).Beatmaps[0]);
                     Beatmap = song;
                 }
             }
