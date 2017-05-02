@@ -22,9 +22,9 @@ namespace osu.Game.Screens.Tournament
     public class ScrollingTeamContainer : Container
     {
         public event Action OnScrollStarted;
-        public event Action<Team> OnSelected;
+        public event Action<DrawingsTeam> OnSelected;
 
-        private readonly List<Team> availableTeams = new List<Team>();
+        private readonly List<DrawingsTeam> availableTeams = new List<DrawingsTeam>();
 
         private readonly Container tracker;
 
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(DrawingsTeam team)
         {
             if (availableTeams.Contains(team))
                 return;
@@ -169,12 +169,12 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
-        public void AddTeams(IEnumerable<Team> teams)
+        public void AddTeams(IEnumerable<DrawingsTeam> teams)
         {
             if (teams == null)
                 return;
 
-            foreach (Team t in teams)
+            foreach (DrawingsTeam t in teams)
                 AddTeam(t);
         }
 
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
-        public void RemoveTeam(Team team)
+        public void RemoveTeam(DrawingsTeam team)
         {
             availableTeams.Remove(team);
 
@@ -270,7 +270,7 @@ namespace osu.Game.Screens.Tournament
 
         private void addFlags()
         {
-            foreach (Team t in availableTeams)
+            foreach (DrawingsTeam t in availableTeams)
             {
                 Add(new ScrollingTeam(t)
                 {
@@ -320,7 +320,7 @@ namespace osu.Game.Screens.Tournament
             public const float WIDTH = 58;
             public const float HEIGHT = 41;
 
-            public Team Team;
+            public DrawingsTeam Team;
 
             private readonly Sprite flagSprite;
             private readonly Box outline;
@@ -340,7 +340,7 @@ namespace osu.Game.Screens.Tournament
                 }
             }
 
-            public ScrollingTeam(Team team)
+            public ScrollingTeam(DrawingsTeam team)
             {
                 Team = team;
 

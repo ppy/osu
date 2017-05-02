@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.Tournament.Teams
 {
-    public class Team
+    public class DrawingsTeam
     {
         /// <summary>
         /// The name of this team.

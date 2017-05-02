@@ -7,6 +7,6 @@ namespace osu.Game.Screens.Tournament.Teams
 {
     public interface ITeamList
     {
-        IEnumerable<Team> Teams { get; }
+        IEnumerable<DrawingsTeam> Teams { get; }
     }
 }
