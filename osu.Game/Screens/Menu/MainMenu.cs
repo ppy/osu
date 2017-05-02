@@ -22,6 +22,8 @@ using osu.Game.Screens.Tournament;
 using osu.Framework.Input;
 using OpenTK.Input;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Menu
 {
@@ -74,10 +76,10 @@ namespace osu.Game.Screens.Menu
             if (!menuMusic)
             {
                 trackManager = game.Audio.Track;
-                int choosableBeatmapsetAmmount = beatmaps.Query<BeatmapSetInfo>().Count();
-                if (choosableBeatmapsetAmmount > 0)
+                List<BeatmapSetInfo> choosableBeatmapsets = beatmaps.Query<BeatmapSetInfo>().ToList();
+                if (choosableBeatmapsets.Count > 0)
                 {
-                    song = beatmaps.GetWorkingBeatmap(beatmaps.GetWithChildren<BeatmapSetInfo>(RNG.Next(1, choosableBeatmapsetAmmount)).Beatmaps[0]);
+                    song = beatmaps.GetWorkingBeatmap(beatmaps.GetWithChildren<BeatmapSetInfo>(choosableBeatmapsets[RNG.Next(0, choosableBeatmapsets.Count - 1)].ID).Beatmaps[0]);
                     Beatmap = song;
                 }
             }
