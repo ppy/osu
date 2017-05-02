@@ -78,6 +78,7 @@
     <Compile Include="Overlays\Music\FilterControl.cs" />
     <Compile Include="Overlays\Music\PlaylistItem.cs" />
     <Compile Include="Overlays\Music\PlaylistList.cs" />
+    <Compile Include="Overlays\Options\Sections\Audio\MainMenuOptions.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />

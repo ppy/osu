@@ -12,42 +12,61 @@ namespace osu.Game.Configuration
     {
         protected override void InitialiseDefaults()
         {
-#pragma warning disable CS0612 // Type or member is obsolete
+            // UI/selection defaults
+
+            Set(OsuConfig.Ruleset, 0, 0, int.MaxValue);
+            Set(OsuConfig.BeatmapDetailTab, BeatmapDetailTab.Details);
+
+            // Online settings
 
             Set(OsuConfig.Username, string.Empty);
             Set(OsuConfig.Token, string.Empty);
 
-            Set(OsuConfig.Ruleset, 0, 0, int.MaxValue);
+            Set(OsuConfig.SavePassword, false).ValueChanged += delegate
+            {
+                if (Get<bool>(OsuConfig.SavePassword)) Set(OsuConfig.SaveUsername, true);
+            };
+
+            Set(OsuConfig.SaveUsername, true).ValueChanged += delegate
+            {
+                if (!Get<bool>(OsuConfig.SaveUsername)) Set(OsuConfig.SavePassword, false);
+            };
+
+            // Audio
 
             Set(OsuConfig.AudioDevice, string.Empty);
-            Set(OsuConfig.SavePassword, false);
-            Set(OsuConfig.SaveUsername, true);
-
-            Set(OsuConfig.MenuCursorSize, 1.0, 0.5f, 2);
-            Set(OsuConfig.GameplayCursorSize, 1.0, 0.5f, 2);
-            Set(OsuConfig.DimLevel, 0.3, 0, 1);
-
-            Set(OsuConfig.MouseDisableButtons, false);
-            Set(OsuConfig.MouseDisableWheel, false);
-
-            Set(OsuConfig.SnakingInSliders, true);
-            Set(OsuConfig.SnakingOutSliders, true);
-
-            Set(OsuConfig.MenuParallax, true);
 
             Set(OsuConfig.MenuVoice, true);
             Set(OsuConfig.MenuMusic, true);
 
-            Set(OsuConfig.BeatmapDetailTab, BeatmapDetailTab.Details);
+            Set(OsuConfig.AudioOffset, 0, -500.0, 500.0);
+
+            // Input
+
+            Set(OsuConfig.MenuCursorSize, 1.0, 0.5f, 2);
+            Set(OsuConfig.GameplayCursorSize, 1.0, 0.5f, 2);
+
+            Set(OsuConfig.MouseDisableButtons, false);
+            Set(OsuConfig.MouseDisableWheel, false);
+
+            // Graphics
+
+            Set(OsuConfig.MenuParallax, true);
+
+            Set(OsuConfig.SnakingInSliders, true);
+            Set(OsuConfig.SnakingOutSliders, true);
+
+            // Gameplay 
+
+            Set(OsuConfig.DimLevel, 0.3, 0, 1);
 
             Set(OsuConfig.ShowInterface, true);
             Set(OsuConfig.KeyOverlay, false);
 
             //todo: implement all settings below this line (remove the Disabled set when doing so).
-            Set(OsuConfig.AudioOffset, 0, -500.0, 500.0);
 
             Set(OsuConfig.MouseSpeed, 1.0).Disabled = true;
-            Set(OsuConfig.BeatmapDirectory, @"Songs").Disabled = true; // TODO: use thi.Disabled = trues
+            Set(OsuConfig.BeatmapDirectory, @"Songs").Disabled = true;
             Set(OsuConfig.AllowPublicInvites, true).Disabled = true;
             Set(OsuConfig.AutoChatHide, true).Disabled = true;
             Set(OsuConfig.AutomaticDownload, true).Disabled = true;
@@ -166,18 +185,6 @@ namespace osu.Game.Configuration
             Set(OsuConfig.Ticker, false).Disabled = true;
             Set(OsuConfig.CompatibilityContext, false).Disabled = true;
             Set(OsuConfig.CanForceOptimusCompatibility, true).Disabled = true;
-            Set(OsuConfig.ConfineMouse, Get<bool>(OsuConfig.ConfineMouseToFullscreen) ?
-                ConfineMouseMode.Fullscreen : ConfineMouseMode.Never).Disabled = true;
-
-            GetOriginalBindable<bool>(OsuConfig.SavePassword).ValueChanged += delegate
-            {
-                if (Get<bool>(OsuConfig.SavePassword)) Set(OsuConfig.SaveUsername, true);
-            };
-            GetOriginalBindable<bool>(OsuConfig.SaveUsername).ValueChanged += delegate
-            {
-                if (!Get<bool>(OsuConfig.SaveUsername)) Set(OsuConfig.SavePassword, false);
-            };
-#pragma warning restore CS0612 // Type or member is obsolete
         }
 
         public OsuConfigManager(Storage storage) : base(storage)
