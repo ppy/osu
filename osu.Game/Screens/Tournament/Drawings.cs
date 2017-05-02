@@ -54,7 +54,10 @@ namespace osu.Game.Screens.Tournament
         {
             this.storage = storage;
 
-            TextureStore flagStore = new TextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
+            TextureStore flagStore = new TextureStore();
+            // Local flag store
+            flagStore.AddStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
+            /// Default texture store
             flagStore.AddStore(textures);
 
             dependencies.Cache(flagStore);
