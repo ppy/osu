@@ -104,10 +104,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateCurrentState(ArmedState state)
         {
-            base.UpdateState(state);
-
             ApproachCircle.FadeOut();
 
             double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;

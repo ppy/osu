@@ -94,6 +94,9 @@ namespace osu.Game.Beatmaps
         {
             if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
                 other.track = track;
+
+            if (background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
+                other.background = background;
         }
 
         public virtual void Dispose()
