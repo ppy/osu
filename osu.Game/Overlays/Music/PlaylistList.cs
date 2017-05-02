@@ -29,6 +29,10 @@ namespace osu.Game.Overlays.Music
 
         public Action<BeatmapSetInfo> OnSelect;
 
+        private readonly SearchContainer search;
+
+        public void Filter(string searchTerm) => search.SearchTerm = searchTerm;
+
         public BeatmapSetInfo SelectedItem
         {
             get { return items.Children.FirstOrDefault(i => i.Selected)?.BeatmapSetInfo; }
@@ -48,14 +52,36 @@ namespace osu.Game.Overlays.Music
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        items = new FillFlowContainer<PlaylistItem>
+                        search = new SearchContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                        },
+                            Children = new Drawable[]
+                            {
+                                items = new ItemSearchContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                },
+                            }
+                        }
                     },
                 },
             };
+        }
+
+        private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
+        {
+            public string[] FilterTerms => new string[] { };
+            public bool MatchingCurrentFilter { set { } }
+
+            public IEnumerable<IFilterable> FilterableChildren => Children;
+
+            public ItemSearchContainer()
+            {
+                LayoutDuration = 200;
+                LayoutEasing = EasingTypes.OutQuint;
+            }
         }
     }
 }
