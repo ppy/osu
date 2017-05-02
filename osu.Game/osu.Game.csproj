@@ -385,7 +385,6 @@
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />
     <Compile Include="Configuration\ScreenshotFormat.cs" />
-    <Compile Include="Configuration\ConfineMouseMode.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
     <Compile Include="Screens\Select\FilterControl.cs" />
     <Compile Include="Screens\Select\SearchTextBox.cs" />

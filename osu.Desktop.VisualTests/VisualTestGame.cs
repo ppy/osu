@@ -29,7 +29,7 @@ namespace osu.Desktop.VisualTests
             host.DrawThread.InactiveHz = host.DrawThread.ActiveHz;
             host.InputThread.InactiveHz = host.InputThread.ActiveHz;
 
-            host.Window.CursorState = CursorState.Hidden;
+            host.Window.CursorState |= CursorState.Hidden;
         }
     }
 }
