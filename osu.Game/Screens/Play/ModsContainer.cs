@@ -20,12 +20,7 @@ namespace osu.Game.Screens.Play
         public bool ShowMods
         {
             get { return showMods; }
-            set
-            {
-                if (showMods == value) return;
-
-                showMods = value;
-            }
+            set { showMods = value; }
         }
 
         public ModsContainer()
@@ -34,8 +29,8 @@ namespace osu.Game.Screens.Play
             {
                 iconsContainer = new FillFlowContainer<ModIcon>
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                 },
