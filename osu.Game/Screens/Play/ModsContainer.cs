@@ -16,11 +16,9 @@ namespace osu.Game.Screens.Play
     {
         private readonly FillFlowContainer<ModIcon> iconsContainer;
 
-        private bool showMods;
         public bool ShowMods
         {
-            get { return showMods; }
-            set { showMods = value; }
+            set { if (!value) Hide(); }
         }
 
         public ModsContainer()
@@ -69,15 +67,6 @@ namespace osu.Game.Screens.Play
 
                 default: return Color4.White;
             }
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (ShowMods)
-                Show();
-            else
-                Hide();
         }
     }
 }
