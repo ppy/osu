@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Tournament
             };
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(DrawingsTeam team)
         {
             GroupTeam gt = new GroupTeam(team);
 
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Tournament
             return allTeams.Any(t => t.Team.FullName == fullName);
         }
 
-        public bool RemoveTeam(Team team)
+        public bool RemoveTeam(DrawingsTeam team)
         {
             allTeams.RemoveAll(gt => gt.Team == team);
 
@@ -122,12 +122,12 @@ namespace osu.Game.Screens.Tournament
 
         private class GroupTeam : Container
         {
-            public readonly Team Team;
+            public readonly DrawingsTeam Team;
 
             private readonly FillFlowContainer innerContainer;
             private readonly Sprite flagSprite;
 
-            public GroupTeam(Team team)
+            public GroupTeam(DrawingsTeam team)
             {
                 Team = team;
 

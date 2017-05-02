@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Tournament
         private GroupContainer groupsContainer;
         private OsuSpriteText fullTeamNameText;
 
-        private readonly List<Team> allTeams = new List<Team>();
+        private readonly List<DrawingsTeam> allTeams = new List<DrawingsTeam>();
 
         private DrawingsConfigManager drawingsConfig;
 
@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Tournament
             reset(true);
         }
 
-        private void onTeamSelected(Team team)
+        private void onTeamSelected(DrawingsTeam team)
         {
             groupsContainer.AddTeam(team);
 
@@ -286,7 +286,7 @@ namespace osu.Game.Screens.Tournament
             teamsContainer.ClearTeams();
             allTeams.Clear();
 
-            foreach (Team t in TeamList.Teams)
+            foreach (DrawingsTeam t in TeamList.Teams)
             {
                 if (groupsContainer.ContainsTeam(t.FullName))
                     continue;
@@ -322,7 +322,7 @@ namespace osu.Game.Screens.Tournament
                             if (line.ToUpper().StartsWith("GROUP"))
                                 continue;
 
-                            Team teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
+                            DrawingsTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
 
                             if (teamToAdd == null)
                                 continue;

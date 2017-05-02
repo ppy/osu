@@ -24,57 +24,57 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class TestTeamList : ITeamList
         {
-            public IEnumerable<Team> Teams { get; } = new[]
+            public IEnumerable<DrawingsTeam> Teams { get; } = new[]
             {
-                new Team
+                new DrawingsTeam
                 {
                     FlagName = "GB",
                     FullName = "United Kingdom",
                     Acronym = "UK"
                 },
-                new Team
+                new DrawingsTeam
                 {
                     FlagName = "FR",
                     FullName = "France",
                     Acronym = "FRA"
                 },
-                new Team
+                new DrawingsTeam
                 {
                     FlagName = "CN",
                     FullName = "China",
                     Acronym = "CHN"
                 },
-                new Team
+                new DrawingsTeam
                 {
                     FlagName = "AU",
                     FullName = "Australia",
                     Acronym = "AUS"
                 },
-                new Team
+                new DrawingsTeam
                 {
                     FlagName = "JP",
                     FullName = "Japan",
                     Acronym = "JPN"
                 },
-                new Team
+                new DrawingsTeam
                 {
                     FlagName = "RO",
                     FullName = "Romania",
                     Acronym = "ROM"
                 },
-                new Team
+                new DrawingsTeam
                 {
                     FlagName = "IT",
                     FullName = "Italy",
                     Acronym = "PIZZA"
                 },
-                new Team
+                new DrawingsTeam
                 {
                     FlagName = "VE",
                     FullName = "Venezuela",
                     Acronym = "VNZ"
                 },
-                new Team
+                new DrawingsTeam
                 {
                     FlagName = "US",
                     FullName = "United States of America",

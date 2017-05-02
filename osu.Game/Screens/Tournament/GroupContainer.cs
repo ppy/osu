@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        public void AddTeam(Team team)
+        public void AddTeam(DrawingsTeam team)
         {
             if (groups[currentGroup].TeamsCount == maxTeams)
                 return;
