@@ -77,7 +77,8 @@ namespace osu.Game.Overlays.Music
             {
                 set
                 {
-                    InvalidateLayout();
+                    if (value)
+                        InvalidateLayout();
                 }
             }
 
