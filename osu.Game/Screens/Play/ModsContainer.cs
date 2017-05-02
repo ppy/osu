@@ -7,7 +7,6 @@ using osu.Game.Rulesets.UI;
 using osu.Framework.Graphics;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
-using osu.Framework.Allocation;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play
