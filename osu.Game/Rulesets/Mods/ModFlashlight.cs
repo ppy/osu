@@ -9,6 +9,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Flashlight";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_flashlight;
+        public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
         public override bool Ranked => true;
     }
