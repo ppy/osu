@@ -260,7 +260,7 @@ namespace osu.Game.Overlays
         }
 
         private WorkingBeatmap current;
-        private TransformDirection queuedDirection;
+        private TransformDirection queuedDirection = TransformDirection.Next;
 
         private void beatmapChanged(WorkingBeatmap beatmap)
         {
@@ -270,6 +270,7 @@ namespace osu.Game.Overlays
             current = beatmapBacking.Value;
 
             updateDisplay(beatmapBacking, audioEquals ? TransformDirection.None : queuedDirection);
+            queuedDirection = TransformDirection.Next;
         }
 
         private ScheduledDelegate pendingBeatmapSwitch;

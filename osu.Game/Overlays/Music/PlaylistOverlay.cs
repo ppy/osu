@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Music
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             ExitRequested = () => State = Visibility.Hidden,
-                            FilterChanged = filterChanged,
+                            FilterChanged = search => list.Filter(search),
                             Padding = new MarginPadding(10),
                         },
                     },
@@ -84,11 +84,6 @@ namespace osu.Game.Overlays.Music
             list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>().ToList();
 
             beatmapBacking.BindTo(game.Beatmap);
-        }
-
-        private void filterChanged(string newValue)
-        {
-            // TODO: implement
         }
 
         protected override void LoadComplete()
