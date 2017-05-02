@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.UI
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
             AutoSizeAxes = Axes.Both,
-            Position = new Vector2(0, 30),
+            Position = new Vector2(0, 25),
         };
 
     [BackgroundDependencyLoader]
