@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using osu.Framework.Testing;
 using osu.Game.Screens.Tournament;
 using osu.Game.Screens.Tournament.Teams;
-using osu.Game.Users;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -25,57 +24,57 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class TestTeamList : ITeamList
         {
-            public IEnumerable<Country> Teams { get; } = new[]
+            public IEnumerable<DrawingsTeam> Teams { get; } = new[]
             {
-                new Country
+                new DrawingsTeam
                 {
                     FlagName = "GB",
                     FullName = "United Kingdom",
                     Acronym = "UK"
                 },
-                new Country
+                new DrawingsTeam
                 {
                     FlagName = "FR",
                     FullName = "France",
                     Acronym = "FRA"
                 },
-                new Country
+                new DrawingsTeam
                 {
                     FlagName = "CN",
                     FullName = "China",
                     Acronym = "CHN"
                 },
-                new Country
+                new DrawingsTeam
                 {
                     FlagName = "AU",
                     FullName = "Australia",
                     Acronym = "AUS"
                 },
-                new Country
+                new DrawingsTeam
                 {
                     FlagName = "JP",
                     FullName = "Japan",
                     Acronym = "JPN"
                 },
-                new Country
+                new DrawingsTeam
                 {
                     FlagName = "RO",
                     FullName = "Romania",
                     Acronym = "ROM"
                 },
-                new Country
+                new DrawingsTeam
                 {
                     FlagName = "IT",
                     FullName = "Italy",
                     Acronym = "PIZZA"
                 },
-                new Country
+                new DrawingsTeam
                 {
                     FlagName = "VE",
                     FullName = "Venezuela",
                     Acronym = "VNZ"
                 },
-                new Country
+                new DrawingsTeam
                 {
                     FlagName = "US",
                     FullName = "United States of America",
