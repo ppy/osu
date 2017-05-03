@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Music
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-        protected IEnumerable<BeatmapSetInfo> BeatmapSets;
+        public IEnumerable<BeatmapSetInfo> BeatmapSets;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, BeatmapDatabase beatmaps, OsuColour colours)
