@@ -56,9 +56,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public Key Key;
 
-        private Box background;
-        private Container hitTargetBar;
-        private Container keyIcon;
+        private readonly Box background;
+        private readonly Container hitTargetBar;
+        private readonly Container keyIcon;
 
         public Column()
         {
