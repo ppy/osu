@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using OpenTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -30,14 +31,15 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.TopCentre,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(5,0),
                 },
                 new OsuSpriteText
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
-                    Text = @"/UNRANKED/",
+                    Text = @"/ UNRANKED /",
                     Font = @"Venera",
-                    TextSize = 15,
+                    TextSize = 12,
                 }
             };
         }
@@ -49,7 +51,7 @@ namespace osu.Game.Screens.Play
                 AutoSizeAxes = Axes.Both,
                 Icon = mod.Icon,
                 Colour = selectColour(mod),
-                IconSize = 60,
+                Scale = new Vector2((float)0.7),
             });
         }
 
