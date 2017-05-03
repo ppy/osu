@@ -39,6 +39,8 @@ namespace osu.Game.Graphics.Cursor
 
         private Vector2? lastPosition;
 
+        private InputResampler resampler = new InputResampler();
+
         protected override DrawNode CreateDrawNode() => new TrailDrawNode();
 
         protected override void ApplyDrawNode(DrawNode node)
@@ -116,22 +118,24 @@ namespace osu.Game.Graphics.Cursor
             if (lastPosition == null)
             {
                 lastPosition = state.Mouse.NativeState.Position;
+                resampler.AddPosition(lastPosition.Value);
                 return base.OnMouseMove(state);
             }
 
             Vector2 pos1 = lastPosition.Value;
-            Vector2 pos2 = state.Mouse.NativeState.Position;
-
-            Vector2 diff = pos2 - pos1;
-            float distance = diff.Length;
-            Vector2 direction = diff / distance;
-
-            float interval = size.X / 2 * 0.9f;
-
-            for (float d = interval; d < distance; d += interval)
+            foreach (Vector2 pos2 in resampler.AddPosition(state.Mouse.NativeState.Position))
             {
-                lastPosition = pos1 + direction * d;
-                addPosition(lastPosition.Value);
+                Vector2 diff = pos2 - pos1;
+                float distance = diff.Length;
+                Vector2 direction = diff / distance;
+
+                float interval = size.X / 2 * 0.9f;
+
+                for (float d = interval; d < distance; d += interval)
+                {
+                    lastPosition = pos1 + direction * d;
+                    addPosition(lastPosition.Value);
+                }
             }
 
             return base.OnMouseMove(state);
