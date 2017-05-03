@@ -41,6 +41,8 @@ namespace osu.Desktop.VisualTests.Tests
                 AddStep("Left special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnStyle = SpecialColumnStyle.Left);
                 AddStep("Right special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnStyle = SpecialColumnStyle.Right);
             }
+
+            AddStep("Normal special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnStyle = SpecialColumnStyle.Normal);
         }
 
         private void triggerKeyDown(Column column)
