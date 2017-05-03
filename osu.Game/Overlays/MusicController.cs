@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
@@ -260,17 +261,36 @@ namespace osu.Game.Overlays
         }
 
         private WorkingBeatmap current;
-        private TransformDirection queuedDirection = TransformDirection.Next;
+        private TransformDirection? queuedDirection;
 
         private void beatmapChanged(WorkingBeatmap beatmap)
         {
             progressBar.IsEnabled = beatmap != null;
 
             bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
+
+            TransformDirection direction;
+
+            if (audioEquals)
+                direction = TransformDirection.None;
+            else if (queuedDirection.HasValue)
+            {
+                direction = queuedDirection.Value;
+                queuedDirection = null;
+            }
+            else
+            {
+                //figure out the best direction based on order in playlist.
+                var last = current == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo.ID).Count();
+                var next = beatmapBacking.Value == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmapBacking.Value.BeatmapSetInfo.ID).Count();
+
+                direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
+            }
+
             current = beatmapBacking.Value;
 
-            updateDisplay(beatmapBacking, audioEquals ? TransformDirection.None : queuedDirection);
-            queuedDirection = TransformDirection.Next;
+            updateDisplay(beatmapBacking, direction);
+            queuedDirection = null;
         }
 
         private ScheduledDelegate pendingBeatmapSwitch;
