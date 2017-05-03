@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 
-namespace osu.Game.Rulesets.Mania.Objects
+namespace osu.Game.Rulesets.Mania.Objects.Types
 {
     public interface IHasColumn
     {
