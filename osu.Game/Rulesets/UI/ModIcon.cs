@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.UI
 
         public new Color4 Colour
         {
-            get { return background?.Colour ?? Color4.Transparent; }
+            get { return background.Colour; }
             set { background.Colour = value; }
         }
 
@@ -42,31 +42,28 @@ namespace osu.Game.Rulesets.UI
 
         public ModIcon(Mod m)
         {
-            if(m!= null)
+            Children = new Drawable[]
             {
-                Children = new Drawable[]
+                background = new TextAwesome
                 {
-                    background = new TextAwesome
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Icon = FontAwesome.fa_osu_mod_bg,
-                        Colour = selectColour(m),
-                        Shadow = true,
-                        TextSize = 20
-                    },
-                    modIcon = new TextAwesome
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Colour = OsuColour.Gray(84),
-                        TextSize = 20,
-                        Icon = m.Icon,
-                    },
-                };
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Icon = FontAwesome.fa_osu_mod_bg,
+                    Colour = pickColour(m),
+                    Shadow = true,
+                    TextSize = 20
+                },
+                modIcon = new TextAwesome
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Colour = OsuColour.Gray(84),
+                    TextSize = 20,
+                    Icon = m?.Icon ?? FontAwesome.fa_question,
+                },
+            };
 
-                reapplySize();
-            }
+            reapplySize();
         }
 
         private void reapplySize()
@@ -75,9 +72,9 @@ namespace osu.Game.Rulesets.UI
             modIcon.TextSize = iconSize - 35;
         }
 
-        private Color4 selectColour(Mod mod)
+        private Color4 pickColour(Mod mod)
         {
-            switch (mod.Type)
+            switch (mod?.Type)
             {
                 case ModType.DifficultyIncrease:
                     return OsuColour.FromHex(@"ffcc22");
