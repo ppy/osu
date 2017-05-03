@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.UI
             Position = new Vector2(0, 25),
         };
 
-    [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             ComboCounter.AccentColour = colours.BlueLighter;
