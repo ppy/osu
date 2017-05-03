@@ -50,31 +50,11 @@ namespace osu.Game.Overlays.Mods
 
                 foreach (ModButton button in value)
                 {
-                    button.ButtonColour = ButtonColour;
                     button.SelectedColour = selectedColour;
                     button.Action = Action;
                 }
 
                 ButtonsContainer.Children = value;
-            }
-        }
-
-        private Color4 buttonsBolour = Color4.White;
-        public Color4 ButtonColour
-        {
-            get
-            {
-                return buttonsBolour;
-            }
-            set
-            {
-                if (value == buttonsBolour) return;
-                buttonsBolour = value;
-
-                foreach (ModButton button in buttons)
-                {
-                    button.ButtonColour = value;
-                }
             }
         }
 

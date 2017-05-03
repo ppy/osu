@@ -71,10 +71,6 @@ namespace osu.Game.Overlays.Mods
             {
                 if (value == buttonColour) return;
                 buttonColour = value;
-                foreach (ModIcon icon in iconsContainer.Children)
-                {
-                    icon.Colour = value;
-                }
             }
         }
 
@@ -180,41 +176,33 @@ namespace osu.Game.Overlays.Mods
             {
                 iconsContainer.Add(new[]
                 {
-                    new ModIcon
+                    new ModIcon(Mods[0])
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(1.5f),
-                        Colour = ButtonColour
                     },
-                    foregroundIcon = new ModIcon
+                    foregroundIcon = new ModIcon(Mods[0])
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(-1.5f),
-                        Colour = ButtonColour
                     },
                 });
             }
             else
             {
-                iconsContainer.Add(foregroundIcon = new ModIcon
+                iconsContainer.Add(foregroundIcon = new ModIcon(Mod)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Colour = ButtonColour
                 });
             }
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            foreach (ModIcon icon in iconsContainer.Children)
-                icon.Colour = ButtonColour;
+            buttonColour = foregroundIcon.Colour;
         }
 
         public ModButton(Mod m)
