@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play
             iconsContainer.Add(new ModIcon(mod)
             {
                 AutoSizeAxes = Axes.Both,
-                Scale = new Vector2((float)0.7),
+                Scale = new Vector2(0.7f),
             });
         }
     }
