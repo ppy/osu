@@ -1,27 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using osu.Framework.Testing;
-using osu.Game.Graphics;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Input;
-using OpenTK.Input;
-using osu.Game.Rulesets.UI;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Input;
+using osu.Framework.Testing;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.UI;
+using System.Linq;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -35,13 +20,13 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            int max_columns = 9;
+            const int max_columns = 9;
 
             for (int i = 1; i <= max_columns; i++)
             {
                 int tempI = i;
 
-                AddStep($@"{i} column" + (i > 1 ? "s" : ""), () =>
+                AddStep($"{i} column" + (i > 1 ? "s" : ""), () =>
                 {
                     Clear();
                     Add(new ManiaPlayfield(tempI)
@@ -51,8 +36,8 @@ namespace osu.Desktop.VisualTests.Tests
                     });
                 });
 
-                AddStep($"Trigger keys down", () => ((ManiaPlayfield)Children.First()).Columns.Children.ForEach(triggerKeyDown));
-                AddStep($"Trigger keys up", () => ((ManiaPlayfield)Children.First()).Columns.Children.ForEach(triggerKeyUp));
+                AddStep("Trigger keys down", () => ((ManiaPlayfield)Children.First()).Columns.Children.ForEach(triggerKeyDown));
+                AddStep("Trigger keys up", () => ((ManiaPlayfield)Children.First()).Columns.Children.ForEach(triggerKeyUp));
             }
         }
 
