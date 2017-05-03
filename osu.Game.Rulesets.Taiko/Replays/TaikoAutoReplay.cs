@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -9,29 +10,28 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
-    public class TaikoAutoReplay : Replay
+    public class TaikoAutoReplay : AutoGenerator<TaikoHitObject>
     {
         private const double swell_hit_speed = 50;
 
-        private readonly Beatmap<TaikoHitObject> beatmap;
-
         public TaikoAutoReplay(Beatmap<TaikoHitObject> beatmap)
+            : base(beatmap)
         {
-            this.beatmap = beatmap;
-
-            createAutoReplay();
         }
 
-        private void createAutoReplay()
+        protected Replay Replay;
+        protected List<ReplayFrame> Frames => Replay.Frames;
+
+        public override Replay Generate()
         {
             bool hitButton = true;
 
             Frames.Add(new ReplayFrame(-100000, null, null, ReplayButtonState.None));
-            Frames.Add(new ReplayFrame(beatmap.HitObjects[0].StartTime - 1000, null, null, ReplayButtonState.None));
+            Frames.Add(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1000, null, null, ReplayButtonState.None));
 
-            for (int i = 0; i < beatmap.HitObjects.Count; i++)
+            for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
-                TaikoHitObject h = beatmap.HitObjects[i];
+                TaikoHitObject h = Beatmap.HitObjects[i];
 
                 ReplayButtonState button;
 
@@ -105,15 +105,17 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
                 Frames.Add(new ReplayFrame(endTime + KEY_UP_DELAY, null, null, ReplayButtonState.None));
 
-                if (i < beatmap.HitObjects.Count - 1)
+                if (i < Beatmap.HitObjects.Count - 1)
                 {
-                    double waitTime = beatmap.HitObjects[i + 1].StartTime - 1000;
+                    double waitTime = Beatmap.HitObjects[i + 1].StartTime - 1000;
                     if (waitTime > endTime)
                         Frames.Add(new ReplayFrame(waitTime, null, null, ReplayButtonState.None));
                 }
 
                 hitButton = !hitButton;
             }
+
+            return Replay;
         }
     }
 }
