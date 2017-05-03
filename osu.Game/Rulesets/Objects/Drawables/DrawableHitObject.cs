@@ -49,6 +49,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
+        internal DrawableHitObject()
+        {
+        }
+
         protected List<SampleChannel> Samples = new List<SampleChannel>();
 
         protected void PlaySamples()
