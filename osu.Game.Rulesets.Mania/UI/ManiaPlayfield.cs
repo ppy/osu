@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Color4[] columnColours = new[]
+            var columnColours = new[]
             {
                 colours.RedDark,
                 colours.GreenDark,
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI
             int columnCount = Columns.Children.Count();
             int halfColumns = columnCount / 2;
 
-            Key[] keys = new[] { Key.A, Key.S, Key.D, Key.F, Key.Space, Key.J, Key.K, Key.L, Key.Semicolon };
+            var keys = new[] { Key.A, Key.S, Key.D, Key.F, Key.Space, Key.J, Key.K, Key.L, Key.Semicolon };
 
             for (int i = 0; i < halfColumns; i++)
             {
