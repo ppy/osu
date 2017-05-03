@@ -15,18 +15,50 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using OpenTK.Input;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaPlayfield : Playfield<ManiaBaseHit, ManiaJudgement>
     {
+        /// <summary>
+        /// Default column keys, expanding outwards from the middle as more column are added.
+        /// E.g. 2 columns use FJ, 4 columns use DFJK, 6 use SDFJKL, etc...
+        /// </summary>
+        private static readonly Key[] default_keys = new[] { Key.A, Key.S, Key.D, Key.F, Key.J, Key.K, Key.L, Key.Semicolon };
+
+        private SpecialColumnStyle specialColumnStyle;
+        /// <summary>
+        /// The style to use for the special column.
+        /// </summary>
+        public SpecialColumnStyle SpecialColumnStyle
+        {
+            get { return specialColumnStyle; }
+            set
+            {
+                if (specialColumnStyle == value)
+                    return;
+                specialColumnStyle = value;
+
+                if (!IsLoaded)
+                    return;
+
+                updateColumnStyle();
+            }
+        }
+
         public readonly FlowContainer<Column> Columns;
 
-        public ManiaPlayfield(int columns)
+        private List<Color4> normalColumnColours = new List<Color4>();
+        private Color4 specialColumnColour;
+
+        private readonly int columnCount;
+
+        public ManiaPlayfield(int columnCount)
         {
-            if (columns > 9)
-                throw new ArgumentException($"{columns} columns is not supported.");
-            if (columns <= 0)
+            this.columnCount = columnCount;
+
+            if (columnCount <= 0)
                 throw new ArgumentException("Can't have zero or fewer columns.");
 
             Children = new Drawable[]
@@ -56,43 +88,81 @@ namespace osu.Game.Rulesets.Mania.UI
                 }
             };
 
-            for (int i = 0; i < columns; i++)
+            for (int i = 0; i < columnCount; i++)
                 Columns.Add(new Column());
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            var columnColours = new[]
+            normalColumnColours = new List<Color4>
             {
                 colours.RedDark,
-                colours.GreenDark,
-                colours.BlueDark // Special column
+                colours.GreenDark
             };
 
-            int columnCount = Columns.Children.Count();
-            int halfColumns = columnCount / 2;
+            specialColumnColour = colours.BlueDark;
 
-            var keys = new[] { Key.A, Key.S, Key.D, Key.F, Key.Space, Key.J, Key.K, Key.L, Key.Semicolon };
+            updateColumnStyle();
+        }
 
-            for (int i = 0; i < halfColumns; i++)
+        /// <summary>
+        /// Updates the column style (special style/colours) + keys.
+        /// </summary>
+        private void updateColumnStyle()
+        {
+            // Set the special column + colour + key
+            for (int i = 0; i < columnCount; i++)
             {
-                Column leftColumn = Columns.Children.ElementAt(i);
-                Column rightColumn = Columns.Children.ElementAt(columnCount - 1 - i);
+                Column column = Columns.Children.ElementAt(i);
+                column.IsSpecial = isSpecialColumn(i);
 
-                Color4 accent = columnColours[i % 2];
-                leftColumn.AccentColour = rightColumn.AccentColour = accent;
-                leftColumn.Key = keys[keys.Length / 2 - halfColumns + i];
-                rightColumn.Key = keys[keys.Length / 2 + halfColumns - i];
+                if (!column.IsSpecial)
+                    continue;
+
+                column.Key = Key.Space;
+                column.AccentColour = specialColumnColour;
             }
 
-            bool hasSpecial = halfColumns * 2 < columnCount;
-            if (hasSpecial)
+            var nonSpecialColumns = Columns.Children.Where(c => !c.IsSpecial).ToList();
+
+            // We'll set the colours of the non-special columns in a separate loop, because the non-special
+            // column colours are mirrored across their centre and special styles mess with this
+            for (int i = 0; i < Math.Ceiling(nonSpecialColumns.Count / 2f); i++)
             {
-                Column specialColumn = Columns.Children.ElementAt(halfColumns);
-                specialColumn.IsSpecialColumn = true;
-                specialColumn.AccentColour = columnColours[2];
-                specialColumn.Key = keys[keys.Length / 2];
+                Color4 colour = normalColumnColours[i % normalColumnColours.Count];
+                nonSpecialColumns[i].AccentColour = colour;
+                nonSpecialColumns[nonSpecialColumns.Count - 1 - i].AccentColour = colour;
+            }
+
+            // We'll set the keys for non-special columns in another separate loop because it's not mirrored like the above colours
+            // Todo: This needs to go when we get to bindings and use Button1, ..., ButtonN instead
+            for (int i = 0; i < nonSpecialColumns.Count; i++)
+            {
+                Column column = nonSpecialColumns[i];
+
+                int keyOffset = default_keys.Length / 2 - nonSpecialColumns.Count / 2 + i;
+                if (keyOffset >= 0 && keyOffset < default_keys.Length)
+                    column.Key = default_keys[keyOffset];
+            }
+        }
+
+        /// <summary>
+        /// Whether the column index is a special column for this playfield.
+        /// </summary>
+        /// <param name="column">The 0-based column index.</param>
+        /// <returns>Whether the column is a special column.</returns>
+        private bool isSpecialColumn(int column)
+        {
+            switch (SpecialColumnStyle)
+            {
+                default:
+                case SpecialColumnStyle.Normal:
+                    return columnCount % 2 == 1 && column == columnCount / 2;
+                case SpecialColumnStyle.Left:
+                    return column == 0;
+                case SpecialColumnStyle.Right:
+                    return column == columnCount - 1;
             }
         }
     }

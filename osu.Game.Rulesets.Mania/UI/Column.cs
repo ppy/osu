@@ -29,31 +29,6 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
-        private Color4 accentColour;
-        public Color4 AccentColour
-        {
-            get { return accentColour; }
-            set
-            {
-                if (accentColour == value)
-                    return;
-                accentColour = value;
-
-                setAccentColour();
-            }
-        }
-
-        private bool isSpecialColumn;
-        public bool IsSpecialColumn
-        {
-            get { return isSpecialColumn; }
-            set
-            {
-                isSpecialColumn = value;
-                Width = isSpecialColumn ? special_column_width : column_width;
-            }
-        }
-
         public Key Key;
 
         private readonly Box background;
@@ -159,23 +134,46 @@ namespace osu.Game.Rulesets.Mania.UI
             };
         }
 
-        private void setAccentColour()
+        private bool isSpecial;
+        public bool IsSpecial
         {
-            background.Colour = AccentColour;
-
-            hitTargetBar.EdgeEffect = new EdgeEffect
+            get { return isSpecial; }
+            set
             {
-                Type = EdgeEffectType.Glow,
-                Radius = 5,
-                Colour = AccentColour.Opacity(0.5f),
-            };
+                if (isSpecial == value)
+                    return;
+                isSpecial = value;
 
-            keyIcon.EdgeEffect = new EdgeEffect
+                Width = isSpecial ? special_column_width : column_width;
+            }
+        }
+
+        private Color4 accentColour;
+        public Color4 AccentColour
+        {
+            get { return accentColour; }
+            set
             {
-                Type = EdgeEffectType.Glow,
-                Radius = 5,
-                Colour = AccentColour.Opacity(0.5f),
-            };
+                if (accentColour == value)
+                    return;
+                accentColour = value;
+
+                background.Colour = accentColour;
+
+                hitTargetBar.EdgeEffect = new EdgeEffect
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 5,
+                    Colour = accentColour.Opacity(0.5f),
+                };
+
+                keyIcon.EdgeEffect = new EdgeEffect
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 5,
+                    Colour = accentColour.Opacity(0.5f),
+                };
+            }
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
