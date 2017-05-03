@@ -53,6 +53,8 @@ namespace osu.Game.Configuration
 
             // Graphics
 
+            Set(OsuConfig.ShowFpsDisplay, false);
+
             Set(OsuConfig.MenuParallax, true);
 
             Set(OsuConfig.SnakingInSliders, true);
@@ -99,6 +101,7 @@ namespace osu.Game.Configuration
         DisplayStarsMinimum,
         DisplayStarsMaximum,
         SnakingInSliders,
-        SnakingOutSliders
+        SnakingOutSliders,
+        ShowFpsDisplay
     }
 }
