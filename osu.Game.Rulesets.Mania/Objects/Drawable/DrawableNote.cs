@@ -12,9 +12,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawable
 {
     public class DrawableNote : Sprite
     {
-        private readonly ManiaBaseHit note;
+        private readonly ManiaHitObject note;
 
-        public DrawableNote(ManiaBaseHit note)
+        public DrawableNote(ManiaHitObject note)
         {
             this.note = note;
             Origin = Anchor.Centre;
