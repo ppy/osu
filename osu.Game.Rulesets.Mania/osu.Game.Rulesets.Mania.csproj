@@ -50,6 +50,7 @@
     <Compile Include="Beatmaps\ManiaBeatmapConverter.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
+    <Compile Include="Objects\IHasColumn.cs" />
     <Compile Include="Scoring\ManiaScoreProcessor.cs" />
     <Compile Include="Objects\Drawable\DrawableNote.cs" />
     <Compile Include="Objects\HoldNote.cs" />
