@@ -144,6 +144,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 int keyOffset = default_keys.Length / 2 - nonSpecialColumns.Count / 2 + i;
                 if (keyOffset >= 0 && keyOffset < default_keys.Length)
                     column.Key = default_keys[keyOffset];
+                else
+                    // There is no default key defined for this column. Let's set this to Unknown for now
+                    // however note that this will be gone after bindings are in place
+                    column.Key = Key.Unknown;
             }
         }
 
