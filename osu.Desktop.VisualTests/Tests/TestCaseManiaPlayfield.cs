@@ -18,6 +18,9 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using OpenTK.Input;
+using osu.Game.Rulesets.UI;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -25,69 +28,119 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Mania playfield";
 
-        private FlowContainer<Column> columns;
+        protected override double TimePerAction => 200;
 
         public override void Reset()
         {
             base.Reset();
 
-            Add(new Container
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Y,
-                AutoSizeAxes = Axes.X,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black
-                    },
-                    columns = new FillFlowContainer<Column>
-                    {
-                        RelativeSizeAxes = Axes.Y,
-                        AutoSizeAxes = Axes.X,
-                        Direction = FillDirection.Horizontal,
-                        Padding = new MarginPadding { Left = 1, Right = 1 },
-                        Spacing = new Vector2(1, 0)
-                    }
-                }
-            });
+            int max_columns = 9;
 
-            var colours = new Color4[]
+            for (int i = 1; i <= max_columns; i++)
             {
-                new Color4(187, 17, 119, 255),
-                new Color4(96, 204, 0, 255),
-                new Color4(17, 136, 170, 255)
+                int tempI = i;
+
+                AddStep($@"{i} column" + (i > 1 ? "s" : ""), () =>
+                {
+                    Clear();
+                    Add(new ManiaPlayfield(tempI)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre
+                    });
+                });
+
+                AddStep($"Trigger keys down", () => ((ManiaPlayfield)Children.First()).Columns.Children.ForEach(triggerKeyDown));
+                AddStep($"Trigger keys up", () => ((ManiaPlayfield)Children.First()).Columns.Children.ForEach(triggerKeyUp));
+            }
+        }
+
+        private void triggerKeyDown(Column column)
+        {
+            column.TriggerKeyDown(new InputState(), new KeyDownEventArgs
+            {
+                Key = column.Key,
+                Repeat = false
+            });
+        }
+
+        private void triggerKeyUp(Column column)
+        {
+            column.TriggerKeyUp(new InputState(), new KeyUpEventArgs
+            {
+                Key = column.Key
+            });
+        }
+    }
+
+    public class ManiaPlayfield : Container
+    {
+        public readonly FlowContainer<Column> Columns;
+
+        public ManiaPlayfield(int columnCount)
+        {
+            if (columnCount > 9)
+                throw new ArgumentException($@"{columnCount} columns is not supported.");
+            if (columnCount <= 0)
+                throw new ArgumentException($@"Can't have zero or fewer columns.");
+
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
+
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black
+                },
+                Columns = new FillFlowContainer<Column>
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Direction = FillDirection.Horizontal,
+                    Padding = new MarginPadding { Left = 1, Right = 1 },
+                    Spacing = new Vector2(1, 0)
+                }
             };
 
-            var keys = new Key[] { Key.S, Key.D, Key.F, Key.Space, Key.J, Key.K, Key.L };
+            for (int i = 0; i < columnCount; i++)
+                Columns.Add(new Column());
+        }
 
-            int num_columns = 7;
-            int half_columns = num_columns / 2;
-
-            for (int i = 0; i < num_columns; i++)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            var columnColours = new Color4[]
             {
-                columns.Add(new Column
-                {
-                    Key = keys[i]
-                });
+                colours.RedDark,
+                colours.GreenDark,
+                colours.BlueDark // Special column
+            };
+
+            int columnCount = Columns.Children.Count();
+            int halfColumns = columnCount / 2;
+
+            var keys = new Key[] { Key.A, Key.S, Key.D, Key.F, Key.Space, Key.J, Key.K, Key.L, Key.Semicolon };
+
+            for (int i = 0; i < halfColumns; i++)
+            {
+                Column leftColumn = Columns.Children.ElementAt(i);
+                Column rightColumn = Columns.Children.ElementAt(columnCount - 1 - i);
+
+                Color4 accent = columnColours[i % 2];
+                leftColumn.AccentColour = rightColumn.AccentColour = accent;
+                leftColumn.Key = keys[keys.Length / 2 - halfColumns + i];
+                rightColumn.Key = keys[keys.Length / 2 + halfColumns - i];
             }
 
-            for (int i = 0; i < half_columns; i++)
-            {
-                Color4 accent = colours[i % 2];
-                columns.Children.ElementAt(i).AccentColour = accent;
-                columns.Children.ElementAt(num_columns - 1 - i).AccentColour = accent;
-            }
-
-            bool hasSpecial = half_columns * 2 < num_columns;
+            bool hasSpecial = halfColumns * 2 < columnCount;
             if (hasSpecial)
             {
-                Column specialColumn = columns.Children.ElementAt(half_columns);
+                Column specialColumn = Columns.Children.ElementAt(halfColumns);
                 specialColumn.IsSpecialColumn = true;
-                specialColumn.AccentColour = colours[2];
+                specialColumn.AccentColour = columnColours[2];
+                specialColumn.Key = keys[keys.Length / 2];
             }
         }
     }
