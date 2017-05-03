@@ -7,16 +7,24 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
-    public class TaikoAutoReplay : AutoGenerator<TaikoHitObject>
+    public class TaikoAutoGenerator : AutoGenerator<TaikoHitObject>
     {
         private const double swell_hit_speed = 50;
 
-        public TaikoAutoReplay(Beatmap<TaikoHitObject> beatmap)
+        public TaikoAutoGenerator(Beatmap<TaikoHitObject> beatmap)
             : base(beatmap)
         {
+            Replay = new Replay
+            {
+                User = new User
+                {
+                    Username = @"Autoplay",
+                }
+            };
         }
 
         protected Replay Replay;
