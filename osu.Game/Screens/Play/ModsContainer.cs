@@ -16,9 +16,15 @@ namespace osu.Game.Screens.Play
     {
         private readonly FillFlowContainer<ModIcon> iconsContainer;
 
+        private bool showMods;
         public bool ShowMods
         {
-            set { if (!value) Hide(); }
+            set
+            {
+                showMods = value;
+                if (!showMods) Hide();
+            }
+            get { return ShowMods; }
         }
 
         public ModsContainer()
@@ -46,28 +52,11 @@ namespace osu.Game.Screens.Play
 
         public void Add(Mod mod)
         {
-            iconsContainer.Add(new ModIcon
+            iconsContainer.Add(new ModIcon(mod)
             {
                 AutoSizeAxes = Axes.Both,
-                Icon = mod.Icon,
-                Colour = selectColour(mod),
                 Scale = new Vector2((float)0.7),
             });
-        }
-
-        private Color4 selectColour(Mod mod)
-        {
-            switch (mod.Type)
-            {
-                case ModType.DifficultyIncrease:
-                    return OsuColour.FromHex(@"ffcc22");
-                case ModType.DifficultyReduction:
-                    return OsuColour.FromHex(@"88b300");
-                case ModType.Special:
-                    return OsuColour.FromHex(@"66ccff");
-
-                default: return Color4.White;
-            }
         }
     }
 }
