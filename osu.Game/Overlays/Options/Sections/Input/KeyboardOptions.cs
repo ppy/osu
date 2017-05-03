@@ -17,13 +17,8 @@ namespace osu.Game.Overlays.Options.Sections.Input
                 new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = "Change keyboard bindings"
+                    Text = "Key Configuration"
                 },
-                new OsuButton
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Text = "osu!mania layout"
-                }
             };
         }
     }
