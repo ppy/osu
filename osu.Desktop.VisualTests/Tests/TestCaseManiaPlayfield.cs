@@ -20,7 +20,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            const int max_columns = 9;
+            const int max_columns = 10;
 
             for (int i = 1; i <= max_columns; i++)
             {
@@ -38,6 +38,8 @@ namespace osu.Desktop.VisualTests.Tests
 
                 AddStep("Trigger keys down", () => ((ManiaPlayfield)Children.First()).Columns.Children.ForEach(triggerKeyDown));
                 AddStep("Trigger keys up", () => ((ManiaPlayfield)Children.First()).Columns.Children.ForEach(triggerKeyUp));
+                AddStep("Left special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnStyle = SpecialColumnStyle.Left);
+                AddStep("Right special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnStyle = SpecialColumnStyle.Right);
             }
         }
 
