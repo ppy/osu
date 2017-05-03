@@ -51,7 +51,6 @@ namespace osu.Game.Overlays
                 new AudioSection(),
                 new SkinSection(),
                 new InputSection(),
-                new EditorSection(),
                 new OnlineSection(),
                 new MaintenanceSection(),
                 new DebugSection(),
