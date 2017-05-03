@@ -21,7 +21,7 @@ using osu.Game.Screens.Tournament.Components;
 using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Users;
+using osu.Framework.IO.Stores;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Tournament
         private GroupContainer groupsContainer;
         private OsuSpriteText fullTeamNameText;
 
-        private readonly List<Country> allTeams = new List<Country>();
+        private readonly List<DrawingsTeam> allTeams = new List<DrawingsTeam>();
 
         private DrawingsConfigManager drawingsConfig;
 
@@ -47,10 +47,20 @@ namespace osu.Game.Screens.Tournament
 
         public ITeamList TeamList;
 
+        protected override DependencyContainer CreateLocalDependencies(DependencyContainer parent) => new DependencyContainer(parent);
+
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, Storage storage)
+        private void load(TextureStore textures, Storage storage, DependencyContainer dependencies)
         {
             this.storage = storage;
+
+            TextureStore flagStore = new TextureStore();
+            // Local flag store
+            flagStore.AddStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
+            // Default texture store
+            flagStore.AddStore(textures);
+
+            dependencies.Cache(flagStore);
 
             if (TeamList == null)
                 TeamList = new StorageBackedTeamList(storage);
@@ -239,7 +249,7 @@ namespace osu.Game.Screens.Tournament
             reset(true);
         }
 
-        private void onTeamSelected(Country team)
+        private void onTeamSelected(DrawingsTeam team)
         {
             groupsContainer.AddTeam(team);
 
@@ -276,7 +286,7 @@ namespace osu.Game.Screens.Tournament
             teamsContainer.ClearTeams();
             allTeams.Clear();
 
-            foreach (Country t in TeamList.Teams)
+            foreach (DrawingsTeam t in TeamList.Teams)
             {
                 if (groupsContainer.ContainsTeam(t.FullName))
                     continue;
@@ -312,7 +322,7 @@ namespace osu.Game.Screens.Tournament
                             if (line.ToUpper().StartsWith("GROUP"))
                                 continue;
 
-                            Country teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
+                            DrawingsTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
 
                             if (teamToAdd == null)
                                 continue;
