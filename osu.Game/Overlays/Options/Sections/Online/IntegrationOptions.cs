@@ -20,22 +20,26 @@ namespace osu.Game.Overlays.Options.Sections.Online
                 new OsuCheckbox
                 {
                     LabelText = "Integrate with Yahoo! status display",
-                    Bindable = config.GetBindable<bool>(OsuConfig.YahooIntegration)
+                    Bindable = config.GetBindable<bool>(OsuConfig.YahooIntegration),
+                    TooltipText = "Your Yahoo! Messenger will show the song you are currently playing or listening to."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Integrate with MSN Live status display",
-                    Bindable = config.GetBindable<bool>(OsuConfig.MsnIntegration)
+                    Bindable = config.GetBindable<bool>(OsuConfig.MsnIntegration),
+                    TooltipText = "Your Windows Live Messenger will show the song you are currently playing or listening to." //Who still uses this?
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Automatically start osu!direct downloads",
-                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticDownload)
+                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticDownload),
+                    TooltipText = "When spectating or multiplaying, beatmaps will be downloaded for you."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Prefer no-video downloads",
-                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticDownloadNoVideo)
+                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticDownloadNoVideo),
+                    TooltipText = "Choose whether automatic osu!direct downloads come with videos."
                 },
             };
         }

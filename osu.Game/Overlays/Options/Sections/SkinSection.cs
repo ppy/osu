@@ -41,22 +41,26 @@ namespace osu.Game.Overlays.Options.Sections
                 new OsuCheckbox
                 {
                     LabelText = "Ignore all beatmap skins",
-                    Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSkins)
+                    Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSkins),
+                    TooltipText = "Defaults game settings to never use skin elemt overrides provided by beatmaps."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Use skin's sound samples",
-                    Bindable = config.GetBindable<bool>(OsuConfig.SkinSamples)
+                    Bindable = config.GetBindable<bool>(OsuConfig.SkinSamples),
+                    TooltipText = "If this is not selected, the default osu! soundset will be used for hit samples."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Use Taiko skin for Taiko mode",
-                    Bindable = config.GetBindable<bool>(OsuConfig.UseTaikoSkin)
+                    Bindable = config.GetBindable<bool>(OsuConfig.UseTaikoSkin),
+                    TooltipText = "If this is selected and the Taiko skin is present, it will always be used when playing Taiko mode."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Always use skin cursor",
-                    Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor)
+                    Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor),
+                    TooltipText = "The selected skin's cursor will override any beatmap-specific cursor modifications."
                 },
                 new OptionSlider<double, SizeSlider>
                 {
@@ -71,7 +75,8 @@ namespace osu.Game.Overlays.Options.Sections
                 new OsuCheckbox
                 {
                     LabelText = "Automatic cursor size",
-                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticCursorSizing)
+                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticCursorSizing),
+                    TooltipText = "Cursor size will adjust based on the CS of the current beatmap"
                 },
             };
         }

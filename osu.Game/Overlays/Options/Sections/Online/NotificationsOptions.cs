@@ -20,32 +20,38 @@ namespace osu.Game.Overlays.Options.Sections.Online
                 new OsuCheckbox
                 {
                     LabelText = "Enable chat ticker",
-                    Bindable = config.GetBindable<bool>(OsuConfig.Ticker)
+                    Bindable = config.GetBindable<bool>(OsuConfig.Ticker),
+                    TooltipText = "Popup new chat messages in a one-liner display at the bottom of the screen when the console is not visible."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show a notification popup when someone says your name",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ChatHighlightName)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ChatHighlightName),
+                    TooltipText = "A message will flash at the bottom of your screen (even during gameplay) when someone mentions your name in chat."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show chat message notifications",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ChatMessageNotification)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ChatMessageNotification),
+                    TooltipText = "A notification will be shown when new chat messages arrive."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Play a sound when someone says your name",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ChatAudibleHighlight)
+                    Bindable = config.GetBindable<bool>(OsuConfig.ChatAudibleHighlight),
+                    TooltipText = "A sound will play when someone mentions your name in chat."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show notification popups instantly during gameplay",
-                    Bindable = config.GetBindable<bool>(OsuConfig.PopupDuringGameplay)
+                    Bindable = config.GetBindable<bool>(OsuConfig.PopupDuringGameplay),
+                    TooltipText = "Choose whether to allow notifications to appear in the notification manager during gameplay."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Show notification popups when friends change status",
-                    Bindable = config.GetBindable<bool>(OsuConfig.NotifyFriends)
+                    Bindable = config.GetBindable<bool>(OsuConfig.NotifyFriends),
+                    TooltipText = "Notifications will be shown when friends go online/offline."
                 },
             };
         }

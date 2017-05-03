@@ -19,7 +19,8 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                 new OsuCheckbox
                 {
                     LabelText = "Show thumbnails",
-                    Bindable = config.GetBindable<bool>(OsuConfig.SongSelectThumbnails)
+                    Bindable = config.GetBindable<bool>(OsuConfig.SongSelectThumbnails),
+                    TooltipText = "Display a preview of each beatmaps's background. Requires skin support (version 2.2+)."
                 }
             };
         }

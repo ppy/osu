@@ -144,6 +144,7 @@ namespace osu.Game.Graphics.Cursor
                         TextSize = text_size,
                         Padding = new MarginPadding(5),
                         Font = @"Exo2.0-Regular",
+                        MaximumSize = new Vector2(500, float.MaxValue),
                     }
                 };
             }

@@ -22,12 +22,14 @@ namespace osu.Game.Overlays.Options.Sections.General
                 new OsuCheckbox
                 {
                     LabelText = "Prefer metadata in original language",
-                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkConfig.ShowUnicode)
+                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkConfig.ShowUnicode),
+                    TooltipText = "Where available, song titles will be shown in their native language (and character-set)."
                 },
                 new OsuCheckbox
                 {
                     LabelText = "Use alternative font for chat display",
-                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.AlternativeChatFont)
+                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.AlternativeChatFont),
+                    TooltipText = "For people who prefer a less stylised font, this sets in-game chat to use ??." //TODO: replace ?? with actual font
                 },
             };
         }
