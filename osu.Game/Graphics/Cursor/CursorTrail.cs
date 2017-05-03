@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.Cursor
 
         private Vector2? lastPosition;
 
-        private InputResampler resampler = new InputResampler();
+        private readonly InputResampler resampler = new InputResampler();
 
         protected override DrawNode CreateDrawNode() => new TrailDrawNode();
 
