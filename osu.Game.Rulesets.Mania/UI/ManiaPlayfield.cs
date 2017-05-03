@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// Default column keys, expanding outwards from the middle as more column are added.
         /// E.g. 2 columns use FJ, 4 columns use DFJK, 6 use SDFJKL, etc...
         /// </summary>
-        private static readonly Key[] default_keys = new[] { Key.A, Key.S, Key.D, Key.F, Key.J, Key.K, Key.L, Key.Semicolon };
+        private static readonly Key[] default_keys = { Key.A, Key.S, Key.D, Key.F, Key.J, Key.K, Key.L, Key.Semicolon };
 
         private SpecialColumnStyle specialColumnStyle;
         /// <summary>
