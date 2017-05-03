@@ -10,10 +10,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using System.Linq;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionDropdown<T> : FillFlowContainer
+    public class OptionDropdown<T> : FillFlowContainer, IFilterable
     {
         private readonly Dropdown<T> dropdown;
         private readonly SpriteText text;
@@ -54,6 +56,15 @@ namespace osu.Game.Overlays.Options
             }
         }
 
+        public string[] FilterTerms => Items.Select(item => item.Key).ToArray();
+        public bool MatchingCurrentFilter
+        {
+            set
+            {
+                FadeTo(value ? 1 : 0, 250);
+            }
+        }
+
         public OptionDropdown()
         {
             Items = new KeyValuePair<string, T>[0];
@@ -76,7 +87,7 @@ namespace osu.Game.Overlays.Options
 
             dropdown.Current.DisabledChanged += disabled =>
             {
-                Alpha = disabled ? 0.3f : 1;
+                Colour = disabled ? new Color4(255, 255, 255, 77) : Color4.White;
             };
         }
     }

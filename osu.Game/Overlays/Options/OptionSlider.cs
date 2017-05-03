@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Options
     {
     }
 
-    public class OptionSlider<T, U> : FillFlowContainer where T : struct where U : SliderBar<T>, new()
+    public class OptionSlider<T, U> : FillFlowContainer, IFilterable where T : struct where U : SliderBar<T>, new()
     {
         private readonly SliderBar<T> slider;
         private readonly SpriteText text;
@@ -39,6 +39,15 @@ namespace osu.Game.Overlays.Options
             {
                 bindable = value;
                 slider.Current.BindTo(bindable);
+            }
+        }
+
+        public string[] FilterTerms => new[] { LabelText };
+        public bool MatchingCurrentFilter
+        {
+            set
+            {
+                FadeTo(value ? 1 : 0, 250);
             }
         }
 
