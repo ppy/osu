@@ -63,15 +63,8 @@ namespace osu.Game.Overlays.Mods
         private Color4 buttonColour;
         public Color4 ButtonColour
         {
-            get
-            {
-                return buttonColour;
-            }
-            set
-            {
-                if (value == buttonColour) return;
-                buttonColour = value;
-            }
+            get { return buttonColour; }
+            set { buttonColour = value; }
         }
 
         private Color4 selectedColour;

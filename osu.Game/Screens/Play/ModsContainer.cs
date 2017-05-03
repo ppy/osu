@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play
                 showMods = value;
                 if (!showMods) Hide();
             }
-            get { return ShowMods; }
+            get { return showMods; }
         }
 
         public ModsContainer()
