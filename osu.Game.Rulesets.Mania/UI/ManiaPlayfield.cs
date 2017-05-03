@@ -8,29 +8,92 @@ using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Framework.Graphics.Containers;
+using System;
+using osu.Framework.Graphics.Primitives;
+using osu.Game.Graphics;
+using osu.Framework.Allocation;
+using OpenTK.Input;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaPlayfield : Playfield<ManiaBaseHit, ManiaJudgement>
     {
+        public readonly FlowContainer<Column> Columns;
+
         public ManiaPlayfield(int columns)
         {
-            Size = new Vector2(0.8f, 1f);
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
+            if (columns > 9)
+                throw new ArgumentException($@"{columns} columns is not supported.");
+            if (columns <= 0)
+                throw new ArgumentException($@"Can't have zero or fewer columns.");
 
-            Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
+            Children = new Drawable[]
+            {
+                new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black
+                        },
+                        Columns = new FillFlowContainer<Column>
+                        {
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+                            Direction = FillDirection.Horizontal,
+                            Padding = new MarginPadding { Left = 1, Right = 1 },
+                            Spacing = new Vector2(1, 0)
+                        }
+                    }
+                }
+            };
 
             for (int i = 0; i < columns; i++)
-                Add(new Box
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Size = new Vector2(2, 1),
-                    RelativePositionAxes = Axes.Both,
-                    Position = new Vector2((float)i / columns, 0),
-                    Alpha = 0.5f,
-                    Colour = Color4.Black
-                });
+                Columns.Add(new Column());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            var columnColours = new Color4[]
+            {
+                colours.RedDark,
+                colours.GreenDark,
+                colours.BlueDark // Special column
+            };
+
+            int columnCount = Columns.Children.Count();
+            int halfColumns = columnCount / 2;
+
+            var keys = new Key[] { Key.A, Key.S, Key.D, Key.F, Key.Space, Key.J, Key.K, Key.L, Key.Semicolon };
+
+            for (int i = 0; i < halfColumns; i++)
+            {
+                Column leftColumn = Columns.Children.ElementAt(i);
+                Column rightColumn = Columns.Children.ElementAt(columnCount - 1 - i);
+
+                Color4 accent = columnColours[i % 2];
+                leftColumn.AccentColour = rightColumn.AccentColour = accent;
+                leftColumn.Key = keys[keys.Length / 2 - halfColumns + i];
+                rightColumn.Key = keys[keys.Length / 2 + halfColumns - i];
+            }
+
+            bool hasSpecial = halfColumns * 2 < columnCount;
+            if (hasSpecial)
+            {
+                Column specialColumn = Columns.Children.ElementAt(halfColumns);
+                specialColumn.IsSpecialColumn = true;
+                specialColumn.AccentColour = columnColours[2];
+                specialColumn.Key = keys[keys.Length / 2];
+            }
         }
     }
 }
