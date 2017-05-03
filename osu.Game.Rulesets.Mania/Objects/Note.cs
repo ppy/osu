@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
-    public class Note : ManiaBaseHit
+    public class Note : ManiaHitObject
     {
     }
 }

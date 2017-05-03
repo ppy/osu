@@ -5,8 +5,8 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
-    public abstract class ManiaBaseHit : HitObject
+    public abstract class ManiaHitObject : HitObject, IHasColumn
     {
-        public int Column;
+        public int Column { get; set; }
     }
 }
