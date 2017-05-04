@@ -38,11 +38,11 @@ namespace osu.Desktop.VisualTests.Tests
 
                 AddStep("Trigger keys down", () => ((ManiaPlayfield)Children.First()).Columns.Children.ForEach(triggerKeyDown));
                 AddStep("Trigger keys up", () => ((ManiaPlayfield)Children.First()).Columns.Children.ForEach(triggerKeyUp));
-                AddStep("Left special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnStyle = SpecialColumnStyle.Left);
-                AddStep("Right special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnStyle = SpecialColumnStyle.Right);
+                AddStep("Left special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnPosition = SpecialColumnPosition.Left);
+                AddStep("Right special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnPosition = SpecialColumnPosition.Right);
             }
 
-            AddStep("Normal special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnStyle = SpecialColumnStyle.Normal);
+            AddStep("Normal special style", () => ((ManiaPlayfield)Children.First()).SpecialColumnPosition = SpecialColumnPosition.Normal);
         }
 
         private void triggerKeyDown(Column column)
