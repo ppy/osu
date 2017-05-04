@@ -56,5 +56,10 @@ namespace osu.Game.Screens.Play
                 Scale = new Vector2(0.7f),
             });
         }
+
+        public void Clear()
+        {
+            iconsContainer.Clear();
+        }
     }
 }
