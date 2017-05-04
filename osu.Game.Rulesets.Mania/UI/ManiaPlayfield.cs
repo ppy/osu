@@ -27,10 +27,20 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         private static readonly Key[] default_keys = { Key.A, Key.S, Key.D, Key.F, Key.J, Key.K, Key.L, Key.Semicolon };
 
+        private SpecialColumnPosition specialColumnPosition;
         /// <summary>
         /// The style to use for the special column.
         /// </summary>
-        public SpecialColumnPosition SpecialColumnPosition;
+        public SpecialColumnPosition SpecialColumnPosition
+        {
+            get { return specialColumnPosition; }
+            set
+            {
+                if (IsLoaded)
+                    throw new InvalidOperationException($"Setting {nameof(SpecialColumnPosition)} after the playfield is loaded requires re-creating the playfield.");
+                specialColumnPosition = value;
+            }
+        }
 
         public readonly FlowContainer<Column> Columns;
 
