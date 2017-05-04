@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                     Height = head_colour_height,
-                    Alpha = 0.5f
+                    Alpha = 0.2f
                 }
             };
         }
@@ -50,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                     return;
                 accentColour = value;
 
-                colouredBox.Colour = AccentColour;
+                colouredBox.Colour = AccentColour.Lighten(0.9f);
 
                 EdgeEffect = new EdgeEffect
                 {

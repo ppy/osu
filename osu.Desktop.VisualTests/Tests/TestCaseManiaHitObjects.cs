@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -31,7 +32,8 @@ namespace osu.Desktop.VisualTests.Tests
                     new DrawableNote(new Note())
                     {
                         Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre
+                        Origin = Anchor.Centre,
+                        AccentColour = Color4.Red
                     }
                 }
             });

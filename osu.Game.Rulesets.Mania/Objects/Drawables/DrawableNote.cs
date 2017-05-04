@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -17,7 +18,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public DrawableNote(Note hitObject)
             : base(hitObject)
         {
-            Add(new NotePiece());
+            Add(headPiece = new NotePiece());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            headPiece.AccentColour = AccentColour;
         }
 
         protected override void UpdateState(ArmedState state)
