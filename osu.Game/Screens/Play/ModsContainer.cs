@@ -7,6 +7,8 @@ using osu.Game.Rulesets.UI;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
+using System.Collections.Generic;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Screens.Play
 {
@@ -14,15 +16,23 @@ namespace osu.Game.Screens.Play
     {
         private readonly FillFlowContainer<ModIcon> iconsContainer;
 
+        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
+
         private bool showMods;
         public bool ShowMods
         {
+            get
+            {
+                return showMods;
+            }
             set
             {
                 showMods = value;
-                if (!showMods) Hide();
+                if (!showMods)
+                    Hide();
+                else
+                    Show();
             }
-            get { return showMods; }
         }
 
         public ModsContainer()
@@ -46,20 +56,19 @@ namespace osu.Game.Screens.Play
                     TextSize = 12,
                 }
             };
-        }
 
-        public void Add(Mod mod)
-        {
-            iconsContainer.Add(new ModIcon(mod)
+            Mods.ValueChanged += mods =>
             {
-                AutoSizeAxes = Axes.Both,
-                Scale = new Vector2(0.7f),
-            });
-        }
-
-        public void Clear()
-        {
-            iconsContainer.Clear();
+                iconsContainer.Clear();
+                foreach (Mod mod in mods)
+                {
+                    iconsContainer.Add(new ModIcon(mod)
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.7f),
+                    });
+                }
+            };
         }
     }
 }

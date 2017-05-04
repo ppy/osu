@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.UI
             set { modIcon.Icon = value; }
         }
 
-        public ModIcon(Mod m)
+        public ModIcon(Mod mod)
         {
             Children = new Drawable[]
             {
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.UI
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Icon = FontAwesome.fa_osu_mod_bg,
-                    Colour = pickColour(m),
+                    Colour = getBackgroundColourFromMod(mod),
                     Shadow = true,
                     TextSize = 20
                 },
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.UI
                     Anchor = Anchor.Centre,
                     Colour = OsuColour.Gray(84),
                     TextSize = 20,
-                    Icon = m?.Icon ?? FontAwesome.fa_question,
+                    Icon = (mod != null) ? mod.Icon : FontAwesome.fa_question,
                 },
             };
 
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.UI
             modIcon.TextSize = iconSize - 35;
         }
 
-        private Color4 pickColour(Mod mod)
+        private Color4 getBackgroundColourFromMod(Mod mod)
         {
             switch (mod?.Type)
             {

@@ -13,7 +13,7 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests the mod select overlay";
 
-        private ModSelectOverlay modSelect;
+        protected ModSelectOverlay modSelect;
         private RulesetDatabase rulesets;
 
         [BackgroundDependencyLoader]

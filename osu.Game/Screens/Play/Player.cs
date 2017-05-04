@@ -170,8 +170,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
             hudOverlay.ModsContainer.ShowMods = HitRenderer.HasReplayLoaded;
-            foreach (var mod in Beatmap.Mods.Value)
-                hudOverlay.ModsContainer.Add(mod);
+            hudOverlay.ModsContainer.Mods.BindTo(Beatmap.Mods);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
