@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
         {
             Children = new[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Parallax",
                     Bindable = config.GetBindable<bool>(OsuConfig.MenuParallax)

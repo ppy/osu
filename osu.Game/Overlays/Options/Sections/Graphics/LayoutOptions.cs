@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                     LabelText = "Screen mode",
                     Bindable = config.GetBindable<WindowMode>(FrameworkConfig.WindowMode),
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Letterboxing",
                     Bindable = letterboxing,
