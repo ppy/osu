@@ -27,25 +27,10 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         private static readonly Key[] default_keys = { Key.A, Key.S, Key.D, Key.F, Key.J, Key.K, Key.L, Key.Semicolon };
 
-        private SpecialColumnPosition specialColumnPosition;
         /// <summary>
         /// The style to use for the special column.
         /// </summary>
-        public SpecialColumnPosition SpecialColumnPosition
-        {
-            get { return specialColumnPosition; }
-            set
-            {
-                if (specialColumnPosition == value)
-                    return;
-                specialColumnPosition = value;
-
-                if (!IsLoaded)
-                    return;
-
-                updateColumnStyle();
-            }
-        }
+        public SpecialColumnPosition SpecialColumnPosition;
 
         public readonly FlowContainer<Column> Columns;
 
@@ -103,14 +88,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
             specialColumnColour = colours.BlueDark;
 
-            updateColumnStyle();
-        }
-
-        /// <summary>
-        /// Updates the column style (special style/colours) + keys.
-        /// </summary>
-        private void updateColumnStyle()
-        {
             // Set the special column + colour + key
             for (int i = 0; i < columnCount; i++)
             {
