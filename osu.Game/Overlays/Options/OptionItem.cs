@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -9,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
@@ -18,9 +16,9 @@ namespace osu.Game.Overlays.Options
     {
         protected abstract Drawable CreateControl();
 
-        protected Drawable Control { get; private set; }
+        protected Drawable Control { get; }
 
-        private IHasCurrentValue<T> ControlWithCurrent => Control as IHasCurrentValue<T>;
+        private IHasCurrentValue<T> controlWithCurrent => Control as IHasCurrentValue<T>;
 
         private SpriteText text;
 
@@ -67,7 +65,7 @@ namespace osu.Game.Overlays.Options
             }
         }
 
-        public OptionItem()
+        protected OptionItem()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -75,8 +73,8 @@ namespace osu.Game.Overlays.Options
 
             if ((Control = CreateControl()) != null)
             {
-                if (ControlWithCurrent != null)
-                    ControlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
+                if (controlWithCurrent != null)
+                    controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
                 Add(Control);
             }
         }
