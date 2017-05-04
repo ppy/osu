@@ -56,10 +56,12 @@
     <Compile Include="Objects\ManiaBaseHit.cs" />
     <Compile Include="Objects\Note.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\Column.cs" />
     <Compile Include="UI\ManiaHitRenderer.cs" />
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />
     <Compile Include="Mods\ManiaMod.cs" />
+    <Compile Include="UI\SpecialColumnPosition.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
