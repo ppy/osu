@@ -14,8 +14,6 @@ namespace osu.Game.Screens.Play
 {
     public class ModsContainer : Container
     {
-        private readonly FillFlowContainer<ModIcon> iconsContainer;
-
         public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
 
         private bool showMods;
@@ -37,6 +35,8 @@ namespace osu.Game.Screens.Play
 
         public ModsContainer()
         {
+            FillFlowContainer<ModIcon> iconsContainer;
+
             Children = new Drawable[]
             {
                 iconsContainer = new FillFlowContainer<ModIcon>
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Play
                     iconsContainer.Add(new ModIcon(mod)
                     {
                         AutoSizeAxes = Axes.Both,
-                        Scale = new Vector2(0.7f),
+                        Scale = new Vector2(0.65f),
                     });
                 }
             };

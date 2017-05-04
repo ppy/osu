@@ -1,18 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Testing;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Screens.Menu;
-using OpenTK.Graphics;
-using osu.Game.Screens.Play;
-using osu.Framework.Allocation;
-using osu.Game.Overlays.Mods;
-using osu.Game.Database;
-using osu.Game.Rulesets.Mods;
 using OpenTK;
+using osu.Framework.Graphics;
+using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -34,7 +25,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Position = new Vector2(0, 25),
             });
 
-            modsContainer.Mods.BindTo(modSelect.SelectedMods);
+            modsContainer.Mods.BindTo(ModSelect.SelectedMods);
         }
     }
 }
