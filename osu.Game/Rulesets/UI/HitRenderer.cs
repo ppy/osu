@@ -202,8 +202,6 @@ namespace osu.Game.Rulesets.UI
         protected HitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
         {
-            KeyConversionInputManager.Add(Playfield = CreatePlayfield());
-
             InputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -216,6 +214,8 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load()
         {
+            KeyConversionInputManager.Add(Playfield = CreatePlayfield());
+
             loadObjects();
 
             if (InputManager?.ReplayInputHandler != null)
