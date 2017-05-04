@@ -22,8 +22,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             RelativeSizeAxes = Axes.X;
             Height = head_height;
 
-            Masking = true;
-
             Children = new[]
             {
                 new Box
@@ -52,13 +50,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 accentColour = value;
 
                 colouredBox.Colour = AccentColour.Lighten(0.9f);
-
-                EdgeEffect = new EdgeEffect
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 5,
-                    Colour = AccentColour
-                };
             }
         }
     }

@@ -21,10 +21,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Add(headPiece = new NotePiece());
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public override Color4 AccentColour
         {
-            headPiece.AccentColour = AccentColour;
+            get { return AccentColour; }
+            set
+            {
+                if (base.AccentColour == value)
+                    return;
+                base.AccentColour = value;
+
+                headPiece.AccentColour = value;
+            }
         }
 
         protected override void UpdateState(ArmedState state)
