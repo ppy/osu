@@ -20,7 +20,6 @@ namespace osu.Game.Overlays.Options.Sections
                 new LayoutOptions(),
                 new DetailOptions(),
                 new MainMenuOptions(),
-                new SongSelectGraphicsOptions(),
             };
         }
     }

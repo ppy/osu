@@ -19,6 +19,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 using SQLite.Net;
+using osu.Framework.Graphics.Performance;
 
 namespace osu.Game
 {
@@ -43,6 +44,8 @@ namespace osu.Game
         protected MenuCursor Cursor;
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        private Bindable<bool> fpsDisplayVisible;
 
         protected AssemblyName AssemblyName => Assembly.GetEntryAssembly()?.GetName() ?? new AssemblyName { Version = new Version() };
 
@@ -160,6 +163,15 @@ namespace osu.Game
                     },
                 }
             });
+
+            // TODO: This is temporary until we reimplement the local FPS display.
+            // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
+            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuConfig.ShowFpsDisplay);
+            fpsDisplayVisible.ValueChanged += val =>
+            {
+                FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None;
+            };
+            fpsDisplayVisible.TriggerChange();
         }
 
         public override void SetHost(GameHost host)
