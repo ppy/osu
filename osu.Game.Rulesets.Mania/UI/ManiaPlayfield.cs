@@ -27,18 +27,18 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         private static readonly Key[] default_keys = { Key.A, Key.S, Key.D, Key.F, Key.J, Key.K, Key.L, Key.Semicolon };
 
-        private SpecialColumnStyle specialColumnStyle;
+        private SpecialColumnPosition specialColumnPosition;
         /// <summary>
         /// The style to use for the special column.
         /// </summary>
-        public SpecialColumnStyle SpecialColumnStyle
+        public SpecialColumnPosition SpecialColumnPosition
         {
-            get { return specialColumnStyle; }
+            get { return specialColumnPosition; }
             set
             {
-                if (specialColumnStyle == value)
+                if (specialColumnPosition == value)
                     return;
-                specialColumnStyle = value;
+                specialColumnPosition = value;
 
                 if (!IsLoaded)
                     return;
@@ -158,14 +158,14 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <returns>Whether the column is a special column.</returns>
         private bool isSpecialColumn(int column)
         {
-            switch (SpecialColumnStyle)
+            switch (SpecialColumnPosition)
             {
                 default:
-                case SpecialColumnStyle.Normal:
+                case SpecialColumnPosition.Normal:
                     return columnCount % 2 == 1 && column == columnCount / 2;
-                case SpecialColumnStyle.Left:
+                case SpecialColumnPosition.Left:
                     return column == 0;
-                case SpecialColumnStyle.Right:
+                case SpecialColumnPosition.Right:
                     return column == columnCount - 1;
             }
         }

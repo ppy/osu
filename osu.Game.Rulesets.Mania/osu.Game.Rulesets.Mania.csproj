@@ -61,7 +61,7 @@
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />
     <Compile Include="Mods\ManiaMod.cs" />
-    <Compile Include="UI\SpecialColumnStyle.cs" />
+    <Compile Include="UI\SpecialColumnPosition.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

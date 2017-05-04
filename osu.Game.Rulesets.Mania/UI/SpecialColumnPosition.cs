@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public enum SpecialColumnStyle
+    public enum SpecialColumnPosition
     {
         /// <summary>
         /// The special column will lie in the center of the columns.
