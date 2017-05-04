@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                     LabelText = "Frame limiter",
                     Bindable = config.GetBindable<FrameSync>(FrameworkConfig.FrameSync)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Show FPS",
                     Bindable = osuConfig.GetBindable<bool>(OsuConfig.ShowFpsDisplay)

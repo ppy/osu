@@ -17,12 +17,12 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
         {
             Children = new Drawable[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Snaking in sliders",
                     Bindable = config.GetBindable<bool>(OsuConfig.SnakingInSliders)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Snaking out sliders",
                     Bindable = config.GetBindable<bool>(OsuConfig.SnakingOutSliders)

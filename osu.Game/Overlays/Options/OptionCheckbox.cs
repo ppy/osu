@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
@@ -12,19 +12,16 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options
 {
-    public class OptionSlider<T> : OptionSlider<T, OsuSliderBar<T>>
-        where T : struct
+    public class OptionCheckbox : OptionItem<bool>
     {
-    }
+        private OsuCheckbox checkbox;
 
-    public class OptionSlider<T, U> : OptionItem<T>
-        where T : struct
-        where U : SliderBar<T>, new()
-    {
-        protected override Drawable CreateControl() => new U()
+        protected override Drawable CreateControl() => checkbox = new OsuCheckbox();
+
+        public override string LabelText
         {
-            Margin = new MarginPadding { Top = 5, Bottom = 5 },
-            RelativeSizeAxes = Axes.X
-        };
+            get { return checkbox.LabelText; }
+            set { checkbox.LabelText = value; }
+        }
     }
 }

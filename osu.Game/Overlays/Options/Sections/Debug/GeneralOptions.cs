@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Options.Sections.Debug
         {
             Children = new Drawable[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Bypass caching",
                     Bindable = config.GetBindable<bool>(FrameworkDebugConfig.BypassCaching)
