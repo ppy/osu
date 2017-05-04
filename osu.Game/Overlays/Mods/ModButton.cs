@@ -28,6 +28,12 @@ namespace osu.Game.Overlays.Mods
 
         public Action<Mod> Action; // Passed the selected mod or null if none
 
+        private bool buttonIsActive;
+        public bool IsActive
+        {
+            get { return buttonIsActive; }
+        }
+
         private int _selectedIndex = -1;
         private int selectedIndex
         {
@@ -40,21 +46,24 @@ namespace osu.Game.Overlays.Mods
                 if (value == _selectedIndex) return;
                 _selectedIndex = value;
 
-                if (value >= Mods.Length)
+                if (buttonIsActive)
                 {
-                    _selectedIndex = -1;
-                }
-                else if (value <= -2)
-                {
-                    _selectedIndex = Mods.Length - 1;
-                }
+                    if (value >= Mods.Length)
+                    {
+                        _selectedIndex = -1;
+                    }
+                    else if (value <= -2)
+                    {
+                        _selectedIndex = Mods.Length - 1;
+                    }
 
-                iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
-                iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
-                foregroundIcon.Colour = Selected ? SelectedColour : ButtonColour;
+                    iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
+                    iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
+                    foregroundIcon.Colour = Selected ? SelectedColour : ButtonColour;
 
-                if (mod != null)
-                    displayMod(SelectedMod ?? Mods[0]);
+                    if (mod != null)
+                        displayMod(SelectedMod ?? Mods[0]);
+                }
             }
         }
 
@@ -78,7 +87,7 @@ namespace osu.Game.Overlays.Mods
             {
                 if (value == selectedColour) return;
                 selectedColour = value;
-                if (Selected) foregroundIcon.Colour = value;
+                if (Selected && buttonIsActive) foregroundIcon.Colour = value;
             }
         }
 
@@ -116,33 +125,46 @@ namespace osu.Game.Overlays.Mods
 
         // the mods from Mod, only multiple if Mod is a MultiMod
 
-        public Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
+        public Mod SelectedMod
+        {
+            get { return buttonIsActive ? Mods.ElementAtOrDefault(selectedIndex) : null; }
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleOn = audio.Sample.Get(@"Checkbox/check-on");
-            sampleOff = audio.Sample.Get(@"Checkbox/check-off");
+            if (buttonIsActive)
+            {
+                sampleOn = audio.Sample.Get(@"Checkbox/check-on");
+                sampleOff = audio.Sample.Get(@"Checkbox/check-off");
+            }
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            switch (args.Button)
+            if (buttonIsActive)
             {
-                case MouseButton.Left:
-                    SelectNext();
-                    break;
-                case MouseButton.Right:
-                    SelectPrevious();
-                    break;
+                switch (args.Button)
+                {
+                    case MouseButton.Left:
+                        SelectNext();
+                        break;
+                    case MouseButton.Right:
+                        SelectPrevious();
+                        break;
+                }
+                return true;
             }
-            return true;
+            return false;
         }
 
         public void SelectNext()
         {
-            (++selectedIndex == -1 ? sampleOff : sampleOn).Play();
-            Action?.Invoke(SelectedMod);
+            if (buttonIsActive)
+            {
+                (++selectedIndex == -1 ? sampleOff : sampleOn).Play();
+                Action?.Invoke(SelectedMod);
+            }
         }
 
         public void SelectPrevious()
@@ -205,32 +227,37 @@ namespace osu.Game.Overlays.Mods
             Size = new Vector2(100f);
             AlwaysPresent = true;
 
-            Children = new Drawable[]
-            {
-                new Container
-                {
-                    Size = new Vector2(77f, 80f),
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    Children = new Drawable[]
-                    {
-                        iconsContainer = new Container<ModIcon>
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                        }
-                    }
-                },
-                text = new OsuSpriteText
-                {
-                    Origin = Anchor.TopCentre,
-                    Anchor = Anchor.TopCentre,
-                    TextSize = 18,
-                },
-            };
+            buttonIsActive = m != null;
 
-            Mod = m;
+            if (buttonIsActive)
+            {
+                Children = new Drawable[]
+                {
+                    new Container
+                    {
+                        Size = new Vector2(77f, 80f),
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Children = new Drawable[]
+                        {
+                            iconsContainer = new Container<ModIcon>
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                            }
+                        }
+                    },
+                    text = new OsuSpriteText
+                    {
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        TextSize = 18,
+                    },
+                };
+
+                Mod = m;
+            }
         }
     }
 }

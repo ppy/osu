@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.UI
                     Anchor = Anchor.Centre,
                     Colour = OsuColour.Gray(84),
                     TextSize = 20,
-                    Icon = (mod != null) ? mod.Icon : FontAwesome.fa_question,
+                    Icon = mod.Icon
                 },
             };
 
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.UI
 
         private Color4 getBackgroundColourFromMod(Mod mod)
         {
-            switch (mod?.Type)
+            switch (mod.Type)
             {
                 case ModType.DifficultyIncrease:
                     return OsuColour.FromHex(@"ffcc22");
