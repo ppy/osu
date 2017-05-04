@@ -4,8 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
-using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Audio
 {
@@ -14,18 +12,13 @@ namespace osu.Game.Overlays.Options.Sections.Audio
         protected override string Header => "Volume";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, AudioManager audio)
+        private void load(AudioManager audio)
         {
             Children = new Drawable[]
             {
                 new OptionSlider<double> { LabelText = "Master", Bindable = audio.Volume },
                 new OptionSlider<double> { LabelText = "Effect", Bindable = audio.VolumeSample },
                 new OptionSlider<double> { LabelText = "Music", Bindable = audio.VolumeTrack },
-                new OsuCheckbox
-                {
-                    LabelText = "Ignore beatmap hitsounds",
-                    Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSamples)
-                }
             };
         }
     }

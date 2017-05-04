@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.Options
             set
             {
                 text.Text = value;
+                text.Alpha = !string.IsNullOrEmpty(value) ? 1 : 0;
             }
         }
 
