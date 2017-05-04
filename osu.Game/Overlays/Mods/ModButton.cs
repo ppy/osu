@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Mods
 
         public Action<Mod> Action; // Passed the selected mod or null if none
 
-        private bool buttonIsActive;
+        private readonly bool buttonIsActive;
         public bool IsActive
         {
             get { return buttonIsActive; }
