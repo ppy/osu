@@ -12,6 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using OpenTK;
+using osu.Framework.Input;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -73,9 +74,25 @@ namespace osu.Game.Screens.Play.HUD
         {
             iconsContainer.Flush();
             iconsContainer.FadeInFromZero(1000, EasingTypes.OutQuint);
-            iconsContainer.TransformSpacingTo(new Vector2(5, 0));
+            expand();
             using (iconsContainer.BeginDelayedSequence(1200))
-                iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, EasingTypes.OutQuint);
+                contract();
+        }
+
+        private void expand() => iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, EasingTypes.OutQuint);
+
+        private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, EasingTypes.OutQuint);
+
+        protected override bool OnHover(InputState state)
+        {
+            expand();
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            contract();
+            base.OnHoverLost(state);
         }
 
         private class IconFlow : FillFlowContainer<ModIcon>
