@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.Music
             }
         }
 
+        public BeatmapSetInfo FirstVisibleSet => items.Children.FirstOrDefault(i => i.MatchingCurrentFilter)?.BeatmapSetInfo;
+
         private void itemSelected(BeatmapSetInfo b)
         {
             OnSelect?.Invoke(b);

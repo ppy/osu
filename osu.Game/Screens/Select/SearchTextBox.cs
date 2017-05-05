@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Select
     /// </summary>
     public class SearchTextBox : FocusedTextBox
     {
+        protected virtual bool AllowCommit => false;
+
         public SearchTextBox()
         {
             Height = 35;
@@ -45,8 +47,11 @@ namespace osu.Game.Screens.Select
                     case Key.Right:
                     case Key.Up:
                     case Key.Down:
-                    case Key.Enter:
                         return false;
+
+                    case Key.Enter:
+                        if (!AllowCommit) return false;
+                        break;
                 }
             }
 
