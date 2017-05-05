@@ -62,6 +62,7 @@ namespace osu.Game.Overlays.Music
 
             protected override Color4 BackgroundUnfocused => backgroundColour;
             protected override Color4 BackgroundFocused => backgroundColour;
+            protected override bool AllowCommit => true;
 
             public FilterTextBox()
             {

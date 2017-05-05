@@ -132,6 +132,10 @@ namespace osu.Game.Overlays.Music
 
                 FadeTo(matching ? 1 : 0, 200);
             }
+            get
+            {
+                return matching;
+            }
         }
     }
 }
