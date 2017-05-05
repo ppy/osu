@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play.HUD
                     {
                         AutoSizeAxes = Axes.Both,
                         Scale = new Vector2(0.6f),
-                        
+
                     });
                 }
 
