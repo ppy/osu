@@ -15,19 +15,7 @@ namespace osu.Game.Rulesets.UI
         private readonly TextAwesome modIcon;
         private readonly TextAwesome background;
 
-        private float iconSize = 80;
-        public float IconSize
-        {
-            get
-            {
-                return iconSize;
-            }
-            set
-            {
-                iconSize = value;
-                reapplySize();
-            }
-        }
+        private const float icon_size = 80;
 
         public new Color4 Colour
         {
@@ -71,8 +59,8 @@ namespace osu.Game.Rulesets.UI
 
         private void reapplySize()
         {
-            background.TextSize = iconSize;
-            modIcon.TextSize = iconSize - 35;
+            background.TextSize = icon_size;
+            modIcon.TextSize = icon_size - 35;
         }
 
         private Color4 getBackgroundColourFromMod(Mod mod)
