@@ -169,7 +169,6 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
-            hudOverlay.ModDisplay.ShowMods = HitRenderer.HasReplayLoaded;
             hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
@@ -357,6 +356,10 @@ namespace osu.Game.Screens.Play
 
             hitRendererContainer.Alpha = 0;
             hitRendererContainer.FadeIn(750, EasingTypes.OutQuint);
+
+            if (!HitRenderer.HasReplayLoaded)
+                using (hudOverlay.ModDisplay.BeginDelayedSequence(2000))
+                    hudOverlay.ModDisplay.FadeOut(200);
         }
 
         protected override void OnSuspending(Screen next)

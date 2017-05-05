@@ -19,23 +19,6 @@ namespace osu.Game.Screens.Play.HUD
     {
         private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>();
 
-        private bool showMods;
-        public bool ShowMods
-        {
-            get
-            {
-                return showMods;
-            }
-            set
-            {
-                showMods = value;
-                if (!showMods)
-                    Hide();
-                else
-                    Show();
-            }
-        }
-
         public Bindable<IEnumerable<Mod>> Current => mods;
 
         private readonly FillFlowContainer<ModIcon> iconsContainer;
