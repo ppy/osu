@@ -19,7 +19,11 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModButton : FillFlowContainer
+
+    /// <summary>
+    /// Represents a clickable button which can cycle through one of more mods.
+    /// </summary>
+    public class ModButton : ModButtonEmpty
     {
         private ModIcon foregroundIcon { get; set; }
         private readonly SpriteText text;
@@ -116,7 +120,7 @@ namespace osu.Game.Overlays.Mods
 
         // the mods from Mod, only multiple if Mod is a MultiMod
 
-        public Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
+        public override Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -198,13 +202,8 @@ namespace osu.Game.Overlays.Mods
             buttonColour = foregroundIcon.Colour;
         }
 
-        public ModButton(Mod m)
+        public ModButton(Mod mod)
         {
-            Direction = FillDirection.Vertical;
-            Spacing = new Vector2(0f, -5f);
-            Size = new Vector2(100f);
-            AlwaysPresent = true;
-
             Children = new Drawable[]
             {
                 new Container
@@ -224,13 +223,14 @@ namespace osu.Game.Overlays.Mods
                 },
                 text = new OsuSpriteText
                 {
+                    Y = 75,
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
                     TextSize = 18,
                 },
             };
 
-            Mod = m;
+            Mod = mod;
         }
     }
 }

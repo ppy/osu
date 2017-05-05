@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -42,6 +43,8 @@ namespace osu.Game.Rulesets.UI
 
         public ModIcon(Mod mod)
         {
+            if (mod == null) throw new ArgumentNullException(nameof(mod));
+
             Children = new Drawable[]
             {
                 background = new TextAwesome
@@ -59,7 +62,7 @@ namespace osu.Game.Rulesets.UI
                     Anchor = Anchor.Centre,
                     Colour = OsuColour.Gray(84),
                     TextSize = 20,
-                    Icon = (mod != null) ? mod.Icon : FontAwesome.fa_question,
+                    Icon = mod.Icon
                 },
             };
 
@@ -74,7 +77,7 @@ namespace osu.Game.Rulesets.UI
 
         private Color4 getBackgroundColourFromMod(Mod mod)
         {
-            switch (mod?.Type)
+            switch (mod.Type)
             {
                 case ModType.DifficultyIncrease:
                     return OsuColour.FromHex(@"ffcc22");

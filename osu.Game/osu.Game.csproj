@@ -391,6 +391,7 @@
     <Compile Include="Screens\Play\Pause\PauseProgressGraph.cs" />
     <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
     <Compile Include="Rulesets\Mods\Mod.cs" />
+    <Compile Include="Overlays\Mods\ModButtonEmpty.cs" />
     <Compile Include="Overlays\Mods\ModButton.cs" />
     <Compile Include="Rulesets\UI\ModIcon.cs" />
     <Compile Include="Overlays\Mods\ModSection.cs" />
