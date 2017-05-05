@@ -5,18 +5,19 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Play;
-using osu.Game.Rulesets.Scoring;
-using osu.Framework.Input;
-using OpenTK.Input;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play.HUD;
+using OpenTK.Input;
 
-namespace osu.Game.Rulesets.UI
+namespace osu.Game.Screens.Play
 {
-    public abstract class HudOverlay : Container
+    public abstract class HUDOverlay : Container
     {
         private const int duration = 100;
 
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.UI
         public readonly RollingCounter<double> AccuracyCounter;
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
-        public readonly ModsContainer ModsContainer;
+        public readonly ModDisplay ModDisplay;
 
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
@@ -40,9 +41,9 @@ namespace osu.Game.Rulesets.UI
         protected abstract ScoreCounter CreateScoreCounter();
         protected abstract HealthDisplay CreateHealthDisplay();
         protected abstract SongProgress CreateProgress();
-        protected abstract ModsContainer CreateModsContainer();
+        protected abstract ModDisplay CreateModsContainer();
 
-        protected HudOverlay()
+        protected HUDOverlay()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -58,7 +59,7 @@ namespace osu.Game.Rulesets.UI
                     AccuracyCounter = CreateAccuracyCounter(),
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
-                    ModsContainer = CreateModsContainer(),
+                    ModDisplay = CreateModsContainer(),
                 }
             });
         }

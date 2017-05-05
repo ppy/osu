@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play
 
         private Container hitRendererContainer;
 
-        private HudOverlay hudOverlay;
+        private HUDOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
 
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 
-            hudOverlay = new StandardHudOverlay()
+            hudOverlay = new StandardHUDOverlay()
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
@@ -169,8 +169,8 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
-            hudOverlay.ModsContainer.ShowMods = HitRenderer.HasReplayLoaded;
-            hudOverlay.ModsContainer.Mods.BindTo(Beatmap.Mods);
+            hudOverlay.ModDisplay.ShowMods = HitRenderer.HasReplayLoaded;
+            hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;

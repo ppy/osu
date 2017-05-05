@@ -1,18 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.HUD;
+using OpenTK;
 
-namespace osu.Game.Rulesets.UI
+namespace osu.Game.Screens.Play
 {
-    public class StandardHudOverlay : HudOverlay
+    public class StandardHUDOverlay : HUDOverlay
     {
         protected override RollingCounter<double> CreateAccuracyCounter() => new PercentageCounter
         {
@@ -64,12 +64,12 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.X,
         };
 
-        protected override ModsContainer CreateModsContainer() => new ModsContainer
+        protected override ModDisplay CreateModsContainer() => new ModDisplay
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
             AutoSizeAxes = Axes.Both,
-            Position = new Vector2(0, 25),
+            Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
         [BackgroundDependencyLoader]
