@@ -122,9 +122,9 @@ namespace osu.Game.Graphics.Cursor
                 return base.OnMouseMove(state);
             }
 
-            Vector2 pos1 = lastPosition.Value;
             foreach (Vector2 pos2 in resampler.AddPosition(state.Mouse.NativeState.Position))
             {
+                Vector2 pos1 = lastPosition.Value;
                 Vector2 diff = pos2 - pos1;
                 float distance = diff.Length;
                 Vector2 direction = diff / distance;
