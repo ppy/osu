@@ -190,6 +190,7 @@
     <Compile Include="Tests\TestCaseDrawings.cs" />
     <Compile Include="Tests\TestCaseGamefield.cs" />
     <Compile Include="Tests\TestCaseGraph.cs" />
+    <Compile Include="Tests\TestCaseManiaPlayfield.cs" />
     <Compile Include="Tests\TestCaseMenuOverlays.cs" />
     <Compile Include="Tests\TestCaseMusicController.cs" />
     <Compile Include="Tests\TestCaseNotificationManager.cs" />

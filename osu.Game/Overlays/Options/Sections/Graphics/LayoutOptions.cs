@@ -24,7 +24,6 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
 
             Children = new Drawable[]
             {
-                new OptionLabel { Text = "Resolution: TODO dropdown" },
                 new OptionEnumDropdown<WindowMode>
                 {
                     LabelText = "Screen mode",

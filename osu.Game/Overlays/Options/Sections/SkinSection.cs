@@ -21,43 +21,6 @@ namespace osu.Game.Overlays.Options.Sections
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
-                new OptionLabel { Text = "TODO: Skin preview textures" },
-                new OptionLabel { Text = "Current skin: TODO dropdown" },
-                new OsuButton
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Text = "Preview gameplay",
-                },
-                new OsuButton
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Text = "Open skin folder",
-                },
-                new OsuButton
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Text = "Export as .osk",
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Ignore all beatmap skins",
-                    Bindable = config.GetBindable<bool>(OsuConfig.IgnoreBeatmapSkins)
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Use skin's sound samples",
-                    Bindable = config.GetBindable<bool>(OsuConfig.SkinSamples)
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Use Taiko skin for Taiko mode",
-                    Bindable = config.GetBindable<bool>(OsuConfig.UseTaikoSkin)
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Always use skin cursor",
-                    Bindable = config.GetBindable<bool>(OsuConfig.UseSkinCursor)
-                },
                 new OptionSlider<double, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
@@ -67,11 +30,6 @@ namespace osu.Game.Overlays.Options.Sections
                 {
                     LabelText = "Gameplay cursor size",
                     Bindable = config.GetBindable<double>(OsuConfig.GameplayCursorSize)
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Automatic cursor size",
-                    Bindable = config.GetBindable<bool>(OsuConfig.AutomaticCursorSizing)
                 },
             };
         }
