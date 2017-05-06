@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             Action waitAction = () =>
             {
                 while (!(resultSets = host.Dependencies.Get<BeatmapDatabase>()
-                    .GetAllWithChildren<BeatmapSetInfo>(s => s.OnlineBeatmapSetID == 241526)).Any())
+                    .Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Any())
                     Thread.Sleep(50);
             };
 
@@ -142,7 +142,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
                 @"Beatmaps did not import to the database in allocated time");
 
-            var set = resultSets.First();
+            var set = host.Dependencies.Get<BeatmapDatabase>().GetChildren(resultSets.First(), true);
 
             Assert.IsTrue(set.Beatmaps.Count == resultBeatmaps.Count(),
                 $@"Incorrect database beatmap count post-import ({resultBeatmaps.Count()} but should be {set.Beatmaps.Count}).");
