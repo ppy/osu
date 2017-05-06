@@ -220,13 +220,11 @@ namespace osu.Game.Screens.Select
 
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
         {
-            database.GetChildren(beatmapSet);
-            beatmapSet.Beatmaps.ForEach(b =>
+            foreach(var b in beatmapSet.Beatmaps)
             {
-                database.GetChildren(b);
                 if (b.Metadata == null)
                     b.Metadata = beatmapSet.Metadata;
-            });
+            }
 
             return new BeatmapGroup(beatmapSet, database)
             {

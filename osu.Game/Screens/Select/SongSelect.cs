@@ -183,7 +183,7 @@ namespace osu.Game.Screens.Select
             initialAddSetsTask = new CancellationTokenSource();
 
             carousel.BeatmapsChanged = beatmapsLoaded;
-            carousel.Beatmaps = database.Query<BeatmapSetInfo>().Where(b => !b.DeletePending);
+            carousel.Beatmaps = database.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending);
         }
 
         private void beatmapsLoaded()
