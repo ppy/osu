@@ -65,7 +65,6 @@ namespace osu.Game.Screens.Menu
 
         private Bindable<bool> menuMusic;
         private TrackManager trackManager;
-        private WorkingBeatmap song;
 
         [BackgroundDependencyLoader]
         private void load(OsuGame game, OsuConfigManager config, BeatmapDatabase beatmaps)
@@ -79,8 +78,7 @@ namespace osu.Game.Screens.Menu
                 List<BeatmapSetInfo> choosableBeatmapSets = beatmaps.Query<BeatmapSetInfo>().ToList();
                 if (choosableBeatmapSets.Count > 0)
                 {
-                    song = beatmaps.GetWorkingBeatmap(beatmaps.GetWithChildren<BeatmapSetInfo>(choosableBeatmapSets[RNG.Next(0, choosableBeatmapSets.Count - 1)].ID).Beatmaps[0]);
-                    Beatmap = song;
+                    Beatmap = beatmaps.GetWorkingBeatmap(beatmaps.GetWithChildren<BeatmapSetInfo>(choosableBeatmapSets[RNG.Next(0, choosableBeatmapSets.Count - 1)].ID).Beatmaps[0]);
                 }
             }
 
@@ -106,15 +104,15 @@ namespace osu.Game.Screens.Menu
         {
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
-            if (last is Intro && song != null)
+            if (last is Intro && Beatmap != null)
             {
                 Task.Run(() =>
                 {
-                    trackManager.SetExclusive(song.Track);
-                    song.Track.Seek(song.Beatmap.Metadata.PreviewTime);
-                    if (song.Beatmap.Metadata.PreviewTime == -1)
-                        song.Track.Seek(song.Track.Length * 0.4f);
-                    song.Track.Start();
+                    trackManager.SetExclusive(Beatmap.Track);
+                    Beatmap.Track.Seek(Beatmap.Metadata.PreviewTime);
+                    if (Beatmap.Metadata.PreviewTime == -1)
+                        Beatmap.Track.Seek(Beatmap.Track.Length * 0.4f);
+                    Beatmap.Track.Start();
                 });
             }
         }

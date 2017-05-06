@@ -343,7 +343,7 @@ namespace osu.Game.Screens.Select
             {
                 trackManager.SetExclusive(track);
                 if (preview)
-                    track.Seek(Beatmap.Beatmap.Metadata.PreviewTime);
+                    track.Seek(Beatmap.Metadata.PreviewTime);
                 track.Start();
             }
         }
