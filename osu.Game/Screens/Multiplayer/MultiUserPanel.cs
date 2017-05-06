@@ -8,8 +8,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Multiplayer
 {
@@ -28,15 +28,14 @@ namespace osu.Game.Screens.Multiplayer
                 switch (state)
                 {
                     case UserState.Guest:
-                        statusString = "Hosting a Room";
-                        UpdatePanel(this);
+                        statusString = "Waiting in a Room";
                         break;
 
                     case UserState.Host:
-                        statusString = "Waiting in a Room";
-                        UpdatePanel(this);
+                        statusString = "Hosting a Room";
                         break;
                 }
+                statusSprite.Text = statusString;
             }
         }
 
@@ -49,14 +48,10 @@ namespace osu.Game.Screens.Multiplayer
         public const int STATUS_HEIGHT = 33;
         public const float PANEL_WIDTH = 0.25f;
 
-        public void UpdatePanel(MultiUserPanel panel)
-        {
-            statusSprite.Text = statusString;
-        }
 
-        public MultiUserPanel(string user = "Unknown")
+        public MultiUserPanel(User user = null)
         {
-            userName = user;
+            userName = user.Username;
 
             RelativeSizeAxes = Axes.X;
             Height = PANEL_HEIGHT;
@@ -67,7 +62,7 @@ namespace osu.Game.Screens.Multiplayer
             EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(40),
+                Colour = new Color4(0, 0, 0, 40),
                 Radius = 5,
             };
             Children = new Drawable[]
@@ -85,28 +80,20 @@ namespace osu.Game.Screens.Multiplayer
                     Origin = Anchor.BottomCentre,
                     Colour = new Color4(17, 136, 170, 128),
                 },
-                new Container //Avatar
+                new Avatar(user)
                 {
                     Masking = true,
                     CornerRadius = 5,
                     Width = 50,
                     Height = 50,
                     Margin = new MarginPadding { Top = 9, Left = 10 },
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Gray,
-                        }
-                    }
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Full,
 
                     Children = new Drawable[]
                     {
@@ -117,30 +104,22 @@ namespace osu.Game.Screens.Multiplayer
                             Font = @"Exo2.0-RegularItalic",
                             Margin = new MarginPadding { Top = 13, Bottom = 10, Left = 70 }
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 20,
-                            Direction = FlowDirections.Horizontal,
+                            Direction = FillDirection.Horizontal,
                             Padding = new MarginPadding { Left = 70 },
                             Spacing = new Vector2(5,0),
                             Children = new Drawable[]
                             {
-
-                                new Container //Country Flag
+                                new DrawableFlag(user?.Country?.FlagName ?? "__")
                                 {
                                     Masking = true,
                                     CornerRadius = 5,
                                     Width = 30,
                                     Height = 20,
-                                    Children = new Drawable[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4.Gray,
-                                        }
-                                    }
+                                    FlagName = user.Country.FlagName,
                                 },
                                 new Container
                                 {
@@ -178,13 +157,14 @@ namespace osu.Game.Screens.Multiplayer
                 },
                 new CircularContainer
                 {
+                    Masking = true,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Size = new Vector2(12, 12),
                     BorderColour = Color4.White,
                     BorderThickness = 2,
                     Colour = Color4.White,
-                    Margin = new MarginPadding { Left = 80, Bottom = 11 },
+                    Margin = new MarginPadding { Left = 60, Bottom = 11 },
                     Children = new[]
                     {
                         new Box
@@ -201,7 +181,7 @@ namespace osu.Game.Screens.Multiplayer
                     Origin = Anchor.BottomLeft,
                     Text = "Waiting in a Room",
                     TextSize = 16,
-                    Margin = new MarginPadding { Left = 100, Bottom = 10 },
+                    Margin = new MarginPadding { Left = 80, Bottom = 10 },
                 }
             };
         }
