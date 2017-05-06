@@ -279,7 +279,7 @@ namespace osu.Game.Rulesets.UI
         protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
     }
 
-    public class BeatmapInvalidForRulesetException : Exception
+    public class BeatmapInvalidForRulesetException : ArgumentException
     {
         public BeatmapInvalidForRulesetException(string text)
             : base(text)
