@@ -16,7 +16,7 @@ namespace osu.Game.Graphics
             switch (hex.Length)
             {
                 default:
-                    throw new Exception(@"Invalid hex string length!");
+                    throw new ArgumentException(@"Invalid hex string length!");
                 case 3:
                     return new Color4(
                         (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
