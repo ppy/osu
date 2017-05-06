@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
+
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Multiplayer
@@ -28,31 +29,26 @@ namespace osu.Game.Screens.Multiplayer
                 switch (state)
                 {
                     case UserState.Guest:
-                        statusString = "Waiting in a Room";
+                        statusSprite.Text = "Waiting in a Room";
                         break;
 
                     case UserState.Host:
-                        statusString = "Hosting a Room";
+                        statusSprite.Text = "Hosting a Room";
                         break;
                 }
-                statusSprite.Text = statusString;
             }
         }
-
-        private string userName;
-        private string statusString;
+        
         private OsuSpriteText userSprite;
         private OsuSpriteText statusSprite;
 
-        public const int PANEL_HEIGHT = 100;
-        public const int STATUS_HEIGHT = 33;
-        public const float PANEL_WIDTH = 0.25f;
+        private const int PANEL_HEIGHT = 100;
+        private const int STATUS_HEIGHT = 33;
+        private const float PANEL_WIDTH = 0.25f;
 
 
         public MultiUserPanel(User user = null)
         {
-            userName = user.Username;
-
             RelativeSizeAxes = Axes.X;
             Height = PANEL_HEIGHT;
             Width = PANEL_WIDTH;
@@ -70,7 +66,7 @@ namespace osu.Game.Screens.Multiplayer
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(34,34,34, 255),
+                    Colour = new Color4(34, 34, 34, 255),
                 },
                 new Box
                 {
@@ -99,7 +95,7 @@ namespace osu.Game.Screens.Multiplayer
                     {
                         userSprite = new OsuSpriteText
                         {
-                            Text = userName,
+                            Text = user.Username,
                             TextSize = 16,
                             Font = @"Exo2.0-RegularItalic",
                             Margin = new MarginPadding { Top = 13, Bottom = 10, Left = 70 }
