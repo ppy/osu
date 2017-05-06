@@ -71,8 +71,7 @@ namespace osu.Game.Screens.Select
 
         protected override void OnSuspending(Screen next)
         {
-            if (modSelect.State == Visibility.Visible)
-                modSelect.Hide();
+            modSelect.Hide();
 
             base.OnSuspending(next);
         }
