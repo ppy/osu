@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using System.Linq;
@@ -20,42 +21,38 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseMultiUserPanel : TestCase
     {
-        private MultiUserPanel host;
         private FillFlowContainer panelContainer;
         public override string Description => @"User pannel in a multiplayer room";
 
-        private void action(int action)
+        private void addPanel()
         {
-            switch (action)
+            User User = new User
             {
-                case 0:
-                    User User = new User
-                    {
-                        Id = 9492835,
-                        Username = @"Naeferith",
-                        Country = new Country
-                        {
-                            FullName = @"France",
-                            FlagName = @"FR",
-                        },
-                    };
-                    if (panelContainer.Children.Count() == 0)
-                    {
-                        panelContainer.Add(host = new MultiUserPanel(User));
-                        host.State = MultiUserPanel.UserState.Host;
-                    }
-                    else panelContainer.Add(new MultiUserPanel(User));
-                    break;
-                case 1:
-                    System.Random rnd = new System.Random();
-                    int newHost = rnd.Next(panelContainer.Children.Count());
-                    if (panelContainer.Children.Count() > 1) while (panelContainer.Children.ElementAt(newHost).Equals(host)) newHost = rnd.Next(panelContainer.Children.Count());
-                    MultiUserPanel newHostPanel = (MultiUserPanel)panelContainer.Children.ElementAt(newHost);
-                    host.State = MultiUserPanel.UserState.Guest;
-                    host = newHostPanel;
-                    host.State = MultiUserPanel.UserState.Host;
-                    break;
+                Id = 9492835,
+                Username = @"Naeferith",
+                Country = new Country
+                {
+                    FullName = @"France",
+                    FlagName = @"FR",
+                },
+            };
+            panelContainer.Add(new MultiUserPanel(User));
+        }
+
+        private void rndHost()
+        {
+            int newHost = RNG.Next(panelContainer.Children.Count());
+            MultiUserPanel newHostPanel = (MultiUserPanel)panelContainer.Children.ElementAt(newHost);
+            if (panelContainer.Children.Count() > 1) while (newHostPanel.State == MultiUserPanel.UserState.Host)
+                {
+                    newHost = RNG.Next(panelContainer.Children.Count());
+                    newHostPanel = (MultiUserPanel)panelContainer.Children.ElementAt(newHost);
+                }
+            foreach (MultiUserPanel panels in panelContainer.Children)
+            {
+                panels.State = MultiUserPanel.UserState.Guest;
             }
+            newHostPanel.State = MultiUserPanel.UserState.Host;
         }
 
         public override void Reset()
@@ -71,8 +68,8 @@ namespace osu.Desktop.VisualTests.Tests
                 Size = new Vector2(0.9f, 0.5f),
             });
 
-            AddStep(@"Add Panel", () => action(0));
-            AddStep(@"Random Host", () => action(1));
+            AddStep(@"Add Panel", addPanel);
+            AddStep(@"Random Host", rndHost);
             
         }
     }
