@@ -13,6 +13,7 @@ using System;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Options.Sections;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
@@ -32,6 +33,7 @@ namespace osu.Game.Overlays
         private Sidebar sidebar;
         private SidebarButton[] sidebarButtons;
         private OptionsSection[] sections;
+        private SearchContainer searchContainer;
         private float lastKnownScroll;
 
         public OptionsOverlay()
@@ -43,6 +45,8 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGame game, OsuColour colours)
         {
+            OsuTextBox textBox;
+
             sections = new OptionsSection[]
             {
                 new GeneralSection(),
@@ -92,7 +96,13 @@ namespace osu.Game.Overlays
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
                                 },
-                                new FillFlowContainer
+                                textBox = new OsuTextBox
+                                {
+                                    PlaceholderText = "Type to search!",
+                                    Width = width - CONTENT_MARGINS * 2,
+                                    Margin = new MarginPadding { Left = CONTENT_MARGINS },
+                                },
+                                searchContainer = new SearchContainer
                                 {
                                     AutoSizeAxes = Axes.Y,
                                     RelativeSizeAxes = Axes.X,
@@ -117,6 +127,8 @@ namespace osu.Game.Overlays
                     ).ToArray()
                 }
             };
+
+            textBox.Current.ValueChanged += newValue => searchContainer.SearchTerm = newValue;
 
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }

@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿using System;
+using System.Collections.Generic;
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
@@ -10,16 +12,27 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using System.Linq;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSection : Container
+    public abstract class OptionsSection : Container, IHasFilterableChildren
     {
         protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
 
         public abstract FontAwesome Icon { get; }
         public abstract string Header { get; }
+
+        public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
+        public string[] FilterTerms => new[] { Header };
+        public bool MatchingCurrentFilter
+        {
+            set
+            {
+                FadeTo(value ? 1 : 0);
+            }
+        }
 
         private readonly SpriteText headerLabel;
 
