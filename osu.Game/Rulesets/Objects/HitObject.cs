@@ -5,7 +5,6 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects.Types;
-using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Objects
 {
@@ -29,7 +28,7 @@ namespace osu.Game.Rulesets.Objects
         /// and can be treated as the default samples for the hit object.
         /// </para>
         /// </summary>
-        public List<SampleInfo> Samples = new List<SampleInfo>();
+        public SampleInfoList Samples = new SampleInfoList();
 
         /// <summary>
         /// Applies default values to this HitObject.

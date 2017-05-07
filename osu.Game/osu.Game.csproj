@@ -71,9 +71,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\SampleInfo.cs" />
+    <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
+    <Compile Include="Overlays\Music\FilterControl.cs" />
+    <Compile Include="Overlays\Music\PlaylistItem.cs" />
+    <Compile Include="Overlays\Music\PlaylistList.cs" />
+    <Compile Include="Overlays\Options\Sections\Audio\MainMenuOptions.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
@@ -321,6 +326,7 @@
     <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
     <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
     <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
     <Compile Include="Users\UpdateableAvatar.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
@@ -351,7 +357,6 @@
     <Compile Include="Overlays\Options\Sections\Graphics\LayoutOptions.cs" />
     <Compile Include="Overlays\Options\Sections\Graphics\DetailOptions.cs" />
     <Compile Include="Overlays\Options\Sections\Graphics\MainMenuOptions.cs" />
-    <Compile Include="Overlays\Options\Sections\Graphics\SongSelectGraphicsOptions.cs" />
     <Compile Include="Overlays\Options\Sections\GameplaySection.cs" />
     <Compile Include="Overlays\Options\Sections\Gameplay\GeneralOptions.cs" />
     <Compile Include="Overlays\Options\Sections\Gameplay\SongSelectOptions.cs" />
@@ -362,25 +367,17 @@
     <Compile Include="Overlays\Options\Sections\InputSection.cs" />
     <Compile Include="Overlays\Options\Sections\Input\MouseOptions.cs" />
     <Compile Include="Overlays\Options\Sections\Input\KeyboardOptions.cs" />
-    <Compile Include="Overlays\Options\Sections\Input\OtherInputOptions.cs" />
     <Compile Include="Overlays\Options\Sections\OnlineSection.cs" />
-    <Compile Include="Overlays\Options\Sections\Online\IntegrationOptions.cs" />
-    <Compile Include="Overlays\Options\Sections\Online\InGameChatOptions.cs" />
-    <Compile Include="Overlays\Options\Sections\EditorSection.cs" />
     <Compile Include="Overlays\Options\Sections\SkinSection.cs" />
-    <Compile Include="Overlays\Options\Sections\Online\PrivacyOptions.cs" />
-    <Compile Include="Overlays\Options\Sections\Online\NotificationsOptions.cs" />
     <Compile Include="Graphics\UserInterface\OsuCheckbox.cs" />
     <Compile Include="Overlays\Options\SidebarButton.cs" />
     <Compile Include="Overlays\Options\OptionTextBox.cs" />
     <Compile Include="Overlays\Options\OptionSlider.cs" />
-    <Compile Include="Configuration\ProgressBarType.cs" />
     <Compile Include="Overlays\Options\OptionEnumDropdown.cs" />
     <Compile Include="Configuration\RankingType.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
     <Compile Include="Configuration\ReleaseStream.cs" />
     <Compile Include="Configuration\ScreenshotFormat.cs" />
-    <Compile Include="Configuration\ConfineMouseMode.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
     <Compile Include="Screens\Select\FilterControl.cs" />
     <Compile Include="Screens\Select\SearchTextBox.cs" />
@@ -420,6 +417,9 @@
     <Compile Include="Screens\Select\BeatmapDetailArea.cs" />
     <Compile Include="Graphics\UserInterface\OsuTabControlCheckbox.cs" />
     <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
+    <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
+    <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
+    <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

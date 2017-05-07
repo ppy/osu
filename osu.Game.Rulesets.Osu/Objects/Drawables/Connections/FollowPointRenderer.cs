@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using OpenTK;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
@@ -80,14 +81,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                         double fadeOutTime = startTime + fraction * duration;
                         double fadeInTime = fadeOutTime - PreEmpt;
 
-                        Add(new FollowPoint
+                        FollowPoint fp;
+
+                        Add(fp = new FollowPoint
                         {
-                            StartTime = fadeInTime,
-                            EndTime = fadeOutTime,
                             Position = pointStartPosition,
-                            EndPosition = pointEndPosition,
                             Rotation = rotation,
+                            Alpha = 0,
+                            Scale = new Vector2(1.5f),
                         });
+
+                        using (fp.BeginAbsoluteSequence(fadeInTime))
+                        {
+                            fp.FadeIn(DrawableOsuHitObject.TIME_FADEIN);
+                            fp.ScaleTo(1, DrawableOsuHitObject.TIME_FADEIN, EasingTypes.Out);
+
+                            fp.MoveTo(pointEndPosition, DrawableOsuHitObject.TIME_FADEIN, EasingTypes.Out);
+
+                            fp.Delay(fadeOutTime - fadeInTime);
+                            fp.FadeOut(DrawableOsuHitObject.TIME_FADEIN);
+                        }
+
+                        fp.Expire(true);
                     }
                 }
                 prevHitObject = currHitObject;

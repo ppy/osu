@@ -6,7 +6,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetBeatmapDetailsRequest : APIRequest<GetBeatmapDeatilsResponse>
+    public class GetBeatmapDetailsRequest : APIRequest<GetBeatmapDetailsResponse>
     {
         private readonly BeatmapInfo beatmap;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Online.API.Requests
         protected override string Target => $@"beatmaps/{lookupString}";
     }
 
-    public class GetBeatmapDeatilsResponse : BeatmapMetrics
+    public class GetBeatmapDetailsResponse : BeatmapMetrics
     {
         //the online API returns some metrics as a nested object.
         [JsonProperty(@"failtimes")]

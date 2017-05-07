@@ -22,21 +22,6 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                     LabelText = "Background dim",
                     Bindable = config.GetBindable<double>(OsuConfig.DimLevel)
                 },
-                new OptionEnumDropdown<ProgressBarType>
-                {
-                    LabelText = "Progress display",
-                    Bindable = config.GetBindable<ProgressBarType>(OsuConfig.ProgressBarType)
-                },
-                new OptionEnumDropdown<ScoreMeterType>
-                {
-                    LabelText = "Score meter type",
-                    Bindable = config.GetBindable<ScoreMeterType>(OsuConfig.ScoreMeter)
-                },
-                new OptionSlider<double>
-                {
-                    LabelText = "Score meter size",
-                    Bindable = config.GetBindable<double>(OsuConfig.ScoreMeterScale)
-                },
                 new OsuCheckbox
                 {
                     LabelText = "Show score overlay",
@@ -46,21 +31,6 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                 {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuConfig.KeyOverlay)
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Show approach circle on first \"Hidden\" object",
-                    Bindable = config.GetBindable<bool>(OsuConfig.HiddenShowFirstApproach)
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Scale osu!mania scroll speed with BPM",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ManiaSpeedBPMScale)
-                },
-                new OsuCheckbox
-                {
-                    LabelText = "Remember osu!mania scroll speed per beatmap",
-                    Bindable = config.GetBindable<bool>(OsuConfig.UsePerBeatmapManiaSpeed)
                 },
             };
         }
