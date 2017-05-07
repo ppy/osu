@@ -139,16 +139,15 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            double drawableCurrentTime = AudioClock?.CurrentTime ?? Time.Current;
-            double songCurrentTime = drawableCurrentTime - firstHitTime;
-            double progress = songCurrentTime / lastHitTime;
+            double currentTime = (AudioClock?.CurrentTime ?? Time.Current) - firstHitTime;
+            double progress = currentTime / lastHitTime;
 
             bar.UpdatePosition((float)progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
 
             info.Progress = (int)(progress * 100);
-            info.TimeCurrent = songCurrentTime;
-            info.TimeLeft = lastHitTime - firstHitTime - songCurrentTime;
+            info.TimeCurrent = currentTime;
+            info.TimeLeft = lastHitTime - firstHitTime - currentTime;
         }
     }
 }
