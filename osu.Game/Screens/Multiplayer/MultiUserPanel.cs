@@ -184,8 +184,8 @@ namespace osu.Game.Screens.Multiplayer
 
         public enum UserState
         {
-            Host,
-            Guest
+            Guest,
+            Host
         }
     }
 }
