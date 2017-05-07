@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps.Drawables
         /// <summary>
         /// Fires when one of our difficulties was selected. Will fire on first expand.
         /// </summary>
-        public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
+        public Action<BeatmapGroup, BeatmapPanel> SelectionChanged;
 
         /// <summary>
         /// Fires when one of our difficulties is clicked when already selected. Should start playing the map.
@@ -89,8 +89,6 @@ namespace osu.Game.Beatmaps.Drawables
             //we want to make sure one of our children is selected in the case none have been selected yet.
             if (SelectedPanel == null)
                 BeatmapPanels.First().State = PanelSelectedState.Selected;
-            else
-                SelectionChanged?.Invoke(this, SelectedPanel.Beatmap);
         }
 
         private void panelGainedSelection(BeatmapPanel panel)
@@ -106,7 +104,7 @@ namespace osu.Game.Beatmaps.Drawables
             finally
             {
                 State = BeatmapGroupState.Expanded;
-                SelectionChanged?.Invoke(this, panel.Beatmap);
+                SelectionChanged?.Invoke(this, SelectedPanel);
             }
         }
     }

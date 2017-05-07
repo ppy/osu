@@ -132,10 +132,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             disc.FadeIn(200);
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateCurrentState(ArmedState state)
         {
-            base.UpdateState(state);
-
             Delay(spinner.Duration, true);
 
             FadeOut(160);
