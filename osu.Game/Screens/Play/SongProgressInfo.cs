@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play
                     timeCurrentText.Text = TimeSpan.FromMilliseconds(value).ToString(@"m\:ss");
             }
         }
-        public double TimeLeft { set { timeLeft.Text = @"-" + TimeSpan.FromMilliseconds((timeCurrent < 0) ? (value + timeCurrent) : value).ToString(@"m\:ss"); } }
+        public double TimeLeft { set { timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(timeCurrent < 0 ? value + timeCurrent : value).ToString(@"m\:ss"); } }
         public int Progress
         {
             set
