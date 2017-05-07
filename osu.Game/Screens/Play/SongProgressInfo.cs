@@ -13,22 +13,54 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressInfo : Container
     {
-        private OsuSpriteText timeCurrent;
+        private OsuSpriteText timeCurrentText;
         private OsuSpriteText timeLeft;
-        private OsuSpriteText progress;
+        private OsuSpriteText progressText;
+
+        private int progress;
+        private double timeCurrent;
 
         private const int margin = 10;
 
-        public double TimeCurrent { set { timeCurrent.Text = TimeSpan.FromMilliseconds(value).ToString(@"m\:ss"); } }
-        public double TimeLeft { set { timeLeft.Text = @"- " + TimeSpan.FromMilliseconds(value).ToString(@"m\:ss"); } }
-        public int Progress { set { progress.Text = value.ToString() + @"%"; } }
+        public double TimeCurrent
+        {
+            set
+            {
+                timeCurrent = value;
+
+                if (value > 0)
+                    timeCurrentText.Text = TimeSpan.FromMilliseconds(value).ToString(@"m\:ss");
+            }
+        }
+        public double TimeLeft
+        {
+            set
+            {
+                if(timeCurrent < 0)
+                    timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(value + timeCurrent).ToString(@"m\:ss");
+                else
+                    timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(value).ToString(@"m\:ss");
+            }
+        }
+        public int Progress
+        {
+            set
+            {
+                if (progress == value)
+                    return;
+
+                progress = value;
+                if (value > 0)
+                    progressText.Text = value.ToString() + @"%";
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Children = new Drawable[]
             {
-                timeCurrent = new OsuSpriteText
+                timeCurrentText = new OsuSpriteText
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
@@ -38,13 +70,15 @@ namespace osu.Game.Screens.Play
                     {
                         Left = margin,
                     },
+                    Text = @"0:00",
                 },
-                progress = new OsuSpriteText
+                progressText = new OsuSpriteText
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     Colour = colours.BlueLighter,
                     Font = @"Venera",
+                    Text = @"0%",
                 },
                 timeLeft = new OsuSpriteText
                 {
