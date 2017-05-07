@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Play
             set
             {
                 timeCurrent = value;
-
                 if (value > 0)
                     timeCurrentText.Text = TimeSpan.FromMilliseconds(value).ToString(@"m\:ss");
             }
