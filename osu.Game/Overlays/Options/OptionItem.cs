@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Options
             set
             {
                 bindable = value;
-                (Control as IHasCurrentValue<T>)?.Current.BindTo(bindable);
+                controlWithCurrent?.Current.BindTo(bindable);
             }
         }
 
