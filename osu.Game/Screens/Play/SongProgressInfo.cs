@@ -13,25 +13,26 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressInfo : Container
     {
-        private OsuSpriteText timeCurrentText;
+        private OsuSpriteText timeCurrent;
         private OsuSpriteText timeLeft;
         private OsuSpriteText progressText;
 
+        private double currentTime;
+        private double songLenght;
         private int progress;
-        private double timeCurrent;
 
         private const int margin = 10;
 
-        public double TimeCurrent
+        public double SongLenght { set { songLenght = value; } }
+        public double CurrentTime
         {
             set
             {
-                timeCurrent = value;
+                currentTime = value;
                 if (value > 0)
-                    timeCurrentText.Text = TimeSpan.FromMilliseconds(value).ToString(@"m\:ss");
+                    timeCurrent.Text = TimeSpan.FromMilliseconds(value).ToString(@"m\:ss");
             }
         }
-        public double TimeLeft { set { timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(timeCurrent < 0 ? value + timeCurrent : value).ToString(@"m\:ss"); } }
         public int Progress
         {
             set
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.Play
                     return;
 
                 progress = value;
-                if (value > 0)
+                if (currentTime > 0)
                     progressText.Text = value.ToString() + @"%";
             }
         }
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Play
         {
             Children = new Drawable[]
             {
-                timeCurrentText = new OsuSpriteText
+                timeCurrent = new OsuSpriteText
                 {
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
@@ -79,9 +80,18 @@ namespace osu.Game.Screens.Play
                     Margin = new MarginPadding
                     {
                         Right = margin,
-                    }
+                    },
+                    Text = @"-" + TimeSpan.FromMilliseconds(songLenght).ToString(@"m\:ss"),
                 }
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if(currentTime > 0)
+                timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(songLenght - currentTime).ToString(@"m\:ss");
         }
     }
 }

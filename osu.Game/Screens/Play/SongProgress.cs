@@ -45,6 +45,7 @@ namespace osu.Game.Screens.Play
             set
             {
                 graph.Objects = objects = value;
+                info.SongLenght = lastHitTime - firstHitTime;
             }
         }
 
@@ -146,8 +147,7 @@ namespace osu.Game.Screens.Play
             graph.Progress = (int)(graph.ColumnCount * progress);
 
             info.Progress = (int)(progress * 100);
-            info.TimeCurrent = currentTime;
-            info.TimeLeft = lastHitTime - firstHitTime - currentTime;
+            info.CurrentTime = currentTime;
         }
     }
 }
