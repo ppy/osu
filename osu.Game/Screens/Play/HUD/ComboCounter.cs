@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.Sprites;
 
-namespace osu.Game.Rulesets.UI
+namespace osu.Game.Screens.Play.HUD
 {
     public abstract class ComboCounter : Container
     {

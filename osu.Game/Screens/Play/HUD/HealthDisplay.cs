@@ -4,7 +4,7 @@
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Rulesets.UI
+namespace osu.Game.Screens.Play.HUD
 {
     public abstract class HealthDisplay : Container
     {
