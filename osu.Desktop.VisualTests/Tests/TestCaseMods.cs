@@ -6,15 +6,20 @@ using osu.Framework.Graphics;
 using osu.Game.Overlays.Mods;
 using osu.Framework.Testing;
 using osu.Game.Database;
+using osu.Game.Screens.Play.HUD;
+using OpenTK;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    internal class TestCaseModSelectOverlay : TestCase
+    internal class TestCaseMods : TestCase
     {
-        public override string Description => @"Tests the mod select overlay";
+        public override string Description => @"Mod select overlay and in-game display";
 
         private ModSelectOverlay modSelect;
+        private ModDisplay modDisplay;
+
         private RulesetDatabase rulesets;
+
 
         [BackgroundDependencyLoader]
         private void load(RulesetDatabase rulesets)
@@ -32,6 +37,16 @@ namespace osu.Desktop.VisualTests.Tests
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
             });
+
+            Add(modDisplay = new ModDisplay
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                AutoSizeAxes = Axes.Both,
+                Position = new Vector2(0, 25),
+            });
+
+            modDisplay.Current.BindTo(modSelect.SelectedMods);
 
             AddStep("Toggle", modSelect.ToggleVisibility);
 

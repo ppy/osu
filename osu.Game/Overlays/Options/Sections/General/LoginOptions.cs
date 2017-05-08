@@ -132,12 +132,12 @@ namespace osu.Game.Overlays.Options.Sections.General
                         TabbableContentContainer = this,
                         OnCommit = (sender, newText) => performLogin()
                     },
-                    new OsuCheckbox
+                    new OptionCheckbox
                     {
                         LabelText = "Remember username",
                         Bindable = config.GetBindable<bool>(OsuConfig.SaveUsername),
                     },
-                    new OsuCheckbox
+                    new OptionCheckbox
                     {
                         LabelText = "Stay logged in",
                         Bindable = config.GetBindable<bool>(OsuConfig.SavePassword),
