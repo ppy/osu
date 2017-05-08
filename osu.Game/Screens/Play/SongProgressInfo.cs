@@ -15,11 +15,10 @@ namespace osu.Game.Screens.Play
     {
         private OsuSpriteText timeCurrent;
         private OsuSpriteText timeLeft;
-        private OsuSpriteText progressText;
+        private OsuSpriteText progress;
 
         private double currentTime;
         private double songLenght;
-        private int progress;
 
         private const int margin = 10;
 
@@ -33,16 +32,12 @@ namespace osu.Game.Screens.Play
                     timeCurrent.Text = TimeSpan.FromMilliseconds(value).ToString(@"m\:ss");
             }
         }
-        public int Progress
+        public float Progress
         {
             set
             {
-                if (progress == value)
-                    return;
-
-                progress = value;
                 if (currentTime > 0)
-                    progressText.Text = value.ToString() + @"%";
+                    progress.Text = value.ToString("P0");
             }
         }
 
@@ -63,7 +58,7 @@ namespace osu.Game.Screens.Play
                     },
                     Text = @"0:00",
                 },
-                progressText = new OsuSpriteText
+                progress = new OsuSpriteText
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
