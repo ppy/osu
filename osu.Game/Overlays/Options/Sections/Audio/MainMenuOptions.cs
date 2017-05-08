@@ -2,29 +2,28 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Game.Configuration;
 
-namespace osu.Game.Overlays.Options.Sections.Graphics
+namespace osu.Game.Overlays.Options.Sections.Audio
 {
-    public class DetailOptions : OptionsSubsection
+    public class MainMenuOptions : OptionsSubsection
     {
-        protected override string Header => "Detail Settings";
+        protected override string Header => "Main Menu";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            Children = new Drawable[]
+            Children = new[]
             {
                 new OptionCheckbox
                 {
-                    LabelText = "Snaking in sliders",
-                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingInSliders)
+                    LabelText = "Interface voices",
+                    Bindable = config.GetBindable<bool>(OsuConfig.MenuVoice)
                 },
                 new OptionCheckbox
                 {
-                    LabelText = "Snaking out sliders",
-                    Bindable = config.GetBindable<bool>(OsuConfig.SnakingOutSliders)
+                    LabelText = "osu! music theme",
+                    Bindable = config.GetBindable<bool>(OsuConfig.MenuMusic)
                 },
             };
         }

@@ -69,6 +69,13 @@ namespace osu.Game.Screens.Select
             base.OnResuming(last);
         }
 
+        protected override void OnSuspending(Screen next)
+        {
+            modSelect.Hide();
+
+            base.OnSuspending(next);
+        }
+
         protected override bool OnExiting(Screen next)
         {
             if (modSelect.State == Visibility.Visible)
