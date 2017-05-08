@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModButton : FillFlowContainer
     {
-        private ModIcon foregroundIcon { get; set; }
+        private ModIcon foregroundIcon;
         private readonly SpriteText text;
         private readonly Container<ModIcon> iconsContainer;
         private SampleChannel sampleOn, sampleOff;
