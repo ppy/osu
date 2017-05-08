@@ -48,7 +48,6 @@ namespace osu.Game.Screens.Select
                     case Key.Up:
                     case Key.Down:
                         return false;
-
                     case Key.Enter:
                         if (!AllowCommit) return false;
                         break;
