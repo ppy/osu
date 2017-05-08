@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Mods
 
                 iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
                 iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
-                foregroundIcon.Colour = Selected ? SelectedColour : ButtonColour;
+                foregroundIcon.Highlighted = Selected;
 
                 if (mod != null)
                     displayMod(SelectedMod ?? Mods[0]);
@@ -64,12 +64,6 @@ namespace osu.Game.Overlays.Mods
 
         public bool Selected => selectedIndex != -1;
 
-        private Color4 buttonColour;
-        public Color4 ButtonColour
-        {
-            get { return buttonColour; }
-            set { buttonColour = value; }
-        }
 
         private Color4 selectedColour;
         public Color4 SelectedColour
@@ -198,8 +192,6 @@ namespace osu.Game.Overlays.Mods
                     AutoSizeAxes = Axes.Both,
                 });
             }
-
-            buttonColour = foregroundIcon.Colour;
         }
 
         public ModButton(Mod mod)
