@@ -14,6 +14,7 @@ using OpenTK.Graphics.ES30;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Timing;
+using System.Diagnostics;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -124,6 +125,8 @@ namespace osu.Game.Graphics.Cursor
 
             foreach (Vector2 pos2 in resampler.AddPosition(state.Mouse.NativeState.Position))
             {
+                Trace.Assert(lastPosition.HasValue);
+
                 Vector2 pos1 = lastPosition.Value;
                 Vector2 diff = pos2 - pos1;
                 float distance = diff.Length;
