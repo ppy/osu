@@ -21,7 +21,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseMultiUserPanel : TestCase
     {
-        private FillFlowContainer panelContainer;
+        private MultiUserPanelContainer panelContainer;
         public override string Description => @"User pannel in a multiplayer room";
 
         private void addPanel()
@@ -39,27 +39,38 @@ namespace osu.Desktop.VisualTests.Tests
             panelContainer.Add(new MultiUserPanel(User));
         }
 
-        private void rndHost()
+        private void rotHost()
         {
-            int newHost = RNG.Next(panelContainer.Children.Count());
-            MultiUserPanel newHostPanel = (MultiUserPanel)panelContainer.Children.ElementAt(newHost);
-            if (panelContainer.Children.Count() > 1) while (newHostPanel.State == MultiUserPanel.UserState.Host)
-                {
-                    newHost = RNG.Next(panelContainer.Children.Count());
-                    newHostPanel = (MultiUserPanel)panelContainer.Children.ElementAt(newHost);
-                }
-            foreach (MultiUserPanel panels in panelContainer.Children)
+            if (panelContainer.Children.Count() > 1)
             {
-                panels.State = MultiUserPanel.UserState.Guest;
+                MultiUserPanel currentHost = panelContainer.Host;
+                if (currentHost == null)
+                {
+                    currentHost = panelContainer.Children.First();
+                    currentHost.Host = true;
+                }
+                else
+                {
+                    int newHost = 0;
+                    while (!(panelContainer.Children.ElementAt(newHost).Host)) newHost += 1;
+                    MultiUserPanel newHostPanel = (MultiUserPanel)panelContainer.Children.ElementAt(newHost);
+                    if (newHost < panelContainer.Children.Count() - 1) newHost += 1;
+                    else newHost = 0;
+                    newHostPanel = (MultiUserPanel)panelContainer.Children.ElementAt(newHost);
+                    foreach (MultiUserPanel panels in panelContainer.Children)
+                    {
+                        panels.Host = false;
+                    }
+                    newHostPanel.Host = true;
+                }
             }
-            newHostPanel.State = MultiUserPanel.UserState.Host;
         }
 
         public override void Reset()
         {
             base.Reset();
 
-            Add(panelContainer = new FillFlowContainer
+            Add(panelContainer = new MultiUserPanelContainer()
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
@@ -69,8 +80,7 @@ namespace osu.Desktop.VisualTests.Tests
             });
 
             AddStep(@"Add Panel", addPanel);
-            AddStep(@"Random Host", rndHost);
-            
+            AddStep(@"Host Rotation", rotHost);
         }
     }
 }
