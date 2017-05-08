@@ -273,7 +273,7 @@ namespace osu.Game.Database
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo, withStoryboard: withStoryboard);
+            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo, withStoryboard);
 
             previous?.TransferTo(working);
 
