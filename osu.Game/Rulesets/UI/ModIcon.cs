@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.UI
             set { modIcon.Icon = value; }
         }
 
-        private ModType type;
+        private readonly ModType type;
 
         public ModIcon(Mod mod)
         {
