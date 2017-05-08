@@ -3,6 +3,7 @@
 
 using System;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -17,21 +18,19 @@ namespace osu.Game.Rulesets.UI
 
         private const float icon_size = 80;
 
-        public new Color4 Colour
-        {
-            get { return background.Colour; }
-            set { background.Colour = value; }
-        }
-
         public FontAwesome Icon
         {
             get { return modIcon.Icon; }
             set { modIcon.Icon = value; }
         }
 
+        private ModType type;
+
         public ModIcon(Mod mod)
         {
             if (mod == null) throw new ArgumentNullException(nameof(mod));
+
+            type = mod.Type;
 
             Children = new Drawable[]
             {
@@ -39,43 +38,66 @@ namespace osu.Game.Rulesets.UI
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
+                    TextSize = icon_size,
                     Icon = FontAwesome.fa_osu_mod_bg,
-                    Colour = getBackgroundColourFromMod(mod),
                     Shadow = true,
-                    TextSize = 20
                 },
                 modIcon = new TextAwesome
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Colour = OsuColour.Gray(84),
-                    TextSize = 20,
+                    TextSize = icon_size - 35,
                     Icon = mod.Icon
                 },
             };
-
-            reapplySize();
         }
 
-        private void reapplySize()
-        {
-            background.TextSize = icon_size;
-            modIcon.TextSize = icon_size - 35;
-        }
+        private Color4 backgroundColour;
+        private Color4 highlightedColour;
 
-        private Color4 getBackgroundColourFromMod(Mod mod)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            switch (mod.Type)
+            switch (type)
             {
+                default:
                 case ModType.DifficultyIncrease:
-                    return OsuColour.FromHex(@"ffcc22");
+                    backgroundColour = colours.Yellow;
+                    highlightedColour = colours.YellowLight;
+                    break;
                 case ModType.DifficultyReduction:
-                    return OsuColour.FromHex(@"88b300");
+                    backgroundColour = colours.Green;
+                    highlightedColour = colours.GreenLight;
+                    break;
                 case ModType.Special:
-                    return OsuColour.FromHex(@"66ccff");
-
-                default: return Color4.White;
+                    backgroundColour = colours.Blue;
+                    highlightedColour = colours.BlueLight;
+                    break;
             }
+
+            applyStyle();
+        }
+
+        private bool highlighted;
+
+        public bool Highlighted
+        {
+            get
+            {
+                return highlighted;
+            }
+
+            set
+            {
+                highlighted = value;
+                applyStyle();
+            }
+        }
+
+        private void applyStyle()
+        {
+            background.Colour = highlighted ? highlightedColour : backgroundColour;
         }
     }
 }
