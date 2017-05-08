@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Menu
             float barWidth = Size.X * (float)Math.Sqrt(2f * (1f - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualizer)))) / 2.2f;
 
             for (int i = 0; i < 5; i++)
+            {
                 for (int j = 0; j < bars_per_visualizer; j++)
                 {
                     Add(new Box()
@@ -50,19 +51,19 @@ namespace osu.Game.Screens.Menu
                         Colour = Color4.White,
                         Alpha = 0.2f,
                         Position = new Vector2(
-                        -(float)Math.Sin((float)(j + i * 300) / bars_per_visualizer * 2 * MathHelper.Pi) / 2,
-                        -0.5f + (float)Math.Cos((float)(j + i * 300) / bars_per_visualizer * 2 * MathHelper.Pi) / 2),
+                        -(float)Math.Sin((float)(j + i * (bars_per_visualizer / 5)) / bars_per_visualizer * 2 * MathHelper.Pi) / 2,
+                        -0.5f + (float)Math.Cos((float)(j + i * (bars_per_visualizer / 5)) / bars_per_visualizer * 2 * MathHelper.Pi) / 2),
                         Rotation = 360f / bars_per_visualizer * j + 180 + 360f / 5 * i,
                     });
-                    //Add(new QuintVisualisationBar(barWidth) { Rotation = (360f / bars_around_circle * i) });
                 }
+            }
 
             kiai.ValueChanged += updateKiai;
         }
 
         private void updateKiai(bool newValue)
         {
-            FadeTo(newValue ? 2.5f : 1, 100);
+            FadeTo(newValue ? 2.5f : 1, 75);
         }
 
         protected override void Update()
@@ -80,7 +81,7 @@ namespace osu.Game.Screens.Menu
                     {
                         int i = 0;
 
-                        audioData = (beatmap.Value.Track as TrackBass).GetChannelData();
+                        audioData = beatmap.Value.Track.FrequencyAmplitudes;
 
                         foreach (Box b in Children)
                         {
@@ -88,10 +89,10 @@ namespace osu.Game.Screens.Menu
                             if (index > 249)
                                 index -= 250;
 
-                            if (audioData[index] * 3.5f >= b.Scale.Y)
+                            if (audioData[index] * 3.8f >= b.Scale.Y)
                             {
                                 b.ClearTransforms(true);
-                                b.Scale = new Vector2(1, audioData[index] * 3.5f);
+                                b.Scale = new Vector2(1, audioData[index] * 3.8f);
                             }
                             i++;
                         }

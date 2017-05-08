@@ -92,6 +92,7 @@ namespace osu.Game.Screens.Menu
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
+                                visualizer = new MenuVisualisation(),
                                 new BufferedContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
@@ -158,7 +159,6 @@ namespace osu.Game.Screens.Menu
                                         }
                                     }
                                 },
-                                visualizer = new MenuVisualisation(),
                             }
                         }
                     }
