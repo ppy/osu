@@ -1,51 +1,50 @@
 {
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
-    "version": "0.1.0",
-    "taskSelector": "/t:",
+    "version": "2.0.0",
+    "problemMatcher": "$msCompile",
+    "isShellCommand": true,
+    "command": "msbuild",
+    "suppressTaskName": true,
+    "showOutput": "silent",
+    "args": [
+        "/property:GenerateFullPaths=true",
+        "/property:DebugType=portable"
+    ],
+    "windows": {
+        "args": [
+            "/property:GenerateFullPaths=true",
+            "/property:DebugType=portable",
+            "/m" //parallel compiling support. doesn't work well with mono atm
+        ]
+    },
     "tasks": [
         {
-            "taskName": "build",
-            "isShellCommand": true,
-            "showOutput": "silent",
-            "command": "msbuild",
-            "args": [
-                "/property:GenerateFullPaths=true",
-                "/property:DebugType=portable"
-            ],
-            "windows": {
-                "args": [
-                    "/property:GenerateFullPaths=true",
-                    "/property:DebugType=portable",
-                    "/m" //parallel compiling support. doesn't work well with mono atm
-                ]
-            },
-            // Use the standard MS compiler pattern to detect errors, warnings and infos
-            "problemMatcher": "$msCompile",
+            "taskName": "Build (Debug)",
             "isBuildCommand": true
         },
         {
-            "taskName": "rebuild",
-            "isShellCommand": true,
-            "showOutput": "silent",
-            "command": "msbuild",
+            "taskName": "Build (Release)",
             "args": [
-                // Ask msbuild to generate full paths for file names.
-                "/property:GenerateFullPaths=true",
-                "/property:DebugType=portable",
-                "/target:Clean,Build"
-            ],
-            "windows": {
-                "args": [
-                    "/property:GenerateFullPaths=true",
-                    "/property:DebugType=portable",
-                    "/target:Clean,Build",
-                    "/m" //parallel compiling support. doesn't work well with mono atm
-                ]
-            },
-            // Use the standard MS compiler pattern to detect errors, warnings and infos
-            "problemMatcher": "$msCompile",
-            "isBuildCommand": true
+                "/property:Configuration=Release"
+            ]
+        },
+        {
+            "taskName": "Clean All",
+            "dependsOn": ["Clean (Debug)", "Clean (Release)"]
+        },
+        {
+            "taskName": "Clean (Debug)",
+            "args": [
+                "/target:Clean"
+            ]
+        },
+        {
+            "taskName": "Clean (Release)",
+            "args": [
+                "/target:Clean",
+                "/property:Configuration=Release"
+            ]
         }
     ]
 }
