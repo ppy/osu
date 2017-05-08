@@ -13,7 +13,7 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests the mod select overlay";
 
-        private ModSelectOverlay modSelect;
+        protected ModSelectOverlay ModSelect;
         private RulesetDatabase rulesets;
 
         [BackgroundDependencyLoader]
@@ -26,17 +26,17 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Add(modSelect = new ModSelectOverlay
+            Add(ModSelect = new ModSelectOverlay
             {
                 RelativeSizeAxes = Axes.X,
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.BottomCentre,
             });
 
-            AddStep("Toggle", modSelect.ToggleVisibility);
+            AddStep("Toggle", ModSelect.ToggleVisibility);
 
             foreach (var ruleset in rulesets.AllRulesets)
-                AddStep(ruleset.CreateInstance().Description, () => modSelect.Ruleset.Value = ruleset);
+                AddStep(ruleset.CreateInstance().Description, () => ModSelect.Ruleset.Value = ruleset);
         }
     }
 }
