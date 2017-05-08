@@ -4,36 +4,37 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Multiplayer
 {
-    public class MultiUserPanel : ClickableContainer, IStateful<MultiUserPanel.UserState>
+    public class MultiUserPanel : ClickableContainer
     {
-        private UserState state;
-        public UserState State
+        private bool host;
+        public bool Host
         {
-            get { return state; }
+            get { return host; }
             set
             {
-                if (state == value)
+                if (host == value)
                     return;
 
-                state = value;
-                switch (state)
+                host = value;
+                switch(host)
                 {
-                    case UserState.Guest:
-                        statusSprite.Text = "Waiting in a Room";
+                    case true:
+                        statusSprite.Text = STRING_HOST;
                         break;
-
-                    case UserState.Host:
-                        statusSprite.Text = "Hosting a Room";
+                    case false:
+                        statusSprite.Text = STRING_GUEST;
                         break;
                 }
             }
@@ -41,11 +42,14 @@ namespace osu.Game.Screens.Multiplayer
         
         private OsuSpriteText userSprite;
         private OsuSpriteText statusSprite;
+        private Box background;
+        private Box statusBox;
 
         private const int PANEL_HEIGHT = 100;
         private const int STATUS_HEIGHT = 33;
         private const float PANEL_WIDTH = 0.25f;
-
+        private const string STRING_GUEST = "Waiting in a Room";
+        private const string STRING_HOST = "Hosting a room";
 
         public MultiUserPanel(User user = null)
         {
@@ -63,18 +67,16 @@ namespace osu.Game.Screens.Multiplayer
             };
             Children = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(34, 34, 34, 255),
                 },
-                new Box
+                statusBox = new Box
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = STATUS_HEIGHT,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Colour = new Color4(17, 136, 170, 128),
                 },
                 new Avatar(user)
                 {
@@ -90,7 +92,6 @@ namespace osu.Game.Screens.Multiplayer
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Direction = FillDirection.Full,
-
                     Children = new Drawable[]
                     {
                         userSprite = new OsuSpriteText
@@ -175,17 +176,17 @@ namespace osu.Game.Screens.Multiplayer
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Text = "Waiting in a Room",
+                    Text = STRING_GUEST,
                     TextSize = 16,
                     Margin = new MarginPadding { Left = 80, Bottom = 10 },
                 }
             };
         }
-
-        public enum UserState
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            Guest,
-            Host
+            background.Colour = colours.Gray2;
+            statusBox.Colour = colours.BlueDarker;
         }
     }
 }
