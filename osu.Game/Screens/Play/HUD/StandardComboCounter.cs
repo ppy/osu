@@ -3,7 +3,7 @@
 
 using OpenTK;
 
-namespace osu.Game.Rulesets.UI
+namespace osu.Game.Screens.Play.HUD
 {
     /// <summary>
     /// Uses the 'x' symbol and has a pop-out effect while rolling over.
