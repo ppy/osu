@@ -13,11 +13,11 @@ namespace osu.Game.Beatmaps.IO
     {
         private class Reader
         {
-            public Func<Storage, string, bool> Test { get; set; }
-            public Type Type { get; set; }
+            public Func<Storage, string, bool> Test;
+            public Type Type;
         }
 
-        private static List<Reader> readers { get; } = new List<Reader>();
+        private static readonly List<Reader> readers = new List<Reader>();
 
         public static ArchiveReader GetReader(Storage storage, string path)
         {
