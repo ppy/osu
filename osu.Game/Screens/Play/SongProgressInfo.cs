@@ -29,7 +29,10 @@ namespace osu.Game.Screens.Play
             {
                 currentTime = value;
                 if (value > 0)
+                {
                     timeCurrent.Text = TimeSpan.FromMilliseconds(value).ToString(@"m\:ss");
+                    timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(songLenght - value).ToString(@"m\:ss");
+                }
             }
         }
         public float Progress
@@ -79,14 +82,6 @@ namespace osu.Game.Screens.Play
                     Text = @"-" + TimeSpan.FromMilliseconds(songLenght).ToString(@"m\:ss"),
                 }
             };
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if(currentTime > 0)
-                timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(songLenght - currentTime).ToString(@"m\:ss");
         }
     }
 }
