@@ -109,6 +109,11 @@ namespace osu.Game.Screens.Play
         public virtual void BindHitRenderer(HitRenderer hitRenderer)
         {
             hitRenderer.InputManager.Add(KeyCounter.GetReceptor());
+
+            // in the case a replay isn't loaded, we want some elements to only appear briefly.
+            if (!hitRenderer.HasReplayLoaded)
+                using (ModDisplay.BeginDelayedSequence(2000))
+                    ModDisplay.FadeOut(200);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

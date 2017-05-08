@@ -356,10 +356,6 @@ namespace osu.Game.Screens.Play
 
             hitRendererContainer.Alpha = 0;
             hitRendererContainer.FadeIn(750, EasingTypes.OutQuint);
-
-            if (!HitRenderer.HasReplayLoaded)
-                using (hudOverlay.ModDisplay.BeginDelayedSequence(2000))
-                    hudOverlay.ModDisplay.FadeOut(200);
         }
 
         protected override void OnSuspending(Screen next)
