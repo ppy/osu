@@ -141,12 +141,12 @@ namespace osu.Game.Screens.Play
                 return;
 
             double currentTime = (AudioClock?.CurrentTime ?? Time.Current) - firstHitTime;
-            double progress = currentTime / (lastHitTime - firstHitTime);
+            float progress = (float)(currentTime / (lastHitTime - firstHitTime));
 
-            bar.UpdatePosition((float)progress);
+            bar.UpdatePosition(progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
 
-            info.Progress = (int)(progress * 100);
+            info.Progress = progress;
             info.CurrentTime = currentTime;
         }
     }
