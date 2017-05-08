@@ -24,11 +24,11 @@ namespace osu.Game.Beatmaps
 
         public readonly bool WithStoryboard;
 
-        protected WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo = null, BeatmapMetadata metadata = null, bool withStoryboard = false)
+        protected WorkingBeatmap(BeatmapInfo beatmapInfo, bool withStoryboard = false)
         {
             BeatmapInfo = beatmapInfo;
-            BeatmapSetInfo = beatmapSetInfo ?? beatmapInfo?.BeatmapSet;
-            Metadata = metadata ?? beatmapInfo?.Metadata ?? BeatmapSetInfo?.Metadata;
+            BeatmapSetInfo = beatmapInfo.BeatmapSet;
+            Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo.Metadata;
             WithStoryboard = withStoryboard;
 
             Mods.ValueChanged += mods => applyRateAdjustments();
