@@ -372,8 +372,10 @@
     <Compile Include="Overlays\Options\Sections\SkinSection.cs" />
     <Compile Include="Graphics\UserInterface\OsuCheckbox.cs" />
     <Compile Include="Overlays\Options\SidebarButton.cs" />
+    <Compile Include="Overlays\Options\OptionCheckbox.cs" />
     <Compile Include="Overlays\Options\OptionTextBox.cs" />
     <Compile Include="Overlays\Options\OptionSlider.cs" />
+    <Compile Include="Overlays\Options\OptionItem.cs" />
     <Compile Include="Overlays\Options\OptionEnumDropdown.cs" />
     <Compile Include="Configuration\RankingType.cs" />
     <Compile Include="Configuration\ScoreMeterType.cs" />
