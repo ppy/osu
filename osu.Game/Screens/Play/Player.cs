@@ -23,6 +23,7 @@ using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.Play
         private FailOverlay failOverlay;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu, OsuColour colours)
         {
             dimLevel = config.GetBindable<double>(OsuConfig.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
@@ -168,6 +169,46 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.AudioClock = decoupledClock;
             hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
+
+            hudOverlay.ModsContainer.ShowMods = HitRenderer.HasReplayLoaded;
+            foreach (var mod in Beatmap.Mods.Value)
+            {
+                bool modAdded = false;
+
+                foreach(var modCompaired in rulesetInstance.GetModsFor(ModType.DifficultyIncrease))
+                {
+                    if (mod.Icon == modCompaired.Icon)
+                    {
+                        hudOverlay.ModsContainer.AddMod(mod, colours.Yellow);
+                        modAdded = true;
+                        break;
+                    }
+                }
+                if (!modAdded)
+                {
+                    foreach (var modCompaired in rulesetInstance.GetModsFor(ModType.DifficultyReduction))
+                    {
+                        if (mod.Icon == modCompaired.Icon)
+                        {
+                            hudOverlay.ModsContainer.AddMod(mod, colours.Green);
+                            modAdded = true;
+                            break;
+                        }
+                    }
+                }
+                if (!modAdded)
+                {
+                    foreach (var modCompaired in rulesetInstance.GetModsFor(ModType.Special))
+                    {
+                        if (mod.Icon == modCompaired.Icon)
+                        {
+                            hudOverlay.ModsContainer.AddMod(mod, colours.Blue);
+                            modAdded = true;
+                            break;
+                        }
+                    }
+                }
+            }
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
