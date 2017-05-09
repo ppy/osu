@@ -28,15 +28,8 @@ namespace osu.Game.Screens.Multiplayer
                     return;
 
                 host = value;
-                switch(host)
-                {
-                    case true:
-                        statusSprite.Text = STRING_HOST;
-                        break;
-                    case false:
-                        statusSprite.Text = STRING_GUEST;
-                        break;
-                }
+                if (host) statusSprite.Text = STRING_HOST;
+                else statusSprite.Text = STRING_GUEST;
             }
         }
         
