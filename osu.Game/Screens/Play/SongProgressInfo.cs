@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
         private int previousSecond;
         private bool defaultsSetted;
 
-        private const int margin = 10;        
+        private const int margin = 10;
 
         public IClock AudioClock;
 
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Play
                         timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"m\:ss");
                     }
 
-                    int currentPercent = (int)((songCurrentTime / (endTime - startTime)) * 100);
+                    int currentPercent = (int)(songCurrentTime / (endTime - startTime) * 100);
 
                     if (currentPercent != previousPercent)
                     {
