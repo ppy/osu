@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
@@ -17,32 +18,19 @@ namespace osu.Game.Screens.Play
         private OsuSpriteText timeLeft;
         private OsuSpriteText progress;
 
-        private double currentTime;
-        private double songLenght;
+        private double startTime;
+        private double endTime;
 
-        private const int margin = 10;
+        private int previousPercent;
+        private int previousSecond;
+        private bool defaultsSetted;
 
-        public double SongLenght { set { songLenght = value; } }
-        public double CurrentTime
-        {
-            set
-            {
-                currentTime = value;
-                if (value > 0)
-                {
-                    timeCurrent.Text = TimeSpan.FromMilliseconds(value).ToString(@"m\:ss");
-                    timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(songLenght - value).ToString(@"m\:ss");
-                }
-            }
-        }
-        public float Progress
-        {
-            set
-            {
-                if (currentTime > 0)
-                    progress.Text = value.ToString("P0");
-            }
-        }
+        private const int margin = 10;        
+
+        public IClock AudioClock;
+
+        public double StartTime { set { startTime = value; } }
+        public double EndTime { set { endTime = value; } }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -59,7 +47,6 @@ namespace osu.Game.Screens.Play
                     {
                         Left = margin,
                     },
-                    Text = @"0:00",
                 },
                 progress = new OsuSpriteText
                 {
@@ -67,7 +54,6 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomCentre,
                     Colour = colours.BlueLighter,
                     Font = @"Venera",
-                    Text = @"0%",
                 },
                 timeLeft = new OsuSpriteText
                 {
@@ -79,9 +65,48 @@ namespace osu.Game.Screens.Play
                     {
                         Right = margin,
                     },
-                    Text = @"-" + TimeSpan.FromMilliseconds(songLenght).ToString(@"m\:ss"),
                 }
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            double songCurrentTime = AudioClock.CurrentTime - startTime;
+
+            if (!defaultsSetted)
+            {
+                timeCurrent.Text = @"0:00";
+                timeLeft.Text = TimeSpan.FromMilliseconds(endTime - startTime).ToString(@"m\:ss");
+                progress.Text = @"0%";
+
+                defaultsSetted = true;
+            }
+            else
+            {
+                if(songCurrentTime >= 0)
+                {
+                    int currentSecond = TimeSpan.FromMilliseconds(songCurrentTime).Seconds;
+
+                    if (currentSecond != previousSecond)
+                    {
+                        previousSecond = currentSecond;
+
+                        timeCurrent.Text = TimeSpan.FromMilliseconds(songCurrentTime).ToString(@"m\:ss");
+                        timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"m\:ss");
+                    }
+
+                    int currentPercent = (int)((songCurrentTime / (endTime - startTime)) * 100);
+
+                    if (currentPercent != previousPercent)
+                    {
+                        previousPercent = currentPercent;
+
+                        progress.Text = currentPercent.ToString() + @"%";
+                    }
+                }
+            }
         }
     }
 }
