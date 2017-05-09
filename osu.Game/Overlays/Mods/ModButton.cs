@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Mods
     /// </summary>
     public class ModButton : ModButtonEmpty
     {
-        private ModIcon foregroundIcon { get; set; }
+        private ModIcon foregroundIcon;
         private readonly SpriteText text;
         private readonly Container<ModIcon> iconsContainer;
         private SampleChannel sampleOn, sampleOff;
