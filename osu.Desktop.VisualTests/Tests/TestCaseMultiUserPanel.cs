@@ -2,18 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Select;
 using osu.Game.Screens.Multiplayer;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
-using osu.Framework.MathUtils;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using System.Linq;
 
