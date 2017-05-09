@@ -32,7 +32,15 @@ namespace osu.Game.Screens.Play
 
         public Action<double> OnSeek;
 
-        public IClock AudioClock;
+        private IClock audioClock;
+        public IClock AudioClock
+        {
+            set
+            {
+                audioClock = value;
+                info.AudioClock = value;
+            }
+        }
 
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
 
@@ -45,7 +53,9 @@ namespace osu.Game.Screens.Play
             set
             {
                 graph.Objects = objects = value;
-                info.SongLenght = lastHitTime - firstHitTime;
+
+                info.StartTime = firstHitTime;
+                info.EndTime = lastHitTime;
             }
         }
 
@@ -70,7 +80,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Y = -(bottom_bar_height + graph_height),
+                    Margin = new MarginPadding { Bottom = bottom_bar_height + graph_height },
                 },
                 graph = new SongProgressGraph
                 {
@@ -140,14 +150,10 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            double currentTime = (AudioClock?.CurrentTime ?? Time.Current) - firstHitTime;
-            float progress = (float)(currentTime / (lastHitTime - firstHitTime));
+            float progress = (float)(((audioClock?.CurrentTime ?? Time.Current) - firstHitTime) / (lastHitTime - firstHitTime));
 
             bar.UpdatePosition(progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
-
-            info.Progress = progress;
-            info.CurrentTime = currentTime;
         }
     }
 }
