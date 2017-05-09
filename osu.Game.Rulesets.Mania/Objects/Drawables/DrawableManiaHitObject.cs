@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -17,44 +18,31 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private readonly Container glowContainer;
 
-        protected override Container<Drawable> Content => noteFlow;
-        private readonly FlowContainer<Drawable> noteFlow;
-
         public DrawableManiaHitObject(TObject hitObject)
             : base(hitObject)
         {
             HitObject = hitObject;
 
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.BottomCentre;
 
-            InternalChildren = new Drawable[]
+            RelativePositionAxes = Axes.Y;
+            Y = (float)HitObject.StartTime;
+
+            Add(glowContainer = new Container
             {
-                glowContainer = new Container
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Children = new[]
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Children = new[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            AlwaysPresent = true,
-                            Alpha = 0
+                            Alpha = 0,
+                            AlwaysPresent = true
                         }
                     }
-                },
-                noteFlow = new FillFlowContainer<Drawable>
-                {
-                    Name = "Main container",
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y
-                }
-            };
+            });
         }
 
         public override Color4 AccentColour

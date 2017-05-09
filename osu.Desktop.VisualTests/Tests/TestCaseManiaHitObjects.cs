@@ -34,32 +34,40 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     new Container
                     {
+                        Name = "Normal note column",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Y,
                         Width = 50,
+                        RelativeCoordinateSpace = new Vector2(1, 10000),
                         Children = new[]
                         {
-                            new DrawableNote(new Note())
+                            new DrawableNote(new Note
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                StartTime = 5000
+                            })
+                            {
                                 AccentColour = Color4.Red
                             }
                         }
                     },
                     new Container
                     {
+                        Name = "Hold note column",
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Y,
                         Width = 50,
+                        RelativeCoordinateSpace = new Vector2(1, 10000),
                         Children = new[]
                         {
-                            new DrawableHoldNote(new HoldNote())
+                            new DrawableHoldNote(new HoldNote
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
+                                StartTime = 5000,
+                                Duration = 1000,
+
+                            })
+                            {
                                 AccentColour = Color4.Red,
                                 Length = 0.4f
                             }
