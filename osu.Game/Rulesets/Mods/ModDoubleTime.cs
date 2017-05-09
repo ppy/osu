@@ -11,6 +11,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Double Time";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_doubletime;
+        public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Zoooooooooom";
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModHalfTime) };
