@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         protected override Beatmap<TaikoHitObject> ConvertBeatmap(Beatmap original)
         {
             // Rewrite the beatmap info to add the slider velocity multiplier
-            BeatmapInfo info = original.BeatmapInfo.DeepClone<BeatmapInfo>();
+            BeatmapInfo info = original.BeatmapInfo.DeepClone();
             info.Difficulty.SliderMultiplier *= legacy_velocity_multiplier;
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original);
