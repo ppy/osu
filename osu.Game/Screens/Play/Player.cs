@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play
 
         private Container hitRendererContainer;
 
-        private HudOverlay hudOverlay;
+        private HUDOverlay hudOverlay;
         private PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
 
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Play
                     Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
 
                 if (Beatmap?.Beatmap == null)
-                    throw new Exception("Beatmap was not loaded");
+                    throw new InvalidOperationException("Beatmap was not loaded");
 
                 ruleset = osu?.Ruleset.Value ?? Beatmap.BeatmapInfo.Ruleset;
                 rulesetInstance = ruleset.CreateInstance();
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
                 }
 
                 if (!HitRenderer.Objects.Any())
-                    throw new Exception("Beatmap contains no hit objects!");
+                    throw new InvalidOperationException("Beatmap contains no hit objects!");
             }
             catch (Exception e)
             {
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 
-            hudOverlay = new StandardHudOverlay()
+            hudOverlay = new StandardHUDOverlay()
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
@@ -168,6 +168,8 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.AudioClock = decoupledClock;
             hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
+
+            hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;

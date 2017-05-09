@@ -2,13 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Options
 {
-    internal class OptionLabel : OsuSpriteText
+    internal class OptionLabel : OptionItem<string>
     {
+        protected override Drawable CreateControl() => null;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {

@@ -1,12 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-namespace osu.Game.Configuration
+namespace osu.Game.Rulesets.Replays
 {
-    public enum ConfineMouseMode
+    public interface IAutoGenerator
     {
-        Never,
-        Fullscreen,
-        Always
+        Replay Generate();
     }
 }

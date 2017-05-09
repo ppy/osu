@@ -27,13 +27,8 @@ namespace osu.Game.Screens.Select
 
                 bool match = hasCurrentMode;
 
-                match &= string.IsNullOrEmpty(SearchText)
-                    || (set.Metadata.Artist ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (set.Metadata.ArtistUnicode ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (set.Metadata.Title ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (set.Metadata.TitleUnicode ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (set.Metadata.Tags ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1
-                    || (set.Metadata.Source ?? string.Empty).IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) != -1;
+                if (!string.IsNullOrEmpty(SearchText))
+                    match &= set.Metadata.SearchableTerms.Any(term => term.IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) >= 0);
 
                 switch (g.State)
                 {
