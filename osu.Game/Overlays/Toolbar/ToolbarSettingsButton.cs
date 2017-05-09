@@ -19,7 +19,6 @@ namespace osu.Game.Overlays.Toolbar
         private void load(OptionsOverlay options)
         {
             StateContainer = options;
-            Action = options.ToggleVisibility;
         }
     }
 }

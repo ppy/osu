@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps.Formats
 {
     public abstract class BeatmapDecoder
     {
-        private static Dictionary<string, Type> decoders { get; } = new Dictionary<string, Type>();
+        private static readonly Dictionary<string, Type> decoders = new Dictionary<string, Type>();
 
         public static BeatmapDecoder GetDecoder(StreamReader stream)
         {
