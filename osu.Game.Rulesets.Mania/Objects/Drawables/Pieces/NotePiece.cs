@@ -10,6 +10,9 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 {
+    /// <summary>
+    /// Represents the static hit markers of notes.
+    /// </summary>
     internal class NotePiece : Container, IHasAccentColour
     {
         private const float head_height = 10;

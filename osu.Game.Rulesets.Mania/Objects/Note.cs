@@ -7,9 +7,15 @@ using osu.Game.Rulesets.Mania.Judgements;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
+    /// <summary>
+    /// Represents a hit object which has a single hit press.
+    /// </summary>
     public class Note : ManiaHitObject
     {
-        public HitWindows HitWindows { get; protected set; } = new HitWindows();
+        /// <summary>
+        /// The key-press hit window for this note.
+        /// </summary>
+        protected HitWindows HitWindows = new HitWindows();
 
         public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {

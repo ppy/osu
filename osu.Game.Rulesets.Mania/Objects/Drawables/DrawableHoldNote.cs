@@ -13,11 +13,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
     public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>
     {
-        /// <summary>
-        /// Length of this hold note, relative to its parent.
-        /// </summary>
-        public float Length;
-
         private NotePiece headPiece;
         private BodyPiece bodyPiece;
         private NotePiece tailPiece;
@@ -30,6 +25,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             Add(new Drawable[]
             {
+                // For now the body piece covers the entire height of the container
+                // whereas possibly in the future we don't want to extend under the head/tail.
+                // This will be fixed when new designs are given or the current design is finalized.
                 bodyPiece = new BodyPiece
                 {
                     Anchor = Anchor.BottomCentre,

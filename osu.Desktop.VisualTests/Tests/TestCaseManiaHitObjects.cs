@@ -39,15 +39,23 @@ namespace osu.Desktop.VisualTests.Tests
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Y,
                         Width = 50,
-                        RelativeCoordinateSpace = new Vector2(1, 10000),
                         Children = new[]
                         {
-                            new DrawableNote(new Note
+                            new Container
                             {
-                                StartTime = 5000
-                            })
-                            {
-                                AccentColour = Color4.Red
+                                Name = "Timing section",
+                                RelativeSizeAxes = Axes.Both,
+                                RelativeCoordinateSpace = new Vector2(1, 10000),
+                                Children = new[]
+                                {
+                                    new DrawableNote(new Note
+                                    {
+                                        StartTime = 5000
+                                    })
+                                    {
+                                        AccentColour = Color4.Red
+                                    }
+                                }
                             }
                         }
                     },
@@ -58,18 +66,25 @@ namespace osu.Desktop.VisualTests.Tests
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Y,
                         Width = 50,
-                        RelativeCoordinateSpace = new Vector2(1, 10000),
                         Children = new[]
                         {
-                            new DrawableHoldNote(new HoldNote
+                            new Container
                             {
-                                StartTime = 5000,
-                                Duration = 1000,
+                                Name = "Timing section",
+                                RelativeSizeAxes = Axes.Both,
+                                RelativeCoordinateSpace = new Vector2(1, 10000),
+                                Children = new[]
+                                {
+                                    new DrawableHoldNote(new HoldNote
+                                    {
+                                        StartTime = 5000,
+                                        Duration = 1000,
 
-                            })
-                            {
-                                AccentColour = Color4.Red,
-                                Length = 0.4f
+                                    })
+                                    {
+                                        AccentColour = Color4.Red
+                                    }
+                                }
                             }
                         }
                     }
