@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public class OsuLogo : Container
     {
-        public Color4 OsuPink = OsuColour.FromHex(@"e967a1");
+        public readonly Color4 OsuPink = OsuColour.FromHex(@"e967a1");
 
         private readonly Sprite logo;
         private readonly CircularContainer logoContainer;
