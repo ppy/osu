@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Play
                     Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
 
                 if (Beatmap?.Beatmap == null)
-                    throw new Exception("Beatmap was not loaded");
+                    throw new InvalidOperationException("Beatmap was not loaded");
 
                 ruleset = osu?.Ruleset.Value ?? Beatmap.BeatmapInfo.Ruleset;
                 rulesetInstance = ruleset.CreateInstance();
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Play
                 }
 
                 if (!HitRenderer.Objects.Any())
-                    throw new Exception("Beatmap contains no hit objects!");
+                    throw new InvalidOperationException("Beatmap contains no hit objects!");
             }
             catch (Exception e)
             {

@@ -23,7 +23,7 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"channel_id")]
         public int Id;
 
-        public SortedList<Message> Messages = new SortedList<Message>((m1, m2) => m1.Id.CompareTo(m2.Id));
+        public readonly SortedList<Message> Messages = new SortedList<Message>((m1, m2) => m1.Id.CompareTo(m2.Id));
 
         //internal bool Joined;
 
