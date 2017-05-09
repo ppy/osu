@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Mania.Judgements
         /// Hit window for a PERFECT hit.
         /// </summary>
         public double Perfect = perfect_mid;
-        
+
         /// <summary>
         /// Hit window for a GREAT hit.
         /// </summary>
