@@ -18,7 +18,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public DrawableNote(Note hitObject)
             : base(hitObject)
         {
-            Add(headPiece = new NotePiece());
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+
+            Add(headPiece = new NotePiece
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre
+            });
         }
 
         public override Color4 AccentColour

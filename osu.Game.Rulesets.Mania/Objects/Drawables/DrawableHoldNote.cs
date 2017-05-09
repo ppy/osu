@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -24,24 +25,31 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public DrawableHoldNote(HoldNote hitObject)
             : base(hitObject)
         {
-            Children = new Drawable[]
+            RelativeSizeAxes = Axes.Both;
+            Height = (float)HitObject.Duration;
+
+            Add(new Drawable[]
             {
-                headPiece = new NotePiece
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre
-                },
                 bodyPiece = new BodyPiece
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                 },
-                tailPiece = new NotePiece
+                headPiece = new NotePiece
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre
+                },
+                tailPiece = new NotePiece
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre
                 }
-            };
+            });
+
+            // The "length" of the hold note stops at the "base" of the tail piece
+            // but we want to contain the tail piece within our bounds
+            Height += (float)HitObject.Duration / headPiece.Height;
         }
 
         public override Color4 AccentColour
@@ -57,12 +65,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 bodyPiece.AccentColour = value;
                 tailPiece.AccentColour = value;
             }
-        }
-
-
-        protected override void Update()
-        {
-            bodyPiece.Height = Parent.DrawSize.Y * Length;
         }
 
         protected override void UpdateState(ArmedState state)

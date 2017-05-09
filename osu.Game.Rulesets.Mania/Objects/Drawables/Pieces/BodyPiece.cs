@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
         public BodyPiece()
         {
-            RelativeSizeAxes = Axes.X;
+            RelativeSizeAxes = Axes.Both;
             Masking = true;
 
             Children = new[]
