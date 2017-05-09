@@ -78,7 +78,7 @@ namespace osu.Game.Graphics.Cursor
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
         {
-            shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.Texture);
+            shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
             texture = textures.Get(@"Cursor/cursortrail");
             Scale = new Vector2(1 / texture.ScaleAdjust);
         }
