@@ -78,8 +78,7 @@ namespace osu.Desktop.VisualTests.Tests
                                     new DrawableHoldNote(new HoldNote
                                     {
                                         StartTime = 5000,
-                                        Duration = 1000,
-
+                                        Duration = 1000
                                     })
                                     {
                                         AccentColour = Color4.Red
