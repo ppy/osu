@@ -85,6 +85,8 @@
     <Compile Include="TaikoDifficultyCalculator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scoring\TaikoScoreProcessor.cs" />
+    <Compile Include="Timing\TimingSection.cs" />
+    <Compile Include="Timing\DrawableTimingSection.cs" />
     <Compile Include="UI\HitTarget.cs" />
     <Compile Include="UI\InputDrum.cs" />
     <Compile Include="UI\DrawableTaikoJudgement.cs" />
