@@ -5,7 +5,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Rulesets.Taiko.Timing
+namespace osu.Game.Rulesets.Mania.Timing
 {
     public class DrawableTimingSection : Container
     {

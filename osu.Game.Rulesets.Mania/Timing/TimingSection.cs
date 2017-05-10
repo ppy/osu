@@ -3,7 +3,7 @@
 
 using osu.Game.Beatmaps.Timing;
 
-namespace osu.Game.Rulesets.Taiko.Timing
+namespace osu.Game.Rulesets.Mania.Timing
 {
     public class TimingSection
     {
