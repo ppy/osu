@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Play
 
             double progress = ((audioClock?.CurrentTime ?? Time.Current) - firstHitTime) / (lastHitTime - firstHitTime);
 
-            if((int)progress * 100 < 100)
+            if(progress < 1)
             {
                 bar.UpdatePosition((float)progress);
                 graph.Progress = (int)(graph.ColumnCount * progress);

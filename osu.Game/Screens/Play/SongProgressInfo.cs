@@ -74,8 +74,9 @@ namespace osu.Game.Screens.Play
             base.Update();
 
             double songCurrentTime = AudioClock.CurrentTime - startTime;
+            int currentPercent = (int)(songCurrentTime / (endTime - startTime) * 100);
 
-            if(songCurrentTime < endTime - startTime)
+            if (currentPercent <= 100)
             {
                 int currentSecond = TimeSpan.FromMilliseconds(songCurrentTime).Seconds;
 
@@ -91,8 +92,6 @@ namespace osu.Game.Screens.Play
 
                     timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"m\:ss");
                 }
-
-                int currentPercent = (int)(songCurrentTime / (endTime - startTime) * 100) + 1;
 
                 if (currentPercent != previousPercent)
                 {
