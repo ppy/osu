@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play
 
         private int previousPercent;
         private int previousSecond;
-        private bool defaultsSetted;
+        private double previousTimespan;
 
         private const int margin = 10;
 
@@ -75,37 +75,24 @@ namespace osu.Game.Screens.Play
 
             double songCurrentTime = AudioClock.CurrentTime - startTime;
 
-            if (!defaultsSetted)
-            {
-                timeCurrent.Text = @"0:00";
-                timeLeft.Text = TimeSpan.FromMilliseconds(endTime - startTime).ToString(@"m\:ss");
-                progress.Text = @"0%";
+            int currentSecond = TimeSpan.FromMilliseconds(songCurrentTime).Seconds;
 
-                defaultsSetted = true;
+            if (currentSecond != previousSecond || (previousTimespan < 0 && songCurrentTime > 0))
+            {
+                previousTimespan = songCurrentTime;
+                previousSecond = currentSecond;
+
+                timeCurrent.Text = ((songCurrentTime < 0) ? @"-" : @"") + TimeSpan.FromMilliseconds(songCurrentTime).ToString(@"m\:ss");
+                timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"m\:ss");
             }
-            else
+
+            int currentPercent = (int)(songCurrentTime / (endTime - startTime) * 100);
+
+            if (currentPercent != previousPercent)
             {
-                if(songCurrentTime >= 0)
-                {
-                    int currentSecond = TimeSpan.FromMilliseconds(songCurrentTime).Seconds;
+                previousPercent = currentPercent;
 
-                    if (currentSecond != previousSecond)
-                    {
-                        previousSecond = currentSecond;
-
-                        timeCurrent.Text = TimeSpan.FromMilliseconds(songCurrentTime).ToString(@"m\:ss");
-                        timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"m\:ss");
-                    }
-
-                    int currentPercent = (int)(songCurrentTime / (endTime - startTime) * 100);
-
-                    if (currentPercent != previousPercent)
-                    {
-                        previousPercent = currentPercent;
-
-                        progress.Text = currentPercent.ToString() + @"%";
-                    }
-                }
+                progress.Text = ((currentPercent <= 0) ? @"0" : currentPercent.ToString()) + @"%";
             }
         }
     }
