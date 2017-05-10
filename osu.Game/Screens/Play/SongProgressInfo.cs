@@ -77,12 +77,16 @@ namespace osu.Game.Screens.Play
 
             int currentSecond = TimeSpan.FromMilliseconds(songCurrentTime).Seconds;
 
-            if (currentSecond != previousSecond || (previousTimespan < 0 && songCurrentTime > 0))
+            if (currentSecond != previousSecond || previousTimespan < 0 && songCurrentTime > 0)
             {
                 previousTimespan = songCurrentTime;
                 previousSecond = currentSecond;
 
-                timeCurrent.Text = ((songCurrentTime < 0) ? @"-" : @"") + TimeSpan.FromMilliseconds(songCurrentTime).ToString(@"m\:ss");
+                if(songCurrentTime < 0)
+                    timeCurrent.Text = @"-" + TimeSpan.FromMilliseconds(songCurrentTime - 1000).ToString(@"m\:ss");
+                else
+                    timeCurrent.Text = TimeSpan.FromMilliseconds(songCurrentTime).ToString(@"m\:ss");
+
                 timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"m\:ss");
             }
 
@@ -92,7 +96,7 @@ namespace osu.Game.Screens.Play
             {
                 previousPercent = currentPercent;
 
-                progress.Text = ((currentPercent <= 0) ? @"0" : currentPercent.ToString()) + @"%";
+                progress.Text = (currentPercent <= 0 ? @"0" : currentPercent.ToString()) + @"%";
             }
         }
     }
