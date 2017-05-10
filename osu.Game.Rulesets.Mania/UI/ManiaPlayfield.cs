@@ -16,6 +16,10 @@ using osu.Framework.Allocation;
 using OpenTK.Input;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Taiko.Timing;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -156,5 +160,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     return column == columnCount - 1;
             }
         }
+
+        public void Add(TimingSection timingSection) => columns.Children.ForEach(c => c.Add(timingSection));
     }
 }

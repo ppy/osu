@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Taiko.Timing;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -29,11 +30,17 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
+        private const double time_span_default = 2000;
+        private const double time_span_min = 10;
+        private const double time_span_max = 20000;
+        private const double time_span_step = 100;
+
         public Key Key;
 
         private readonly Box background;
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
+        private readonly Container<DrawableTimingSection> timingSectionContainer;
 
         public Column()
         {
@@ -130,6 +137,14 @@ namespace osu.Game.Rulesets.Mania.UI
                             }
                         }
                     }
+                },
+                timingSectionContainer = new Container<DrawableTimingSection>
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Y = -hit_target_bar_height,
+                    RelativeCoordinateSpace = new Vector2(1, (float)time_span_default)
                 }
             };
         }
@@ -176,12 +191,30 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        public void AddTimingSection(TimingSection timingSection) => timingSectionContainer.Add(new DrawableTimingSection(timingSection));
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == Key && !args.Repeat)
+            if (args.Repeat)
+                return false;
+
+            if (args.Key == Key)
             {
                 background.FadeTo(background.Alpha + 0.2f, 50, EasingTypes.OutQuint);
                 keyIcon.ScaleTo(1.4f, 50, EasingTypes.OutQuint);
+            }
+
+            if (state.Keyboard.ControlPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.Minus:
+                        timeSpan += time_span_step;
+                        break;
+                    case Key.Plus:
+                        timeSpan -= time_span_step;
+                        break;
+                }
             }
 
             return false;
@@ -196,6 +229,15 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// The amount of time which the length of this column spans.
+        /// </summary>
+        private double timeSpan
+        {
+            get { return timingSectionContainer.RelativeCoordinateSpace.Y; }
+            set { timingSectionContainer.RelativeCoordinateSpace = new Vector2(1, (float)MathHelper.Clamp(value, time_span_min, time_span_max)); }
         }
     }
 
