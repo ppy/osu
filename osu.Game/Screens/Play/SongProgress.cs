@@ -33,14 +33,7 @@ namespace osu.Game.Screens.Play
         public Action<double> OnSeek;
 
         private IClock audioClock;
-        public IClock AudioClock
-        {
-            set
-            {
-                audioClock = value;
-                info.AudioClock = value;
-            }
-        }
+        public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
 
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
 
@@ -150,9 +143,9 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            float progress = (float)(((audioClock?.CurrentTime ?? Time.Current) - firstHitTime) / (lastHitTime - firstHitTime));
+            double progress = ((audioClock?.CurrentTime ?? Time.Current) - firstHitTime) / (lastHitTime - firstHitTime);
 
-            bar.UpdatePosition(progress);
+            bar.UpdatePosition((float)progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
         }
     }
