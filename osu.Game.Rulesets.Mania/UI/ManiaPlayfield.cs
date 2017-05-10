@@ -161,6 +161,6 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public void Add(TimingSection timingSection) => columns.Children.ForEach(c => c.Add(timingSection));
+        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.Children.ElementAt(h.HitObject.Column).Add(h);
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Beatmaps;
@@ -22,12 +23,11 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaHitRenderer : HitRenderer<ManiaHitObject, ManiaJudgement>
     {
-        private readonly int columns;
+        public int? Columns;
 
-        public ManiaHitRenderer(WorkingBeatmap beatmap, int columns = 5)
+        public ManiaHitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
         {
-            this.columns = columns;
             // Has to be done before drawable hit objects are generated in load()
             loadTimingSections();
         }
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter();
 
-        protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(columns);
+        protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize));
 
         protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h) => null;
     }
