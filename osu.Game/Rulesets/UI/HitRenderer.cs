@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.UI
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
         protected override Container<Drawable> Content => content;
-        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result != HitResult.None);
+        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judged);
 
         /// <summary>
         /// The playfield.
