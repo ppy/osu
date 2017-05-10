@@ -8,6 +8,7 @@ using System;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -17,7 +18,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
-            yield return null;
+            yield return new Note
+            {
+                StartTime = original.StartTime,
+                Column = 1,
+            };
         }
     }
 }
