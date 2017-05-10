@@ -119,10 +119,17 @@ namespace osu.Game.Rulesets.Mania.Judgements
         /// </summary>
         public double Miss = miss_mid;
 
+        /// <summary>
+        /// Constructs default hit windows.
+        /// </summary>
         public HitWindows()
         {
         }
 
+        /// <summary>
+        /// Constructs hit windows by fitting a parameter to a 2-part piecewise linear function for each hit window.
+        /// </summary>
+        /// <param name="difficulty">The parameter.</param>
         public HitWindows(double difficulty)
         {
             Perfect = BeatmapDifficulty.DifficultyRange(difficulty, perfect_max, perfect_mid, perfect_min);
@@ -133,6 +140,11 @@ namespace osu.Game.Rulesets.Mania.Judgements
             Miss = BeatmapDifficulty.DifficultyRange(difficulty, miss_max, miss_mid, miss_min);
         }
 
+        /// <summary>
+        /// Constructs new hit windows which have been multiplied by a value.
+        /// </summary>
+        /// <param name="windows">The original hit windows.</param>
+        /// <param name="value">The value to multiply each hit window by.</param>
         public static HitWindows operator *(HitWindows windows, double value)
         {
             return new HitWindows
@@ -146,6 +158,11 @@ namespace osu.Game.Rulesets.Mania.Judgements
             };
         }
 
+        /// <summary>
+        /// Constructs new hit windows which have been divided by a value.
+        /// </summary>
+        /// <param name="windows">The original hit windows.</param>
+        /// <param name="value">The value to divide each hit window by.</param>
         public static HitWindows operator /(HitWindows windows, double value)
         {
             return new HitWindows
