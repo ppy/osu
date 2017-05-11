@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.UI
 
         public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
 
-        protected override bool AllObjectsJudged => drawableObjects.All(h => h.Judgement.Result != HitResult.None);
+        protected override bool AllObjectsJudged => drawableObjects.All(h => h.Judged);
 
         /// <summary>
         /// The playfield.
