@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly FlowContainer<Column> Columns;
 
-        private readonly TimingSectionContainer barlineContainer;
+        private readonly TimeRelativeContainer barlineContainer;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Left = 1, Right = 1 },
                             Spacing = new Vector2(1, 0)
                         },
-                        barlineContainer = new TimingSectionContainer(timingSections)
+                        barlineContainer = new TimeRelativeContainer(timingSections)
                         {
                             Name = "Barlines",
                             Anchor = Anchor.BottomCentre,

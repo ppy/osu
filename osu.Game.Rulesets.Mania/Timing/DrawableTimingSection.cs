@@ -7,32 +7,5 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Mania.Timing
 {
-    /// <summary>
-    /// A container that contains hit objects within the time span of a timing section.
-    /// </summary>
-    public class DrawableTimingSection : Container
-    {
-        public readonly TimingSection TimingSection;
 
-        public DrawableTimingSection(TimingSection section)
-        {
-            TimingSection = section;
-
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
-
-            RelativePositionAxes = Axes.Y;
-            Y = -(float)section.StartTime;
-
-            RelativeSizeAxes = Axes.Both;
-            Height = (float)section.Duration;
-
-            RelativeCoordinateSpace = new Vector2(1, Height);
-        }
-
-        protected override void Update()
-        {
-            Y = (float)(Time.Current - TimingSection.StartTime);
-        }
-    }
 }
