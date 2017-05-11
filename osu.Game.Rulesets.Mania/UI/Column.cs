@@ -55,6 +55,48 @@ namespace osu.Game.Rulesets.Mania.UI
                 },
                 new Container
                 {
+                    Name = "Hit target",
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.X,
+                    Height = hit_target_height,
+                    Y = -ManiaPlayfield.HIT_TARGET_POSITION,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Name = "Background",
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black
+                        },
+                        hitTargetBar = new Container
+                        {
+                            Name = "Bar",
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            RelativeSizeAxes = Axes.X,
+                            Height = hit_target_bar_height,
+                            Masking = true,
+                            Children = new[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both
+                                }
+                            }
+                        }
+                    }
+                },
+                TimingSectionContainer = new TimingSectionContainer(timingSections)
+                {
+                    Name = "Hit objects",
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Y = -ManiaPlayfield.HIT_TARGET_POSITION
+                },
+                new Container
+                {
                     Name = "Key",
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
@@ -86,48 +128,6 @@ namespace osu.Game.Rulesets.Mania.UI
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0,
                                     AlwaysPresent = true
-                                }
-                            }
-                        }
-                    }
-                },
-                TimingSectionContainer = new TimingSectionContainer(timingSections)
-                {
-                    Name = "Hit objects",
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Y = -ManiaPlayfield.HIT_TARGET_POSITION
-                },
-                new Container
-                {
-                    Name = "Hit target",
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    Height = hit_target_height,
-                    Y = -ManiaPlayfield.HIT_TARGET_POSITION,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Name = "Background",
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black
-                        },
-                        hitTargetBar = new Container
-                        {
-                            Name = "Bar",
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            RelativeSizeAxes = Axes.X,
-                            Height = hit_target_bar_height,
-                            Masking = true,
-                            Children = new[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both
                                 }
                             }
                         }
