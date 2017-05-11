@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
         private const float head_height = 10;
         private const float head_colour_height = 6;
 
-        private Box colouredBox;
+        private readonly Box colouredBox;
 
         public NotePiece()
         {
