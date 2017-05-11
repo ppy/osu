@@ -51,14 +51,12 @@ namespace osu.Game.Beatmaps.Drawables
                         title = new OsuSpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
-                            Text = beatmap.BeatmapSetInfo.Metadata.Title,
                             TextSize = 22,
                             Shadow = true,
                         },
                         artist = new OsuSpriteText
                         {
                             Font = @"Exo2.0-SemiBoldItalic",
-                            Text = beatmap.BeatmapSetInfo.Metadata.Artist,
                             TextSize = 17,
                             Shadow = true,
                         },
@@ -81,8 +79,8 @@ namespace osu.Game.Beatmaps.Drawables
         [BackgroundDependencyLoader]
         private void load(LocalisationEngine localisation)
         {
-            title.Current = localisation.GetUnicodePreference(beatmap.BeatmapSetInfo.Metadata.TitleUnicode, beatmap.BeatmapSetInfo.Metadata.Title);
-            artist.Current = localisation.GetUnicodePreference(beatmap.BeatmapSetInfo.Metadata.ArtistUnicode, beatmap.BeatmapSetInfo.Metadata.Artist);
+            title.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
+            artist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
         }
 
         private class PanelBackground : BufferedContainer
