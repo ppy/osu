@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         },
                         barlineContainer = new TimeRelativeContainer(timingSections)
                         {
-                            Name = "Barlines",
+                            Name = "Bar lines",
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.Both,

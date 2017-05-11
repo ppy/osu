@@ -129,6 +129,11 @@ namespace osu.Game.Rulesets.Mania.Timing
                 base.Add(drawable);
             }
 
+            /// <summary>
+            /// Whether this timing section can contain a drawable. A timing section can contain a drawable if the drawable
+            /// can be placed within the timing section's bounds (in this case, from the start of the timing section up to infinity).
+            /// </summary>
+            /// <param name="drawable">The drawable to check.</param>
             public bool CanContain(Drawable drawable) => content.Y >= drawable.Y;
         }
     }
