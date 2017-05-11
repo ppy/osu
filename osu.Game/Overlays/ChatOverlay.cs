@@ -142,9 +142,13 @@ namespace osu.Game.Overlays
 
         private List<Channel> careChannels;
 
+        private List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
+
         private void initializeChannels()
         {
             currentChannelContainer.Clear();
+
+            loadedChannels.Clear();
 
             careChannels = new List<Channel>();
 
@@ -167,6 +171,7 @@ namespace osu.Game.Overlays
                 Scheduler.Add(delegate
                 {
                     loading.FadeOut(100);
+
                     addChannel(channels.Find(c => c.Name == @"#lazer"));
                     addChannel(channels.Find(c => c.Name == @"#osu"));
                     addChannel(channels.Find(c => c.Name == @"#lobby"));
@@ -192,10 +197,17 @@ namespace osu.Game.Overlays
                 if (currentChannel == value) return;
 
                 if (currentChannel != null)
-                    currentChannelContainer.Clear();
+                    currentChannelContainer.Clear(false);
 
                 currentChannel = value;
-                currentChannelContainer.Add(new DrawableChannel(currentChannel));
+
+                var loaded = loadedChannels.Find(d => d.Channel == value);
+                if (loaded == null)
+                    loadedChannels.Add(loaded = new DrawableChannel(currentChannel));
+
+                inputTextBox.Current.Disabled = currentChannel.ReadOnly;
+
+                currentChannelContainer.Add(loaded);
 
                 channelTabs.Current.Value = value;
             }
@@ -203,6 +215,8 @@ namespace osu.Game.Overlays
 
         private void addChannel(Channel channel)
         {
+            if (channel == null) return;
+
             careChannels.Add(channel);
             channelTabs.AddItem(channel);
 
@@ -246,8 +260,6 @@ namespace osu.Game.Overlays
 
             if (!string.IsNullOrEmpty(postText) && api.LocalUser.Value != null)
             {
-                var currentChannel = careChannels.FirstOrDefault();
-
                 if (currentChannel == null) return;
 
                 var message = new Message

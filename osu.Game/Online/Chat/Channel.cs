@@ -27,6 +27,8 @@ namespace osu.Game.Online.Chat
 
         //internal bool Joined;
 
+        public bool ReadOnly => Name != "#lazer";
+
         public const int MAX_HISTORY = 300;
 
         [JsonConstructor]

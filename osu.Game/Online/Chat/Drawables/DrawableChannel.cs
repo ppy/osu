@@ -13,13 +13,13 @@ namespace osu.Game.Online.Chat.Drawables
 {
     public class DrawableChannel : Container
     {
-        private readonly Channel channel;
+        public readonly Channel Channel;
         private readonly FillFlowContainer flow;
         private readonly ScrollContainer scroll;
 
         public DrawableChannel(Channel channel)
         {
-            this.channel = channel;
+            Channel = channel;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -48,14 +48,14 @@ namespace osu.Game.Online.Chat.Drawables
         {
             base.LoadComplete();
 
-            newMessagesArrived(channel.Messages);
+            newMessagesArrived(Channel.Messages);
             scrollToEnd();
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            channel.NewMessagesArrived -= newMessagesArrived;
+            Channel.NewMessagesArrived -= newMessagesArrived;
         }
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)
