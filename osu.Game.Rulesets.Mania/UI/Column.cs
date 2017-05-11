@@ -14,8 +14,6 @@ using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Timing;
 using System.Collections.Generic;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Judgements;

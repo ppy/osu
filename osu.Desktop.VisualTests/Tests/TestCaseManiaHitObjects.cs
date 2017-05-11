@@ -6,11 +6,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK.Graphics;
 using OpenTK;
 
