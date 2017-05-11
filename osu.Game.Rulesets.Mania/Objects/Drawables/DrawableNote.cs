@@ -41,6 +41,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
+        protected override void Update()
+        {
+            if (Time.Current > HitObject.StartTime)
+                Colour = Color4.Green;
+        }
+
         protected override void UpdateState(ArmedState state)
         {
         }
