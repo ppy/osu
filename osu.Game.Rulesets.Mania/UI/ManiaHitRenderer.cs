@@ -12,11 +12,12 @@ using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Timing;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -28,17 +29,11 @@ namespace osu.Game.Rulesets.Mania.UI
         public ManiaHitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
         {
-            // Has to be done before drawable hit objects are generated in load()
-            loadTimingSections();
         }
 
-        private void loadTimingSections()
+        protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
         {
-            var maniaPlayfield = Playfield as ManiaPlayfield;
-            if (maniaPlayfield == null)
-                return;
-
-            var sections = new List<TimingSection>();
+            List<TimingSection> timingSections = new List<TimingSection>();
 
             // Construct all the relevant timing sections
             ControlPoint lastTimingChange = null;
@@ -47,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 if (point.TimingChange)
                     lastTimingChange = point;
 
-                sections.Add(new TimingSection
+                timingSections.Add(new TimingSection
                 {
                     StartTime = point.Time,
                     // Todo: Should this be dividing by beatlength?
@@ -59,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.UI
             double lastObjectTime = (Objects.Last() as IHasEndTime)?.EndTime ?? Objects.Last().StartTime;
 
             // Perform some post processing of the timing sections
-            sections = sections
+            timingSections = timingSections
                 // Collapse sections after the last hit object
                 .Where(s => s.StartTime <= lastObjectTime)
                 // Collapse sections with the same start time
@@ -69,27 +64,36 @@ namespace osu.Game.Rulesets.Mania.UI
                 .ToList();
 
             // Determine duration of timing sections
-            for (int i = 0; i < sections.Count; i++)
+            for (int i = 0; i < timingSections.Count; i++)
             {
-                if (i < sections.Count - 1)
-                    sections[i].Duration = sections[i + 1].StartTime - sections[i].StartTime;
+                if (i < timingSections.Count - 1)
+                    timingSections[i].Duration = timingSections[i + 1].StartTime - timingSections[i].StartTime;
                 else
                 {
                     // Extra length added for the last timing section to extend past the last hitobject
-                    double extraLength = sections[i].BeatLength * (int)sections[i].TimeSignature;
-                    sections[i].Duration = lastObjectTime + extraLength - sections[i].StartTime;
+                    double extraLength = timingSections[i].BeatLength * (int)timingSections[i].TimeSignature;
+                    timingSections[i].Duration = lastObjectTime + extraLength - timingSections[i].StartTime;
                 }
             }
 
-            sections.ForEach(s => maniaPlayfield.Columns.Children.ForEach(c => c.AddTimingSection(s)));
+            return new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize), timingSections);
         }
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter();
 
-        protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize));
+        protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
+        {
+            var note = h as Note;
+            if (note != null)
+                return new DrawableNote(note);
 
-        protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h) => null;
+            var holdNote = h as HoldNote;
+            if (holdNote != null)
+                return new DrawableHoldNote(holdNote);
+
+            return null;
+        }
     }
 }
