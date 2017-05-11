@@ -85,7 +85,7 @@ namespace osu.Game.Online.API
             // we want to ensure only a single authentication update is happening at once.
             lock (access_token_retrieval_lock)
             {
-                // re-check if valid, in case another requrest completed and revalidated our access.
+                // re-check if valid, in case another request completed and revalidated our access.
                 if (accessTokenValid) return true;
 
                 // if not, let's try using our refresh token to request a new access token.
