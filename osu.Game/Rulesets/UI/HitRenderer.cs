@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.UI
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        private List<DrawableHitObject<TObject, TJudgement>> drawableObjects;
+        private readonly List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
         protected HitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
@@ -226,7 +226,7 @@ namespace osu.Game.Rulesets.UI
 
         private void loadObjects()
         {
-            drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>(Beatmap.HitObjects.Count);
+            drawableObjects.Capacity = Beatmap.HitObjects.Count;
 
             foreach (TObject h in Beatmap.HitObjects)
             {
