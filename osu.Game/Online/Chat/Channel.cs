@@ -53,5 +53,7 @@ namespace osu.Game.Online.Chat
             if (messageCount > MAX_HISTORY)
                 Messages.RemoveRange(0, messageCount - MAX_HISTORY);
         }
+
+        public override string ToString() => Name;
     }
 }
