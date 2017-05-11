@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
+                    Masking = true,
                     Children = new Drawable[]
                     {
                         new Box
