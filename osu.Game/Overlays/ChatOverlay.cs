@@ -110,12 +110,18 @@ namespace osu.Game.Overlays
         {
             MoveToY(0, transition_length, EasingTypes.OutQuint);
             FadeIn(transition_length, EasingTypes.OutQuint);
+
+            inputTextBox.HoldFocus = true;
+            base.PopIn();
         }
 
         protected override void PopOut()
         {
             MoveToY(DrawSize.Y, transition_length, EasingTypes.InSine);
             FadeOut(transition_length, EasingTypes.InSine);
+
+            inputTextBox.HoldFocus = false;
+            base.PopOut();
         }
 
         [BackgroundDependencyLoader]
