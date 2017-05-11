@@ -13,7 +13,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaHitRenderer : HitRenderer<ManiaBaseHit, ManiaJudgement>
+    public class ManiaHitRenderer : HitRenderer<ManiaHitObject, ManiaJudgement>
     {
         private readonly int columns;
 
@@ -25,10 +25,10 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        protected override BeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
+        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter();
 
-        protected override Playfield<ManiaBaseHit, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(columns);
+        protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(columns);
 
-        protected override DrawableHitObject<ManiaBaseHit, ManiaJudgement> GetVisualRepresentation(ManiaBaseHit h) => null;
+        protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h) => null;
     }
 }
