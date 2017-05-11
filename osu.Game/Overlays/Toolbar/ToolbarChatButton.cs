@@ -17,7 +17,6 @@ namespace osu.Game.Overlays.Toolbar
         private void load(ChatOverlay chat)
         {
             StateContainer = chat;
-            Action = chat.ToggleVisibility;
         }
     }
 }
