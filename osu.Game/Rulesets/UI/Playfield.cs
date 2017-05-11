@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The HitObjects contained in this Playfield.
         /// </summary>
-        protected HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects;
+        public HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects;
 
         internal Container<Drawable> ScaledContent;
 

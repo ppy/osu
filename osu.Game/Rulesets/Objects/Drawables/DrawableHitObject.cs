@@ -12,7 +12,6 @@ using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Audio;
-using System.Linq;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -24,11 +23,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public bool Interactive = true;
 
         public TJudgement Judgement;
-
-        /// <summary>
-        /// Whether this hit object has been judged.
-        /// </summary>
-        public virtual bool Judged => (Judgement?.Result ?? HitResult.None) != HitResult.None;
 
         protected abstract TJudgement CreateJudgement();
 
@@ -53,10 +47,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 if (State == ArmedState.Hit)
                     PlaySamples();
             }
-        }
-
-        internal DrawableHitObject()
-        {
         }
 
         protected List<SampleChannel> Samples = new List<SampleChannel>();
@@ -94,12 +84,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The colour used for various elements of this DrawableHitObject.
         /// </summary>
-        public virtual Color4 AccentColour { get; set; }
-
-        /// <summary>
-        /// Whether this hit object and all of its nested hit objects have been judged.
-        /// </summary>
-        public sealed override bool Judged => base.Judged && NestedHitObjects.All(h => h.Judged);
+        public Color4 AccentColour { get; protected set; }
 
         protected DrawableHitObject(TObject hitObject)
         {
@@ -183,11 +168,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        private readonly List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();
+        private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
+
         protected IEnumerable<DrawableHitObject<TObject, TJudgement>> NestedHitObjects => nestedHitObjects;
 
         protected void AddNested(DrawableHitObject<TObject, TJudgement> h)
         {
+            if (nestedHitObjects == null)
+                nestedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();
+
             h.OnJudgement += d => OnJudgement?.Invoke(d);
             nestedHitObjects.Add(h);
         }
