@@ -48,12 +48,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Beatmaps\ManiaBeatmapConverter.cs" />
+    <Compile Include="Judgements\HitWindows.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
+    <Compile Include="Objects\Drawables\DrawableHoldNote.cs" />
+    <Compile Include="Objects\Drawables\DrawableManiaHitObject.cs" />
+    <Compile Include="Objects\Drawables\DrawableNote.cs" />
+    <Compile Include="Objects\Drawables\Pieces\BodyPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\NotePiece.cs" />
+    <Compile Include="Objects\Types\IHasColumn.cs" />
     <Compile Include="Scoring\ManiaScoreProcessor.cs" />
-    <Compile Include="Objects\Drawable\DrawableNote.cs" />
     <Compile Include="Objects\HoldNote.cs" />
-    <Compile Include="Objects\ManiaBaseHit.cs" />
+    <Compile Include="Objects\ManiaHitObject.cs" />
     <Compile Include="Objects\Note.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Column.cs" />
