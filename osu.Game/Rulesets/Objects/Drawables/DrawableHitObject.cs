@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -12,12 +11,23 @@ using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Audio;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
-    public abstract class DrawableHitObject<TJudgement> : Container, IStateful<ArmedState>
+    public abstract class DrawableHitObject<TObject, TJudgement> : Container
+        where TObject : HitObject
         where TJudgement : Judgement
     {
+        public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
+
+        public TObject HitObject;
+
+        /// <summary>
+        /// The colour used for various elements of this DrawableHitObject.
+        /// </summary>
+        public virtual Color4 AccentColour { get; set; }
+
         public override bool HandleInput => Interactive;
 
         public bool Interactive = true;
@@ -56,14 +66,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             Samples.ForEach(s => s?.Play());
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            //we may be setting a custom judgement in test cases or what not.
-            if (Judgement == null)
-                Judgement = CreateJudgement();
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -71,20 +73,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             //force application of the state that was set before we loaded.
             UpdateState(State);
         }
-    }
-
-    public abstract class DrawableHitObject<TObject, TJudgement> : DrawableHitObject<TJudgement>
-        where TObject : HitObject
-        where TJudgement : Judgement
-    {
-        public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
-
-        public TObject HitObject;
 
         /// <summary>
-        /// The colour used for various elements of this DrawableHitObject.
+        /// Whether this hit object and all of its nested hit objects have been judged.
         /// </summary>
-        public Color4 AccentColour { get; protected set; }
+        public bool Judged => (Judgement?.Result ?? HitResult.None) != HitResult.None && (NestedHitObjects?.All(h => h.Judged) ?? true);
 
         protected DrawableHitObject(TObject hitObject)
         {
@@ -97,7 +90,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <returns>Whether a hit was processed.</returns>
         protected bool UpdateJudgement(bool userTriggered)
         {
-            IPartialJudgement partial = Judgement as IPartialJudgement;
+            var partial = Judgement as IPartialJudgement;
 
             // Never re-process non-partial hits
             if (Judgement.Result != HitResult.None && partial == null)
@@ -166,10 +159,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 channel.Volume.Value = sample.Volume;
                 Samples.Add(channel);
             }
+
+            //we may be setting a custom judgement in test cases or what not.
+            if (Judgement == null)
+                Judgement = CreateJudgement();
         }
 
         private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
-
         protected IEnumerable<DrawableHitObject<TObject, TJudgement>> NestedHitObjects => nestedHitObjects;
 
         protected void AddNested(DrawableHitObject<TObject, TJudgement> h)
