@@ -34,11 +34,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public TJudgement Judgement;
 
-        /// <summary>
-        /// Whether this hit object has been judged.
-        /// </summary>
-        public virtual bool Judged => (Judgement?.Result ?? HitResult.None) != HitResult.None;
-
         protected abstract TJudgement CreateJudgement();
 
         protected abstract void UpdateState(ArmedState state);
@@ -82,7 +77,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether this hit object and all of its nested hit objects have been judged.
         /// </summary>
-        public sealed override bool Judged => base.Judged && (NestedHitObjects?.All(h => h.Judged) ?? true);
+        public bool Judged => (Judgement?.Result ?? HitResult.None) != HitResult.None && (NestedHitObjects?.All(h => h.Judged) ?? true);
 
         protected DrawableHitObject(TObject hitObject)
         {
