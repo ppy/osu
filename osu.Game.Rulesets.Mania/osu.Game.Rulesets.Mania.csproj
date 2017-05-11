@@ -59,7 +59,6 @@
     <Compile Include="Objects\Types\IHasColumn.cs" />
     <Compile Include="Scoring\ManiaScoreProcessor.cs" />
     <Compile Include="Timing\TimingSection.cs" />
-    <Compile Include="Timing\DrawableTimingSection.cs" />
     <Compile Include="Objects\HoldNote.cs" />
     <Compile Include="Objects\ManiaHitObject.cs" />
     <Compile Include="Objects\Note.cs" />
