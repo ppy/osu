@@ -10,10 +10,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Options;
 using System;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Options.Sections;
-using osu.Game.Screens.Select;
 using osu.Framework.Input;
 
 namespace osu.Game.Overlays
@@ -35,8 +32,11 @@ namespace osu.Game.Overlays
         private SidebarButton[] sidebarButtons;
         private OptionsSection[] sections;
 
+        private OptionsHeader header;
+
+        private OptionsFooter footer;
+
         private SearchContainer searchContainer;
-        private SearchTextBox searchTextBox;
 
         private float lastKnownScroll;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGame game, OsuColour colours)
+        private void load(OsuGame game)
         {
             sections = new OptionsSection[]
             {
@@ -75,45 +75,20 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
                     Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
-                    Children = new[]
+                    Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        searchContainer = new SearchContainer
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                             Direction = FillDirection.Vertical,
-
-                            Children = new Drawable[]
-                            {
-                                new OsuSpriteText
-                                {
-                                    Text = "settings",
-                                    TextSize = 40,
-                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Top = Toolbar.Toolbar.TOOLTIP_HEIGHT },
-                                },
-                                new OsuSpriteText
-                                {
-                                    Colour = colours.Pink,
-                                    Text = "Change the way osu! behaves",
-                                    TextSize = 18,
-                                    Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
-                                },
-                                searchTextBox = new SearchTextBox
-                                {
-                                    Width = width - CONTENT_MARGINS * 2,
-                                    Margin = new MarginPadding { Left = CONTENT_MARGINS },
-                                    Exit = () => Hide(),
-                                },
-                                searchContainer = new SearchContainer
-                                {
-                                    AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
-                                    Direction = FillDirection.Vertical,
-                                    Children = sections,
-                                },
-                                new OptionsFooter()
-                            }
-                        }
+                            Children = sections,
+                        },
+                        footer = new OptionsFooter(),
+                        header = new OptionsHeader(() => scrollContainer.Current)
+                        {
+                            Exit = Hide,
+                        },
                     }
                 },
                 sidebar = new Sidebar
@@ -130,9 +105,18 @@ namespace osu.Game.Overlays
                 }
             };
 
-            searchTextBox.Current.ValueChanged += newValue => searchContainer.SearchTerm = newValue;
+            header.SearchTextBox.Current.ValueChanged += newValue => searchContainer.SearchTerm = newValue;
 
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            //we need to update these manually because we can't put the OptionsHeader inside the SearchContainer (due to its anchoring).
+            searchContainer.Y = header.DrawHeight;
+            footer.Y = searchContainer.Y + searchContainer.DrawHeight;
         }
 
         protected override void Update()
@@ -172,7 +156,7 @@ namespace osu.Game.Overlays
             sidebar.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(1, TRANSITION_LENGTH / 2);
 
-            searchTextBox.HoldFocus = true;
+            header.SearchTextBox.HoldFocus = true;
         }
 
         protected override void PopOut()
@@ -183,13 +167,13 @@ namespace osu.Game.Overlays
             sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(0, TRANSITION_LENGTH / 2);
 
-            searchTextBox.HoldFocus = false;
-            searchTextBox.TriggerFocusLost();
+            header.SearchTextBox.HoldFocus = false;
+            header.SearchTextBox.TriggerFocusLost();
         }
 
         protected override bool OnFocus(InputState state)
         {
-            searchTextBox.TriggerFocus(state);
+            header.SearchTextBox.TriggerFocus(state);
             return false;
         }
     }
