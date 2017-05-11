@@ -25,14 +25,6 @@ namespace osu.Game.Online.Chat.Drawables
 
             Children = new Drawable[]
             {
-                new OsuSpriteText
-                {
-                    Text = channel.Name,
-                    TextSize = 50,
-                    Alpha = 0.3f,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                },
                 scroll = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,

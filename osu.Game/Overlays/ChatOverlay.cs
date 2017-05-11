@@ -30,9 +30,7 @@ namespace osu.Game.Overlays
 
         private ScheduledDelegate messageRequest;
 
-        private readonly Container content;
-
-        protected override Container<Drawable> Content => content;
+        private readonly Container currentChannelContainer;
 
         private readonly FocusedTextBox inputTextBox;
 
@@ -42,6 +40,8 @@ namespace osu.Game.Overlays
 
         private GetMessagesRequest fetchReq;
 
+        private readonly OsuTabControl<Channel> channelTabs;
+
         public ChatOverlay()
         {
             RelativeSizeAxes = Axes.X;
@@ -49,8 +49,13 @@ namespace osu.Game.Overlays
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
-            AddInternal(new Drawable[]
+            Children = new Drawable[]
             {
+                channelTabs = new OsuTabControl<Channel>()
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 20,
+                },
                 new Box
                 {
                     Depth = float.MaxValue,
@@ -58,10 +63,10 @@ namespace osu.Game.Overlays
                     Colour = Color4.Black,
                     Alpha = 0.9f,
                 },
-                content = new Container
+                currentChannelContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 5, Bottom = textbox_height + 5 },
+                    Padding = new MarginPadding { Top = 25, Bottom = textbox_height + 5 },
                 },
                 new Container
                 {
@@ -83,7 +88,9 @@ namespace osu.Game.Overlays
                         }
                     }
                 }
-            });
+            };
+
+            channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -137,7 +144,7 @@ namespace osu.Game.Overlays
 
         private void initializeChannels()
         {
-            Clear();
+            currentChannelContainer.Clear();
 
             careChannels = new List<Channel>();
 
@@ -161,24 +168,56 @@ namespace osu.Game.Overlays
                 {
                     loading.FadeOut(100);
                     addChannel(channels.Find(c => c.Name == @"#lazer"));
+                    addChannel(channels.Find(c => c.Name == @"#osu"));
+                    addChannel(channels.Find(c => c.Name == @"#lobby"));
                 });
 
-                messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
+                messageRequest = Scheduler.AddDelayed(() => fetchNewMessages(), 1000, true);
             };
+
             api.Queue(req);
+        }
+
+        private Channel currentChannel;
+
+        protected Channel CurrentChannel
+        {
+            get
+            {
+                return currentChannel;
+            }
+
+            set
+            {
+                if (currentChannel == value) return;
+
+                if (currentChannel != null)
+                    currentChannelContainer.Clear();
+
+                currentChannel = value;
+                currentChannelContainer.Add(new DrawableChannel(currentChannel));
+
+                channelTabs.Current.Value = value;
+            }
         }
 
         private void addChannel(Channel channel)
         {
-            Add(new DrawableChannel(channel));
             careChannels.Add(channel);
+            channelTabs.AddItem(channel);
+
+            // we need to get a good number of messages initially for each channel we care about.
+            fetchNewMessages(channel);
+
+            if (CurrentChannel == null)
+                CurrentChannel = channel;
         }
 
-        private void fetchNewMessages()
+        private void fetchNewMessages(Channel specificChannel = null)
         {
             if (fetchReq != null) return;
 
-            fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
+            fetchReq = new GetMessagesRequest(specificChannel != null ? new List<Channel> { specificChannel } : careChannels, lastMessageId);
             fetchReq.Success += delegate (List<Message> messages)
             {
                 var ids = messages.Where(m => m.TargetType == TargetType.Channel).Select(m => m.TargetId).Distinct();
