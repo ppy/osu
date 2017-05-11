@@ -27,10 +27,10 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public const float HIT_TARGET_POSITION = 50;
 
-        private const float time_span_default = 500;
+        private const float time_span_default = 20000;
         private const float time_span_min = 10;
-        private const float time_span_max = 20000;
-        private const float time_span_step = 100;
+        private const float time_span_max = 50000;
+        private const float time_span_step = 1000;
 
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.
