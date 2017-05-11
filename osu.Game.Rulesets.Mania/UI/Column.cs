@@ -12,14 +12,18 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Taiko.Timing;
+using osu.Game.Rulesets.Mania.Timing;
+using System.Collections.Generic;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Primitives;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Judgements;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public class Column : Container, IHasAccentColour
     {
-        private const float key_size = 50;
-
         private const float key_icon_size = 10;
         private const float key_icon_corner_radius = 3;
         private const float key_icon_border_radius = 2;
@@ -30,24 +34,20 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
-        private const double time_span_default = 2000;
-        private const double time_span_min = 10;
-        private const double time_span_max = 20000;
-        private const double time_span_step = 100;
-
         public Key Key;
 
         private readonly Box background;
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
-        private readonly Container<DrawableTimingSection> timingSectionContainer;
 
-        public Column()
+        public readonly TimingSectionContainer TimingSectionContainer;
+
+        public Column(IEnumerable<TimingSection> timingSections)
         {
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 background = new Box
                 {
@@ -55,96 +55,85 @@ namespace osu.Game.Rulesets.Mania.UI
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.2f
                 },
-                new FillFlowContainer
+                new Container
                 {
-                    Name = "Key + hit target",
+                    Name = "Key",
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Children = new[]
+                    Height = ManiaPlayfield.HIT_TARGET_POSITION,
+                    Children = new Drawable[]
                     {
-                        new Container
+                        new Box
                         {
-                            Name = "Key",
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            RelativeSizeAxes = Axes.X,
-                            Height = key_size,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Name = "Key gradient",
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColourInfo = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0)),
-                                    Alpha = 0.5f
-                                },
-                                keyIcon = new Container
-                                {
-                                    Name = "Key icon",
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Size = new Vector2(key_icon_size),
-                                    Masking = true,
-                                    CornerRadius = key_icon_corner_radius,
-                                    BorderThickness = 2,
-                                    BorderColour = Color4.White, // Not true
-                                    Children = new[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Alpha = 0,
-                                            AlwaysPresent = true
-                                        }
-                                    }
-                                }
-                            }
+                            Name = "Key gradient",
+                            RelativeSizeAxes = Axes.Both,
+                            ColourInfo = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0)),
+                            Alpha = 0.5f
                         },
-                        new Container
+                        keyIcon = new Container
                         {
-                            Name = "Hit target",
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            RelativeSizeAxes = Axes.X,
-                            Height = hit_target_height,
-                            Children = new Drawable[]
+                            Name = "Key icon",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(key_icon_size),
+                            Masking = true,
+                            CornerRadius = key_icon_corner_radius,
+                            BorderThickness = 2,
+                            BorderColour = Color4.White, // Not true
+                            Children = new[]
                             {
                                 new Box
                                 {
-                                    Name = "Background",
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black
-                                },
-                                hitTargetBar = new Container
-                                {
-                                    Name = "Bar",
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = hit_target_bar_height,
-                                    Masking = true,
-                                    Children = new[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both
-                                        }
-                                    }
+                                    Alpha = 0,
+                                    AlwaysPresent = true
                                 }
                             }
                         }
                     }
                 },
-                timingSectionContainer = new Container<DrawableTimingSection>
+                TimingSectionContainer = new TimingSectionContainer(timingSections)
                 {
+                    Name = "Hit objects",
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Y = -hit_target_bar_height,
-                    RelativeCoordinateSpace = new Vector2(1, (float)time_span_default)
+                    Y = -ManiaPlayfield.HIT_TARGET_POSITION
+                },
+                new Container
+                {
+                    Name = "Hit target",
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.X,
+                    Height = hit_target_height,
+                    Y = -ManiaPlayfield.HIT_TARGET_POSITION,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Name = "Background",
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black
+                        },
+                        hitTargetBar = new Container
+                        {
+                            Name = "Bar",
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            RelativeSizeAxes = Axes.X,
+                            Height = hit_target_bar_height,
+                            Masking = true,
+                            Children = new[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both
+                                }
+                            }
+                        }
+                    }
                 }
             };
         }
@@ -191,7 +180,10 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public void AddTimingSection(TimingSection timingSection) => timingSectionContainer.Add(new DrawableTimingSection(timingSection));
+        public void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject)
+        {
+            TimingSectionContainer.Add(hitObject);
+        }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -202,19 +194,6 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 background.FadeTo(background.Alpha + 0.2f, 50, EasingTypes.OutQuint);
                 keyIcon.ScaleTo(1.4f, 50, EasingTypes.OutQuint);
-            }
-
-            if (state.Keyboard.ControlPressed)
-            {
-                switch (args.Key)
-                {
-                    case Key.Minus:
-                        timeSpan += time_span_step;
-                        break;
-                    case Key.Plus:
-                        timeSpan -= time_span_step;
-                        break;
-                }
             }
 
             return false;
@@ -230,15 +209,5 @@ namespace osu.Game.Rulesets.Mania.UI
 
             return false;
         }
-
-        /// <summary>
-        /// The amount of time which the length of this column spans.
-        /// </summary>
-        private double timeSpan
-        {
-            get { return timingSectionContainer.RelativeCoordinateSpace.Y; }
-            set { timingSectionContainer.RelativeCoordinateSpace = new Vector2(1, (float)MathHelper.Clamp(value, time_span_min, time_span_max)); }
-        }
     }
-
 }

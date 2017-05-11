@@ -16,15 +16,23 @@ using osu.Framework.Allocation;
 using OpenTK.Input;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Taiko.Timing;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Timing;
+using osu.Framework.Input;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaPlayfield : Playfield<ManiaHitObject, ManiaJudgement>
     {
+        public const float HIT_TARGET_POSITION = 50;
+
+        private const float time_span_default = 500;
+        private const float time_span_min = 10;
+        private const float time_span_max = 20000;
+        private const float time_span_step = 100;
+
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.
         /// E.g. 2 columns use FJ, 4 columns use DFJK, 6 use SDFJKL, etc...
@@ -48,12 +56,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly FlowContainer<Column> Columns;
 
+        private readonly TimingSectionContainer barlineContainer;
+
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
         private readonly int columnCount;
 
-        public ManiaPlayfield(int columnCount)
+        public ManiaPlayfield(int columnCount, IEnumerable<TimingSection> timingSections)
         {
             this.columnCount = columnCount;
 
@@ -77,18 +87,29 @@ namespace osu.Game.Rulesets.Mania.UI
                         },
                         Columns = new FillFlowContainer<Column>
                         {
+                            Name = "Columns",
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
                             Direction = FillDirection.Horizontal,
                             Padding = new MarginPadding { Left = 1, Right = 1 },
                             Spacing = new Vector2(1, 0)
+                        },
+                        barlineContainer = new TimingSectionContainer(timingSections)
+                        {
+                            Name = "Barlines",
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Bottom = HIT_TARGET_POSITION }
                         }
                     }
                 }
             };
 
             for (int i = 0; i < columnCount; i++)
-                Columns.Add(new Column());
+                Columns.Add(new Column(timingSections));
+
+            TimeSpan = time_span_default;
         }
 
         [BackgroundDependencyLoader]
@@ -162,5 +183,45 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.Children.ElementAt(h.HitObject.Column).Add(h);
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat)
+                return false;
+
+            if (state.Keyboard.ControlPressed)
+            {
+                switch (args.Key)
+                {
+                    case Key.Minus:
+                        TimeSpan += time_span_step;
+                        break;
+                    case Key.Plus:
+                        TimeSpan -= time_span_step;
+                        break;
+                }
+            }
+
+            return false;
+        }
+
+        private double timeSpan;
+        /// <summary>
+        /// The amount of time which the length of the playfield spans.
+        /// </summary>
+        public double TimeSpan
+        {
+            get { return timeSpan; }
+            set
+            {
+                if (timeSpan == value)
+                    return;
+                timeSpan = value;
+
+                barlineContainer.TimeSpan = value;
+                Columns.Children.ForEach(c => c.TimingSectionContainer.TimeSpan = value);
+            }
+        }
+
     }
 }
