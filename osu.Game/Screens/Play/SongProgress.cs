@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
                     Origin =  Anchor.BottomLeft,
                     SeekRequested = delegate (float position)
                     {
-                        OnSeek?.Invoke(firstHitTime + position * (lastHitTime - firstHitTime));
+                        OnSeek?.Invoke(position * lastHitTime);
                     },
                 },
             };
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            double progress = ((AudioClock?.CurrentTime ?? Time.Current) - firstHitTime) / lastHitTime;
+            double progress = (AudioClock?.CurrentTime ?? Time.Current) / lastHitTime;
 
             bar.UpdatePosition((float)progress);
             graph.Progress = (int)(graph.ColumnCount * progress);
