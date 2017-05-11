@@ -45,8 +45,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 timingSections.Add(new TimingSection
                 {
                     StartTime = point.Time,
-                    // Todo: Should this be dividing by beatlength?
-                    BeatLength = point.SpeedMultiplier * lastTimingChange.BeatLength,
+                    BeatLength = lastTimingChange.BeatLength / point.SpeedMultiplier,
                     TimeSignature = point.TimeSignature
                 });
             }
