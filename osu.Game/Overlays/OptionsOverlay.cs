@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Options.Sections;
 using osu.Game.Screens.Select;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays
 {
@@ -184,6 +185,12 @@ namespace osu.Game.Overlays
 
             searchTextBox.HoldFocus = false;
             searchTextBox.TriggerFocusLost();
+        }
+
+        protected override bool OnFocus(InputState state)
+        {
+            searchTextBox.TriggerFocus(state);
+            return false;
         }
     }
 }
