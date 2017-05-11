@@ -284,7 +284,6 @@
     <Compile Include="Screens\Play\HUD\ComboResultCounter.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
-    <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Backgrounds\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\MenuCursor.cs" />
