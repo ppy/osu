@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Timing
                 return;
             }
 
-            var section = drawableTimingSections.LastOrDefault(t => t.CanContain(drawable)) ?? drawableTimingSections.First();
+            var section = drawableTimingSections.LastOrDefault(t => t.CanContain(drawable)) ?? drawableTimingSections.FirstOrDefault();
 
             if (section == null)
                 throw new Exception("Could not find suitable timing section to add object to.");
