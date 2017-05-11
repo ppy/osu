@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The colour used for various elements of this DrawableHitObject.
         /// </summary>
-        public Color4 AccentColour { get; protected set; }
+        public virtual Color4 AccentColour { get; set; }
 
         /// <summary>
         /// Whether this hit object and all of its nested hit objects have been judged.
