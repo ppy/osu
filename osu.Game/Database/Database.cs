@@ -48,11 +48,9 @@ namespace osu.Game.Database
             return Connection.Table<T>();
         }
 
-        public T GetWithChildren<T>(object id, bool recursive = false) where T : class
-        {
-            return Connection.GetWithChildren<T>(id, recursive);
-        }
-
+        /// <summary>
+        /// This is expensive. Use with caution.
+        /// </summary>
         public List<T> GetAllWithChildren<T>(Expression<Func<T, bool>> filter = null, bool recursive = true)
             where T : class
         {

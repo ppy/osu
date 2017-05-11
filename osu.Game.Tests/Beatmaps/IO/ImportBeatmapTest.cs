@@ -142,7 +142,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
                 @"Beatmaps did not import to the database in allocated time");
 
-            var set = host.Dependencies.Get<BeatmapDatabase>().GetChildren(resultSets.First(), true);
+            var set = host.Dependencies.Get<BeatmapDatabase>().GetChildren(resultSets.First());
 
             Assert.IsTrue(set.Beatmaps.Count == resultBeatmaps.Count(),
                 $@"Incorrect database beatmap count post-import ({resultBeatmaps.Count()} but should be {set.Beatmaps.Count}).");
