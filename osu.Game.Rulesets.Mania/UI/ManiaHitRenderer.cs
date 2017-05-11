@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenTK;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Beatmaps;
@@ -31,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
         {
-            List<TimingSection> timingSections = new List<TimingSection>();
+            var timingSections = new List<TimingSection>();
 
             // Construct all the relevant timing sections
             ControlPoint lastTimingChange = null;
@@ -74,7 +76,11 @@ namespace osu.Game.Rulesets.Mania.UI
                 }
             }
 
-            return new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize), timingSections);
+            return new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize), timingSections)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            };
         }
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
@@ -93,5 +99,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             return null;
         }
+
+        protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(1, 0.8f);
     }
 }
