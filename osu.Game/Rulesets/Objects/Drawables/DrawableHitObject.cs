@@ -12,6 +12,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Audio;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -23,6 +24,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public bool Interactive = true;
 
         public TJudgement Judgement;
+
+        /// <summary>
+        /// Whether this hit object has been judged.
+        /// </summary>
+        public virtual bool Judged => (Judgement?.Result ?? HitResult.None) != HitResult.None;
 
         protected abstract TJudgement CreateJudgement();
 
@@ -86,6 +92,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public Color4 AccentColour { get; protected set; }
 
+        /// <summary>
+        /// Whether this hit object and all of its nested hit objects have been judged.
+        /// </summary>
+        public sealed override bool Judged => base.Judged && (NestedHitObjects?.All(h => h.Judged) ?? true);
+
         protected DrawableHitObject(TObject hitObject)
         {
             HitObject = hitObject;
@@ -97,7 +108,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <returns>Whether a hit was processed.</returns>
         protected bool UpdateJudgement(bool userTriggered)
         {
-            IPartialJudgement partial = Judgement as IPartialJudgement;
+            var partial = Judgement as IPartialJudgement;
 
             // Never re-process non-partial hits
             if (Judgement.Result != HitResult.None && partial == null)
@@ -169,7 +180,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
-
         protected IEnumerable<DrawableHitObject<TObject, TJudgement>> NestedHitObjects => nestedHitObjects;
 
         protected void AddNested(DrawableHitObject<TObject, TJudgement> h)
