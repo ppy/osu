@@ -36,7 +36,11 @@ namespace osu.Game.Rulesets.Mania.UI
             var timingSections = new List<TimingSection>();
 
             // Construct all the relevant timing sections
-            ControlPoint lastTimingChange = null;
+            ControlPoint lastTimingChange = Beatmap.TimingInfo.ControlPoints.FirstOrDefault(t => t.TimingChange);
+
+            if (lastTimingChange == null)
+                throw new Exception("The Beatmap contains no timing points!");
+
             foreach (ControlPoint point in Beatmap.TimingInfo.ControlPoints)
             {
                 if (point.TimingChange)
@@ -91,10 +95,6 @@ namespace osu.Game.Rulesets.Mania.UI
             var note = h as Note;
             if (note != null)
                 return new DrawableNote(note);
-
-            var holdNote = h as HoldNote;
-            if (holdNote != null)
-                return new DrawableHoldNote(holdNote);
 
             return null;
         }

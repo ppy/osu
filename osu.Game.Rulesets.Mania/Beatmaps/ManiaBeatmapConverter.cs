@@ -8,6 +8,7 @@ using System;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Objects;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -17,12 +18,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
-            int columns = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.CircleSize);
+            int availableColumns = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.CircleSize);
 
             var positionData = original as IHasXPosition;
 
-            float localWDivisor = 512.0f / columns;
-            int column = Math.Min((int)Math.Floor(positionData.X / localWDivisor), columns - 1);
+            float localWDivisor = 512.0f / availableColumns;
+            int column = MathHelper.Clamp((int)Math.Floor((positionData?.X ?? 1) / localWDivisor), 0, availableColumns - 1);
 
             yield return new Note
             {
