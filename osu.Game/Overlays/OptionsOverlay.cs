@@ -13,7 +13,7 @@ using System;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Options.Sections;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Overlays
 {
@@ -33,7 +33,10 @@ namespace osu.Game.Overlays
         private Sidebar sidebar;
         private SidebarButton[] sidebarButtons;
         private OptionsSection[] sections;
+
         private SearchContainer searchContainer;
+        private SearchTextBox searchTextBox;
+
         private float lastKnownScroll;
 
         public OptionsOverlay()
@@ -45,8 +48,6 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGame game, OsuColour colours)
         {
-            OsuTextBox textBox;
-
             sections = new OptionsSection[]
             {
                 new GeneralSection(),
@@ -96,11 +97,11 @@ namespace osu.Game.Overlays
                                     TextSize = 18,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS, Bottom = 30 },
                                 },
-                                textBox = new OsuTextBox
+                                searchTextBox = new SearchTextBox
                                 {
-                                    PlaceholderText = "Type to search!",
                                     Width = width - CONTENT_MARGINS * 2,
                                     Margin = new MarginPadding { Left = CONTENT_MARGINS },
+                                    Exit = () => Hide(),
                                 },
                                 searchContainer = new SearchContainer
                                 {
@@ -128,7 +129,7 @@ namespace osu.Game.Overlays
                 }
             };
 
-            textBox.Current.ValueChanged += newValue => searchContainer.SearchTerm = newValue;
+            searchTextBox.Current.ValueChanged += newValue => searchContainer.SearchTerm = newValue;
 
             scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
@@ -169,6 +170,8 @@ namespace osu.Game.Overlays
             scrollContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(1, TRANSITION_LENGTH / 2);
+
+            searchTextBox.HoldFocus = true;
         }
 
         protected override void PopOut()
@@ -178,6 +181,9 @@ namespace osu.Game.Overlays
             scrollContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(0, TRANSITION_LENGTH / 2);
+
+            searchTextBox.HoldFocus = false;
+            searchTextBox.TriggerFocusLost();
         }
     }
 }
