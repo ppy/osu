@@ -315,7 +315,7 @@ namespace osu.Game.Overlays
                     }
                     else
                     {
-                        BeatmapMetadata metadata = beatmap.Beatmap.BeatmapInfo.Metadata;
+                        BeatmapMetadata metadata = beatmap.Metadata;
                         title.Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
                         artist.Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
                     }
