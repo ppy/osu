@@ -187,19 +187,17 @@ namespace osu.Game.Rulesets.UI
 
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
-        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
-
-        protected override bool AllObjectsJudged => drawableObjects.All(o => o.Judged);
+        protected override Container<Drawable> Content => content;
+        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result != HitResult.None);
 
         /// <summary>
         /// The playfield.
         /// </summary>
         protected Playfield<TObject, TJudgement> Playfield;
 
-        protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        private readonly List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
+        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
 
         protected HitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
@@ -226,8 +224,6 @@ namespace osu.Game.Rulesets.UI
 
         private void loadObjects()
         {
-            drawableObjects.Clear();
-
             foreach (TObject h in Beatmap.HitObjects)
             {
                 var drawableObject = GetVisualRepresentation(h);
@@ -237,7 +233,6 @@ namespace osu.Game.Rulesets.UI
 
                 drawableObject.OnJudgement += onJudgement;
 
-                drawableObjects.Add(drawableObject);
                 Playfield.Add(drawableObject);
             }
 
