@@ -1,21 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
-using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
     public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>
     {
-        private NotePiece headPiece;
-        private BodyPiece bodyPiece;
-        private NotePiece tailPiece;
+        private readonly NotePiece headPiece;
+        private readonly BodyPiece bodyPiece;
+        private readonly NotePiece tailPiece;
 
         public DrawableHoldNote(HoldNote hitObject)
             : base(hitObject)
@@ -52,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public override Color4 AccentColour
         {
-            get { return AccentColour; }
+            get { return base.AccentColour; }
             set
             {
                 if (base.AccentColour == value)
