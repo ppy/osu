@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                     Frames.Add(new ReplayFrame(h.StartTime, null, null, button));
                 }
                 else
-                    throw new Exception("Unknown hit object type.");
+                    throw new InvalidOperationException("Unknown hit object type.");
 
                 Frames.Add(new ReplayFrame(endTime + KEY_UP_DELAY, null, null, ReplayButtonState.None));
 

@@ -16,12 +16,13 @@ namespace osu.Game.IO.Serialization
             return JsonConvert.SerializeObject(obj);
         }
 
-        public static T Deserialize<T>(string objString)
+        public static T Deserialize<T>(this string objString)
         {
             return JsonConvert.DeserializeObject<T>(objString);
         }
 
-        public static T DeepClone<T>(this IJsonSerializable obj)
+        public static T DeepClone<T>(this T obj)
+            where T : IJsonSerializable
         {
             return Deserialize<T>(Serialize(obj));
         }

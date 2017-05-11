@@ -24,12 +24,12 @@ namespace osu.Game.Overlays.Options.Sections.Input
                     LabelText = "Confine mouse cursor",
                     Bindable = config.GetBindable<ConfineMouseMode>(FrameworkConfig.ConfineMouseMode),
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Disable mouse wheel during gameplay",
                     Bindable = osuConfig.GetBindable<bool>(OsuConfig.MouseDisableWheel)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Disable mouse buttons during gameplay",
                     Bindable = osuConfig.GetBindable<bool>(OsuConfig.MouseDisableButtons)

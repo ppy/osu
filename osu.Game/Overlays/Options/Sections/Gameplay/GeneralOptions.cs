@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Gameplay
 {
@@ -22,12 +21,12 @@ namespace osu.Game.Overlays.Options.Sections.Gameplay
                     LabelText = "Background dim",
                     Bindable = config.GetBindable<double>(OsuConfig.DimLevel)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Show score overlay",
                     Bindable = config.GetBindable<bool>(OsuConfig.ShowInterface)
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuConfig.KeyOverlay)
