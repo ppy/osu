@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public void Add(Drawable drawable)
         {
-            var section = Children.LastOrDefault(t => t.TimingSection.StartTime <= drawable.Y) ?? Children.First();
-            drawable.Y -= (float)section.TimingSection.StartTime;
+            var section = Children.LastOrDefault(t => t.Y >= drawable.Y) ?? Children.First();
+            drawable.Y -= (float)section.Y;
             section.Add(drawable);
         }
     }

@@ -23,11 +23,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             HitObject = hitObject;
 
-            Anchor = Anchor.TopCentre;
+            Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
 
             RelativePositionAxes = Axes.Y;
-            Y = (float)HitObject.StartTime;
+            Y = (float)-HitObject.StartTime;
 
             Add(glowContainer = new Container
             {
