@@ -11,5 +11,10 @@ namespace osu.Game.Screens.Multiplayer
         protected override IEnumerable<Type> PossibleChildren => new[] {
                 typeof(Match)
         };
+
+        public MatchCreate()
+        {
+            ValidForResume = false;
+        }
     }
 }

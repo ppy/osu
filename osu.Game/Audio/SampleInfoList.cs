@@ -11,9 +11,8 @@ namespace osu.Game.Audio
         {
         }
 
-        public SampleInfoList(IEnumerable<SampleInfo> elements)
+        public SampleInfoList(IEnumerable<SampleInfo> elements) : base(elements)
         {
-            AddRange(elements);
         }
     }
 }
