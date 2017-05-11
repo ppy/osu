@@ -54,33 +54,33 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             AddInternal(new Drawable[]
             {
-                rightBackgroundContainer = new Container
-                {
-                    Name = "Transparent playfield background",
-                    RelativeSizeAxes = Axes.Both,
-                    BorderThickness = 2,
-                    Masking = true,
-                    EdgeEffect = new EdgeEffect
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(0.2f),
-                        Radius = 5,
-                    },
-                    Children = new Drawable[]
-                    {
-                        rightBackground = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.6f
-                        },
-                    }
-                },
                 new ScaleFixContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = DEFAULT_PLAYFIELD_HEIGHT,
                     Children = new[]
                     {
+                        rightBackgroundContainer = new Container
+                        {
+                            Name = "Transparent playfield background",
+                            RelativeSizeAxes = Axes.Both,
+                            BorderThickness = 2,
+                            Masking = true,
+                            EdgeEffect = new EdgeEffect
+                            {
+                                Type = EdgeEffectType.Shadow,
+                                Colour = Color4.Black.Opacity(0.2f),
+                                Radius = 5,
+                            },
+                            Children = new Drawable[]
+                            {
+                                rightBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0.6f
+                                },
+                            }
+                        },
                         new Container
                         {
                             Name = "Transparent playfield elements",
