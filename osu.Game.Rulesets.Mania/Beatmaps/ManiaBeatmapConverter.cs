@@ -18,10 +18,17 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
+            int columns = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.CircleSize);
+
+            var positionData = original as IHasXPosition;
+
+            float localWDivisor = 512.0f / columns;
+            int column = Math.Min((int)Math.Floor(positionData.X / localWDivisor), columns - 1);
+
             yield return new Note
             {
                 StartTime = original.StartTime,
-                Column = 1,
+                Column = column,
             };
         }
     }
