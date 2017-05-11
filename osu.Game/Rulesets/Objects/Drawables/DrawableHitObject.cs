@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -15,9 +14,19 @@ using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
-    public abstract class DrawableHitObject<TJudgement> : Container, IStateful<ArmedState>
+    public abstract class DrawableHitObject<TObject, TJudgement> : Container
+        where TObject : HitObject
         where TJudgement : Judgement
     {
+        public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
+
+        public TObject HitObject;
+
+        /// <summary>
+        /// The colour used for various elements of this DrawableHitObject.
+        /// </summary>
+        public virtual Color4 AccentColour { get; set; }
+
         public override bool HandleInput => Interactive;
 
         public bool Interactive = true;
@@ -49,23 +58,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        internal DrawableHitObject()
-        {
-        }
-
         protected List<SampleChannel> Samples = new List<SampleChannel>();
 
         protected void PlaySamples()
         {
             Samples.ForEach(s => s?.Play());
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            //we may be setting a custom judgement in test cases or what not.
-            if (Judgement == null)
-                Judgement = CreateJudgement();
         }
 
         protected override void LoadComplete()
@@ -75,20 +72,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             //force application of the state that was set before we loaded.
             UpdateState(State);
         }
-    }
-
-    public abstract class DrawableHitObject<TObject, TJudgement> : DrawableHitObject<TJudgement>
-        where TObject : HitObject
-        where TJudgement : Judgement
-    {
-        public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
-
-        public TObject HitObject;
-
-        /// <summary>
-        /// The colour used for various elements of this DrawableHitObject.
-        /// </summary>
-        public virtual Color4 AccentColour { get; set; }
 
         protected DrawableHitObject(TObject hitObject)
         {
@@ -170,6 +153,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 channel.Volume.Value = sample.Volume;
                 Samples.Add(channel);
             }
+
+            //we may be setting a custom judgement in test cases or what not.
+            if (Judgement == null)
+                Judgement = CreateJudgement();
         }
 
         private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
