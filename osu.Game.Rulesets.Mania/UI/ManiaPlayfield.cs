@@ -19,7 +19,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : Playfield<ManiaBaseHit, ManiaJudgement>
+    public class ManiaPlayfield : Playfield<ManiaHitObject, ManiaJudgement>
     {
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.

@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Menu
                 if (count > 0)
                 {
                     var beatmap = query.ElementAt(RNG.Next(0, count - 1));
-                    beatmaps.GetChildren(beatmap, true);
+                    beatmaps.GetChildren(beatmap);
                     Beatmap = beatmaps.GetWorkingBeatmap(beatmap.Beatmaps[0]);
                 }
             }
