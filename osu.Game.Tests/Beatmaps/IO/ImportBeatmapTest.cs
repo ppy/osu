@@ -135,15 +135,14 @@ namespace osu.Game.Tests.Beatmaps.IO
             waitAction = () =>
             {
                 while ((resultBeatmaps = host.Dependencies.Get<BeatmapDatabase>()
-                    .Query<BeatmapInfo>().Where(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
+                    .GetAllWithChildren<BeatmapInfo>(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
                     Thread.Sleep(50);
             };
 
             Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
                 @"Beatmaps did not import to the database in allocated time");
 
-            //fetch children and check we can load from the post-storage path...
-            var set = host.Dependencies.Get<BeatmapDatabase>().GetChildren(resultSets.First());
+            var set = host.Dependencies.Get<BeatmapDatabase>().GetChildren(resultSets.First(), true);
 
             Assert.IsTrue(set.Beatmaps.Count == resultBeatmaps.Count(),
                 $@"Incorrect database beatmap count post-import ({resultBeatmaps.Count()} but should be {set.Beatmaps.Count}).");

@@ -18,14 +18,17 @@ namespace osu.Game.Beatmaps
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
+        public readonly BeatmapMetadata Metadata;
+
         public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
         public readonly bool WithStoryboard;
 
-        protected WorkingBeatmap(BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, bool withStoryboard = false)
+        protected WorkingBeatmap(BeatmapInfo beatmapInfo, bool withStoryboard = false)
         {
             BeatmapInfo = beatmapInfo;
-            BeatmapSetInfo = beatmapSetInfo;
+            BeatmapSetInfo = beatmapInfo.BeatmapSet;
+            Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo.Metadata;
             WithStoryboard = withStoryboard;
 
             Mods.ValueChanged += mods => applyRateAdjustments();
