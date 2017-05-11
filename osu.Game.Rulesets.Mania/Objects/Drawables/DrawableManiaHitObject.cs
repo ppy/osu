@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -18,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private readonly Container glowContainer;
 
-        public DrawableManiaHitObject(TObject hitObject)
+        protected DrawableManiaHitObject(TObject hitObject)
             : base(hitObject)
         {
             HitObject = hitObject;

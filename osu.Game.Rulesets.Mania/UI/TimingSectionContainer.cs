@@ -6,10 +6,7 @@ using System.Linq;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Timing;
-using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -32,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public void Add(Drawable drawable)
         {
             var section = Children.LastOrDefault(t => t.Y >= drawable.Y) ?? Children.First();
-            drawable.Y -= (float)section.Y;
+            drawable.Y -= section.Y;
             section.Add(drawable);
         }
     }

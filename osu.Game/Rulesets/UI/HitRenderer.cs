@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.UI
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        private List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
+        private readonly List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
         protected HitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
