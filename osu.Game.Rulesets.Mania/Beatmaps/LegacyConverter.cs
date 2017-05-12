@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private ManiaHitObject generateSpecific(HitObject original)
         {
             var endTimeData = original as IHasEndTime;
-            var positionData = original as IHasPosition;
+            var positionData = original as IHasXPosition;
 
             int column = getColumn(positionData?.X ?? 0);
 
