@@ -33,53 +33,37 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
         {
-            var timingSections = new List<TimingSection>();
+            ControlPoint firstTimingChange = Beatmap.TimingInfo.ControlPoints.FirstOrDefault(t => t.TimingChange);
 
-            // Construct all the relevant timing sections
-            ControlPoint lastTimingChange = Beatmap.TimingInfo.ControlPoints.FirstOrDefault(t => t.TimingChange);
-
-            if (lastTimingChange == null)
+            if (firstTimingChange == null)
                 throw new Exception("The Beatmap contains no timing points!");
 
-            foreach (ControlPoint point in Beatmap.TimingInfo.ControlPoints)
+            // Generate the timing points, making non-timing changes use the previous timing change
+            var timingChanges = Beatmap.TimingInfo.ControlPoints.Select(c =>
             {
-                if (point.TimingChange)
-                    lastTimingChange = point;
+                ControlPoint t = c.Clone();
 
-                timingSections.Add(new TimingSection
-                {
-                    StartTime = point.Time,
-                    BeatLength = lastTimingChange.BeatLength / point.SpeedMultiplier,
-                    TimeSignature = point.TimeSignature
-                });
-            }
+                if (c.TimingChange)
+                    firstTimingChange = c;
+                else
+                    t.BeatLength = firstTimingChange.BeatLength;
+
+                return t;
+            });
 
             double lastObjectTime = (Objects.Last() as IHasEndTime)?.EndTime ?? Objects.Last().StartTime;
 
-            // Perform some post processing of the timing sections
-            timingSections = timingSections
+            // Perform some post processing of the timing changes
+            timingChanges = timingChanges
                 // Collapse sections after the last hit object
-                .Where(s => s.StartTime <= lastObjectTime)
+                .Where(s => s.Time <= lastObjectTime)
                 // Collapse sections with the same start time
-                .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime)
+                .GroupBy(s => s.Time).Select(g => g.Last()).OrderBy(s => s.Time)
                 // Collapse sections with the same beat length
-                .GroupBy(s => s.BeatLength).Select(g => g.First())
+                .GroupBy(s => s.BeatLength * s.SpeedMultiplier).Select(g => g.First())
                 .ToList();
 
-            // Determine duration of timing sections
-            for (int i = 0; i < timingSections.Count; i++)
-            {
-                if (i < timingSections.Count - 1)
-                    timingSections[i].Duration = timingSections[i + 1].StartTime - timingSections[i].StartTime;
-                else
-                {
-                    // Extra length added for the last timing section to extend past the last hitobject
-                    double extraLength = timingSections[i].BeatLength * (int)timingSections[i].TimeSignature;
-                    timingSections[i].Duration = lastObjectTime + extraLength - timingSections[i].StartTime;
-                }
-            }
-
-            return new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize), timingSections)
+            return new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize), timingChanges)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre

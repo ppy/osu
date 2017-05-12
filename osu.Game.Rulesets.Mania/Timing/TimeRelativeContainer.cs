@@ -7,15 +7,16 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Rulesets.Mania.Timing
 {
     /// <summary>
     /// A container in which the Y-relative coordinate space is spanned by a length of time.
     /// <para>
-    /// This container contains <see cref="TimingSection"/>s which scroll inside this container.
-    /// Drawables added to this container are moved inside the relevant <see cref="TimingSection"/>,
-    /// and as such, will scroll along with the <see cref="TimingSection"/>s.
+    /// This container contains <see cref="ControlPoint"/>s which scroll inside this container.
+    /// Drawables added to this container are moved inside the relevant <see cref="ControlPoint"/>,
+    /// and as such, will scroll along with the <see cref="ControlPoint"/>s.
     /// </para>
     /// </summary>
     public class TimeRelativeContainer : Container<Drawable>
@@ -31,9 +32,9 @@ namespace osu.Game.Rulesets.Mania.Timing
 
         private readonly List<DrawableTimingSection> drawableTimingSections;
 
-        public TimeRelativeContainer(IEnumerable<TimingSection> timingSections)
+        public TimeRelativeContainer(IEnumerable<ControlPoint> timingChanges)
         {
-            drawableTimingSections = timingSections.Select(t => new DrawableTimingSection(t)).ToList();
+            drawableTimingSections = timingChanges.Select(t => new DrawableTimingSection(t)).ToList();
 
             Children = drawableTimingSections;
         }
@@ -68,13 +69,7 @@ namespace osu.Game.Rulesets.Mania.Timing
         /// </summary>
         private class DrawableTimingSection : Container
         {
-            protected override Container<Drawable> Content => content;
-            /// <summary>
-            /// The container which will scroll relative to the current time.
-            /// </summary>
-            private readonly Container content;
-
-            private readonly TimingSection section;
+            private readonly ControlPoint timingChange;
 
             /// <summary>
             /// Creates a drawable timing section. The height of this container will be proportional
@@ -84,26 +79,17 @@ namespace osu.Game.Rulesets.Mania.Timing
             /// which means that the content container will scroll at twice the normal rate.
             /// </para>
             /// </summary>
-            /// <param name="section">The section to create the drawable timing section for.</param>
-            public DrawableTimingSection(TimingSection section)
+            /// <param name="timingChange">The timing change to create the drawable timing section for.</param>
+            public DrawableTimingSection(ControlPoint timingChange)
             {
-                this.section = section;
+                this.timingChange = timingChange;
 
                 Anchor = Anchor.BottomCentre;
                 Origin = Anchor.BottomCentre;
 
                 RelativeSizeAxes = Axes.Both;
 
-                AddInternal(content = new Container
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativePositionAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
-                    Y = -(float)section.StartTime,
-                    Height = (float)section.Duration,
-                    RelativeCoordinateSpace = new Vector2(1, (float)section.Duration)
-                });
+                Y = -(float)timingChange.Time;
             }
 
             protected override void Update()
@@ -111,11 +97,11 @@ namespace osu.Game.Rulesets.Mania.Timing
                 var parent = (TimeRelativeContainer)Parent;
 
                 // Adjust our height to account for the speed changes
-                Height = (float)(parent.TimeSpan * 1000 / section.BeatLength);
+                Height = (float)(parent.TimeSpan * 1000 / timingChange.BeatLength / timingChange.SpeedMultiplier);
                 RelativeCoordinateSpace = new Vector2(1, (float)parent.TimeSpan);
 
                 // Scroll the content
-                content.Y = (float)(Time.Current - section.StartTime);
+                Y = (float)(Time.Current - timingChange.Time);
             }
 
             public override void Add(Drawable drawable)
@@ -124,7 +110,7 @@ namespace osu.Game.Rulesets.Mania.Timing
                 // we need to offset it back by our position so that it becomes correctly relatively-positioned to us
                 // This can be removed if hit objects were stored such that either their StartTime or their "beat offset" was relative to the timing section
                 // they belonged to, but this requires a radical change to the beatmap format which we're not ready to do just yet
-                drawable.Y += (float)section.StartTime;
+                drawable.Y += (float)timingChange.Time;
 
                 base.Add(drawable);
             }
@@ -134,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.Timing
             /// can be placed within the timing section's bounds (in this case, from the start of the timing section up to infinity).
             /// </summary>
             /// <param name="drawable">The drawable to check.</param>
-            public bool CanContain(Drawable drawable) => content.Y >= drawable.Y;
+            public bool CanContain(Drawable drawable) => Y >= drawable.Y;
         }
     }
 }
