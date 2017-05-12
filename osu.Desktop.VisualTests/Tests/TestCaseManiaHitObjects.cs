@@ -43,13 +43,8 @@ namespace osu.Desktop.VisualTests.Tests
                                 RelativeCoordinateSpace = new Vector2(1, 10000),
                                 Children = new[]
                                 {
-                                    new DrawableNote(new Note
-                                    {
-                                        StartTime = 5000
-                                    })
-                                    {
-                                        AccentColour = Color4.Red
-                                    }
+                                    new DrawableNote(new Note { StartTime = 5000 }) { AccentColour = Color4.Red },
+                                    new DrawableNote(new Note { StartTime = 6000 }) { AccentColour = Color4.Red }
                                 }
                             }
                         }
@@ -74,10 +69,7 @@ namespace osu.Desktop.VisualTests.Tests
                                     {
                                         StartTime = 5000,
                                         Duration = 1000
-                                    })
-                                    {
-                                        AccentColour = Color4.Red
-                                    }
+                                    }) { AccentColour = Color4.Red }
                                 }
                             }
                         }

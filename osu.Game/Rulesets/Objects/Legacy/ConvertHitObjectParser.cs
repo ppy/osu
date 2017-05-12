@@ -145,8 +145,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 if (split.Length > 5 && !string.IsNullOrEmpty(split[5]))
                 {
-                    endTime = Convert.ToDouble(split[0], CultureInfo.InvariantCulture);
-                    readCustomSampleBanks(string.Join(":", split.Skip(1)), bankInfo);
+                    string[] ss = split[5].Split(':');
+                    endTime = Convert.ToDouble(ss[0], CultureInfo.InvariantCulture);
+                    readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
                 }
 
                 result = CreateHold(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, endTime);
