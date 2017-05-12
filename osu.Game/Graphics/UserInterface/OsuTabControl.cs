@@ -25,15 +25,15 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || Dropdown.Contains(screenSpacePos);
 
+        private bool isEnumType => typeof(T).IsEnum;
+
         public OsuTabControl()
         {
             TabContainer.Spacing = new Vector2(10f, 0f);
 
-            if (!typeof(T).IsEnum)
-                throw new InvalidOperationException("OsuTabControl only supports enums as the generic type argument");
-
-            foreach (var val in (T[])Enum.GetValues(typeof(T)))
-                AddItem(val);
+            if (isEnumType)
+                foreach (var val in (T[])Enum.GetValues(typeof(T)))
+                    AddItem(val);
         }
 
         [BackgroundDependencyLoader]
@@ -136,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
                         Margin = new MarginPadding { Top = 5, Bottom = 5 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                        Text = (value as Enum)?.GetDescription(),
+                        Text = (value as Enum)?.GetDescription() ?? value.ToString(),
                         TextSize = 14,
                         Font = @"Exo2.0-Bold", // Font should only turn bold when active?
                     },
