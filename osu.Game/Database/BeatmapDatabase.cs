@@ -268,10 +268,14 @@ namespace osu.Game.Database
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null, bool withStoryboard = false)
         {
             if (beatmapInfo.BeatmapSet == null)
+            {
                 beatmapInfo = GetChildren(beatmapInfo, true);
 
-            if (beatmapInfo.BeatmapSet == null)
-                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
+                if (beatmapInfo.BeatmapSet == null)
+                    throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
+            }
+
+
 
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
