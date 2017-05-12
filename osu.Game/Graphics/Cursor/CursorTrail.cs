@@ -14,6 +14,7 @@ using OpenTK.Graphics.ES30;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Timing;
+using System.Diagnostics;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -38,6 +39,8 @@ namespace osu.Game.Graphics.Cursor
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
 
         private Vector2? lastPosition;
+
+        private readonly InputResampler resampler = new InputResampler();
 
         protected override DrawNode CreateDrawNode() => new TrailDrawNode();
 
@@ -75,7 +78,7 @@ namespace osu.Game.Graphics.Cursor
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
         {
-            shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.Texture);
+            shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
             texture = textures.Get(@"Cursor/cursortrail");
             Scale = new Vector2(1 / texture.ScaleAdjust);
         }
@@ -116,22 +119,26 @@ namespace osu.Game.Graphics.Cursor
             if (lastPosition == null)
             {
                 lastPosition = state.Mouse.NativeState.Position;
+                resampler.AddPosition(lastPosition.Value);
                 return base.OnMouseMove(state);
             }
 
-            Vector2 pos1 = lastPosition.Value;
-            Vector2 pos2 = state.Mouse.NativeState.Position;
-
-            Vector2 diff = pos2 - pos1;
-            float distance = diff.Length;
-            Vector2 direction = diff / distance;
-
-            float interval = size.X / 2 * 0.9f;
-
-            for (float d = interval; d < distance; d += interval)
+            foreach (Vector2 pos2 in resampler.AddPosition(state.Mouse.NativeState.Position))
             {
-                lastPosition = pos1 + direction * d;
-                addPosition(lastPosition.Value);
+                Trace.Assert(lastPosition.HasValue);
+
+                Vector2 pos1 = lastPosition.Value;
+                Vector2 diff = pos2 - pos1;
+                float distance = diff.Length;
+                Vector2 direction = diff / distance;
+
+                float interval = size.X / 2 * 0.9f;
+
+                for (float d = interval; d < distance; d += interval)
+                {
+                    lastPosition = pos1 + direction * d;
+                    addPosition(lastPosition.Value);
+                }
             }
 
             return base.OnMouseMove(state);

@@ -6,10 +6,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Online.Chat.Drawables
+namespace osu.Game.Overlays.Chat
 {
     public class ChatLine : Container
     {
@@ -62,7 +63,10 @@ namespace osu.Game.Online.Chat.Drawables
             return username_colours[message.UserId % username_colours.Length];
         }
 
-        private const float padding = 200;
+        public const float LEFT_PADDING = message_padding + padding * 2;
+
+        private const float padding = 15;
+        private const float message_padding = 200;
         private const float text_size = 20;
 
         public ChatLine(Message message)
@@ -72,13 +76,13 @@ namespace osu.Game.Online.Chat.Drawables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Padding = new MarginPadding { Left = 15, Right = 15 };
+            Padding = new MarginPadding { Left = padding, Right = padding };
 
             Children = new Drawable[]
             {
                 new Container
                 {
-                    Size = new Vector2(padding, text_size),
+                    Size = new Vector2(message_padding, text_size),
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
@@ -106,7 +110,7 @@ namespace osu.Game.Online.Chat.Drawables
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = padding + 15 },
+                    Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
