@@ -8,5 +8,9 @@ namespace osu.Game.Rulesets.Objects.Types
     /// </summary>
     public interface IHasHold
     {
+        /// <summary>
+        /// The time at which the hold ends.
+        /// </summary>
+        double EndTime { get; }
     }
 }

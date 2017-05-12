@@ -44,5 +44,14 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
                 EndTime = endTime
             };
         }
+
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, double endTime)
+        {
+            return new ConvertHold
+            {
+                X = position.X,
+                EndTime = endTime
+            };
+        }
     }
 }
