@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly TimeRelativeContainer TimingSectionContainer;
 
-        public Column(IEnumerable<TimingSection> timingSections)
+        public Column(IEnumerable<ControlPoint> timingChanges)
         {
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
@@ -87,7 +88,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         }
                     }
                 },
-                TimingSectionContainer = new TimeRelativeContainer(timingSections)
+                TimingSectionContainer = new TimeRelativeContainer(timingChanges)
                 {
                     Name = "Hit objects",
                     RelativeSizeAxes = Axes.Both,

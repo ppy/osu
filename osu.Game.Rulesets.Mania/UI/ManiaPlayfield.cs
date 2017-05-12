@@ -20,6 +20,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Framework.Input;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -62,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly int columnCount;
 
-        public ManiaPlayfield(int columnCount, IEnumerable<TimingSection> timingSections)
+        public ManiaPlayfield(int columnCount, IEnumerable<ControlPoint> timingChanges)
         {
             this.columnCount = columnCount;
 
@@ -94,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Left = 1, Right = 1 },
                             Spacing = new Vector2(1, 0)
                         },
-                        barlineContainer = new TimeRelativeContainer(timingSections)
+                        barlineContainer = new TimeRelativeContainer(timingChanges)
                         {
                             Name = "Bar lines",
                             Anchor = Anchor.BottomCentre,
@@ -107,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < columnCount; i++)
-                Columns.Add(new Column(timingSections));
+                Columns.Add(new Column(timingChanges));
 
             TimeSpan = time_span_default;
         }
