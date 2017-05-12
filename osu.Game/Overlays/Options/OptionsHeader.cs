@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Select;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Options
