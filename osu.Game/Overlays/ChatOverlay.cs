@@ -50,6 +50,7 @@ namespace osu.Game.Overlays
         private readonly ChatTabControl channelTabs;
 
         private readonly Box chatBackground;
+        private readonly Box tabBackground;
 
         private Bindable<double> chatHeight;
 
@@ -120,11 +121,10 @@ namespace osu.Game.Overlays
                     Height = TAB_AREA_HEIGHT,
                     Children = new Drawable[]
                     {
-                        new Box
+                        tabBackground = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Black,
-                            Alpha = 0.8f,
                         },
                         channelTabs = new ChatTabControl
                         {
@@ -196,7 +196,11 @@ namespace osu.Game.Overlays
             api.Register(this);
 
             chatHeight = config.GetBindable<double>(OsuConfig.ChatDisplayHeight);
-            chatHeight.ValueChanged += h => Height = (float)h;
+            chatHeight.ValueChanged += h =>
+            {
+                Height = (float)h;
+                tabBackground.FadeTo(Height == 1 ? 1 : 0.8f, 200);
+            };
             chatHeight.TriggerChange();
 
             chatBackground.Colour = colours.ChatBlue;
