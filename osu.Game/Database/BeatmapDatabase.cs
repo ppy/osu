@@ -267,7 +267,7 @@ namespace osu.Game.Database
 
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null, bool withStoryboard = false)
         {
-            if (beatmapInfo.BeatmapSet == null)
+            if (beatmapInfo.BeatmapSet == null || beatmapInfo.Ruleset == null)
                 beatmapInfo = GetChildren(beatmapInfo, true);
 
             if (beatmapInfo.BeatmapSet == null)
