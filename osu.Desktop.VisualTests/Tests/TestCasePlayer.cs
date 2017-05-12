@@ -23,6 +23,7 @@ namespace osu.Desktop.VisualTests.Tests
         protected Player Player;
         private BeatmapDatabase db;
         private RulesetDatabase rulesets;
+        private WorkingBeatmap beatmap;
 
         public override string Description => @"Showing everything to play the game.";
 
@@ -36,8 +37,6 @@ namespace osu.Desktop.VisualTests.Tests
         public override void Reset()
         {
             base.Reset();
-
-            WorkingBeatmap beatmap = null;
 
             var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.RulesetID == 0);
             if (beatmapInfo != null)
