@@ -125,6 +125,7 @@
     <Compile Include="Rulesets\Objects\Legacy\ConvertSlider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHit.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHold.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertSlider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertSpinner.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertHitObjectParser.cs" />
@@ -161,7 +162,6 @@
     <Compile Include="Rulesets\Objects\CircularArcApproximator.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertHit.cs" />
     <Compile Include="Rulesets\Objects\Legacy\ConvertHitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\ConvertHold.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertSlider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertSpinner.cs" />
     <Compile Include="Rulesets\Objects\SliderCurve.cs" />
