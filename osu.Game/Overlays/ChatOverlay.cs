@@ -16,19 +16,20 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Chat.Drawables;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Overlays
 {
     public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
     {
-        private const float textbox_height = 40;
+        private const float textbox_height = 60;
 
         private ScheduledDelegate messageRequest;
 
@@ -42,9 +43,14 @@ namespace osu.Game.Overlays
 
         public const float DEFAULT_HEIGHT = 0.4f;
 
+        public const float TAB_AREA_HEIGHT = 50;
+
         private GetMessagesRequest fetchReq;
 
-        private readonly OsuTabControl<Channel> channelTabs;
+        private readonly ChatTabControl channelTabs;
+
+        private readonly Box chatBackground;
+        private readonly Box tabBackground;
 
         private Bindable<double> chatHeight;
 
@@ -56,45 +62,76 @@ namespace osu.Game.Overlays
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
+            const float padding = 5;
+
             Children = new Drawable[]
             {
-                channelTabs = new OsuTabControl<Channel>
+                new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 20,
-                },
-                new Box
-                {
-                    Depth = float.MaxValue,
+                    Name = @"chat area",
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.9f,
-                },
-                currentChannelContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 25, Bottom = textbox_height + 5 },
+                    Padding = new MarginPadding { Top = TAB_AREA_HEIGHT },
+                    Children = new Drawable[]
+                    {
+                        chatBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        currentChannelContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding
+                            {
+                                Top = padding,
+                                Bottom = textbox_height + padding
+                            },
+                        },
+                        new Container
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                            Height = textbox_height,
+                            Padding = new MarginPadding
+                            {
+                                Top = padding * 2,
+                                Bottom = padding * 2,
+                                Left = ChatLine.LEFT_PADDING + padding * 2,
+                                Right = padding * 2,
+                            },
+                            Children = new Drawable[]
+                            {
+                                inputTextBox = new FocusedTextBox
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Height = 1,
+                                    PlaceholderText = "type your message",
+                                    Exit = () => State = Visibility.Hidden,
+                                    OnCommit = postMessage,
+                                    HoldFocus = true,
+                                }
+                            }
+                        }
+                    }
                 },
                 new Container
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
+                    Name = @"tabs area",
                     RelativeSizeAxes = Axes.X,
-                    Height = textbox_height,
-                    Padding = new MarginPadding(5),
+                    Height = TAB_AREA_HEIGHT,
                     Children = new Drawable[]
                     {
-                        inputTextBox = new FocusedTextBox
+                        tabBackground = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Height = 1,
-                            PlaceholderText = "type your message",
-                            Exit = () => State = Visibility.Hidden,
-                            OnCommit = postMessage,
-                            HoldFocus = true,
-                        }
+                            Colour = Color4.Black,
+                        },
+                        channelTabs = new ChatTabControl
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     }
-                }
+                },
             };
 
             channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
@@ -153,14 +190,20 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuConfigManager config)
+        private void load(APIAccess api, OsuConfigManager config, OsuColour colours)
         {
             this.api = api;
             api.Register(this);
 
             chatHeight = config.GetBindable<double>(OsuConfig.ChatDisplayHeight);
-            chatHeight.ValueChanged += h => Height = (float)h;
+            chatHeight.ValueChanged += h =>
+            {
+                Height = (float)h;
+                tabBackground.FadeTo(Height == 1 ? 1 : 0.8f, 200);
+            };
             chatHeight.TriggerChange();
+
+            chatBackground.Colour = colours.ChatBlue;
         }
 
         private long? lastMessageId;
