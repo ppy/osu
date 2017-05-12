@@ -18,9 +18,13 @@ namespace osu.Desktop.VisualTests.Tests
         private SongProgress progress;
         private SongProgressGraph graph;
 
+        private StopwatchClock clock;
+
         public override void Reset()
         {
             base.Reset();
+
+            clock = new StopwatchClock(true);
 
             Add(progress = new SongProgress
             {
@@ -55,6 +59,9 @@ namespace osu.Desktop.VisualTests.Tests
 
             progress.Objects = objects;
             graph.Objects = objects;
+
+            progress.AudioClock = clock;
+            progress.OnSeek = pos => clock.Seek(pos);
         }
     }
 }
