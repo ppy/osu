@@ -43,11 +43,13 @@ namespace osu.Game.Overlays
 
         public const float DEFAULT_HEIGHT = 0.4f;
 
-        private const float tab_area_height = 50;
+        public const float TAB_AREA_HEIGHT = 50;
 
         private GetMessagesRequest fetchReq;
 
-        private readonly OsuTabControl<Channel> channelTabs;
+        private readonly ChatTabControl channelTabs;
+
+        private readonly Box chatBackground;
 
         private Bindable<double> chatHeight;
 
@@ -65,34 +67,14 @@ namespace osu.Game.Overlays
             {
                 new Container
                 {
-                    Name = @"tabs area",
-                    RelativeSizeAxes = Axes.X,
-                    Height = tab_area_height,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0.8f,
-                        },
-                        channelTabs = new OsuTabControl<Channel>
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                    }
-                },
-                new Container
-                {
                     Name = @"chat area",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = tab_area_height },
+                    Padding = new MarginPadding { Top = TAB_AREA_HEIGHT },
                     Children = new Drawable[]
                     {
-                        new Box
+                        chatBackground = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.FromHex(@"17292e"),
                         },
                         currentChannelContainer = new Container
                         {
@@ -129,6 +111,25 @@ namespace osu.Game.Overlays
                                 }
                             }
                         }
+                    }
+                },
+                new Container
+                {
+                    Name = @"tabs area",
+                    RelativeSizeAxes = Axes.X,
+                    Height = TAB_AREA_HEIGHT,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                            Alpha = 0.8f,
+                        },
+                        channelTabs = new ChatTabControl
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     }
                 },
             };
@@ -189,7 +190,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuConfigManager config)
+        private void load(APIAccess api, OsuConfigManager config, OsuColour colours)
         {
             this.api = api;
             api.Register(this);
@@ -197,6 +198,8 @@ namespace osu.Game.Overlays
             chatHeight = config.GetBindable<double>(OsuConfig.ChatDisplayHeight);
             chatHeight.ValueChanged += h => Height = (float)h;
             chatHeight.TriggerChange();
+
+            chatBackground.Colour = colours.ChatBlue;
         }
 
         private long? lastMessageId;
