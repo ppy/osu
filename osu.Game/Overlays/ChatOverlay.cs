@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -21,6 +22,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using OpenTK.Graphics;
 using osu.Framework.Input;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays
 {
@@ -38,14 +40,19 @@ namespace osu.Game.Overlays
 
         private const int transition_length = 500;
 
+        public const float DEFAULT_HEIGHT = 0.4f;
+
         private GetMessagesRequest fetchReq;
 
         private readonly OsuTabControl<Channel> channelTabs;
 
+        private Bindable<double> chatHeight;
+
         public ChatOverlay()
         {
-            RelativeSizeAxes = Axes.X;
-            Size = new Vector2(1, 300);
+            RelativeSizeAxes = Axes.Both;
+            RelativePositionAxes = Axes.Both;
+            Size = new Vector2(1, DEFAULT_HEIGHT);
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
@@ -93,6 +100,20 @@ namespace osu.Game.Overlays
             channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
         }
 
+        protected override bool OnDragStart(InputState state)
+        {
+            if (channelTabs.Hovering)
+                return true;
+
+            return base.OnDragStart(state);
+        }
+
+        protected override bool OnDrag(InputState state)
+        {
+            chatHeight.Value = Height - state.Mouse.Delta.Y / Parent.DrawSize.Y;
+            return base.OnDrag(state);
+        }
+
         public void APIStateChanged(APIAccess api, APIState state)
         {
             switch (state)
@@ -124,7 +145,7 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            MoveToY(DrawSize.Y, transition_length, EasingTypes.InSine);
+            MoveToY(Height, transition_length, EasingTypes.InSine);
             FadeOut(transition_length, EasingTypes.InSine);
 
             inputTextBox.HoldFocus = false;
@@ -132,10 +153,14 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(APIAccess api, OsuConfigManager config)
         {
             this.api = api;
             api.Register(this);
+
+            chatHeight = config.GetBindable<double>(OsuConfig.ChatDisplayHeight);
+            chatHeight.ValueChanged += h => Height = (float)h;
+            chatHeight.TriggerChange();
         }
 
         private long? lastMessageId;
