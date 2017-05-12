@@ -16,13 +16,14 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Chat.Drawables;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Overlays
 {
