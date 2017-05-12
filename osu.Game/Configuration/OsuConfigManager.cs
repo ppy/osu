@@ -3,6 +3,7 @@
 
 using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using osu.Game.Overlays;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Configuration
@@ -18,6 +19,8 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.DisplayStarsMinimum, 0.0, 0, 10);
             Set(OsuConfig.DisplayStarsMaximum, 10.0, 0, 10);
+
+            Set(OsuConfig.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
 
             // Online settings
 
@@ -102,6 +105,7 @@ namespace osu.Game.Configuration
         DisplayStarsMaximum,
         SnakingInSliders,
         SnakingOutSliders,
-        ShowFpsDisplay
+        ShowFpsDisplay,
+        ChatDisplayHeight
     }
 }
