@@ -384,7 +384,7 @@
     <Compile Include="Configuration\ScreenshotFormat.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
     <Compile Include="Screens\Select\FilterControl.cs" />
-    <Compile Include="Screens\Select\SearchTextBox.cs" />
+    <Compile Include="Graphics\UserInterface\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
     <Compile Include="Screens\Play\SongProgress.cs" />
