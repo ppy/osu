@@ -21,13 +21,10 @@ namespace osu.Game.Screens.Play
         private double startTime;
         private double endTime;
 
-        private int previousPercent;
-        private int previousSecond;
+        private int? previousPercent;
+        private int? previousSecond;
 
         private double songLength => endTime - startTime;
-
-        private bool percentHasChanged = true;
-        private bool secondHasChanged = true;
 
         private const int margin = 10;
 
@@ -81,22 +78,19 @@ namespace osu.Game.Screens.Play
             int currentPercent = Math.Max(0, Math.Min(100, (int)(songCurrentTime / songLength * 100)));
             int currentSecond = (int)Math.Floor(songCurrentTime / 1000.0);
 
-            if (percentHasChanged)
+            if (currentPercent != previousPercent)
             {
                 progress.Text = currentPercent.ToString() + @"%";
                 previousPercent = currentPercent;
             }
 
-            if (secondHasChanged && songCurrentTime < songLength)
+            if (currentSecond != previousSecond && songCurrentTime < songLength)
             {
                 timeCurrent.Text = TimeSpan.FromSeconds(currentSecond).ToString(songCurrentTime < 0 ? @"\-m\:ss" : @"m\:ss");
                 timeLeft.Text = TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"\-m\:ss");
 
                 previousSecond = currentSecond;
             }
-
-            percentHasChanged = currentPercent != previousPercent;
-            secondHasChanged = currentSecond != previousSecond;
         }
     }
 }
