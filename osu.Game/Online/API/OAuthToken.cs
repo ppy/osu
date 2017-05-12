@@ -41,13 +41,13 @@ namespace osu.Game.Online.API
         [JsonProperty(@"refresh_token")]
         public string RefreshToken;
 
-        public override string ToString() => $@"{AccessToken}/{AccessTokenExpiry.ToString(NumberFormatInfo.InvariantInfo)}/{RefreshToken}";
+        public override string ToString() => $@"{AccessToken}|{AccessTokenExpiry.ToString(NumberFormatInfo.InvariantInfo)}|{RefreshToken}";
 
         public static OAuthToken Parse(string value)
         {
             try
             {
-                string[] parts = value.Split('/');
+                string[] parts = value.Split('|');
                 return new OAuthToken
                 {
                     AccessToken = parts[0],
