@@ -160,7 +160,7 @@ namespace osu.Game
             });
 
             //overlay elements
-            LoadComponentAsync(chat = new ChatOverlay { Depth = 0 }, overlayContent.Add);
+            LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(options = new OptionsOverlay { Depth = -1 }, overlayContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
@@ -320,8 +320,7 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            if (intro?.ChildScreen != null)
-                intro.ChildScreen.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
+            mainContent.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
 
             Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
         }

@@ -7,8 +7,9 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Game.Online.Chat;
 
-namespace osu.Game.Online.Chat.Drawables
+namespace osu.Game.Overlays.Chat
 {
     public class DrawableChannel : Container
     {
