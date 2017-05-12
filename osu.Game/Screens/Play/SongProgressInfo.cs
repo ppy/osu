@@ -23,9 +23,8 @@ namespace osu.Game.Screens.Play
 
         private int previousPercent;
         private int previousSecond;
-        private double previousTimespan;
 
-        private double songLenght => endTime - startTime;
+        private double songLength => endTime - startTime;
 
         private bool percentHasChanged = true;
         private bool secondHasChanged = true;
@@ -79,8 +78,8 @@ namespace osu.Game.Screens.Play
             base.Update();
 
             double songCurrentTime = AudioClock.CurrentTime - startTime;
-            int currentPercent = songCurrentTime < 0 ? 0 : songCurrentTime > songLenght ? 100 : (int)(songCurrentTime / songLenght * 100);
-            int currentSecond = TimeSpan.FromMilliseconds(songCurrentTime).Seconds;
+            int currentPercent = Math.Max(0, Math.Min(100, (int)(songCurrentTime / songLength * 100)));
+            int currentSecond = (int)Math.Floor(songCurrentTime / 1000.0);
 
             if (percentHasChanged)
             {
@@ -88,17 +87,12 @@ namespace osu.Game.Screens.Play
                 previousPercent = currentPercent;
             }
 
-            if (secondHasChanged && songCurrentTime < songLenght || previousTimespan < 0 && songCurrentTime > 0)
+            if (secondHasChanged && songCurrentTime < songLength)
             {
-                if (songCurrentTime < 0)
-                    timeCurrent.Text = @"-" + TimeSpan.FromMilliseconds(songCurrentTime - 1000).ToString(@"m\:ss");
-                else
-                    timeCurrent.Text = TimeSpan.FromMilliseconds(songCurrentTime).ToString(@"m\:ss");
-
-                timeLeft.Text = @"-" + TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"m\:ss");
+                timeCurrent.Text = TimeSpan.FromSeconds(currentSecond).ToString(songCurrentTime < 0 ? @"\-m\:ss" : @"m\:ss");
+                timeLeft.Text = TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"\-m\:ss");
 
                 previousSecond = currentSecond;
-                previousTimespan = songCurrentTime;
             }
 
             percentHasChanged = currentPercent != previousPercent;
