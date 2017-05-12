@@ -10,16 +10,28 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSection : Container
+    public abstract class OptionsSection : Container, IHasFilterableChildren
     {
         protected FillFlowContainer FlowContent;
         protected override Container<Drawable> Content => FlowContent;
 
         public abstract FontAwesome Icon { get; }
         public abstract string Header { get; }
+
+        public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
+        public string[] FilterTerms => new[] { Header };
+        public bool MatchingCurrentFilter
+        {
+            set
+            {
+                FadeTo(value ? 1 : 0);
+            }
+        }
 
         private readonly SpriteText headerLabel;
 
