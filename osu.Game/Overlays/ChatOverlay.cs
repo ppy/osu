@@ -51,7 +51,7 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                channelTabs = new OsuTabControl<Channel>()
+                channelTabs = new OsuTabControl<Channel>
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 20,
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays
 
         private List<Channel> careChannels;
 
-        private List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
+        private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
         private void initializeChannels()
         {
