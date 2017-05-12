@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Music
             beatmapBacking.BindTo(game.Beatmap);
 
             filter.Search.OnCommit = (sender, newText) => {
-                var beatmap = list.FirstVisibleSet?.Beatmaps?.ValueAtOrDefault(0);
+                var beatmap = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
                 if (beatmap != null) playSpecified(beatmap);
             };
         }
