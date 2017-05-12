@@ -270,7 +270,7 @@ namespace osu.Game.Database
             if (beatmapInfo.BeatmapSet == null)
             {
                 beatmapInfo = GetChildren(beatmapInfo, true);
-                
+
                 if (beatmapInfo.BeatmapSet == null)
                     throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
             }
