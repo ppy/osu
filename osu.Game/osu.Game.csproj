@@ -75,6 +75,7 @@
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
+    <Compile Include="Overlays\Chat\ChatTabControl.cs" />
     <Compile Include="Overlays\Music\FilterControl.cs" />
     <Compile Include="Overlays\Music\PlaylistItem.cs" />
     <Compile Include="Overlays\Music\PlaylistList.cs" />
@@ -305,8 +306,8 @@
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
     <Compile Include="Online\API\Requests\ListChannelsRequest.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
-    <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />
-    <Compile Include="Online\Chat\Drawables\ChatLine.cs" />
+    <Compile Include="Overlays\Chat\DrawableChannel.cs" />
+    <Compile Include="Overlays\Chat\ChatLine.cs" />
     <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
