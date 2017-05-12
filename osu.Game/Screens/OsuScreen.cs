@@ -7,6 +7,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
+using OpenTK;
 
 namespace osu.Game.Screens
 {
@@ -96,6 +97,9 @@ namespace osu.Game.Screens
             }
             else if (bg != null)
             {
+                // this makes up for the fact our padding changes when the global toolbar is visible.
+                bg.Scale = new Vector2(1.06f);
+
                 AddInternal(new ParallaxContainer
                 {
                     Depth = float.MaxValue,

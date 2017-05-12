@@ -85,5 +85,7 @@ namespace osu.Game.Graphics
         public readonly Color4 Red = FromHex(@"ed1121");
         public readonly Color4 RedDark = FromHex(@"ba0011");
         public readonly Color4 RedDarker = FromHex(@"870000");
+
+        public readonly Color4 ChatBlue = FromHex(@"17292e");
     }
 }
