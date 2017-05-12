@@ -11,11 +11,11 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
-    internal class ManiaBeatmapConverter : BeatmapConverter<ManiaBaseHit>
+    internal class ManiaBeatmapConverter : BeatmapConverter<ManiaHitObject>
     {
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
-        protected override IEnumerable<ManiaBaseHit> ConvertHitObject(HitObject original, Beatmap beatmap)
+        protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
             yield return null;
         }

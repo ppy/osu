@@ -7,32 +7,24 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 
-namespace osu.Game.Online.Chat.Drawables
+namespace osu.Game.Overlays.Chat
 {
     public class DrawableChannel : Container
     {
-        private readonly Channel channel;
+        public readonly Channel Channel;
         private readonly FillFlowContainer flow;
         private readonly ScrollContainer scroll;
 
         public DrawableChannel(Channel channel)
         {
-            this.channel = channel;
+            Channel = channel;
 
             RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]
             {
-                new OsuSpriteText
-                {
-                    Text = channel.Name,
-                    TextSize = 50,
-                    Alpha = 0.3f,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                },
                 scroll = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -56,14 +48,14 @@ namespace osu.Game.Online.Chat.Drawables
         {
             base.LoadComplete();
 
-            newMessagesArrived(channel.Messages);
+            newMessagesArrived(Channel.Messages);
             scrollToEnd();
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            channel.NewMessagesArrived -= newMessagesArrived;
+            Channel.NewMessagesArrived -= newMessagesArrived;
         }
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)

@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Mods
             var instance = newRuleset.CreateInstance();
 
             foreach (ModSection section in modSectionsContainer.Children)
-                section.Buttons = instance.GetModsFor(section.ModType).Select(m => new ModButton(m)).ToArray();
+                section.Mods = instance.GetModsFor(section.ModType);
             refreshSelectedMods();
         }
 
@@ -103,14 +103,7 @@ namespace osu.Game.Overlays.Mods
         {
             if (modTypes.Length == 0) return;
             foreach (ModSection section in modSectionsContainer.Children)
-                foreach (ModButton button in section.Buttons)
-                {
-                    Mod selected = button.SelectedMod;
-                    if (selected == null) continue;
-                    foreach (Type type in modTypes)
-                        if (type.IsInstanceOfType(selected))
-                            button.Deselect();
-                }
+                section.DeselectTypes(modTypes);
         }
 
         private void modButtonPressed(Mod selectedMod)
@@ -122,7 +115,7 @@ namespace osu.Game.Overlays.Mods
 
         private void refreshSelectedMods()
         {
-            SelectedMods.Value = modSectionsContainer.Children.SelectMany(s => s.Buttons.Select(x => x.SelectedMod).Where(x => x != null)).ToArray();
+            SelectedMods.Value = modSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
 
             double multiplier = 1.0;
             bool ranked = true;

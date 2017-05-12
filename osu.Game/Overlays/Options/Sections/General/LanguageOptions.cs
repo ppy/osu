@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.General
 {
@@ -17,7 +16,7 @@ namespace osu.Game.Overlays.Options.Sections.General
         {
             Children = new Drawable[]
             {
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Prefer metadata in original language",
                     Bindable = frameworkConfig.GetBindable<bool>(FrameworkConfig.ShowUnicode)

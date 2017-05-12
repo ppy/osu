@@ -19,9 +19,13 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModButton : FillFlowContainer
+
+    /// <summary>
+    /// Represents a clickable button which can cycle through one of more mods.
+    /// </summary>
+    public class ModButton : ModButtonEmpty
     {
-        private ModIcon foregroundIcon { get; set; }
+        private ModIcon foregroundIcon;
         private readonly SpriteText text;
         private readonly Container<ModIcon> iconsContainer;
         private SampleChannel sampleOn, sampleOff;
@@ -51,7 +55,7 @@ namespace osu.Game.Overlays.Mods
 
                 iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
                 iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
-                foregroundIcon.Colour = Selected ? SelectedColour : ButtonColour;
+                foregroundIcon.Highlighted = Selected;
 
                 if (mod != null)
                     displayMod(SelectedMod ?? Mods[0]);
@@ -60,23 +64,6 @@ namespace osu.Game.Overlays.Mods
 
         public bool Selected => selectedIndex != -1;
 
-        private Color4 buttonColour;
-        public Color4 ButtonColour
-        {
-            get
-            {
-                return buttonColour;
-            }
-            set
-            {
-                if (value == buttonColour) return;
-                buttonColour = value;
-                foreach (ModIcon icon in iconsContainer.Children)
-                {
-                    icon.Colour = value;
-                }
-            }
-        }
 
         private Color4 selectedColour;
         public Color4 SelectedColour
@@ -127,7 +114,7 @@ namespace osu.Game.Overlays.Mods
 
         // the mods from Mod, only multiple if Mod is a MultiMod
 
-        public Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
+        public override Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -180,50 +167,35 @@ namespace osu.Game.Overlays.Mods
             {
                 iconsContainer.Add(new[]
                 {
-                    new ModIcon
+                    new ModIcon(Mods[0])
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(1.5f),
-                        Colour = ButtonColour
                     },
-                    foregroundIcon = new ModIcon
+                    foregroundIcon = new ModIcon(Mods[0])
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(-1.5f),
-                        Colour = ButtonColour
                     },
                 });
             }
             else
             {
-                iconsContainer.Add(foregroundIcon = new ModIcon
+                iconsContainer.Add(foregroundIcon = new ModIcon(Mod)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Colour = ButtonColour
                 });
             }
         }
 
-        protected override void LoadComplete()
+        public ModButton(Mod mod)
         {
-            base.LoadComplete();
-            foreach (ModIcon icon in iconsContainer.Children)
-                icon.Colour = ButtonColour;
-        }
-
-        public ModButton(Mod m)
-        {
-            Direction = FillDirection.Vertical;
-            Spacing = new Vector2(0f, -5f);
-            Size = new Vector2(100f);
-            AlwaysPresent = true;
-
             Children = new Drawable[]
             {
                 new Container
@@ -243,13 +215,14 @@ namespace osu.Game.Overlays.Mods
                 },
                 text = new OsuSpriteText
                 {
+                    Y = 75,
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
                     TextSize = 18,
                 },
             };
 
-            Mod = m;
+            Mod = mod;
         }
     }
 }

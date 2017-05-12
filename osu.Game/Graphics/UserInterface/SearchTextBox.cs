@@ -1,14 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
+using OpenTK.Input;
 
-namespace osu.Game.Screens.Select
+namespace osu.Game.Graphics.UserInterface
 {
     /// <summary>
     /// A textbox which holds focus eagerly.

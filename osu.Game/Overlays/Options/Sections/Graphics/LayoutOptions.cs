@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Options.Sections.Graphics
 {
@@ -29,7 +28,7 @@ namespace osu.Game.Overlays.Options.Sections.Graphics
                     LabelText = "Screen mode",
                     Bindable = config.GetBindable<WindowMode>(FrameworkConfig.WindowMode),
                 },
-                new OsuCheckbox
+                new OptionCheckbox
                 {
                     LabelText = "Letterboxing",
                     Bindable = letterboxing,
