@@ -10,6 +10,8 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Beatmaps;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -21,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly SpinnerBackground background;
         private readonly Container circleContainer;
         private readonly DrawableHitCircle circle;
+
+        private WorkingBeatmap currentBeatmap;
 
         public DrawableSpinner(Spinner s) : base(s)
         {
@@ -71,6 +75,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             disc.Scale = scaleToCircle;
         }
 
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuGame game)
+        {
+            currentBeatmap = game?.Beatmap?.Value;
+        }
+
         protected override void CheckJudgement(bool userTriggered)
         {
             if (Time.Current < HitObject.StartTime) return;
@@ -108,9 +118,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Vector2 scaleToCircle => circle.Scale * circle.DrawWidth / DrawWidth * 0.95f;
 
-        private const float spins_per_minute_needed = 100 + 5 * 15; //TODO: read per-map OD and place it on the 5
+        private float spinsPerMinuteNeeded => 100 + (currentBeatmap?.Beatmap.BeatmapInfo.Difficulty.OverallDifficulty ?? 5) * 15;
 
-        private float rotationsNeeded => (float)(spins_per_minute_needed * (spinner.EndTime - spinner.StartTime) / 60000f);
+        private float rotationsNeeded => (float)(spinsPerMinuteNeeded * (spinner.EndTime - spinner.StartTime) / 60000f);
 
         public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / rotationsNeeded, 0, 1);
 
