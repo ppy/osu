@@ -27,7 +27,7 @@ using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent, IOccluder
+    public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent, IHasOccluder
     {
         private const float textbox_height = 60;
 
@@ -45,9 +45,26 @@ namespace osu.Game.Overlays
 
         public const float TAB_AREA_HEIGHT = 50;
 
+        public IDrawable Occluder
+        {
+            get
+            {
+                if (Alpha != 1)
+                    return null;
+
+                if (tabBackground.Alpha == 1)
+                    return outerOccluder;
+
+                return innerOccluder;
+            }
+        }
+
         private GetMessagesRequest fetchReq;
 
         private readonly ChatTabControl channelTabs;
+
+        private readonly Container outerOccluder;
+        private readonly Container innerOccluder;
 
         private readonly Box chatBackground;
         private readonly Box tabBackground;
@@ -58,7 +75,7 @@ namespace osu.Game.Overlays
         {
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
-            Size = new Vector2(2, DEFAULT_HEIGHT);
+            Size = new Vector2(1, DEFAULT_HEIGHT);
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
 
@@ -68,80 +85,91 @@ namespace osu.Game.Overlays
             {
                 new Container
                 {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Name = @"chat area",
                     RelativeSizeAxes = Axes.Both,
-                    Width = 0.5f,
-                    Children = new[]
+                    Padding = new MarginPadding { Top = TAB_AREA_HEIGHT },
+                    Children = new Drawable[]
                     {
-                        new Container
+                        innerOccluder = new Container
                         {
-                            Name = @"chat area",
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = TAB_AREA_HEIGHT },
-                            Children = new Drawable[]
+                            // We need to artificially increase the width because beatmap panels lie off-screen, but they should be occluded by this container
+                            Width = 10,
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        },
+                        chatBackground = new Box
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            RelativeSizeAxes = Axes.Both
+                        },
+                        currentChannelContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding
                             {
-                                chatBackground = new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both
-                                },
-                                currentChannelContainer = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding
-                                    {
-                                        Top = padding,
-                                        Bottom = textbox_height + padding
-                                    },
-                                },
-                                new Container
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = textbox_height,
-                                    Padding = new MarginPadding
-                                    {
-                                        Top = padding * 2,
-                                        Bottom = padding * 2,
-                                        Left = ChatLine.LEFT_PADDING + padding * 2,
-                                        Right = padding * 2,
-                                    },
-                                    Children = new Drawable[]
-                                    {
-                                        inputTextBox = new FocusedTextBox
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Height = 1,
-                                            PlaceholderText = "type your message",
-                                            Exit = () => State = Visibility.Hidden,
-                                            OnCommit = postMessage,
-                                            HoldFocus = true,
-                                        }
-                                    }
-                                }
-                            }
+                                Top = padding,
+                                Bottom = textbox_height + padding
+                            },
                         },
                         new Container
                         {
-                            Name = @"tabs area",
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
                             RelativeSizeAxes = Axes.X,
-                            Height = TAB_AREA_HEIGHT,
+                            Height = textbox_height,
+                            Padding = new MarginPadding
+                            {
+                                Top = padding * 2,
+                                Bottom = padding * 2,
+                                Left = ChatLine.LEFT_PADDING + padding * 2,
+                                Right = padding * 2,
+                            },
                             Children = new Drawable[]
                             {
-                                tabBackground = new Box
+                                inputTextBox = new FocusedTextBox
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
-                                },
-                                channelTabs = new ChatTabControl
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
+                                    Height = 1,
+                                    PlaceholderText = "type your message",
+                                    Exit = () => State = Visibility.Hidden,
+                                    OnCommit = postMessage,
+                                    HoldFocus = true,
+                                    Name = "testing"
+                                }
                             }
                         }
                     }
-                }
+                },
+                new Container
+                {
+                    Name = @"tabs area",
+                    RelativeSizeAxes = Axes.X,
+                    Height = TAB_AREA_HEIGHT,
+                    Children = new Drawable[]
+                    {
+                        tabBackground = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                        },
+                        channelTabs = new ChatTabControl
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    }
+                },
+                outerOccluder = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    // We need to artificially increase the width because beatmap panels lie off-screen, but they should be occluded by this container
+                    Width = 10,
+                    Alpha = 0,
+                    AlwaysPresent = true
+                },
             };
 
             channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
