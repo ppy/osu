@@ -69,6 +69,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapPanel(BeatmapInfo beatmap)
         {
+            Name = "testing 12 12 123";
+
             Beatmap = beatmap;
             Height *= 0.60f;
 
