@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Beatmaps;
 using osu.Framework.Allocation;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -24,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Container circleContainer;
         private readonly DrawableHitCircle circle;
 
-        private float beatmapOD;
+        private float beatmapOd;
 
         public DrawableSpinner(Spinner s) : base(s)
         {
@@ -78,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGame game)
         {
-            beatmapOD = game?.Beatmap?.Value.Beatmap.BeatmapInfo.Difficulty.OverallDifficulty ?? 5;
+            beatmapOd = game?.Beatmap?.Value.Beatmap.BeatmapInfo.Difficulty.OverallDifficulty ?? 5;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -118,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Vector2 scaleToCircle => circle.Scale * circle.DrawWidth / DrawWidth * 0.95f;
 
-        private float spinsPerMinuteNeeded => 100 + beatmapOD * 15;
+        private float spinsPerMinuteNeeded => 100 + beatmapOd * 15;
 
         private float rotationsNeeded => (float)(spinsPerMinuteNeeded * (spinner.EndTime - spinner.StartTime) / 60000f);
 
