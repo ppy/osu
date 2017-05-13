@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Select
                         Content = getBPMRange(beatmap.Beatmap),
                     }));
 
-                    //get statistics fromt he current ruleset.
+                    //get statistics from the current ruleset.
                     labels.AddRange(beatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
                 }
 

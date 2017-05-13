@@ -75,9 +75,11 @@
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
+    <Compile Include="Overlays\Chat\ChatTabControl.cs" />
     <Compile Include="Overlays\Music\FilterControl.cs" />
     <Compile Include="Overlays\Music\PlaylistItem.cs" />
     <Compile Include="Overlays\Music\PlaylistList.cs" />
+    <Compile Include="Overlays\Options\OptionsHeader.cs" />
     <Compile Include="Overlays\Options\Sections\Audio\MainMenuOptions.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
@@ -227,6 +229,7 @@
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
+    <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
     <Compile Include="Screens\Play\SquareGraph.cs" />
     <Compile Include="Screens\Play\StandardHUDOverlay.cs" />
@@ -284,7 +287,6 @@
     <Compile Include="Screens\Play\HUD\ComboResultCounter.cs" />
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
-    <Compile Include="Input\GlobalHotkeys.cs" />
     <Compile Include="Graphics\Backgrounds\Background.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\MenuCursor.cs" />
@@ -305,8 +307,8 @@
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
     <Compile Include="Online\API\Requests\ListChannelsRequest.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
-    <Compile Include="Online\Chat\Drawables\DrawableChannel.cs" />
-    <Compile Include="Online\Chat\Drawables\ChatLine.cs" />
+    <Compile Include="Overlays\Chat\DrawableChannel.cs" />
+    <Compile Include="Overlays\Chat\ChatLine.cs" />
     <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="OsuGame.cs" />
     <Compile Include="OsuGameBase.cs" />
@@ -383,7 +385,7 @@
     <Compile Include="Configuration\ScreenshotFormat.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
     <Compile Include="Screens\Select\FilterControl.cs" />
-    <Compile Include="Screens\Select\SearchTextBox.cs" />
+    <Compile Include="Graphics\UserInterface\SearchTextBox.cs" />
     <Compile Include="Screens\Select\FooterButton.cs" />
     <Compile Include="Screens\Select\Footer.cs" />
     <Compile Include="Screens\Play\SongProgress.cs" />

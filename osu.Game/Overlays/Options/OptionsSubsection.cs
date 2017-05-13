@@ -6,16 +6,28 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics.Sprites;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays.Options
 {
-    public abstract class OptionsSubsection : FillFlowContainer
+    public abstract class OptionsSubsection : FillFlowContainer, IHasFilterableChildren
     {
         protected override Container<Drawable> Content => content;
 
         private readonly Container<Drawable> content;
 
         protected abstract string Header { get; }
+
+        public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
+        public string[] FilterTerms => new[] { Header };
+        public bool MatchingCurrentFilter
+        {
+            set
+            {
+                FadeTo(value ? 1 : 0);
+            }
+        }
 
         protected OptionsSubsection()
         {
