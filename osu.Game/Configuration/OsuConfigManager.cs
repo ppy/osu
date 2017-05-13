@@ -50,6 +50,7 @@ namespace osu.Game.Configuration
 
             Set(OsuConfig.MenuCursorSize, 1.0, 0.5f, 2);
             Set(OsuConfig.GameplayCursorSize, 1.0, 0.5f, 2);
+            Set(OsuConfig.AutoCursorSize, false);
 
             Set(OsuConfig.MouseDisableButtons, false);
             Set(OsuConfig.MouseDisableWheel, false);
@@ -86,6 +87,7 @@ namespace osu.Game.Configuration
         Token,
         MenuCursorSize,
         GameplayCursorSize,
+        AutoCursorSize,
         DimLevel,
         KeyOverlay,
         ShowInterface,

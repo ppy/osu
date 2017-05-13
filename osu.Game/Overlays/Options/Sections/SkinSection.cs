@@ -31,6 +31,11 @@ namespace osu.Game.Overlays.Options.Sections
                     LabelText = "Gameplay cursor size",
                     Bindable = config.GetBindable<double>(OsuConfig.GameplayCursorSize)
                 },
+                new OptionCheckbox
+                {
+                    LabelText = "Automatic gameplay cursor size",
+                    Bindable = config.GetBindable<bool>(OsuConfig.AutoCursorSize)
+                },
             };
         }
 
