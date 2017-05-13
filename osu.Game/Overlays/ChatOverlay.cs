@@ -76,8 +76,8 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
             Size = new Vector2(1, DEFAULT_HEIGHT);
-            Anchor = Anchor.BottomCentre;
-            Origin = Anchor.BottomCentre;
+            Anchor = Anchor.BottomLeft;
+            Origin = Anchor.BottomLeft;
 
             const float padding = 5;
 
@@ -102,8 +102,6 @@ namespace osu.Game.Overlays
                         },
                         chatBackground = new Box
                         {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.Both
                         },
                         currentChannelContainer = new Container
