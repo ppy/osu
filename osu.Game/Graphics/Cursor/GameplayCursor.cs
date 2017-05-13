@@ -42,6 +42,9 @@ namespace osu.Game.Graphics.Cursor
         {
             private Container cursorContainer;
             private Bindable<double> cursorScale;
+            private Bindable<bool> autoCursorScale;
+
+            private const int scaling_factor = 5;
 
             public OsuCursor()
             {
@@ -49,8 +52,8 @@ namespace osu.Game.Graphics.Cursor
                 Size = new Vector2(42);
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config)
+            [BackgroundDependencyLoader(permitNulls:true)]
+            private void load(OsuConfigManager config, OsuGame game)
             {
                 Children = new Drawable[]
                 {
@@ -117,6 +120,16 @@ namespace osu.Game.Graphics.Cursor
                 cursorScale = config.GetBindable<double>(OsuConfig.GameplayCursorSize);
                 cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)cursorScale);
                 cursorScale.TriggerChange();
+
+                autoCursorScale = config.GetBindable<bool>(OsuConfig.AutoCursorSize);
+                autoCursorScale.ValueChanged += newScale =>
+                {
+                    if (newScale)
+                        cursorContainer.Scale *= scaling_factor / (game?.Beatmap?.Value.Beatmap.BeatmapInfo.Difficulty.CircleSize ?? scaling_factor);
+                    else
+                        cursorScale.TriggerChange();
+                };
+                autoCursorScale.TriggerChange();
             }
         }
     }
