@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// <summary>
         /// Number of spins required to finish the spinner without miss.
         /// </summary>
-        public double SpinsRequired { get; protected set; }
+        public int SpinsRequired { get; protected set; }
 
         public override bool NewCombo => true;
 
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaults(timing, difficulty);
 
-            SpinsRequired = Duration / 1000 * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5);
+            SpinsRequired = (int)(Duration / 1000 * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5));
         }
     }
 }

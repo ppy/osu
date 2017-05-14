@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Vector2 scaleToCircle => circle.Scale * circle.DrawWidth / DrawWidth * 0.95f;
 
-        public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / (float)spinner.SpinsRequired, 0, 1);
+        public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / spinner.SpinsRequired, 0, 1);
 
         protected override void UpdatePreemptState()
         {
