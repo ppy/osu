@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -44,7 +45,11 @@ namespace osu.Game.Graphics.Cursor
             private Bindable<double> cursorScale;
             private Bindable<bool> autoCursorScale;
 
-            private const int scaling_factor = 5;
+            private float beatmapCircleSize;
+            private const float default_beatmap_cs = 5f;
+
+            private float autoScaleMultiplier => autoCursorScale ? (float)(1 - (0.7 * (beatmapCircleSize - 4) / 5)) : 1f;
+
 
             public OsuCursor()
             {
@@ -117,19 +122,19 @@ namespace osu.Game.Graphics.Cursor
                     },
                 };
 
-                cursorScale = config.GetBindable<double>(OsuConfig.GameplayCursorSize);
-                cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)cursorScale);
-                cursorScale.TriggerChange();
+                beatmapCircleSize = game?.Beatmap?.Value.Beatmap.BeatmapInfo.Difficulty.CircleSize ?? default_beatmap_cs;
 
+                cursorScale = config.GetBindable<double>(OsuConfig.GameplayCursorSize);
                 autoCursorScale = config.GetBindable<bool>(OsuConfig.AutoCursorSize);
-                autoCursorScale.ValueChanged += newScale =>
-                {
-                    if (newScale)
-                        cursorContainer.Scale *= scaling_factor / (game?.Beatmap?.Value.Beatmap.BeatmapInfo.Difficulty.CircleSize ?? scaling_factor);
-                    else
-                        cursorScale.TriggerChange();
-                };
-                autoCursorScale.TriggerChange();
+
+                cursorScale.ValueChanged += newValue => calculateScale();
+                autoCursorScale.ValueChanged += newValue => calculateScale();
+                cursorScale.TriggerChange();
+            }
+
+            private void calculateScale()
+            {
+                cursorContainer.Scale = new Vector2(autoScaleMultiplier * (float)cursorScale);
             }
         }
     }
