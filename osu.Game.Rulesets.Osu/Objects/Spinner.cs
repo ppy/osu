@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// <summary>
         /// Number of spins required to finish the spinner without miss.
         /// </summary>
-        public int SpinsRequired { get; protected set; }
+        public int SpinsRequired { get; protected set; } = 1;
 
         public override bool NewCombo => true;
 
