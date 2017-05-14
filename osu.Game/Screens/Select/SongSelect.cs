@@ -22,6 +22,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select.Options;
+using System.Linq;
+using osu.Game.Overlays.Mods;
 
 namespace osu.Game.Screens.Select
 {
@@ -65,7 +67,7 @@ namespace osu.Game.Screens.Select
         /// Contains any panel which is triggered by a footer button.
         /// Helps keep them located beneath the footer itself.
         /// </summary>
-        protected readonly Container FooterPanels;
+        protected readonly FooterContainer FooterPanels;
 
         public readonly FilterControl FilterControl;
 
@@ -133,7 +135,7 @@ namespace osu.Game.Screens.Select
 
             if (ShowFooter)
             {
-                Add(FooterPanels = new Container
+                Add(FooterPanels = new FooterContainer
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -142,7 +144,7 @@ namespace osu.Game.Screens.Select
                     Margin = new MarginPadding
                     {
                         Bottom = Footer.HEIGHT,
-                    },
+                    }
                 });
                 Add(Footer = new Footer
                 {
@@ -380,6 +382,11 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(state, args);
+        }
+
+        protected class FooterContainer : Container, IHasOccluder
+        {
+            public IDrawable Occluder => Children.OfType<ModSelectOverlay>().LastOrDefault()?.Occluder;
         }
     }
 }
