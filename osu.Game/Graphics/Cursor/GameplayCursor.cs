@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -48,7 +47,7 @@ namespace osu.Game.Graphics.Cursor
             private float beatmapCircleSize;
             private const float default_beatmap_cs = 5f;
 
-            private float autoScaleMultiplier => autoCursorScale ? (float)(1 - (0.7 * (beatmapCircleSize - 4) / 5)) : 1f;
+            private float autoScaleMultiplier => autoCursorScale ? (float)(1 - 0.7 * (beatmapCircleSize - 4) / 5) : 1f;
 
 
             public OsuCursor()
