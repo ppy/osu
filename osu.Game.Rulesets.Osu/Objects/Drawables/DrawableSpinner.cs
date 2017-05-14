@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -22,8 +21,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly SpinnerBackground background;
         private readonly Container circleContainer;
         private readonly DrawableHitCircle circle;
-
-        private float beatmapOd;
 
         public DrawableSpinner(Spinner s) : base(s)
         {
@@ -74,12 +71,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             disc.Scale = scaleToCircle;
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGame game)
-        {
-            beatmapOd = game?.Beatmap?.Value.Beatmap.BeatmapInfo.Difficulty.OverallDifficulty ?? 5;
-        }
-
         protected override void CheckJudgement(bool userTriggered)
         {
             if (Time.Current < HitObject.StartTime) return;
@@ -117,11 +108,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private Vector2 scaleToCircle => circle.Scale * circle.DrawWidth / DrawWidth * 0.95f;
 
-        private float spinsPerMinuteNeeded => 100 + beatmapOd * 15;
-
-        private float rotationsNeeded => (float)(spinsPerMinuteNeeded * (spinner.EndTime - spinner.StartTime) / 60000f);
-
-        public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / rotationsNeeded, 0, 1);
+        public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / (float)spinner.SpinsRequired, 0, 1);
 
         protected override void UpdatePreemptState()
         {
