@@ -27,7 +27,7 @@ using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
+    public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent, IHasOccluder
     {
         private const float textbox_height = 60;
 
@@ -45,9 +45,26 @@ namespace osu.Game.Overlays
 
         public const float TAB_AREA_HEIGHT = 50;
 
+        public IDrawable Occluder
+        {
+            get
+            {
+                if (Alpha != 1)
+                    return null;
+
+                if (tabBackground.Alpha == 1)
+                    return outerOccluder;
+
+                return innerOccluder;
+            }
+        }
+
         private GetMessagesRequest fetchReq;
 
         private readonly ChatTabControl channelTabs;
+
+        private readonly Container outerOccluder;
+        private readonly Container innerOccluder;
 
         private readonly Box chatBackground;
         private readonly Box tabBackground;
@@ -73,9 +90,19 @@ namespace osu.Game.Overlays
                     Padding = new MarginPadding { Top = TAB_AREA_HEIGHT },
                     Children = new Drawable[]
                     {
+                        innerOccluder = new Container
+                        {
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                            RelativeSizeAxes = Axes.Both,
+                            // We need to artificially increase the width because beatmap panels lie off-screen, but they should be occluded by this container
+                            Width = 10,
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        },
                         chatBackground = new Box
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.Both
                         },
                         currentChannelContainer = new Container
                         {
@@ -109,6 +136,7 @@ namespace osu.Game.Overlays
                                     Exit = () => State = Visibility.Hidden,
                                     OnCommit = postMessage,
                                     HoldFocus = true,
+                                    Name = "testing"
                                 }
                             }
                         }
@@ -131,6 +159,14 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.Both,
                         },
                     }
+                },
+                outerOccluder = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    // We need to artificially increase the width because beatmap panels lie off-screen, but they should be occluded by this container
+                    Width = 10,
+                    Alpha = 0,
+                    AlwaysPresent = true
                 },
             };
 

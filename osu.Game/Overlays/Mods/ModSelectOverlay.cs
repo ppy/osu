@@ -21,7 +21,7 @@ using osu.Game.Database;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModSelectOverlay : WaveOverlayContainer
+    public class ModSelectOverlay : WaveOverlayContainer, IHasOccluder
     {
         private const int button_duration = 700;
         private const int ranked_multiplier_duration = 700;
@@ -38,6 +38,8 @@ namespace osu.Game.Overlays.Mods
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+
+        public IDrawable Occluder => Content;
 
         private void rulesetChanged(RulesetInfo newRuleset)
         {
