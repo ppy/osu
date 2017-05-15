@@ -123,8 +123,8 @@ namespace osu.Game.Graphics.Cursor
 
                 beatmapCircleSize = game.Beatmap.Value?.Beatmap.BeatmapInfo.Difficulty.CircleSize ?? default_circle_size;
 
-                cursorScale = config.GetBindable<double>(OsuConfig.GameplayCursorSize);
-                autoCursorScale = config.GetBindable<bool>(OsuConfig.AutoCursorSize);
+                cursorScale = config.GetBindable<double>(OsuSetting.GameplayCursorSize);
+                autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
 
                 cursorScale.ValueChanged += newValue => calculateScale();
                 autoCursorScale.ValueChanged += newValue => calculateScale();
