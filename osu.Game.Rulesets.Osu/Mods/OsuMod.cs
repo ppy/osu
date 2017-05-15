@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     public class OsuModAutoplay : ModAutoplay<OsuHitObject>
     {
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
+        public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot), typeof(OsuModSpunOut) }).ToArray();
 
         protected override Score CreateReplayScore(Beatmap<OsuHitObject> beatmap) => new Score
         {
