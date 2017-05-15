@@ -337,7 +337,7 @@ namespace osu.Game.Overlays
                 textbox.Text = string.Empty;
                 return;
             }
-                
+
             var message = new Message
             {
                 Sender = api.LocalUser.Value,
