@@ -11,7 +11,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -41,14 +43,10 @@ namespace osu.Game.Graphics.Cursor
         public class OsuCursor : Container
         {
             private Container cursorContainer;
+
             private Bindable<double> cursorScale;
             private Bindable<bool> autoCursorScale;
-
-
-            private float beatmapCircleSize;
-            private const int default_circle_size = 5;
-            private float autoScaleMultiplier => autoCursorScale ? (float)(1 - 0.7 * (beatmapCircleSize - 4) / 5) : 1f;
-
+            private Bindable<WorkingBeatmap> beatmap;
 
             public OsuCursor()
             {
@@ -121,19 +119,29 @@ namespace osu.Game.Graphics.Cursor
                     },
                 };
 
-                beatmapCircleSize = game.Beatmap.Value?.Beatmap.BeatmapInfo.Difficulty.CircleSize ?? default_circle_size;
+                beatmap = game.Beatmap.GetBoundCopy();
+                beatmap.ValueChanged += v => calculateScale();
 
                 cursorScale = config.GetBindable<double>(OsuSetting.GameplayCursorSize);
-                autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
+                cursorScale.ValueChanged += v => calculateScale();
 
-                cursorScale.ValueChanged += newValue => calculateScale();
-                autoCursorScale.ValueChanged += newValue => calculateScale();
-                cursorScale.TriggerChange();
+                autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
+                autoCursorScale.ValueChanged += v => calculateScale();
+
+                calculateScale();
             }
 
             private void calculateScale()
             {
-                cursorContainer.Scale = new Vector2((float)(autoScaleMultiplier * cursorScale));
+                float scale = (float)cursorScale.Value;
+
+                if (autoCursorScale && beatmap.Value != null)
+                {
+                    // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
+                    scale *= (float)(1 - 0.7 * (1 + beatmap.Value.BeatmapInfo.Difficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY);
+                }
+
+                cursorContainer.Scale = new Vector2(scale);
             }
         }
     }
