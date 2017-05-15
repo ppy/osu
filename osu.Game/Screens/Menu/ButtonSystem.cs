@@ -245,7 +245,13 @@ namespace osu.Game.Screens.Menu
                         buttonArea.FadeIn(300);
 
                         if (lastState == MenuState.Initial)
+                        {
                             buttonArea.Delay(150, true);
+
+                            if (osuLogo.Scale.X > 0.5f)
+                                using (osuLogo.BeginDelayedSequence(200, true))
+                                    osuLogo.Impact();
+                        }
 
                         Scheduler.AddDelayed(() => toolbar?.Show(), 150);
 
