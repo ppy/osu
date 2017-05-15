@@ -18,12 +18,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 new SettingsCheckbox
                 {
                     LabelText = "Interface voices",
-                    Bindable = config.GetBindable<bool>(OsuConfig.MenuVoice)
+                    Bindable = config.GetBindable<bool>(OsuSetting.MenuVoice)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "osu! music theme",
-                    Bindable = config.GetBindable<bool>(OsuConfig.MenuMusic)
+                    Bindable = config.GetBindable<bool>(OsuSetting.MenuMusic)
                 },
             };
         }

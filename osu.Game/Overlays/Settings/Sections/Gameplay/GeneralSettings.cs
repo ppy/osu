@@ -19,17 +19,17 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsSlider<double>
                 {
                     LabelText = "Background dim",
-                    Bindable = config.GetBindable<double>(OsuConfig.DimLevel)
+                    Bindable = config.GetBindable<double>(OsuSetting.DimLevel)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show score overlay",
-                    Bindable = config.GetBindable<bool>(OsuConfig.ShowInterface)
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowInterface)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Always show key overlay",
-                    Bindable = config.GetBindable<bool>(OsuConfig.KeyOverlay)
+                    Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
             };
         }

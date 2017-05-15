@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 new SettingsEnumDropdown<ReleaseStream>
                 {
                     LabelText = "Release stream",
-                    Bindable = config.GetBindable<ReleaseStream>(OsuConfig.ReleaseStream),
+                    Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
                 },
                 new OsuButton
                 {

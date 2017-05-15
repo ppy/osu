@@ -20,12 +20,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "Display beatmaps from",
-                    Bindable = config.GetBindable<double>(OsuConfig.DisplayStarsMinimum)
+                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum)
                 },
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "up to",
-                    Bindable = config.GetBindable<double>(OsuConfig.DisplayStarsMaximum)
+                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum)
                 },
             };
         }

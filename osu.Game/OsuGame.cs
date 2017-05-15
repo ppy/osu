@@ -88,7 +88,7 @@ namespace osu.Game
 
             Dependencies.Cache(this);
 
-            configRuleset = LocalConfig.GetBindable<int>(OsuConfig.Ruleset);
+            configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetDatabase.GetRuleset(configRuleset.Value);
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
         }
