@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            buttons.OnSettings = game.ToggleOptions;
+            buttons.OnSettings = game.ToggleSettings;
 
             preloadSongSelect();
         }
