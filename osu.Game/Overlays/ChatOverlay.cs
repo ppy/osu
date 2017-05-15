@@ -306,7 +306,7 @@ namespace osu.Game.Overlays
 
                 //batch messages per channel.
                 foreach (var id in ids)
-                    careChannels.Find(c => c.Id == id)?.AddNewMessages(messages.Where(m => m.TargetId == id));
+                    careChannels.Find(c => c.Id == id)?.AddNewMessages(messages.Where(m => m.TargetId == id).ToArray());
 
                 lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
 
@@ -326,38 +326,45 @@ namespace osu.Game.Overlays
         {
             var postText = textbox.Text;
 
-            if (!string.IsNullOrEmpty(postText) && api.LocalUser.Value != null)
+            if (string.IsNullOrEmpty(postText) || api.LocalUser.Value == null) return;
+
+            if (currentChannel == null) return;
+
+            if (postText[0] == '/')
             {
-                if (currentChannel == null) return;
-
-                var message = new Message
-                {
-                    Sender = api.LocalUser.Value,
-                    Timestamp = DateTimeOffset.Now,
-                    TargetType = TargetType.Channel, //TODO: read this from currentChannel
-                    TargetId = currentChannel.Id,
-                    Content = postText
-                };
-
-                textbox.ReadOnly = true;
-                var req = new PostMessageRequest(message);
-
-                req.Failure += e =>
-                {
-                    textbox.FlashColour(Color4.Red, 1000);
-                    textbox.ReadOnly = false;
-                };
-
-                req.Success += m =>
-                {
-                    currentChannel.AddNewMessages(new[] { m });
-
-                    textbox.ReadOnly = false;
-                    textbox.Text = string.Empty;
-                };
-
-                api.Queue(req);
+                // TODO: handle commands
+                currentChannel.AddNewMessages(new ErrorMessage("Chat commands are not supported yet!"));
+                textbox.Text = string.Empty;
+                return;
             }
+                
+            var message = new Message
+            {
+                Sender = api.LocalUser.Value,
+                Timestamp = DateTimeOffset.Now,
+                TargetType = TargetType.Channel, //TODO: read this from currentChannel
+                TargetId = currentChannel.Id,
+                Content = postText
+            };
+
+            textbox.ReadOnly = true;
+            var req = new PostMessageRequest(message);
+
+            req.Failure += e =>
+            {
+                textbox.FlashColour(Color4.Red, 1000);
+                textbox.ReadOnly = false;
+            };
+
+            req.Success += m =>
+            {
+                currentChannel.AddNewMessages(m);
+
+                textbox.ReadOnly = false;
+                textbox.Text = string.Empty;
+            };
+
+            api.Queue(req);
         }
     }
 }
