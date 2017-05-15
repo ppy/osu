@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Menu
 
         private readonly Container colourAndTriangles;
 
+        private readonly MenuVisualisation visualizer;
+
         public Action Action;
 
         public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X * 0.78f;
@@ -46,6 +48,14 @@ namespace osu.Game.Screens.Menu
             set
             {
                 colourAndTriangles.Alpha = value ? 1 : 0;
+            }
+        }
+
+        public bool Visualizer
+        {
+            set
+            {
+                visualizer.Alpha = value ? 1 : 0;
             }
         }
 
@@ -82,6 +92,7 @@ namespace osu.Game.Screens.Menu
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
+                                visualizer = new MenuVisualisation(),
                                 new BufferedContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
@@ -148,14 +159,6 @@ namespace osu.Game.Screens.Menu
                                         }
                                     }
                                 },
-                                new MenuVisualisation
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Size = logo.Size,
-                                    BlendingMode = BlendingMode.Additive,
-                                    Alpha = 0.2f,
-                                }
                             }
                         }
                     }

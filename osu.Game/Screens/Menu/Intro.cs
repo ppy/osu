@@ -51,7 +51,8 @@ namespace osu.Game.Screens.Menu
                             BlendingMode = BlendingMode.Additive,
                             Interactive = false,
                             Colour = Color4.DarkGray,
-                            Ripple = false
+                            Ripple = false,
+                            Visualizer = false,
                         }
                     }
                 }
