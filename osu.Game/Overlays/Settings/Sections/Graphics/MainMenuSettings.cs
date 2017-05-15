@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 new SettingsCheckbox
                 {
                     LabelText = "Parallax",
-                    Bindable = config.GetBindable<bool>(OsuConfig.MenuParallax)
+                    Bindable = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
             };
         }

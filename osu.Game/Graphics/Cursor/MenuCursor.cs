@@ -128,7 +128,7 @@ namespace osu.Game.Graphics.Cursor
                     }
                 };
 
-                cursorScale = config.GetBindable<double>(OsuConfig.MenuCursorSize);
+                cursorScale = config.GetBindable<double>(OsuSetting.MenuCursorSize);
                 cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale);
                 cursorScale.TriggerChange();
             }

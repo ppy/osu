@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 new SettingsCheckbox
                 {
                     LabelText = "Show FPS",
-                    Bindable = osuConfig.GetBindable<bool>(OsuConfig.ShowFpsDisplay)
+                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };
         }
