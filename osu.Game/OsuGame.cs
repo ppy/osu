@@ -62,14 +62,14 @@ namespace osu.Game
 
         private readonly string[] args;
 
-        private OptionsOverlay options;
+        private SettingsOverlay settings;
 
         public OsuGame(string[] args = null)
         {
             this.args = args;
         }
 
-        public void ToggleOptions() => options.ToggleVisibility();
+        public void ToggleSettings() => settings.ToggleVisibility();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -88,7 +88,7 @@ namespace osu.Game
 
             Dependencies.Cache(this);
 
-            configRuleset = LocalConfig.GetBindable<int>(OsuConfig.Ruleset);
+            configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetDatabase.GetRuleset(configRuleset.Value);
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
         }
@@ -161,7 +161,7 @@ namespace osu.Game
 
             //overlay elements
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
-            LoadComponentAsync(options = new OptionsOverlay { Depth = -1 }, overlayContent.Add);
+            LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
                 Depth = -2,
@@ -192,7 +192,7 @@ namespace osu.Game
                 });
             };
 
-            Dependencies.Cache(options);
+            Dependencies.Cache(settings);
             Dependencies.Cache(chat);
             Dependencies.Cache(musicController);
             Dependencies.Cache(notificationManager);
@@ -204,15 +204,15 @@ namespace osu.Game
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
             }, overlayContent.Add);
 
-            options.StateChanged += delegate
+            settings.StateChanged += delegate
             {
-                switch (options.State)
+                switch (settings.State)
                 {
                     case Visibility.Hidden:
-                        intro.MoveToX(0, OptionsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
+                        intro.MoveToX(0, SettingsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
                         break;
                     case Visibility.Visible:
-                        intro.MoveToX(OptionsOverlay.SIDEBAR_WIDTH / 2, OptionsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
+                        intro.MoveToX(SettingsOverlay.SIDEBAR_WIDTH / 2, SettingsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
                         break;
                 }
             };
@@ -247,7 +247,7 @@ namespace osu.Game
                         Toolbar.ToggleVisibility();
                         return true;
                     case Key.O:
-                        options.ToggleVisibility();
+                        settings.ToggleVisibility();
                         return true;
                 }
             }
@@ -276,7 +276,7 @@ namespace osu.Game
             //central game screen change logic.
             if (!currentScreen.ShowOverlays)
             {
-                options.State = Visibility.Hidden;
+                settings.State = Visibility.Hidden;
                 Toolbar.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;

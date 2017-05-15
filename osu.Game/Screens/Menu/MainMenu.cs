@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuGame game, OsuConfigManager config, BeatmapDatabase beatmaps)
         {
-            menuMusic = config.GetBindable<bool>(OsuConfig.MenuMusic);
+            menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
             LoadComponentAsync(background);
 
             if (!menuMusic)
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            buttons.OnSettings = game.ToggleOptions;
+            buttons.OnSettings = game.ToggleSettings;
 
             preloadSongSelect();
         }

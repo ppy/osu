@@ -79,8 +79,8 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
         {
-            dimLevel = config.GetBindable<double>(OsuConfig.DimLevel);
-            mouseWheelDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableWheel);
+            dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
             Ruleset rulesetInstance;
 
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Play
 
             offsetClock = new FramedOffsetClock(decoupledClock);
 
-            userAudioOffset = config.GetBindable<double>(OsuConfig.AudioOffset);
+            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
