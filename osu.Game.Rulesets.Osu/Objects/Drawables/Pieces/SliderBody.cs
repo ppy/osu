@@ -97,8 +97,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            snakingIn = config.GetBindable<bool>(OsuConfig.SnakingInSliders);
-            snakingOut = config.GetBindable<bool>(OsuConfig.SnakingOutSliders);
+            snakingIn = config.GetBindable<bool>(OsuSetting.SnakingInSliders);
+            snakingOut = config.GetBindable<bool>(OsuSetting.SnakingOutSliders);
 
             reloadTexture();
         }
