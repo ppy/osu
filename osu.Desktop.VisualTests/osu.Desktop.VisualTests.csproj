@@ -211,7 +211,7 @@
     <Compile Include="Tests\TestCaseTwoLayerButton.cs" />
     <Compile Include="VisualTestGame.cs" />
     <Compile Include="Platform\TestStorage.cs" />
-    <Compile Include="Tests\TestCaseOptions.cs" />
+    <Compile Include="Tests\TestCaseSettings.cs" />
     <Compile Include="Tests\TestCaseSongProgress.cs" />
     <Compile Include="Tests\TestCaseMods.cs" />
     <Compile Include="Tests\TestCaseDialogOverlay.cs" />
