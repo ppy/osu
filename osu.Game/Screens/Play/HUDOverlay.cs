@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, NotificationManager notificationManager)
         {
-            showKeyCounter = config.GetBindable<bool>(OsuConfig.KeyOverlay);
+            showKeyCounter = config.GetBindable<bool>(OsuSetting.KeyOverlay);
             showKeyCounter.ValueChanged += keyCounterVisibility =>
             {
                 if (keyCounterVisibility)
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
             };
             showKeyCounter.TriggerChange();
 
-            showHud = config.GetBindable<bool>(OsuConfig.ShowInterface);
+            showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
             showHud.ValueChanged += hudVisibility =>
             {
                 if (hudVisibility)

@@ -125,8 +125,8 @@ namespace osu.Game
 
             Dependencies.Cache(API = new APIAccess
             {
-                Username = LocalConfig.Get<string>(OsuConfig.Username),
-                Token = LocalConfig.Get<string>(OsuConfig.Token)
+                Username = LocalConfig.Get<string>(OsuSetting.Username),
+                Token = LocalConfig.Get<string>(OsuSetting.Token)
             });
 
             API.Register(this);
@@ -137,7 +137,7 @@ namespace osu.Game
             switch (state)
             {
                 case APIState.Online:
-                    LocalConfig.Set(OsuConfig.Username, LocalConfig.Get<bool>(OsuConfig.SaveUsername) ? API.Username : string.Empty);
+                    LocalConfig.Set(OsuSetting.Username, LocalConfig.Get<bool>(OsuSetting.SaveUsername) ? API.Username : string.Empty);
                     break;
             }
         }
@@ -166,7 +166,7 @@ namespace osu.Game
 
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
-            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuConfig.ShowFpsDisplay);
+            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
             fpsDisplayVisible.ValueChanged += val =>
             {
                 FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None;
@@ -192,7 +192,7 @@ namespace osu.Game
             //refresh token may have changed.
             if (LocalConfig != null && API != null)
             {
-                LocalConfig.Set(OsuConfig.Token, LocalConfig.Get<bool>(OsuConfig.SavePassword) ? API.Token : string.Empty);
+                LocalConfig.Set(OsuSetting.Token, LocalConfig.Get<bool>(OsuSetting.SavePassword) ? API.Token : string.Empty);
                 LocalConfig.Save();
             }
 

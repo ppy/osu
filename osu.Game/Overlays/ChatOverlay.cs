@@ -195,7 +195,7 @@ namespace osu.Game.Overlays
             this.api = api;
             api.Register(this);
 
-            chatHeight = config.GetBindable<double>(OsuConfig.ChatDisplayHeight);
+            chatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
             chatHeight.ValueChanged += h =>
             {
                 Height = (float)h;
