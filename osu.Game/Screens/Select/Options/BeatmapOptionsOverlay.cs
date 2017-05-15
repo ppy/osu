@@ -4,14 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Select.Options
 {

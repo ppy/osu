@@ -8,71 +8,71 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Configuration
 {
-    public class OsuConfigManager : ConfigManager<OsuConfig>
+    public class OsuConfigManager : ConfigManager<OsuSetting>
     {
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
 
-            Set(OsuConfig.Ruleset, 0, 0, int.MaxValue);
-            Set(OsuConfig.BeatmapDetailTab, BeatmapDetailTab.Details);
+            Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
+            Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
-            Set(OsuConfig.DisplayStarsMinimum, 0.0, 0, 10);
-            Set(OsuConfig.DisplayStarsMaximum, 10.0, 0, 10);
+            Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10);
+            Set(OsuSetting.DisplayStarsMaximum, 10.0, 0, 10);
 
-            Set(OsuConfig.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
+            Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
 
             // Online settings
 
-            Set(OsuConfig.Username, string.Empty);
-            Set(OsuConfig.Token, string.Empty);
+            Set(OsuSetting.Username, string.Empty);
+            Set(OsuSetting.Token, string.Empty);
 
-            Set(OsuConfig.SavePassword, false).ValueChanged += val =>
+            Set(OsuSetting.SavePassword, false).ValueChanged += val =>
             {
-                if (val) Set(OsuConfig.SaveUsername, true);
+                if (val) Set(OsuSetting.SaveUsername, true);
             };
 
-            Set(OsuConfig.SaveUsername, true).ValueChanged += val =>
+            Set(OsuSetting.SaveUsername, true).ValueChanged += val =>
             {
-                if (!val) Set(OsuConfig.SavePassword, false);
+                if (!val) Set(OsuSetting.SavePassword, false);
             };
 
             // Audio
 
-            Set(OsuConfig.AudioDevice, string.Empty);
+            Set(OsuSetting.AudioDevice, string.Empty);
 
-            Set(OsuConfig.MenuVoice, true);
-            Set(OsuConfig.MenuMusic, true);
+            Set(OsuSetting.MenuVoice, true);
+            Set(OsuSetting.MenuMusic, true);
 
-            Set(OsuConfig.AudioOffset, 0, -500.0, 500.0);
+            Set(OsuSetting.AudioOffset, 0, -500.0, 500.0);
 
             // Input
 
-            Set(OsuConfig.MenuCursorSize, 1.0, 0.5f, 2);
-            Set(OsuConfig.GameplayCursorSize, 1.0, 0.5f, 2);
+            Set(OsuSetting.MenuCursorSize, 1.0, 0.5f, 2);
+            Set(OsuSetting.GameplayCursorSize, 1.0, 0.5f, 2);
 
-            Set(OsuConfig.MouseDisableButtons, false);
-            Set(OsuConfig.MouseDisableWheel, false);
+            Set(OsuSetting.MouseDisableButtons, false);
+            Set(OsuSetting.MouseDisableWheel, false);
 
             // Graphics
 
-            Set(OsuConfig.ShowFpsDisplay, false);
+            Set(OsuSetting.ShowFpsDisplay, false);
 
-            Set(OsuConfig.MenuParallax, true);
+            Set(OsuSetting.MenuParallax, true);
 
-            Set(OsuConfig.SnakingInSliders, true);
-            Set(OsuConfig.SnakingOutSliders, true);
+            Set(OsuSetting.SnakingInSliders, true);
+            Set(OsuSetting.SnakingOutSliders, true);
 
             // Gameplay
 
-            Set(OsuConfig.DimLevel, 0.3, 0, 1);
+            Set(OsuSetting.DimLevel, 0.3, 0, 1);
 
-            Set(OsuConfig.ShowInterface, true);
-            Set(OsuConfig.KeyOverlay, false);
+            Set(OsuSetting.ShowInterface, true);
+            Set(OsuSetting.KeyOverlay, false);
 
             // Update
 
-            Set(OsuConfig.ReleaseStream, ReleaseStream.Lazer);
+            Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
         }
 
         public OsuConfigManager(Storage storage) : base(storage)
@@ -80,7 +80,7 @@ namespace osu.Game.Configuration
         }
     }
 
-    public enum OsuConfig
+    public enum OsuSetting
     {
         Ruleset,
         Token,
