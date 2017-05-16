@@ -195,6 +195,7 @@
     <Compile Include="Tests\TestCaseMenuOverlays.cs" />
     <Compile Include="Tests\TestCaseMusicController.cs" />
     <Compile Include="Tests\TestCaseNotificationManager.cs" />
+    <Compile Include="Tests\TestCaseOnScreenDisplay.cs" />
     <Compile Include="Tests\TestCasePlayer.cs" />
     <Compile Include="Tests\TestCaseHitObjects.cs" />
     <Compile Include="Tests\TestCaseKeyCounter.cs" />
