@@ -10,6 +10,7 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps.Timing;
+using OpenTK;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -32,7 +33,8 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    SpecialColumnPosition = pos
+                    SpecialColumnPosition = pos,
+                    Scale = new Vector2(1, -1)
                 });
             };
 
