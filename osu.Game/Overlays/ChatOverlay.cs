@@ -17,7 +17,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Graphics.UserInterface;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using OpenTK.Graphics;
 using osu.Framework.Input;
