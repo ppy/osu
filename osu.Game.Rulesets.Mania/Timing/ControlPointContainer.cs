@@ -132,6 +132,9 @@ namespace osu.Game.Rulesets.Mania.Timing
                         return;
                     }
 
+                    if (!Children.Any())
+                        return;
+
                     float height = Children.Select(child => child.Y + child.Height).Max();
 
                     Height = height;
