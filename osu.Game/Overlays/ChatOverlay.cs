@@ -245,7 +245,7 @@ namespace osu.Game.Overlays
                     addChannel(channels.Find(c => c.Name == @"#lobby"));
                 });
 
-                messageRequest = Scheduler.AddDelayed(() => fetchNewMessages(), 1000, true);
+                messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
             };
 
             api.Queue(req);
@@ -289,17 +289,34 @@ namespace osu.Game.Overlays
             channelTabs.AddItem(channel);
 
             // we need to get a good number of messages initially for each channel we care about.
-            fetchNewMessages(channel);
+            fetchInitialMessages(channel);
 
             if (CurrentChannel == null)
                 CurrentChannel = channel;
         }
 
-        private void fetchNewMessages(Channel specificChannel = null)
+        private void fetchInitialMessages(Channel channel)
+        {
+            var req = new GetMessagesRequest(new List<Channel> { channel }, null);
+
+            req.Success += delegate (List<Message> messages)
+            {
+                channel.AddNewMessages(messages.ToArray());
+                Debug.Write("success!");
+            };
+            req.Failure += delegate
+            {
+                Debug.Write("failure!");
+            };
+
+            api.Queue(req);
+        }
+
+        private void fetchNewMessages()
         {
             if (fetchReq != null) return;
 
-            fetchReq = new GetMessagesRequest(specificChannel != null ? new List<Channel> { specificChannel } : careChannels, lastMessageId);
+            fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
             fetchReq.Success += delegate (List<Message> messages)
             {
                 var ids = messages.Where(m => m.TargetType == TargetType.Channel).Select(m => m.TargetId).Distinct();
