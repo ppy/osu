@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public DrawableNote(Note hitObject)
             : base(hitObject)
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.Both;
+            Height = 100;
 
             Add(headPiece = new NotePiece
             {

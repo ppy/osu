@@ -41,10 +41,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Origin = Anchor.TopCentre
                 }
             });
-
-            // The "length" of the hold note stops at the "base" of the tail piece
-            // but we want to contain the tail piece within our bounds
-            Height += (float)HitObject.Duration / headPiece.Height;
         }
 
         public override Color4 AccentColour
