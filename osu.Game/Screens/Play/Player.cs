@@ -224,6 +224,15 @@ namespace osu.Game.Screens.Play
             };
         }
 
+        protected override void Update()
+        {
+            // eagerly pause when we lose window focus (if we are locally playing).
+            if (!Game.IsActive && !HitRenderer.HasReplayLoaded)
+                Pause();
+
+            base.Update();
+        }
+
         private void initializeSkipButton()
         {
             const double skip_required_cutoff = 3000;
