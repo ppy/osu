@@ -12,7 +12,6 @@ using System.Linq;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Screens.Play
 {
@@ -28,10 +27,12 @@ namespace osu.Game.Screens.Play
 
         private readonly SongProgressBar bar;
         private readonly SongProgressGraph graph;
+        private readonly SongProgressInfo info;
 
         public Action<double> OnSeek;
 
-        public IClock AudioClock;
+        private IClock audioClock;
+        public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
 
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
 
@@ -44,6 +45,9 @@ namespace osu.Game.Screens.Play
             set
             {
                 graph.Objects = objects = value;
+
+                info.StartTime = firstHitTime;
+                info.EndTime = lastHitTime;
             }
         }
 
@@ -62,6 +66,14 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
+                info = new SongProgressInfo
+                {
+                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Margin = new MarginPadding { Bottom = bottom_bar_height + graph_height },
+                },
                 graph = new SongProgressGraph
                 {
                     RelativeSizeAxes = Axes.X,
@@ -130,10 +142,13 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            double progress = ((AudioClock?.CurrentTime ?? Time.Current) - firstHitTime) / lastHitTime;
+            double progress = ((audioClock?.CurrentTime ?? Time.Current) - firstHitTime) / (lastHitTime - firstHitTime);
 
-            bar.UpdatePosition((float)progress);
-            graph.Progress = (int)(graph.ColumnCount * progress);
+            if(progress < 1)
+            {
+                bar.UpdatePosition((float)progress);
+                graph.Progress = (int)(graph.ColumnCount * progress);
+            }
         }
     }
 }

@@ -6,11 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Select;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
@@ -62,6 +60,7 @@ namespace osu.Game.Overlays.Music
 
             protected override Color4 BackgroundUnfocused => backgroundColour;
             protected override Color4 BackgroundFocused => backgroundColour;
+            protected override bool AllowCommit => true;
 
             public FilterTextBox()
             {
