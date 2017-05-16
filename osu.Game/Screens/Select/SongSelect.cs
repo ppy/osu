@@ -11,7 +11,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
