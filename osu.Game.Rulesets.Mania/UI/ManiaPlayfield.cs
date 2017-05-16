@@ -20,6 +20,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Framework.Input;
 using osu.Game.Beatmaps.Timing;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -196,10 +198,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 switch (args.Key)
                 {
                     case Key.Minus:
-                        TimeSpan += time_span_step;
+                        transformTimeSpanTo(TimeSpan + time_span_step, 200, EasingTypes.OutQuint);
                         break;
                     case Key.Plus:
-                        TimeSpan -= time_span_step;
+                        transformTimeSpanTo(TimeSpan - time_span_step, 200, EasingTypes.OutQuint);
                         break;
                 }
             }
@@ -227,5 +229,32 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        private void transformTimeSpanTo(double newTimeSpan, double duration = 0, EasingTypes easing = EasingTypes.None)
+        {
+            TransformTo(() => TimeSpan, newTimeSpan, duration, easing, new TransformTimeSpan());
+        }
+
+        private class TransformTimeSpan : Transform<double>
+        {
+            public override double CurrentValue
+            {
+                get
+                {
+                    double time = Time?.Current ?? 0;
+                    if (time < StartTime) return StartValue;
+                    if (time >= EndTime) return EndValue;
+
+                    return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+                }
+            }
+
+            public override void Apply(Drawable d)
+            {
+                base.Apply(d);
+
+                var p = (ManiaPlayfield)d;
+                p.TimeSpan = CurrentValue;
+            }
+        }
     }
 }
