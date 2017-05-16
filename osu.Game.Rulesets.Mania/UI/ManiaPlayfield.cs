@@ -216,6 +216,8 @@ namespace osu.Game.Rulesets.Mania.UI
                     return;
                 timeSpan = value;
 
+                timeSpan = MathHelper.Clamp(timeSpan, time_span_min, time_span_max);
+
                 barlineContainer.TimeSpan = value;
                 Columns.Children.ForEach(c => c.TimingSectionContainer.TimeSpan = value);
             }
