@@ -66,7 +66,7 @@ namespace osu.Game.IO.Legacy
         public DateTime ReadDateTime()
         {
             long ticks = ReadInt64();
-            if (ticks < 0) throw new AbandonedMutexException("oops");
+            if (ticks < 0) throw new IOException("Bad ticks count read!");
             return new DateTime(ticks, DateTimeKind.Utc);
         }
 
