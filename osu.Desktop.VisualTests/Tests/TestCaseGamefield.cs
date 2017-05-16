@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Taiko.UI;
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Beatmaps;
 using osu.Framework.Allocation;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -52,6 +53,12 @@ namespace osu.Desktop.VisualTests.Tests
                 time += RNG.Next(50, 500);
             }
 
+            TimingInfo timing = new TimingInfo();
+            timing.ControlPoints.Add(new ControlPoint
+            {
+                BeatLength = 200
+            });
+
             WorkingBeatmap beatmap = new TestWorkingBeatmap(new Beatmap
             {
                 HitObjects = objects,
@@ -64,8 +71,9 @@ namespace osu.Desktop.VisualTests.Tests
                         Artist = @"Unknown",
                         Title = @"Sample Beatmap",
                         Author = @"peppy",
-                    }
-                }
+                    },
+                },
+                TimingInfo = timing
             });
 
             Add(new Drawable[]

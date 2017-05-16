@@ -12,13 +12,17 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Timing;
+using System.Collections.Generic;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public class Column : Container, IHasAccentColour
     {
-        private const float key_size = 50;
-
         private const float key_icon_size = 10;
         private const float key_icon_corner_radius = 3;
         private const float key_icon_border_radius = 2;
@@ -35,7 +39,9 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
-        public Column()
+        public readonly ControlPointContainer ControlPointContainer;
+
+        public Column(IEnumerable<ControlPoint> timingChanges)
         {
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
@@ -48,59 +54,16 @@ namespace osu.Game.Rulesets.Mania.UI
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.2f
                 },
-                new FillFlowContainer
+                new Container
                 {
-                    Name = "Key + hit target",
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Children = new[]
+                    Name = "Hit target + hit objects",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = ManiaPlayfield.HIT_TARGET_POSITION},
+                    Children = new Drawable[]
                     {
                         new Container
                         {
-                            Name = "Key",
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            RelativeSizeAxes = Axes.X,
-                            Height = key_size,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    Name = "Key gradient",
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColourInfo = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0)),
-                                    Alpha = 0.5f
-                                },
-                                keyIcon = new Container
-                                {
-                                    Name = "Key icon",
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Size = new Vector2(key_icon_size),
-                                    Masking = true,
-                                    CornerRadius = key_icon_corner_radius,
-                                    BorderThickness = 2,
-                                    BorderColour = Color4.White, // Not true
-                                    Children = new[]
-                                    {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Alpha = 0,
-                                            AlwaysPresent = true
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        new Container
-                        {
                             Name = "Hit target",
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.X,
                             Height = hit_target_height,
                             Children = new Drawable[]
@@ -114,8 +77,6 @@ namespace osu.Game.Rulesets.Mania.UI
                                 hitTargetBar = new Container
                                 {
                                     Name = "Bar",
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
                                     RelativeSizeAxes = Axes.X,
                                     Height = hit_target_bar_height,
                                     Masking = true,
@@ -126,6 +87,47 @@ namespace osu.Game.Rulesets.Mania.UI
                                             RelativeSizeAxes = Axes.Both
                                         }
                                     }
+                                }
+                            }
+                        },
+                        ControlPointContainer = new ControlPointContainer(timingChanges)
+                        {
+                            Name = "Hit objects",
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    }
+                },
+                new Container
+                {
+                    Name = "Key",
+                    RelativeSizeAxes = Axes.X,
+                    Height = ManiaPlayfield.HIT_TARGET_POSITION,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Name = "Key gradient",
+                            RelativeSizeAxes = Axes.Both,
+                            ColourInfo = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0)),
+                            Alpha = 0.5f
+                        },
+                        keyIcon = new Container
+                        {
+                            Name = "Key icon",
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(key_icon_size),
+                            Masking = true,
+                            CornerRadius = key_icon_corner_radius,
+                            BorderThickness = 2,
+                            BorderColour = Color4.White, // Not true
+                            Children = new[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Alpha = 0,
+                                    AlwaysPresent = true
                                 }
                             }
                         }
@@ -176,9 +178,17 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        public void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject)
+        {
+            ControlPointContainer.Add(hitObject);
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == Key && !args.Repeat)
+            if (args.Repeat)
+                return false;
+
+            if (args.Key == Key)
             {
                 background.FadeTo(background.Alpha + 0.2f, 50, EasingTypes.OutQuint);
                 keyIcon.ScaleTo(1.4f, 50, EasingTypes.OutQuint);
@@ -198,5 +208,4 @@ namespace osu.Game.Rulesets.Mania.UI
             return false;
         }
     }
-
 }

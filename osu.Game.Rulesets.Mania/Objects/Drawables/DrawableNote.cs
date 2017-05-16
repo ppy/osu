@@ -15,13 +15,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public DrawableNote(Note hitObject)
             : base(hitObject)
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.Both;
+            Height = 100;
 
             Add(headPiece = new NotePiece
             {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre
             });
         }
 
@@ -36,6 +36,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 headPiece.AccentColour = value;
             }
+        }
+
+        protected override void Update()
+        {
+            if (Time.Current > HitObject.StartTime)
+                Colour = Color4.Green;
         }
 
         protected override void UpdateState(ArmedState state)
