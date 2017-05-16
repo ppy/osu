@@ -12,7 +12,7 @@ using osu.Game.Beatmaps.Timing;
 namespace osu.Game.Rulesets.Mania.Timing
 {
     /// <summary>
-    /// A container in which the Y-relative coordinate space is spanned by a length of time.
+    /// A container in which added drawables are put into a relative coordinate space spanned by a length of time.
     /// <para>
     /// This container contains <see cref="ControlPoint"/>s which scroll inside this container.
     /// Drawables added to this container are moved inside the relevant <see cref="ControlPoint"/>,
@@ -22,39 +22,38 @@ namespace osu.Game.Rulesets.Mania.Timing
     public class ControlPointContainer : Container<Drawable>
     {
         /// <summary>
-        /// The amount of time which the height of this container spans.
+        /// The amount of time which this container spans.
         /// </summary>
         public double TimeSpan { get; set; }
 
-        private readonly List<DrawableTimingSection> drawableTimingSections;
+        private readonly List<DrawableControlPoint> drawableControlPoints;
 
         public ControlPointContainer(IEnumerable<ControlPoint> timingChanges)
         {
-            drawableTimingSections = timingChanges.Select(t => new DrawableTimingSection(t)).ToList();
-
-            Children = drawableTimingSections;
+            drawableControlPoints = timingChanges.Select(t => new DrawableControlPoint(t)).ToList();
+            Children = drawableControlPoints;
         }
 
         /// <summary>
-        /// Adds a drawable to this container. Note that the drawable added must have a
-        /// Y-position as a time relative to this container.
+        /// Adds a drawable to this container. Note that the drawable added must have its Y-position be
+        /// an absolute unit of time that is _not_ relative to <see cref="TimeSpan"/>.
         /// </summary>
         /// <param name="drawable">The drawable to add.</param>
         public override void Add(Drawable drawable)
         {
             // Always add timing sections to ourselves
-            if (drawable is DrawableTimingSection)
+            if (drawable is DrawableControlPoint)
             {
                 base.Add(drawable);
                 return;
             }
 
-            var section = drawableTimingSections.LastOrDefault(t => t.CanContain(drawable)) ?? drawableTimingSections.FirstOrDefault();
+            var controlPoint = drawableControlPoints.LastOrDefault(t => t.CanContain(drawable)) ?? drawableControlPoints.FirstOrDefault();
 
-            if (section == null)
+            if (controlPoint == null)
                 throw new Exception("Could not find suitable timing section to add object to.");
 
-            section.Add(drawable);
+            controlPoint.Add(drawable);
         }
 
         /// <summary>
@@ -63,7 +62,7 @@ namespace osu.Game.Rulesets.Mania.Timing
         /// The content of this container will scroll relative to the current time.
         /// </para>
         /// </summary>
-        private class DrawableTimingSection : Container
+        private class DrawableControlPoint : Container
         {
             private readonly ControlPoint timingChange;
 
@@ -71,15 +70,13 @@ namespace osu.Game.Rulesets.Mania.Timing
             private readonly Container content;
 
             /// <summary>
-            /// Creates a drawable timing section. The height of this container will be proportional
-            /// to the beat length of the timing section and the timespan of its parent at all times.
-            /// <para>
-            /// This is so that, e.g. a beat length of 500ms results in this container being twice as high as its parent,
-            /// which means that the content container will scroll at twice the normal rate.
-            /// </para>
+            /// Creates a drawable control point. The height of this container will be proportional
+            /// to the beat length of the control point it is initialized with such that, e.g. a beat length
+            /// of 500ms results in this container being twice as high as its parent, which further means that
+            /// the content container will scroll at twice the normal rate.
             /// </summary>
-            /// <param name="timingChange">The timing change to create the drawable timing section for.</param>
-            public DrawableTimingSection(ControlPoint timingChange)
+            /// <param name="timingChange">The control point to create the drawable control point for.</param>
+            public DrawableControlPoint(ControlPoint timingChange)
             {
                 this.timingChange = timingChange;
 
@@ -107,9 +104,9 @@ namespace osu.Game.Rulesets.Mania.Timing
 
             public override void Add(Drawable drawable)
             {
-                // The previously relatively-positioned drawable will now become relative to us, but since the drawable has no knowledge of us,
-                // we need to offset it back by our position so that it becomes correctly relatively-positioned to us
-                // This can be removed if hit objects were stored such that either their StartTime or their "beat offset" was relative to the timing section
+                // The previously relatively-positioned drawable will now become relative to content, but since the drawable has no knowledge of content,
+                // we need to offset it back by content's position position so that it becomes correctly relatively-positioned to content
+                // This can be removed if hit objects were stored such that either their StartTime or their "beat offset" was relative to the timing change
                 // they belonged to, but this requires a radical change to the beatmap format which we're not ready to do just yet
                 drawable.Y -= (float)timingChange.Time;
 
@@ -117,8 +114,7 @@ namespace osu.Game.Rulesets.Mania.Timing
             }
 
             /// <summary>
-            /// Whether this timing section can contain a drawable. A timing section can contain a drawable if the drawable
-            /// can be placed within the timing section's bounds (in this case, from the start of the timing section up to infinity).
+            /// Whether this control point can contain a drawable. This control point can contain a drawable if the drawable is positioned "after" this control point.
             /// </summary>
             /// <param name="drawable">The drawable to check.</param>
             public bool CanContain(Drawable drawable) => content.Y <= drawable.Y;
@@ -136,14 +132,7 @@ namespace osu.Game.Rulesets.Mania.Timing
                         return;
                     }
 
-                    float height = 0;
-
-                    foreach (Drawable child in Children)
-                    {
-                        float childEndPos = child.Y + child.Height;
-                        if (childEndPos > height)
-                            height = childEndPos;
-                    }
+                    float height = Children.Select(child => child.Y + child.Height).Max();
 
                     Height = height;
                     RelativeCoordinateSpace = new Vector2(1, height);
