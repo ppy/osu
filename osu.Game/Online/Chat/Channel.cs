@@ -38,9 +38,9 @@ namespace osu.Game.Online.Chat
 
         public event Action<IEnumerable<Message>> NewMessagesArrived;
 
-        public void AddNewMessages(IEnumerable<Message> messages)
+        public void AddNewMessages(params Message[] messages)
         {
-            messages = messages.Except(Messages).ToList();
+            messages = messages.Except(Messages).ToArray();
 
             Messages.AddRange(messages);
 
