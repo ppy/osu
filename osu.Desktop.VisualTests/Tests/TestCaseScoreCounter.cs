@@ -3,12 +3,11 @@
 
 using OpenTK;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play.HUD;
 
 namespace osu.Desktop.VisualTests.Tests
 {

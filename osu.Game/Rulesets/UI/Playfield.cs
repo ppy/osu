@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The HitObjects contained in this Playfield.
         /// </summary>
-        public HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects;
+        protected HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects;
 
         internal Container<Drawable> ScaledContent;
 
@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.UI
                 {
                     content = new Container
                     {
+                        AlwaysReceiveInput = true,
                         RelativeSizeAxes = Axes.Both,
                     }
                 }

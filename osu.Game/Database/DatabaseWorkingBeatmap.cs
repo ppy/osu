@@ -14,8 +14,8 @@ namespace osu.Game.Database
     {
         private readonly BeatmapDatabase database;
 
-        public DatabaseWorkingBeatmap(BeatmapDatabase database, BeatmapInfo beatmapInfo, BeatmapSetInfo beatmapSetInfo, bool withStoryboard = false)
-            : base(beatmapInfo, beatmapSetInfo, withStoryboard)
+        public DatabaseWorkingBeatmap(BeatmapDatabase database, BeatmapInfo beatmapInfo, bool withStoryboard = false)
+            : base(beatmapInfo, withStoryboard)
         {
             this.database = database;
         }
@@ -51,13 +51,13 @@ namespace osu.Game.Database
 
         protected override Texture GetBackground()
         {
-            if (BeatmapInfo?.Metadata?.BackgroundFile == null)
+            if (Metadata?.BackgroundFile == null)
                 return null;
 
             try
             {
                 using (var reader = getReader())
-                    return new TextureStore(new RawTextureLoaderStore(reader), false).Get(BeatmapInfo.Metadata.BackgroundFile);
+                    return new TextureStore(new RawTextureLoaderStore(reader), false).Get(Metadata.BackgroundFile);
             }
             catch { return null; }
         }
@@ -66,7 +66,7 @@ namespace osu.Game.Database
         {
             try
             {
-                var trackData = getReader()?.GetStream(BeatmapInfo.Metadata.AudioFile);
+                var trackData = getReader()?.GetStream(Metadata.AudioFile);
                 return trackData == null ? null : new TrackBass(trackData);
             }
             catch { return null; }
