@@ -46,6 +46,7 @@ namespace osu.Game.Overlays.Chat
             private Color4 backgroundActive;
 
             private readonly SpriteText text;
+            private readonly SpriteText textBold;
             private readonly Box box;
             private readonly Box highlightBox;
 
@@ -77,7 +78,9 @@ namespace osu.Game.Overlays.Chat
 
                 box.FadeColour(backgroundActive, transition_length, EasingTypes.OutQuint);
                 highlightBox.FadeIn(transition_length, EasingTypes.OutQuint);
-                text.Font = @"Exo2.0-Bold";
+
+                text.FadeOut(transition_length, EasingTypes.OutQuint);
+                textBold.FadeIn(transition_length, EasingTypes.OutQuint);
             }
 
             private void fadeInactive()
@@ -86,7 +89,9 @@ namespace osu.Game.Overlays.Chat
 
                 box.FadeColour(backgroundInactive, transition_length, EasingTypes.OutQuint);
                 highlightBox.FadeOut(transition_length, EasingTypes.OutQuint);
-                text.Font = @"Exo2.0-Regular";
+
+                text.FadeIn(transition_length, EasingTypes.OutQuint);
+                textBold.FadeOut(transition_length, EasingTypes.OutQuint);
             }
 
             protected override bool OnHover(InputState state)
@@ -170,6 +175,16 @@ namespace osu.Game.Overlays.Chat
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                                 Text = value.ToString(),
+                                TextSize = 18,
+                            },
+                            textBold = new OsuSpriteText
+                            {
+                                Alpha = 0,
+                                Margin = new MarginPadding(5),
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                                Text = value.ToString(),
+                                Font = @"Exo2.0-Bold",
                                 TextSize = 18,
                             },
                         }
