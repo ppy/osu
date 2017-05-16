@@ -71,6 +71,9 @@ namespace osu.Game.Rulesets.Mania.Timing
         {
             private readonly ControlPoint timingChange;
 
+            protected override Container<Drawable> Content => content;
+            private readonly Container content;
+
             /// <summary>
             /// Creates a drawable timing section. The height of this container will be proportional
             /// to the beat length of the timing section and the timespan of its parent at all times.
@@ -89,7 +92,14 @@ namespace osu.Game.Rulesets.Mania.Timing
 
                 RelativeSizeAxes = Axes.Both;
 
-                Y = -(float)timingChange.Time;
+                AddInternal(content = new AutoTimeRelativeContainer
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    RelativePositionAxes = Axes.Both,
+                    Y = -(float)timingChange.Time
+                });
             }
 
             protected override void Update()
@@ -101,7 +111,7 @@ namespace osu.Game.Rulesets.Mania.Timing
                 RelativeCoordinateSpace = new Vector2(1, (float)parent.TimeSpan);
 
                 // Scroll the content
-                Y = (float)(Time.Current - timingChange.Time);
+                content.Y = (float)(Time.Current - timingChange.Time);
             }
 
             public override void Add(Drawable drawable)
@@ -120,7 +130,28 @@ namespace osu.Game.Rulesets.Mania.Timing
             /// can be placed within the timing section's bounds (in this case, from the start of the timing section up to infinity).
             /// </summary>
             /// <param name="drawable">The drawable to check.</param>
-            public bool CanContain(Drawable drawable) => Y >= drawable.Y;
+            public bool CanContain(Drawable drawable) => content.Y >= drawable.Y;
+
+            private class AutoTimeRelativeContainer : Container
+            {
+                public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+                {
+                    float height = 0;
+
+                    foreach (Drawable child in Children)
+                    {
+                        // Todo: This is wrong, it won't work for absolute-y-sized children
+                        float childEndPos = -child.Y + child.Height;
+                        if (childEndPos > height)
+                            height = childEndPos;
+                    }
+
+                    Height = height;
+                    RelativeCoordinateSpace = new Vector2(1, height);
+
+                    return base.Invalidate(invalidation, source, shallPropagate);
+                }
+            }
         }
     }
 }
