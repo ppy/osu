@@ -12,7 +12,6 @@ using System.Linq;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Screens.Play
 {
