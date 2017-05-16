@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
 
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
                 background = new Box
                 {
