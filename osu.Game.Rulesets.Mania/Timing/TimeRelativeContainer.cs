@@ -87,18 +87,13 @@ namespace osu.Game.Rulesets.Mania.Timing
             {
                 this.timingChange = timingChange;
 
-                Anchor = Anchor.BottomCentre;
-                Origin = Anchor.BottomCentre;
-
                 RelativeSizeAxes = Axes.Both;
 
                 AddInternal(content = new AutoTimeRelativeContainer
                 {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.Both,
-                    Y = -(float)timingChange.Time
+                    Y = (float)timingChange.Time
                 });
             }
 
@@ -111,7 +106,7 @@ namespace osu.Game.Rulesets.Mania.Timing
                 RelativeCoordinateSpace = new Vector2(1, (float)parent.TimeSpan);
 
                 // Scroll the content
-                content.Y = (float)(Time.Current - timingChange.Time);
+                content.Y = (float)(timingChange.Time - Time.Current);
             }
 
             public override void Add(Drawable drawable)
@@ -120,7 +115,7 @@ namespace osu.Game.Rulesets.Mania.Timing
                 // we need to offset it back by our position so that it becomes correctly relatively-positioned to us
                 // This can be removed if hit objects were stored such that either their StartTime or their "beat offset" was relative to the timing section
                 // they belonged to, but this requires a radical change to the beatmap format which we're not ready to do just yet
-                drawable.Y += (float)timingChange.Time;
+                drawable.Y -= (float)timingChange.Time;
 
                 base.Add(drawable);
             }
@@ -130,7 +125,7 @@ namespace osu.Game.Rulesets.Mania.Timing
             /// can be placed within the timing section's bounds (in this case, from the start of the timing section up to infinity).
             /// </summary>
             /// <param name="drawable">The drawable to check.</param>
-            public bool CanContain(Drawable drawable) => content.Y >= drawable.Y;
+            public bool CanContain(Drawable drawable) => content.Y <= drawable.Y;
 
             private class AutoTimeRelativeContainer : Container
             {
@@ -140,8 +135,7 @@ namespace osu.Game.Rulesets.Mania.Timing
 
                     foreach (Drawable child in Children)
                     {
-                        // Todo: This is wrong, it won't work for absolute-y-sized children
-                        float childEndPos = -child.Y + child.Height;
+                        float childEndPos = child.Y + child.Height;
                         if (childEndPos > height)
                             height = childEndPos;
                     }
