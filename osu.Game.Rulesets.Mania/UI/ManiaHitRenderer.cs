@@ -66,7 +66,9 @@ namespace osu.Game.Rulesets.Mania.UI
             return new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize), timingChanges)
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Origin = Anchor.Centre,
+                // Invert by default for now (should be moved to config/skin later)
+                Scale = new Vector2(1, -1)
             };
         }
 
