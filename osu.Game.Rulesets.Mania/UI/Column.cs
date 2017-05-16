@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Beatmaps.Timing;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -56,51 +57,50 @@ namespace osu.Game.Rulesets.Mania.UI
                 },
                 new Container
                 {
-                    Name = "Hit target",
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    Height = hit_target_height,
-                    Y = -ManiaPlayfield.HIT_TARGET_POSITION,
+                    Name = "Hit target + hit objects",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = ManiaPlayfield.HIT_TARGET_POSITION},
                     Children = new Drawable[]
                     {
-                        new Box
+                        new Container
                         {
-                            Name = "Background",
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black
-                        },
-                        hitTargetBar = new Container
-                        {
-                            Name = "Bar",
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
+                            Name = "Hit target",
                             RelativeSizeAxes = Axes.X,
-                            Height = hit_target_bar_height,
-                            Masking = true,
-                            Children = new[]
+                            Height = hit_target_height,
+                            Children = new Drawable[]
                             {
                                 new Box
                                 {
-                                    RelativeSizeAxes = Axes.Both
+                                    Name = "Background",
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black
+                                },
+                                hitTargetBar = new Container
+                                {
+                                    Name = "Bar",
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = hit_target_bar_height,
+                                    Masking = true,
+                                    Children = new[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        },
+                        TimingSectionContainer = new TimeRelativeContainer(timingChanges)
+                        {
+                            Name = "Hit objects",
+                            RelativeSizeAxes = Axes.Both,
+                        },
                     }
-                },
-                TimingSectionContainer = new TimeRelativeContainer(timingChanges)
-                {
-                    Name = "Hit objects",
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Y = -ManiaPlayfield.HIT_TARGET_POSITION
                 },
                 new Container
                 {
                     Name = "Key",
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
                     Height = ManiaPlayfield.HIT_TARGET_POSITION,
                     Children = new Drawable[]

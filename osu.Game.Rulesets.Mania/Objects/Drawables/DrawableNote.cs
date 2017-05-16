@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             Add(headPiece = new NotePiece
             {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre
             });
         }
 

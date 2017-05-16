@@ -74,8 +74,8 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 new Container
                 {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Masking = true,
@@ -95,13 +95,18 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Left = 1, Right = 1 },
                             Spacing = new Vector2(1, 0)
                         },
-                        barlineContainer = new TimeRelativeContainer(timingChanges)
+                        new Container
                         {
-                            Name = "Bar lines",
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Bottom = HIT_TARGET_POSITION }
+                            Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
+                            Children = new[]
+                            {
+                                barlineContainer = new TimeRelativeContainer(timingChanges)
+                                {
+                                    Name = "Bar lines",
+                                    RelativeSizeAxes = Axes.Both,
+                                }
+                            }
                         }
                     }
                 }
