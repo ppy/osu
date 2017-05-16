@@ -28,10 +28,10 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public const float HIT_TARGET_POSITION = 50;
 
-        private const float time_span_default = 20000;
+        private const float time_span_default = 5000;
         private const float time_span_min = 10;
         private const float time_span_max = 50000;
-        private const float time_span_step = 1000;
+        private const float time_span_step = 200;
 
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.
@@ -187,9 +187,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Repeat)
-                return false;
-
             if (state.Keyboard.ControlPressed)
             {
                 switch (args.Key)
