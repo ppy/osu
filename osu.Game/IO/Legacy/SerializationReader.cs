@@ -10,7 +10,6 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Threading;
 
 namespace osu.Game.IO.Legacy
 {
