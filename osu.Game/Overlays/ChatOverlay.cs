@@ -284,10 +284,21 @@ namespace osu.Game.Overlays
         {
             if (channel == null) return;
 
-            careChannels.Add(channel);
-            channelTabs.AddItem(channel);
+            var existing = careChannels.Find(c => c.Id == channel.Id);
 
-            // we need to get a good number of messages initially for each channel we care about.
+            if (existing != null)
+            {
+                // if we already have this channel loaded, we don't want to make a second one.
+                channel = existing;
+            }
+            else
+            {
+
+                careChannels.Add(channel);
+                channelTabs.AddItem(channel);
+            }
+
+            // let's fetch a small number of messages to bring us up-to-date with the backlog.
             fetchInitialMessages(channel);
 
             if (CurrentChannel == null)
