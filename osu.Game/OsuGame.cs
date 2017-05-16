@@ -145,6 +145,7 @@ namespace osu.Game
                 },
                 volume = new VolumeControl(),
                 overlayContent = new Container{ RelativeSizeAxes = Axes.Both },
+                new OnScreenDisplay(),
                 new GlobalHotkeys //exists because UserInputManager is at a level below us.
                 {
                     Handler = globalHotkeyPressed
