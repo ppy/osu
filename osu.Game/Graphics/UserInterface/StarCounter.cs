@@ -131,14 +131,14 @@ namespace osu.Game.Graphics.UserInterface
             foreach (var star in stars.Children)
             {
                 star.ClearTransforms(true);
-                if (count <= newValue)
-                    star.Delay(Math.Max(i - count, 0) * animationDelay, true);
-                else
-                    star.Delay(Math.Max(count - 1 - i, 0) * animationDelay, true);
 
-                star.FadeTo(i < newValue ? 1.0f : minStarAlpha, fadingDuration);
-                star.Icon.ScaleTo(getStarScale(i, newValue), scalingDuration, scalingEasing);
-                star.DelayReset();
+                var delay = (count <= newValue ? Math.Max(i - count, 0) : Math.Max(count - 1 - i, 0)) * animationDelay;
+
+                using (BeginDelayedSequence(delay, true))
+                {
+                    star.FadeTo(i < newValue ? 1.0f : minStarAlpha, fadingDuration);
+                    star.Icon.ScaleTo(getStarScale(i, newValue), scalingDuration, scalingEasing);
+                }
 
                 i++;
             }

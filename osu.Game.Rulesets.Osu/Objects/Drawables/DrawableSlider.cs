@@ -158,10 +158,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ball.Alpha = 0;
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateCurrentState(ArmedState state)
         {
-            base.UpdateState(state);
-
             ball.FadeIn();
 
             Delay(slider.Duration, true);

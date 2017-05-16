@@ -19,11 +19,6 @@ namespace osu.Game.Users
         public string FullName;
 
         /// <summary>
-        /// Short acronym which appears in the group boxes post-selection.
-        /// </summary>
-        public string Acronym;
-
-        /// <summary>
         /// Two-letter flag acronym (ISO 3166 standard)
         /// </summary>
         [JsonProperty(@"code")]

@@ -8,16 +8,28 @@ using System;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Objects;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
-    internal class ManiaBeatmapConverter : BeatmapConverter<ManiaBaseHit>
+    internal class ManiaBeatmapConverter : BeatmapConverter<ManiaHitObject>
     {
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
-        protected override IEnumerable<ManiaBaseHit> ConvertHitObject(HitObject original, Beatmap beatmap)
+        protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
-            yield return null;
+            int availableColumns = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.CircleSize);
+
+            var positionData = original as IHasXPosition;
+
+            float localWDivisor = 512.0f / availableColumns;
+            int column = MathHelper.Clamp((int)Math.Floor((positionData?.X ?? 1) / localWDivisor), 0, availableColumns - 1);
+
+            yield return new Note
+            {
+                StartTime = original.StartTime,
+                Column = column,
+            };
         }
     }
 }

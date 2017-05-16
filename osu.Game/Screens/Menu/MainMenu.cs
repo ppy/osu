@@ -1,20 +1,26 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Threading.Tasks;
+using OpenTK;
+using OpenTK.Input;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multiplayer;
-using OpenTK;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
-using osu.Framework.Input;
-using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
@@ -54,12 +60,31 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        private Bindable<bool> menuMusic;
+        private TrackManager trackManager;
+
         [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        private void load(OsuGame game, OsuConfigManager config, BeatmapDatabase beatmaps)
         {
+            menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
             LoadComponentAsync(background);
 
-            buttons.OnSettings = game.ToggleOptions;
+            if (!menuMusic)
+            {
+                trackManager = game.Audio.Track;
+
+                var query = beatmaps.Query<BeatmapSetInfo>().Where(b => !b.DeletePending);
+                int count = query.Count();
+
+                if (count > 0)
+                {
+                    var beatmap = query.ElementAt(RNG.Next(0, count - 1));
+                    beatmaps.GetChildren(beatmap);
+                    Beatmap = beatmaps.GetWorkingBeatmap(beatmap.Beatmaps[0]);
+                }
+            }
+
+            buttons.OnSettings = game.ToggleSettings;
 
             preloadSongSelect();
         }
@@ -81,6 +106,17 @@ namespace osu.Game.Screens.Menu
         {
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
+            if (last is Intro && Beatmap != null)
+            {
+                Task.Run(() =>
+                {
+                    trackManager.SetExclusive(Beatmap.Track);
+                    Beatmap.Track.Seek(Beatmap.Metadata.PreviewTime);
+                    if (Beatmap.Metadata.PreviewTime == -1)
+                        Beatmap.Track.Seek(Beatmap.Track.Length * 0.4f);
+                    Beatmap.Track.Start();
+                });
+            }
         }
 
         protected override void OnSuspending(Screen next)

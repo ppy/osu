@@ -7,7 +7,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Scoring;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
@@ -70,24 +69,26 @@ namespace osu.Game.Screens.Ranking
             circleOuterBackground.ScaleTo(1, transition_time, EasingTypes.OutQuint);
             circleOuterBackground.FadeTo(1, transition_time, EasingTypes.OutQuint);
 
-            Content.Delay(transition_time * 0.25f, true);
+            using (BeginDelayedSequence(transition_time * 0.25f, true))
+            {
 
-            circleOuter.ScaleTo(1, transition_time, EasingTypes.OutQuint);
-            circleOuter.FadeTo(1, transition_time, EasingTypes.OutQuint);
+                circleOuter.ScaleTo(1, transition_time, EasingTypes.OutQuint);
+                circleOuter.FadeTo(1, transition_time, EasingTypes.OutQuint);
 
-            Content.Delay(transition_time * 0.3f, true);
+                using (BeginDelayedSequence(transition_time * 0.3f, true))
+                {
+                    backgroundParallax.FadeIn(transition_time, EasingTypes.OutQuint);
 
-            backgroundParallax.FadeIn(transition_time, EasingTypes.OutQuint);
+                    circleInner.ScaleTo(1, transition_time, EasingTypes.OutQuint);
+                    circleInner.FadeTo(1, transition_time, EasingTypes.OutQuint);
 
-            circleInner.ScaleTo(1, transition_time, EasingTypes.OutQuint);
-            circleInner.FadeTo(1, transition_time, EasingTypes.OutQuint);
-
-            Content.Delay(transition_time * 0.4f, true);
-
-            modeChangeButtons.FadeIn(transition_time, EasingTypes.OutQuint);
-            currentPage.FadeIn(transition_time, EasingTypes.OutQuint);
-
-            Content.DelayReset();
+                    using (BeginDelayedSequence(transition_time * 0.4f, true))
+                    {
+                        modeChangeButtons.FadeIn(transition_time, EasingTypes.OutQuint);
+                        currentPage.FadeIn(transition_time, EasingTypes.OutQuint);
+                    }
+                }
+            }
         }
 
         protected override bool OnExiting(Screen next)

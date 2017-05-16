@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Formats
             // TODO: Not sure how far back to go, or differences between versions
         }
 
-        private HitObjectParser parser;
+        private ConvertHitObjectParser parser;
 
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
@@ -90,16 +90,16 @@ namespace osu.Game.Beatmaps.Formats
                     switch (beatmap.BeatmapInfo.RulesetID)
                     {
                         case 0:
-                            parser = new Rulesets.Objects.Legacy.Osu.HitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser();
                             break;
                         case 1:
-                            parser = new Rulesets.Objects.Legacy.Taiko.HitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Taiko.ConvertHitObjectParser();
                             break;
                         case 2:
-                            parser = new Rulesets.Objects.Legacy.Catch.HitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Catch.ConvertHitObjectParser();
                             break;
                         case 3:
-                            parser = new Rulesets.Objects.Legacy.Mania.HitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Mania.ConvertHitObjectParser();
                             break;
                     }
                     break;

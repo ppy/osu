@@ -12,11 +12,6 @@ namespace osu.Game.Rulesets.Objects.Types
     public interface IHasCurve : IHasDistance, IHasRepeats
     {
         /// <summary>
-        /// The curve.
-        /// </summary>
-        SliderCurve Curve { get; }
-
-        /// <summary>
         /// The control points that shape the curve.
         /// </summary>
         List<Vector2> ControlPoints { get; }

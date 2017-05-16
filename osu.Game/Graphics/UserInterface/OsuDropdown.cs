@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
@@ -123,6 +122,8 @@ namespace osu.Game.Graphics.UserInterface
                 set { label.Text = value; }
             }
 
+            protected readonly TextAwesome Icon;
+
             private Color4? accentColour;
             public virtual Color4 AccentColour
             {
@@ -145,19 +146,19 @@ namespace osu.Game.Graphics.UserInterface
 
                 Foreground.Children = new Drawable[]
                 {
-                label = new OsuSpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                },
-                new TextAwesome
-                {
-                    Icon = FontAwesome.fa_chevron_down,
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding { Right = 4 },
-                    TextSize = 20
-                }
+                    label = new OsuSpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                    },
+                    Icon = new TextAwesome
+                    {
+                        Icon = FontAwesome.fa_chevron_down,
+                        Anchor = Anchor.CentreRight,
+                        Origin = Anchor.CentreRight,
+                        Margin = new MarginPadding { Right = 4 },
+                        TextSize = 20
+                    }
                 };
             }
 

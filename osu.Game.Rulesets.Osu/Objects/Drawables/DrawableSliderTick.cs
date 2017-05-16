@@ -72,10 +72,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Delay(-animIn);
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateCurrentState(ArmedState state)
         {
-            base.UpdateState(state);
-
             switch (state)
             {
                 case ArmedState.Idle:
