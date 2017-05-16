@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly FlowContainer<Column> Columns;
 
-        private readonly TimeRelativeContainer barlineContainer;
+        private readonly ControlPointContainer barlineContainer;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
                             {
-                                barlineContainer = new TimeRelativeContainer(timingChanges)
+                                barlineContainer = new ControlPointContainer(timingChanges)
                                 {
                                     Name = "Bar lines",
                                     RelativeSizeAxes = Axes.Both,

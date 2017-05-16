@@ -19,20 +19,16 @@ namespace osu.Game.Rulesets.Mania.Timing
     /// and as such, will scroll along with the <see cref="ControlPoint"/>s.
     /// </para>
     /// </summary>
-    public class TimeRelativeContainer : Container<Drawable>
+    public class ControlPointContainer : Container<Drawable>
     {
         /// <summary>
         /// The amount of time which the height of this container spans.
         /// </summary>
-        public double TimeSpan
-        {
-            get { return RelativeCoordinateSpace.Y; }
-            set { RelativeCoordinateSpace = new Vector2(1, (float)value); }
-        }
+        public double TimeSpan { get; set; }
 
         private readonly List<DrawableTimingSection> drawableTimingSections;
 
-        public TimeRelativeContainer(IEnumerable<ControlPoint> timingChanges)
+        public ControlPointContainer(IEnumerable<ControlPoint> timingChanges)
         {
             drawableTimingSections = timingChanges.Select(t => new DrawableTimingSection(t)).ToList();
 
@@ -99,10 +95,10 @@ namespace osu.Game.Rulesets.Mania.Timing
 
             protected override void Update()
             {
-                var parent = (TimeRelativeContainer)Parent;
+                var parent = (ControlPointContainer)Parent;
 
                 // Adjust our height to account for the speed changes
-                Height = (float)(parent.TimeSpan * 1000 / timingChange.BeatLength / timingChange.SpeedMultiplier);
+                Height = (float)(1000 / timingChange.BeatLength / timingChange.SpeedMultiplier);
                 RelativeCoordinateSpace = new Vector2(1, (float)parent.TimeSpan);
 
                 // Scroll the content
@@ -127,10 +123,19 @@ namespace osu.Game.Rulesets.Mania.Timing
             /// <param name="drawable">The drawable to check.</param>
             public bool CanContain(Drawable drawable) => content.Y <= drawable.Y;
 
+            /// <summary>
+            /// A container which always keeps its height and relative coordinate space "auto-sized" to its children.
+            /// </summary>
             private class AutoTimeRelativeContainer : Container
             {
-                public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+                public override void InvalidateFromChild(Invalidation invalidation)
                 {
+                    if ((invalidation & Invalidation.Geometry) == 0)
+                    {
+                        base.InvalidateFromChild(invalidation);
+                        return;
+                    }
+
                     float height = 0;
 
                     foreach (Drawable child in Children)
@@ -143,7 +148,7 @@ namespace osu.Game.Rulesets.Mania.Timing
                     Height = height;
                     RelativeCoordinateSpace = new Vector2(1, height);
 
-                    return base.Invalidate(invalidation, source, shallPropagate);
+                    base.InvalidateFromChild(invalidation);
                 }
             }
         }
