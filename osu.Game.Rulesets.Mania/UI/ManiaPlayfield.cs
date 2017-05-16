@@ -10,7 +10,6 @@ using OpenTK.Graphics;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Graphics.Containers;
 using System;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using OpenTK.Input;

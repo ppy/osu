@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.Containers
         private void load(UserInputManager input, OsuConfigManager config)
         {
             this.input = input;
-            parallaxEnabled = config.GetBindable<bool>(OsuConfig.MenuParallax);
+            parallaxEnabled = config.GetBindable<bool>(OsuSetting.MenuParallax);
             parallaxEnabled.ValueChanged += delegate
             {
                 if (!parallaxEnabled)

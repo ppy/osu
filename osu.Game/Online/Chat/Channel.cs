@@ -27,6 +27,8 @@ namespace osu.Game.Online.Chat
 
         //internal bool Joined;
 
+        public bool ReadOnly => Name != "#lazer";
+
         public const int MAX_HISTORY = 300;
 
         [JsonConstructor]
@@ -36,9 +38,9 @@ namespace osu.Game.Online.Chat
 
         public event Action<IEnumerable<Message>> NewMessagesArrived;
 
-        public void AddNewMessages(IEnumerable<Message> messages)
+        public void AddNewMessages(params Message[] messages)
         {
-            messages = messages.Except(Messages).ToList();
+            messages = messages.Except(Messages).ToArray();
 
             Messages.AddRange(messages);
 
@@ -53,5 +55,7 @@ namespace osu.Game.Online.Chat
             if (messageCount > MAX_HISTORY)
                 Messages.RemoveRange(0, messageCount - MAX_HISTORY);
         }
+
+        public override string ToString() => Name;
     }
 }
