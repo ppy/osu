@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Primitives;
 using System.Linq;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using System;
