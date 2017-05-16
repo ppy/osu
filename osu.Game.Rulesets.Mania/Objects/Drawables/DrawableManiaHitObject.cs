@@ -22,9 +22,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             HitObject = hitObject;
 
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.BottomCentre;
-
             RelativePositionAxes = Axes.Y;
             Y = (float)HitObject.StartTime;
 
