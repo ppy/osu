@@ -121,11 +121,16 @@ namespace osu.Game.Rulesets.Mania.Timing
 
             /// <summary>
             /// A container which always keeps its height and relative coordinate space "auto-sized" to its children.
+            /// <para>
+            /// This is used in the case where children are relatively positioned/sized to time values (e.g. notes/bar lines) to keep
+            /// such children wrapped inside a container, otherwise they would disappear due to container flattening.
+            /// </para>
             /// </summary>
             private class AutoTimeRelativeContainer : Container
             {
                 public override void InvalidateFromChild(Invalidation invalidation)
                 {
+                    // We only want to re-compute our size when a child's size or position has changed
                     if ((invalidation & Invalidation.Geometry) == 0)
                     {
                         base.InvalidateFromChild(invalidation);
