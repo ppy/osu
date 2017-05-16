@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mania.UI;
 using System.Linq;
 using System;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Mania.Timing;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -28,7 +28,7 @@ namespace osu.Desktop.VisualTests.Tests
             Action<int, SpecialColumnPosition> createPlayfield = (cols, pos) =>
             {
                 Clear();
-                Add(new ManiaPlayfield(cols, new List<TimingSection>())
+                Add(new ManiaPlayfield(cols, new List<ControlPoint>())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

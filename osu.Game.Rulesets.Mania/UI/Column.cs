@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
-        public readonly TimeRelativeContainer TimingSectionContainer;
+        public readonly ControlPointContainer TimingSectionContainer;
 
         public Column(IEnumerable<ControlPoint> timingChanges)
         {
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 }
                             }
                         },
-                        TimingSectionContainer = new TimeRelativeContainer(timingChanges)
+                        TimingSectionContainer = new ControlPointContainer(timingChanges)
                         {
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,
