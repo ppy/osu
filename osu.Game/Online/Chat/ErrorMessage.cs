@@ -12,7 +12,7 @@ namespace osu.Game.Online.Chat
 
         public ErrorMessage(string message) : base(errorId--)
         {
-            Timestamp = DateTime.Now;
+            Timestamp = DateTimeOffset.Now;
             Content = message;
 
             Sender = new User

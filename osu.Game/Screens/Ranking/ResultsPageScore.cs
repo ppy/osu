@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Ranking
                             Origin = Anchor.TopCentre,
                             Margin = new MarginPadding { Bottom = 10 },
                         },
-                        new DateDisplay(Score.Date)
+                        new DateDisplay(Score.Date.LocalDateTime)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
