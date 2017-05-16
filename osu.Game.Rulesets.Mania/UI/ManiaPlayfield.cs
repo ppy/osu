@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 timeSpan = MathHelper.Clamp(timeSpan, time_span_min, time_span_max);
 
                 barlineContainer.TimeSpan = value;
-                Columns.Children.ForEach(c => c.TimingSectionContainer.TimeSpan = value);
+                Columns.Children.ForEach(c => c.ControlPointContainer.TimeSpan = value);
             }
         }
 
