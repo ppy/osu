@@ -191,7 +191,7 @@ namespace osu.Game.Online.API
                 req.Perform(this);
 
                 //we could still be in initialisation, at which point we don't want to say we're Online yet.
-                if (LocalUser.Value != null)
+                if (IsLoggedIn)
                     State = APIState.Online;
 
                 failureCount = 0;
@@ -265,6 +265,8 @@ namespace osu.Game.Online.API
                 }
             }
         }
+
+        public bool IsLoggedIn => LocalUser.Value.Id > 1;
 
         public void Queue(APIRequest request)
         {
