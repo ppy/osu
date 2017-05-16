@@ -27,24 +27,20 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 // This will be fixed when new designs are given or the current design is finalized.
                 bodyPiece = new BodyPiece
                 {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                 },
                 headPiece = new NotePiece
                 {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre
                 },
                 tailPiece = new NotePiece
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre
                 }
             });
-
-            // The "length" of the hold note stops at the "base" of the tail piece
-            // but we want to contain the tail piece within our bounds
-            Height += (float)HitObject.Duration / headPiece.Height;
         }
 
         public override Color4 AccentColour
