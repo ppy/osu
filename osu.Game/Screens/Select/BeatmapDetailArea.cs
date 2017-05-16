@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Leaderboards;
 
