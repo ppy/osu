@@ -34,7 +34,7 @@ namespace osu.Game.Online.API
 
         public string Password;
 
-        public Bindable<User> LocalUser = new Bindable<User>(createGustUser());
+        public Bindable<User> LocalUser = new Bindable<User>(createGuestUser());
 
         public string Token
         {
@@ -297,10 +297,10 @@ namespace osu.Game.Online.API
             clearCredentials();
             authentication.Clear();
             State = APIState.Offline;
-            LocalUser.Value = createGustUser();
+            LocalUser.Value = createGuestUser();
         }
 
-        private static User createGustUser() => new User
+        private static User createGuestUser() => new User
         {
             Username = @"Guest",
             Id = 1,
