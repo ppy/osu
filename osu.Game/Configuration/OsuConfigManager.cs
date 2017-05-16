@@ -39,8 +39,6 @@ namespace osu.Game.Configuration
 
             // Audio
 
-            Set(OsuSetting.AudioDevice, string.Empty);
-
             Set(OsuSetting.MenuVoice, true);
             Set(OsuSetting.MenuMusic, true);
 
@@ -99,7 +97,6 @@ namespace osu.Game.Configuration
         MenuParallax,
         BeatmapDetailTab,
         Username,
-        AudioDevice,
         ReleaseStream,
         SavePassword,
         SaveUsername,
