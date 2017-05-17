@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Scoring
         public long OnlineScoreID;
 
         [JsonProperty(@"created_at")]
-        public DateTime Date;
+        public DateTimeOffset Date;
 
         [JsonProperty(@"statistics")]
         private Dictionary<string, dynamic> jsonStats
