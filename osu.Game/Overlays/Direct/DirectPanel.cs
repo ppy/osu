@@ -7,6 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Beatmaps.Drawables;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -24,7 +26,7 @@ namespace osu.Game.Overlays.Direct
         protected virtual FillFlowContainer DifficultyIcons { get; }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(TextureStore textures, RulesetDatabase rulesets)
         {
             Background.Texture = textures.Get(@"Backgrounds/bg4");
 
@@ -34,6 +36,11 @@ namespace osu.Game.Overlays.Direct
             Source.Text = @"from Cardcaptor Sakura";
             PlayCount.Value = 4579492;
             FavouriteCount.Value = 2659;
+
+            for (int i = 0; i < 4; i++)
+            {
+                DifficultyIcons.Add(new DifficultyIcon(new BeatmapInfo { Ruleset = rulesets.GetRuleset(i), StarDifficulty = i + 1 }));
+            }
         }
 
         public class Statistic : FillFlowContainer
