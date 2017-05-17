@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Play.Options
         public override string Title => @"COLLECTIONS";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
             Add(new OsuSpriteText
             {
