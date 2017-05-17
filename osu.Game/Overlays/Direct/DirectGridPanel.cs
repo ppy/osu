@@ -136,13 +136,6 @@ namespace osu.Game.Overlays.Direct
                                         {
                                             Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding  },
                                             AutoSizeAxes = Axes.Both,
-                                            Children = new[]
-                                            {
-                                                new Box //todo: placeholder
-                                                {
-                                                    Size = new Vector2(16f),
-                                                },
-                                            },
                                         },
                                     },
                                 },
