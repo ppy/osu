@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
 
         public Action RestartRequested;
 
-        public bool IsPaused => !decoupledClock.IsRunning;
+        public bool IsPaused { get; private set; }
 
         internal override bool AllowRulesetChange => false;
 
@@ -264,19 +264,18 @@ namespace osu.Game.Screens.Play
         {
             if (!canPause && !force) return;
 
-            // the actual pausing is potentially happening on a different thread.
-            // we want to wait for the source clock to stop so we can be sure all components are in a stable state.
-            if (!IsPaused)
-            {
-                decoupledClock.Stop();
+            if (IsPaused) return;
 
-                Schedule(() => Pause(force));
-                return;
-            }
+            // stop the decoupled clock (stops the audio eventually)
+            decoupledClock.Stop();
+
+            // stop processing updatess on the offset clock (instantly freezes time for all our components)
+            offsetClock.ProcessSourceClockFrames = false;
+
+            IsPaused = true;
 
             // we need to do a final check after all of our children have processed up to the paused clock time.
-            // this is to cover cases where, for instance, the player fails in the last processed frame (which would change canPause).
-            // as the scheduler runs before children updates, let's schedule for the next frame.
+            // this is to cover cases where, for instance, the player fails in the current processing frame.
             Schedule(() =>
             {
                 if (!canPause) return;
@@ -291,6 +290,11 @@ namespace osu.Game.Screens.Play
 
         public void Resume()
         {
+            if (!IsPaused) return;
+
+            IsPaused = false;
+            offsetClock.ProcessSourceClockFrames = true;
+
             lastPauseActionTime = Time.Current;
             hudOverlay.KeyCounter.IsCounting = true;
             hudOverlay.Progress.Hide();
