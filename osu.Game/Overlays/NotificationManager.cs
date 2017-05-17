@@ -81,7 +81,7 @@ namespace osu.Game.Overlays
                 hasCompletionTarget.CompletionTarget = Post;
 
             var ourType = notification.GetType();
-            sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => ourType == accept || ourType.IsSubclassOf(accept)))?.Add(notification);
+            sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
         }
 
         protected override void PopIn()

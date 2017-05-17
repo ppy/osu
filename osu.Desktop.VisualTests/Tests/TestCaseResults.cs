@@ -47,7 +47,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Accuracy = 0.98,
                 MaxCombo = 123,
                 Rank = ScoreRank.A,
-                Date = DateTime.Now,
+                Date = DateTimeOffset.Now,
                 Statistics = new Dictionary<string, dynamic>()
                 {
                     { "300", 50 },

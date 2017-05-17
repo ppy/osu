@@ -81,7 +81,6 @@ namespace osu.Game.Overlays
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding
                             {
-                                Top = padding,
                                 Bottom = textbox_height + padding
                             },
                         },
@@ -353,7 +352,15 @@ namespace osu.Game.Overlays
         {
             var postText = textbox.Text;
 
-            if (string.IsNullOrEmpty(postText) || api.LocalUser.Value == null) return;
+            if (string.IsNullOrEmpty(postText))
+                return;
+
+            if (!api.IsLoggedIn)
+            {
+                currentChannel?.AddNewMessages(new ErrorMessage("Please login to participate in chat!"));
+                textbox.Text = string.Empty;
+                return;
+            }
 
             if (currentChannel == null) return;
 

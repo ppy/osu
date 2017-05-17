@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Select
                                         drainRate = new DifficultyRow("HP Drain"),
                                         overallDifficulty = new DifficultyRow("Accuracy"),
                                         approachRate = new DifficultyRow("Approach Rate"),
-                                        stars = new DifficultyRow("Star Diffculty"),
+                                        stars = new DifficultyRow("Star Difficulty"),
                                     },
                                 },
                             },

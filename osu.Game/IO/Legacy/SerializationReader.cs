@@ -10,7 +10,6 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Threading;
 
 namespace osu.Game.IO.Legacy
 {
@@ -66,7 +65,7 @@ namespace osu.Game.IO.Legacy
         public DateTime ReadDateTime()
         {
             long ticks = ReadInt64();
-            if (ticks < 0) throw new AbandonedMutexException("oops");
+            if (ticks < 0) throw new IOException("Bad ticks count read!");
             return new DateTime(ticks, DateTimeKind.Utc);
         }
 
