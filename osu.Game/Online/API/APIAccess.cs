@@ -288,7 +288,7 @@ namespace osu.Game.Online.API
             {
                 APIRequest req;
                 while (oldQueue.TryDequeue(out req))
-                    req.Fail(new Exception(@"Disconnected from server"));
+                    req.Fail(new WebException(@"Disconnected from server"));
             }
         }
 
