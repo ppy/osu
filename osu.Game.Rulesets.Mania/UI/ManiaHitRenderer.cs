@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Mania.MathUtils;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -27,6 +28,11 @@ namespace osu.Game.Rulesets.Mania.UI
         public ManiaHitRenderer(WorkingBeatmap beatmap)
             : base(beatmap)
         {
+            FastRandom fr = new FastRandom(1337);
+            while (true)
+            {
+                int value = fr.Next();
+            }
         }
 
         protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
