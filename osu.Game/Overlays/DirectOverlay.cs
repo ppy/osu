@@ -67,13 +67,18 @@ namespace osu.Game.Overlays
                         },
                     },
                 },
-                new DirectPanel
+                new DirectGridPanel
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Style = DirectPanelStyle.Grid,
+                    Origin = Anchor.BottomCentre,
                     Width = 300,
-                }
+                },
+                new DirectListPanel
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
+                    Width = 0.8f,
+                },
             };
 
             filter.Search.Exit = Hide;

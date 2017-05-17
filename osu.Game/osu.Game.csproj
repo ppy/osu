@@ -434,6 +434,8 @@
     <Compile Include="Overlays\Direct\SortTabControl.cs" />
     <Compile Include="Graphics\UserInterface\OsuEnumDropdown.cs" />
     <Compile Include="Overlays\Direct\DirectPanel.cs" />
+    <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
+    <Compile Include="Overlays\Direct\DirectListPanel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
