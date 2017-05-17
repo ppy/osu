@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.Options
             Add(new SettingsSlider<double>
             {
                 LabelText = "Playback speed",
-                Bindable = config.GetBindable<double>(OsuSetting.DimLevel),
+                Bindable = config.GetBindable<double>(OsuSetting.PlaybackSpeed),
             });
         }
     }

@@ -70,6 +70,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.KeyOverlay, false);
 
             Set(OsuSetting.FloatingComments, false);
+            Set(OsuSetting.PlaybackSpeed, 1.0, 0.5f, 2);
 
             // Update
 
@@ -91,6 +92,7 @@ namespace osu.Game.Configuration
         DimLevel,
         KeyOverlay,
         FloatingComments,
+        PlaybackSpeed,
         ShowInterface,
         MouseDisableButtons,
         MouseDisableWheel,
