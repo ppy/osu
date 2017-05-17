@@ -113,7 +113,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected class OsuDropdownHeader : DropdownHeader
+        public class OsuDropdownHeader : DropdownHeader
         {
             private readonly SpriteText label;
             protected override string Label
