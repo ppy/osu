@@ -206,7 +206,7 @@ namespace osu.Game.Overlays
 
         private long? lastMessageId;
 
-        private List<Channel> careChannels = new List<Channel>();
+        private readonly List<Channel> careChannels = new List<Channel>();
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
