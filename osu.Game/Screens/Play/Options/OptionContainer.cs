@@ -19,10 +19,9 @@ namespace osu.Game.Screens.Play.Options
         /// </summary>
         public abstract string Title { get; }
 
-        private Container header;
-        private FillFlowContainer content;
+        private readonly FillFlowContainer content;
 
-        public OptionContainer()
+        protected OptionContainer()
         {
             AutoSizeAxes = Axes.Y;
             Width = 250;
@@ -47,7 +46,7 @@ namespace osu.Game.Screens.Play.Options
 
                     Children = new Drawable[]
                     {
-                        header = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 30,
