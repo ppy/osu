@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Ranking
                             Origin = Anchor.TopCentre,
                             Margin = new MarginPadding { Bottom = 10 },
                         },
-                        new DateDisplay(Score.Date)
+                        new DateTimeDisplay(Score.Date.LocalDateTime)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -220,13 +220,13 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        private class DateDisplay : Container
+        private class DateTimeDisplay : Container
         {
-            private DateTime date;
+            private DateTime datetime;
 
-            public DateDisplay(DateTime date)
+            public DateTimeDisplay(DateTime datetime)
             {
-                this.date = date;
+                this.datetime = datetime;
 
                 AutoSizeAxes = Axes.Y;
 
@@ -250,7 +250,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         Origin = Anchor.CentreLeft,
                         Anchor = Anchor.CentreLeft,
-                        Text = date.ToString("HH:mm"),
+                        Text = datetime.ToString("HH:mm"),
                         Padding = new MarginPadding { Left = 10, Right = 10, Top = 5, Bottom = 5 },
                         Colour = Color4.White,
                     },
@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Ranking
                     {
                         Origin = Anchor.CentreRight,
                         Anchor = Anchor.CentreRight,
-                        Text = date.ToString("yyyy/MM/dd"),
+                        Text = datetime.ToString("yyyy/MM/dd"),
                         Padding = new MarginPadding { Left = 10, Right = 10, Top = 5, Bottom = 5 },
                         Colour = Color4.White,
                     }
