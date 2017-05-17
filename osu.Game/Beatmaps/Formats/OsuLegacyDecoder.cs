@@ -204,23 +204,42 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(Beatmap beatmap, string val)
         {
-            if (val.StartsWith(@"//"))
-                return;
-            if (val.StartsWith(@" "))
-                return; // TODO
             string[] split = val.Split(',');
+
             EventType type;
-            int intType;
-            if (!int.TryParse(split[0], out intType))
+            if (!Enum.TryParse(split[0], out type))
+                throw new InvalidDataException($@"Unknown event type {split[0]}");
+
+            // Todo: Implement the rest
+            switch (type)
             {
-                if (!Enum.TryParse(split[0], out type))
-                    throw new InvalidDataException($@"Unknown event type {split[0]}");
+                case EventType.Video:
+                case EventType.Background:
+                    string filename = split[2].Trim('"');
+
+                    beatmap.EventInfo.Backgrounds.Add(new BackgroundEvent
+                    {
+                        StartTime = double.Parse(split[1], NumberFormatInfo.InvariantInfo),
+                        Filename = filename
+                    });
+
+                    if (type == EventType.Background)
+                        beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
+
+                    break;
+                case EventType.Break:
+                    var breakEvent = new BreakEvent
+                    {
+                        StartTime = double.Parse(split[1], NumberFormatInfo.InvariantInfo),
+                        EndTime = double.Parse(split[2], NumberFormatInfo.InvariantInfo)
+                    };
+
+                    if (!breakEvent.HasEffect)
+                        return;
+
+                    beatmap.EventInfo.Breaks.Add(breakEvent);
+                    break;
             }
-            else
-                type = (EventType)intType;
-            // TODO: Parse and store the rest of the event
-            if (type == EventType.Background)
-                beatmap.BeatmapInfo.Metadata.BackgroundFile = split[2].Trim('"');
         }
 
         private void handleTimingPoints(Beatmap beatmap, string val)
@@ -330,6 +349,9 @@ namespace osu.Game.Beatmaps.Formats
                 if (string.IsNullOrEmpty(line))
                     continue;
 
+                if (line.StartsWith(" ") || line.StartsWith("_") || line.StartsWith("//"))
+                    continue;
+
                 if (line.StartsWith(@"osu file format v"))
                 {
                     beatmap.BeatmapInfo.BeatmapVersion = int.Parse(line.Substring(17));
@@ -389,6 +411,17 @@ namespace osu.Game.Beatmaps.Formats
             Normal = 1,
             Soft = 2,
             Drum = 3
+        }
+
+        internal enum EventType
+        {
+            Background = 0,
+            Video = 1,
+            Break = 2,
+            Colour = 3,
+            Sprite = 4,
+            Sample = 5,
+            Animation = 6
         }
     }
 }
