@@ -6,6 +6,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -55,6 +56,7 @@ namespace osu.Game.Overlays.Direct
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.FromHex(@"384552"),
+                    Alpha = 0.9f,
                 },
                 tabStrip = new Box
                 {
@@ -122,7 +124,7 @@ namespace osu.Game.Overlays.Direct
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                backgroundColour = colours.Gray2;
+                backgroundColour = colours.Gray2.Opacity(0.9f);
             }
         }
 
@@ -180,6 +182,7 @@ namespace osu.Game.Overlays.Direct
         private class SlimEnumDropdown<T> : OsuEnumDropdown<T>
         {
             protected override DropdownHeader CreateHeader() => new SlimDropdownHeader { AccentColour = AccentColour };
+            protected override Menu CreateMenu() => new SlimMenu();
 
             private class SlimDropdownHeader : OsuDropdownHeader
             {
@@ -187,7 +190,21 @@ namespace osu.Game.Overlays.Direct
                 {
                     Height = 25;
                     Icon.TextSize = 16;
-                    Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4, };
+                    Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+                    BackgroundColour = Color4.Black.Opacity(0.25f);
+                }
+            }
+
+            private class SlimMenu : OsuMenu
+            {
+                public SlimMenu()
+                {
+                    Background.Colour = Color4.Black.Opacity(0.25f);
                 }
             }
         }
