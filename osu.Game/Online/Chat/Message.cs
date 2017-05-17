@@ -44,7 +44,7 @@ namespace osu.Game.Online.Chat
 
         public int CompareTo(Message other) => Id.CompareTo(other.Id);
 
-        public bool Equals(Message other) => Id == other.Id;
+        public bool Equals(Message other) => Id == other?.Id;
     }
 
     public enum TargetType
