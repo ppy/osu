@@ -136,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             public OsuDropdownHeader()
-            {
+            {   
                 Foreground.Padding = new MarginPadding(4);
 
                 AutoSizeAxes = Axes.None;

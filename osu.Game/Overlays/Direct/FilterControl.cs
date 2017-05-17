@@ -47,8 +47,7 @@ namespace osu.Game.Overlays.Direct
         public FilterControl()
         {
             RelativeSizeAxes = Axes.X;
-            //AutoSizeAxes = Axes.Y;
-            Height = 127;
+            AutoSizeAxes = Axes.Y;
 
             Children = new Drawable[]
             {
@@ -90,10 +89,10 @@ namespace osu.Game.Overlays.Direct
                 },
                 rankStatusDropdown = new SlimEnumDropdown<RankStatus>
                 {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
                     RelativeSizeAxes = Axes.None,
-                    Margin = new MarginPadding { Top = 93, Bottom = 5, Right = DirectOverlay.WIDTH_PADDING }, //todo: sort of hacky positioning
+                    Margin = new MarginPadding { Bottom = 5, Right = DirectOverlay.WIDTH_PADDING },
                     Width = 160f,
                 },
             };
@@ -115,8 +114,16 @@ namespace osu.Game.Overlays.Direct
 
         private class DirectSearchTextBox : SearchTextBox
         {
-            protected override Color4 BackgroundUnfocused => OsuColour.FromHex(@"222222");
-            protected override Color4 BackgroundFocused => OsuColour.FromHex(@"222222");
+            protected override Color4 BackgroundUnfocused => backgroundColour;
+            protected override Color4 BackgroundFocused => backgroundColour;
+
+            private Color4 backgroundColour;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                backgroundColour = colours.Gray2;
+            }
         }
 
         private class ModeToggleButton : ClickableContainer
