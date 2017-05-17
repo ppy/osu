@@ -8,7 +8,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
-    public class Message : IComparable<Message>
+    public class Message
     {
         [JsonProperty(@"message_id")]
         public readonly long Id;
@@ -42,7 +42,17 @@ namespace osu.Game.Online.Chat
             Id = id;
         }
 
-        public int CompareTo(Message other) => Id.CompareTo(other.Id);
+        public override bool Equals(object obj)
+        {
+            var objMessage = obj as Message;
+
+            return Id == objMessage?.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 
     public enum TargetType
