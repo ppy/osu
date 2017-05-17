@@ -428,6 +428,11 @@
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
+    <Compile Include="Overlays\DirectOverlay.cs" />
+    <Compile Include="Overlays\Direct\FilterControl.cs" />
+    <Compile Include="Overlays\Direct\Header.cs" />
+    <Compile Include="Overlays\Direct\SortTabControl.cs" />
+    <Compile Include="Graphics\UserInterface\OsuEnumDropdown.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -450,6 +455,9 @@
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Overlays\Direct\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
