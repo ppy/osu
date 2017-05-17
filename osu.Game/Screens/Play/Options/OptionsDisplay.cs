@@ -8,6 +8,21 @@ namespace osu.Game.Screens.Play.Options
 {
     public class OptionsDisplay : FillFlowContainer
     {
+        private bool isVisible;
+        public bool IsVisible
+        {
+            set
+            {
+                isVisible = value;
+
+                if (isVisible)
+                    Show();
+                else
+                    Hide();
+            }
+            get { return isVisible; }
+        }
+
         public OptionsDisplay()
         {
             Direction = FillDirection.Vertical;

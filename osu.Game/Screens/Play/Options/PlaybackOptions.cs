@@ -2,9 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Play.Options
