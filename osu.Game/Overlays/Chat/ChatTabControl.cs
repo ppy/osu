@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Chat
 {
     public class ChatTabControl : OsuTabControl<Channel>
     {
-        protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value);
+        protected override TabItem<Channel> CreateTabItem(Channel value) => value.Id == -1 ? new ChannelTabItem.ChannelSelectorTabItem(value) : new ChannelTabItem(value);
 
         private const float shear_width = 10;
 
@@ -37,6 +37,11 @@ namespace osu.Game.Overlays.Chat
                 TextSize = 20,
                 Padding = new MarginPadding(10),
             });
+
+            AddItem(new Channel
+            {
+                Id = ChatOverlay.CHANNEL_SELECTOR_ID,
+            });
         }
 
         private class ChannelTabItem : TabItem<Channel>
@@ -49,6 +54,7 @@ namespace osu.Game.Overlays.Chat
             private readonly SpriteText textBold;
             private readonly Box box;
             private readonly Box highlightBox;
+            private readonly TextAwesome icon;
 
             public override bool Active
             {
@@ -159,7 +165,7 @@ namespace osu.Game.Overlays.Chat
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new TextAwesome
+                            icon = new TextAwesome
                             {
                                 Icon = FontAwesome.fa_hashtag,
                                 Anchor = Anchor.CentreLeft,
@@ -190,6 +196,28 @@ namespace osu.Game.Overlays.Chat
                         }
                     }
                 };
+            }
+
+            public class ChannelSelectorTabItem : ChannelTabItem
+            {
+                public ChannelSelectorTabItem(Channel value) : base(value)
+                {
+                    Depth = float.MaxValue;
+                    Width = 60;
+
+                    icon.Icon = FontAwesome.fa_plus;
+                    icon.X = 0;
+                }
+
+                [BackgroundDependencyLoader]
+                private new void load(OsuColour colour)
+                {
+                    backgroundActive = colour.Green;
+                    backgroundInactive = colour.GreenDark;
+                    backgroundHover = colour.Green;
+
+                    updateState();
+                }
             }
         }
     }
