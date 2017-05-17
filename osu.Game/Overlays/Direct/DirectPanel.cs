@@ -2,9 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,182 +12,31 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class DirectPanel : Container
+    public abstract class DirectPanel : Container
     {
-        private readonly float horizontal_padding = 10;
-        private readonly float vertical_padding = 5;
-
-        private readonly Sprite background;
-        private readonly OsuSpriteText title, artist, mapperPrefix, mapper, source;
-        private readonly Statistic playCount, favouriteCount;
-        private readonly FillFlowContainer difficultyIcons;
-
-        private DirectPanelStyle style;
-        public DirectPanelStyle Style
-        {
-            get { return style; }
-            set
-            {
-                if (value == style) return;
-                style = value;
-            }
-        }
-
-        public DirectPanel()
-        {
-            Height = 135 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
-            CornerRadius = 4;
-            Masking = true;
-            EdgeEffect = new EdgeEffect
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(0f, 1f),
-                Radius = 3f,
-                Colour = Color4.Black.Opacity(0.25f),
-            };
-
-            Children = new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
-                background = new Sprite
-                {
-                    FillMode = FillMode.Fill,
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.5f),
-                },
-                new FillFlowContainer
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Direction = FillDirection.Vertical,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(0f, vertical_padding),
-                    Children = new Drawable[]
-                    {
-                        new FillFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = horizontal_padding, Right = horizontal_padding },
-                            Direction = FillDirection.Vertical,
-                            Children = new[]
-                            {
-                                title = new OsuSpriteText
-                                {
-                                    TextSize = 18,
-                                    Font = @"Exo2.0-BoldItalic",
-                                },
-                                artist = new OsuSpriteText
-                                {
-                                    Font = @"Exo2.0-BoldItalic",
-                                },
-                            },
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                new FillFlowContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
-                                    Padding = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding, Left = horizontal_padding, Right = horizontal_padding },
-                                    Children = new Drawable[]
-                                    {
-                                        new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Children = new[]
-                                            {
-                                                mapperPrefix = new OsuSpriteText
-                                                {
-                                                    Text = @"mapped by ",
-                                                    TextSize = 14,
-                                                    Shadow = false,
-                                                },
-                                                mapper = new OsuSpriteText
-                                                {
-                                                    TextSize = 14,
-                                                    Font = @"Exo2.0-SemiBoldItalic",
-                                                    Shadow = false,
-                                                },
-                                            },
-                                        },
-                                        source = new OsuSpriteText
-                                        {
-                                            TextSize = 14,
-                                            Shadow = false,
-                                        },
-                                        difficultyIcons = new FillFlowContainer
-                                        {
-                                            Margin = new MarginPadding { Top = vertical_padding },
-                                            AutoSizeAxes = Axes.Both,
-                                            Children = new[]
-                                            {
-                                                new Box //todo: placeholder
-                                                {
-                                                    Size = new Vector2(16f),
-                                                },
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                new FillFlowContainer
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Margin = new MarginPadding { Top = vertical_padding, Right = vertical_padding },
-                    Children = new[]
-                    {
-                        playCount = new Statistic(FontAwesome.fa_play_circle)
-                        {
-                            Margin = new MarginPadding { Right = 1 },
-                        },
-                        favouriteCount = new Statistic(FontAwesome.fa_heart),
-                    },
-                },
-            };
-
-            title.Text = @"Platina";
-            artist.Text = @"Maaya Sakamoto";
-            mapper.Text = @"TicClick";
-            source.Text = @"from Cardcaptor Sakura";
-            playCount.Value = 4579492;
-            favouriteCount.Value = 2659;
-        }
+        protected virtual Sprite Background { get; }
+        protected virtual OsuSpriteText Title { get; }
+        protected virtual OsuSpriteText Artist { get; }
+        protected virtual OsuSpriteText Mapper { get; }
+        protected virtual OsuSpriteText Source { get; }
+        protected virtual Statistic PlayCount { get; }
+        protected virtual Statistic FavouriteCount { get; }
+        protected virtual FillFlowContainer DifficultyIcons { get; }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, OsuColour colours)
+        private void load(TextureStore textures)
         {
-            background.Texture = textures.Get(@"Backgrounds/bg4");
+            Background.Texture = textures.Get(@"Backgrounds/bg4");
 
-            mapperPrefix.Colour = colours.Gray5;
-            mapper.Colour = colours.BlueDark;
-            source.Colour = colours.Gray5;
+            Title.Text = @"Platina";
+            Artist.Text = @"Maaya Sakamoto";
+            Mapper.Text = @"TicClick";
+            Source.Text = @"from Cardcaptor Sakura";
+            PlayCount.Value = 4579492;
+            FavouriteCount.Value = 2659;
         }
 
-        private class Statistic : FillFlowContainer
+        public class Statistic : FillFlowContainer
         {
             private readonly SpriteText text;
 
@@ -230,11 +77,5 @@ namespace osu.Game.Overlays.Direct
                 Value = value;
             }
         }
-    }
-
-    public enum DirectPanelStyle
-    {
-        Grid,
-        List,
     }
 }
