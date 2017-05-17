@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tailPiece = new NotePiece
                 {
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre
+                    Origin = Anchor.TopCentre
                 }
             });
         }

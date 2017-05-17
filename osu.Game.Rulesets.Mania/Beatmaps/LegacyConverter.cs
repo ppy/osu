@@ -6,9 +6,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using SharpNeat.Utility;
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets.Mania.MathUtils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
