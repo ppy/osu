@@ -19,14 +19,17 @@ namespace osu.Game.Screens.Play.Options
         /// </summary>
         public abstract string Title { get; }
 
+        private Container header;
+        private FillFlowContainer content;
+
         public OptionContainer()
         {
+            AutoSizeAxes = Axes.Y;
+            Width = 250;
             Masking = true;
-            Size = new Vector2(200, 100);
             CornerRadius = 5;
             BorderColour = Color4.Black;
             BorderThickness = 2;
-            Depth = 10;
 
             Children = new Drawable[]
             {
@@ -36,24 +39,60 @@ namespace osu.Game.Screens.Play.Options
                     Colour = Color4.Black,
                     Alpha = 0.5f,
                 },
-                new OsuSpriteText
+                new FillFlowContainer
                 {
-                    Origin = Anchor.TopLeft,
-                    Anchor = Anchor.TopLeft,
-                    Text = Title,
-                    TextSize = 17,
-                    Margin = new MarginPadding { Top = 5, Left = 10 },
-                    Font = @"Exo2.0-Bold",
-                },
-                new SimpleButton
-                {
-                    Origin = Anchor.TopRight,
-                    Anchor = Anchor.TopRight,
-                    Margin = new MarginPadding { Top = 5, Right = 10 },
-                    Icon = FontAwesome.fa_bars,
-                    Scale = new Vector2(0.7f),
+                    Direction = FillDirection.Vertical,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+
+                    Children = new Drawable[]
+                    {
+                        header = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 30,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreLeft,
+                                    Text = Title,
+                                    TextSize = 17,
+                                    Font = @"Exo2.0-Bold",
+                                    Margin = new MarginPadding { Left = 10 },
+                                },
+                                new SimpleButton
+                                {
+                                    Origin = Anchor.Centre,
+                                    Anchor = Anchor.CentreRight,
+                                    Position = new Vector2(-15,0),
+                                    Icon = FontAwesome.fa_bars,
+                                    Scale = new Vector2(0.7f),
+                                },
+                            }
+                        },
+                        content = new FillFlowContainer
+                        {
+                            Direction = FillDirection.Vertical,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Padding = new MarginPadding(15),
+                            Spacing = new Vector2(0, 10),
+                        }
+                    }
                 },
             };
+        }
+
+        public new void Add(Drawable drawable)
+        {
+            content.Add(drawable);
         }
     }
 }

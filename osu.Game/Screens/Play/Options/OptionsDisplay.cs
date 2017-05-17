@@ -6,16 +6,16 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Play.Options
 {
-    public class OptionsDisplay : FillFlowContainer<OptionContainer>
+    public class OptionsDisplay : FillFlowContainer
     {
         public OptionsDisplay()
         {
             Direction = FillDirection.Vertical;
             Spacing = new Vector2(0, 20);
 
-            Add(new PlaybackOption());
-            Add(new PlaybackOption());
-            Add(new PlaybackOption());
+            Add(new CollectionOptions());
+            Add(new DiscussionOptions());
+            Add(new PlaybackOptions());
         }
     }
 }
