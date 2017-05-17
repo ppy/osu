@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Play.Options
         public abstract string Title { get; }
 
         private readonly FillFlowContainer content;
+        private bool contentIsVisible;
 
         protected OptionContainer()
         {
@@ -71,6 +72,7 @@ namespace osu.Game.Screens.Play.Options
                                     Position = new Vector2(-15,0),
                                     Icon = FontAwesome.fa_bars,
                                     Scale = new Vector2(0.7f),
+                                    Action = () => triggerContentVisibility(),
                                 },
                             }
                         },
@@ -92,6 +94,16 @@ namespace osu.Game.Screens.Play.Options
         public new void Add(Drawable drawable)
         {
             content.Add(drawable);
+        }
+
+        private void triggerContentVisibility()
+        {
+            if (contentIsVisible)
+                content.Show();
+            else
+                content.Hide();
+
+            contentIsVisible = !contentIsVisible;
         }
     }
 }
