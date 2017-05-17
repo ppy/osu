@@ -29,13 +29,10 @@ namespace osu.Game.Graphics.Containers
                 if (controlPoint != null)
                 {
                     double oldTimingPointStart = timingPointStart;
-                    double beatLength;
+                    double beatLength = controlPoint.BeatLength;
                     int oldBeat = beat;
-                    bool kiai;
-
-                    beatLength = controlPoint.BeatLength;
+                    bool kiai = kiaiControlPoint?.KiaiMode ?? false;
                     timingPointStart = controlPoint.Time;
-                    kiai = kiaiControlPoint?.KiaiMode ?? false;
 
                     beat = beatLength > min_beat_length ? (int)((currentTime - timingPointStart) / beatLength) : 0;
 
@@ -44,7 +41,7 @@ namespace osu.Game.Graphics.Containers
                     if (currentTime <= timingPointStart)
                         beat--;
 
-                    if ((timingPointStart != oldTimingPointStart || beat != oldBeat) && (currentTime - timingPointStart) % (beatLength) <= seek_tolerance)
+                    if ((timingPointStart != oldTimingPointStart || beat != oldBeat) && (int)((currentTime - timingPointStart) % beatLength) <= seek_tolerance)
                         OnNewBeat(beat, beatLength, controlPoint.TimeSignature, kiai);
                 }
             }
