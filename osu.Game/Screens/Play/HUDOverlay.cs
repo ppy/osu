@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
 using OpenTK.Input;
+using osu.Game.Screens.Play.Options;
 
 namespace osu.Game.Screens.Play
 {
@@ -29,6 +30,7 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
+        public readonly OptionsDisplay OptionsDisplay;
 
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
@@ -42,6 +44,7 @@ namespace osu.Game.Screens.Play
         protected abstract HealthDisplay CreateHealthDisplay();
         protected abstract SongProgress CreateProgress();
         protected abstract ModDisplay CreateModsContainer();
+        protected abstract OptionsDisplay CreateOptionsDisplay();
 
         protected HUDOverlay()
         {
@@ -60,6 +63,7 @@ namespace osu.Game.Screens.Play
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
+                    OptionsDisplay = CreateOptionsDisplay(),
                 }
             });
         }
