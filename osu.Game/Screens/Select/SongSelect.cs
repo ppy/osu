@@ -313,15 +313,15 @@ namespace osu.Game.Screens.Select
         {
             bool beatmapSetChange = false;
 
-            if (!beatmap.Equals(Beatmap?.BeatmapInfo))
+            if (beatmap.Equals(Beatmap?.BeatmapInfo))
+                return;
+
+            if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
+                sampleChangeDifficulty.Play();
+            else
             {
-                if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
-                    sampleChangeDifficulty.Play();
-                else
-                {
-                    sampleChangeBeatmap.Play();
-                    beatmapSetChange = true;
-                }
+                sampleChangeBeatmap.Play();
+                beatmapSetChange = true;
             }
 
             selectionChangeNoBounce = beatmap;

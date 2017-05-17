@@ -100,6 +100,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return beatmap; }
             set
             {
+                if (beatmap == value) return;
+
                 beatmap = value;
                 Scores = null;
 
