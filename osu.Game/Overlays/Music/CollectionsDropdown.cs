@@ -11,60 +11,63 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
-public class CollectionsDropdown<T> : OsuDropdown<T>
+namespace osu.Game.Overlays.Music
 {
-    protected override DropdownHeader CreateHeader() => new CollectionsHeader { AccentColour = AccentColour };
-    protected override Menu CreateMenu() => new CollectionsMenu();
-
-    [BackgroundDependencyLoader]
-    private void load(OsuColour colours)
+    public class CollectionsDropdown<T> : OsuDropdown<T>
     {
-        AccentColour = colours.Gray6;
-    }
+        protected override DropdownHeader CreateHeader() => new CollectionsHeader { AccentColour = AccentColour };
+        protected override Menu CreateMenu() => new CollectionsMenu();
 
-    private class CollectionsHeader : OsuDropdownHeader
-    {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BackgroundColour = colours.Gray4;
+            AccentColour = colours.Gray6;
         }
 
-        public CollectionsHeader()
+        private class CollectionsHeader : OsuDropdownHeader
         {
-            CornerRadius = 5;
-            Height = 30;
-            Icon.TextSize = 14;
-            Icon.Margin = new MarginPadding(0);
-            Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 10, Right = 10 };
-            EdgeEffect = new EdgeEffect
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
             {
-                Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(0.3f),
-                Radius = 3,
-                Offset = new Vector2(0f, 1f),
-            };
-        }
-    }
+                BackgroundColour = colours.Gray4;
+            }
 
-    private class CollectionsMenu : OsuMenu
-    {
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            Background.Colour = colours.Gray4;
-        }
-
-        public CollectionsMenu()
-        {
-            CornerRadius = 5;
-            EdgeEffect = new EdgeEffect
+            public CollectionsHeader()
             {
-                Type = EdgeEffectType.Shadow,
-                Colour = Color4.Black.Opacity(0.3f),
-                Radius = 3,
-                Offset = new Vector2(0f, 1f),
-            };
+                CornerRadius = 5;
+                Height = 30;
+                Icon.TextSize = 14;
+                Icon.Margin = new MarginPadding(0);
+                Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 10, Right = 10 };
+                EdgeEffect = new EdgeEffect
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Colour = Color4.Black.Opacity(0.3f),
+                    Radius = 3,
+                    Offset = new Vector2(0f, 1f),
+                };
+            }
+        }
+
+        private class CollectionsMenu : OsuMenu
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Background.Colour = colours.Gray4;
+            }
+
+            public CollectionsMenu()
+            {
+                CornerRadius = 5;
+                EdgeEffect = new EdgeEffect
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Colour = Color4.Black.Opacity(0.3f),
+                    Radius = 3,
+                    Offset = new Vector2(0f, 1f),
+                };
+            }
         }
     }
 }
