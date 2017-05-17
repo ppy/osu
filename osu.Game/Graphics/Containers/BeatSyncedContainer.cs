@@ -18,10 +18,6 @@ namespace osu.Game.Graphics.Containers
         private const int seek_tolerance = 20;
         private const double min_beat_length = 1E-100;
 
-        public BeatSyncedContainer()
-        {
-        }
-
         protected override void Update()
         {
             if (beatmap.Value != null)
@@ -33,23 +29,23 @@ namespace osu.Game.Graphics.Containers
                 if (controlPoint != null)
                 {
                     double oldTimingPointStart = timingPointStart;
-                    double beatLenght = double.MinValue;
+                    double beatLength;
                     int oldBeat = beat;
-                    bool kiai = false;
+                    bool kiai;
 
-                    beatLenght = controlPoint.BeatLength;
+                    beatLength = controlPoint.BeatLength;
                     timingPointStart = controlPoint.Time;
                     kiai = kiaiControlPoint?.KiaiMode ?? false;
 
-                    beat = beatLenght > min_beat_length ? (int)((currentTime - timingPointStart) / beatLenght) : 0;
+                    beat = beatLength > min_beat_length ? (int)((currentTime - timingPointStart) / beatLength) : 0;
 
                     //should we handle negative beats? (before the start of the controlPoint)
                     //The beats before the start of the first control point are off by 1, this should do the trick
                     if (currentTime <= timingPointStart)
                         beat--;
 
-                    if ((timingPointStart != oldTimingPointStart || beat != oldBeat) && (int)((currentTime - timingPointStart) % (beatLenght)) <= seek_tolerance)
-                        OnNewBeat(beat, controlPoint.BeatLength, controlPoint.TimeSignature, kiai);
+                    if ((timingPointStart != oldTimingPointStart || beat != oldBeat) && (currentTime - timingPointStart) % (beatLength) <= seek_tolerance)
+                        OnNewBeat(beat, beatLength, controlPoint.TimeSignature, kiai);
                 }
             }
         }
