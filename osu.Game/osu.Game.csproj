@@ -78,6 +78,7 @@
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
+    <Compile Include="Overlays\Music\CollectionsDropdown.cs" />
     <Compile Include="Overlays\Music\FilterControl.cs" />
     <Compile Include="Overlays\Music\PlaylistItem.cs" />
     <Compile Include="Overlays\Music\PlaylistList.cs" />
@@ -232,9 +233,11 @@
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
+    <Compile Include="Screens\Play\Options\CollectionOptions.cs" />
+    <Compile Include="Screens\Play\Options\DiscussionOptions.cs" />
     <Compile Include="Screens\Play\Options\OptionContainer.cs" />
     <Compile Include="Screens\Play\Options\OptionsDisplay.cs" />
-    <Compile Include="Screens\Play\Options\PlaybackOption.cs" />
+    <Compile Include="Screens\Play\Options\PlaybackOptions.cs" />
     <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
     <Compile Include="Screens\Play\SquareGraph.cs" />
