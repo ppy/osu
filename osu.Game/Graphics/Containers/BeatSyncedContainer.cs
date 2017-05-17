@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.Containers
 
                     //should we handle negative beats? (before the start of the controlPoint)
                     //The beats before the start of the first control point are off by 1, this should do the trick
-                    if (currentTime <= timingPointStart)
+                    if (currentTime < timingPointStart)
                         beat--;
 
                     if ((timingPointStart != oldTimingPointStart || beat != oldBeat) && (int)((currentTime - timingPointStart) % beatLength) <= seek_tolerance)
