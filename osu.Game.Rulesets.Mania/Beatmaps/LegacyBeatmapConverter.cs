@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
     internal class LegacyBeatmapConverter
     {
         private readonly int availableColumns;
-        private readonly float localXDivisor; 
+        private readonly float localXDivisor;
 
         private readonly Beatmap beatmap;
 
