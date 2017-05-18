@@ -339,6 +339,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             add(newRow, holdColumn, startTime, separationTime * repeatCount);
 
             // Todo: Complete
+
+            return newRow;
         }
 
         private void add(ObjectRow row, int column, double startTime, double endTime, int siblings = 1)

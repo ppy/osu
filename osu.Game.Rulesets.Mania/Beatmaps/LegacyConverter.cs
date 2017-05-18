@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private readonly Beatmap beatmap;
 
-        public LegacyConverter(ObjectRow previousrow, Beatmap beatmap)
+        public LegacyConverter(Beatmap beatmap)
         {
             this.beatmap = beatmap;
 
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (conversion == null)
                 yield break;
 
-            foreach (ManiaHitObject obj in conversion.GenerateConversion())
+            foreach (ManiaHitObject obj in conversion.GenerateConversion().HitObjects)
                 yield return obj;
         }
 
