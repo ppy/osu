@@ -255,7 +255,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         private Pattern generateRandomMultipleNotes(double startTime)
         {
             // - - - -
-            // x - - 
+            // x - - -
             // - x x -
             // - - - x
             // x - x -
