@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         private const float osu_base_scoring_distance = 100;
 
         private readonly double endTime;
+        private readonly double segmentDuration;
         private readonly int repeatCount;
 
         private PatternType convertType;
@@ -55,37 +56,36 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             double osuDuration = distance / osuVelocity;
 
             endTime = hitObject.StartTime + osuDuration;
+            segmentDuration = (endTime - HitObject.StartTime) / repeatCount;
         }
 
         public override Pattern Generate()
         {
-            double segmentDuration = endTime / repeatCount;
-
             if (repeatCount > 1)
             {
                 if (segmentDuration <= 90)
-                    return generateRandomHoldNotes(HitObject.StartTime, endTime, 1);
+                    return generateRandomHoldNotes(HitObject.StartTime, 1);
 
                 if (segmentDuration <= 120)
                 {
                     convertType |= PatternType.ForceNotStack;
-                    return generateRandomNotes(HitObject.StartTime, segmentDuration, repeatCount);
+                    return generateRandomNotes(HitObject.StartTime, repeatCount + 1);
                 }
 
                 if (segmentDuration <= 160)
-                    return generateStair(HitObject.StartTime, segmentDuration);
+                    return generateStair(HitObject.StartTime);
 
                 if (segmentDuration <= 200 && ConversionDifficulty > 3)
-                    return generateRandomMultipleNotes(HitObject.StartTime, segmentDuration, repeatCount);
+                    return generateRandomMultipleNotes(HitObject.StartTime);
 
                 double duration = endTime - HitObject.StartTime;
                 if (duration >= 4000)
-                    return generateNRandomNotes(HitObject.StartTime, endTime, 0.23, 0, 0);
+                    return generateNRandomNotes(HitObject.StartTime, 0.23, 0, 0);
 
                 if (segmentDuration > 400 && duration < 4000 && repeatCount < AvailableColumns - 1 - RandomStart)
-                    return generateTiledHoldNotes(HitObject.StartTime, segmentDuration, repeatCount);
+                    return generateTiledHoldNotes(HitObject.StartTime);
 
-                return generateHoldAndNormalNotes(HitObject.StartTime, segmentDuration);
+                return generateHoldAndNormalNotes(HitObject.StartTime);
             }
 
             if (segmentDuration <= 110)
@@ -94,43 +94,42 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     convertType |= PatternType.ForceNotStack;
                 else
                     convertType &= ~PatternType.ForceNotStack;
-                return generateRandomNotes(HitObject.StartTime, segmentDuration, segmentDuration < 80 ? 0 : 1);
+                return generateRandomNotes(HitObject.StartTime, segmentDuration < 80 ? 1 : 2);
             }
 
             if (ConversionDifficulty > 6.5)
             {
                 if ((convertType & PatternType.LowProbability) > 0)
-                    return generateNRandomNotes(HitObject.StartTime, endTime, 0.78, 0.3, 0);
-                return generateNRandomNotes(HitObject.StartTime, endTime, 0.85, 0.36, 0.03);
+                    return generateNRandomNotes(HitObject.StartTime, 0.78, 0.3, 0);
+                return generateNRandomNotes(HitObject.StartTime, 0.85, 0.36, 0.03);
             }
 
             if (ConversionDifficulty > 4)
             {
                 if ((convertType & PatternType.LowProbability) > 0)
-                    return generateNRandomNotes(HitObject.StartTime, endTime, 0.43, 0.08, 0);
-                return generateNRandomNotes(HitObject.StartTime, endTime, 0.56, 0.18, 0);
+                    return generateNRandomNotes(HitObject.StartTime, 0.43, 0.08, 0);
+                return generateNRandomNotes(HitObject.StartTime, 0.56, 0.18, 0);
             }
 
             if (ConversionDifficulty > 2.5)
             {
                 if ((convertType & PatternType.LowProbability) > 0)
-                    return generateNRandomNotes(HitObject.StartTime, endTime, 0.3, 0, 0);
-                return generateNRandomNotes(HitObject.StartTime, endTime, 0.37, 0.08, 0);
+                    return generateNRandomNotes(HitObject.StartTime, 0.3, 0, 0);
+                return generateNRandomNotes(HitObject.StartTime, 0.37, 0.08, 0);
             }
 
             if ((convertType & PatternType.LowProbability) > 0)
-                return generateNRandomNotes(HitObject.StartTime, endTime, 0.17, 0, 0);
-            return generateNRandomNotes(HitObject.StartTime, endTime, 0.27, 0, 0);
+                return generateNRandomNotes(HitObject.StartTime, 0.17, 0, 0);
+            return generateNRandomNotes(HitObject.StartTime, 0.27, 0, 0);
         }
 
         /// <summary>
         /// Generates random hold notes that start at an span the same amount of rows.
         /// </summary>
         /// <param name="startTime">Start time of each hold note.</param>
-        /// <param name="endTime">End time of the hold notes.</param>
         /// <param name="noteCount">Number of hold notes.</param>
         /// <returns>The <see cref="Pattern"/> containing the hit objects.</returns>
-        private Pattern generateRandomHoldNotes(double startTime, double endTime, int noteCount)
+        private Pattern generateRandomHoldNotes(double startTime, int noteCount)
         {
             // - - - -
             // ■ - ■ ■
@@ -163,10 +162,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Generates random notes, with one note per row and no stacking.
         /// </summary>
         /// <param name="startTime">The start time.</param>
-        /// <param name="separationTime">The separation of notes between rows.</param>
-        /// <param name="repeatCount">The number of rows.</param>
+        /// <param name="noteCount">The number of notes.</param>
         /// <returns>The <see cref="Pattern"/> containing the hit objects.</returns>
-        private Pattern generateRandomNotes(double startTime, double separationTime, int repeatCount)
+        private Pattern generateRandomNotes(double startTime, int noteCount)
         {
             // - - - -
             // x - - -
@@ -184,14 +182,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
 
             int lastColumn = nextColumn;
-            for (int i = 0; i <= repeatCount; i++)
+            for (int i = 0; i < noteCount; i++)
             {
                 addToPattern(pattern, HitObject, nextColumn, startTime, startTime);
                 while (nextColumn == lastColumn)
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
                 lastColumn = nextColumn;
-                startTime += separationTime;
+                startTime += segmentDuration;
             }
 
             return pattern;
@@ -201,9 +199,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Generates a stair of notes, with one note per row.
         /// </summary>
         /// <param name="startTime">The start time.</param>
-        /// <param name="separationTime">The separation of notes between rows.</param>
         /// <returns>The <see cref="Pattern"/> containing the hit objects.</returns>
-        private Pattern generateStair(double startTime, double separationTime)
+        private Pattern generateStair(double startTime)
         {
             // - - - -
             // x - - -
@@ -222,7 +219,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             for (int i = 0; i <= repeatCount; i++)
             {
                 addToPattern(pattern, HitObject, column, startTime, startTime);
-                startTime += separationTime;
+                startTime += segmentDuration;
                 
                 // Check if we're at the borders of the stage, and invert the pattern if so
                 if (increasing)
@@ -254,10 +251,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Generates random notes with 1-2 notes per row and no stacking.
         /// </summary>
         /// <param name="startTime">The start time.</param>
-        /// <param name="separationTime">The separation of notes between rows.</param>
-        /// <param name="repeatCount">The number of rows.</param>
         /// <returns>The <see cref="Pattern"/> containing the hit objects.</returns>
-        private Pattern generateRandomMultipleNotes(double startTime, double separationTime, int repeatCount)
+        private Pattern generateRandomMultipleNotes(double startTime)
         {
             // - - - -
             // x - - 
@@ -285,7 +280,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     addToPattern(pattern, HitObject, nextColumn, startTime, startTime, 2);
 
                 nextColumn = Random.Next(RandomStart, AvailableColumns);
-                startTime += separationTime;
+                startTime += segmentDuration;
             }
 
             return pattern;
@@ -295,12 +290,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Generates random hold notes. The amount of hold notes generated is determined by probabilities.
         /// </summary>
         /// <param name="startTime">The hold note start time.</param>
-        /// <param name="endTime">The hold note end time.</param>
         /// <param name="p2">The probability required for 2 hold notes to be generated.</param>
         /// <param name="p3">The probability required for 3 hold notes to be generated.</param>
         /// <param name="p4">The probability required for 4 hold notes to be generated.</param>
         /// <returns>The <see cref="Pattern"/> containing the hit objects.</returns>
-        private Pattern generateNRandomNotes(double startTime, double endTime, double p2, double p3, double p4)
+        private Pattern generateNRandomNotes(double startTime, double p2, double p3, double p4)
         {
             // - - - -
             // ■ - ■ ■
@@ -339,17 +333,15 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (canGenerateTwoNotes)
                 p2 = 1;
 
-            return generateRandomHoldNotes(startTime, endTime, GetRandomNoteCount(p2, p3, p4));
+            return generateRandomHoldNotes(startTime, GetRandomNoteCount(p2, p3, p4));
         }
 
         /// <summary>
         /// Generates tiled hold notes. You can think of this as a stair of hold notes.
         /// </summary>
         /// <param name="startTime">The first hold note start time.</param>
-        /// <param name="separationTime">The separation time between hold notes.</param>
-        /// <param name="noteCount">The amount of hold notes.</param>
         /// <returns>The <see cref="Pattern"/> containing the hit objects.</returns>
-        private Pattern generateTiledHoldNotes(double startTime, double separationTime, int noteCount)
+        private Pattern generateTiledHoldNotes(double startTime)
         {
             // - - - -
             // ■ ■ ■ ■
@@ -362,7 +354,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             var pattern = new Pattern();
 
-            int columnRepeat = Math.Min(noteCount, AvailableColumns);
+            int columnRepeat = Math.Min(repeatCount, AvailableColumns);
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
             if ((convertType & PatternType.ForceNotStack) > 0 && PreviousPattern.ColumnsFilled < AvailableColumns)
@@ -376,8 +368,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 while (pattern.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
-                addToPattern(pattern, HitObject, nextColumn, startTime, endTime, noteCount);
-                startTime += separationTime;
+                addToPattern(pattern, HitObject, nextColumn, startTime, endTime, repeatCount);
+                startTime += segmentDuration;
             }
 
             return pattern;
@@ -387,9 +379,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Generates a hold note alongside normal notes.
         /// </summary>
         /// <param name="startTime">The start time of notes.</param>
-        /// <param name="separationTime">The separation time between notes.</param>
         /// <returns>The <see cref="Pattern"/> containing the hit objects.</returns>
-        private Pattern generateHoldAndNormalNotes(double startTime, double separationTime)
+        private Pattern generateHoldAndNormalNotes(double startTime)
         {
             // - - - -
             // ■ x x -
@@ -407,7 +398,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
 
             // Create the hold note
-            addToPattern(pattern, HitObject, holdColumn, startTime, separationTime * repeatCount);
+            addToPattern(pattern, HitObject, holdColumn, startTime, endTime);
 
             int noteCount = 1;
             if (ConversionDifficulty > 6.5)
@@ -437,7 +428,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 pattern.Add(rowPattern);
                 rowPattern.Clear();
 
-                startTime += separationTime;
+                startTime += segmentDuration;
             }
 
             return pattern;
@@ -455,7 +446,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (curveData == null)
                 return HitObject.Samples;
 
-            double segmentTime = (curveData.EndTime - HitObject.StartTime) / repeatCount;
+            double segmentTime = (endTime - HitObject.StartTime) / repeatCount;
 
             int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
             return curveData.RepeatSamples[index];

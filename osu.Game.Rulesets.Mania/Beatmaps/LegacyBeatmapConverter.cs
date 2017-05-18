@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
+using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -74,10 +75,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var distanceData = original as IHasDistance;
             var positionData = original as IHasPosition;
 
-            PatternGenerator conversion = null;
+            Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
             {
+                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern);
                 // Slider
             }
             else if (endTimeData != null)
