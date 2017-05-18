@@ -23,27 +23,10 @@ namespace osu.Game.Overlays.Direct
     {
         private readonly Box tabStrip;
         private readonly FillFlowContainer<ModeToggleButton> modeButtons;
-        private readonly OsuDropdown<RankStatus> rankStatusDropdown;
 
         public readonly SearchTextBox Search;
-
-        public enum RankStatus
-        {
-            Any,
-            [Description("Ranked & Approved")]
-            RankedApproved,
-            Approved,
-            Loved,
-            Favourites,
-            [Description("Mod Requests")]
-            ModRequests,
-            Pending,
-            Graveyard,
-            [Description("My Maps")]
-            MyMaps,
-        }
-
-        protected override bool InternalContains(Vector2 screenSpacePos) => true;
+        public readonly SortTabControl SortTabs;
+        public readonly OsuEnumDropdown<RankStatus> RankStatusDropdown;
 
         public FilterControl()
         {
@@ -83,13 +66,13 @@ namespace osu.Game.Overlays.Direct
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(10f, 0f),
                         },
-                        new SortTabControl
+                        SortTabs = new SortTabControl
                         {
                             RelativeSizeAxes = Axes.X,
                         },
                     },
                 },
-                rankStatusDropdown = new SlimEnumDropdown<RankStatus>
+                RankStatusDropdown = new SlimEnumDropdown<RankStatus>
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
@@ -99,14 +82,18 @@ namespace osu.Game.Overlays.Direct
                 },
             };
 
-            rankStatusDropdown.Current.Value = RankStatus.RankedApproved;
+            RankStatusDropdown.Current.Value = RankStatus.RankedApproved;
+
+            //todo: possibly restore from config instead of always title
+            SortTabs.Current.Value = SortCriteria.Title;
+            SortTabs.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game, RulesetDatabase rulesets, OsuColour colours)
         {
             tabStrip.Colour = colours.Yellow;
-            rankStatusDropdown.AccentColour = colours.BlueDark;
+            RankStatusDropdown.AccentColour = colours.BlueDark;
 
             foreach (var r in rulesets.AllRulesets)
             {
@@ -208,5 +195,21 @@ namespace osu.Game.Overlays.Direct
                 }
             }
         }
+    }
+
+    public enum RankStatus
+    {
+    	Any,
+    	[Description("Ranked & Approved")]
+    	RankedApproved,
+    	Approved,
+    	Loved,
+    	Favourites,
+    	[Description("Mod Requests")]
+    	ModRequests,
+    	Pending,
+    	Graveyard,
+    	[Description("My Maps")]
+    	MyMaps,
     }
 }

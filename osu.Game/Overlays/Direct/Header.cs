@@ -21,9 +21,8 @@ namespace osu.Game.Overlays.Direct
     public class Header : Container
     {
         private readonly Box tabStrip;
-        private readonly DirectTabControl tabs;
 
-        public Action<DirectTab> OnSelectTab;
+        public readonly OsuTabControl<DirectTab> Tabs;
 
         public Header()
         {
@@ -71,7 +70,7 @@ namespace osu.Game.Overlays.Direct
                             Width = 282, //todo: make this actually match the tab control's width instead of hardcoding
                             Height = 1,
                         },
-                        tabs = new DirectTabControl
+                        Tabs = new DirectTabControl
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -81,7 +80,9 @@ namespace osu.Game.Overlays.Direct
                 },
             };
 
-            tabs.Current.ValueChanged += (newValue) => OnSelectTab?.Invoke(newValue);
+            //todo: possibly restore from config instead of always search
+            Tabs.Current.Value = DirectTab.Search;
+            Tabs.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
@@ -114,10 +115,10 @@ namespace osu.Game.Overlays.Direct
     {
         Search,
         [Description("Newest Maps")]
-        New,
+        NewestMaps,
         [Description("Top Rated")]
-        Top,
+        TopRated,
         [Description("Most Played")]
-        MostP
+        MostPlayed
     }
 }
