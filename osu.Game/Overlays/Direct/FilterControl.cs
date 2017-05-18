@@ -60,7 +60,6 @@ namespace osu.Game.Overlays.Direct
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    //Spacing = new Vector2(0f, 10f),
                     Padding = new MarginPadding { Left = DirectOverlay.WIDTH_PADDING, Right = DirectOverlay.WIDTH_PADDING, Top = 10 },
                     Children = new Drawable[]
                     {
