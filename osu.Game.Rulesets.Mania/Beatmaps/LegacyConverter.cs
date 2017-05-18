@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private readonly double lastNoteTime;
         private readonly float lastNotePosition;
 
+        private ObjectRow lastRow = new ObjectRow();
+
         private readonly int availableColumns;
         private readonly float localXDivisor; 
 
@@ -105,7 +107,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             ObjectConversion conversion = null;
 
             if (distanceData != null)
-                conversion = new DistanceObjectConversion(distanceData, beatmap);
+                conversion = new DistanceObjectConversion(original, lastRow, random, beatmap);
             else if (endTimeData != null)
             {
                 // Spinner
@@ -118,8 +120,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (conversion == null)
                 yield break;
 
-            foreach (ManiaHitObject obj in conversion.GenerateConversion().HitObjects)
+            ObjectRow newRow = conversion.GenerateConversion();
+
+            foreach (ManiaHitObject obj in newRow.HitObjects)
                 yield return obj;
+
+            lastRow = newRow;
         }
 
         private int getColumn(float position) => MathHelper.Clamp((int)Math.Floor(position / localXDivisor), 0, availableColumns - 1);
