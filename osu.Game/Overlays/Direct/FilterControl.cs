@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.Direct
 
             void Bindable_ValueChanged(RulesetInfo obj)
             {
-                icon.FadeTo((Ruleset.ID == obj.ID) ? 1f : 0.5f, 100);
+                icon.FadeTo((Ruleset.ID == obj?.ID) ? 1f : 0.5f, 100);
             }
 
             public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
