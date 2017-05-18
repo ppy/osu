@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Direct
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(0f, 10f),
+                    //Spacing = new Vector2(0f, 10f),
                     Padding = new MarginPadding { Left = DirectOverlay.WIDTH_PADDING, Right = DirectOverlay.WIDTH_PADDING, Top = 10 },
                     Children = new Drawable[]
                     {
@@ -72,6 +72,7 @@ namespace osu.Game.Overlays.Direct
                         {
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(10f, 0f),
+                            Margin = new MarginPadding { Top = 10f },
                         },
                         SortTabs = new SortTabControl
                         {
@@ -111,7 +112,7 @@ namespace osu.Game.Overlays.Direct
                 },
             };
 
-            //todo: possibly restore from config instead of always title
+            //todo: possibly restore from config
             RankStatusDropdown.Current.Value = RankStatus.RankedApproved;
             SortTabs.Current.Value = SortCriteria.Title;
             SortTabs.Current.TriggerChange();
