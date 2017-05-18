@@ -154,15 +154,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            normalColour = colours.SpinnerBaseColour;
+            normalColour = colours.SpinnerBase;
 
             background.AccentColour = normalColour;
 
             completeColour = colours.YellowLight.Opacity(0.6f);
 
-            disc.AccentColour = normalColour;
-            circle.Colour = colours.BlueDarker;
-            glow.Colour = colours.BlueDarker;
+            disc.AccentColour = colours.SpinnerFill;
+            circle.Colour = colours.BlueDark;
+            glow.Colour = colours.BlueDark;
         }
 
         protected override void UpdateAfterChildren()
