@@ -236,6 +236,7 @@
     <Compile Include="Screens\Play\Options\CollectionOptions.cs" />
     <Compile Include="Screens\Play\Options\DiscussionOptions.cs" />
     <Compile Include="Screens\Play\Options\OptionContainer.cs" />
+    <Compile Include="Screens\Play\Options\OptionDropdown.cs" />
     <Compile Include="Screens\Play\Options\OptionsDisplay.cs" />
     <Compile Include="Screens\Play\Options\PlaybackOptions.cs" />
     <Compile Include="Screens\Play\PauseContainer.cs" />

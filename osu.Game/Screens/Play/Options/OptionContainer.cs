@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -19,7 +20,8 @@ namespace osu.Game.Screens.Play.Options
         /// </summary>
         public abstract string Title { get; }
 
-        private readonly FillFlowContainer content;
+        private readonly OptionDropdown content;
+        private readonly SimpleButton button;
         private bool contentIsVisible;
 
         protected OptionContainer()
@@ -65,7 +67,7 @@ namespace osu.Game.Screens.Play.Options
                                     Font = @"Exo2.0-Bold",
                                     Margin = new MarginPadding { Left = 10 },
                                 },
-                                new SimpleButton
+                                button = new SimpleButton
                                 {
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.CentreRight,
@@ -76,19 +78,19 @@ namespace osu.Game.Screens.Play.Options
                                 },
                             }
                         },
-                        content = new FillFlowContainer
+                        content = new OptionDropdown
                         {
-                            Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Padding = new MarginPadding(15),
-                            Spacing = new Vector2(0, 10),
                         }
                     }
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            content.StateChanged += (c, s) => button.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, EasingTypes.OutQuint);
         }
 
         public new void Add(Drawable drawable)
@@ -98,12 +100,12 @@ namespace osu.Game.Screens.Play.Options
 
         private void triggerContentVisibility()
         {
+            contentIsVisible = !contentIsVisible;
+
             if (contentIsVisible)
                 content.Show();
             else
                 content.Hide();
-
-            contentIsVisible = !contentIsVisible;
         }
     }
 }
