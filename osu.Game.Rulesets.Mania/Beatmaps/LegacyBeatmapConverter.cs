@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
+using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -74,9 +75,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var distanceData = original as IHasDistance;
             var positionData = original as IHasPosition;
 
-            // Following lines currently commented out to appease resharper
-
-            //PatternGenerator conversion = null;
+            Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
             {
@@ -84,6 +83,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
             else if (endTimeData != null)
             {
+                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap);
                 // Spinner
             }
             else if (positionData != null)
@@ -91,13 +91,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 // Circle
             }
 
-            //if (conversion == null)
+            if (conversion == null)
                 return null;
 
-            //Pattern newPattern = conversion.Generate();
-            //lastPattern = newPattern;
+            Pattern newPattern = conversion.Generate();
+            lastPattern = newPattern;
 
-            //return newPattern.HitObjects;
+            return newPattern.HitObjects;
         }
 
         /// <summary>
