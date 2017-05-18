@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Audio;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mania.Judgements;
@@ -21,6 +22,11 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public double Duration { get; set; }
         public double EndTime => StartTime + Duration;
+
+        /// <summary>
+        /// The samples to be played when this hold note is released.
+        /// </summary>
+        public SampleInfoList EndSamples = new SampleInfoList();
 
         /// <summary>
         /// The key-release hit windows for this hold note.
