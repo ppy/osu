@@ -231,6 +231,7 @@
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
+    <Compile Include="Screens\Play\PauseContainer.cs" />
     <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
     <Compile Include="Screens\Play\SquareGraph.cs" />
@@ -254,8 +255,6 @@
     <Compile Include="Screens\Play\FailOverlay.cs" />
     <Compile Include="Screens\Play\MenuOverlay.cs" />
     <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
-    <Compile Include="Screens\Play\PauseOverlay.cs" />
-    <Compile Include="Screens\Play\Pause\PauseButton.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\ReplayPlayer.cs" />
@@ -395,8 +394,6 @@
     <Compile Include="Screens\Play\SongProgress.cs" />
     <Compile Include="Screens\Play\SongProgressGraph.cs" />
     <Compile Include="Screens\Play\SongProgressBar.cs" />
-    <Compile Include="Screens\Play\Pause\PauseProgressBar.cs" />
-    <Compile Include="Screens\Play\Pause\PauseProgressGraph.cs" />
     <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
     <Compile Include="Rulesets\Mods\Mod.cs" />
     <Compile Include="Overlays\Mods\ModButtonEmpty.cs" />
