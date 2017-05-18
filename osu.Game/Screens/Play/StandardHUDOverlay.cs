@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using OpenTK;
-using osu.Game.Screens.Play.Options;
+using osu.Game.Screens.Play.Settings;
 
 namespace osu.Game.Screens.Play
 {
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected override OptionsDisplay CreateOptionsDisplay() => new OptionsDisplay
+        protected override SettingsDisplay CreateSettingsDisplay() => new SettingsDisplay
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
