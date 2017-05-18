@@ -126,7 +126,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var newObjects = new ObjectList();
 
             int usableColumns = AvailableColumns - RandomStart - PreviousObjects.ColumnsFilled;
-
             int nextColumn = Random.Next(RandomStart, AvailableColumns);
             for (int i = 0; i < Math.Min(usableColumns, noteCount); i++)
             {
@@ -325,7 +324,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             canGenerateTwoNotes &= originalObject.Samples.Any(isDoubleSample) || sampleInfoListAt(originalObject.StartTime).Any(isDoubleSample);
 
             if (canGenerateTwoNotes)
-                p2 = 0;
+                p2 = 1;
 
             return generateRandomHoldNotes(startTime, endTime, GetRandomNoteCount(p2, p3, p4));
         }
@@ -397,7 +396,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             // Create the hold note
             add(newObjects, holdColumn, startTime, separationTime * repeatCount);
 
-            int noteCount = 0;
+            int noteCount = 1;
             if (conversionDifficulty > 6.5)
                 noteCount = GetRandomNoteCount(0.63, 0);
             else if (conversionDifficulty > 4)
@@ -422,10 +421,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     }
                 }
 
-                foreach (ManiaHitObject obj in tempObjects.HitObjects)
-                    newObjects.Add(obj);
-
+                newObjects.Add(tempObjects);
                 tempObjects.Clear();
+
                 startTime += separationTime;
             }
 
