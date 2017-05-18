@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(hitObject.StartTime) * speedAdjustment;
 
             // The true distance, accounting for any repeats. This ends up being the drum roll distance later
-            double distance = distanceData.Distance * repeatCount;
+            double distance = (distanceData?.Distance ?? 0) * repeatCount;
 
             // The velocity of the osu! hit object - calculated as the velocity of a slider
             double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength;
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 while (pattern.IsFilled(nextColumn) || PreviousPattern.IsFilled(nextColumn))  //find available column
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
-                addToPattern(pattern, HitObject, nextColumn, startTime, endTime, noteCount);
+                addToPattern(pattern, nextColumn, startTime, endTime, noteCount);
             }
 
             // This is can't be combined with the above loop due to RNG
@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 while (pattern.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
-                addToPattern(pattern, HitObject, nextColumn, startTime, endTime, noteCount);
+                addToPattern(pattern, nextColumn, startTime, endTime, noteCount);
             }
 
             return pattern;
@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int lastColumn = nextColumn;
             for (int i = 0; i < noteCount; i++)
             {
-                addToPattern(pattern, HitObject, nextColumn, startTime, startTime);
+                addToPattern(pattern, nextColumn, startTime, startTime);
                 while (nextColumn == lastColumn)
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
@@ -218,7 +218,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             for (int i = 0; i <= repeatCount; i++)
             {
-                addToPattern(pattern, HitObject, column, startTime, startTime);
+                addToPattern(pattern, column, startTime, startTime);
                 startTime += segmentDuration;
                 
                 // Check if we're at the borders of the stage, and invert the pattern if so
@@ -268,7 +268,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
             for (int i = 0; i <= repeatCount; i++)
             {
-                addToPattern(pattern, HitObject, nextColumn, startTime, startTime, 2);
+                addToPattern(pattern, nextColumn, startTime, startTime, 2);
 
                 nextColumn += interval;
                 if (nextColumn >= AvailableColumns - RandomStart)
@@ -277,7 +277,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
                 // If we're in 2K, let's not add many consecutive doubles
                 if (AvailableColumns > 2)
-                    addToPattern(pattern, HitObject, nextColumn, startTime, startTime, 2);
+                    addToPattern(pattern, nextColumn, startTime, startTime, 2);
 
                 nextColumn = Random.Next(RandomStart, AvailableColumns);
                 startTime += segmentDuration;
@@ -368,7 +368,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 while (pattern.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
-                addToPattern(pattern, HitObject, nextColumn, startTime, endTime, repeatCount);
+                addToPattern(pattern, nextColumn, startTime, endTime, repeatCount);
                 startTime += segmentDuration;
             }
 
@@ -398,7 +398,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
 
             // Create the hold note
-            addToPattern(pattern, HitObject, holdColumn, startTime, endTime);
+            addToPattern(pattern, holdColumn, startTime, endTime);
 
             int noteCount = 1;
             if (ConversionDifficulty > 6.5)
@@ -421,7 +421,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     {
                         while (rowPattern.IsFilled(nextColumn) || nextColumn == holdColumn)
                             nextColumn = Random.Next(RandomStart, AvailableColumns);
-                        addToPattern(rowPattern, HitObject, nextColumn, startTime, startTime, noteCount + 1);
+                        addToPattern(rowPattern, nextColumn, startTime, startTime, noteCount + 1);
                     }
                 }
 
@@ -457,12 +457,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// Constructs and adds a note to a pattern.
         /// </summary>
         /// <param name="pattern">The pattern to add to.</param>
-        /// <param name="originalObject">The original hit object (used for samples).</param>
         /// <param name="column">The column to add the note to.</param>
         /// <param name="startTime">The start time of the note.</param>
         /// <param name="endTime">The end time of the note (set to <paramref name="startTime"/> for a non-hold note).</param>
         /// <param name="siblings">The number of children alongside this note (these will not be generated, but are used for volume calculations).</param>
-        private void addToPattern(Pattern pattern, HitObject originalObject, int column, double startTime, double endTime, int siblings = 1)
+        private void addToPattern(Pattern pattern, int column, double startTime, double endTime, int siblings = 1)
         {
             ManiaHitObject newObject;
 
