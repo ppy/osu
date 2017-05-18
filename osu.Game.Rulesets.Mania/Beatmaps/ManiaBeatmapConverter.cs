@@ -25,7 +25,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             {
                 BeatmapInfo = original.BeatmapInfo,
                 TimingInfo = original.TimingInfo,
-                HitObjects = original.HitObjects.SelectMany(converter.Convert).ToList()
+                // We need to sort here, because the converter generates patterns
+                HitObjects = original.HitObjects.SelectMany(converter.Convert).OrderBy(h => h.StartTime).ToList()
             };
         }
 
