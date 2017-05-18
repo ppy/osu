@@ -22,5 +22,12 @@ namespace osu.Game.Beatmaps.Events
         /// Total duration of all breaks.
         /// </summary>
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
+
+        /// <summary>
+        /// Retrieves the active background at a time.
+        /// </summary>
+        /// <param name="time">The time to retrieve the background at.</param>
+        /// <returns>The background.</returns>
+        public BackgroundEvent BackgroundAt(double time) => Backgrounds.FirstOrDefault(b => b.StartTime <= time);
     }
 }
