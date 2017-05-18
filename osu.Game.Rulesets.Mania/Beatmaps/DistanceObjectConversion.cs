@@ -338,7 +338,37 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             // Create the hold note
             add(newRow, holdColumn, startTime, separationTime * repeatCount);
 
-            // Todo: Complete
+            int noteCount = 0;
+            if (conversionDifficulty > 6.5)
+                noteCount = GetRandomNoteCount(0.63, 0);
+            else if (conversionDifficulty > 4)
+                noteCount = GetRandomNoteCount(AvailableColumns < 6 ? 0.12 : 0.45, 0);
+            else if (conversionDifficulty > 2.5)
+                noteCount = GetRandomNoteCount(AvailableColumns < 6 ? 0 : 0.24, 0);
+            noteCount = Math.Min(AvailableColumns - 1, noteCount);
+
+            bool ignoreHead = !sampleInfoListAt(startTime, separationTime).Any(s => s.Name == SampleInfo.HIT_WHISTLE || s.Name == SampleInfo.HIT_FINISH || s.Name == SampleInfo.HIT_CLAP);
+            int nextColumn = Random.Next(RandomStart, AvailableColumns);
+
+            var tempRow = new ObjectRow();
+            for (int i = 0; i <= repeatCount; i++)
+            {
+                if (!(ignoreHead && startTime == originalObject.StartTime))
+                {
+                    for (int j = 0; j < noteCount; j++)
+                    {
+                        while (tempRow.IsTaken(nextColumn) || nextColumn == holdColumn)
+                            nextColumn = Random.Next(RandomStart, AvailableColumns);
+                        add(tempRow, nextColumn, startTime, startTime, noteCount + 1);
+                    }
+                }
+
+                foreach (ManiaHitObject obj in tempRow.HitObjects)
+                    newRow.Add(obj);
+
+                tempRow.Clear();
+                startTime += separationTime;
+            }
 
             return newRow;
         }
