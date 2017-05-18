@@ -154,8 +154,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            normalColour = colours.SpinnerFill;
-            background.AccentColour = colours.SpinnerBackground;
+            normalColour = colours.SpinnerBaseColour;
+
+            background.AccentColour = normalColour;
 
             completeColour = colours.YellowLight.Opacity(0.6f);
 
