@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Chat
 {
     public class ChatTabControl : OsuTabControl<Channel>
     {
-        protected override TabItem<Channel> CreateTabItem(Channel value) => value.Id == -1 ? new ChannelTabItem.ChannelSelectorTabItem(value) : new ChannelTabItem(value);
+        protected override TabItem<Channel> CreateTabItem(Channel value) => value.Id == ChatOverlay.CHANNEL_SELECTOR_ID ? new ChannelTabItem.ChannelSelectorTabItem(value) : new ChannelTabItem(value);
 
         private const float shear_width = 10;
 

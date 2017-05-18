@@ -264,12 +264,13 @@ namespace osu.Game.Overlays
             {
                 if (currentChannel == value) return;
 
-                if(value.Id == CHANNEL_SELECTOR_ID)
+                if (value.Id == CHANNEL_SELECTOR_ID)
                 {
                     //channel selector popout
                     currentChannel = value;
                     return;
-                }else if(currentChannel?.Id == CHANNEL_SELECTOR_ID)
+                }
+                else if (currentChannel?.Id == CHANNEL_SELECTOR_ID)
                 {
                     //channel selector popin
                 }
