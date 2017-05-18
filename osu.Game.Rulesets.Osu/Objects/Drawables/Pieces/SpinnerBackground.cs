@@ -23,17 +23,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             set { Disc.Colour = value; }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            EdgeEffect = new EdgeEffect
-            {
-                Type = EdgeEffectType.Glow,
-                Radius = 14,
-                Colour = colours.BlueLight.Opacity(0.3f),
-            };
-        }
-
         public SpinnerBackground()
         {
             RelativeSizeAxes = Axes.Both;
@@ -48,6 +37,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 1,
                 },
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            EdgeEffect = new EdgeEffect
+            {
+                Type = EdgeEffectType.Glow,
+                Radius = 14,
+                Colour = colours.BlueLight.Opacity(0.3f),
             };
         }
     }
