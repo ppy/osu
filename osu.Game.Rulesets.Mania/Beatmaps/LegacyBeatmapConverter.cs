@@ -1,32 +1,33 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
+using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
+using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using System;
-using System.Collections.Generic;
-using osu.Game.Rulesets.Mania.MathUtils;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
     /// <summary>
     /// Special converter used for converting from osu!stable beatmaps.
     /// </summary>
-    internal class LegacyConverter
+    internal class LegacyBeatmapConverter
     {
         private readonly FastRandom random;
 
-        private ObjectList lastRow = new ObjectList();
+        private Patterns.Pattern lastPattern = new Patterns.Pattern();
 
         private readonly int availableColumns;
         private readonly float localXDivisor; 
 
         private readonly Beatmap beatmap;
 
-        public LegacyConverter(Beatmap beatmap)
+        public LegacyBeatmapConverter(Beatmap beatmap)
         {
             this.beatmap = beatmap;
 
@@ -93,10 +94,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var distanceData = original as IHasDistance;
             var positionData = original as IHasPosition;
 
-            ObjectConversion conversion = null;
+            Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
-                conversion = new DistanceObjectConversion(original, lastRow, random, beatmap);
+                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern);
             else if (endTimeData != null)
             {
                 // Spinner
@@ -109,12 +110,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (conversion == null)
                 yield break;
 
-            ObjectList newRow = conversion.Generate();
+            Patterns.Pattern newPattern = conversion.Generate();
 
-            foreach (ManiaHitObject obj in newRow.HitObjects)
+            foreach (ManiaHitObject obj in newPattern.HitObjects)
                 yield return obj;
 
-            lastRow = newRow;
+            lastPattern = newPattern;
         }
 
         private int getColumn(float position) => MathHelper.Clamp((int)Math.Floor(position / localXDivisor), 0, availableColumns - 1);
