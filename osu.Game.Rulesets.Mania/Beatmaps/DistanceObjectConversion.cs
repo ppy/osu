@@ -17,6 +17,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 {
     internal class DistanceObjectConversion : ObjectConversion
     {
+        /// <summary>
+        /// Base osu! slider scoring distance.
+        /// </summary>
+        private const float osu_base_scoring_distance = 100;
+
         private readonly HitObject originalObject;
 
         private readonly double endTime;
@@ -39,8 +44,20 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var distanceData = originalObject as IHasDistance;
             var repeatsData = originalObject as IHasRepeats;
 
-            endTime = distanceData?.EndTime ?? 0;
             repeatCount = repeatsData?.RepeatCount ?? 1;
+
+            double speedAdjustment = beatmap.TimingInfo.SpeedMultiplierAt(originalObject.StartTime);
+            double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(originalObject.StartTime) * speedAdjustment;
+
+            // The true distance, accounting for any repeats. This ends up being the drum roll distance later
+            double distance = distanceData.Distance * repeatCount;
+
+            // The velocity of the osu! hit object - calculated as the velocity of a slider
+            double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength;
+            // The duration of the osu! hit object
+            double osuDuration = distance / osuVelocity;
+
+            endTime = originalObject.StartTime + osuDuration;
         }
 
         public override ObjectList Generate()
