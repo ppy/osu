@@ -9,6 +9,7 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.Direct;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -25,6 +26,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(direct = new DirectOverlay());
             newBeatmaps();
+            direct.ResultCounts = new ResultCounts(1, 432, 3);
 
             AddStep(@"Toggle", direct.ToggleVisibility);
         }

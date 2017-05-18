@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using OpenTK;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -30,10 +29,16 @@ namespace osu.Game.Overlays
                 var p = new List<DirectPanel>();
 
                 foreach (BeatmapSetInfo b in value)
-                    p.Add(new DirectGridPanel(b) { Width = 407 });
+                    p.Add(new DirectGridPanel(b) { Width = 400 });
 
                 panels.Children = p;
             }
+        }
+
+        public ResultCounts ResultCounts
+        {
+            get { return filter.ResultCounts; }
+            set { filter.ResultCounts = value; }
         }
 
         public DirectOverlay()
