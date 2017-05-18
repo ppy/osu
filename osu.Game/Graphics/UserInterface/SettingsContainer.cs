@@ -110,7 +110,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             private const float transition_duration = 600;
 
-            private FillFlowContainer content;
+            private readonly FillFlowContainer content;
 
             public SettingsDropdown()
             {
