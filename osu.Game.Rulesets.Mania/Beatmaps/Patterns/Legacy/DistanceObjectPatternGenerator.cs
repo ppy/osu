@@ -480,7 +480,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 newObject = new Note
                 {
                     StartTime = startTime,
-                    Samples = originalObject.Samples,
+                    Samples = sampleInfoListAt(startTime),
                     Column = column,
                     Siblings = siblings
                 };
@@ -490,7 +490,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 newObject = new HoldNote
                 {
                     StartTime = startTime,
-                    Samples = originalObject.Samples,
+                    Samples = sampleInfoListAt(startTime),
+                    EndSamples = sampleInfoListAt(endTime),
                     Column = column,
                     Duration = endTime - startTime,
                     Siblings = siblings
