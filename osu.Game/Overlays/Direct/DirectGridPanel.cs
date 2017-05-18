@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -19,20 +20,20 @@ namespace osu.Game.Overlays.Direct
         private readonly float vertical_padding = 5;
 
         private readonly Sprite background;
-        private readonly OsuSpriteText title, artist, mapperPrefix, mapper, source;
+        private readonly OsuSpriteText title, artist, authorPrefix, author, source;
         private readonly Statistic playCount, favouriteCount;
         private readonly FillFlowContainer difficultyIcons;
 
         protected override Sprite Background => background;
         protected override OsuSpriteText Title => title;
         protected override OsuSpriteText Artist => artist;
-        protected override OsuSpriteText Mapper => mapper;
+        protected override OsuSpriteText Author => author;
         protected override OsuSpriteText Source => source;
         protected override Statistic PlayCount => playCount;
         protected override Statistic FavouriteCount => favouriteCount;
         protected override FillFlowContainer DifficultyIcons => difficultyIcons;
 
-        public DirectGridPanel()
+        public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
             CornerRadius = 4;
@@ -113,13 +114,13 @@ namespace osu.Game.Overlays.Direct
                                             Direction = FillDirection.Horizontal,
                                             Children = new[]
                                             {
-                                                mapperPrefix = new OsuSpriteText
+                                                authorPrefix = new OsuSpriteText
                                                 {
                                                     Text = @"mapped by ",
                                                     TextSize = 14,
                                                     Shadow = false,
                                                 },
-                                                mapper = new OsuSpriteText
+                                                author = new OsuSpriteText
                                                 {
                                                     TextSize = 14,
                                                     Font = @"Exo2.0-SemiBoldItalic",
@@ -165,8 +166,8 @@ namespace osu.Game.Overlays.Direct
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-        	mapperPrefix.Colour = colours.Gray5;
-        	Mapper.Colour = colours.BlueDark;
+        	authorPrefix.Colour = colours.Gray5;
+        	Author.Colour = colours.BlueDark;
         	Source.Colour = colours.Gray5;
         }
     }
