@@ -8,11 +8,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Play.Pause;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Play
 
         protected void AddButton(string text, Color4 colour, Action action)
         {
-            Buttons.Add(new PauseButton
+            Buttons.Add(new Button
             {
                 Text = text,
                 ButtonColour = colour,
@@ -179,12 +179,6 @@ namespace osu.Game.Screens.Play
                         }
                     }
                 },
-                new PauseProgressBar
-                {
-                    Origin = Anchor.BottomCentre,
-                    Anchor = Anchor.BottomCentre,
-                    Width = 1f
-                }
             };
 
             Retries = 0;
@@ -194,6 +188,16 @@ namespace osu.Game.Screens.Play
         {
             AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
+        }
+
+        public class Button : DialogButton
+        {
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                SampleHover = audio.Sample.Get(@"Menu/menuclick");
+                SampleClick = audio.Sample.Get(@"Menu/menuback");
+            }
         }
     }
 }
