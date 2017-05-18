@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly SpinnerBackground background;
         private readonly Container circleContainer;
         private readonly CirclePiece circle;
+        private readonly GlowPiece glow;
 
         private readonly TextAwesome symbol;
 
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             RelativeSizeAxes = Axes.Both;
 
             // we are slightly bigger than our parent, to clip the top and bottom of the circle
-            Height = 1.2f;
+            Height = 1.3f;
 
             spinner = s;
 
@@ -55,6 +56,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
+                        glow = new GlowPiece(),
                         circle = new CirclePiece
                         {
                             Position = Vector2.Zero,
@@ -69,7 +71,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             TextSize = 48,
                             Icon = FontAwesome.fa_asterisk,
                             Shadow = false,
-                        }
+                        },
                     }
                 },
                 mainContainer = new AspectContainer
@@ -81,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     {
                         background = new SpinnerBackground
                         {
-                            Alpha = 0.2f,
+                            Alpha = 0.6f,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -112,9 +114,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 disc.Complete = true;
 
-                disc.FadeAccent(completeColour, 500);
-                background.FadeAccent(completeColour, 500);
-                circle.FadeColour(completeColour, 500);
+                const float duration = 200;
+
+                disc.FadeAccent(completeColour, duration);
+
+                background.FadeAccent(completeColour, duration);
+                background.FadeOut(duration);
+
+                circle.FadeColour(completeColour, duration);
+                glow.FadeColour(completeColour, duration);
             }
 
             if (!userTriggered && Time.Current >= spinner.EndTime)
@@ -146,12 +154,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            normalColour = colours.BlueDark;
-            completeColour = colours.YellowLight.Opacity(0.8f);
+            normalColour = colours.SpinnerFill;
+            background.AccentColour = colours.SpinnerBackground;
+
+            completeColour = colours.YellowLight.Opacity(0.6f);
 
             disc.AccentColour = normalColour;
-            background.AccentColour = normalColour;
-            circle.Colour = normalColour;
+            circle.Colour = colours.BlueDarker;
+            glow.Colour = colours.BlueDarker;
         }
 
         protected override void UpdateAfterChildren()

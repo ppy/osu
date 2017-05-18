@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,12 +14,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         public override bool HandleInput => false;
 
-        protected Sprite Disc;
+        protected Box Disc;
 
         public Color4 AccentColour
         {
-            get { return Disc.Colour; }
-            set { Disc.Colour = value; }
+            get
+            {
+                return Disc.Colour;
+            }
+            set
+            {
+                Disc.Colour = value;
+
+                EdgeEffect = new EdgeEffect
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 14,
+                    Colour = value.Opacity(0.3f),
+                };
+            }
         }
 
         public SpinnerBackground()
@@ -37,17 +49,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 1,
                 },
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            EdgeEffect = new EdgeEffect
-            {
-                Type = EdgeEffectType.Glow,
-                Radius = 14,
-                Colour = colours.BlueLight.Opacity(0.3f),
             };
         }
     }
