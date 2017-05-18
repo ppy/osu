@@ -22,6 +22,11 @@ namespace osu.Game.Overlays.Direct
 {
     public class FilterControl : Container
     {
+        /// <summary>
+        /// The height of the content below the filter control (tab strip + result count text).
+        /// </summary>
+        public static readonly float LOWER_HEIGHT = 21;
+
         private readonly Box tabStrip;
         private readonly FillFlowContainer<ModeToggleButton> modeButtons;
         private FillFlowContainer resultCounts;
