@@ -220,7 +220,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 addToPattern(pattern, column, startTime, startTime);
                 startTime += segmentDuration;
-                
+
                 // Check if we're at the borders of the stage, and invert the pattern if so
                 if (increasing)
                 {
