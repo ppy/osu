@@ -49,6 +49,8 @@ namespace osu.Game.Screens.Select
             get { return beatmap; }
             set
             {
+                if (beatmap == value) return;
+
                 beatmap = value;
 
                 pendingBeatmapSwitch?.Cancel();

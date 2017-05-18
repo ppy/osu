@@ -12,7 +12,7 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests pause and fail overlays";
 
-        private PauseOverlay pauseOverlay;
+        private PauseContainer.PauseOverlay pauseOverlay;
         private FailOverlay failOverlay;
         private int retryCount;
 
@@ -22,7 +22,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             retryCount = 0;
 
-            Add(pauseOverlay = new PauseOverlay
+            Add(pauseOverlay = new PauseContainer.PauseOverlay
             {
                 OnResume = () => Logger.Log(@"Resume"),
                 OnRetry = () => Logger.Log(@"Retry"),
