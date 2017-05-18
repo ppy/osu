@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
-using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -18,10 +16,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
     /// </summary>
     internal class LegacyBeatmapConverter
     {
-        private readonly FastRandom random;
-
-        private Patterns.Pattern lastPattern = new Patterns.Pattern();
-
         private readonly int availableColumns;
         private readonly float localXDivisor; 
 
@@ -30,10 +24,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         public LegacyBeatmapConverter(Beatmap beatmap)
         {
             this.beatmap = beatmap;
-
-            int seed = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.DrainRate + beatmap.BeatmapInfo.Difficulty.CircleSize)
-                * 20 + (int)(beatmap.BeatmapInfo.Difficulty.OverallDifficulty * 41.2) + (int)Math.Round(beatmap.BeatmapInfo.Difficulty.ApproachRate);
-            random = new FastRandom(seed);
 
             availableColumns = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.CircleSize);
             localXDivisor = 512.0f / availableColumns;
@@ -97,7 +87,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
-                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern);
+            {
+                // Slider
+            }
             else if (endTimeData != null)
             {
                 // Spinner
@@ -114,8 +106,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             foreach (ManiaHitObject obj in newPattern.HitObjects)
                 yield return obj;
-
-            lastPattern = newPattern;
         }
 
         private int getColumn(float position) => MathHelper.Clamp((int)Math.Floor(position / localXDivisor), 0, availableColumns - 1);
