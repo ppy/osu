@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             // Following lines currently commented out to appease resharper
 
-            //PatternGenerator conversion = null;
+            Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
             {
@@ -93,13 +93,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 // Circle
             }
 
-            //if (conversion == null)
+            if (conversion == null)
                 return null;
 
-            //Pattern newPattern = conversion.Generate();
-            //lastPattern = newPattern;
+            Pattern newPattern = conversion.Generate();
+            lastPattern = newPattern;
 
-            //return newPattern.HitObjects;
+            return newPattern.HitObjects;
         }
 
         /// <summary>
