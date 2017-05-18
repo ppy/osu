@@ -3,11 +3,11 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Screens.Play.Options;
+using osu.Game.Screens.Play.Settings;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    internal class TestCaseOptionsContainer : TestCase
+    internal class TestCaseSettingsDisplay : TestCase
     {
         public override string Description => @"Setting visible in replay/auto";
 
@@ -15,7 +15,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            Add(new OptionsDisplay()
+            Add(new SettingsDisplay()
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,

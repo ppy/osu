@@ -4,9 +4,9 @@
 using OpenTK;
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Screens.Play.Options
+namespace osu.Game.Screens.Play.Settings
 {
-    public class OptionsDisplay : FillFlowContainer
+    public class SettingsDisplay : FillFlowContainer
     {
         private bool isVisible;
         public bool IsVisible
@@ -23,14 +23,14 @@ namespace osu.Game.Screens.Play.Options
             get { return isVisible; }
         }
 
-        public OptionsDisplay()
+        public SettingsDisplay()
         {
             Direction = FillDirection.Vertical;
             Spacing = new Vector2(0, 20);
 
-            Add(new CollectionOptions());
-            Add(new DiscussionOptions());
-            Add(new PlaybackOptions());
+            Add(new CollectionSettings());
+            Add(new DiscussionSettings());
+            Add(new PlaybackSettings());
         }
     }
 }

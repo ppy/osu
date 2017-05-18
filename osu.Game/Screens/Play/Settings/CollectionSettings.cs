@@ -6,10 +6,11 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Music;
 using System.Collections.Generic;
+using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Screens.Play.Options
+namespace osu.Game.Screens.Play.Settings
 {
-    public class CollectionOptions : OptionContainer
+    public class CollectionSettings : SettingsContainer
     {
         public override string Title => @"COLLECTIONS";
 

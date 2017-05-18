@@ -7,9 +7,9 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
-namespace osu.Game.Screens.Play.Options
+namespace osu.Game.Screens.Play.Settings
 {
-    public class DiscussionOptions : OptionContainer
+    public class DiscussionSettings : SettingsContainer
     {
         public override string Title => @"DISCUSSIONS";
 
