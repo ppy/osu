@@ -29,11 +29,19 @@ namespace osu.Game.Overlays.Direct
 
         private readonly Box tabStrip;
         private readonly FillFlowContainer<RulesetToggleButton> modeButtons;
-        private FillFlowContainer resultCounts;
+        private FillFlowContainer resultCountsContainer;
+        private OsuSpriteText resultCountsText;
 
         public readonly SearchTextBox Search;
         public readonly SortTabControl SortTabs;
         public readonly OsuEnumDropdown<RankStatus> RankStatusDropdown;
+
+        private ResultCounts resultCounts;
+        public  ResultCounts ResultCounts
+        {
+            get { return resultCounts; }
+            set { resultCounts = value; updateResultCounts(); }
+        }
 
         public FilterControl()
         {
@@ -87,7 +95,7 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Bottom = 5, Right = DirectOverlay.WIDTH_PADDING },
                     Width = 160f,
                 },
-                resultCounts = new FillFlowContainer
+                resultCountsContainer = new FillFlowContainer
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
@@ -101,9 +109,8 @@ namespace osu.Game.Overlays.Direct
                             Text = @"Found ",
                             TextSize = 15,
                         },
-                        new OsuSpriteText
+                        resultCountsText = new OsuSpriteText
                         {
-                            Text = @"1 Artist, 432 Songs, 3 Tags",
                             TextSize = 15,
                             Font = @"Exo2.0-Bold",
                         },
@@ -115,19 +122,36 @@ namespace osu.Game.Overlays.Direct
             RankStatusDropdown.Current.Value = RankStatus.RankedApproved;
             SortTabs.Current.Value = SortCriteria.Title;
             SortTabs.Current.TriggerChange();
+
+            updateResultCounts();
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game, RulesetDatabase rulesets, OsuColour colours)
         {
             tabStrip.Colour = colours.Yellow;
-            resultCounts.Colour = colours.Yellow;
+            resultCountsContainer.Colour = colours.Yellow;
             RankStatusDropdown.AccentColour = colours.BlueDark;
 
             foreach (var r in rulesets.AllRulesets)
             {
                 modeButtons.Add(new RulesetToggleButton(game?.Ruleset ?? new Bindable<RulesetInfo>(), r));
             }
+        }
+
+        private void updateResultCounts()
+        {
+            resultCountsContainer.FadeTo(ResultCounts == null ? 0 : 1, 200, EasingTypes.Out);
+            if (resultCounts == null) return;
+
+            resultCountsText.Text = pluralize(@"Artist", ResultCounts.Artists) + ", " +
+                                    pluralize(@"Song", ResultCounts.Songs) + ", " +
+                                    pluralize(@"Tag", ResultCounts.Tags);
+        }
+
+        private string pluralize(string prefix, int value)
+        {
+            return $@"{value} {prefix}" + (value == 1 ? @"" : @"s");
         }
 
         private class DirectSearchTextBox : SearchTextBox
@@ -240,5 +264,19 @@ namespace osu.Game.Overlays.Direct
     	Graveyard,
     	[Description("My Maps")]
     	MyMaps,
+    }
+
+    public class ResultCounts
+    {
+        public readonly int Artists;
+        public readonly int Songs;
+        public readonly int Tags;
+
+        public ResultCounts(int artists, int songs, int tags)
+        {
+            Artists = artists;
+            Songs = songs;
+            Tags = tags;
+        }
     }
 }
