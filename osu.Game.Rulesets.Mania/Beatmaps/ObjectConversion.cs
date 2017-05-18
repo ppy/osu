@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <param name="p5">Probability for 5 notes to be generated.</param>
         /// <param name="p6">Probability for 6 notes to be generated.</param>
         /// <returns>The amount of notes to be generated.</returns>
-        protected int GetRandomNoteCount(double p2, double p3, double p4 = 1, double p5 = 1, double p6 = 1)
+        protected int GetRandomNoteCount(double p2, double p3, double p4 = 0, double p5 = 0, double p6 = 0)
         {
             double val = Random.NextDouble();
             if (val >= 1 - p6)
