@@ -7,7 +7,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK;
+using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
+using osu.Game.Rulesets.Mania.MathUtils;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -16,17 +17,18 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
     /// </summary>
     internal class LegacyBeatmapConverter
     {
-        private readonly int availableColumns;
-        private readonly float localXDivisor;
+        private Pattern lastPattern = new Pattern();
 
+        private readonly FastRandom random;
         private readonly Beatmap beatmap;
 
         public LegacyBeatmapConverter(Beatmap beatmap)
         {
             this.beatmap = beatmap;
 
-            availableColumns = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.CircleSize);
-            localXDivisor = 512.0f / availableColumns;
+            int seed = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.DrainRate + beatmap.BeatmapInfo.Difficulty.CircleSize)
+                       * 20 + (int)(beatmap.BeatmapInfo.Difficulty.OverallDifficulty * 41.2) + (int)Math.Round(beatmap.BeatmapInfo.Difficulty.ApproachRate);
+            random = new FastRandom(seed);
         }
 
         public IEnumerable<ManiaHitObject> Convert(HitObject original)
@@ -38,44 +40,32 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield break;
             }
 
-            if (beatmap.BeatmapInfo.RulesetID == 3)
-                yield return generateSpecific(original);
-            else
+            IEnumerable<ManiaHitObject> objects = null;
+            switch (beatmap.BeatmapInfo.RulesetID)
             {
-                foreach (ManiaHitObject c in generateConverted(original))
-                    yield return c;
+                default:
+                    objects = generateConverted(original);
+                    break;
+                case 3:
+                    objects = generateSpecific(original);
+                    break;
             }
+
+            if (objects == null)
+                yield break;
+
+            foreach (ManiaHitObject obj in objects)
+                yield return obj;
         }
 
-        private ManiaHitObject generateSpecific(HitObject original)
+        private IEnumerable<ManiaHitObject> generateSpecific(HitObject original)
         {
-            var endTimeData = original as IHasEndTime;
-            var positionData = original as IHasXPosition;
+            var generator = new SpecificPatternGenerator(random, original, beatmap, lastPattern);
 
-            int column = getColumn(positionData?.X ?? 0);
+            Pattern newPattern = generator.Generate();
+            lastPattern = newPattern;
 
-            if (endTimeData != null)
-            {
-                return new HoldNote
-                {
-                    StartTime = original.StartTime,
-                    Samples = original.Samples,
-                    Duration = endTimeData.Duration,
-                    Column = column,
-                };
-            }
-
-            if (positionData != null)
-            {
-                return new Note
-                {
-                    StartTime = original.StartTime,
-                    Samples = original.Samples,
-                    Column = column
-                };
-            }
-
-            return null;
+            return newPattern.HitObjects;
         }
 
         private IEnumerable<ManiaHitObject> generateConverted(HitObject original)
@@ -84,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var distanceData = original as IHasDistance;
             var positionData = original as IHasPosition;
 
-            Patterns.PatternGenerator conversion = null;
+            PatternGenerator conversion = null;
 
             if (distanceData != null)
             {
@@ -100,14 +90,53 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
 
             if (conversion == null)
-                yield break;
+                return new ManiaHitObject[0];
 
-            Patterns.Pattern newPattern = conversion.Generate();
+            Pattern newPattern = conversion.Generate();
+            lastPattern = newPattern;
 
-            foreach (ManiaHitObject obj in newPattern.HitObjects)
-                yield return obj;
+            return newPattern.HitObjects;
         }
 
-        private int getColumn(float position) => MathHelper.Clamp((int)Math.Floor(position / localXDivisor), 0, availableColumns - 1);
+        /// <summary>
+        /// A pattern generator for mania-specific beatmaps.
+        /// </summary>
+        private class SpecificPatternGenerator : Patterns.Legacy.PatternGenerator
+        {
+            public SpecificPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, Pattern previousPattern)
+                : base(random, hitObject, beatmap, previousPattern)
+            {
+            }
+
+            public override Pattern Generate()
+            {
+                var endTimeData = HitObject as IHasEndTime;
+                var positionData = HitObject as IHasXPosition;
+
+                var pattern = new Pattern();
+
+                if (endTimeData != null)
+                {
+                    pattern.Add(new HoldNote
+                    {
+                        StartTime = HitObject.StartTime,
+                        Samples = HitObject.Samples,
+                        Duration = endTimeData.Duration,
+                        Column = GetColumn(positionData?.X ?? 0),
+                    });
+                }
+                else if (positionData != null)
+                {
+                    pattern.Add(new Note
+                    {
+                        StartTime = HitObject.StartTime,
+                        Samples = HitObject.Samples,
+                        Column = GetColumn(positionData?.X ?? 0)
+                    });
+                }
+
+                return pattern;
+            }
+        }
     }
 }
