@@ -9,6 +9,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
@@ -144,7 +145,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 while (pattern.IsFilled(nextColumn) || PreviousPattern.IsFilled(nextColumn))  //find available column
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
-                AddToPattern(pattern, HitObject, nextColumn, startTime, endTime, noteCount);
+                addToPattern(pattern, HitObject, nextColumn, startTime, endTime, noteCount);
             }
 
             // This is can't be combined with the above loop due to RNG
@@ -152,7 +153,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 while (pattern.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
-                AddToPattern(pattern, HitObject, nextColumn, startTime, endTime, noteCount);
+                addToPattern(pattern, HitObject, nextColumn, startTime, endTime, noteCount);
             }
 
             return pattern;
@@ -185,7 +186,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int lastColumn = nextColumn;
             for (int i = 0; i <= repeatCount; i++)
             {
-                AddToPattern(pattern, HitObject, nextColumn, startTime, startTime);
+                addToPattern(pattern, HitObject, nextColumn, startTime, startTime);
                 while (nextColumn == lastColumn)
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
@@ -220,7 +221,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             for (int i = 0; i <= repeatCount; i++)
             {
-                AddToPattern(pattern, HitObject, column, startTime, startTime);
+                addToPattern(pattern, HitObject, column, startTime, startTime);
                 startTime += separationTime;
                 
                 // Check if we're at the borders of the stage, and invert the pattern if so
@@ -272,7 +273,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
             for (int i = 0; i <= repeatCount; i++)
             {
-                AddToPattern(pattern, HitObject, nextColumn, startTime, startTime, 2);
+                addToPattern(pattern, HitObject, nextColumn, startTime, startTime, 2);
 
                 nextColumn += interval;
                 if (nextColumn >= AvailableColumns - RandomStart)
@@ -281,7 +282,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
                 // If we're in 2K, let's not add many consecutive doubles
                 if (AvailableColumns > 2)
-                    AddToPattern(pattern, HitObject, nextColumn, startTime, startTime, 2);
+                    addToPattern(pattern, HitObject, nextColumn, startTime, startTime, 2);
 
                 nextColumn = Random.Next(RandomStart, AvailableColumns);
                 startTime += separationTime;
@@ -375,7 +376,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 while (pattern.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
-                AddToPattern(pattern, HitObject, nextColumn, startTime, endTime, noteCount);
+                addToPattern(pattern, HitObject, nextColumn, startTime, endTime, noteCount);
                 startTime += separationTime;
             }
 
@@ -406,7 +407,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
 
             // Create the hold note
-            AddToPattern(pattern, HitObject, holdColumn, startTime, separationTime * repeatCount);
+            addToPattern(pattern, HitObject, holdColumn, startTime, separationTime * repeatCount);
 
             int noteCount = 1;
             if (ConversionDifficulty > 6.5)
@@ -429,7 +430,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     {
                         while (rowPattern.IsFilled(nextColumn) || nextColumn == holdColumn)
                             nextColumn = Random.Next(RandomStart, AvailableColumns);
-                        AddToPattern(rowPattern, HitObject, nextColumn, startTime, startTime, noteCount + 1);
+                        addToPattern(rowPattern, HitObject, nextColumn, startTime, startTime, noteCount + 1);
                     }
                 }
 
@@ -458,6 +459,45 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
             return curveData.RepeatSamples[index];
+        }
+
+
+        /// <summary>
+        /// Constructs and adds a note to a pattern.
+        /// </summary>
+        /// <param name="pattern">The pattern to add to.</param>
+        /// <param name="originalObject">The original hit object (used for samples).</param>
+        /// <param name="column">The column to add the note to.</param>
+        /// <param name="startTime">The start time of the note.</param>
+        /// <param name="endTime">The end time of the note (set to <paramref name="startTime"/> for a non-hold note).</param>
+        /// <param name="siblings">The number of children alongside this note (these will not be generated, but are used for volume calculations).</param>
+        private void addToPattern(Pattern pattern, HitObject originalObject, int column, double startTime, double endTime, int siblings = 1)
+        {
+            ManiaHitObject newObject;
+
+            if (startTime == endTime)
+            {
+                newObject = new Note
+                {
+                    StartTime = startTime,
+                    Samples = originalObject.Samples,
+                    Column = column
+                };
+            }
+            else
+            {
+                newObject = new HoldNote
+                {
+                    StartTime = startTime,
+                    Samples = originalObject.Samples,
+                    Column = column,
+                    Duration = endTime - startTime
+                };
+            }
+
+            // Todo: Consider siblings and write sample volumes (probably at ManiaHitObject level)
+
+            pattern.Add(newObject);
         }
     }
 }
