@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
@@ -9,8 +8,6 @@ using osu.Game.Rulesets.Objects.Types;
 using System;
 using osu.Game.Rulesets.Mania.MathUtils;
 using System.Linq;
-using OpenTK;
-using osu.Game.Database;
 using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
@@ -78,7 +75,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 if (segmentDuration <= 160)
                     return generateStair(originalObject.StartTime, segmentDuration, repeatCount);
 
-                if (segmentDuration <= 200 && conversionDifficulty > 3)
+                if (segmentDuration <= 200 && ConversionDifficulty > 3)
                     return generateRandomMultipleNotes(originalObject.StartTime, segmentDuration, repeatCount);
 
                 double duration = endTime - originalObject.StartTime;
@@ -100,21 +97,21 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 return generateRandomNotes(originalObject.StartTime, segmentDuration, segmentDuration < 80 ? 0 : 1);
             }
 
-            if (conversionDifficulty > 6.5)
+            if (ConversionDifficulty > 6.5)
             {
                 if ((convertType & LegacyConvertType.LowProbability) > 0)
                     return generateNRandomNotes(originalObject.StartTime, endTime, 0.78, 0.3, 0);
                 return generateNRandomNotes(originalObject.StartTime, endTime, 0.85, 0.36, 0.03);
             }
 
-            if (conversionDifficulty > 4)
+            if (ConversionDifficulty > 4)
             {
                 if ((convertType & LegacyConvertType.LowProbability) > 0)
                     return generateNRandomNotes(originalObject.StartTime, endTime, 0.43, 0.08, 0);
                 return generateNRandomNotes(originalObject.StartTime, endTime, 0.56, 0.18, 0);
             }
 
-            if (conversionDifficulty > 2.5)
+            if (ConversionDifficulty > 2.5)
             {
                 if ((convertType & LegacyConvertType.LowProbability) > 0)
                     return generateNRandomNotes(originalObject.StartTime, endTime, 0.3, 0, 0);
@@ -148,7 +145,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             {
                 while (newObjects.IsFilled(nextColumn) || PreviousObjects.IsFilled(nextColumn))  //find available column
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
-                add(newObjects, nextColumn, startTime, endTime, noteCount);
+                Add(newObjects, originalObject, nextColumn, startTime, endTime, noteCount);
             }
 
             // This is can't be combined with the above loop due to RNG
@@ -156,7 +153,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             {
                 while (newObjects.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
-                add(newObjects, nextColumn, startTime, endTime, noteCount);
+                Add(newObjects, originalObject, nextColumn, startTime, endTime, noteCount);
             }
 
             return newObjects;
@@ -189,7 +186,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             int lastColumn = nextColumn;
             for (int i = 0; i <= repeatCount; i++)
             {
-                add(newObjects, nextColumn, startTime, startTime);
+                Add(newObjects, originalObject, nextColumn, startTime, startTime);
                 while (nextColumn == lastColumn)
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
@@ -225,7 +222,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             for (int i = 0; i <= repeatCount; i++)
             {
-                add(newObjects, column, startTime, startTime);
+                Add(newObjects, originalObject, column, startTime, startTime);
                 startTime += separationTime;
                 
                 // Check if we're at the borders of the stage, and invert the pattern if so
@@ -277,7 +274,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             int nextColumn = GetColumn((originalObject as IHasXPosition)?.X ?? 0, true);
             for (int i = 0; i <= repeatCount; i++)
             {
-                add(newObjects, nextColumn, startTime, startTime, 2);
+                Add(newObjects, originalObject, nextColumn, startTime, startTime, 2);
 
                 nextColumn += interval;
                 if (nextColumn >= AvailableColumns - RandomStart)
@@ -286,7 +283,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 // If we're in 2K, let's not add many consecutive doubles
                 if (AvailableColumns > 2)
-                    add(newObjects, nextColumn, startTime, startTime, 2);
+                    Add(newObjects, originalObject, nextColumn, startTime, startTime, 2);
 
                 nextColumn = Random.Next(RandomStart, AvailableColumns);
                 startTime += separationTime;
@@ -380,7 +377,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 while (newObjects.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
-                add(newObjects, nextColumn, startTime, endTime, noteCount);
+                Add(newObjects, originalObject, nextColumn, startTime, endTime, noteCount);
                 startTime += separationTime;
             }
 
@@ -411,14 +408,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             }
 
             // Create the hold note
-            add(newObjects, holdColumn, startTime, separationTime * repeatCount);
+            Add(newObjects, originalObject, holdColumn, startTime, separationTime * repeatCount);
 
             int noteCount = 1;
-            if (conversionDifficulty > 6.5)
+            if (ConversionDifficulty > 6.5)
                 noteCount = GetRandomNoteCount(0.63, 0);
-            else if (conversionDifficulty > 4)
+            else if (ConversionDifficulty > 4)
                 noteCount = GetRandomNoteCount(AvailableColumns < 6 ? 0.12 : 0.45, 0);
-            else if (conversionDifficulty > 2.5)
+            else if (ConversionDifficulty > 2.5)
                 noteCount = GetRandomNoteCount(AvailableColumns < 6 ? 0 : 0.24, 0);
             noteCount = Math.Min(AvailableColumns - 1, noteCount);
 
@@ -434,7 +431,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     {
                         while (tempObjects.IsFilled(nextColumn) || nextColumn == holdColumn)
                             nextColumn = Random.Next(RandomStart, AvailableColumns);
-                        add(tempObjects, nextColumn, startTime, startTime, noteCount + 1);
+                        Add(tempObjects, originalObject, nextColumn, startTime, startTime, noteCount + 1);
                     }
                 }
 
@@ -448,47 +445,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         }
 
         /// <summary>
-        /// Constructs and adds a note to an object list.
-        /// </summary>
-        /// <param name="objectList">The list to add to.</param>
-        /// <param name="column">The column to add the note to.</param>
-        /// <param name="startTime">The start time of the note.</param>
-        /// <param name="endTime">The end time of the note (set to <paramref name="startTime"/> for a non-hold note).</param>
-        /// <param name="siblings">The number of children alongside this note (these will not be generated, but are used for volume calculations).</param>
-        private void add(ObjectList objectList, int column, double startTime, double endTime, int siblings = 1)
-        {
-            ManiaHitObject newObject;
-
-            if (startTime == endTime)
-            {
-                newObject = new Note
-                {
-                    StartTime = startTime,
-                    Samples = originalObject.Samples,
-                    Column = column
-                };
-            }
-            else
-            {
-                newObject = new HoldNote
-                {
-                    StartTime = startTime,
-                    Samples = originalObject.Samples,
-                    Column = column,
-                    Duration = endTime - startTime
-                };
-            }
-            
-            // Todo: Consider siblings and write sample volumes (probably at ManiaHitObject level)
-
-            objectList.Add(newObject);
-        }
-
-        /// <summary>
         /// Retrieves the sample info list at a point in time.
         /// </summary>
         /// <param name="time">The time to retrieve the sample info list from.</param>
-        /// <param name="separationTime"></param>
         /// <returns></returns>
         private SampleInfoList sampleInfoListAt(double time)
         {
@@ -501,34 +460,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             int index = (int)(segmentTime == 0 ? 0 : (time - originalObject.StartTime) / segmentTime);
             return curveData.RepeatSamples[index];
-        }
-
-        private double? _conversionDifficulty;
-        /// <summary>
-        /// A difficulty factor used for various conversion methods from osu!stable.
-        /// </summary>
-        private double conversionDifficulty
-        {
-            get
-            {
-                if (_conversionDifficulty != null)
-                    return _conversionDifficulty.Value;
-
-                HitObject lastObject = Beatmap.HitObjects.LastOrDefault();
-                HitObject firstObject = Beatmap.HitObjects.FirstOrDefault();
-
-                double drainTime = (lastObject?.StartTime ?? 0) - (firstObject?.StartTime ?? 0);
-                drainTime -= Beatmap.EventInfo.TotalBreakTime;
-
-                if (drainTime == 0)
-                    drainTime = 10000;
-
-                BeatmapDifficulty difficulty = Beatmap.BeatmapInfo.Difficulty;
-                _conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + Beatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
-                _conversionDifficulty = Math.Min(_conversionDifficulty.Value, 12);
-
-                return _conversionDifficulty.Value;
-            }
         }
     }
 }
