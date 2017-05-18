@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
 using Container = osu.Framework.Graphics.Containers.Container;
@@ -23,6 +24,7 @@ namespace osu.Game.Overlays.Direct
     {
         private readonly Box tabStrip;
         private readonly FillFlowContainer<ModeToggleButton> modeButtons;
+        private FillFlowContainer resultCounts;
 
         public readonly SearchTextBox Search;
         public readonly SortTabControl SortTabs;
@@ -53,8 +55,8 @@ namespace osu.Game.Overlays.Direct
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = DirectOverlay.WIDTH_PADDING, Right = DirectOverlay.WIDTH_PADDING, Top = 10 },
                     Spacing = new Vector2(0f, 10f),
+                    Padding = new MarginPadding { Left = DirectOverlay.WIDTH_PADDING, Right = DirectOverlay.WIDTH_PADDING, Top = 10 },
                     Children = new Drawable[]
                     {
                         Search = new DirectSearchTextBox
@@ -80,11 +82,32 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Bottom = 5, Right = DirectOverlay.WIDTH_PADDING },
                     Width = 160f,
                 },
+                resultCounts = new FillFlowContainer
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopLeft,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding { Left = DirectOverlay.WIDTH_PADDING, Top = 6 },
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = @"Found ",
+                            TextSize = 15,
+                        },
+                        new OsuSpriteText
+                        {
+                            Text = @"1 Artist, 432 Songs, 3 Tags",
+                            TextSize = 15,
+                            Font = @"Exo2.0-Bold",
+                        },
+                    }    
+                },
             };
 
-            RankStatusDropdown.Current.Value = RankStatus.RankedApproved;
-
             //todo: possibly restore from config instead of always title
+            RankStatusDropdown.Current.Value = RankStatus.RankedApproved;
             SortTabs.Current.Value = SortCriteria.Title;
             SortTabs.Current.TriggerChange();
         }
@@ -93,6 +116,7 @@ namespace osu.Game.Overlays.Direct
         private void load(OsuGame game, RulesetDatabase rulesets, OsuColour colours)
         {
             tabStrip.Colour = colours.Yellow;
+            resultCounts.Colour = colours.Yellow;
             RankStatusDropdown.AccentColour = colours.BlueDark;
 
             foreach (var r in rulesets.AllRulesets)

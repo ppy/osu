@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Direct
                 },
             };
 
-            //todo: possibly restore from config instead of always search
+            //todo: possibly restore from config instead
             Tabs.Current.Value = DirectTab.Search;
             Tabs.Current.TriggerChange();
         }
