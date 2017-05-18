@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Position = s.Position;
 
             RelativeSizeAxes = Axes.Both;
-            
+
             // we are slightly bigger than our parent, to clip the top and bottom of the circle
             Height = 1.2f;
 
