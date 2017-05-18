@@ -16,7 +16,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         private readonly Sprite disc;
 
-
         public Func<bool> Hit;
 
         public CirclePiece()

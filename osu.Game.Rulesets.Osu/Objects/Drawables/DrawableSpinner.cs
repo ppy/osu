@@ -1,15 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Allocation;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -18,9 +19,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Spinner spinner;
 
         private readonly SpinnerDisc disc;
+        private readonly SpinnerTicks ticks;
+
+        private readonly Container mainContainer;
+
         private readonly SpinnerBackground background;
         private readonly Container circleContainer;
-        private readonly DrawableHitCircle circle;
+        private readonly CirclePiece circle;
+        private readonly GlowPiece glow;
+
+        private readonly TextAwesome symbol;
+
+        private Color4 normalColour;
+        private Color4 completeColour;
 
         public DrawableSpinner(Spinner s) : base(s)
         {
@@ -29,56 +40,90 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Origin = Anchor.Centre;
             Position = s.Position;
 
-            //take up full playfield.
-            Size = new Vector2(OsuPlayfield.BASE_SIZE.X);
+            RelativeSizeAxes = Axes.Both;
+
+            // we are slightly bigger than our parent, to clip the top and bottom of the circle
+            Height = 1.3f;
 
             spinner = s;
 
             Children = new Drawable[]
             {
-                background = new SpinnerBackground
-                {
-                    Alpha = 0,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    DiscColour = Color4.Black
-                },
-                disc = new SpinnerDisc
-                {
-                    Alpha = 0,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    DiscColour = AccentColour
-                },
                 circleContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Children = new []
+                    Children = new Drawable[]
                     {
-                        circle = new DrawableHitCircle(s)
+                        glow = new GlowPiece(),
+                        circle = new CirclePiece
                         {
-                            Interactive = false,
                             Position = Vector2.Zero,
                             Anchor = Anchor.Centre,
-                        }
+                        },
+                        new RingPiece(),
+                        symbol = new TextAwesome
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            UseFullGlyphHeight = true,
+                            TextSize = 48,
+                            Icon = FontAwesome.fa_asterisk,
+                            Shadow = false,
+                        },
                     }
-                }
+                },
+                mainContainer = new AspectContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Y,
+                    Children = new Drawable[]
+                    {
+                        background = new SpinnerBackground
+                        {
+                            Alpha = 0.6f,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                        disc = new SpinnerDisc(spinner)
+                        {
+                            Scale = Vector2.Zero,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                        circleContainer.CreateProxy(),
+                        ticks = new SpinnerTicks
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        },
+                    }
+                },
             };
-
-            background.Scale = scaleToCircle;
-            disc.Scale = scaleToCircle;
         }
+
+        public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / spinner.SpinsRequired, 0, 1);
 
         protected override void CheckJudgement(bool userTriggered)
         {
             if (Time.Current < HitObject.StartTime) return;
 
-            disc.ScaleTo(Interpolation.ValueAt(Math.Sqrt(Progress), scaleToCircle, Vector2.One, 0, 1), 100);
-
-            if (Progress >= 1)
+            if (Progress >= 1 && !disc.Complete)
+            {
                 disc.Complete = true;
+
+                const float duration = 200;
+
+                disc.FadeAccent(completeColour, duration);
+
+                background.FadeAccent(completeColour, duration);
+                background.FadeOut(duration);
+
+                circle.FadeColour(completeColour, duration);
+                glow.FadeColour(completeColour, duration);
+            }
 
             if (!userTriggered && Time.Current >= spinner.EndTime)
             {
@@ -106,26 +151,48 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        private Vector2 scaleToCircle => circle.Scale * circle.DrawWidth / DrawWidth * 0.95f;
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            normalColour = colours.SpinnerBase;
 
-        public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / spinner.SpinsRequired, 0, 1);
+            background.AccentColour = normalColour;
+
+            completeColour = colours.YellowLight.Opacity(0.6f);
+
+            disc.AccentColour = colours.SpinnerFill;
+            circle.Colour = colours.BlueDark;
+            glow.Colour = colours.BlueDark;
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            circle.Rotation = disc.Rotation;
+            ticks.Rotation = disc.Rotation;
+
+            float relativeCircleScale = spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
+            disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, EasingTypes.OutQuint);
+
+            symbol.RotateTo(disc.Rotation / 2, 500, EasingTypes.OutQuint);
+        }
 
         protected override void UpdatePreemptState()
         {
             base.UpdatePreemptState();
 
-            circleContainer.ScaleTo(1, 400, EasingTypes.OutElastic);
+            circleContainer.ScaleTo(spinner.Scale * 0.3f);
+            circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, EasingTypes.OutQuint);
 
-            background.Delay(TIME_PREEMPT - 500);
+            disc.RotateTo(-720);
+            symbol.RotateTo(-720);
 
-            background.ScaleTo(scaleToCircle * 1.2f, 400, EasingTypes.OutQuint);
-            background.FadeIn(200);
+            mainContainer.ScaleTo(0);
+            mainContainer.ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, EasingTypes.OutQuint);
 
-            background.Delay(400);
-            background.ScaleTo(1, 250, EasingTypes.OutQuint);
-
-            disc.Delay(TIME_PREEMPT - 50);
-            disc.FadeIn(200);
+            mainContainer.Delay(TIME_PREEMPT - 150);
+            mainContainer.ScaleTo(1, 500, EasingTypes.OutQuint);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
