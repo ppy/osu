@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.MathUtils;
-using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -18,14 +17,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
     /// </summary>
     internal class LegacyConverter
     {
-        private const int max_previous_note_times = 7;
-
         private readonly FastRandom random;
-
-        private readonly List<double> previousNoteTimes;
-        private readonly bool[] previousNotes;
-        private readonly double lastNoteTime;
-        private readonly float lastNotePosition;
 
         private ObjectList lastRow = new ObjectList();
 
@@ -44,9 +36,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             availableColumns = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.CircleSize);
             localXDivisor = 512.0f / availableColumns;
-
-            previousNoteTimes = new List<double>(max_previous_note_times);
-            previousNotes = new bool[availableColumns];
         }
 
         public IEnumerable<ManiaHitObject> Convert(HitObject original)

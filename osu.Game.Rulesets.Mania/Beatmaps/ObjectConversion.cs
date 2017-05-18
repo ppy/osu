@@ -5,6 +5,10 @@ using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
 using System;
+using System.Linq;
+using osu.Game.Database;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -72,6 +76,72 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (val >= 1 - p3)
                 return 3;
             return val >= 1 - p2 ? 2 : 1;
+        }
+
+        /// <summary>
+        /// Constructs and adds a note to an object list.
+        /// </summary>
+        /// <param name="objectList">The list to add to.</param>
+        /// <param name="originalObject">The original hit object (used for samples).</param>
+        /// <param name="column">The column to add the note to.</param>
+        /// <param name="startTime">The start time of the note.</param>
+        /// <param name="endTime">The end time of the note (set to <paramref name="startTime"/> for a non-hold note).</param>
+        /// <param name="siblings">The number of children alongside this note (these will not be generated, but are used for volume calculations).</param>
+        protected void Add(ObjectList objectList, HitObject originalObject, int column, double startTime, double endTime, int siblings = 1)
+        {
+            ManiaHitObject newObject;
+
+            if (startTime == endTime)
+            {
+                newObject = new Note
+                {
+                    StartTime = startTime,
+                    Samples = originalObject.Samples,
+                    Column = column
+                };
+            }
+            else
+            {
+                newObject = new HoldNote
+                {
+                    StartTime = startTime,
+                    Samples = originalObject.Samples,
+                    Column = column,
+                    Duration = endTime - startTime
+                };
+            }
+
+            // Todo: Consider siblings and write sample volumes (probably at ManiaHitObject level)
+
+            objectList.Add(newObject);
+        }
+
+        private double? conversionDifficulty;
+        /// <summary>
+        /// A difficulty factor used for various conversion methods from osu!stable.
+        /// </summary>
+        protected double ConversionDifficulty
+        {
+            get
+            {
+                if (conversionDifficulty != null)
+                    return conversionDifficulty.Value;
+
+                HitObject lastObject = Beatmap.HitObjects.LastOrDefault();
+                HitObject firstObject = Beatmap.HitObjects.FirstOrDefault();
+
+                double drainTime = (lastObject?.StartTime ?? 0) - (firstObject?.StartTime ?? 0);
+                drainTime -= Beatmap.EventInfo.TotalBreakTime;
+
+                if (drainTime == 0)
+                    drainTime = 10000;
+
+                BeatmapDifficulty difficulty = Beatmap.BeatmapInfo.Difficulty;
+                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + Beatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
+                conversionDifficulty = Math.Min(conversionDifficulty.Value, 12);
+
+                return conversionDifficulty.Value;
+            }
         }
     }
 }
