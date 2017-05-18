@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// The hit object to create the pattern for.
         /// </summary>
         protected readonly HitObject HitObject;
-       
+
         /// <summary>
         /// The beatmap which <see cref="HitObject"/> is a part of.
         /// </summary>
