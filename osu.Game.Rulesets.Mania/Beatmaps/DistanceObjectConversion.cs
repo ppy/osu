@@ -12,7 +12,6 @@ using System.Linq;
 using OpenTK;
 using osu.Game.Database;
 using osu.Game.Audio;
-using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -25,8 +24,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private LegacyConvertType convertType;
 
-        public DistanceObjectConversion(HitObject originalObject, ObjectRow previousRow, FastRandom random, Beatmap beatmap)
-            : base(previousRow, random, beatmap)
+        public DistanceObjectConversion(HitObject originalObject, ObjectList previousObjects, FastRandom random, Beatmap beatmap)
+            : base(previousObjects, random, beatmap)
         {
             this.originalObject = originalObject;
 
@@ -44,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             repeatCount = repeatsData?.RepeatCount ?? 1;
         }
 
-        public override ObjectRow GenerateConversion()
+        public override ObjectList Generate()
         {
             double segmentDuration = endTime / repeatCount;
 
@@ -56,113 +55,125 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 if (segmentDuration <= 120)
                 {
                     convertType |= LegacyConvertType.ForceNotStack;
-                    return addRandomNotes(originalObject.StartTime, segmentDuration, repeatCount);
+                    return generateRandomNotes(originalObject.StartTime, segmentDuration, repeatCount);
                 }
 
                 if (segmentDuration <= 160)
-                    return addStair(originalObject.StartTime, segmentDuration, repeatCount);
+                    return generateStair(originalObject.StartTime, segmentDuration, repeatCount);
 
                 if (segmentDuration <= 200 && conversionDifficulty > 3)
-                    return addMultipleNotes(originalObject.StartTime, segmentDuration, repeatCount);
+                    return generateRandomMultipleNotes(originalObject.StartTime, segmentDuration, repeatCount);
 
                 double duration = endTime - originalObject.StartTime;
                 if (duration >= 4000)
-                    return addNRandomNotes(originalObject.StartTime, endTime, 0.23, 0, 0);
+                    return generateNRandomNotes(originalObject.StartTime, endTime, 0.23, 0, 0);
 
                 if (segmentDuration > 400 && duration < 4000 && repeatCount < AvailableColumns - 1 - RandomStart)
                     return generateTiledHoldNotes(originalObject.StartTime, segmentDuration, repeatCount);
 
-                return generateLongAndNormalNotes(originalObject.StartTime, segmentDuration);
+                return generateHoldAndNormalNotes(originalObject.StartTime, segmentDuration);
             }
 
             if (segmentDuration <= 110)
             {
-                if (PreviousRow.Columns < AvailableColumns)
+                if (PreviousObjects.ColumnsFilled < AvailableColumns)
                     convertType |= LegacyConvertType.ForceNotStack;
                 else
                     convertType &= ~LegacyConvertType.ForceNotStack;
-                return addRandomNotes(originalObject.StartTime, segmentDuration, segmentDuration < 80 ? 0 : 1);
+                return generateRandomNotes(originalObject.StartTime, segmentDuration, segmentDuration < 80 ? 0 : 1);
             }
 
             if (conversionDifficulty > 6.5)
             {
                 if ((convertType & LegacyConvertType.LowProbability) > 0)
-                    return addNRandomNotes(originalObject.StartTime, endTime, 0.78, 0.3, 0);
-                return addNRandomNotes(originalObject.StartTime, endTime, 0.85, 0.36, 0.03);
+                    return generateNRandomNotes(originalObject.StartTime, endTime, 0.78, 0.3, 0);
+                return generateNRandomNotes(originalObject.StartTime, endTime, 0.85, 0.36, 0.03);
             }
 
             if (conversionDifficulty > 4)
             {
                 if ((convertType & LegacyConvertType.LowProbability) > 0)
-                    return addNRandomNotes(originalObject.StartTime, endTime, 0.43, 0.08, 0);
-                return addNRandomNotes(originalObject.StartTime, endTime, 0.56, 0.18, 0);
+                    return generateNRandomNotes(originalObject.StartTime, endTime, 0.43, 0.08, 0);
+                return generateNRandomNotes(originalObject.StartTime, endTime, 0.56, 0.18, 0);
             }
 
             if (conversionDifficulty > 2.5)
             {
                 if ((convertType & LegacyConvertType.LowProbability) > 0)
-                    return addNRandomNotes(originalObject.StartTime, endTime, 0.3, 0, 0);
-                return addNRandomNotes(originalObject.StartTime, endTime, 0.37, 0.08, 0);
+                    return generateNRandomNotes(originalObject.StartTime, endTime, 0.3, 0, 0);
+                return generateNRandomNotes(originalObject.StartTime, endTime, 0.37, 0.08, 0);
             }
 
             if ((convertType & LegacyConvertType.LowProbability) > 0)
-                return addNRandomNotes(originalObject.StartTime, endTime, 0.17, 0, 0);
-            return addNRandomNotes(originalObject.StartTime, endTime, 0.27, 0, 0);
+                return generateNRandomNotes(originalObject.StartTime, endTime, 0.17, 0, 0);
+            return generateNRandomNotes(originalObject.StartTime, endTime, 0.27, 0, 0);
         }
 
         /// <summary>
-        /// Adds random hold notes.
+        /// Generates random hold notes that start at an span the same amount of rows.
         /// </summary>
-        /// <param name="count">Number of hold notes.</param>
         /// <param name="startTime">Start time of each hold note.</param>
         /// <param name="endTime">End time of the hold notes.</param>
-        /// <returns>The new row.</returns>
-        private ObjectRow generateRandomHoldNotes(double startTime, double endTime, int count)
+        /// <param name="noteCount">Number of hold notes.</param>
+        /// <returns>The <see cref="ObjectList"/> containing the hit objects.</returns>
+        private ObjectList generateRandomHoldNotes(double startTime, double endTime, int noteCount)
         {
-            var newRow = new ObjectRow();
+            // - - - -
+            // ■ - ■ ■
+            // □ - □ □
+            // ■ - ■ ■
 
-            int usableColumns = AvailableColumns - RandomStart - PreviousRow.Columns;
+            var newObjects = new ObjectList();
+
+            int usableColumns = AvailableColumns - RandomStart - PreviousObjects.ColumnsFilled;
+
             int nextColumn = Random.Next(RandomStart, AvailableColumns);
-            for (int i = 0; i < Math.Min(usableColumns, count); i++)
+            for (int i = 0; i < Math.Min(usableColumns, noteCount); i++)
             {
-                while (newRow.IsTaken(nextColumn) || PreviousRow.IsTaken(nextColumn))  //find available column
+                while (newObjects.IsFilled(nextColumn) || PreviousObjects.IsFilled(nextColumn))  //find available column
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
-                add(newRow, nextColumn, startTime, endTime, count);
+                add(newObjects, nextColumn, startTime, endTime, noteCount);
             }
 
             // This is can't be combined with the above loop due to RNG
-            for (int i = 0; i < count - usableColumns; i++)
+            for (int i = 0; i < noteCount - usableColumns; i++)
             {
-                while (newRow.IsTaken(nextColumn))
+                while (newObjects.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
-                add(newRow, nextColumn, startTime, endTime, count);
+                add(newObjects, nextColumn, startTime, endTime, noteCount);
             }
 
-            return newRow;
+            return newObjects;
         }
 
         /// <summary>
-        /// Adds random notes, with one note per row. No stacking.
+        /// Generates random notes, with one note per row and no stacking.
         /// </summary>
         /// <param name="startTime">The start time.</param>
         /// <param name="separationTime">The separation of notes between rows.</param>
         /// <param name="repeatCount">The number of rows.</param>
-        /// <returns>The new row.</returns>
-        private ObjectRow addRandomNotes(double startTime, double separationTime, int repeatCount)
+        /// <returns>The <see cref="ObjectList"/> containing the hit objects.</returns>
+        private ObjectList generateRandomNotes(double startTime, double separationTime, int repeatCount)
         {
-            var newRow = new ObjectRow();
+            // - - - -
+            // x - - -
+            // - - x -
+            // - - - x
+            // x - - -
+
+            var newObjects = new ObjectList();
 
             int nextColumn = GetColumn((originalObject as IHasXPosition)?.X ?? 0, true);
-            if ((convertType & LegacyConvertType.ForceNotStack) > 0 && PreviousRow.Columns < AvailableColumns)
+            if ((convertType & LegacyConvertType.ForceNotStack) > 0 && PreviousObjects.ColumnsFilled < AvailableColumns)
             {
-                while (PreviousRow.IsTaken(nextColumn))
+                while (PreviousObjects.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
             }
 
             int lastColumn = nextColumn;
             for (int i = 0; i <= repeatCount; i++)
             {
-                add(newRow, nextColumn, startTime, startTime);
+                add(newObjects, nextColumn, startTime, startTime);
                 while (nextColumn == lastColumn)
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
@@ -170,26 +181,35 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 startTime += separationTime;
             }
 
-            return newRow;
+            return newObjects;
         }
 
         /// <summary>
-        /// Creates a stair of notes, with one note per row.
+        /// Generates a stair of notes, with one note per row.
         /// </summary>
         /// <param name="startTime">The start time.</param>
         /// <param name="separationTime">The separation of notes between rows.</param>
         /// <param name="repeatCount">The number of rows/notes.</param>
-        /// <returns>The new row.</returns>
-        private ObjectRow addStair(double startTime, double separationTime, int repeatCount)
+        /// <returns>The <see cref="ObjectList"/> containing the hit objects.</returns>
+        private ObjectList generateStair(double startTime, double separationTime, int repeatCount)
         {
-            var newRow = new ObjectRow();
+            // - - - -
+            // x - - -
+            // - x - -
+            // - - x -
+            // - - - x
+            // - - x -
+            // - x - -
+            // x - - -
+
+            var newObjects = new ObjectList();
 
             int column = GetColumn((originalObject as IHasXPosition)?.X ?? 0, true);
             bool increasing = Random.NextDouble() > 0.5;
 
             for (int i = 0; i <= repeatCount; i++)
             {
-                add(newRow, column, startTime, startTime);
+                add(newObjects, column, startTime, startTime);
                 startTime += separationTime;
                 
                 // Check if we're at the borders of the stage, and invert the pattern if so
@@ -215,19 +235,25 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 }
             }
 
-            return newRow;
+            return newObjects;
         }
 
         /// <summary>
-        /// Adds random notes, with 1-2 notes per row. No stacking.
+        /// Generates random notes with 1-2 notes per row and no stacking.
         /// </summary>
         /// <param name="startTime">The start time.</param>
         /// <param name="separationTime">The separation of notes between rows.</param>
         /// <param name="repeatCount">The number of rows.</param>
-        /// <returns>The new row.</returns>
-        private ObjectRow addMultipleNotes(double startTime, double separationTime, int repeatCount)
+        /// <returns>The <see cref="ObjectList"/> containing the hit objects.</returns>
+        private ObjectList generateRandomMultipleNotes(double startTime, double separationTime, int repeatCount)
         {
-            var newRow = new ObjectRow();
+            // - - - -
+            // x - - 
+            // - x x -
+            // - - - x
+            // x - x -
+
+            var newObjects = new ObjectList();
 
             bool legacy = AvailableColumns >= 4 && AvailableColumns <= 8;
             int interval = Random.Next(1, AvailableColumns - (legacy ? 1 : 0));
@@ -235,7 +261,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             int nextColumn = GetColumn((originalObject as IHasXPosition)?.X ?? 0, true);
             for (int i = 0; i <= repeatCount; i++)
             {
-                add(newRow, nextColumn, startTime, startTime, 2);
+                add(newObjects, nextColumn, startTime, startTime, 2);
 
                 nextColumn += interval;
                 if (nextColumn >= AvailableColumns - RandomStart)
@@ -244,13 +270,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 // If we're in 2K, let's not add many consecutive doubles
                 if (AvailableColumns > 2)
-                    add(newRow, nextColumn, startTime, startTime, 2);
+                    add(newObjects, nextColumn, startTime, startTime, 2);
 
                 nextColumn = Random.Next(RandomStart, AvailableColumns);
                 startTime += separationTime;
             }
 
-            return newRow;
+            return newObjects;
         }
 
         /// <summary>
@@ -261,9 +287,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <param name="p2">The probability required for 2 hold notes to be generated.</param>
         /// <param name="p3">The probability required for 3 hold notes to be generated.</param>
         /// <param name="p4">The probability required for 4 hold notes to be generated.</param>
-        /// <returns>The new row.</returns>
-        private ObjectRow addNRandomNotes(double startTime, double endTime, double p2, double p3, double p4)
+        /// <returns>The <see cref="ObjectList"/> containing the hit objects.</returns>
+        private ObjectList generateNRandomNotes(double startTime, double endTime, double p2, double p3, double p4)
         {
+            // - - - -
+            // ■ - ■ ■
+            // □ - □ □
+            // ■ - ■ ■
+
             switch (AvailableColumns)
             {
                 case 2:
@@ -291,7 +322,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             Func<SampleInfo, bool> isDoubleSample = sample => sample.Name == SampleInfo.HIT_CLAP && sample.Name == SampleInfo.HIT_FINISH;
 
             bool canGenerateTwoNotes = (convertType & LegacyConvertType.LowProbability) == 0;
-            canGenerateTwoNotes &= originalObject.Samples.Any(isDoubleSample) || sampleInfoListAt(originalObject.StartTime, originalObject.StartTime - endTime).Any(isDoubleSample);
+            canGenerateTwoNotes &= originalObject.Samples.Any(isDoubleSample) || sampleInfoListAt(originalObject.StartTime).Any(isDoubleSample);
 
             if (canGenerateTwoNotes)
                 p2 = 0;
@@ -299,44 +330,72 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             return generateRandomHoldNotes(startTime, endTime, GetRandomNoteCount(p2, p3, p4));
         }
 
-        private ObjectRow generateTiledHoldNotes(double startTime, double separationTime, int noteCount)
+        /// <summary>
+        /// Generates tiled hold notes. You can think of this as a stair of hold notes.
+        /// </summary>
+        /// <param name="startTime">The first hold note start time.</param>
+        /// <param name="separationTime">The separation time between hold notes.</param>
+        /// <param name="noteCount">The amount of hold notes.</param>
+        /// <returns>The <see cref="ObjectList"/> containing the hit objects.</returns>
+        private ObjectList generateTiledHoldNotes(double startTime, double separationTime, int noteCount)
         {
-            var newRow = new ObjectRow();
+            // - - - -
+            // ■ ■ ■ ■
+            // □ □ □ □
+            // □ □ □ □
+            // □ □ □ ■
+            // □ □ ■ -
+            // □ ■ - -
+            // ■ - - -
+
+            var newObjects = new ObjectList();
 
             int columnRepeat = Math.Min(noteCount, AvailableColumns);
 
             int nextColumn = GetColumn((originalObject as IHasXPosition)?.X ?? 0, true);
-            if ((convertType & LegacyConvertType.ForceNotStack) > 0 && PreviousRow.Columns < AvailableColumns)
+            if ((convertType & LegacyConvertType.ForceNotStack) > 0 && PreviousObjects.ColumnsFilled < AvailableColumns)
             {
-                while (PreviousRow.IsTaken(nextColumn))
+                while (PreviousObjects.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
             }
 
             for (int i = 0; i < columnRepeat; i++)
             {
-                while (newRow.IsTaken(nextColumn))
+                while (newObjects.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
-                add(newRow, nextColumn, startTime, endTime, noteCount);
+                add(newObjects, nextColumn, startTime, endTime, noteCount);
                 startTime += separationTime;
             }
 
-            return newRow;
+            return newObjects;
         }
 
-        private ObjectRow generateLongAndNormalNotes(double startTime, double separationTime)
+        /// <summary>
+        /// Generates a hold note alongside normal notes.
+        /// </summary>
+        /// <param name="startTime">The start time of notes.</param>
+        /// <param name="separationTime">The separation time between notes.</param>
+        /// <returns>The <see cref="ObjectList"/> containing the hit objects.</returns>
+        private ObjectList generateHoldAndNormalNotes(double startTime, double separationTime)
         {
-            var newRow = new ObjectRow();
+            // - - - -
+            // ■ x x -
+            // ■ - x x
+            // ■ x - x
+            // ■ - x x
+
+            var newObjects = new ObjectList();
 
             int holdColumn = GetColumn((originalObject as IHasXPosition)?.X ?? 0, true);
-            if ((convertType & LegacyConvertType.ForceNotStack) > 0 && PreviousRow.Columns < AvailableColumns)
+            if ((convertType & LegacyConvertType.ForceNotStack) > 0 && PreviousObjects.ColumnsFilled < AvailableColumns)
             {
-                while (PreviousRow.IsTaken(holdColumn))
+                while (PreviousObjects.IsFilled(holdColumn))
                     holdColumn = Random.Next(RandomStart, AvailableColumns);
             }
 
             // Create the hold note
-            add(newRow, holdColumn, startTime, separationTime * repeatCount);
+            add(newObjects, holdColumn, startTime, separationTime * repeatCount);
 
             int noteCount = 0;
             if (conversionDifficulty > 6.5)
@@ -347,33 +406,41 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 noteCount = GetRandomNoteCount(AvailableColumns < 6 ? 0 : 0.24, 0);
             noteCount = Math.Min(AvailableColumns - 1, noteCount);
 
-            bool ignoreHead = !sampleInfoListAt(startTime, separationTime).Any(s => s.Name == SampleInfo.HIT_WHISTLE || s.Name == SampleInfo.HIT_FINISH || s.Name == SampleInfo.HIT_CLAP);
+            bool ignoreHead = !sampleInfoListAt(startTime).Any(s => s.Name == SampleInfo.HIT_WHISTLE || s.Name == SampleInfo.HIT_FINISH || s.Name == SampleInfo.HIT_CLAP);
             int nextColumn = Random.Next(RandomStart, AvailableColumns);
 
-            var tempRow = new ObjectRow();
+            var tempObjects = new ObjectList();
             for (int i = 0; i <= repeatCount; i++)
             {
                 if (!(ignoreHead && startTime == originalObject.StartTime))
                 {
                     for (int j = 0; j < noteCount; j++)
                     {
-                        while (tempRow.IsTaken(nextColumn) || nextColumn == holdColumn)
+                        while (tempObjects.IsFilled(nextColumn) || nextColumn == holdColumn)
                             nextColumn = Random.Next(RandomStart, AvailableColumns);
-                        add(tempRow, nextColumn, startTime, startTime, noteCount + 1);
+                        add(tempObjects, nextColumn, startTime, startTime, noteCount + 1);
                     }
                 }
 
-                foreach (ManiaHitObject obj in tempRow.HitObjects)
-                    newRow.Add(obj);
+                foreach (ManiaHitObject obj in tempObjects.HitObjects)
+                    newObjects.Add(obj);
 
-                tempRow.Clear();
+                tempObjects.Clear();
                 startTime += separationTime;
             }
 
-            return newRow;
+            return newObjects;
         }
 
-        private void add(ObjectRow row, int column, double startTime, double endTime, int siblings = 1)
+        /// <summary>
+        /// Constructs and adds a note to an object list.
+        /// </summary>
+        /// <param name="objectList">The list to add to.</param>
+        /// <param name="column">The column to add the note to.</param>
+        /// <param name="startTime">The start time of the note.</param>
+        /// <param name="endTime">The end time of the note (set to <paramref name="startTime"/> for a non-hold note).</param>
+        /// <param name="siblings">The number of children alongside this note (these will not be generated, but are used for volume calculations).</param>
+        private void add(ObjectList objectList, int column, double startTime, double endTime, int siblings = 1)
         {
             ManiaHitObject newObject;
 
@@ -399,21 +466,32 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             
             // Todo: Consider siblings and write sample volumes (probably at ManiaHitObject level)
 
-            row.Add(newObject);
+            objectList.Add(newObject);
         }
 
-        private SampleInfoList sampleInfoListAt(double time, double separationTime)
+        /// <summary>
+        /// Retrieves the sample info list at a point in time.
+        /// </summary>
+        /// <param name="time">The time to retrieve the sample info list from.</param>
+        /// <param name="separationTime"></param>
+        /// <returns></returns>
+        private SampleInfoList sampleInfoListAt(double time)
         {
             var curveData = originalObject as IHasCurve;
 
             if (curveData == null)
                 return originalObject.Samples;
 
-            int index = (int)(separationTime == 0 ? 0 : (time - originalObject.StartTime) / separationTime);
+            double segmentTime = (curveData.EndTime - originalObject.StartTime) / repeatCount;
+
+            int index = (int)(segmentTime == 0 ? 0 : (time - originalObject.StartTime) / segmentTime);
             return curveData.RepeatSamples[index];
         }
 
         private double? _conversionDifficulty;
+        /// <summary>
+        /// A difficulty factor used for various conversion methods from osu!stable.
+        /// </summary>
         private double conversionDifficulty
         {
             get

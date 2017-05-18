@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private readonly double lastNoteTime;
         private readonly float lastNotePosition;
 
-        private ObjectRow lastRow = new ObjectRow();
+        private ObjectList lastRow = new ObjectList();
 
         private readonly int availableColumns;
         private readonly float localXDivisor; 
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (conversion == null)
                 yield break;
 
-            ObjectRow newRow = conversion.GenerateConversion();
+            ObjectList newRow = conversion.Generate();
 
             foreach (ManiaHitObject obj in newRow.HitObjects)
                 yield return obj;
