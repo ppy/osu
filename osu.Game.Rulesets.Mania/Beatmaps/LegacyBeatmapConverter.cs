@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield break;
             }
 
-            IEnumerable<ManiaHitObject> objects = null;
+            IEnumerable<ManiaHitObject> objects;
             switch (beatmap.BeatmapInfo.RulesetID)
             {
                 default:
@@ -75,7 +75,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             var distanceData = original as IHasDistance;
             var positionData = original as IHasPosition;
 
-            Patterns.PatternGenerator conversion = null;
+            // Following lines currently commented out to appease resharper
+
+            //PatternGenerator conversion = null;
 
             if (distanceData != null)
             {
@@ -91,13 +93,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 // Circle
             }
 
-            if (conversion == null)
-                return new ManiaHitObject[0];
+            //if (conversion == null)
+                return null;
 
-            Pattern newPattern = conversion.Generate();
-            lastPattern = newPattern;
+            //Pattern newPattern = conversion.Generate();
+            //lastPattern = newPattern;
 
-            return newPattern.HitObjects;
+            //return newPattern.HitObjects;
         }
 
         /// <summary>
@@ -115,6 +117,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 var endTimeData = HitObject as IHasEndTime;
                 var positionData = HitObject as IHasXPosition;
 
+                int column = GetColumn(positionData?.X ?? 0);
+
                 var pattern = new Pattern();
 
                 if (endTimeData != null)
@@ -124,7 +128,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                         StartTime = HitObject.StartTime,
                         Samples = HitObject.Samples,
                         Duration = endTimeData.Duration,
-                        Column = GetColumn(positionData?.X ?? 0),
+                        Column = column,
                     });
                 }
                 else if (positionData != null)
@@ -133,7 +137,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     {
                         StartTime = HitObject.StartTime,
                         Samples = HitObject.Samples,
-                        Column = GetColumn(positionData?.X ?? 0)
+                        Column = column
                     });
                 }
 

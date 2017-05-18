@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 return t;
             });
 
-            double lastObjectTime = (Objects.Last() as IHasEndTime)?.EndTime ?? Objects.Last().StartTime;
+            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
             // Perform some post processing of the timing changes
             timingChanges = timingChanges
