@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens.Play.Settings
 {
-    public class SettingsDisplay : FillFlowContainer
+    public class ReplaySettingsOverlay : FillFlowContainer
     {
         private bool isVisible;
         public bool IsVisible
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Play.Settings
             get { return isVisible; }
         }
 
-        public SettingsDisplay()
+        public ReplaySettingsOverlay()
         {
             Direction = FillDirection.Vertical;
             Spacing = new Vector2(0, 20);

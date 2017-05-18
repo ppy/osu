@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
-        public readonly SettingsDisplay SettingsDisplay;
+        public readonly ReplaySettingsOverlay ReplaySettingsOverlay;
 
         private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         protected abstract HealthDisplay CreateHealthDisplay();
         protected abstract SongProgress CreateProgress();
         protected abstract ModDisplay CreateModsContainer();
-        protected abstract SettingsDisplay CreateSettingsDisplay();
+        protected abstract ReplaySettingsOverlay CreateReplaySettingsOverlay();
 
         protected HUDOverlay()
         {
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
-                    SettingsDisplay = CreateSettingsDisplay(),
+                    ReplaySettingsOverlay = CreateReplaySettingsOverlay(),
                 }
             });
         }
