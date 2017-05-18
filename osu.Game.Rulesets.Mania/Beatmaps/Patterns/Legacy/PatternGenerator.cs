@@ -1,41 +1,38 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mania.MathUtils;
 using System;
 using System.Linq;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
+using OpenTK;
 
-namespace osu.Game.Rulesets.Mania.Beatmaps
+namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
-    internal abstract class ObjectConversion
+    /// <summary>
+    /// A pattern generator for legacy hit objects.
+    /// </summary>
+    internal abstract class PatternGenerator : Patterns.PatternGenerator
     {
-        protected readonly int AvailableColumns;
+        /// <summary>
+        /// The column index at which to start generating random notes.
+        /// </summary>
         protected readonly int RandomStart;
 
-        protected ObjectList PreviousObjects;
+        /// <summary>
+        /// The random number generator to use.
+        /// </summary>
         protected readonly FastRandom Random;
-        protected readonly Beatmap Beatmap;
 
-        protected ObjectConversion(ObjectList previousObjects, FastRandom random, Beatmap beatmap)
+        protected PatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, Pattern previousPattern)
+            : base(hitObject, beatmap, previousPattern)
         {
-            PreviousObjects = previousObjects;
             Random = random;
-            Beatmap = beatmap;
 
-            AvailableColumns = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.CircleSize);
             RandomStart = AvailableColumns == 8 ? 1 : 0;
         }
-
-        /// <summary>
-        /// Generates a new object list filled with converted hit objects.
-        /// </summary>
-        /// <returns>The <see cref="ObjectList"/> containing the hit objects.</returns>
-        public abstract ObjectList Generate();
 
         /// <summary>
         /// Converts an x-position into a column.
@@ -76,44 +73,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (val >= 1 - p3)
                 return 3;
             return val >= 1 - p2 ? 2 : 1;
-        }
-
-        /// <summary>
-        /// Constructs and adds a note to an object list.
-        /// </summary>
-        /// <param name="objectList">The list to add to.</param>
-        /// <param name="originalObject">The original hit object (used for samples).</param>
-        /// <param name="column">The column to add the note to.</param>
-        /// <param name="startTime">The start time of the note.</param>
-        /// <param name="endTime">The end time of the note (set to <paramref name="startTime"/> for a non-hold note).</param>
-        /// <param name="siblings">The number of children alongside this note (these will not be generated, but are used for volume calculations).</param>
-        protected void Add(ObjectList objectList, HitObject originalObject, int column, double startTime, double endTime, int siblings = 1)
-        {
-            ManiaHitObject newObject;
-
-            if (startTime == endTime)
-            {
-                newObject = new Note
-                {
-                    StartTime = startTime,
-                    Samples = originalObject.Samples,
-                    Column = column
-                };
-            }
-            else
-            {
-                newObject = new HoldNote
-                {
-                    StartTime = startTime,
-                    Samples = originalObject.Samples,
-                    Column = column,
-                    Duration = endTime - startTime
-                };
-            }
-
-            // Todo: Consider siblings and write sample volumes (probably at ManiaHitObject level)
-
-            objectList.Add(newObject);
         }
 
         private double? conversionDifficulty;

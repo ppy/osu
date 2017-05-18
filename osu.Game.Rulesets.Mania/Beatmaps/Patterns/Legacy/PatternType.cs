@@ -3,10 +3,13 @@
 
 using System;
 
-namespace osu.Game.Rulesets.Mania.Beatmaps
+namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
+    /// <summary>
+    /// The type of pattern to generate. Used for legacy patterns.
+    /// </summary>
     [Flags]
-    internal enum LegacyConvertType
+    internal enum PatternType
     {
         None = 0,
         /// <summary>

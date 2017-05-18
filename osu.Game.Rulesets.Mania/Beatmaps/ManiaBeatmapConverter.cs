@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(Beatmap original)
         {
             // Todo: This should be cased when we get better conversion methods
-            var converter = new LegacyConverter(original);
+            var converter = new LegacyBeatmapConverter(original);
 
             return new Beatmap<ManiaHitObject>
             {
