@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Database;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -21,20 +22,20 @@ namespace osu.Game.Overlays.Direct
         private readonly float height = 70;
 
         private readonly Sprite background;
-        private readonly OsuSpriteText title, artist, mapper, source;
+        private readonly OsuSpriteText title, artist, author, source;
         private readonly Statistic playCount, favouriteCount;
         private readonly FillFlowContainer difficultyIcons;
 
         protected override Sprite Background => background;
         protected override OsuSpriteText Title => title;
         protected override OsuSpriteText Artist => artist;
-        protected override OsuSpriteText Mapper => mapper;
+        protected override OsuSpriteText Author => author;
         protected override OsuSpriteText Source => source;
         protected override Statistic PlayCount => playCount;
         protected override Statistic FavouriteCount => favouriteCount;
         protected override FillFlowContainer DifficultyIcons => difficultyIcons;
 
-        public DirectListPanel()
+        public DirectListPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -101,11 +102,11 @@ namespace osu.Game.Overlays.Direct
                             Margin = new MarginPadding { Right = (height - vertical_padding * 2) + vertical_padding },
                             Children = new Drawable[]
                             {
-                                playCount = new Statistic(FontAwesome.fa_play_circle, 4579492)
+                                playCount = new Statistic(FontAwesome.fa_play_circle)
                                 {
                                 	Margin = new MarginPadding { Right = 1 },
                                 },
-                                favouriteCount = new Statistic(FontAwesome.fa_heart, 2659),
+                                favouriteCount = new Statistic(FontAwesome.fa_heart),
                                 new FillFlowContainer
                                 {
                                     Anchor = Anchor.TopRight,
@@ -119,7 +120,7 @@ namespace osu.Game.Overlays.Direct
                                             Text = @"mapped by ",
                                             TextSize = 14,
                                         },
-                                        mapper = new OsuSpriteText
+                                        author = new OsuSpriteText
                                         {
                                             TextSize = 14,
                                             Font = @"Exo2.0-SemiBoldItalic",

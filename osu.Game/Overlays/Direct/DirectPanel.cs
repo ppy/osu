@@ -6,7 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -19,28 +19,29 @@ namespace osu.Game.Overlays.Direct
         protected virtual Sprite Background { get; }
         protected virtual OsuSpriteText Title { get; }
         protected virtual OsuSpriteText Artist { get; }
-        protected virtual OsuSpriteText Mapper { get; }
+        protected virtual OsuSpriteText Author { get; }
         protected virtual OsuSpriteText Source { get; }
         protected virtual Statistic PlayCount { get; }
         protected virtual Statistic FavouriteCount { get; }
         protected virtual FillFlowContainer DifficultyIcons { get; }
 
+        private BeatmapSetInfo setInfo;
+
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, RulesetDatabase rulesets)
+        private void load(LocalisationEngine localisation)
         {
-            Background.Texture = textures.Get(@"Backgrounds/bg4");
+            Title.Current = localisation.GetUnicodePreference(setInfo.Metadata.TitleUnicode, setInfo.Metadata.Title);
+            Artist.Current = localisation.GetUnicodePreference(setInfo.Metadata.ArtistUnicode, setInfo.Metadata.Artist);
+            Author.Text = setInfo.Metadata.Author;
+            Source.Text = @"from " + setInfo.Metadata.Source;
 
-            Title.Text = @"Platina";
-            Artist.Text = @"Maaya Sakamoto";
-            Mapper.Text = @"TicClick";
-            Source.Text = @"from Cardcaptor Sakura";
-            PlayCount.Value = 4579492;
-            FavouriteCount.Value = 2659;
+            foreach (var b in setInfo.Beatmaps)
+                DifficultyIcons.Add(new DifficultyIcon(b));
+        }
 
-            for (int i = 0; i < 4; i++)
-            {
-                DifficultyIcons.Add(new DifficultyIcon(new BeatmapInfo { Ruleset = rulesets.GetRuleset(i), StarDifficulty = i + 1 }));
-            }
+        public DirectPanel(BeatmapSetInfo setInfo)
+        {
+            this.setInfo = setInfo;
         }
 
         public class Statistic : FillFlowContainer

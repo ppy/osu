@@ -1,10 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
+using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Overlays.Direct;
@@ -67,21 +69,49 @@ namespace osu.Game.Overlays
                         },
                     },
                 },
-                new DirectGridPanel
+            };
+
+            filter.Search.Exit = Hide;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetDatabase rulesets)
+        {
+            var setInfo = new BeatmapSetInfo
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Title = @"Platina",
+                    Artist = @"Maaya Sakamoto",
+                    Author = @"TicClick",
+                    Source = @"Cardcaptor Sakura",
+                },
+                Beatmaps = new List<BeatmapInfo>(),
+            };
+
+            for (int i = 0; i< 4; i++)
+            {
+                setInfo.Beatmaps.Add(new BeatmapInfo {
+                    Ruleset = rulesets.GetRuleset(i),
+                    StarDifficulty = i + 1,
+                });
+            }
+
+            Add(new Drawable[]
+            {
+                new DirectGridPanel(setInfo)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.BottomCentre,
                     Width = 300,
                 },
-                new DirectListPanel
+                new DirectListPanel(setInfo)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
                     Width = 0.8f,
                 },
-            };
-
-            filter.Search.Exit = Hide;
+            });
         }
 
         protected override void PopIn()
