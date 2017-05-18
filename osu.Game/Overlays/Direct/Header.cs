@@ -20,13 +20,15 @@ namespace osu.Game.Overlays.Direct
 {
     public class Header : Container
     {
+        public static readonly float HEIGHT = 90;
+
         private readonly Box tabStrip;
 
         public readonly OsuTabControl<DirectTab> Tabs;
 
         public Header()
         {
-            Height = 90;
+            Height = HEIGHT;
 
             Children = new Drawable[]
             {

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,9 +17,24 @@ namespace osu.Game.Overlays
     public class DirectOverlay : WaveOverlayContainer
     {
         public static readonly int WIDTH_PADDING = 80;
+        private readonly float panel_padding = 10f;
 
         private readonly Box background;
         private readonly FilterControl filter;
+        private readonly FillFlowContainer<DirectPanel> panels;
+
+        public IEnumerable<BeatmapSetInfo> BeatmapSets
+        {
+            set
+            {
+                var p = new List<DirectPanel>();
+
+                foreach (BeatmapSetInfo b in value)
+                    p.Add(new DirectGridPanel(b) { Width = 407 });
+
+                panels.Children = p;
+            }
+        }
 
         public DirectOverlay()
         {
@@ -53,65 +69,42 @@ namespace osu.Game.Overlays
                         },
                     },
                 },
-                new FillFlowContainer
+                new ScrollContainer
                 {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Both,
+                    ScrollDraggerVisible = false,
+                    Padding = new MarginPadding { Top = Header.HEIGHT },
                     Children = new Drawable[]
                     {
-                        new Header
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                        },
-                        filter = new FilterControl
-                        {
-                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
+                            {
+                                filter = new FilterControl
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                },
+                                panels = new FillFlowContainer<DirectPanel>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding { Top = FilterControl.LOWER_HEIGHT + panel_padding, Bottom = panel_padding, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
+                                    Spacing = new Vector2(panel_padding),
+                                },
+                            },
                         },
                     },
+                },
+                new Header
+                {
+                    RelativeSizeAxes = Axes.X,
                 },
             };
 
             filter.Search.Exit = Hide;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets)
-        {
-            var setInfo = new BeatmapSetInfo
-            {
-                Metadata = new BeatmapMetadata
-                {
-                    Title = @"Platina",
-                    Artist = @"Maaya Sakamoto",
-                    Author = @"TicClick",
-                    Source = @"Cardcaptor Sakura",
-                },
-                Beatmaps = new List<BeatmapInfo>(),
-            };
-
-            for (int i = 0; i< 4; i++)
-            {
-                setInfo.Beatmaps.Add(new BeatmapInfo {
-                    Ruleset = rulesets.GetRuleset(i),
-                    StarDifficulty = i + 1,
-                });
-            }
-
-            Add(new Drawable[]
-            {
-                new DirectGridPanel(setInfo)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.BottomCentre,
-                    Width = 300,
-                },
-                new DirectListPanel(setInfo)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                    Width = 0.8f,
-                },
-            });
         }
 
         protected override void PopIn()
