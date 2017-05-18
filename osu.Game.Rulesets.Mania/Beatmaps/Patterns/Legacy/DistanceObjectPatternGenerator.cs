@@ -481,7 +481,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     StartTime = startTime,
                     Samples = originalObject.Samples,
-                    Column = column
+                    Column = column,
+                    Siblings = siblings
                 };
             }
             else
@@ -491,11 +492,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     StartTime = startTime,
                     Samples = originalObject.Samples,
                     Column = column,
-                    Duration = endTime - startTime
+                    Duration = endTime - startTime,
+                    Siblings = siblings
                 };
             }
-
-            // Todo: Consider siblings and write sample volumes (probably at ManiaHitObject level)
 
             pattern.Add(newObject);
         }
