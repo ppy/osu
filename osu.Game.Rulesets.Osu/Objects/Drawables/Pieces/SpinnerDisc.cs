@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private readonly SpinnerBackground background;
 
-        private const float idle_alpha = 0.1f;
-        private const float tracking_alpha = 0.3f;
+        private const float idle_alpha = 0.2f;
+        private const float tracking_alpha = 0.4f;
 
         public SpinnerDisc(Spinner s)
         {
@@ -127,9 +127,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             if (Complete && updateCompleteTick())
             {
                 background.Flush(flushType: typeof(TransformAlpha));
-                background.FadeTo(0.75f, 60, EasingTypes.OutExpo);
+                background.FadeTo(tracking_alpha + 0.4f, 60, EasingTypes.OutExpo);
                 background.Delay(60);
-                background.FadeTo(0.5f, 250, EasingTypes.OutQuint);
+                background.FadeTo(tracking_alpha, 250, EasingTypes.OutQuint);
             }
 
             RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, EasingTypes.OutExpo);

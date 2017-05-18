@@ -53,8 +53,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Size = new Vector2(60, 10),
                     Origin = Anchor.Centre,
                     Position = new Vector2(
-                        0.5f + (float)Math.Sin((float)i / count * 2 * MathHelper.Pi) / 2 * 0.9f,
-                        0.5f + (float)Math.Cos((float)i / count * 2 * MathHelper.Pi) / 2 * 0.9f
+                        0.5f + (float)Math.Sin((float)i / count * 2 * MathHelper.Pi) / 2 * 0.86f,
+                        0.5f + (float)Math.Cos((float)i / count * 2 * MathHelper.Pi) / 2 * 0.86f
                     ),
                     Rotation = -(float)i / count * 360 + 90,
                     Children = new[]
