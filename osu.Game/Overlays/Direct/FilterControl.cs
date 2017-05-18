@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Direct
         public static readonly float LOWER_HEIGHT = 21;
 
         private readonly Box tabStrip;
-        private readonly FillFlowContainer<ModeToggleButton> modeButtons;
+        private readonly FillFlowContainer<RulesetToggleButton> modeButtons;
         private FillFlowContainer resultCounts;
 
         public readonly SearchTextBox Search;
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Direct
                         {
                             RelativeSizeAxes = Axes.X,
                         },
-                        modeButtons = new FillFlowContainer<ModeToggleButton>
+                        modeButtons = new FillFlowContainer<RulesetToggleButton>
                         {
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(10f, 0f),
@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Direct
 
             foreach (var r in rulesets.AllRulesets)
             {
-                modeButtons.Add(new ModeToggleButton(game?.Ruleset ?? new Bindable<RulesetInfo>(), r));
+                modeButtons.Add(new RulesetToggleButton(game?.Ruleset ?? new Bindable<RulesetInfo>(), r));
             }
         }
 
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        private class ModeToggleButton : ClickableContainer
+        private class RulesetToggleButton : ClickableContainer
         {
             private TextAwesome icon;
 
@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.Direct
                 icon.FadeTo((Ruleset == obj) ? 1f : 0.5f, 100);
             }
 
-            public ModeToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
+            public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
             {
                 this.bindable = bindable;
                 AutoSizeAxes = Axes.Both;
