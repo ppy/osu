@@ -13,13 +13,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         protected readonly int AvailableColumns;
         protected readonly int RandomStart;
 
-        protected ObjectRow PreviousRow;
+        protected ObjectList PreviousObjects;
         protected readonly FastRandom Random;
         protected readonly Beatmap Beatmap;
 
-        protected ObjectConversion(ObjectRow previousRow, FastRandom random, Beatmap beatmap)
+        protected ObjectConversion(ObjectList previousObjects, FastRandom random, Beatmap beatmap)
         {
-            PreviousRow = previousRow;
+            PreviousObjects = previousObjects;
             Random = random;
             Beatmap = beatmap;
 
@@ -28,10 +28,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         }
 
         /// <summary>
-        /// Generates a new row filled with converted hit objects.
+        /// Generates a new object list filled with converted hit objects.
         /// </summary>
-        /// <returns>The new row.</returns>
-        public abstract ObjectRow GenerateConversion();
+        /// <returns>The <see cref="ObjectList"/> containing the hit objects.</returns>
+        public abstract ObjectList Generate();
 
         /// <summary>
         /// Converts an x-position into a column.
