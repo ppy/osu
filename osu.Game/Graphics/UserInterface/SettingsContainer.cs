@@ -3,7 +3,6 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -18,9 +17,11 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public abstract string Title { get; }
 
-        private readonly SettingsDropdown content;
+        private const float transition_duration = 600;
+
+        private readonly FillFlowContainer content;
         private readonly SimpleButton button;
-        private bool contentIsVisible;
+        private bool buttonIsPressed;
 
         protected SettingsContainer()
         {
@@ -76,19 +77,21 @@ namespace osu.Game.Graphics.UserInterface
                                 },
                             }
                         },
-                        content = new SettingsDropdown
+                        content = new FillFlowContainer
                         {
+                            Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Padding = new MarginPadding(15),
+                            Spacing = new Vector2(0, 10),
                         }
                     }
                 },
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            content.StateChanged += (c, s) => button.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, EasingTypes.OutQuint);
+            button.TriggerClick();
         }
 
         public new void Add(Drawable drawable)
@@ -98,53 +101,14 @@ namespace osu.Game.Graphics.UserInterface
 
         private void triggerContentVisibility()
         {
-            contentIsVisible = !contentIsVisible;
+            buttonIsPressed = !buttonIsPressed;
 
-            if (contentIsVisible)
+            button.FadeColour(buttonIsPressed ? OsuColour.FromHex(@"ffcc22") : Color4.White, 200, EasingTypes.OutQuint);
+
+            if (buttonIsPressed)
                 content.Show();
             else
                 content.Hide();
-        }
-
-        private class SettingsDropdown : OverlayContainer
-        {
-            private const float transition_duration = 600;
-
-            private readonly FillFlowContainer content;
-
-            public SettingsDropdown()
-            {
-                Children = new Drawable[]
-                {
-                    content = new FillFlowContainer
-                    {
-                        Direction = FillDirection.Vertical,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Padding = new MarginPadding(15),
-                        Spacing = new Vector2(0, 10),
-                    }
-                };
-            }
-
-            public new void Add(Drawable drawable)
-            {
-                content.Add(drawable);
-            }
-
-            protected override void PopIn()
-            {
-                ResizeTo(new Vector2(1, content.Height), transition_duration, EasingTypes.OutQuint);
-                FadeIn(transition_duration, EasingTypes.OutQuint);
-            }
-
-            protected override void PopOut()
-            {
-                ResizeTo(new Vector2(1, 0), transition_duration, EasingTypes.OutQuint);
-                FadeOut(transition_duration);
-            }
         }
     }
 }

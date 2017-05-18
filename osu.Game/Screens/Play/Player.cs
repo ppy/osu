@@ -208,7 +208,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.Objects = HitRenderer.Objects;
             hudOverlay.Progress.AudioClock = decoupledClock;
             hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
-            hudOverlay.SettingsDisplay.IsVisible = HitRenderer.HasReplayLoaded;
+            hudOverlay.ReplaySettingsOverlay.IsVisible = HitRenderer.HasReplayLoaded;
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
             hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
