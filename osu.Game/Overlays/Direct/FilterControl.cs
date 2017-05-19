@@ -31,15 +31,16 @@ namespace osu.Game.Overlays.Direct
 
         private readonly Box tabStrip;
         private readonly FillFlowContainer<RulesetToggleButton> modeButtons;
-        private FillFlowContainer resultCountsContainer;
-        private OsuSpriteText resultCountsText;
+        private readonly FillFlowContainer resultCountsContainer;
+        private readonly OsuSpriteText resultCountsText;
 
         public readonly SearchTextBox Search;
         public readonly SortTabControl SortTabs;
         public readonly OsuEnumDropdown<RankStatus> RankStatusDropdown;
+        public readonly Bindable<PanelDisplayStyle> DisplayStyle = new Bindable<PanelDisplayStyle>();
 
         private ResultCounts resultCounts;
-        public  ResultCounts ResultCounts
+        public ResultCounts ResultCounts
         {
             get { return resultCounts; }
             set { resultCounts = value; updateResultCounts(); }
@@ -49,6 +50,7 @@ namespace osu.Game.Overlays.Direct
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            DisplayStyle.Value = PanelDisplayStyle.Grid;
 
             Children = new Drawable[]
             {
@@ -90,13 +92,33 @@ namespace osu.Game.Overlays.Direct
                         },
                     },
                 },
-                RankStatusDropdown = new SlimEnumDropdown<RankStatus>
+                new FillFlowContainer
                 {
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    RelativeSizeAxes = Axes.None,
+                    Spacing = new Vector2(10f, 0f),
+                    Direction = FillDirection.Horizontal,
                     Margin = new MarginPadding { Bottom = 5, Right = DirectOverlay.WIDTH_PADDING },
-                    Width = 160f,
+                    Children = new Drawable[]
+                    {
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Spacing = new Vector2(5f, 0f),
+                            Direction = FillDirection.Horizontal,
+                            Children = new[]
+                            {
+                                new DisplayModeToggleButton(FontAwesome.fa_th_large, PanelDisplayStyle.Grid, DisplayStyle),
+                                new DisplayModeToggleButton(FontAwesome.fa_list_ul, PanelDisplayStyle.List, DisplayStyle),
+                            },
+                        },
+                        RankStatusDropdown = new SlimEnumDropdown<RankStatus>
+                        {
+                            RelativeSizeAxes = Axes.None,
+                            Width = 160f,
+                        },
+                    },
                 },
                 resultCountsContainer = new FillFlowContainer
                 {
@@ -117,7 +139,7 @@ namespace osu.Game.Overlays.Direct
                             TextSize = 15,
                             Font = @"Exo2.0-Bold",
                         },
-                    }    
+                    }
                 },
             };
 
@@ -221,6 +243,47 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
+        private class DisplayModeToggleButton : ClickableContainer
+        {
+            private readonly TextAwesome icon;
+            private readonly PanelDisplayStyle mode;
+            private readonly Bindable<PanelDisplayStyle> bindable;
+
+            public DisplayModeToggleButton(FontAwesome icon, PanelDisplayStyle mode, Bindable<PanelDisplayStyle> bindable)
+            {
+                this.bindable = bindable;
+                this.mode = mode;
+                Size = new Vector2(25f);
+
+                Children = new Drawable[]
+                {
+                    this.icon = new TextAwesome
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Icon = icon,
+                        TextSize = 18,
+                        UseFullGlyphHeight = false,
+                        Alpha = 0.5f,
+                    },
+                };
+
+                bindable.ValueChanged += Bindable_ValueChanged;
+                Bindable_ValueChanged(bindable.Value);
+                Action = () => bindable.Value = this.mode;
+            }
+
+            private void Bindable_ValueChanged(PanelDisplayStyle mode)
+            {
+                icon.FadeTo(mode == this.mode ? 1.0f : 0.5f, 100);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                bindable.ValueChanged -= Bindable_ValueChanged;
+            }
+        }
+
         private class SlimEnumDropdown<T> : OsuEnumDropdown<T>
         {
             protected override DropdownHeader CreateHeader() => new SlimDropdownHeader { AccentColour = AccentColour };
@@ -257,7 +320,7 @@ namespace osu.Game.Overlays.Direct
         public readonly int Artists;
         public readonly int Songs;
         public readonly int Tags;
-        
+
         public ResultCounts(int artists, int songs, int tags)
         {
             Artists = artists;
@@ -280,5 +343,11 @@ namespace osu.Game.Overlays.Direct
         Graveyard,
         [Description("My Maps")]
         MyMaps,
+    }
+
+    public enum PanelDisplayStyle
+    {
+        Grid,
+        List,
     }
 }
