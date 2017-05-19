@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -9,8 +9,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuColour colours, LocalisationEngine localisation, TextureStore textures)
         {
             Children = new Drawable[]
             {
@@ -46,9 +46,13 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                new Sprite
+                new Container
                 {
-                    FillMode = FillMode.Fill,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new[]
+                    {
+                        GetBackground(textures),
+                    },
                 },
                 new Box
                 {
@@ -126,18 +130,27 @@ namespace osu.Game.Overlays.Direct
                                                 },
                                             },
                                         },
-                                        new OsuSpriteText
+                                        new Container
                                         {
-                                            Text = $@"from {SetInfo.Metadata.Source}",
-                                            TextSize = 14,
-                                            Shadow = false,
-                                            Colour = colours.Gray5,
+                                            AutoSizeAxes = Axes.X,
+                                            Height = 14,
+                                            Children = new[]
+                                            {
+                                                new OsuSpriteText
+                                                {
+                                                    Text = $@"from {SetInfo.Metadata.Source}",
+                                                    TextSize = 14,
+                                                    Shadow = false,
+                                                    Colour = colours.Gray5,
+                                                    Alpha = SetInfo.Metadata.Source == @"" ? 0 : 1,
+                                                },
+                                            },
                                         },
                                         new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.X,
                                             Height = 20,
-                                            Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding  },
+                                            Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
                                             Children = DifficultyIcons,
                                         },
                                     },
@@ -155,11 +168,11 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Top = vertical_padding, Right = vertical_padding },
                     Children = new[]
                     {
-                        new Statistic(FontAwesome.fa_play_circle)
+                        new Statistic(FontAwesome.fa_play_circle, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.PlayCount ?? 0)
                         {
                             Margin = new MarginPadding { Right = 1 },
                         },
-                        new Statistic(FontAwesome.fa_heart),
+                        new Statistic(FontAwesome.fa_heart, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.FavouriteCount ?? 0),
                     },
                 },
             };
