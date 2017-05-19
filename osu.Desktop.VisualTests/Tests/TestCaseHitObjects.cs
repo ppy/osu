@@ -129,8 +129,6 @@ namespace osu.Desktop.VisualTests.Tests
             };
 
             Add(clockAdjustContainer);
-
-            load(mode);
         }
 
         private int depth;

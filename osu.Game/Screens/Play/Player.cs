@@ -241,8 +241,8 @@ namespace osu.Game.Screens.Play
                 skipButton.Action = null;
             };
 
-            skipButton.Delay(firstHitObject - skip_required_cutoff - fade_time);
-            skipButton.FadeOut(fade_time);
+            using (skipButton.BeginDelayedSequence(firstHitObject - skip_required_cutoff - fade_time))
+                skipButton.FadeOut(fade_time);
             skipButton.Expire();
         }
 
@@ -263,18 +263,20 @@ namespace osu.Game.Screens.Play
 
             ValidForResume = false;
 
-            Delay(1000);
-            onCompletionEvent = Schedule(delegate
+            using (BeginDelayedSequence(1000))
             {
-                var score = new Score
+                onCompletionEvent = Schedule(delegate
                 {
-                    Beatmap = Beatmap.BeatmapInfo,
-                    Ruleset = ruleset
-                };
-                scoreProcessor.PopulateScore(score);
-                score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
-                Push(new Results(score));
-            });
+                    var score = new Score
+                    {
+                        Beatmap = Beatmap.BeatmapInfo,
+                        Ruleset = ruleset
+                    };
+                    scoreProcessor.PopulateScore(score);
+                    score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
+                    Push(new Results(score));
+                });
+            }
         }
 
         private void onFail()
@@ -299,17 +301,19 @@ namespace osu.Game.Screens.Play
 
             Content.ScaleTo(0.7f);
 
-            Content.Delay(250);
-            Content.FadeIn(250);
+            using (Content.BeginDelayedSequence(250))
+                Content.FadeIn(250);
 
             Content.ScaleTo(1, 750, EasingTypes.OutQuint);
 
-            Delay(750);
-            Schedule(() =>
-            {
-                decoupledClock.Start();
-                initializeSkipButton();
-            });
+            using (BeginDelayedSequence(750))
+                Schedule(() =>
+                {
+                    if (!pauseContainer.IsPaused)
+                        decoupledClock.Start();
+
+                    initializeSkipButton();
+                });
 
             pauseContainer.Alpha = 0;
             pauseContainer.FadeIn(750, EasingTypes.OutQuint);
