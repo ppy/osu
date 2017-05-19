@@ -57,6 +57,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield return obj;
         }
 
+        /// <summary>
+        /// Method that generates hit objects for osu!mania specific beatmaps.
+        /// </summary>
+        /// <param name="original">The original hit object.</param>
+        /// <param name="beatmap">The beatmap.</param>
+        /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateSpecific(HitObject original, Beatmap beatmap)
         {
             var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, lastPattern);
@@ -67,6 +73,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             return newPattern.HitObjects;
         }
 
+        /// <summary>
+        /// Method that generates hit objects for non-osu!mania beatmaps.
+        /// </summary>
+        /// <param name="original">The original hit object.</param>
+        /// <param name="beatmap">The beatmap.</param>
+        /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateConverted(HitObject original, Beatmap beatmap)
         {
             var endTimeData = original as IHasEndTime;
@@ -100,7 +112,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         }
 
         /// <summary>
-        /// A pattern generator for mania-specific beatmaps.
+        /// A pattern generator for osu!mania-specific beatmaps.
         /// </summary>
         private class SpecificBeatmapPatternGenerator : Patterns.Legacy.PatternGenerator
         {
