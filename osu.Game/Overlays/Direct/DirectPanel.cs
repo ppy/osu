@@ -19,17 +19,14 @@ namespace osu.Game.Overlays.Direct
     {
         protected readonly BeatmapSetInfo SetInfo;
 
-        protected IEnumerable<DifficultyIcon> DifficultyIcons
+        protected IEnumerable<DifficultyIcon> GetDifficultyIcons()
         {
-            get
-            {
-                var icons = new List<DifficultyIcon>();
+            var icons = new List<DifficultyIcon>();
 
-                foreach (var b in SetInfo.Beatmaps)
-                    icons.Add(new DifficultyIcon(b));
+            foreach (var b in SetInfo.Beatmaps)
+                icons.Add(new DifficultyIcon(b));
 
-                return icons;
-            }
+            return icons;
         }
 
         protected Drawable GetBackground(TextureStore textures)
