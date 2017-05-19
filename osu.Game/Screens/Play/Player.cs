@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, ruleset.ID == Beatmap.BeatmapInfo.Ruleset.ID);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = Beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, true);
                 }
 
                 if (!HitRenderer.Objects.Any())

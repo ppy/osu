@@ -41,13 +41,13 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
 
-        protected override Beatmap<TaikoHitObject> ConvertBeatmap(Beatmap original)
+        protected override Beatmap<TaikoHitObject> ConvertBeatmap(Beatmap original, bool isForCurrentRuleset)
         {
             // Rewrite the beatmap info to add the slider velocity multiplier
             BeatmapInfo info = original.BeatmapInfo.DeepClone();
             info.Difficulty.SliderMultiplier *= legacy_velocity_multiplier;
 
-            Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original);
+            Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original, isForCurrentRuleset);
 
             // Post processing step to transform hit objects with the same start time into strong hits
             converted.HitObjects = converted.HitObjects.GroupBy(t => t.StartTime).Select(x =>
