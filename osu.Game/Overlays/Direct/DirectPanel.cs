@@ -30,10 +30,10 @@ namespace osu.Game.Overlays.Direct
 
             foreach (var b in SetInfo.Beatmaps)
                 icons.Add(new DifficultyIcon(b));
-            
+
             return icons;
         }
-        
+
         protected Drawable GetBackground(TextureStore textures)
         {
             return new AsyncLoadWrapper(new Sprite
