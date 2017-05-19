@@ -76,7 +76,6 @@ namespace osu.Game.Screens.Play
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
-            AutoSizeAxes = Axes.Both,
             Margin = new MarginPadding { Top = 100, Right = 10 },
         };
 
