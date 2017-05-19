@@ -47,7 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beatmaps\Patterns\Legacy\PatternGenerator.cs" />
+    <Compile Include="Beatmaps\Patterns\PatternGenerator.cs" />
+    <Compile Include="Beatmaps\Patterns\Legacy\PatternType.cs" />
     <Compile Include="Beatmaps\ManiaBeatmapConverter.cs" />
+    <Compile Include="Beatmaps\Patterns\Pattern.cs" />
     <Compile Include="MathUtils\FastRandom.cs" />
     <Compile Include="Judgements\HitWindows.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />

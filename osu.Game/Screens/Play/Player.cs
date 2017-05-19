@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, ruleset.ID == Beatmap.BeatmapInfo.Ruleset.ID);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = Beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, true);
                 }
 
                 if (!HitRenderer.Objects.Any())
@@ -230,18 +230,20 @@ namespace osu.Game.Screens.Play
 
             ValidForResume = false;
 
-            Delay(1000);
-            onCompletionEvent = Schedule(delegate
+            using (BeginDelayedSequence(1000))
             {
-                var score = new Score
+                onCompletionEvent = Schedule(delegate
                 {
-                    Beatmap = Beatmap.BeatmapInfo,
-                    Ruleset = ruleset
-                };
-                scoreProcessor.PopulateScore(score);
-                score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
-                Push(new Results(score));
-            });
+                    var score = new Score
+                    {
+                        Beatmap = Beatmap.BeatmapInfo,
+                        Ruleset = ruleset
+                    };
+                    scoreProcessor.PopulateScore(score);
+                    score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
+                    Push(new Results(score));
+                });
+            }
         }
 
         private void onFail()
@@ -266,16 +268,18 @@ namespace osu.Game.Screens.Play
 
             Content.ScaleTo(0.7f);
 
-            Content.Delay(250);
-            Content.FadeIn(250);
+            using (Content.BeginDelayedSequence(250))
+                Content.FadeIn(250);
 
             Content.ScaleTo(1, 750, EasingTypes.OutQuint);
 
-            Delay(750);
-            Schedule(() =>
-            {
-                decoupledClock.Start();
-            });
+            using (BeginDelayedSequence(750))
+                Schedule(() =>
+                {
+                    if (!pauseContainer.IsPaused)
+                        decoupledClock.Start();
+
+                });
 
             pauseContainer.Alpha = 0;
             pauseContainer.FadeIn(750, EasingTypes.OutQuint);
