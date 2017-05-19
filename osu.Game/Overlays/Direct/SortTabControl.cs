@@ -27,9 +27,9 @@ namespace osu.Game.Overlays.Direct
 
         private class SortTabItem : TabItem<SortCriteria>
         {
-            private readonly float transition_duration = 100;
+            private const float transition_duration = 100;
 
-            private Box box;
+            private readonly Box box;
 
             public override bool Active
             {

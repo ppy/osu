@@ -21,9 +21,9 @@ namespace osu.Game.Overlays.Direct
 {
     public class DirectListPanel : DirectPanel
     {
-        private readonly float horizontal_padding = 10;
-        private readonly float vertical_padding = 5;
-        private readonly float height = 70;
+        private const float horizontal_padding = 10;
+        private const float vertical_padding = 5;
+        private const float height = 70;
 
         public DirectListPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Direct
         [BackgroundDependencyLoader]
         private void load(LocalisationEngine localisation, TextureStore textures)
         {
-            Children = new Drawable[]
+            Children = new[]
             {
                 new Box
                 {
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Direct
                             Origin = Anchor.TopRight,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Vertical,
-                            Margin = new MarginPadding { Right = (height - vertical_padding * 2) + vertical_padding },
+                            Margin = new MarginPadding { Right = height - vertical_padding * 2 + vertical_padding },
                             Children = new Drawable[]
                             {
                                 new Statistic(FontAwesome.fa_play_circle, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.PlayCount ?? 0)
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Direct
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
-                            Size = new Vector2(height - (vertical_padding * 2)),
+                            Size = new Vector2(height - vertical_padding * 2),
                         },
                     },
                 },

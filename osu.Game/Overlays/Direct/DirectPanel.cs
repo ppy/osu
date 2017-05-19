@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Direct
     {
         protected readonly BeatmapSetInfo SetInfo;
 
-        public DirectPanel(BeatmapSetInfo setInfo)
+        protected DirectPanel(BeatmapSetInfo setInfo)
         {
             SetInfo = setInfo;
         }

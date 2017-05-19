@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Direct
         public FilterControl()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 35 + 32 + 30 + (padding * 2); // search + mode toggle buttons + sort tabs + padding
+            Height = 35 + 32 + 30 + padding * 2; // search + mode toggle buttons + sort tabs + padding
             DisplayStyle.Value = PanelDisplayStyle.Grid;
 
             Children = new Drawable[]
@@ -170,9 +170,9 @@ namespace osu.Game.Overlays.Direct
             resultCountsContainer.FadeTo(ResultCounts == null ? 0 : 1, 200, EasingTypes.Out);
             if (resultCounts == null) return;
 
-            resultCountsText.Text = pluralize(@"Artist", ResultCounts.Artists) + ", " +
-                                    pluralize(@"Song", ResultCounts.Songs) + ", " +
-                                    pluralize(@"Tag", ResultCounts.Tags);
+            resultCountsText.Text = pluralize(@"Artist", ResultCounts?.Artists ?? 0) + ", " +
+                                    pluralize(@"Song", ResultCounts?.Songs ?? 0) + ", " +
+                                    pluralize(@"Tag", ResultCounts?.Tags ?? 0);
         }
 
         private string pluralize(string prefix, int value)
@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.Direct
 
         private class RulesetToggleButton : ClickableContainer
         {
-            private TextAwesome icon;
+            private readonly TextAwesome icon;
 
             private RulesetInfo ruleset;
             public RulesetInfo Ruleset
@@ -209,11 +209,11 @@ namespace osu.Game.Overlays.Direct
                 }
             }
 
-            private Bindable<RulesetInfo> bindable;
+            private readonly Bindable<RulesetInfo> bindable;
 
-            void Bindable_ValueChanged(RulesetInfo obj)
+            private void Bindable_ValueChanged(RulesetInfo obj)
             {
-                icon.FadeTo((Ruleset.ID == obj?.ID) ? 1f : 0.5f, 100);
+                icon.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
             }
 
             public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
