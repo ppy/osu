@@ -28,7 +28,7 @@ namespace osu.Game.Overlays
             get { return beatmapSets; }
             set
             {
-                if (value == beatmapSets) return;
+                if (beatmapSets?.Equals(value) ?? false) return;
                 beatmapSets = value;
 
                 recreatePanels(filter.DisplayStyle.Value);

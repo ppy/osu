@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Direct
                 set
                 {
                     this.value = value;
-                    text.Text = string.Format("{0:n0}", Value);
+                    text.Text = string.Format(@"{0:n0}", Value);
                 }
             }
 
