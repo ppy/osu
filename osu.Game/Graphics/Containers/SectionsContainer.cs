@@ -16,7 +16,8 @@ namespace osu.Game.Graphics.Containers
     public class SectionsContainer : Container
     {
         private Drawable expandableHeader, fixedHeader;
-        private ScrollContainer scrollContainer;
+        private readonly ScrollContainer scrollContainer;
+        private readonly Container<Drawable> sectionsContainer;
 
         public Drawable ExpandableHeader
         {
@@ -53,6 +54,13 @@ namespace osu.Game.Graphics.Containers
         public Bindable<Drawable> SelectedSection { get; } = new Bindable<Drawable>();
         public void ScrollToSection(Drawable section) => scrollContainer.ScrollIntoView(section);
 
+        protected virtual Container<Drawable> CreateSectionsContainer()
+            => new FillFlowContainer
+            {
+                Direction = FillDirection.Vertical,
+                AutoSizeAxes = Axes.Both
+            };
+
         private List<Drawable> sections = new List<Drawable>();
         public IEnumerable<Drawable> Sections
         {
@@ -62,14 +70,14 @@ namespace osu.Game.Graphics.Containers
                 if (value == sections) return;
 
                 foreach (var section in sections)
-                    scrollContainer.Remove(section);
+                    sectionsContainer.Remove(section);
 
                 sections = value.ToList();
                 if (sections.Count == 0) return;
 
                 originalSectionMargin = sections[0].Margin;
                 updateSectionMargin();
-                scrollContainer.Add(sections);
+                sectionsContainer.Add(sections);
                 SelectedSection.Value = sections[0];
             }
         }
@@ -87,9 +95,10 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            Add(scrollContainer = new ScrollContainer
+            Add(scrollContainer = new ScrollContainer()
             {
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[] { sectionsContainer = CreateSectionsContainer() }
             });
         }
 
