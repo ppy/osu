@@ -20,6 +20,7 @@ namespace osu.Game.Overlays
         private readonly float panel_padding = 10f;
 
         private readonly Box background;
+        private readonly Header header;
         private readonly FilterControl filter;
         private readonly FillFlowContainer<DirectPanel> panels;
 
@@ -104,13 +105,16 @@ namespace osu.Game.Overlays
                         },
                     },
                 },
-                new Header
+                header = new Header
                 {
                     RelativeSizeAxes = Axes.X,
                 },
             };
 
+            header.Tabs.Current.ValueChanged += (tab) => { if (tab != DirectTab.Search) filter.Search.Current.Value = @""; };
+
             filter.Search.Exit = Hide;
+            filter.Search.Current.ValueChanged += (s) => { if (s != @"") header.Tabs.Current.Value = DirectTab.Search; };
             filter.DisplayStyle.ValueChanged += recreatePanels;
         }
 
