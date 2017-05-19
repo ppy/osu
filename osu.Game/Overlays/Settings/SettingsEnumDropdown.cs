@@ -9,9 +9,9 @@ namespace osu.Game.Overlays.Settings
     public class SettingsEnumDropdown<T> : SettingsDropdown<T>
     {
         protected override Drawable CreateControl() => new OsuEnumDropdown<T>
-		{
-			Margin = new MarginPadding { Top = 5 },
-			RelativeSizeAxes = Axes.X,
+        {
+            Margin = new MarginPadding { Top = 5 },
+            RelativeSizeAxes = Axes.X,
         };
     }
 }

@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Direct
         protected IEnumerable<DifficultyIcon> GetDifficultyIcons()
         {
             var icons = new List<DifficultyIcon>();
-            
+
             foreach (var b in SetInfo.Beatmaps)
                 icons.Add(new DifficultyIcon(b));
             
