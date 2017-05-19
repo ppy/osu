@@ -16,8 +16,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
     {
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
-        protected override Beatmap<ManiaHitObject> ConvertBeatmap(Beatmap original)
+        protected override Beatmap<ManiaHitObject> ConvertBeatmap(Beatmap original, bool isForCurrentRuleset)
         {
+
             // Todo: This should be cased when we get better conversion methods
             var converter = new LegacyBeatmapConverter(original);
 
@@ -32,6 +33,15 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, Beatmap beatmap)
         {
+            var maniaOriginal = original as ManiaHitObject;
+            if (maniaOriginal != null)
+            {
+                yield return maniaOriginal;
+                yield break;
+            }
+
+
+
             // Handled by the LegacyConvereter
             yield return null;
         }
