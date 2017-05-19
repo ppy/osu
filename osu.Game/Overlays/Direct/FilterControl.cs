@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Direct
                     Origin = Anchor.TopRight,
                     Spacing = new Vector2(10f, 0f),
                     Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Top = Height - 25 - padding, Right = DirectOverlay.WIDTH_PADDING },
+                    Margin = new MarginPadding { Top = Height - SlimEnumDropdown<DirectTab>.HEIGHT - padding, Right = DirectOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -255,7 +255,7 @@ namespace osu.Game.Overlays.Direct
             {
                 this.bindable = bindable;
                 this.style = style;
-                Size = new Vector2(25f);
+                Size = new Vector2(SlimEnumDropdown<DirectTab>.HEIGHT);
 
                 Children = new Drawable[]
                 {
@@ -288,6 +288,8 @@ namespace osu.Game.Overlays.Direct
 
         private class SlimEnumDropdown<T> : OsuEnumDropdown<T>
         {
+            public const float HEIGHT = 25;
+
             protected override DropdownHeader CreateHeader() => new SlimDropdownHeader { AccentColour = AccentColour };
             protected override Menu CreateMenu() => new SlimMenu();
 
@@ -295,7 +297,7 @@ namespace osu.Game.Overlays.Direct
             {
                 public SlimDropdownHeader()
                 {
-                    Height = 25;
+                    Height = HEIGHT;
                     Icon.TextSize = 16;
                     Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
                 }
