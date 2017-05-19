@@ -2,10 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -30,7 +32,14 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        //todo: Direct panel backgrounds
+        protected Drawable GetBackground(TextureStore textures)
+        {
+            return new AsyncLoadWrapper(new Sprite
+            {
+                FillMode = FillMode.Fill,
+                Texture = new OnlineWorkingBeatmap(SetInfo.Beatmaps.FirstOrDefault(), textures, null).Background,
+            }) { RelativeSizeAxes = Axes.Both };
+        }
 
         public DirectPanel(BeatmapSetInfo setInfo)
         {

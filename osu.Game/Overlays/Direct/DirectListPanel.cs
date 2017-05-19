@@ -13,6 +13,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
+using osu.Framework.Graphics.Textures;
+using System.Linq;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -38,7 +40,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation)
+        private void load(LocalisationEngine localisation, TextureStore textures)
         {
             Children = new Drawable[]
             {
@@ -47,9 +49,13 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                new Sprite
+                new Container
                 {
-                    FillMode = FillMode.Fill,
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new[]
+                    {
+                        GetBackground(textures),
+                    },
                 },
                 new Box
                 {
@@ -97,11 +103,11 @@ namespace osu.Game.Overlays.Direct
                             Margin = new MarginPadding { Right = (height - vertical_padding * 2) + vertical_padding },
                             Children = new Drawable[]
                             {
-                                new Statistic(FontAwesome.fa_play_circle)
+                                new Statistic(FontAwesome.fa_play_circle, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.PlayCount ?? 0)
                                 {
                                     Margin = new MarginPadding { Right = 1 },
                                 },
-                                new Statistic(FontAwesome.fa_heart),
+                                new Statistic(FontAwesome.fa_heart, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.FavouriteCount ?? 0),
                                 new FillFlowContainer
                                 {
                                     Anchor = Anchor.TopRight,
@@ -129,6 +135,7 @@ namespace osu.Game.Overlays.Direct
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     TextSize = 14,
+                                    Alpha = SetInfo.Metadata.Source == @"" ? 0 : 1,
                                 },
                             },
                         },
