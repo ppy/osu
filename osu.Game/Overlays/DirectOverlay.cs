@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
                 var p = new List<DirectPanel>();
 
                 foreach (BeatmapSetInfo b in value)
-                    p.Add(new DirectListPanel(b));
+                    p.Add(new DirectListPanel(b)); //todo: proper switching between grid/list
 
                 panels.Children = p;
             }
