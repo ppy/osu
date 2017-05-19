@@ -149,7 +149,6 @@ namespace osu.Game.Overlays.Direct
                     },
                 },
             };
-            
         }
 
         private class DownloadButton : ClickableContainer

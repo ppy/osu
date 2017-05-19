@@ -9,7 +9,7 @@ using osu.Game.Beatmaps;
 namespace osu.Game.Database
 {
     internal class OnlineWorkingBeatmap : WorkingBeatmap
-	{
+    {
         private TextureStore textures;
         private TrackManager tracks;
 
