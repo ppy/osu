@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play
             var baseClock = Clock;
 
             if (AudioClock != null)
-                Clock = new FramedClock(AudioClock);
+                Clock = new FramedClock(AudioClock) { ProcessSourceClockFrames = false };
 
             Children = new Drawable[]
             {
