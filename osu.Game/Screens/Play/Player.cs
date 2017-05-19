@@ -166,13 +166,8 @@ namespace osu.Game.Screens.Play
                             Clock = offsetClock,
                             Children = new Drawable[]
                             {
+                                new SkipButton(firstObjectTime) { AudioClock = decoupledClock, Depth = 1 },
                                 HitRenderer,
-                                new SkipButton(firstObjectTime)
-                                {
-                                    AudioClock = decoupledClock,
-                                    Alpha = 0,
-                                    Margin = new MarginPadding { Bottom = 140 } // this is temporary
-                                },
                             }
                         },
                         hudOverlay = new StandardHUDOverlay
