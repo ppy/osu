@@ -198,8 +198,11 @@ namespace osu.Game.Screens.Select
             var pendingSelection = selectionChangedDebounce;
             selectionChangedDebounce = null;
 
-            pendingSelection?.RunTask();
-            pendingSelection?.Cancel(); // cancel the already scheduled task.
+            if (pendingSelection?.Completed == false)
+            {
+                pendingSelection?.RunTask();
+                pendingSelection?.Cancel(); // cancel the already scheduled task.
+            }
 
             if (Beatmap == null) return;
 
