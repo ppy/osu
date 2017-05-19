@@ -39,6 +39,13 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            FadeInFromZero(200, EasingTypes.Out);
+        }
+
         [BackgroundDependencyLoader]
         private void load(LocalisationEngine localisation, TextureStore textures)
         {

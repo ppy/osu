@@ -22,16 +22,16 @@ namespace osu.Game.Overlays
         private readonly FilterControl filter;
         private readonly FillFlowContainer<DirectPanel> panels;
 
+        private IEnumerable<BeatmapSetInfo> beatmapSets;
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
+            get { return beatmapSets; }
             set
             {
-                var p = new List<DirectPanel>();
+                if (beatmapSets == value) return;
+                beatmapSets = value;
 
-                foreach (BeatmapSetInfo b in value)
-                    p.Add(new DirectListPanel(b)); //todo: proper switching between grid/list
-
-                panels.Children = p;
+                recreatePanels(filter.DisplayStyle.Value);
             }
         }
 
@@ -110,6 +110,18 @@ namespace osu.Game.Overlays
             };
 
             filter.Search.Exit = Hide;
+            filter.DisplayStyle.ValueChanged += recreatePanels;
+        }
+
+        private void recreatePanels(PanelDisplayStyle displayStyle)
+        {
+            var p = new List<DirectPanel>();
+
+            foreach (BeatmapSetInfo b in BeatmapSets)
+                p.Add(displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)(new DirectGridPanel(b) { Width = 400}) :
+                                                               (DirectPanel)(new DirectListPanel(b)));
+
+            panels.Children = p;
         }
 
         protected override void PopIn()

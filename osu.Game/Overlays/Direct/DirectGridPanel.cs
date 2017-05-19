@@ -22,11 +22,14 @@ namespace osu.Game.Overlays.Direct
         private readonly float horizontal_padding = 10;
         private readonly float vertical_padding = 5;
 
+        private FillFlowContainer bottomPanel;
+
         public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
             CornerRadius = 4;
             Masking = true;
+
             EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Shadow,
@@ -34,6 +37,16 @@ namespace osu.Game.Overlays.Direct
                 Radius = 3f,
                 Colour = Color4.Black.Opacity(0.25f),
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            FadeInFromZero(200, EasingTypes.Out);
+            bottomPanel.LayoutDuration = 200;
+            bottomPanel.LayoutEasing = EasingTypes.Out;
+            bottomPanel.Origin = Anchor.BottomLeft;
         }
 
         [BackgroundDependencyLoader]
@@ -52,10 +65,10 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(0.5f),
                 },
-                new FillFlowContainer
+                bottomPanel = new FillFlowContainer
                 {
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
+                    Origin = Anchor.TopLeft,
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
