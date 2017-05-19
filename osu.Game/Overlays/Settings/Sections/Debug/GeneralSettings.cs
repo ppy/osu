@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
         protected override string Header => "General";
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkDebugConfigManager config)
+        private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig)
         {
             Children = new Drawable[]
             {
@@ -20,6 +20,11 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                 {
                     LabelText = "Bypass caching",
                     Bindable = config.GetBindable<bool>(FrameworkDebugConfig.BypassCaching)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Debug logs",
+                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 }
             };
         }
