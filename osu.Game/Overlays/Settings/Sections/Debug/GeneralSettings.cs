@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                 new SettingsCheckbox
                 {
                     LabelText = "Bypass caching",
-                    Bindable = config.GetBindable<bool>(FrameworkDebugConfig.BypassCaching)
+                    Bindable = config.GetBindable<bool>(DebugSetting.BypassCaching)
                 },
                 new SettingsCheckbox
                 {
