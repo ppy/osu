@@ -19,16 +19,21 @@ namespace osu.Game.Overlays.Direct
     {
         protected readonly BeatmapSetInfo SetInfo;
 
+        public DirectPanel(BeatmapSetInfo setInfo)
+        {
+            SetInfo = setInfo;
+        }
+
         protected IEnumerable<DifficultyIcon> GetDifficultyIcons()
         {
             var icons = new List<DifficultyIcon>();
-
+            
             foreach (var b in SetInfo.Beatmaps)
                 icons.Add(new DifficultyIcon(b));
-
+            
             return icons;
         }
-
+        
         protected Drawable GetBackground(TextureStore textures)
         {
             return new AsyncLoadWrapper(new Sprite
@@ -36,11 +41,6 @@ namespace osu.Game.Overlays.Direct
                 FillMode = FillMode.Fill,
                 Texture = new OnlineWorkingBeatmap(SetInfo.Beatmaps.FirstOrDefault(), textures, null).Background,
             }) { RelativeSizeAxes = Axes.Both };
-        }
-
-        public DirectPanel(BeatmapSetInfo setInfo)
-        {
-            SetInfo = setInfo;
         }
 
         public class Statistic : FillFlowContainer
