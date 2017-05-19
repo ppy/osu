@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
         public OsuEnumDropdown()
         {
             if (!typeof(T).IsEnum)
-                throw new InvalidOperationException("SettingsDropdown only supports enums as the generic type argument");
+                throw new InvalidOperationException("OsuEnumDropdown only supports enums as the generic type argument");
 
             List<KeyValuePair<string, T>> items = new List<KeyValuePair<string, T>>();
             foreach(var val in (T[])Enum.GetValues(typeof(T)))
