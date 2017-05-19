@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <summary>
         /// Whether this hit object can generate a note in the special column.
         /// </summary>
-        private bool hasSpecialColumn() => HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP) && HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH);
+        private bool hasSpecialColumn => HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP) && HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH);
 
         /// <summary>
         /// Generates a random pattern.
@@ -260,7 +260,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int noteCount = getRandomNoteCount(p2, p3, p4, p5);
             int siblings = noteCount;
 
-            if (RandomStart > 0 && hasSpecialColumn(HitObject.Samples))
+            if (RandomStart > 0 && hasSpecialColumn)
             {
                 siblings++;
                 addToPattern(pattern, 0, siblings);
@@ -288,7 +288,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (addToCentre)
                 siblings++;
-            if (RandomStart > 0 && hasSpecialColumn(HitObject.Samples))
+            if (RandomStart > 0 && hasSpecialColumn)
                 siblings++;
 
             int columnLimit = (AvailableColumns % 2 == 0 ? AvailableColumns : AvailableColumns - 1) / 2;
@@ -306,7 +306,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (addToCentre)
                 addToPattern(pattern, AvailableColumns / 2, siblings);
 
-            if (RandomStart > 0 && hasSpecialColumn(HitObject.Samples))
+            if (RandomStart > 0 && hasSpecialColumn)
                 addToPattern(pattern, 0, siblings);
 
             return pattern;
