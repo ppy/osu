@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Beatmaps\Patterns\Legacy\PatternGenerator.cs" />
     <Compile Include="Beatmaps\Patterns\PatternGenerator.cs" />
+    <Compile Include="Beatmaps\Patterns\Legacy\HitObjectPatternGenerator.cs" />
     <Compile Include="Beatmaps\Patterns\Legacy\PatternType.cs" />
     <Compile Include="Beatmaps\ManiaBeatmapConverter.cs" />
     <Compile Include="Beatmaps\Patterns\Pattern.cs" />
