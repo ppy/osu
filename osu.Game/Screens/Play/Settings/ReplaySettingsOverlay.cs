@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Input;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 
@@ -32,6 +33,7 @@ namespace osu.Game.Screens.Play.Settings
         {
             AlwaysPresent = true;
             Direction = FillDirection.Vertical;
+            AutoSizeAxes = Axes.Both;
             Spacing = new Vector2(0, 20);
 
             Add(new CollectionSettings());

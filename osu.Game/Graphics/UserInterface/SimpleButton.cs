@@ -42,35 +42,35 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                    content = new Container
-                    {
-                        Size = new Vector2(button_size),
-                        CornerRadius = 5,
-                        Masking = true,
+                content = new Container
+                {
+                    Size = new Vector2(button_size),
+                    CornerRadius = 5,
+                    Masking = true,
 
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        EdgeEffect = new EdgeEffect
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    EdgeEffect = new EdgeEffect
+                    {
+                        Colour = Color4.Black.Opacity(0.04f),
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 5,
+                    },
+                    Children = new Drawable[]
+                    {
+                        hover = new Box
                         {
-                            Colour = Color4.Black.Opacity(0.04f),
-                            Type = EdgeEffectType.Shadow,
-                            Radius = 5,
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
                         },
-                        Children = new Drawable[]
+                        icon = new TextAwesome
                         {
-                            hover = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0,
-                            },
-                            icon = new TextAwesome
-                            {
-                                TextSize = 18,
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre
-                            }
+                            TextSize = 18,
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre
                         }
                     }
+                }
             };
         }
 

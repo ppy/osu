@@ -19,7 +19,6 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                AutoSizeAxes = Axes.Both,
             });
         }
     }
