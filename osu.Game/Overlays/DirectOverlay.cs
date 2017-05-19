@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -81,7 +82,7 @@ namespace osu.Game.Overlays
                     Padding = new MarginPadding { Top = Header.HEIGHT },
                     Children = new Drawable[]
                     {
-                        new FillFlowContainer
+                        new ContentFlow
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -118,7 +119,7 @@ namespace osu.Game.Overlays
             var p = new List<DirectPanel>();
 
             foreach (BeatmapSetInfo b in BeatmapSets)
-                p.Add(displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)(new DirectGridPanel(b) { Width = 400}) :
+                p.Add(displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)(new DirectGridPanel(b) { Width = 400 }) :
                                                                (DirectPanel)(new DirectListPanel(b)));
 
             panels.Children = p;
@@ -137,6 +138,17 @@ namespace osu.Game.Overlays
             base.PopOut();
 
             filter.Search.HoldFocus = false;
+        }
+
+        private class ContentFlow : FillFlowContainer<Drawable>
+        {
+            protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
+            protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
+
+            public ContentFlow()
+            {
+                Direction = FillDirection.Vertical;
+            }
         }
     }
 }
