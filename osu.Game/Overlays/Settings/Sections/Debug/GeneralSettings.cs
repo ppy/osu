@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                 new SettingsCheckbox
                 {
                     LabelText = "Debug logs",
-                    Bindable = frameworkConfig.GetBindable<bool>(DebugSetting.ShowLogOverlay)
+                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 }
             };
         }
