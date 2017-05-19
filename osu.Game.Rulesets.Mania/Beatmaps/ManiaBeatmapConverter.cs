@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 {
     public class ManiaBeatmapConverter : BeatmapConverter<ManiaHitObject>
     {
-        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
+        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition), typeof(ManiaHitObject) };
 
         private Pattern lastPattern = new Pattern();
         private FastRandom random;
