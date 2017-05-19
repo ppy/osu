@@ -3,6 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Play.Settings;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -11,15 +13,44 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Settings visible in replay/auto";
 
+        private ExampleContainer container;
+
         public override void Reset()
         {
             base.Reset();
 
             Add(new ReplaySettingsOverlay()
             {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
+                IsAvaliable = true,
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
             });
+
+            Add(container = new ExampleContainer());
+
+            AddStep(@"Add button", () => container.Add(new OsuButton
+            {
+                RelativeSizeAxes = Axes.X,
+                Text = @"Button",
+            }));
+
+            AddStep(@"Add checkbox", () => container.Add(new SettingsCheckbox
+            {
+                LabelText = "Checkbox",
+            }));
+
+            AddStep(@"Add textbox", () => container.Add(new FocusedTextBox
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 30,
+                PlaceholderText = "Textbox",
+                HoldFocus = false,
+            }));
+        }
+
+        private class ExampleContainer : SettingsContainer
+        {
+            public override string Title => @"EXAMPLE";
         }
     }
 }
