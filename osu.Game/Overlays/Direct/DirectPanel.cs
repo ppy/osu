@@ -40,6 +40,7 @@ namespace osu.Game.Overlays.Direct
             {
                 FillMode = FillMode.Fill,
                 Texture = new OnlineWorkingBeatmap(SetInfo.Beatmaps.FirstOrDefault(), textures, null).Background,
+                OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
             }) { RelativeSizeAxes = Axes.Both };
         }
 
