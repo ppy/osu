@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public int? Columns;
 
-        public ManiaHitRenderer(WorkingBeatmap beatmap)
-            : base(beatmap)
+        public ManiaHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(beatmap, isForCurrentRuleset)
         {
         }
 
