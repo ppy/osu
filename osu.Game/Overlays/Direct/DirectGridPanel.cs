@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Direct
                                                     TextSize = 14,
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
-                                                    Alpha = SetInfo.Metadata.Source == @"" ? 0 : 1,
+                                                    Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
                                                 },
                                             },
                                         },

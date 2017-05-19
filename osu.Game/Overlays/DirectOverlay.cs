@@ -52,7 +52,7 @@ namespace osu.Game.Overlays
             ThirdWaveColour = OsuColour.FromHex(@"005774");
             FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
-            Header header = null;
+            Header header;
             Children = new Drawable[]
             {
                 new Box
@@ -119,13 +119,7 @@ namespace osu.Game.Overlays
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
         {
-            var p = new List<DirectPanel>();
-
-            foreach (BeatmapSetInfo b in BeatmapSets)
-                p.Add(displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)new DirectGridPanel(b) { Width = 400 } :
-                                                               new DirectListPanel(b));
-
-            panels.Children = p;
+            panels.Children = BeatmapSets.Select(b => displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)new DirectGridPanel(b) { Width = 400 } : new DirectListPanel(b));
         }
 
         protected override void PopIn()

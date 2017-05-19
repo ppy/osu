@@ -136,7 +136,7 @@ namespace osu.Game.Overlays.Direct
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     TextSize = 14,
-                                    Alpha = SetInfo.Metadata.Source == @"" ? 0 : 1,
+                                    Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
                                 },
                             },
                         },
@@ -190,7 +190,7 @@ namespace osu.Game.Overlays.Direct
 
             protected override void OnHoverLost(InputState state)
             {
-                icon.ScaleTo(1, 500, EasingTypes.OutElastic);
+                icon.ScaleTo(1f, 500, EasingTypes.OutElastic);
             }
         }
     }
