@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Database;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 using OpenTK;
 
@@ -136,9 +135,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             Pattern newPattern = conversion.Generate();
             lastPattern = newPattern;
 
-            var stairPatternGenerator = conversion as HitObjectPatternGenerator;
-            if (stairPatternGenerator != null)
-                lastStair = stairPatternGenerator.StairType;
+            var stairPatternGenerator = (HitObjectPatternGenerator)conversion;
+            lastStair = stairPatternGenerator.StairType;
 
             return newPattern.HitObjects;
         }

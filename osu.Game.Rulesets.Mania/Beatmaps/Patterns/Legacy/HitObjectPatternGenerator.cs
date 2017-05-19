@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     StairType = PatternType.ReverseStair;
                 }
 
-                addToPattern(pattern, targetColumn, 1);
+                addToPattern(pattern, targetColumn);
                 return pattern;
             }
 
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     StairType = PatternType.Stair;
                 }
 
-                addToPattern(pattern, targetColumn, 1);
+                addToPattern(pattern, targetColumn);
                 return pattern;
             }
 
@@ -282,7 +282,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         {
             var pattern = new Pattern();
 
-            bool addToCentre = false;
+            bool addToCentre;
             int noteCount = getRandomNoteCountMirrored(centreProbability, p2, p3, out addToCentre);
             int siblings = noteCount;
 
