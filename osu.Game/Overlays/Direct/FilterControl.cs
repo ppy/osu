@@ -46,10 +46,12 @@ namespace osu.Game.Overlays.Direct
             set { resultCounts = value; updateResultCounts(); }
         }
 
+        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || RankStatusDropdown.Contains(screenSpacePos);
+
         public FilterControl()
         {
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
+            Height = 35 + 32 + 30 + (padding * 2); // search + mode toggle buttons + sort tabs + padding
             DisplayStyle.Value = PanelDisplayStyle.Grid;
 
             Children = new Drawable[]
@@ -95,11 +97,11 @@ namespace osu.Game.Overlays.Direct
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
                     Spacing = new Vector2(10f, 0f),
                     Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Bottom = 5, Right = DirectOverlay.WIDTH_PADDING },
+                    Margin = new MarginPadding { Top = Height - 25 - padding, Right = DirectOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -109,8 +111,8 @@ namespace osu.Game.Overlays.Direct
                             Direction = FillDirection.Horizontal,
                             Children = new[]
                             {
-                                new DisplayModeToggleButton(FontAwesome.fa_th_large, PanelDisplayStyle.Grid, DisplayStyle),
-                                new DisplayModeToggleButton(FontAwesome.fa_list_ul, PanelDisplayStyle.List, DisplayStyle),
+                                new DisplayStyleToggleButton(FontAwesome.fa_th_large, PanelDisplayStyle.Grid, DisplayStyle),
+                                new DisplayStyleToggleButton(FontAwesome.fa_list_ul, PanelDisplayStyle.List, DisplayStyle),
                             },
                         },
                         RankStatusDropdown = new SlimEnumDropdown<RankStatus>
@@ -243,16 +245,16 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        private class DisplayModeToggleButton : ClickableContainer
+        private class DisplayStyleToggleButton : ClickableContainer
         {
             private readonly TextAwesome icon;
-            private readonly PanelDisplayStyle mode;
+            private readonly PanelDisplayStyle style;
             private readonly Bindable<PanelDisplayStyle> bindable;
 
-            public DisplayModeToggleButton(FontAwesome icon, PanelDisplayStyle mode, Bindable<PanelDisplayStyle> bindable)
+            public DisplayStyleToggleButton(FontAwesome icon, PanelDisplayStyle style, Bindable<PanelDisplayStyle> bindable)
             {
                 this.bindable = bindable;
-                this.mode = mode;
+                this.style = style;
                 Size = new Vector2(25f);
 
                 Children = new Drawable[]
@@ -270,12 +272,12 @@ namespace osu.Game.Overlays.Direct
 
                 bindable.ValueChanged += Bindable_ValueChanged;
                 Bindable_ValueChanged(bindable.Value);
-                Action = () => bindable.Value = this.mode;
+                Action = () => bindable.Value = this.style;
             }
 
-            private void Bindable_ValueChanged(PanelDisplayStyle mode)
+            private void Bindable_ValueChanged(PanelDisplayStyle style)
             {
-                icon.FadeTo(mode == this.mode ? 1.0f : 0.5f, 100);
+                icon.FadeTo(style == this.style ? 1.0f : 0.5f, 100);
             }
 
             protected override void Dispose(bool isDisposing)
