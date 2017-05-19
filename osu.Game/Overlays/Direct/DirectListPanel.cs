@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Database;
+using osu.Framework.Allocation;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -19,20 +21,6 @@ namespace osu.Game.Overlays.Direct
         private readonly float horizontal_padding = 10;
         private readonly float vertical_padding = 5;
         private readonly float height = 70;
-
-        private readonly Sprite background;
-        private readonly OsuSpriteText title, artist, author, source;
-        private readonly Statistic playCount, favouriteCount;
-        private readonly FillFlowContainer difficultyIcons;
-
-        protected override Sprite Background => background;
-        protected override OsuSpriteText Title => title;
-        protected override OsuSpriteText Artist => artist;
-        protected override OsuSpriteText Author => author;
-        protected override OsuSpriteText Source => source;
-        protected override Statistic PlayCount => playCount;
-        protected override Statistic FavouriteCount => favouriteCount;
-        protected override FillFlowContainer DifficultyIcons => difficultyIcons;
 
         public DirectListPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
@@ -47,7 +35,11 @@ namespace osu.Game.Overlays.Direct
                 Radius = 3f,
                 Colour = Color4.Black.Opacity(0.25f),
             };
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(LocalisationEngine localisation)
+        {
             Children = new Drawable[]
             {
                 new Box
@@ -55,7 +47,7 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                background = new Sprite
+                new Sprite
                 {
                     FillMode = FillMode.Fill,
                 },
@@ -76,19 +68,23 @@ namespace osu.Game.Overlays.Direct
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
-                                title = new OsuSpriteText
+                                new OsuSpriteText
                                 {
+                                    Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
                                     TextSize = 18,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
-                                artist = new OsuSpriteText
+                                new OsuSpriteText
                                 {
+                                    Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
                                     Font = @"Exo2.0-BoldItalic",
                                 },
-                                difficultyIcons = new FillFlowContainer
+                                new FillFlowContainer
                                 {
+                                    AutoSizeAxes = Axes.X,
+                                    Height = 20,
                                     Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
-                                    AutoSizeAxes = Axes.Both,
+                                    Children = DifficultyIcons,
                                 },
                             },
                         },
@@ -101,11 +97,11 @@ namespace osu.Game.Overlays.Direct
                             Margin = new MarginPadding { Right = (height - vertical_padding * 2) + vertical_padding },
                             Children = new Drawable[]
                             {
-                                playCount = new Statistic(FontAwesome.fa_play_circle)
+                                new Statistic(FontAwesome.fa_play_circle)
                                 {
-                                	Margin = new MarginPadding { Right = 1 },
+                                    Margin = new MarginPadding { Right = 1 },
                                 },
-                                favouriteCount = new Statistic(FontAwesome.fa_heart),
+                                new Statistic(FontAwesome.fa_heart),
                                 new FillFlowContainer
                                 {
                                     Anchor = Anchor.TopRight,
@@ -119,15 +115,17 @@ namespace osu.Game.Overlays.Direct
                                             Text = @"mapped by ",
                                             TextSize = 14,
                                         },
-                                        author = new OsuSpriteText
+                                        new OsuSpriteText
                                         {
+                                            Text = SetInfo.Metadata.Author,
                                             TextSize = 14,
                                             Font = @"Exo2.0-SemiBoldItalic",
                                         },
                                     },
                                 },
-                                source = new OsuSpriteText
+                                new OsuSpriteText
                                 {
+                                    Text = $@"from {SetInfo.Metadata.Source}",
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     TextSize = 14,
@@ -143,6 +141,7 @@ namespace osu.Game.Overlays.Direct
                     },
                 },
             };
+            
         }
 
         private class DownloadButton : ClickableContainer

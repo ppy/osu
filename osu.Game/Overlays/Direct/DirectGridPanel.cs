@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -8,6 +9,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -18,20 +21,6 @@ namespace osu.Game.Overlays.Direct
     {
         private readonly float horizontal_padding = 10;
         private readonly float vertical_padding = 5;
-
-        private readonly Sprite background;
-        private readonly OsuSpriteText title, artist, authorPrefix, author, source;
-        private readonly Statistic playCount, favouriteCount;
-        private readonly FillFlowContainer difficultyIcons;
-
-        protected override Sprite Background => background;
-        protected override OsuSpriteText Title => title;
-        protected override OsuSpriteText Artist => artist;
-        protected override OsuSpriteText Author => author;
-        protected override OsuSpriteText Source => source;
-        protected override Statistic PlayCount => playCount;
-        protected override Statistic FavouriteCount => favouriteCount;
-        protected override FillFlowContainer DifficultyIcons => difficultyIcons;
 
         public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
@@ -45,7 +34,11 @@ namespace osu.Game.Overlays.Direct
                 Radius = 3f,
                 Colour = Color4.Black.Opacity(0.25f),
             };
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, LocalisationEngine localisation)
+        {
             Children = new Drawable[]
             {
                 new Box
@@ -53,7 +46,7 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                background = new Sprite
+                new Sprite
                 {
                     FillMode = FillMode.Fill,
                 },
@@ -79,13 +72,15 @@ namespace osu.Game.Overlays.Direct
                             Direction = FillDirection.Vertical,
                             Children = new[]
                             {
-                                title = new OsuSpriteText
+                                new OsuSpriteText
                                 {
+                                    Text = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
                                     TextSize = 18,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
-                                artist = new OsuSpriteText
+                                new OsuSpriteText
                                 {
+                                    Text = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
                                     Font = @"Exo2.0-BoldItalic",
                                 },
                             },
@@ -114,29 +109,36 @@ namespace osu.Game.Overlays.Direct
                                             Direction = FillDirection.Horizontal,
                                             Children = new[]
                                             {
-                                                authorPrefix = new OsuSpriteText
+                                                new OsuSpriteText
                                                 {
                                                     Text = @"mapped by ",
                                                     TextSize = 14,
                                                     Shadow = false,
+                                                    Colour = colours.Gray5,
                                                 },
-                                                author = new OsuSpriteText
+                                                new OsuSpriteText
                                                 {
+                                                    Text = SetInfo.Metadata.Author,
                                                     TextSize = 14,
                                                     Font = @"Exo2.0-SemiBoldItalic",
                                                     Shadow = false,
+                                                    Colour = colours.BlueDark,
                                                 },
                                             },
                                         },
-                                        source = new OsuSpriteText
+                                        new OsuSpriteText
                                         {
+                                            Text = $@"from {SetInfo.Metadata.Source}",
                                             TextSize = 14,
                                             Shadow = false,
+                                            Colour = colours.Gray5,
                                         },
-                                        difficultyIcons = new FillFlowContainer
+                                        new FillFlowContainer
                                         {
+                                            AutoSizeAxes = Axes.X,
+                                            Height = 20,
                                             Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding  },
-                                            AutoSizeAxes = Axes.Both,
+                                            Children = DifficultyIcons,
                                         },
                                     },
                                 },
@@ -153,22 +155,14 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Top = vertical_padding, Right = vertical_padding },
                     Children = new[]
                     {
-                        playCount = new Statistic(FontAwesome.fa_play_circle)
+                        new Statistic(FontAwesome.fa_play_circle)
                         {
-	                        Margin = new MarginPadding { Right = 1 },
+                            Margin = new MarginPadding { Right = 1 },
                         },
-                        favouriteCount = new Statistic(FontAwesome.fa_heart),
+                        new Statistic(FontAwesome.fa_heart),
                     },
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-        	authorPrefix.Colour = colours.Gray5;
-        	Author.Colour = colours.BlueDark;
-        	Source.Colour = colours.Gray5;
         }
     }
 }
