@@ -15,6 +15,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics.Textures;
 using System.Linq;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -153,12 +154,14 @@ namespace osu.Game.Overlays.Direct
 
         private class DownloadButton : ClickableContainer
         {
+            private readonly TextAwesome icon;
+
             //todo: proper download button animations
             public DownloadButton()
             {
                 Children = new Drawable[]
                 {
-                    new TextAwesome
+                    icon = new TextAwesome
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -167,6 +170,29 @@ namespace osu.Game.Overlays.Direct
                         Icon = FontAwesome.fa_osu_chevron_down_o,
                     },
                 };
+            }
+
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            {
+                icon.ScaleTo(0.9f, 1000, EasingTypes.Out);
+                return base.OnMouseDown(state, args);
+            }
+
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            {
+                icon.ScaleTo(1f, 500, EasingTypes.OutElastic);
+                return base.OnMouseUp(state, args);
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                icon.ScaleTo(1.1f, 500, EasingTypes.OutElastic);
+                return base.OnHover(state);
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                icon.ScaleTo(1, 500, EasingTypes.OutElastic);
             }
         }
     }
