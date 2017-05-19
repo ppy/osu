@@ -76,6 +76,7 @@ namespace osu.Game.Overlays
                         {
                             TextSize = 24,
                             Font = @"Exo2.0-Light",
+                            Padding = new MarginPadding { Left = 10, Right = 10 },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.BottomCentre,
                         },
