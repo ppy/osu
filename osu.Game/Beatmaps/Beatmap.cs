@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects;
@@ -17,6 +18,7 @@ namespace osu.Game.Beatmaps
     {
         public BeatmapInfo BeatmapInfo;
         public TimingInfo TimingInfo = new TimingInfo();
+        public EventInfo EventInfo = new EventInfo();
         public readonly List<Color4> ComboColors = new List<Color4>
         {
             new Color4(17, 136, 170, 255),
@@ -40,6 +42,7 @@ namespace osu.Game.Beatmaps
         {
             BeatmapInfo = original?.BeatmapInfo ?? BeatmapInfo;
             TimingInfo = original?.TimingInfo ?? TimingInfo;
+            EventInfo = original?.EventInfo ?? EventInfo;
             ComboColors = original?.ComboColors ?? ComboColors;
         }
     }

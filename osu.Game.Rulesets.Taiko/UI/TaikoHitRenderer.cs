@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class TaikoHitRenderer : HitRenderer<TaikoHitObject, TaikoJudgement>
     {
-        public TaikoHitRenderer(WorkingBeatmap beatmap)
-            : base(beatmap)
+        public TaikoHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(beatmap, isForCurrentRuleset)
         {
         }
 

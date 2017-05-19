@@ -18,12 +18,13 @@ namespace osu.Game.Rulesets
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         /// <summary>
-        /// Attempt to create a HitRenderer for the provided beatmap.
+        /// Attempt to create a hit renderer for a beatmap
         /// </summary>
-        /// <param name="beatmap"></param>
+        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="isForCurrentRuleset">Whether the hit renderer should assume the beatmap is for the current ruleset.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
-        public abstract HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap);
+        public abstract HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap);
 
