@@ -160,13 +160,13 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
+                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Clock = offsetClock,
                             Children = new Drawable[]
                             {
-                                new SkipButton(firstObjectTime) { AudioClock = decoupledClock, Depth = 1 },
                                 HitRenderer,
                             }
                         },

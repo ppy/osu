@@ -54,6 +54,11 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            var baseClock = Clock;
+
+            if (AudioClock != null)
+                Clock = new FramedClock(AudioClock);
+
             Children = new Drawable[]
             {
                 fadeContainer = new FadeContainer
@@ -63,6 +68,7 @@ namespace osu.Game.Screens.Play
                     {
                         button = new Button
                         {
+                            Clock = baseClock,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -109,7 +115,7 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             base.Update();
-            remainingTimeBox.Width = (float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime));
+            remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, EasingTypes.OutQuint);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -273,9 +279,10 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnClick(InputState state)
             {
-                box.FlashColour(Color4.White, 500, EasingTypes.OutQuint);
-
                 Action?.Invoke();
+
+                box.FlashColour(Color4.White, 500, EasingTypes.OutQuint);
+                aspect.ScaleTo(1.2f, 2000, EasingTypes.OutQuint);
                 return true;
             }
         }
