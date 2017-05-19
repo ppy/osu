@@ -49,14 +49,7 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
-                    {
-                        GetBackground(textures),
-                    },
-                },
+                GetBackground(textures),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
