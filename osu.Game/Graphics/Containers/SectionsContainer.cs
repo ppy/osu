@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -47,6 +48,9 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
+        public Bindable<Drawable> SelectedSection { get; } = new Bindable<Drawable>();
+        public void ScrollToSection(Drawable section) => scrollContainer.ScrollIntoView(section);
+
         private List<Drawable> sections = new List<Drawable>();
         public IEnumerable<Drawable> Sections
         {
@@ -64,6 +68,7 @@ namespace osu.Game.Graphics.Containers
                 originalSectionMargin = sections[0].Margin;
                 updateSectionMargin();
                 scrollContainer.Add(sections);
+                SelectedSection.Value = sections[0];
             }
         }
 
@@ -86,6 +91,7 @@ namespace osu.Game.Graphics.Containers
             });
         }
 
+        float lastKnownScroll;
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -96,6 +102,28 @@ namespace osu.Game.Graphics.Containers
 
             expandableHeader.Y = -offset;
             fixedHeader.Y = -offset + expandableHeader.Height;
+
+            float currentScroll = scrollContainer.Current;
+            if (currentScroll != lastKnownScroll)
+            {
+                lastKnownScroll = currentScroll;
+
+                Drawable bestMatch = null;
+                float minDiff = float.MaxValue;
+
+                foreach (var section in sections)
+                {
+                    float diff = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll);
+                    if (diff < minDiff)
+                    {
+                        minDiff = diff;
+                        bestMatch = section;
+                    }
+                }
+
+                if (bestMatch != null)
+                    SelectedSection.Value = bestMatch;
+            }
         }
     }
 }
