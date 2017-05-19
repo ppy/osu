@@ -20,11 +20,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private Pattern lastPattern = new Pattern();
         private FastRandom random;
+        private Beatmap beatmap;
         private bool isForCurrentRuleset;
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(Beatmap original, bool isForCurrentRuleset)
         {
             this.isForCurrentRuleset = isForCurrentRuleset;
+
+            beatmap = original;
 
             BeatmapDifficulty difficulty = original.BeatmapInfo.Difficulty;
 
@@ -43,11 +46,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield break;
             }
 
-            IEnumerable<ManiaHitObject> objects;
-            if (isForCurrentRuleset)
-                objects = generateSpecific(original, beatmap);
-            else
-                objects = generateConverted(original, beatmap);
+            var objects = isForCurrentRuleset ? generateSpecific(original) : generateConverted(original);
 
             if (objects == null)
                 yield break;
@@ -60,9 +59,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// Method that generates hit objects for osu!mania specific beatmaps.
         /// </summary>
         /// <param name="original">The original hit object.</param>
-        /// <param name="beatmap">The beatmap.</param>
         /// <returns>The hit objects generated.</returns>
-        private IEnumerable<ManiaHitObject> generateSpecific(HitObject original, Beatmap beatmap)
+        private IEnumerable<ManiaHitObject> generateSpecific(HitObject original)
         {
             var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, lastPattern);
 
@@ -76,9 +74,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// Method that generates hit objects for non-osu!mania beatmaps.
         /// </summary>
         /// <param name="original">The original hit object.</param>
-        /// <param name="beatmap">The beatmap.</param>
         /// <returns>The hit objects generated.</returns>
-        private IEnumerable<ManiaHitObject> generateConverted(HitObject original, Beatmap beatmap)
+        private IEnumerable<ManiaHitObject> generateConverted(HitObject original)
         {
             var endTimeData = original as IHasEndTime;
             var distanceData = original as IHasDistance;
