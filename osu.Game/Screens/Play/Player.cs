@@ -63,8 +63,6 @@ namespace osu.Game.Screens.Play
 
         #endregion
 
-        private SkipButton skipButton;
-
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
 
@@ -169,8 +167,9 @@ namespace osu.Game.Screens.Play
                             Children = new Drawable[]
                             {
                                 HitRenderer,
-                                skipButton = new SkipButton
+                                new SkipButton(firstObjectTime)
                                 {
+                                    AudioClock = decoupledClock,
                                     Alpha = 0,
                                     Margin = new MarginPadding { Bottom = 140 } // this is temporary
                                 },
@@ -217,33 +216,6 @@ namespace osu.Game.Screens.Play
 
             //bind ScoreProcessor to ourselves (for a fail situation)
             scoreProcessor.Failed += onFail;
-        }
-
-        private void initializeSkipButton()
-        {
-            const double skip_required_cutoff = 3000;
-            const double fade_time = 300;
-
-            double firstHitObject = Beatmap.Beatmap.HitObjects.First().StartTime;
-
-            if (firstHitObject < skip_required_cutoff)
-            {
-                skipButton.Alpha = 0;
-                skipButton.Expire();
-                return;
-            }
-
-            skipButton.FadeInFromZero(fade_time);
-
-            skipButton.Action = () =>
-            {
-                decoupledClock.Seek(firstHitObject - skip_required_cutoff - fade_time);
-                skipButton.Action = null;
-            };
-
-            skipButton.Delay(firstHitObject - skip_required_cutoff - fade_time);
-            skipButton.FadeOut(fade_time);
-            skipButton.Expire();
         }
 
         public void Restart()
@@ -308,7 +280,6 @@ namespace osu.Game.Screens.Play
             Schedule(() =>
             {
                 decoupledClock.Start();
-                initializeSkipButton();
             });
 
             pauseContainer.Alpha = 0;

@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK.Input;
@@ -13,8 +14,12 @@ namespace osu.Game.Screens.Play
 {
     public class SkipButton : TwoLayerButton
     {
-        public SkipButton()
+        private readonly double startTime;
+        public IAdjustableClock AudioClock;
+
+        public SkipButton(double startTime)
         {
+            this.startTime = startTime;
             Text = @"Skip";
             Icon = FontAwesome.fa_osu_right_o;
             Anchor = Anchor.BottomRight;
@@ -27,6 +32,24 @@ namespace osu.Game.Screens.Play
             ActivationSound = audio.Sample.Get(@"Menu/menuhit");
             BackgroundColour = colours.Yellow;
             HoverColour = colours.YellowDark;
+
+            const double skip_required_cutoff = 3000;
+            const double fade_time = 300;
+
+            if (startTime < skip_required_cutoff)
+            {
+                Alpha = 0;
+                Expire();
+                return;
+            }
+
+            FadeInFromZero(fade_time);
+
+            Action = () => AudioClock.Seek(startTime - skip_required_cutoff - fade_time);
+
+            Delay(startTime - skip_required_cutoff - fade_time);
+            FadeOut(fade_time);
+            Expire();
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
