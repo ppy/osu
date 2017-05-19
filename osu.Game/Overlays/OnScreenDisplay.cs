@@ -76,6 +76,7 @@ namespace osu.Game.Overlays
                         {
                             TextSize = 24,
                             Font = @"Exo2.0-Light",
+                            Padding = new MarginPadding { Left = 10, Right = 10 },
                             Anchor = Anchor.Centre,
                             Origin = Anchor.BottomCentre,
                         },
@@ -116,7 +117,7 @@ namespace osu.Game.Overlays
         private void load(FrameworkConfigManager frameworkConfig)
         {
             trackSetting(frameworkConfig.GetBindable<FrameSync>(FrameworkSetting.FrameSync), v => display(v, "Frame Limiter", v.GetDescription(), "Ctrl+F7"));
-            trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.AudioDevice), v => display(v, "Audio Device", v, v));
+            trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.AudioDevice), v => display(v, "Audio Device", string.IsNullOrEmpty(v) ? "Default" : v, v));
             trackSetting(frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay), v => display(v, "Debug Logs", v ? "visible" : "hidden", "Ctrl+F10"));
 
             Action displayResolution = delegate { display(null, "Screen Resolution", frameworkConfig.Get<int>(FrameworkSetting.Width) + "x" + frameworkConfig.Get<int>(FrameworkSetting.Height)); };
