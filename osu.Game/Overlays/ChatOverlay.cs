@@ -44,8 +44,6 @@ namespace osu.Game.Overlays
 
         public const float TAB_AREA_HEIGHT = 50;
 
-        public const int CHANNEL_SELECTOR_ID = -1;
-
         private GetMessagesRequest fetchReq;
 
         private readonly ChatTabControl channelTabs;
@@ -264,16 +262,7 @@ namespace osu.Game.Overlays
             {
                 if (currentChannel == value) return;
 
-                if (value.Id == CHANNEL_SELECTOR_ID)
-                {
-                    //channel selector popout
-                    currentChannel = value;
-                    return;
-                }
-                else if (currentChannel?.Id == CHANNEL_SELECTOR_ID)
-                {
-                    //channel selector popin
-                }
+                if (channelTabs.ChannelSelectorActive) return;
 
                 if (currentChannel != null)
                     currentChannelContainer.Clear(false);

@@ -14,14 +14,19 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Chat
 {
     public class ChatTabControl : OsuTabControl<Channel>
     {
-        protected override TabItem<Channel> CreateTabItem(Channel value) => value.Id == ChatOverlay.CHANNEL_SELECTOR_ID ? new ChannelTabItem.ChannelSelectorTabItem(value) : new ChannelTabItem(value);
+        protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value);
 
         private const float shear_width = 10;
+
+        private Bindable<bool> channelSelectorActive = new Bindable<bool>();
+
+        public Bindable<bool> ChannelSelectorActive => channelSelectorActive;
 
         public ChatTabControl()
         {
@@ -38,10 +43,7 @@ namespace osu.Game.Overlays.Chat
                 Padding = new MarginPadding(10),
             });
 
-            AddItem(new Channel
-            {
-                Id = ChatOverlay.CHANNEL_SELECTOR_ID,
-            });
+            AddTabItem(new ChannelTabItem.ChannelSelectorTabItem(new Channel(), channelSelectorActive));
         }
 
         private class ChannelTabItem : TabItem<Channel>
@@ -200,8 +202,21 @@ namespace osu.Game.Overlays.Chat
 
             public class ChannelSelectorTabItem : ChannelTabItem
             {
-                public ChannelSelectorTabItem(Channel value) : base(value)
+                public override bool Active
                 {
+                    get { return base.Active; }
+                    set
+                    {
+                        activeBindable.Value = value;
+                        base.Active = value;
+                    }
+                }
+
+                private Bindable<bool> activeBindable;
+
+                public ChannelSelectorTabItem(Channel value, Bindable<bool> active) : base(value)
+                {
+                    activeBindable = active;
                     Depth = float.MaxValue;
                     Width = 60;
 
