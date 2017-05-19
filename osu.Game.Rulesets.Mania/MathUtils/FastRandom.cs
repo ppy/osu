@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
     /// </summary>
     internal class FastRandom
     {
-        private const double uint_to_real = 1.0 / (int.MaxValue + 1.0);
+        private const double uint_to_real = 1.0 / (uint.MaxValue + 1.0);
         private const uint int_mask = 0x7FFFFFFF;
         private const uint y = 842502087;
         private const uint z = 3579807591;
