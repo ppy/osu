@@ -91,25 +91,25 @@ namespace osu.Game.Rulesets.Osu.Replays
             // Make the cursor stay at a hitObject as long as possible (mainly for autopilot).
             if (h.StartTime - h.HitWindowFor(OsuScoreResult.Miss) > endTime + h.HitWindowFor(OsuScoreResult.Hit50) + 50)
             {
-                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindowFor(OsuScoreResult.Hit50), prev.EndPosition.X, prev.EndPosition.Y, ReplayButtonState.None));
-                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindowFor(OsuScoreResult.Miss), h.Position.X, h.Position.Y, ReplayButtonState.None));
+                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindowFor(OsuScoreResult.Hit50), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
+                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindowFor(OsuScoreResult.Miss), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
             }
             else if (h.StartTime - h.HitWindowFor(OsuScoreResult.Hit50) > endTime + h.HitWindowFor(OsuScoreResult.Hit50) + 50)
             {
-                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindowFor(OsuScoreResult.Hit50), prev.EndPosition.X, prev.EndPosition.Y, ReplayButtonState.None));
-                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindowFor(OsuScoreResult.Hit50), h.Position.X, h.Position.Y, ReplayButtonState.None));
+                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindowFor(OsuScoreResult.Hit50), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
+                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindowFor(OsuScoreResult.Hit50), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
             }
             else if (h.StartTime - h.HitWindowFor(OsuScoreResult.Hit100) > endTime + h.HitWindowFor(OsuScoreResult.Hit100) + 50)
             {
-                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindowFor(OsuScoreResult.Hit100), prev.EndPosition.X, prev.EndPosition.Y, ReplayButtonState.None));
-                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindowFor(OsuScoreResult.Hit100), h.Position.X, h.Position.Y, ReplayButtonState.None));
+                if (!(prev is Spinner) && h.StartTime - endTime < 1000) AddFrameToReplay(new ReplayFrame(endTime + h.HitWindowFor(OsuScoreResult.Hit100), prev.StackedEndPosition.X, prev.StackedEndPosition.Y, ReplayButtonState.None));
+                if (!(h is Spinner)) AddFrameToReplay(new ReplayFrame(h.StartTime - h.HitWindowFor(OsuScoreResult.Hit100), h.StackedPosition.X, h.StackedPosition.Y, ReplayButtonState.None));
             }
         }
 
         private void addHitObjectReplay(OsuHitObject h)
         {
             // Default values for circles/sliders
-            Vector2 startPosition = h.Position;
+            Vector2 startPosition = h.StackedPosition;
             EasingTypes easing = preferredEasing;
             float spinnerDirection = -1;
 
@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             // TODO: Why do we delay 1 ms if the object is a spinner? There already is KEY_UP_DELAY from hEndTime.
             double hEndTime = ((h as IHasEndTime)?.EndTime ?? h.StartTime) + KEY_UP_DELAY;
             int endDelay = h is Spinner ? 1 : 0;
-            ReplayFrame endFrame = new ReplayFrame(hEndTime + endDelay, h.EndPosition.X, h.EndPosition.Y, ReplayButtonState.None);
+            ReplayFrame endFrame = new ReplayFrame(hEndTime + endDelay, h.StackedEndPosition.X, h.StackedEndPosition.Y, ReplayButtonState.None);
 
             // Decrement because we want the previous frame, not the next one
             int index = FindInsertionIndex(startFrame) - 1;
