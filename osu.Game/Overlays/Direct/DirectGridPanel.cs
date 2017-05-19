@@ -19,8 +19,8 @@ namespace osu.Game.Overlays.Direct
 {
     public class DirectGridPanel : DirectPanel
     {
-        private readonly float horizontal_padding = 10;
-        private readonly float vertical_padding = 5;
+        private const float horizontal_padding = 10;
+        private const float vertical_padding = 5;
 
         private FillFlowContainer bottomPanel;
 
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Direct
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, LocalisationEngine localisation, TextureStore textures)
         {
-            Children = new Drawable[]
+            Children = new[]
             {
                 new Box
                 {

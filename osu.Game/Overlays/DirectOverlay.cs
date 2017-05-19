@@ -17,10 +17,8 @@ namespace osu.Game.Overlays
     public class DirectOverlay : WaveOverlayContainer
     {
         public static readonly int WIDTH_PADDING = 80;
-        private readonly float panel_padding = 10f;
+        private const float panel_padding = 10f;
 
-        private readonly Box background;
-        private readonly Header header;
         private readonly FilterControl filter;
         private readonly FillFlowContainer<DirectPanel> panels;
 
@@ -30,7 +28,7 @@ namespace osu.Game.Overlays
             get { return beatmapSets; }
             set
             {
-                if (beatmapSets == value) return;
+                if (value == beatmapSets) return;
                 beatmapSets = value;
 
                 recreatePanels(filter.DisplayStyle.Value);
@@ -54,9 +52,10 @@ namespace osu.Game.Overlays
             ThirdWaveColour = OsuColour.FromHex(@"005774");
             FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
+            Header header = null;
             Children = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.FromHex(@"485e74"),
@@ -111,10 +110,10 @@ namespace osu.Game.Overlays
                 },
             };
 
-            header.Tabs.Current.ValueChanged += (tab) => { if (tab != DirectTab.Search) filter.Search.Current.Value = @""; };
+            header.Tabs.Current.ValueChanged += tab => { if (tab != DirectTab.Search) filter.Search.Current.Value = @""; };
 
             filter.Search.Exit = Hide;
-            filter.Search.Current.ValueChanged += (s) => { if (s != @"") header.Tabs.Current.Value = DirectTab.Search; };
+            filter.Search.Current.ValueChanged += text => { if (text != @"") header.Tabs.Current.Value = DirectTab.Search; };
             filter.DisplayStyle.ValueChanged += recreatePanels;
         }
 
@@ -123,8 +122,8 @@ namespace osu.Game.Overlays
             var p = new List<DirectPanel>();
 
             foreach (BeatmapSetInfo b in BeatmapSets)
-                p.Add(displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)(new DirectGridPanel(b) { Width = 400 }) :
-                                                               (DirectPanel)(new DirectListPanel(b)));
+                p.Add(displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)new DirectGridPanel(b) { Width = 400 } :
+                                                               new DirectListPanel(b));
 
             panels.Children = p;
         }

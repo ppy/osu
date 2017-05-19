@@ -10,8 +10,8 @@ namespace osu.Game.Database
 {
     internal class OnlineWorkingBeatmap : WorkingBeatmap
     {
-        private TextureStore textures;
-        private TrackManager tracks;
+        private readonly TextureStore textures;
+        private readonly TrackManager tracks;
 
         public OnlineWorkingBeatmap(BeatmapInfo beatmapInfo, TextureStore textures, TrackManager tracks) : base(beatmapInfo)
         {

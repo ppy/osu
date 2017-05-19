@@ -3,12 +3,9 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Direct;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -41,7 +38,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             var ruleset = rulesets.GetRuleset(0);
 
-            direct.BeatmapSets = new BeatmapSetInfo[]
+            direct.BeatmapSets = new[]
             {
                 new BeatmapSetInfo
                 {
