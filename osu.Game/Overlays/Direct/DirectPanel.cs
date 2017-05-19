@@ -1,12 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using OpenTK;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -16,32 +15,26 @@ namespace osu.Game.Overlays.Direct
 {
     public abstract class DirectPanel : Container
     {
-        protected virtual Sprite Background { get; }
-        protected virtual OsuSpriteText Title { get; }
-        protected virtual OsuSpriteText Artist { get; }
-        protected virtual OsuSpriteText Author { get; }
-        protected virtual OsuSpriteText Source { get; }
-        protected virtual Statistic PlayCount { get; }
-        protected virtual Statistic FavouriteCount { get; }
-        protected virtual FillFlowContainer DifficultyIcons { get; }
+        protected readonly BeatmapSetInfo SetInfo;
 
-        private BeatmapSetInfo setInfo;
-
-        [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation)
+        protected IEnumerable<DifficultyIcon> DifficultyIcons
         {
-            Title.Current = localisation.GetUnicodePreference(setInfo.Metadata.TitleUnicode, setInfo.Metadata.Title);
-            Artist.Current = localisation.GetUnicodePreference(setInfo.Metadata.ArtistUnicode, setInfo.Metadata.Artist);
-            Author.Text = setInfo.Metadata.Author;
-            Source.Text = @"from " + setInfo.Metadata.Source;
+            get
+            {
+                var icons = new List<DifficultyIcon>();
 
-            foreach (var b in setInfo.Beatmaps)
-                DifficultyIcons.Add(new DifficultyIcon(b));
+                foreach (var b in SetInfo.Beatmaps)
+                    icons.Add(new DifficultyIcon(b));
+
+                return icons;
+            }
         }
+
+        //todo: Direct panel backgrounds
 
         public DirectPanel(BeatmapSetInfo setInfo)
         {
-            this.setInfo = setInfo;
+            SetInfo = setInfo;
         }
 
         public class Statistic : FillFlowContainer
