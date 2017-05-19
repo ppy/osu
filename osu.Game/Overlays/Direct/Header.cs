@@ -81,7 +81,6 @@ namespace osu.Game.Overlays.Direct
                 },
             };
 
-            //todo: possibly restore from config instead
             Tabs.Current.Value = DirectTab.Search;
             Tabs.Current.TriggerChange();
         }
@@ -102,7 +101,7 @@ namespace osu.Game.Overlays.Direct
                 AccentColour = Color4.White;
             }
 
-            private class DirectTabItem : OsuTabControl<DirectTab>.OsuTabItem
+            private class DirectTabItem : OsuTabItem
             {
                 public DirectTabItem(DirectTab value) : base(value)
                 {

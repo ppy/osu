@@ -27,6 +27,8 @@ namespace osu.Game.Overlays.Direct
         /// </summary>
         public static readonly float LOWER_HEIGHT = 21;
 
+        private const float padding = 10;
+
         private readonly Box tabStrip;
         private readonly FillFlowContainer<RulesetToggleButton> modeButtons;
         private FillFlowContainer resultCountsContainer;
@@ -68,18 +70,19 @@ namespace osu.Game.Overlays.Direct
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = DirectOverlay.WIDTH_PADDING, Right = DirectOverlay.WIDTH_PADDING, Top = 10 },
+                    Padding = new MarginPadding { Left = DirectOverlay.WIDTH_PADDING, Right = DirectOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
                         Search = new DirectSearchTextBox
                         {
                             RelativeSizeAxes = Axes.X,
+                            Margin = new MarginPadding { Top = padding },
                         },
                         modeButtons = new FillFlowContainer<RulesetToggleButton>
                         {
                             AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(10f, 0f),
-                            Margin = new MarginPadding { Top = 10f },
+                            Spacing = new Vector2(padding, 0f),
+                            Margin = new MarginPadding { Top = padding },
                         },
                         SortTabs = new SortTabControl
                         {
@@ -118,7 +121,6 @@ namespace osu.Game.Overlays.Direct
                 },
             };
 
-            //todo: possibly restore from config
             RankStatusDropdown.Current.Value = RankStatus.RankedApproved;
             SortTabs.Current.Value = SortCriteria.Title;
             SortTabs.Current.TriggerChange();
@@ -250,33 +252,33 @@ namespace osu.Game.Overlays.Direct
         }
     }
 
-    public enum RankStatus
-    {
-    	Any,
-    	[Description("Ranked & Approved")]
-    	RankedApproved,
-    	Approved,
-    	Loved,
-    	Favourites,
-    	[Description("Mod Requests")]
-    	ModRequests,
-    	Pending,
-    	Graveyard,
-    	[Description("My Maps")]
-    	MyMaps,
-    }
-
     public class ResultCounts
     {
         public readonly int Artists;
         public readonly int Songs;
         public readonly int Tags;
-
+        
         public ResultCounts(int artists, int songs, int tags)
         {
             Artists = artists;
             Songs = songs;
             Tags = tags;
         }
+    }
+
+    public enum RankStatus
+    {
+        Any,
+        [Description("Ranked & Approved")]
+        RankedApproved,
+        Approved,
+        Loved,
+        Favourites,
+        [Description("Mod Requests")]
+        ModRequests,
+        Pending,
+        Graveyard,
+        [Description("My Maps")]
+        MyMaps,
     }
 }
