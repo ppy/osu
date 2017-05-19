@@ -4,8 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -26,10 +24,11 @@ namespace osu.Game.Graphics.Containers
             {
                 if (value == expandableHeader) return;
 
-                scrollContainer.Remove(expandableHeader);
+                Remove(expandableHeader);
                 expandableHeader = value;
                 expandableHeader.Depth = float.MinValue;
-                scrollContainer.Add(expandableHeader);
+                Add(expandableHeader);
+                updateSectionMargin();
             }
         }
 
@@ -40,10 +39,11 @@ namespace osu.Game.Graphics.Containers
             {
                 if (value == fixedHeader) return;
 
-                scrollContainer.Remove(fixedHeader);
+                Remove(fixedHeader);
                 fixedHeader = value;
                 fixedHeader.Depth = float.MinValue / 2;
-                scrollContainer.Add(fixedHeader);
+                Add(fixedHeader);
+                updateSectionMargin();
             }
         }
 
@@ -59,8 +59,23 @@ namespace osu.Game.Graphics.Containers
                     scrollContainer.Remove(section);
 
                 sections = value.ToList();
-                scrollContainer.Add(value);
+                if (sections.Count == 0) return;
+
+                originalSectionMargin = sections[0].Margin;
+                updateSectionMargin();
+                scrollContainer.Add(sections);
             }
+        }
+
+        private MarginPadding originalSectionMargin;
+        private void updateSectionMargin()
+        {
+            if (sections.Count == 0) return;
+
+            var newMargin = originalSectionMargin;
+            newMargin.Top += ExpandableHeader?.Height ?? 0 + FixedHeader?.Height ?? 0;
+
+            sections[0].Margin = newMargin;
         }
 
         public SectionsContainer()
@@ -69,6 +84,18 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both
             });
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            if (expandableHeader == null) return;
+
+            float position = scrollContainer.Current;
+            float offset = Math.Max(expandableHeader.Height, position);
+
+            expandableHeader.Y = -offset;
+            fixedHeader.Y = -offset + expandableHeader.Height;
         }
     }
 }
