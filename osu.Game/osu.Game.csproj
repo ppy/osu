@@ -438,6 +438,7 @@
     <Compile Include="Overlays\Direct\DirectListPanel.cs" />
     <Compile Include="Database\OnlineWorkingBeatmap.cs" />
     <Compile Include="Database\BeatmapOnlineInfo.cs" />
+    <Compile Include="Overlays\Direct\SlimEnumDropdown.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
