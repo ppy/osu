@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Database;
+using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -83,12 +84,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             // Following lines currently commented out to appease resharper
 
-            //Patterns.PatternGenerator conversion = null;
+            Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
-            {
-                // Slider
-            }
+                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern);
             else if (endTimeData != null)
             {
                 // Spinner
@@ -98,13 +97,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 // Circle
             }
 
-            //if (conversion == null)
-            return null;
+            if (conversion == null)
+                return null;
 
-            //Pattern newPattern = conversion.Generate();
-            //lastPattern = newPattern;
+            Pattern newPattern = conversion.Generate();
+            lastPattern = newPattern;
 
-            //return newPattern.HitObjects;
+            return newPattern.HitObjects;
         }
 
         /// <summary>
