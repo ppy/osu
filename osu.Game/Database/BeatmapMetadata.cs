@@ -26,6 +26,7 @@ namespace osu.Game.Database
 
         public string[] SearchableTerms => new[]
         {
+            Author,
             Artist,
             ArtistUnicode,
             Title,
