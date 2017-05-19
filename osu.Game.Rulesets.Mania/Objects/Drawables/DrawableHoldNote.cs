@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tailPiece = new NotePiece
                 {
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre
+                    Origin = Anchor.TopCentre
                 }
             });
         }
@@ -60,6 +60,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+        }
+
+        protected override void Update()
+        {
+            if (Time.Current > HitObject.StartTime)
+                headPiece.Colour = Color4.Green;
+            if (Time.Current > HitObject.EndTime)
+            {
+                bodyPiece.Colour = Color4.Green;
+                tailPiece.Colour = Color4.Green;
+            }
         }
     }
 }

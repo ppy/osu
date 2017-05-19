@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuHitRenderer : HitRenderer<OsuHitObject, OsuJudgement>
     {
-        public OsuHitRenderer(WorkingBeatmap beatmap)
-            : base(beatmap)
+        public OsuHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(beatmap, isForCurrentRuleset)
         {
         }
 

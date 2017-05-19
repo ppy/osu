@@ -74,6 +74,10 @@
     <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
+    <Compile Include="Beatmaps\Events\BackgroundEvent.cs" />
+    <Compile Include="Beatmaps\Events\BreakEvent.cs" />
+    <Compile Include="Beatmaps\Events\Event.cs" />
+    <Compile Include="Beatmaps\Events\EventInfo.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
@@ -125,6 +129,7 @@
     <Compile Include="Rulesets\Objects\Legacy\ConvertSlider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHit.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHold.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertSlider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertSpinner.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertHitObjectParser.cs" />
@@ -161,7 +166,6 @@
     <Compile Include="Rulesets\Objects\CircularArcApproximator.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertHit.cs" />
     <Compile Include="Rulesets\Objects\Legacy\ConvertHitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\ConvertHold.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertSlider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertSpinner.cs" />
     <Compile Include="Rulesets\Objects\SliderCurve.cs" />
@@ -341,7 +345,6 @@
     <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
-    <Compile Include="Beatmaps\Events\EventType.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeMeter.cs" />
     <Compile Include="Database\BeatmapSetInfo.cs" />
     <Compile Include="Database\BeatmapMetadata.cs" />
