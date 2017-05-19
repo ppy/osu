@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.UserInterface
     public abstract class SettingsContainer : Container
     {
         /// <summary>
-        /// The title of this option.
+        /// The title of this container.
         /// </summary>
         public abstract string Title { get; }
 
@@ -82,6 +82,8 @@ namespace osu.Game.Graphics.UserInterface
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            AutoSizeDuration = transition_duration,
+                            AutoSizeEasing = EasingTypes.OutQuint,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Padding = new MarginPadding(15),
@@ -106,9 +108,15 @@ namespace osu.Game.Graphics.UserInterface
             button.FadeColour(buttonIsPressed ? OsuColour.FromHex(@"ffcc22") : Color4.White, 200, EasingTypes.OutQuint);
 
             if (buttonIsPressed)
-                content.Show();
+            {
+                content.ClearTransforms();
+                content.AutoSizeAxes = Axes.Y;
+            }
             else
-                content.Hide();
+            {
+                content.AutoSizeAxes = Axes.None;
+                content.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
+            }
         }
     }
 }
