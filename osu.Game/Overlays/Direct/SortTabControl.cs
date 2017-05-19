@@ -53,24 +53,24 @@ namespace osu.Game.Overlays.Direct
 
                 Children = new Drawable[]
                 {
-                new OsuSpriteText
-                {
-                    Margin = new MarginPadding { Top = 8, Bottom = 8 },
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    Text = (value as Enum)?.GetDescription() ?? value.ToString(),
-                    TextSize = 14,
-                    Font = @"Exo2.0-Bold",
-                },
-                box = new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 5,
-                    Scale = new Vector2(1f, 0f),
-                    Colour = Color4.White,
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                },
+                    new OsuSpriteText
+                    {
+                        Margin = new MarginPadding { Top = 8, Bottom = 8 },
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                        Text = (value as Enum)?.GetDescription() ?? value.ToString(),
+                        TextSize = 14,
+                        Font = @"Exo2.0-Bold",
+                    },
+                    box = new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 5,
+                        Scale = new Vector2(1f, 0f),
+                        Colour = Color4.White,
+                        Origin = Anchor.BottomLeft,
+                        Anchor = Anchor.BottomLeft,
+                    },
                 };
             }
 
