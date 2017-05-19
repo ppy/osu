@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected abstract bool AllObjectsJudged { get; }
 
-        protected HitRenderer()
+        internal HitRenderer()
         {
             KeyConversionInputManager = CreateKeyConversionInputManager();
             KeyConversionInputManager.RelativeSizeAxes = Axes.Both;
@@ -120,7 +120,12 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public Beatmap<TObject> Beatmap;
 
-        protected HitRenderer(WorkingBeatmap beatmap)
+        /// <summary>
+        /// Creates a hit renderer for a beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
+        internal HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
         {
             Debug.Assert(beatmap != null, "HitRenderer initialized with a null beatmap.");
 
@@ -134,7 +139,7 @@ namespace osu.Game.Rulesets.UI
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can't be converted for the current ruleset.");
 
             // Convert the beatmap
-            Beatmap = converter.Convert(beatmap.Beatmap);
+            Beatmap = converter.Convert(beatmap.Beatmap, isForCurrentRuleset);
 
             // Apply defaults
             foreach (var h in Beatmap.HitObjects)
@@ -201,8 +206,13 @@ namespace osu.Game.Rulesets.UI
 
         private readonly List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
-        protected HitRenderer(WorkingBeatmap beatmap)
-            : base(beatmap)
+        /// <summary>
+        /// Creates a hit renderer for a beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
+        protected HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(beatmap, isForCurrentRuleset)
         {
             InputManager.Add(content = new Container
             {
