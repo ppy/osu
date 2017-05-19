@@ -25,7 +25,8 @@ namespace osu.Game.Graphics.Containers
             {
                 if (value == expandableHeader) return;
 
-                Remove(expandableHeader);
+                if (expandableHeader != null)
+                    Remove(expandableHeader);
                 expandableHeader = value;
                 expandableHeader.Depth = float.MinValue;
                 Add(expandableHeader);
@@ -40,7 +41,8 @@ namespace osu.Game.Graphics.Containers
             {
                 if (value == fixedHeader) return;
 
-                Remove(fixedHeader);
+                if (fixedHeader != null)
+                    Remove(fixedHeader);
                 fixedHeader = value;
                 fixedHeader.Depth = float.MinValue / 2;
                 Add(fixedHeader);
