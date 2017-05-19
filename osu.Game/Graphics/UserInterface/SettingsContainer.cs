@@ -18,6 +18,10 @@ namespace osu.Game.Graphics.UserInterface
         public abstract string Title { get; }
 
         private const float transition_duration = 600;
+        private const int container_width = 250;
+        private const int border_thickness = 2;
+        private const int header_height = 30;
+        private const int corner_radius = 5;
 
         private readonly FillFlowContainer content;
         private readonly SimpleButton button;
@@ -26,11 +30,11 @@ namespace osu.Game.Graphics.UserInterface
         protected SettingsContainer()
         {
             AutoSizeAxes = Axes.Y;
-            Width = 250;
+            Width = container_width;
             Masking = true;
-            CornerRadius = 5;
+            CornerRadius = corner_radius;
             BorderColour = Color4.Black;
-            BorderThickness = 2;
+            BorderThickness = border_thickness;
 
             Children = new Drawable[]
             {
@@ -51,7 +55,7 @@ namespace osu.Game.Graphics.UserInterface
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 30,
+                            Height = header_height,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
 
