@@ -156,7 +156,6 @@ namespace osu.Game.Overlays.Direct
         {
             private readonly TextAwesome icon;
 
-            //todo: proper download button animations
             public DownloadButton()
             {
                 Children = new Drawable[]
