@@ -13,18 +13,19 @@ namespace osu.Game.Screens.Play.Settings
         private const int fade_duration = 100;
 
         private bool isVisible;
-        public bool IsVisible
+
+        private bool isAvaliable;
+        public bool IsAvaliable
         {
             set
             {
-                isVisible = value;
-
-                if (isVisible)
-                    FadeIn(fade_duration);
-                else
-                    FadeOut(fade_duration);
+                isAvaliable = value;
+                if (!isAvaliable) Hide();
             }
-            get { return isVisible; }
+            get
+            {
+                return isAvaliable;
+            }
         }
 
         public ReplaySettingsOverlay()
@@ -47,12 +48,25 @@ namespace osu.Game.Screens.Play.Settings
                 switch (args.Key)
                 {
                     case Key.H:
-                        IsVisible = !isVisible;
+                        toogleVisibility();
                         return true;
                 }
             }
 
             return base.OnKeyDown(state, args);
+        }
+
+        private void toogleVisibility()
+        {
+            if (isAvaliable)
+            {
+                if (isVisible)
+                    FadeIn(fade_duration);
+                else
+                    FadeOut(fade_duration);
+
+                isVisible = !isVisible;
+            }
         }
     }
 }
