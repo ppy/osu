@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace osu.Game.Database
 {
     /// <summary>
-    /// Beatmap info retrieved for non-local viewing.
+    /// Beatmap info retrieved for previewing locally without having the beatmap downloaded.
     /// </summary>
     public class BeatmapOnlineInfo
     {
