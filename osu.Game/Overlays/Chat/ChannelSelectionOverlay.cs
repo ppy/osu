@@ -19,7 +19,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelSelectionOverlay : OverlayContainer
+    public class ChannelSelectionOverlay : FocusedOverlayContainer
     {
         public static readonly float WIDTH_PADDING = 170;
 
@@ -134,6 +134,8 @@ namespace osu.Game.Overlays.Chat
 
         protected override void PopIn()
         {
+            base.PopIn();
+
             search.HoldFocus = true;
             Schedule(() => search.TriggerFocus());
 
@@ -143,6 +145,8 @@ namespace osu.Game.Overlays.Chat
 
         protected override void PopOut()
         {
+            base.PopOut();
+
             search.HoldFocus = false;
 
             FadeOut(500, EasingTypes.InQuint);
