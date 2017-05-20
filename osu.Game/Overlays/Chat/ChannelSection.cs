@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Chat
         {
             set
             {
-                items.Children = value.Select(c => new ChannelListItem(c));
+                items.Children = value.Select(c => new ChannelListItem { Channel = c });
             }
         }
 
