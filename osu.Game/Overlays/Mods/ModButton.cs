@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System;
 using System.Linq;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -23,7 +24,7 @@ namespace osu.Game.Overlays.Mods
     /// <summary>
     /// Represents a clickable button which can cycle through one of more mods.
     /// </summary>
-    public class ModButton : ModButtonEmpty
+    public class ModButton : ModButtonEmpty, IHasTooltip
     {
         private ModIcon foregroundIcon;
         private readonly SpriteText text;
@@ -31,6 +32,8 @@ namespace osu.Game.Overlays.Mods
         private SampleChannel sampleOn, sampleOff;
 
         public Action<Mod> Action; // Passed the selected mod or null if none
+
+        public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
 
         private int _selectedIndex = -1;
         private int selectedIndex
