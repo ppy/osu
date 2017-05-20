@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class SectionsContainer : Container
     {
-        private Drawable expandableHeader, fixedHeader;
+        private Drawable expandableHeader, fixedHeader, footer;
         public readonly ScrollContainer ScrollContainer;
         private readonly Container<Drawable> sectionsContainer;
 
@@ -31,7 +31,6 @@ namespace osu.Game.Graphics.Containers
                 expandableHeader = value;
                 if (value == null) return;
 
-                expandableHeader.Depth = float.MinValue;
                 Add(expandableHeader);
                 lastKnownScroll = float.NaN;
             }
@@ -49,8 +48,26 @@ namespace osu.Game.Graphics.Containers
                 fixedHeader = value;
                 if (value == null) return;
 
-                fixedHeader.Depth = float.MinValue / 2;
                 Add(fixedHeader);
+                lastKnownScroll = float.NaN;
+            }
+        }
+
+        public Drawable Footer
+        {
+            get { return footer; }
+            set
+            {
+                if (value == footer) return;
+
+                if (footer != null)
+                    ScrollContainer.Remove(footer);
+                footer = value;
+                if (value == null) return;
+
+                footer.Anchor |= Anchor.y2;
+                footer.Origin |= Anchor.y2;
+                ScrollContainer.Add(footer);
                 lastKnownScroll = float.NaN;
             }
         }
@@ -78,23 +95,23 @@ namespace osu.Game.Graphics.Containers
                 sections = value.ToList();
                 if (sections.Count == 0) return;
 
-                originalSectionMargin = sections[0].Margin;
                 sectionsContainer.Add(sections);
                 SelectedSection.Value = sections[0];
                 lastKnownScroll = float.NaN;
             }
         }
 
-        float headerHeight;
-        private MarginPadding originalSectionMargin;
-        private void updateSectionMargin()
+        private float headerHeight, footerHeight;
+        private MarginPadding originalSectionsMargin;
+        private void updateSectionsMargin()
         {
             if (sections.Count == 0) return;
 
-            var newMargin = originalSectionMargin;
+            var newMargin = originalSectionsMargin;
             newMargin.Top += headerHeight;
+            newMargin.Bottom += footerHeight;
 
-            sections[0].Margin = newMargin;
+            sectionsContainer.Margin = newMargin;
         }
 
         public SectionsContainer()
@@ -105,6 +122,7 @@ namespace osu.Game.Graphics.Containers
                 Masking = false,
                 Children = new Drawable[] { sectionsContainer = CreateScrollContentContainer() }
             });
+            originalSectionsMargin = sectionsContainer.Margin;
         }
 
         float lastKnownScroll;
@@ -112,11 +130,13 @@ namespace osu.Game.Graphics.Containers
         {
             base.UpdateAfterChildren();
 
-            float height = (ExpandableHeader?.Height ?? 0) + (FixedHeader?.Height ?? 0);
-            if (height != headerHeight)
+            float headerHeight = (ExpandableHeader?.Height ?? 0) + (FixedHeader?.Height ?? 0);
+            float footerHeight = Footer?.Height ?? 0;
+            if (headerHeight != this.headerHeight || footerHeight != this.footerHeight)
             {
-                headerHeight = height;
-                updateSectionMargin();
+                this.headerHeight = headerHeight;
+                this.footerHeight = footerHeight;
+                updateSectionsMargin();
             }
 
             float currentScroll = ScrollContainer.Current;
