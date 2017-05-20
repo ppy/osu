@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Mods
 
         public Action<Mod> Action; // Passed the selected mod or null if none
 
-        public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? @"";
+        public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
 
         private int _selectedIndex = -1;
         private int selectedIndex
