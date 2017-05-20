@@ -90,6 +90,7 @@ namespace osu.Game.Overlays.Music
             artistBind = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
 
             titleBind.ValueChanged += newText => recreateText();
+            artistBind.ValueChanged += newText => recreateText();
             titleBind.TriggerChange();
         }
 
