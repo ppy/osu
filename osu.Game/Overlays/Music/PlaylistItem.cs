@@ -7,13 +7,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Overlays.Music
 {
@@ -100,7 +97,6 @@ namespace osu.Game.Overlays.Music
         {
             text.Clear();
 
-            var metadata = BeatmapSetInfo.Metadata;
             var t = new List<SpriteText>();
 
             //space after the title to put a space between the title and artist
