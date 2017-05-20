@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using OpenTK;
 using osu.Framework.Input;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -27,7 +28,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             Children = new Drawable[]
             {
-                iconsContainer = new IconFlow
+                iconsContainer = new ReverseDepthFillFlowContainer<ModIcon>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -92,13 +93,6 @@ namespace osu.Game.Screens.Play.HUD
         {
             contract();
             base.OnHoverLost(state);
-        }
-
-        private class IconFlow : FillFlowContainer<ModIcon>
-        {
-            // just reverses the depth of flow contents.
-            protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
-            protected override IEnumerable<ModIcon> FlowingChildren => base.FlowingChildren.Reverse();
         }
     }
 }
