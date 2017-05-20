@@ -7,7 +7,6 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -41,18 +40,13 @@ namespace osu.Game.Overlays.Chat
         public ChannelSelectionOverlay()
         {
             RelativeSizeAxes = Axes.X;
+
             Children = new Drawable[]
             {
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    EdgeEffect = new EdgeEffect
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(0.25f),
-                        Radius = 5,
-                    },
                     Children = new Drawable[]
                     {
                         bg = new Box
@@ -138,11 +132,17 @@ namespace osu.Game.Overlays.Chat
         {
             search.HoldFocus = true;
             Schedule(() => search.TriggerFocus());
+
+            FadeIn(100, EasingTypes.OutQuint);
+            MoveToY(0, 800, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
             search.HoldFocus = false;
+
+            FadeOut(500, EasingTypes.InQuint);
+            MoveToY(DrawHeight, 500, EasingTypes.In);
         }
 
         private class HeaderSearchTextBox : SearchTextBox
