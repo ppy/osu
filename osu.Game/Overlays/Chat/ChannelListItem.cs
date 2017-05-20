@@ -8,11 +8,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
 {
     public class ChannelListItem : ClickableContainer
     {
+        private const float width_padding = 5;
         private const float channel_width = 150;
         private const float topic_width = 380;
         private const float text_size = 15;
@@ -37,7 +39,7 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        public ChannelListItem()
+        public ChannelListItem(Channel channel)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -49,8 +51,6 @@ namespace osu.Game.Overlays.Chat
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(5f, 0f),
-                    Padding = new MarginPadding { Left = ChannelSelectionOverlay.WIDTH_PADDING, Right = ChannelSelectionOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
                         new Container
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Chat
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = @"#osu!",
+                                    Text = $@"#{channel.Name}",
                                     TextSize = text_size,
                                     Font = @"Exo2.0-Bold",
                                 },
@@ -86,11 +86,12 @@ namespace osu.Game.Overlays.Chat
                         {
                             Width = topic_width,
                             AutoSizeAxes = Axes.Y,
+                            Margin = new MarginPadding { Left = width_padding },
                             Children = new[]
                             {
                                 topic = new OsuSpriteText
                                 {
-                                    Text = @"I dunno, the default channel I guess?",
+                                    Text = channel.Topic,
                                     TextSize = text_size,
                                     Font = @"Exo2.0-SemiBold",
                                     Alpha = 0.8f,
@@ -101,6 +102,7 @@ namespace osu.Game.Overlays.Chat
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
+                            Margin = new MarginPadding { Left = width_padding },
                             Spacing = new Vector2(3f, 0f),
                             Children = new Drawable[]
                             {
