@@ -26,19 +26,21 @@ namespace osu.Game.Rulesets.Beatmaps
         /// Converts a Beatmap using this Beatmap Converter.
         /// </summary>
         /// <param name="original">The un-converted Beatmap.</param>
+        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
         /// <returns>The converted Beatmap.</returns>
-        public Beatmap<T> Convert(Beatmap original)
+        public Beatmap<T> Convert(Beatmap original, bool isForCurrentRuleset)
         {
             // We always operate on a clone of the original beatmap, to not modify it game-wide
-            return ConvertBeatmap(new Beatmap(original));
+            return ConvertBeatmap(new Beatmap(original), isForCurrentRuleset);
         }
 
         /// <summary>
         /// Performs the conversion of a Beatmap using this Beatmap Converter.
         /// </summary>
         /// <param name="original">The un-converted Beatmap.</param>
+        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
         /// <returns>The converted Beatmap.</returns>
-        protected virtual Beatmap<T> ConvertBeatmap(Beatmap original)
+        protected virtual Beatmap<T> ConvertBeatmap(Beatmap original, bool isForCurrentRuleset)
         {
             return new Beatmap<T>
             {
