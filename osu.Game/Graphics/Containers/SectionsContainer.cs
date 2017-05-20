@@ -87,8 +87,6 @@ namespace osu.Game.Graphics.Containers
             get { return sections; }
             set
             {
-                if (value == sections) return;
-
                 foreach (var section in sections)
                     sectionsContainer.Remove(section);
 
@@ -102,7 +100,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         private float headerHeight, footerHeight;
-        private MarginPadding originalSectionsMargin;
+        private readonly MarginPadding originalSectionsMargin;
         private void updateSectionsMargin()
         {
             if (sections.Count == 0) return;
@@ -125,17 +123,17 @@ namespace osu.Game.Graphics.Containers
             originalSectionsMargin = sectionsContainer.Margin;
         }
 
-        float lastKnownScroll;
+        private float lastKnownScroll;
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
-            float headerHeight = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
-            float footerHeight = Footer?.LayoutSize.Y ?? 0;
-            if (headerHeight != this.headerHeight || footerHeight != this.footerHeight)
+            float headerH = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
+            float footerH = Footer?.LayoutSize.Y ?? 0;
+            if (headerH != headerHeight || footerH != footerHeight)
             {
-                this.headerHeight = headerHeight;
-                this.footerHeight = footerHeight;
+                headerHeight = headerH;
+                footerHeight = footerH;
                 updateSectionsMargin();
             }
 
