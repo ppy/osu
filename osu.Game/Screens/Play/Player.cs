@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Play
                     FramedClock = offsetClock,
                     OnRetry = Restart,
                     OnQuit = Exit,
-                    CheckCanPause = () => ValidForResume && !HasFailed,
+                    CheckCanPause = () => ValidForResume && !HasFailed && !HitRenderer.HasReplayLoaded,
                     Retries = RestartCount,
                     OnPause = () => {
                         hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
