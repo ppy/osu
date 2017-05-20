@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Direct;
 
 namespace osu.Game.Overlays
@@ -82,7 +83,7 @@ namespace osu.Game.Overlays
                     Padding = new MarginPadding { Top = Header.HEIGHT },
                     Children = new Drawable[]
                     {
-                        new ContentFlow
+                        new ReverseDepthFillFlowContainer<Drawable>
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -135,17 +136,6 @@ namespace osu.Game.Overlays
             base.PopOut();
 
             filter.Search.HoldFocus = false;
-        }
-
-        private class ContentFlow : FillFlowContainer<Drawable>
-        {
-            protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
-            protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
-
-            public ContentFlow()
-            {
-                Direction = FillDirection.Vertical;
-            }
         }
     }
 }
