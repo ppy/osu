@@ -130,8 +130,8 @@ namespace osu.Game.Graphics.Containers
         {
             base.UpdateAfterChildren();
 
-            float headerHeight = (ExpandableHeader?.Height ?? 0) + (FixedHeader?.Height ?? 0);
-            float footerHeight = Footer?.Height ?? 0;
+            float headerHeight = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
+            float footerHeight = Footer?.LayoutSize.Y ?? 0;
             if (headerHeight != this.headerHeight || footerHeight != this.footerHeight)
             {
                 this.headerHeight = headerHeight;
@@ -146,10 +146,10 @@ namespace osu.Game.Graphics.Containers
 
                 if (expandableHeader != null && fixedHeader != null)
                 {
-                    float offset = Math.Min(expandableHeader.Height, currentScroll);
+                    float offset = Math.Min(expandableHeader.LayoutSize.Y, currentScroll);
 
                     expandableHeader.Y = -offset;
-                    fixedHeader.Y = -offset + expandableHeader.Height;
+                    fixedHeader.Y = -offset + expandableHeader.LayoutSize.Y;
                 }
 
                 Drawable bestMatch = null;
