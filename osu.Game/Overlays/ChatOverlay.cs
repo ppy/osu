@@ -206,18 +206,12 @@ namespace osu.Game.Overlays
 
         private long? lastMessageId;
 
-        private List<Channel> careChannels;
+        private readonly List<Channel> careChannels = new List<Channel>();
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
         private void initializeChannels()
         {
-            currentChannelContainer.Clear();
-
-            loadedChannels.Clear();
-
-            careChannels = new List<Channel>();
-
             SpriteText loading;
             Add(loading = new OsuSpriteText
             {
@@ -232,8 +226,6 @@ namespace osu.Game.Overlays
             ListChannelsRequest req = new ListChannelsRequest();
             req.Success += delegate (List<Channel> channels)
             {
-                Debug.Assert(careChannels.Count == 0);
-
                 Scheduler.Add(delegate
                 {
                     loading.FadeOut(100);
