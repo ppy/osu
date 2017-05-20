@@ -74,6 +74,10 @@
     <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
+    <Compile Include="Beatmaps\Events\BackgroundEvent.cs" />
+    <Compile Include="Beatmaps\Events\BreakEvent.cs" />
+    <Compile Include="Beatmaps\Events\Event.cs" />
+    <Compile Include="Beatmaps\Events\EventInfo.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
@@ -125,6 +129,7 @@
     <Compile Include="Rulesets\Objects\Legacy\ConvertSlider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHit.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHold.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertSlider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertSpinner.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertHitObjectParser.cs" />
@@ -161,7 +166,6 @@
     <Compile Include="Rulesets\Objects\CircularArcApproximator.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertHit.cs" />
     <Compile Include="Rulesets\Objects\Legacy\ConvertHitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\ConvertHold.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertSlider.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertSpinner.cs" />
     <Compile Include="Rulesets\Objects\SliderCurve.cs" />
@@ -231,6 +235,7 @@
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
+    <Compile Include="Screens\Play\PauseContainer.cs" />
     <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
     <Compile Include="Screens\Play\SquareGraph.cs" />
@@ -254,8 +259,6 @@
     <Compile Include="Screens\Play\FailOverlay.cs" />
     <Compile Include="Screens\Play\MenuOverlay.cs" />
     <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
-    <Compile Include="Screens\Play\PauseOverlay.cs" />
-    <Compile Include="Screens\Play\Pause\PauseButton.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\ReplayPlayer.cs" />
@@ -342,7 +345,6 @@
     <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
-    <Compile Include="Beatmaps\Events\EventType.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeMeter.cs" />
     <Compile Include="Database\BeatmapSetInfo.cs" />
     <Compile Include="Database\BeatmapMetadata.cs" />
@@ -395,8 +397,6 @@
     <Compile Include="Screens\Play\SongProgress.cs" />
     <Compile Include="Screens\Play\SongProgressGraph.cs" />
     <Compile Include="Screens\Play\SongProgressBar.cs" />
-    <Compile Include="Screens\Play\Pause\PauseProgressBar.cs" />
-    <Compile Include="Screens\Play\Pause\PauseProgressGraph.cs" />
     <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
     <Compile Include="Rulesets\Mods\Mod.cs" />
     <Compile Include="Overlays\Mods\ModButtonEmpty.cs" />

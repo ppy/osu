@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public int? Columns;
 
-        public ManiaHitRenderer(WorkingBeatmap beatmap)
-            : base(beatmap)
+        public ManiaHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(beatmap, isForCurrentRuleset)
         {
         }
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 return t;
             });
 
-            double lastObjectTime = (Objects.Last() as IHasEndTime)?.EndTime ?? Objects.Last().StartTime;
+            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
             // Perform some post processing of the timing changes
             timingChanges = timingChanges
@@ -76,6 +76,10 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
         {
+            var holdNote = h as HoldNote;
+            if (holdNote != null)
+                return new DrawableHoldNote(holdNote);
+
             var note = h as Note;
             if (note != null)
                 return new DrawableNote(note);
