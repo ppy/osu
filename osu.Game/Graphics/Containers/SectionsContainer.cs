@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.Containers
 
         public Bindable<Drawable> SelectedSection { get; } = new Bindable<Drawable>();
 
-        protected virtual Container<Drawable> CreateSectionsContainer()
+        protected virtual Container<Drawable> CreateScrollContentContainer()
             => new FillFlowContainer
             {
                 Direction = FillDirection.Vertical,
@@ -103,7 +103,7 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = false,
-                Children = new Drawable[] { sectionsContainer = CreateSectionsContainer() }
+                Children = new Drawable[] { sectionsContainer = CreateScrollContentContainer() }
             });
         }
 
