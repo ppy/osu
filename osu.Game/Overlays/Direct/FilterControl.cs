@@ -158,9 +158,10 @@ namespace osu.Game.Overlays.Direct
             resultCountsContainer.Colour = colours.Yellow;
             RankStatusDropdown.AccentColour = colours.BlueDark;
 
+            var b = new Bindable<RulesetInfo>(); //backup bindable incase the game is null
             foreach (var r in rulesets.AllRulesets)
             {
-                modeButtons.Add(new RulesetToggleButton(game?.Ruleset ?? new Bindable<RulesetInfo>(), r));
+                modeButtons.Add(new RulesetToggleButton(game?.Ruleset ?? b, r));
             }
         }
 
