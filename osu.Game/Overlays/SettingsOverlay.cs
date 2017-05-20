@@ -27,20 +27,13 @@ namespace osu.Game.Overlays
 
         private const float sidebar_padding = 10;
 
-        private ScrollContainer scrollContainer;
         private Sidebar sidebar;
         private SidebarButton[] sidebarButtons;
         private SettingsSection[] sections;
 
-        private SettingsHeader header;
-
-        private SettingsFooter footer;
-
-        private SearchContainer searchContainer;
-
         private SettingsSectionsContainer sectionsContainer;
 
-        private float lastKnownScroll;
+        private SearchTextBox searchTextBox;
 
         public SettingsOverlay()
         {
@@ -76,8 +69,8 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
                     Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
-                    ExpandableHeader = header = new SettingsHeader(() => sectionsContainer.ScrollContainer.Current),
-                    FixedHeader = new SearchTextBox
+                    ExpandableHeader = new SettingsHeader(),
+                    FixedHeader = searchTextBox = new SearchTextBox
                     {
                         RelativeSizeAxes = Axes.X,
                         Origin = Anchor.TopCentre,
@@ -91,7 +84,7 @@ namespace osu.Game.Overlays
                         Exit = Hide,
                     },
                     Sections = sections,
-                    Footer = footer = new SettingsFooter()
+                    Footer = new SettingsFooter()
                 },
                 sidebar = new Sidebar
                 {
@@ -101,13 +94,13 @@ namespace osu.Game.Overlays
                         {
                             Selected = sections[0] == section,
                             Section = section,
-                            Action = () => scrollContainer.ScrollIntoView(section),
+                            Action = () => sectionsContainer.ScrollContainer.ScrollIntoView(section),
                         }
                     ).ToArray()
                 }
             };
 
-            //header.SearchTextBox.Current.ValueChanged += newValue => searchContainer.SearchTerm = newValue;
+            searchTextBox.Current.ValueChanged += newValue => sectionsContainer.SearchContainer.SearchTerm = newValue;
 
             sectionsContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
@@ -120,7 +113,7 @@ namespace osu.Game.Overlays
             sidebar.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(1, TRANSITION_LENGTH / 2);
 
-            header.SearchTextBox.HoldFocus = true;
+            searchTextBox.HoldFocus = true;
         }
 
         protected override void PopOut()
@@ -131,19 +124,21 @@ namespace osu.Game.Overlays
             sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(0, TRANSITION_LENGTH / 2);
 
-            header.SearchTextBox.HoldFocus = false;
-            header.SearchTextBox.TriggerFocusLost();
+            searchTextBox.HoldFocus = false;
+            searchTextBox.TriggerFocusLost();
         }
 
         protected override bool OnFocus(InputState state)
         {
-            header.SearchTextBox.TriggerFocus(state);
+            searchTextBox.TriggerFocus(state);
             return false;
         }
 
         private class SettingsSectionsContainer : SectionsContainer
         {
             public SearchContainer SearchContainer;
+            private readonly Box headerBackground;
+
             protected override Container<Drawable> CreateScrollContentContainer()
                 => SearchContainer = new SearchContainer
                 {
@@ -151,9 +146,26 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.X,
                     Direction = FillDirection.Vertical,
                 };
+
             public SettingsSectionsContainer()
             {
                 ScrollContainer.ScrollDraggerVisible = false;
+                Add(headerBackground = new Box
+                {
+                    Colour = Color4.Black,
+                    RelativeSizeAxes = Axes.X,
+                    Depth = float.MaxValue
+                });
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                // no null check because the usage of this class is strict
+                headerBackground.Height = ExpandableHeader.LayoutSize.Y + FixedHeader.LayoutSize.Y;
+                headerBackground.Y = ExpandableHeader.Y;
+                headerBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
             }
         }
     }
