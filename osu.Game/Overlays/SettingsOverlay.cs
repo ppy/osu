@@ -7,10 +7,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Overlays.Settings;
-using System;
-using osu.Game.Overlays.Settings.Sections;
 using osu.Framework.Input;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections;
 
 namespace osu.Game.Overlays
 {
@@ -36,6 +37,8 @@ namespace osu.Game.Overlays
         private SettingsFooter footer;
 
         private SearchContainer searchContainer;
+
+        private SettingsSectionsContainer sectionsContainer;
 
         private float lastKnownScroll;
 
@@ -68,27 +71,27 @@ namespace osu.Game.Overlays
                     Colour = Color4.Black,
                     Alpha = 0.6f,
                 },
-                scrollContainer = new ScrollContainer
+                sectionsContainer = new SettingsSectionsContainer
                 {
-                    ScrollDraggerVisible = false,
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
                     Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
-                    Children = new Drawable[]
+                    ExpandableHeader = header = new SettingsHeader(() => sectionsContainer.ScrollContainer.Current),
+                    FixedHeader = new SearchTextBox
                     {
-                        searchContainer = new SearchContainer
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Width = 0.95f,
+                        Margin = new MarginPadding
                         {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                            Direction = FillDirection.Vertical,
-                            Children = sections,
+                            Top = 20,
+                            Bottom = 20
                         },
-                        footer = new SettingsFooter(),
-                        header = new SettingsHeader(() => scrollContainer.Current)
-                        {
-                            Exit = Hide,
-                        },
-                    }
+                        Exit = Hide,
+                    },
+                    Sections = sections,
+                    Footer = footer = new SettingsFooter()
                 },
                 sidebar = new Sidebar
                 {
@@ -104,54 +107,16 @@ namespace osu.Game.Overlays
                 }
             };
 
-            header.SearchTextBox.Current.ValueChanged += newValue => searchContainer.SearchTerm = newValue;
+            //header.SearchTextBox.Current.ValueChanged += newValue => searchContainer.SearchTerm = newValue;
 
-            scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            //we need to update these manually because we can't put the SettingsHeader inside the SearchContainer (due to its anchoring).
-            searchContainer.Y = header.DrawHeight;
-            footer.Y = searchContainer.Y + searchContainer.DrawHeight;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            float currentScroll = scrollContainer.Current;
-            if (currentScroll != lastKnownScroll)
-            {
-                lastKnownScroll = currentScroll;
-
-                SettingsSection bestCandidate = null;
-                float bestDistance = float.MaxValue;
-
-                foreach (SettingsSection section in sections)
-                {
-                    float distance = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll);
-                    if (distance < bestDistance)
-                    {
-                        bestDistance = distance;
-                        bestCandidate = section;
-                    }
-                }
-
-                var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
-                var next = sidebarButtons.SingleOrDefault(sb => sb.Section == bestCandidate);
-                if (previous != null) previous.Selected = false;
-                if (next != null) next.Selected = true;
-            }
+            sectionsContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
 
         protected override void PopIn()
         {
             base.PopIn();
 
-            scrollContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
+            sectionsContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(1, TRANSITION_LENGTH / 2);
 
@@ -162,7 +127,7 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            scrollContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
+            sectionsContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(0, TRANSITION_LENGTH / 2);
 
@@ -174,6 +139,22 @@ namespace osu.Game.Overlays
         {
             header.SearchTextBox.TriggerFocus(state);
             return false;
+        }
+
+        private class SettingsSectionsContainer : SectionsContainer
+        {
+            public SearchContainer SearchContainer;
+            protected override Container<Drawable> CreateScrollContentContainer()
+                => SearchContainer = new SearchContainer
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Direction = FillDirection.Vertical,
+                };
+            public SettingsSectionsContainer()
+            {
+                ScrollContainer.ScrollDraggerVisible = false;
+            }
         }
     }
 }
