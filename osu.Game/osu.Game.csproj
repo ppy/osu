@@ -430,6 +430,7 @@
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
     <Compile Include="Overlays\Chat\ChannelSelectionOverlay.cs" />
     <Compile Include="Overlays\Chat\ChannelListItem.cs" />
+    <Compile Include="Overlays\Chat\ChannelSection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">

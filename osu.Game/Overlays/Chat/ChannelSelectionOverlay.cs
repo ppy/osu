@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -78,17 +79,18 @@ namespace osu.Game.Overlays.Chat
                         },
                     },
                 },
-                new ChannelListItem
+                new ChannelSection
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.BottomCentre,
-                    Joined = false,
-                },
-                new ChannelListItem
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                    Joined = true,
+                    Origin = Anchor.Centre,
+                    Padding = new MarginPadding { Left = WIDTH_PADDING, Right = WIDTH_PADDING },
+                    Header = @"GENERAL CHANNELS",
+                    Channels = new[]
+                    {
+                        new Channel { Name = @"announcements", Topic = @"Automated announcement of stuff going on in osu!" },
+                        new Channel { Name = @"osu!", Topic = @"I dunno, the default channel I guess?" },
+                        new Channel { Name = @"lobby", Topic = @"Look for trouble here" },
+                    },
                 },
             };
         }
