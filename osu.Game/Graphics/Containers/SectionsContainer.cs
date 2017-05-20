@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.Containers
     public class SectionsContainer : Container
     {
         private Drawable expandableHeader, fixedHeader;
-        private readonly ScrollContainer scrollContainer;
+        public readonly ScrollContainer ScrollContainer;
         private readonly Container<Drawable> sectionsContainer;
 
         public Drawable ExpandableHeader
@@ -54,7 +54,6 @@ namespace osu.Game.Graphics.Containers
         }
 
         public Bindable<Drawable> SelectedSection { get; } = new Bindable<Drawable>();
-        public void ScrollToSection(Drawable section) => scrollContainer.ScrollIntoView(section);
 
         protected virtual Container<Drawable> CreateSectionsContainer()
             => new FillFlowContainer
@@ -97,9 +96,10 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            Add(scrollContainer = new ScrollContainer()
+            Add(ScrollContainer = new ScrollContainer()
             {
                 RelativeSizeAxes = Axes.Both,
+                Masking = false,
                 Children = new Drawable[] { sectionsContainer = CreateSectionsContainer() }
             });
         }
@@ -118,7 +118,7 @@ namespace osu.Game.Graphics.Containers
 
             if (expandableHeader == null) return;
 
-            float currentScroll = scrollContainer.Current;
+            float currentScroll = ScrollContainer.Current;
             if (currentScroll != lastKnownScroll)
             {
                 lastKnownScroll = currentScroll;
@@ -136,7 +136,7 @@ namespace osu.Game.Graphics.Containers
 
                 foreach (var section in sections)
                 {
-                    float diff = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll);
+                    float diff = Math.Abs(ScrollContainer.GetChildPosInContent(section) - currentScroll);
                     if (diff < minDiff)
                     {
                         minDiff = diff;
