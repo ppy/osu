@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
 
         private Sidebar sidebar;
         private SidebarButton[] sidebarButtons;
-        private SettingsSection[] sections;
+        private SidebarButton selectedSidebarButton;
 
         private SettingsSectionsContainer sectionsContainer;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGame game)
         {
-            sections = new SettingsSection[]
+            var sections = new SettingsSection[]
             {
                 new GeneralSection(),
                 new GraphicsSection(),
@@ -92,12 +92,21 @@ namespace osu.Game.Overlays
                     Children = sidebarButtons = sections.Select(section =>
                         new SidebarButton
                         {
-                            Selected = sections[0] == section,
                             Section = section,
-                            Action = () => sectionsContainer.ScrollContainer.ScrollIntoView(section),
+                            Action = sectionsContainer.ScrollContainer.ScrollIntoView,
                         }
                     ).ToArray()
                 }
+            };
+
+            selectedSidebarButton = sidebarButtons[0];
+            selectedSidebarButton.Selected = true;
+
+            sectionsContainer.SelectedSection.ValueChanged += section =>
+            {
+                selectedSidebarButton.Selected = false;
+                selectedSidebarButton = sidebarButtons.Single(b => b.Section == section);
+                selectedSidebarButton.Selected = true;
             };
 
             searchTextBox.Current.ValueChanged += newValue => sectionsContainer.SearchContainer.SearchTerm = newValue;

@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings
         private readonly Box backgroundBox;
         private readonly Box selectionIndicator;
         private readonly Container text;
-        public Action Action;
+        public Action<SettingsSection> Action;
 
         private SettingsSection section;
         public SettingsSection Section
@@ -75,6 +75,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     Width = Sidebar.DEFAULT_WIDTH,
                     RelativeSizeAxes = Axes.Y,
+                    Colour = OsuColour.Gray(0.6f),
                     Children = new[]
                     {
                         headerText = new OsuSpriteText
@@ -110,7 +111,7 @@ namespace osu.Game.Overlays.Settings
 
         protected override bool OnClick(InputState state)
         {
-            Action?.Invoke();
+            Action?.Invoke(section);
             backgroundBox.FlashColour(Color4.White, 400);
             return true;
         }
