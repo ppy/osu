@@ -111,10 +111,10 @@ namespace osu.Game.Overlays
                 },
             };
 
-            header.Tabs.Current.ValueChanged += tab => { if (tab != DirectTab.Search) filter.Search.Current.Value = @""; };
+            header.Tabs.Current.ValueChanged += tab => { if (tab != DirectTab.Search) filter.Search.Current.Value = string.Empty; };
 
             filter.Search.Exit = Hide;
-            filter.Search.Current.ValueChanged += text => { if (text != @"") header.Tabs.Current.Value = DirectTab.Search; };
+            filter.Search.Current.ValueChanged += text => { if (text != string.Empty) header.Tabs.Current.Value = DirectTab.Search; };
             filter.DisplayStyle.ValueChanged += recreatePanels;
         }
 

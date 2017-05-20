@@ -177,7 +177,7 @@ namespace osu.Game.Overlays.Direct
 
         private string pluralize(string prefix, int value)
         {
-            return $@"{value} {prefix}" + (value == 1 ? @"" : @"s");
+            return $@"{value} {prefix}" + (value == 1 ? string.Empty : @"s");
         }
 
         private class DirectSearchTextBox : SearchTextBox
