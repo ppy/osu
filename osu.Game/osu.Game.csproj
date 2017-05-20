@@ -78,6 +78,7 @@
     <Compile Include="Beatmaps\Events\BreakEvent.cs" />
     <Compile Include="Beatmaps\Events\Event.cs" />
     <Compile Include="Beatmaps\Events\EventInfo.cs" />
+    <Compile Include="Graphics\Containers\BeatSyncedContainer.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
@@ -186,6 +187,7 @@
     <Compile Include="Database\RulesetDatabase.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
+    <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
     <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />
     <Compile Include="Screens\Play\HUDOverlay.cs" />
     <Compile Include="Screens\Play\HUD\StandardHealthDisplay.cs" />
