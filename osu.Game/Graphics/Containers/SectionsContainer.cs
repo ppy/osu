@@ -29,9 +29,10 @@ namespace osu.Game.Graphics.Containers
                 if (expandableHeader != null)
                     Remove(expandableHeader);
                 expandableHeader = value;
+                if (value == null) return;
+
                 expandableHeader.Depth = float.MinValue;
                 Add(expandableHeader);
-                updateSectionMargin();
             }
         }
 
@@ -45,9 +46,10 @@ namespace osu.Game.Graphics.Containers
                 if (fixedHeader != null)
                     Remove(fixedHeader);
                 fixedHeader = value;
+                if (value == null) return;
+
                 fixedHeader.Depth = float.MinValue / 2;
                 Add(fixedHeader);
-                updateSectionMargin();
             }
         }
 
@@ -76,19 +78,19 @@ namespace osu.Game.Graphics.Containers
                 if (sections.Count == 0) return;
 
                 originalSectionMargin = sections[0].Margin;
-                updateSectionMargin();
                 sectionsContainer.Add(sections);
                 SelectedSection.Value = sections[0];
             }
         }
 
+        float headerHeight;
         private MarginPadding originalSectionMargin;
         private void updateSectionMargin()
         {
             if (sections.Count == 0) return;
 
             var newMargin = originalSectionMargin;
-            newMargin.Top += ExpandableHeader?.Height ?? 0 + FixedHeader?.Height ?? 0;
+            newMargin.Top += headerHeight;
 
             sections[0].Margin = newMargin;
         }
@@ -102,22 +104,32 @@ namespace osu.Game.Graphics.Containers
             });
         }
 
-        float lastKnownScroll;
+        float lastKnownScroll = float.NaN;
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
+
+            float height = (ExpandableHeader?.Height ?? 0) + (FixedHeader?.Height ?? 0);
+            if (height != headerHeight)
+            {
+                headerHeight = height;
+                updateSectionMargin();
+            }
+
             if (expandableHeader == null) return;
-
-            float position = scrollContainer.Current;
-            float offset = Math.Max(expandableHeader.Height, position);
-
-            expandableHeader.Y = -offset;
-            fixedHeader.Y = -offset + expandableHeader.Height;
 
             float currentScroll = scrollContainer.Current;
             if (currentScroll != lastKnownScroll)
             {
                 lastKnownScroll = currentScroll;
+
+                if (expandableHeader != null)
+                {
+                    float offset = Math.Min(expandableHeader.Height, currentScroll);
+
+                    expandableHeader.Y = -offset;
+                    fixedHeader.Y = -offset + expandableHeader.Height;
+                }
 
                 Drawable bestMatch = null;
                 float minDiff = float.MaxValue;
