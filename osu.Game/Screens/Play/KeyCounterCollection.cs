@@ -41,12 +41,11 @@ namespace osu.Game.Screens.Play
             get { return isCounting; }
             set
             {
-                if (value != isCounting)
-                {
-                    isCounting = value;
-                    foreach (var child in Children)
-                        child.IsCounting = value;
-                }
+                if (value == isCounting) return;
+
+                isCounting = value;
+                foreach (var child in Children)
+                    child.IsCounting = value;
             }
         }
 
