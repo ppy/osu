@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Chat
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = $@"#{channel.Name}",
+                                    Text = channel.ToString(),
                                     TextSize = text_size,
                                     Font = @"Exo2.0-Bold",
                                 },
@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Chat
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = @"543145",
+                                    Text = @"0",
                                     TextSize = text_size,
                                     Font = @"Exo2.0-SemiBold",
                                 },
