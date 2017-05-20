@@ -9,5 +9,11 @@ namespace osu.Game.Rulesets.Mania.Objects
     public abstract class ManiaHitObject : HitObject, IHasColumn
     {
         public int Column { get; set; }
+
+        /// <summary>
+        /// The number of other <see cref="ManiaHitObject"/> that start at
+        /// the same time as this hit object.
+        /// </summary>
+        public int Siblings { get; set; }
     }
 }
