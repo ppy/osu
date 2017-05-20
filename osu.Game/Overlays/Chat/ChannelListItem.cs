@@ -21,25 +21,28 @@ namespace osu.Game.Overlays.Chat
         private const float transition_duration = 100;
 
         private readonly OsuSpriteText topic;
+        private readonly OsuSpriteText name;
         private readonly TextAwesome joinedCheckmark;
 
         private Color4? joinedColour;
         private Color4? topicColour;
 
-        private bool joined;
-        public bool Joined
+        private Channel channel;
+        public Channel Channel
         {
-            get { return joined; }
+            get { return channel; }
             set
             {
-                if (value == joined) return;
-                joined = value;
+                if (value == channel) return;
+                channel = value;
 
+                name.Text = Channel.ToString();
+                topic.Text = Channel.Topic;
                 updateColour();
             }
         }
 
-        public ChannelListItem(Channel channel)
+        public ChannelListItem()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -74,9 +77,8 @@ namespace osu.Game.Overlays.Chat
                             AutoSizeAxes = Axes.Y,
                             Children = new[]
                             {
-                                new OsuSpriteText
+                                name = new OsuSpriteText
                                 {
-                                    Text = channel.ToString(),
                                     TextSize = text_size,
                                     Font = @"Exo2.0-Bold",
                                 },
@@ -91,7 +93,6 @@ namespace osu.Game.Overlays.Chat
                             {
                                 topic = new OsuSpriteText
                                 {
-                                    Text = channel.Topic,
                                     TextSize = text_size,
                                     Font = @"Exo2.0-SemiBold",
                                     Alpha = 0.8f,
@@ -136,10 +137,10 @@ namespace osu.Game.Overlays.Chat
 
         private void updateColour()
         {
-            joinedCheckmark.FadeTo(joined ? 1f : 0f, transition_duration);
-            topic.FadeTo(joined ? 0.8f : 1f, transition_duration);
-            topic.FadeColour(joined ? Color4.White : topicColour ?? Color4.White, transition_duration);
-            FadeColour(joined ? joinedColour ?? Color4.White : Color4.White, transition_duration);
+            joinedCheckmark.FadeTo(Channel.Joined ? 1f : 0f, transition_duration);
+            topic.FadeTo(Channel.Joined ? 0.8f : 1f, transition_duration);
+            topic.FadeColour(Channel.Joined ? Color4.White : topicColour ?? Color4.White, transition_duration);
+            FadeColour(Channel.Joined ? joinedColour ?? Color4.White : Color4.White, transition_duration);
         }
     }
 }
