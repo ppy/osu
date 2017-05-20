@@ -33,6 +33,7 @@ namespace osu.Game.Graphics.Containers
 
                 expandableHeader.Depth = float.MinValue;
                 Add(expandableHeader);
+                lastKnownScroll = float.NaN;
             }
         }
 
@@ -50,6 +51,7 @@ namespace osu.Game.Graphics.Containers
 
                 fixedHeader.Depth = float.MinValue / 2;
                 Add(fixedHeader);
+                lastKnownScroll = float.NaN;
             }
         }
 
@@ -79,6 +81,7 @@ namespace osu.Game.Graphics.Containers
                 originalSectionMargin = sections[0].Margin;
                 sectionsContainer.Add(sections);
                 SelectedSection.Value = sections[0];
+                lastKnownScroll = float.NaN;
             }
         }
 
@@ -104,7 +107,7 @@ namespace osu.Game.Graphics.Containers
             });
         }
 
-        float lastKnownScroll = float.NaN;
+        float lastKnownScroll;
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -116,14 +119,12 @@ namespace osu.Game.Graphics.Containers
                 updateSectionMargin();
             }
 
-            if (expandableHeader == null) return;
-
             float currentScroll = ScrollContainer.Current;
             if (currentScroll != lastKnownScroll)
             {
                 lastKnownScroll = currentScroll;
 
-                if (expandableHeader != null)
+                if (expandableHeader != null && fixedHeader != null)
                 {
                     float offset = Math.Min(expandableHeader.Height, currentScroll);
 
