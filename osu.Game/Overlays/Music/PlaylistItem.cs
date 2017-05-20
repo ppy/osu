@@ -97,17 +97,12 @@ namespace osu.Game.Overlays.Music
         {
             text.Clear();
 
-            var t = new List<SpriteText>();
-
             //space after the title to put a space between the title and artist
-            text.AddText(titleBind.Value + @"  ", sprite =>
+            titleSprites = text.AddText(titleBind.Value + @"  ", sprite =>
             {
                 sprite.TextSize = 16;
                 sprite.Font = @"Exo2.0-Regular";
-                t.Add(sprite);
             });
-
-            titleSprites = t;
 
             text.AddText(artistBind.Value, sprite =>
             {
