@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Chat
         private readonly Triangles triangles;
         private readonly Box headerBg;
         private readonly SearchTextBox search;
-        private readonly FillFlowContainer<ChannelSection> sectionsFlow;
+        private readonly SearchContainer<ChannelSection> sectionsFlow;
 
         public IEnumerable<ChannelSection> Sections
         {
@@ -67,11 +67,13 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Top = 85 },
                     Children = new[]
                     {
-                        sectionsFlow = new FillFlowContainer<ChannelSection>
+                        sectionsFlow = new SearchContainer<ChannelSection>
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
+                            LayoutDuration = 200,
+                            LayoutEasing = EasingTypes.OutQuint,
                             Spacing = new Vector2(0f, 20f),
                             Padding = new MarginPadding { Top = 20, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
                         },
@@ -116,6 +118,8 @@ namespace osu.Game.Overlays.Chat
                     Margin = new MarginPadding { Top = 160 },
                 },
             };
+
+            search.Current.ValueChanged += newValue => sectionsFlow.SearchTerm = newValue;
         }
 
         [BackgroundDependencyLoader]

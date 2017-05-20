@@ -12,7 +12,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelListItem : ClickableContainer
+    public class ChannelListItem : ClickableContainer, IFilterable
     {
         private const float width_padding = 5;
         private const float channel_width = 150;
@@ -26,6 +26,15 @@ namespace osu.Game.Overlays.Chat
 
         private Color4? joinedColour;
         private Color4? topicColour;
+
+        public string[] FilterTerms => new[] { Channel.Name };
+        public bool MatchingCurrentFilter
+        {
+        	set
+            {
+                FadeTo(value ? 1f : 0f, 100);
+            }
+        }
 
         private Channel channel;
         public Channel Channel
