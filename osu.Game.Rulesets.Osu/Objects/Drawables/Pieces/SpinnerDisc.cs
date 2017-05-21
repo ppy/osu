@@ -2,13 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
@@ -17,104 +12,31 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SpinnerDisc : CircularContainer
+    public class SpinnerDisc : CircularContainer, IHasAccentColour
     {
-        protected Sprite Disc;
+        private readonly Spinner spinner;
 
-        public SRGBColour DiscColour
+        public Color4 AccentColour
         {
-            get { return Disc.Colour; }
-            set { Disc.Colour = value; }
+            get { return background.AccentColour; }
+            set { background.AccentColour = value; }
         }
 
-        private Color4 completeColour;
+        private readonly SpinnerBackground background;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private const float idle_alpha = 0.2f;
+        private const float tracking_alpha = 0.4f;
+
+        public SpinnerDisc(Spinner s)
         {
-            completeColour = colours.YellowLight.Opacity(0.8f);
-            Masking = true;
-        }
+            spinner = s;
 
-        private class SpinnerBorder : Container
-        {
-            public SpinnerBorder()
-            {
-                Origin = Anchor.Centre;
-                Anchor = Anchor.Centre;
-                RelativeSizeAxes = Axes.Both;
-
-                layout();
-            }
-
-            private int lastLayoutDotCount;
-            private void layout()
-            {
-                int count = (int)(MathHelper.Pi * ScreenSpaceDrawQuad.Width / 9);
-
-                if (count == lastLayoutDotCount) return;
-
-                lastLayoutDotCount = count;
-
-                while (Children.Count() < count)
-                {
-                    Add(new CircularContainer
-                    {
-                        Colour = Color4.White,
-                        RelativePositionAxes = Axes.Both,
-                        Masking = true,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(1 / ScreenSpaceDrawQuad.Width * 2000),
-                        Children = new[]
-                        {
-                            new Box
-                            {
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre,
-                                RelativeSizeAxes = Axes.Both,
-                            }
-                        }
-                    });
-                }
-
-                var size = new Vector2(1 / ScreenSpaceDrawQuad.Width * 2000);
-
-                int i = 0;
-                foreach (var d in Children)
-                {
-                    d.Size = size;
-                    d.Position = new Vector2(
-                        0.5f + (float)Math.Sin((float)i / count * 2 * MathHelper.Pi) / 2,
-                        0.5f + (float)Math.Cos((float)i / count * 2 * MathHelper.Pi) / 2
-                    );
-
-                    i++;
-                }
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-                layout();
-            }
-        }
-
-        public SpinnerDisc()
-        {
             AlwaysReceiveInput = true;
-
             RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]
             {
-                Disc = new Box
-                {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.2f,
-                },
-                new SpinnerBorder()
+                background = new SpinnerBackground { Alpha = idle_alpha },
             };
         }
 
@@ -125,10 +47,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             set
             {
                 if (value == tracking) return;
-
                 tracking = value;
 
-                Disc.FadeTo(tracking ? 0.5f : 0.2f, 100);
+                background.FadeTo(tracking ? tracking_alpha : idle_alpha, 100);
             }
         }
 
@@ -139,10 +60,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             set
             {
                 if (value == complete) return;
-
                 complete = value;
-
-                Disc.FadeColour(completeColour, 200);
 
                 updateCompleteTick();
             }
@@ -150,20 +68,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            Tracking = true;
+            Tracking |= state.Mouse.HasMainButtonPressed;
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            Tracking = false;
+            Tracking &= state.Mouse.HasMainButtonPressed;
             return base.OnMouseUp(state, args);
         }
 
         protected override bool OnMouseMove(InputState state)
         {
             Tracking |= state.Mouse.HasMainButtonPressed;
-            mousePosition = state.Mouse.Position;
+            mousePosition = Parent.ToLocalSpace(state.Mouse.NativeState.Position);
             return base.OnMouseMove(state);
         }
 
@@ -177,13 +95,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private bool updateCompleteTick() => completeTick != (completeTick = (int)(RotationAbsolute / 360));
 
+        private bool rotationTransferred;
+
         protected override void Update()
         {
             base.Update();
 
             var thisAngle = -(float)MathHelper.RadiansToDegrees(Math.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
-            if (tracking)
+
+            bool validAndTracking = tracking && spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
+
+            if (validAndTracking)
             {
+                if (!rotationTransferred)
+                {
+                    currentRotation = Rotation * 2;
+                    rotationTransferred = true;
+                }
+
                 if (thisAngle - lastAngle > 180)
                     lastAngle += 360;
                 else if (lastAngle - thisAngle > 180)
@@ -192,17 +121,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 currentRotation += thisAngle - lastAngle;
                 RotationAbsolute += Math.Abs(thisAngle - lastAngle);
             }
+
             lastAngle = thisAngle;
 
             if (Complete && updateCompleteTick())
             {
-                Disc.Flush(flushType: typeof(TransformAlpha));
-                Disc.FadeTo(0.75f, 30, EasingTypes.OutExpo);
-                Disc.Delay(30);
-                Disc.FadeTo(0.5f, 250, EasingTypes.OutQuint);
+                background.Flush(flushType: typeof(TransformAlpha));
+                background.FadeTo(tracking_alpha + 0.4f, 60, EasingTypes.OutExpo);
+                background.Delay(60);
+                background.FadeTo(tracking_alpha, 250, EasingTypes.OutQuint);
             }
 
-            RotateTo(currentRotation, 100, EasingTypes.OutExpo);
+            RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, EasingTypes.OutExpo);
         }
     }
 }
