@@ -155,7 +155,11 @@ namespace osu.Game.Screens.Select
                 index = (index + direction + groups.Count) % groups.Count;
                 if (groups[index].State != BeatmapGroupState.Hidden)
                 {
-                    SelectBeatmap(direction == 1 || skipDifficulties ? groups[index].BeatmapPanels.First().Beatmap : groups[index].BeatmapPanels.Last().Beatmap);
+                    if (skipDifficulties)
+                        SelectBeatmap(groups[index].SelectedPanel != null ? groups[index].SelectedPanel.Beatmap : groups[index].BeatmapPanels.First().Beatmap);
+                    else
+                        SelectBeatmap(direction == 1 ? groups[index].BeatmapPanels.First().Beatmap : groups[index].BeatmapPanels.Last().Beatmap);
+
                     return;
                 }
             } while (index != startIndex);
