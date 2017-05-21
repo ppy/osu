@@ -348,7 +348,6 @@ namespace osu.Game.Screens.Select
                 trackManager.SetExclusive(track);
                 if (preview)
                     track.Seek(Beatmap.Metadata.PreviewTime);
-                track.Looping = true;
                 track.Start();
             }
         }
