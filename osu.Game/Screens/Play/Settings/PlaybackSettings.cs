@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.Settings
 {
-    public class PlaybackSettings : SettingsContainer
+    public class PlaybackSettings : SettingsDropdownContainer
     {
         public override string Title => @"PLAYBACK";
 

@@ -9,7 +9,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Play.Settings
 {
-    public class DiscussionSettings : SettingsContainer
+    public class DiscussionSettings : SettingsDropdownContainer
     {
         public override string Title => @"DISCUSSIONS";
 

@@ -48,7 +48,7 @@ namespace osu.Desktop.VisualTests.Tests
             }));
         }
 
-        private class ExampleContainer : SettingsContainer
+        private class ExampleContainer : SettingsDropdownContainer
         {
             public override string Title => @"EXAMPLE";
         }

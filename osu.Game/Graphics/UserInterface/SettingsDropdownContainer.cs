@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -10,7 +11,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public abstract class SettingsContainer : Container
+    public abstract class SettingsDropdownContainer : Container
     {
         /// <summary>
         /// The title of this container.
@@ -18,16 +19,19 @@ namespace osu.Game.Graphics.UserInterface
         public abstract string Title { get; }
 
         private const float transition_duration = 600;
-        private const int container_width = 250;
+        private const int container_width = 270;
         private const int border_thickness = 2;
         private const int header_height = 30;
         private const int corner_radius = 5;
 
-        private readonly FillFlowContainer content;
-        private readonly SimpleButton button;
+        private FillFlowContainer content;
+        private SimpleButton button;
         private bool buttonIsPressed;
 
-        protected SettingsContainer()
+        private Color4 buttonPressedColour;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Y;
             Width = container_width;
@@ -54,6 +58,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         new Container
                         {
+                            Name = @"Header",
                             RelativeSizeAxes = Axes.X,
                             Height = header_height,
                             Origin = Anchor.TopCentre,
@@ -76,13 +81,15 @@ namespace osu.Game.Graphics.UserInterface
                                     Anchor = Anchor.CentreRight,
                                     Position = new Vector2(-15,0),
                                     Icon = FontAwesome.fa_bars,
-                                    Scale = new Vector2(0.7f),
-                                    Action = () => triggerContentVisibility(),
+                                    Scale = new Vector2(0.75f),
+                                    Colour = buttonPressedColour = colours.Yellow,
+                                    Action = triggerContentVisibility,
                                 },
                             }
                         },
                         content = new FillFlowContainer
                         {
+                            Name = @"Content",
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -91,13 +98,11 @@ namespace osu.Game.Graphics.UserInterface
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Padding = new MarginPadding(15),
-                            Spacing = new Vector2(0, 10),
+                            Spacing = new Vector2(0, 15),
                         }
                     }
                 },
             };
-
-            button.TriggerClick();
         }
 
         public new void Add(Drawable drawable)
@@ -107,10 +112,6 @@ namespace osu.Game.Graphics.UserInterface
 
         private void triggerContentVisibility()
         {
-            buttonIsPressed = !buttonIsPressed;
-
-            button.FadeColour(buttonIsPressed ? OsuColour.FromHex(@"ffcc22") : Color4.White, 200, EasingTypes.OutQuint);
-
             if (buttonIsPressed)
             {
                 content.ClearTransforms();
@@ -121,6 +122,10 @@ namespace osu.Game.Graphics.UserInterface
                 content.AutoSizeAxes = Axes.None;
                 content.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
             }
+
+            button.FadeColour(buttonIsPressed ? buttonPressedColour : Color4.White, 200, EasingTypes.OutQuint);
+
+            buttonIsPressed = !buttonIsPressed;
         }
     }
 }

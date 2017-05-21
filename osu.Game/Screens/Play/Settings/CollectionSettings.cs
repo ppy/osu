@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.Settings
 {
-    public class CollectionSettings : SettingsContainer
+    public class CollectionSettings : SettingsDropdownContainer
     {
         public override string Title => @"COLLECTIONS";
 
