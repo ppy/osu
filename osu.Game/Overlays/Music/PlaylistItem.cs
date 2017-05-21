@@ -7,10 +7,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Localisation;
+using osu.Framework.Graphics.Sprites;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Music
 {
@@ -19,9 +19,13 @@ namespace osu.Game.Overlays.Music
         private const float fade_duration = 100;
 
         private Color4 hoverColour;
+        private Color4 artistColour;
 
         private TextAwesome handle;
-        private OsuSpriteText title;
+        private Paragraph text;
+        private IEnumerable<SpriteText> titleSprites;
+        private UnicodeBindableString titleBind;
+        private UnicodeBindableString artistBind;
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
@@ -37,7 +41,8 @@ namespace osu.Game.Overlays.Music
                 selected = value;
 
                 Flush(true);
-                title.FadeColour(Selected ? hoverColour : Color4.White, fade_duration);
+                foreach (SpriteText s in titleSprites)
+                    s.FadeColour(Selected ? hoverColour : Color4.White, fade_duration);
             }
         }
 
@@ -53,8 +58,10 @@ namespace osu.Game.Overlays.Music
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, LocalisationEngine localisation)
         {
-            BeatmapMetadata metadata = BeatmapSetInfo.Metadata;
+            hoverColour = colours.Yellow;
+            artistColour = colours.Gray9;
 
+            var metadata = BeatmapSetInfo.Metadata;
             FilterTerms = metadata.SearchableTerms;
 
             Children = new Drawable[]
@@ -70,33 +77,40 @@ namespace osu.Game.Overlays.Music
                     Margin = new MarginPadding { Left = 5 },
                     Padding = new MarginPadding { Top = 2 },
                 },
-                new FillFlowContainer<OsuSpriteText>
+                text = new Paragraph
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = 20 },
-                    Spacing = new Vector2(5f, 0f),
-                    Children = new []
-                    {
-                        title = new OsuSpriteText
-                        {
-                            TextSize = 16,
-                            Font = @"Exo2.0-Regular",
-                            Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title),
-                        },
-                        new OsuSpriteText
-                        {
-                            TextSize = 14,
-                            Font = @"Exo2.0-Bold",
-                            Colour = colours.Gray9,
-                            Padding = new MarginPadding { Top = 1 },
-                            Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist),
-                        }
-                    }
+                    ContentIndent = 10f,
                 },
             };
 
-            hoverColour = colours.Yellow;
+            titleBind = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
+            artistBind = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
+
+            artistBind.ValueChanged += newText => recreateText();
+            artistBind.TriggerChange();
+        }
+
+        private void recreateText()
+        {
+            text.Clear();
+
+            //space after the title to put a space between the title and artist
+            titleSprites = text.AddText(titleBind.Value + @"  ", sprite =>
+            {
+                sprite.TextSize = 16;
+                sprite.Font = @"Exo2.0-Regular";
+            });
+
+            text.AddText(artistBind.Value, sprite =>
+            {
+                sprite.TextSize = 14;
+                sprite.Font = @"Exo2.0-Bold";
+                sprite.Colour = artistColour;
+                sprite.Padding = new MarginPadding { Top = 1 };
+            });
         }
 
         protected override bool OnHover(Framework.Input.InputState state)
