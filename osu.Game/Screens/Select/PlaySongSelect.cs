@@ -65,6 +65,8 @@ namespace osu.Game.Screens.Select
         protected override void OnResuming(Screen last)
         {
             player = null;
+            Beatmap.Track.Looping = false;
+
             base.OnResuming(last);
         }
 
@@ -83,12 +85,18 @@ namespace osu.Game.Screens.Select
                 return true;
             }
 
-            return base.OnExiting(next);
+            if (base.OnExiting(next))
+                return true;
+
+            Beatmap.Track.Looping = false;
+            return false;
         }
 
         protected override void OnSelected()
         {
             if (player != null) return;
+
+            Beatmap.Track.Looping = false;
 
             LoadComponentAsync(player = new PlayerLoader(new Player
             {

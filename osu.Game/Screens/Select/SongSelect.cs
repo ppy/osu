@@ -348,6 +348,7 @@ namespace osu.Game.Screens.Select
                 trackManager.SetExclusive(track);
                 if (preview)
                     track.Seek(Beatmap.Metadata.PreviewTime);
+                track.Looping = true;
                 track.Start();
             }
         }
@@ -363,13 +364,6 @@ namespace osu.Game.Screens.Select
         {
             if (Beatmap != null)
                 dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap));
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            ensurePlayingSelected();
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
