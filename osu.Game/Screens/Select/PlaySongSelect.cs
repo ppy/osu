@@ -57,9 +57,9 @@ namespace osu.Game.Screens.Select
         {
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
 
-            if (Beatmap != null) Beatmap.Track.Looping = false;
+            if (Beatmap != null && Beatmap.Track != null) Beatmap.Track.Looping = false;
             beatmapDetails.Beatmap = beatmap;
-            if(beatmap != null) beatmap.Track.Looping = true;
+            if(beatmap != null && beatmap.Track != null) beatmap.Track.Looping = true;
 
             base.OnBeatmapChanged(beatmap);
         }
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            if(Beatmap != null) Beatmap.Track.Looping = false;
+            if(Beatmap != null && Beatmap.Track != null) Beatmap.Track.Looping = false;
 
             return false;
         }
