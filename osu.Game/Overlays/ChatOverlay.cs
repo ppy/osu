@@ -53,6 +53,10 @@ namespace osu.Game.Overlays
 
         private Bindable<double> chatHeight;
 
+        private readonly ChannelSelectionOverlay channelSelection;
+
+        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || channelSelection.Contains(screenSpacePos);
+
         public ChatOverlay()
         {
             RelativeSizeAxes = Axes.Both;
@@ -65,6 +69,12 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
+                channelSelection = new ChannelSelectionOverlay
+                {
+                    Origin = Anchor.BottomLeft,
+                    Height = 400,
+                    State = Visibility.Visible,
+                },
                 new Container
                 {
                     Name = @"chat area",
@@ -233,6 +243,16 @@ namespace osu.Game.Overlays
                     addChannel(channels.Find(c => c.Name == @"#lazer"));
                     addChannel(channels.Find(c => c.Name == @"#osu"));
                     addChannel(channels.Find(c => c.Name == @"#lobby"));
+
+                    channelSelection.OnRequestJoin = channel => addChannel(channel);
+                    channelSelection.Sections = new[]
+                    {
+                        new ChannelSection
+                        {
+                            Header = @"ALL CHANNELS",
+                            Channels = channels,
+                        },
+                    };
                 });
 
                 messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
@@ -294,6 +314,8 @@ namespace osu.Game.Overlays
 
             if (CurrentChannel == null)
                 CurrentChannel = channel;
+
+            channel.Joined.Value = true;
         }
 
         private void fetchInitialMessages(Channel channel)
