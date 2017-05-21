@@ -1,12 +1,11 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics.Sprites;
-using OpenTK;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics
 {
-    public class TextAwesome : SpriteText
+    public class TextAwesome : OsuSpriteText
     {
         //public override FontFace FontFace => (int)Icon < 0xf000 ? FontFace.OsuFont : FontFace.FontAwesome;
 
@@ -26,11 +25,6 @@ namespace osu.Game.Graphics
                 icon = value;
                 Text = ((char)icon).ToString();
             }
-        }
-
-        public TextAwesome()
-        {
-            Origin = Framework.Graphics.Anchor.Centre;
         }
     }
 
@@ -823,13 +817,13 @@ namespace osu.Game.Graphics
         fa_youtube_play = 0xf16a,
         fa_youtube_square = 0xf166,
 
-        // gamemode icons in circles
+        // ruleset icons in circles
         fa_osu_osu_o = 0xe000,
         fa_osu_mania_o = 0xe001,
         fa_osu_fruits_o = 0xe002,
         fa_osu_taiko_o = 0xe003,
 
-        // gamemode icons without circles
+        // ruleset icons without circles
         fa_osu_filled_circle = 0xe004,
         fa_osu_cross_o = 0xe005,
         fa_osu_logo = 0xe006,
@@ -903,6 +897,6 @@ namespace osu.Game.Graphics
         fa_osu_mod_spunout = 0xe046,
         fa_osu_mod_suddendeath = 0xe047,
         fa_osu_mod_target = 0xe048,
-        fa_osu_mod_bg = 0xe049,
+        fa_osu_mod_bg = 0xe04a,
     }
 }

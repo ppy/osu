@@ -1,8 +1,8 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.GameModes.Testing;
+using osu.Framework.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
@@ -12,19 +12,17 @@ using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseTextAwesome : TestCase
+    internal class TestCaseTextAwesome : TestCase
     {
-        public override string Name => @"TextAwesome";
-
         public override string Description => @"Tests display of icons";
 
         public override void Reset()
         {
             base.Reset();
 
-            FlowContainer flow;
+            FillFlowContainer flow;
 
-            Add(flow = new FlowContainer()
+            Add(flow = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(0.5f),

@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework.Graphics.Containers;
@@ -8,12 +8,11 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.Processing
 {
-    class RatioAdjust : Container
+    internal class RatioAdjust : Container
     {
-        public override bool Contains(Vector2 screenSpacePos) => true;
-
         public RatioAdjust()
         {
+            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
         }
 

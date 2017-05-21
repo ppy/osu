@@ -1,12 +1,10 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
-
-using osu.Game.Screens.Backgrounds;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 namespace osu.Game.Screens.Select
 {
-    class MatchSongSelect : GameModeWhiteBox
+    public class MatchSongSelect : SongSelect
     {
-        protected override BackgroundMode CreateBackground() => new BackgroundModeCustom(@"Backgrounds/bg4");
+        protected override void OnSelected() => Exit();
     }
 }

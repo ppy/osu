@@ -1,24 +1,21 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
-using osu.Framework.Timing;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ScoreCounter : RollingCounter<ulong>
+    public class ScoreCounter : RollingCounter<double>
     {
         protected override Type TransformType => typeof(TransformScore);
 
         protected override double RollingDuration => 1000;
         protected override EasingTypes RollingEasing => EasingTypes.Out;
+
+        public bool UseCommaSeparator;
 
         /// <summary>
         /// How many leading zeroes the counter has.
@@ -39,24 +36,29 @@ namespace osu.Game.Graphics.UserInterface
             LeadingZeroes = leading;
         }
 
-        protected override double GetProportionalDuration(ulong currentValue, ulong newValue)
+        protected override double GetProportionalDuration(double currentValue, double newValue)
         {
             return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
         }
 
-        protected override string FormatCount(ulong count)
+        protected override string FormatCount(double count)
         {
-            return count.ToString("D" + LeadingZeroes);
+            string format = new string('0', (int)LeadingZeroes);
+            if (UseCommaSeparator)
+                for (int i = format.Length - 3; i > 0; i -= 3)
+                    format = format.Insert(i, @",");
+
+            return ((long)count).ToString(format);
         }
 
-        public override void Increment(ulong amount)
+        public override void Increment(double amount)
         {
-            Count = Count + amount;
+            Current.Value = Current + amount;
         }
 
-        protected class TransformScore : Transform<ulong>
+        protected class TransformScore : Transform<double>
         {
-            protected override ulong CurrentValue
+            public override double CurrentValue
             {
                 get
                 {
@@ -64,14 +66,14 @@ namespace osu.Game.Graphics.UserInterface
                     if (time < StartTime) return StartValue;
                     if (time >= EndTime) return EndValue;
 
-                    return (ulong)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+                    return Interpolation.ValueAt(time, (float)StartValue, (float)EndValue, StartTime, EndTime, Easing);
                 }
             }
 
             public override void Apply(Drawable d)
             {
                 base.Apply(d);
-                (d as ScoreCounter).DisplayedCount = CurrentValue;
+                ((ScoreCounter)d).DisplayedCount = CurrentValue;
             }
         }
     }

@@ -1,10 +1,12 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
 using System.IO;
 using NUnit.Framework;
 using osu.Game.Beatmaps.IO;
-using osu.Game.Modes;
-using osu.Game.Modes.Osu;
 using osu.Game.Tests.Resources;
+using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -15,7 +17,6 @@ namespace osu.Game.Tests.Beatmaps.IO
         public void SetUp()
         {
             OszArchiveReader.Register();
-            Ruleset.Register(new OsuRuleset());
         }
 
         [Test]
@@ -39,7 +40,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     "Soleily - Renatus (MMzz) [Muzukashii].osu",
                     "Soleily - Renatus (MMzz) [Oni].osu"
                 };
-                var maps = reader.ReadBeatmaps();
+                var maps = reader.BeatmapFilenames;
                 foreach (var map in expected)
                     Assert.Contains(map, maps);
             }
@@ -51,7 +52,11 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
             {
                 var reader = new OszArchiveReader(osz);
-                var meta = reader.ReadMetadata();
+
+                BeatmapMetadata meta;
+                using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
+                    meta = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
+
                 Assert.AreEqual(241526, meta.OnlineBeatmapSetID);
                 Assert.AreEqual("Soleily", meta.Artist);
                 Assert.AreEqual("Soleily", meta.ArtistUnicode);
@@ -75,7 +80,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 using (var stream = new StreamReader(
                     reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {
-                    Assert.AreEqual("osu file format v13", stream.ReadLine().Trim());
+                    Assert.AreEqual("osu file format v13", stream.ReadLine()?.Trim());
                 }
             }
         }

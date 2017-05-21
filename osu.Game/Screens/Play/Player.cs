@@ -1,189 +1,320 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
+using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics;
-using osu.Framework.Input;
-using osu.Framework.Platform;
-using osu.Framework.Timing;
-using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.Objects.Drawables;
-using osu.Game.Screens.Backgrounds;
-using OpenTK.Input;
-using MouseState = osu.Framework.Input.MouseState;
-using OpenTK;
-using osu.Framework.GameModes;
-using osu.Game.Modes.UI;
-using osu.Game.Screens.Ranking;
-using osu.Game.Configuration;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Logging;
+using osu.Framework.Screens;
+using osu.Framework.Timing;
+using osu.Game.Configuration;
+using osu.Game.Database;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Backgrounds;
 using System;
-using OpenTK.Graphics;
+using System.Linq;
+using osu.Framework.Threading;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuGameMode
+    public class Player : OsuScreen
     {
-        public bool Autoplay;
-
-        protected override BackgroundMode CreateBackground() => new BackgroundModeBeatmap(Beatmap);
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
 
+        internal override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && HitRenderer.ProvidingUserCursor;
+
         public BeatmapInfo BeatmapInfo;
 
-        public PlayMode PreferredPlayMode;
-        
-        private IAdjustableClock sourceClock;
+        public Action RestartRequested;
 
-        private Ruleset ruleset;
+        internal override bool AllowRulesetChange => false;
+
+        public bool HasFailed { get; private set; }
+
+        public int RestartCount;
+
+        private IAdjustableClock adjustableSourceClock;
+        private FramedOffsetClock offsetClock;
+        private DecoupleableInterpolatingFramedClock decoupledClock;
+
+        private PauseContainer pauseContainer;
+
+        private RulesetInfo ruleset;
 
         private ScoreProcessor scoreProcessor;
-        private HitRenderer hitRenderer;
-        private Bindable<int> dimLevel;
+        protected HitRenderer HitRenderer;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuGameBase game, OsuConfigManager config)
+        #region User Settings
+
+        private Bindable<double> dimLevel;
+        private Bindable<bool> mouseWheelDisabled;
+        private Bindable<double> userAudioOffset;
+
+        #endregion
+
+        private HUDOverlay hudOverlay;
+        private FailOverlay failOverlay;
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
         {
-            dimLevel = config.GetBindable<int>(OsuConfig.DimLevel);
+            dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+
+            Ruleset rulesetInstance;
+
             try
             {
                 if (Beatmap == null)
-                    Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo);
+                    Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
+
+                if (Beatmap?.Beatmap == null)
+                    throw new InvalidOperationException("Beatmap was not loaded");
+
+                ruleset = osu?.Ruleset.Value ?? Beatmap.BeatmapInfo.Ruleset;
+                rulesetInstance = ruleset.CreateInstance();
+
+                try
+                {
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, ruleset.ID == Beatmap.BeatmapInfo.Ruleset.ID);
+                }
+                catch (BeatmapInvalidForRulesetException)
+                {
+                    // we may fail to create a HitRenderer if the beatmap cannot be loaded with the user's preferred ruleset
+                    // let's try again forcing the beatmap's ruleset.
+                    ruleset = Beatmap.BeatmapInfo.Ruleset;
+                    rulesetInstance = ruleset.CreateInstance();
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, true);
+                }
+
+                if (!HitRenderer.Objects.Any())
+                    throw new InvalidOperationException("Beatmap contains no hit objects!");
             }
-            catch
+            catch (Exception e)
             {
+                Logger.Log($"Could not load this beatmap sucessfully ({e})!", LoggingTarget.Runtime, LogLevel.Error);
+
                 //couldn't load, hard abort!
                 Exit();
                 return;
             }
 
-            AudioTrack track = Beatmap.Track;
+            Track track = Beatmap.Track;
 
             if (track != null)
             {
                 audio.Track.SetExclusive(track);
-                sourceClock = track;
+                adjustableSourceClock = track;
             }
 
-            sourceClock = (IAdjustableClock)track ?? new StopwatchClock();
+            adjustableSourceClock = (IAdjustableClock)track ?? new StopwatchClock();
+
+            decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
+
+            var firstObjectTime = HitRenderer.Objects.First().StartTime;
+            decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(Beatmap.Beatmap.TimingInfo.BeatLengthAt(firstObjectTime) * 4, Beatmap.BeatmapInfo.AudioLeadIn)));
+            decoupledClock.ProcessFrame();
+
+            offsetClock = new FramedOffsetClock(decoupledClock);
+
+            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
+            userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
+            userAudioOffset.TriggerChange();
 
             Schedule(() =>
             {
-                sourceClock.Reset();
+                adjustableSourceClock.Reset();
+
+                foreach (var mod in Beatmap.Mods.Value.OfType<IApplicableToClock>())
+                    mod.ApplyToClock(adjustableSourceClock);
+
+                decoupledClock.ChangeSource(adjustableSourceClock);
             });
-
-            var beatmap = Beatmap.Beatmap;
-
-            if (beatmap.BeatmapInfo?.Mode > PlayMode.Osu)
-            {
-                //we only support osu! mode for now because the hitobject parsing is crappy and needs a refactor.
-                Exit();
-                return;
-            }
-
-            PlayMode usablePlayMode = beatmap.BeatmapInfo?.Mode > PlayMode.Osu ? beatmap.BeatmapInfo.Mode : PreferredPlayMode;
-
-            ruleset = Ruleset.GetRuleset(usablePlayMode);
-
-            var scoreOverlay = ruleset.CreateScoreOverlay();
-            scoreOverlay.BindProcessor(scoreProcessor = ruleset.CreateScoreProcessor(beatmap.HitObjects.Count));
-
-            hitRenderer = ruleset.CreateHitRendererWith(beatmap.HitObjects);
-
-            //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
-            hitRenderer.OnJudgement += scoreProcessor.AddJudgement;
-            hitRenderer.OnAllJudged += onPass;
-
-            //bind ScoreProcessor to ourselves (for a fail situation)
-            scoreProcessor.Failed += onFail;
-
-            if (Autoplay)
-                hitRenderer.Schedule(() => hitRenderer.DrawableObjects.ForEach(h => h.State = ArmedState.Hit));
 
             Children = new Drawable[]
             {
-                new PlayerInputManager(game.Host)
+                pauseContainer = new PauseContainer
                 {
-                    Clock = new InterpolatingFramedClock(sourceClock),
-                    PassThrough = false,
+                    AudioClock = decoupledClock,
+                    FramedClock = offsetClock,
+                    OnRetry = Restart,
+                    OnQuit = Exit,
+                    CheckCanPause = () => ValidForResume && !HasFailed,
+                    Retries = RestartCount,
+                    OnPause = () => {
+                        hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
+                    },
+                    OnResume = () => {
+                        hudOverlay.KeyCounter.IsCounting = true;
+                    },
                     Children = new Drawable[]
                     {
-                        hitRenderer,
+                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Clock = offsetClock,
+                            Children = new Drawable[]
+                            {
+                                HitRenderer,
+                            }
+                        },
+                        hudOverlay = new StandardHUDOverlay
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre
+                        },
                     }
                 },
-                scoreOverlay,
-            };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Delay(250, true);
-            Content.FadeIn(250);
-
-            Delay(500, true);
-
-            Schedule(() =>
-            {
-                sourceClock.Start();
-            });
-        }
-
-        private void onPass()
-        {
-            Delay(1000);
-            Schedule(delegate
-            {
-                ValidForResume = false;
-                Push(new Results
+                failOverlay = new FailOverlay
                 {
-                    Score = scoreProcessor.GetScore()
+                    OnRetry = Restart,
+                    OnQuit = Exit,
+                },
+                new HotkeyRetryOverlay
+                {
+                    Action = () => {
+                        //we want to hide the hitrenderer immediately (looks better).
+                        //we may be able to remove this once the mouse cursor trail is improved.
+                        HitRenderer?.Hide();
+                        Restart();
+                    },
+                }
+            };
+
+            scoreProcessor = HitRenderer.CreateScoreProcessor();
+
+            hudOverlay.KeyCounter.Add(rulesetInstance.CreateGameplayKeys());
+            hudOverlay.BindProcessor(scoreProcessor);
+            hudOverlay.BindHitRenderer(HitRenderer);
+
+            hudOverlay.Progress.Objects = HitRenderer.Objects;
+            hudOverlay.Progress.AudioClock = decoupledClock;
+            hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
+            hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
+
+            hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
+
+            //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
+            HitRenderer.OnAllJudged += onCompletion;
+
+            //bind ScoreProcessor to ourselves (for a fail situation)
+            scoreProcessor.Failed += onFail;
+        }
+
+        public void Restart()
+        {
+            ValidForResume = false;
+            RestartRequested?.Invoke();
+            Exit();
+        }
+
+        private ScheduledDelegate onCompletionEvent;
+
+        private void onCompletion()
+        {
+            // Only show the completion screen if the player hasn't failed
+            if (scoreProcessor.HasFailed || onCompletionEvent != null)
+                return;
+
+            ValidForResume = false;
+
+            using (BeginDelayedSequence(1000))
+            {
+                onCompletionEvent = Schedule(delegate
+                {
+                    var score = new Score
+                    {
+                        Beatmap = Beatmap.BeatmapInfo,
+                        Ruleset = ruleset
+                    };
+                    scoreProcessor.PopulateScore(score);
+                    score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
+                    Push(new Results(score));
                 });
-            });
+            }
         }
 
         private void onFail()
         {
-            Content.FadeColour(Color4.Red, 500);
-            sourceClock.Stop();
+            decoupledClock.Stop();
 
-            Delay(500);
-            Schedule(delegate
-            {
-                ValidForResume = false;
-                Push(new FailDialog());
-            });
+            HasFailed = true;
+            failOverlay.Retries = RestartCount;
+            failOverlay.Show();
         }
 
-        protected override void OnEntering(GameMode last)
+        protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
 
-            (Background as BackgroundModeBeatmap)?.BlurTo(Vector2.Zero, 1000);
-            Background?.FadeTo((100f- dimLevel)/100, 1000);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, EasingTypes.OutQuint);
+            Background?.FadeTo(1 - (float)dimLevel, 1500, EasingTypes.OutQuint);
 
             Content.Alpha = 0;
-            dimLevel.ValueChanged += dimChanged;
+
+            dimLevel.ValueChanged += newDim => Background?.FadeTo(1 - (float)newDim, 800);
+
+            Content.ScaleTo(0.7f);
+
+            using (Content.BeginDelayedSequence(250))
+                Content.FadeIn(250);
+
+            Content.ScaleTo(1, 750, EasingTypes.OutQuint);
+
+            using (BeginDelayedSequence(750))
+                Schedule(() =>
+                {
+                    if (!pauseContainer.IsPaused)
+                        decoupledClock.Start();
+
+                });
+
+            pauseContainer.Alpha = 0;
+            pauseContainer.FadeIn(750, EasingTypes.OutQuint);
         }
 
-        protected override bool OnExiting(GameMode next)
+        protected override void OnSuspending(Screen next)
         {
-            dimLevel.ValueChanged -= dimChanged;
-            Background?.FadeTo(1f, 200);
-            return base.OnExiting(next);
+            fadeOut();
+            base.OnSuspending(next);
         }
 
-        private void dimChanged(object sender, EventArgs e)
+        protected override bool OnExiting(Screen next)
         {
-            Background?.FadeTo((100f - dimLevel) / 100, 800);
+            if (HasFailed || !ValidForResume || pauseContainer.AllowExit || HitRenderer.HasReplayLoaded)
+            {
+                fadeOut();
+                return base.OnExiting(next);
+            }
+
+            pauseContainer.Pause();
+            return true;
         }
+
+        private void fadeOut()
+        {
+            const float fade_out_duration = 250;
+
+            HitRenderer?.FadeOut(fade_out_duration);
+            Content.FadeOut(fade_out_duration);
+
+            hudOverlay.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
+
+            Background?.FadeTo(1f, fade_out_duration);
+        }
+
+        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
     }
 }

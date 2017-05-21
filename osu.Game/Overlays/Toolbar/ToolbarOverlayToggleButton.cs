@@ -1,29 +1,17 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using osu.Framework;
-using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osu.Game.Configuration;
-using osu.Game.Online.API;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    class ToolbarOverlayToggleButton : ToolbarButton
+    internal class ToolbarOverlayToggleButton : ToolbarButton
     {
-        private Box StateBackground;
+        private readonly Box stateBackground;
 
         private OverlayContainer stateContainer;
 
@@ -33,13 +21,14 @@ namespace osu.Game.Overlays.Toolbar
             set
             {
                 stateContainer = value;
+                Action = stateContainer.ToggleVisibility;
                 stateContainer.StateChanged += stateChanged;
             }
         }
 
         public ToolbarOverlayToggleButton()
         {
-            Add(StateBackground = new Box
+            Add(stateBackground = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = OsuColour.Gray(150).Opacity(180),
@@ -61,10 +50,10 @@ namespace osu.Game.Overlays.Toolbar
             switch (state)
             {
                 case Visibility.Hidden:
-                    StateBackground.FadeOut(200);
+                    stateBackground.FadeOut(200);
                     break;
                 case Visibility.Visible:
-                    StateBackground.FadeIn(200);
+                    stateBackground.FadeIn(200);
                     break;
             }
         }

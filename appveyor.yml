@@ -1,0 +1,23 @@
+clone_depth: 1
+version: '{branch}-{build}'
+configuration: Debug
+cache:
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+  - inspectcode -> appveyor.yml
+  - packages -> **\packages.config
+install:
+  - cmd: git submodule update --init --recursive
+  - cmd: choco install resharper-clt -y
+  - cmd: choco install nvika -y
+  - cmd: appveyor DownloadFile https://github.com/peppy/CodeFileSanity/releases/download/v0.2.2/CodeFileSanity.exe
+before_build:
+  - cmd: CodeFileSanity.exe
+  - cmd: nuget restore
+build:
+  project: osu.sln
+  parallel: true
+  verbosity: minimal
+after_build:
+  - cmd: inspectcode /o="inspectcodereport.xml" /caches-home="inspectcode" osu.sln
+  - cmd: NVika parsereport "inspectcodereport.xml"

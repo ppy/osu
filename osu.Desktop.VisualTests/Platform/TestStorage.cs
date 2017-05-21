@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework;
 using osu.Framework.Desktop.Platform;
@@ -15,7 +15,7 @@ namespace osu.Desktop.VisualTests.Platform
         public TestStorage(string baseName) : base(baseName)
         {
         }
-        
+
         public override SQLiteConnection GetDatabase(string name)
         {
             ISQLitePlatform platform;
@@ -23,7 +23,7 @@ namespace osu.Desktop.VisualTests.Platform
                 platform = new SQLitePlatformWin32();
             else
                 platform = new SQLitePlatformGeneric();
-            return new SQLiteConnection(platform, $@":memory:");
+            return new SQLiteConnection(platform, @":memory:");
         }
     }
 }

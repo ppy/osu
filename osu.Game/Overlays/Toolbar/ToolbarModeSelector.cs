@@ -1,52 +1,48 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
-using osu.Game.Graphics.Backgrounds;
-using osu.Game.Modes;
+using osu.Game.Database;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    class ToolbarModeSelector : Container
+    internal class ToolbarModeSelector : Container
     {
-        const float padding = 10;
+        private const float padding = 10;
 
-        private FlowContainer modeButtons;
-        private Drawable modeButtonLine;
+        private readonly FillFlowContainer modeButtons;
+        private readonly Drawable modeButtonLine;
         private ToolbarModeButton activeButton;
 
-        public Action<PlayMode> OnPlayModeChange;
-        
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+
         public ToolbarModeSelector()
         {
             RelativeSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            Children = new[]
             {
                 new OpaqueBackground(),
-                modeButtons = new FlowContainer
+                modeButtons = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FlowDirection.HorizontalOnly,
+                    Direction = FillDirection.Horizontal,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Left = 10, Right = 10 },
+                    Padding = new MarginPadding { Left = padding, Right = padding },
                 },
                 modeButtonLine = new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Size = new Vector2(0.3f, 3),
+                    Size = new Vector2(padding * 2 + ToolbarButton.WIDTH, 3),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                     Masking = true,
@@ -66,37 +62,43 @@ namespace osu.Game.Overlays.Toolbar
                     }
                 }
             };
+        }
 
-            int amountButtons = 0;
-            foreach (PlayMode m in Enum.GetValues(typeof(PlayMode)))
+        [BackgroundDependencyLoader]
+        private void load(RulesetDatabase rulesets, OsuGame game)
+        {
+            foreach (var r in rulesets.AllRulesets)
             {
-                ++amountButtons;
-
-                var localMode = m;
                 modeButtons.Add(new ToolbarModeButton
                 {
-                    Mode = m,
+                    Ruleset = r,
                     Action = delegate
                     {
-                        SetGameMode(localMode);
-                        OnPlayModeChange?.Invoke(localMode);
+                        ruleset.Value = r;
                     }
                 });
             }
+
+            ruleset.ValueChanged += rulesetChanged;
+            ruleset.DisabledChanged += disabledChanged;
+            ruleset.BindTo(game.Ruleset);
         }
+
+        public override bool HandleInput => !ruleset.Disabled;
+
+        private void disabledChanged(bool isDisabled) => FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
 
         protected override void Update()
         {
             base.Update();
-
             Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
-        public void SetGameMode(PlayMode mode)
+        private void rulesetChanged(RulesetInfo ruleset)
         {
             foreach (ToolbarModeButton m in modeButtons.Children.Cast<ToolbarModeButton>())
             {
-                bool isActive = m.Mode == mode;
+                bool isActive = m.Ruleset.ID == ruleset.ID;
                 m.Active = isActive;
                 if (isActive)
                     activeButton = m;

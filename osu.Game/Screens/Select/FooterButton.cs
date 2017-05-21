@@ -1,14 +1,15 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
-using System;
-using osu.Framework.Graphics.Transformations;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {
@@ -33,7 +34,7 @@ namespace osu.Game.Screens.Select
             set
             {
                 deselectedColour = value;
-                if(light.Colour != SelectedColour)
+                if (light.Colour != SelectedColour)
                     light.Colour = value;
             }
         }
@@ -49,9 +50,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private SpriteText spriteText;
-        private Box box;
-        private Box light;
+        private readonly SpriteText spriteText;
+        private readonly Box box;
+        private readonly Box light;
 
         public FooterButton()
         {
@@ -72,7 +73,7 @@ namespace osu.Game.Screens.Select
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
                 },
-                spriteText = new SpriteText
+                spriteText = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -82,6 +83,7 @@ namespace osu.Game.Screens.Select
 
         public Action Hovered;
         public Action HoverLost;
+        public Key? Hotkey;
 
         protected override bool OnHover(InputState state)
         {
@@ -96,7 +98,6 @@ namespace osu.Game.Screens.Select
             HoverLost?.Invoke();
             light.ScaleTo(new Vector2(1, 1), Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
             light.FadeColour(DeselectedColour, Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
-            box.FadeOut(Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -105,13 +106,29 @@ namespace osu.Game.Screens.Select
             return base.OnMouseDown(state, args);
         }
 
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            box.FadeOut(Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
+            return base.OnMouseUp(state, args);
+        }
+
         protected override bool OnClick(InputState state)
         {
-            box.ClearTransformations();
+            box.ClearTransforms();
             box.Alpha = 1;
             box.FadeOut(Footer.TRANSITION_LENGTH * 3, EasingTypes.OutQuint);
             return base.OnClick(state);
         }
 
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!args.Repeat && args.Key == Hotkey)
+            {
+                OnClick(state);
+                return true;
+            }
+
+            return base.OnKeyDown(state, args);
+        }
     }
 }

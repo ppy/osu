@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using osu.Framework;
@@ -9,12 +9,14 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transformations;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Screens.Menu
 {
@@ -24,43 +26,34 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public class Button : Container, IStateful<ButtonState>
     {
-        private Container iconText;
-        private Container box;
-        private Color4 colour;
-        private TextAwesome icon;
-        private string internalName;
-        private readonly FontAwesome symbol;
-        private Action clickAction;
-        private readonly float extraWidth;
-        private Key triggerKey;
-        private string text;
-        private AudioSample sampleClick;
+        private readonly Container iconText;
+        private readonly Container box;
+        private readonly Box boxHoverLayer;
+        private readonly TextAwesome icon;
+        private readonly string internalName;
+        private readonly Action clickAction;
+        private readonly Key triggerKey;
+        private SampleChannel sampleClick;
 
-        public override bool Contains(Vector2 screenSpacePos)
-        {
-            return box.Contains(screenSpacePos);
-        }
+        protected override bool InternalContains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
 
         public Button(string text, string internalName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
             this.internalName = internalName;
-            this.symbol = symbol;
-            this.colour = colour;
             this.clickAction = clickAction;
-            this.extraWidth = extraWidth;
             this.triggerKey = triggerKey;
-            this.text = text;
 
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
 
-            Vector2 boxSize = new Vector2(ButtonSystem.button_width + Math.Abs(extraWidth), ButtonSystem.button_area_height);
+            Vector2 boxSize = new Vector2(ButtonSystem.BUTTON_WIDTH + Math.Abs(extraWidth), ButtonSystem.BUTTON_AREA_HEIGHT);
 
             Children = new Drawable[]
             {
                 box = new Container
                 {
                     Masking = true,
+                    MaskingSmoothness = 2,
                     EdgeEffect = new EdgeEffect
                     {
                         Type = EdgeEffectType.Shadow,
@@ -70,17 +63,24 @@ namespace osu.Game.Screens.Menu
                     },
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = colour,
                     Scale = new Vector2(0, 1),
                     Size = boxSize,
-                    Shear = new Vector2(ButtonSystem.wedge_width / boxSize.Y, 0),
-
-                    Children = new Drawable[]
+                    Shear = new Vector2(ButtonSystem.WEDGE_WIDTH / boxSize.Y, 0),
+                    Children = new []
                     {
                         new Box
                         {
-                            EdgeSmoothness = new Vector2(2, 0),
+                            EdgeSmoothness = new Vector2(1.5f, 0),
                             RelativeSizeAxes = Axes.Both,
+                            Colour = colour,
+                        },
+                        boxHoverLayer = new Box
+                        {
+                            EdgeSmoothness = new Vector2(1.5f, 0),
+                            RelativeSizeAxes = Axes.Both,
+                            BlendingMode = BlendingMode.Additive,
+                            Colour = Color4.White,
+                            Alpha = 0,
                         },
                     }
                 },
@@ -96,14 +96,15 @@ namespace osu.Game.Screens.Menu
                         {
                             Shadow = true,
                             Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             TextSize = 30,
                             Position = new Vector2(0, 0),
                             Icon = symbol
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Shadow = true,
-                            Direction = FlowDirection.HorizontalOnly,
+                            AllowMultiline = false,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             TextSize = 16,
@@ -127,11 +128,11 @@ namespace osu.Game.Screens.Menu
             int duration = 0; //(int)(Game.Audio.BeatLength / 2);
             if (duration == 0) duration = 250;
 
-            icon.ClearTransformations();
+            icon.ClearTransforms();
 
             icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
 
-            double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
+            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
             double startTime = Time.Current + offset;
 
             icon.RotateTo(10, offset, EasingTypes.InOutSine);
@@ -208,7 +209,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnHoverLost(InputState state)
         {
-            icon.ClearTransformations();
+            icon.ClearTransforms();
             icon.RotateTo(0, 500, EasingTypes.Out);
             icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
             icon.ScaleTo(0.7f, 500, EasingTypes.OutElasticHalf);
@@ -221,12 +222,22 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Sample.Get($@"Menu/menu-{internalName}-click");
-            if (sampleClick == null)
-                sampleClick = audio.Sample.Get(internalName.Contains(@"back") ? @"Menu/menuback" : @"Menu/menuhit");
+            sampleClick = audio.Sample.Get($@"Menu/menu-{internalName}-click") ?? audio.Sample.Get(internalName.Contains(@"back") ? @"Menu/menuback" : @"Menu/menuhit");
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            boxHoverLayer.FadeTo(0.1f, 1000, EasingTypes.OutQuint);
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            boxHoverLayer.FadeTo(0, 1000, EasingTypes.OutQuint);
+            return base.OnMouseUp(state, args);
+        }
+
+        protected override bool OnClick(InputState state)
         {
             trigger();
             return true;
@@ -234,7 +245,8 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            base.OnKeyDown(state, args);
+            if (args.Repeat || state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
+                return false;
 
             if (triggerKey == args.Key && triggerKey != Key.Unknown)
             {
@@ -250,6 +262,10 @@ namespace osu.Game.Screens.Menu
             sampleClick.Play();
 
             clickAction?.Invoke();
+
+            boxHoverLayer.ClearTransforms();
+            boxHoverLayer.Alpha = 0.9f;
+            boxHoverLayer.FadeOut(800, EasingTypes.OutExpo);
         }
 
         public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
@@ -262,7 +278,7 @@ namespace osu.Game.Screens.Menu
 
         public int ContractStyle;
 
-        ButtonState state;
+        private ButtonState state;
 
         public ButtonState State
         {
@@ -293,12 +309,12 @@ namespace osu.Game.Screens.Menu
                     case ButtonState.Expanded:
                         const int expand_duration = 500;
                         box.ScaleTo(new Vector2(1, 1), expand_duration, EasingTypes.OutExpo);
-                        FadeIn(expand_duration / 6);
+                        FadeIn(expand_duration / 6f);
                         break;
                     case ButtonState.Exploded:
                         const int explode_duration = 200;
                         box.ScaleTo(new Vector2(2, 1), explode_duration, EasingTypes.OutExpo);
-                        FadeOut(explode_duration / 4 * 3);
+                        FadeOut(explode_duration / 4f * 3);
                         break;
                 }
             }

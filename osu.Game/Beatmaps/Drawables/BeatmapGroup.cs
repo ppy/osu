@@ -1,24 +1,23 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transformations;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapGroup : IStateful<BeatmapGroupState>
+    public class BeatmapGroup : IStateful<BeatmapGroupState>
     {
         public BeatmapPanel SelectedPanel;
 
         /// <summary>
         /// Fires when one of our difficulties was selected. Will fire on first expand.
         /// </summary>
-        public Action<BeatmapGroup, BeatmapInfo> SelectionChanged;
+        public Action<BeatmapGroup, BeatmapPanel> SelectionChanged;
 
         /// <summary>
         /// Fires when one of our difficulties is clicked when already selected. Should start playing the map.
@@ -31,43 +30,48 @@ namespace osu.Game.Beatmaps.Drawables
 
         public List<BeatmapPanel> BeatmapPanels;
 
+        public BeatmapSetInfo BeatmapSet;
+
         public BeatmapGroupState State
         {
             get { return state; }
             set
             {
-                state = value;
-                switch (state)
+                switch (value)
                 {
                     case BeatmapGroupState.Expanded:
-                        foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.FadeIn(250);
-
                         Header.State = PanelSelectedState.Selected;
-                        if (SelectedPanel != null)
-                            SelectedPanel.State = PanelSelectedState.Selected;
+                        foreach (BeatmapPanel panel in BeatmapPanels)
+                            panel.State = panel == SelectedPanel ? PanelSelectedState.Selected : PanelSelectedState.NotSelected;
                         break;
                     case BeatmapGroupState.Collapsed:
                         Header.State = PanelSelectedState.NotSelected;
-                        if (SelectedPanel != null)
-                            SelectedPanel.State = PanelSelectedState.NotSelected;
-
                         foreach (BeatmapPanel panel in BeatmapPanels)
-                            panel.FadeOut(300, EasingTypes.OutQuint);
+                            panel.State = PanelSelectedState.Hidden;
+                        break;
+                    case BeatmapGroupState.Hidden:
+                        Header.State = PanelSelectedState.Hidden;
+                        foreach (BeatmapPanel panel in BeatmapPanels)
+                            panel.State = PanelSelectedState.Hidden;
                         break;
                 }
+                state = value;
             }
         }
 
-        public BeatmapGroup(WorkingBeatmap beatmap, BeatmapSetInfo set = null)
+        public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapDatabase database)
         {
+            BeatmapSet = beatmapSet;
+            WorkingBeatmap beatmap = database.GetWorkingBeatmap(BeatmapSet.Beatmaps.FirstOrDefault());
+
             Header = new BeatmapSetHeader(beatmap)
             {
                 GainedSelection = headerGainedSelection,
                 RelativeSizeAxes = Axes.X,
             };
 
-            BeatmapPanels = beatmap.BeatmapSetInfo.Beatmaps.Select(b => new BeatmapPanel(b)
+            BeatmapSet.Beatmaps = BeatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
+            BeatmapPanels = BeatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
             {
                 Alpha = 0,
                 GainedSelection = panelGainedSelection,
@@ -85,8 +89,6 @@ namespace osu.Game.Beatmaps.Drawables
             //we want to make sure one of our children is selected in the case none have been selected yet.
             if (SelectedPanel == null)
                 BeatmapPanels.First().State = PanelSelectedState.Selected;
-            else
-                SelectionChanged?.Invoke(this, SelectedPanel.Beatmap);
         }
 
         private void panelGainedSelection(BeatmapPanel panel)
@@ -102,7 +104,7 @@ namespace osu.Game.Beatmaps.Drawables
             finally
             {
                 State = BeatmapGroupState.Expanded;
-                SelectionChanged?.Invoke(this, panel.Beatmap);
+                SelectionChanged?.Invoke(this, SelectedPanel);
             }
         }
     }
@@ -111,5 +113,6 @@ namespace osu.Game.Beatmaps.Drawables
     {
         Collapsed,
         Expanded,
+        Hidden,
     }
 }

@@ -1,42 +1,47 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.GameModes.Testing;
-using osu.Framework.MathUtils;
-using osu.Framework.Timing;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Formats;
 using OpenTK;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
-using osu.Game.Modes;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu.Objects;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Play;
 using OpenTK.Graphics;
+using osu.Desktop.VisualTests.Beatmaps;
+using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCasePlayer : TestCase
+    internal class TestCasePlayer : TestCase
     {
-        private WorkingBeatmap beatmap;
-        public override string Name => @"Player";
+        protected Player Player;
+        private BeatmapDatabase db;
+        private RulesetDatabase rulesets;
 
         public override string Description => @"Showing everything to play the game.";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDatabase db)
+        private void load(BeatmapDatabase db, RulesetDatabase rulesets)
         {
-            var beatmapInfo = db.Query<BeatmapInfo>().Where(b => b.Mode == PlayMode.Osu).FirstOrDefault();
-            if (beatmapInfo != null)
-                beatmap = db.GetWorkingBeatmap(beatmapInfo);
+            this.rulesets = rulesets;
+            this.db = db;
         }
 
         public override void Reset()
         {
             base.Reset();
+
+            WorkingBeatmap beatmap = null;
+
+            var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.RulesetID == 0);
+            if (beatmapInfo != null)
+                beatmap = db.GetWorkingBeatmap(beatmapInfo);
 
             if (beatmap?.Track == null)
             {
@@ -45,40 +50,51 @@ namespace osu.Desktop.VisualTests.Tests
                 int time = 1500;
                 for (int i = 0; i < 50; i++)
                 {
-                    objects.Add(new HitCircle()
+                    objects.Add(new HitCircle
                     {
                         StartTime = time,
-                        Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : 512,
-                        i % 4 < 2 ? 0 : 384),
+                        Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : OsuPlayfield.BASE_SIZE.X,
+                        i % 4 < 2 ? 0 : OsuPlayfield.BASE_SIZE.Y),
                         NewCombo = i % 4 == 0
                     });
 
                     time += 500;
                 }
 
-                var decoder = new ConstructableBeatmapDecoder();
-
                 Beatmap b = new Beatmap
                 {
-                    HitObjects = objects
+                    HitObjects = objects,
+                    BeatmapInfo = new BeatmapInfo
+                    {
+                        Difficulty = new BeatmapDifficulty(),
+                        Ruleset = rulesets.Query<RulesetInfo>().First(),
+                        Metadata = new BeatmapMetadata
+                        {
+                            Artist = @"Unknown",
+                            Title = @"Sample Beatmap",
+                            Author = @"peppy",
+                        }
+                    }
                 };
 
-                decoder.Process(b);
-
-                beatmap = new WorkingBeatmap(b);
+                beatmap = new TestWorkingBeatmap(b);
             }
 
             Add(new Box
             {
                 RelativeSizeAxes = Framework.Graphics.Axes.Both,
-                Colour = Color4.Gray,
+                Colour = Color4.Black,
             });
 
-            Add(new Player
+            Add(Player = CreatePlayer(beatmap));
+        }
+
+        protected virtual Player CreatePlayer(WorkingBeatmap beatmap)
+        {
+            return new Player
             {
-                PreferredPlayMode = PlayMode.Osu,
                 Beatmap = beatmap
-            });
+            };
         }
     }
 }

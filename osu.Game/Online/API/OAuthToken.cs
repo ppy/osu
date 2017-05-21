@@ -1,5 +1,5 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Globalization;
@@ -41,14 +41,14 @@ namespace osu.Game.Online.API
         [JsonProperty(@"refresh_token")]
         public string RefreshToken;
 
-        public override string ToString() => $@"{AccessToken}/{AccessTokenExpiry.ToString(NumberFormatInfo.InvariantInfo)}/{RefreshToken}";
+        public override string ToString() => $@"{AccessToken}|{AccessTokenExpiry.ToString(NumberFormatInfo.InvariantInfo)}|{RefreshToken}";
 
         public static OAuthToken Parse(string value)
         {
             try
             {
-                string[] parts = value.Split('/');
-                return new OAuthToken()
+                string[] parts = value.Split('|');
+                return new OAuthToken
                 {
                     AccessToken = parts[0],
                     AccessTokenExpiry = long.Parse(parts[1], NumberFormatInfo.InvariantInfo),

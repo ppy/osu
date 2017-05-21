@@ -1,14 +1,11 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.Configuration;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
+using osu.Framework.Lists;
 
 namespace osu.Game.Online.Chat
 {
@@ -26,22 +23,27 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"channel_id")]
         public int Id;
 
-        public List<Message> Messages = new List<Message>();
+        public readonly SortedList<Message> Messages = new SortedList<Message>((m1, m2) => m1.Id.CompareTo(m2.Id));
 
         //internal bool Joined;
 
-        public const int MAX_HISTORY = 100;
+        public bool ReadOnly => Name != "#lazer";
+
+        public const int MAX_HISTORY = 300;
 
         [JsonConstructor]
         public Channel()
         {
         }
 
-        public event Action<Message[]> NewMessagesArrived;
+        public event Action<IEnumerable<Message>> NewMessagesArrived;
 
         public void AddNewMessages(params Message[] messages)
         {
+            messages = messages.Except(Messages).ToArray();
+
             Messages.AddRange(messages);
+
             purgeOldMessages();
 
             NewMessagesArrived?.Invoke(messages);
@@ -53,5 +55,7 @@ namespace osu.Game.Online.Chat
             if (messageCount > MAX_HISTORY)
                 Messages.RemoveRange(0, messageCount - MAX_HISTORY);
         }
+
+        public override string ToString() => Name;
     }
 }

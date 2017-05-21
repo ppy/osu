@@ -1,15 +1,15 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.MathUtils;
 using OpenTK;
+using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -17,65 +17,112 @@ namespace osu.Game.Graphics.Backgrounds
     {
         public override bool HandleInput => false;
 
-        public Triangles()
-        {
-            Alpha = 0.3f;
-        }
+        public Color4 ColourLight = Color4.White;
+        public Color4 ColourDark = Color4.Black;
+
+        /// <summary>
+        /// Whether we want to expire triangles as they exit our draw area completely.
+        /// </summary>
+        protected virtual bool ExpireOffScreenTriangles => true;
+
+        /// <summary>
+        /// Whether we should create new triangles as others expire.
+        /// </summary>
+        protected virtual bool CreateNewTriangles => true;
+
+        /// <summary>
+        /// The amount of triangles we want compared to the default distribution.
+        /// </summary>
+        protected virtual float SpawnRatio => 1;
 
         private float triangleScale = 1;
+
+        /// <summary>
+        /// Whether we should drop-off alpha values of triangles more quickly to improve
+        /// the visual appearance of fading. This defaults to on as it is generally more
+        /// aesthetically pleasing, but should be turned off in <see cref="BufferedContainer{T}"/>s.
+        /// </summary>
+        public bool HideAlphaDiscrepancies = true;
 
         public float TriangleScale
         {
             get { return triangleScale; }
             set
             {
+                float change = value / triangleScale;
                 triangleScale = value;
 
-                Children.ForEach(t => t.ScaleTo(triangleScale));
+                if (change != 1)
+                    Children.ForEach(t => t.Scale *= change);
             }
         }
 
-        private int aimTriangleCount => (int)((DrawWidth * DrawHeight) / 800 / triangleScale);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            addTriangles(true);
+        }
+
+        private int aimTriangleCount => (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
 
         protected override void Update()
         {
             base.Update();
 
-            foreach (Drawable d in Children)
+            float adjustedAlpha = HideAlphaDiscrepancies ?
+                // Cubically scale alpha to make it drop off more sharply.
+                (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3) :
+                1;
+
+            foreach (var t in Children)
             {
-                d.Position -= new Vector2(0, (float)(d.Scale.X * (50 / DrawHeight) * (Time.Elapsed / 880)) / triangleScale);
-                if (d.DrawPosition.Y + d.DrawSize.Y * d.Scale.Y < 0)
-                    d.Expire();
+                t.Alpha = adjustedAlpha;
+                t.Position -= new Vector2(0, (float)(t.Scale.X * (50 / DrawHeight) * (Time.Elapsed / 950)) / triangleScale);
+                if (ExpireOffScreenTriangles && t.DrawPosition.Y + t.DrawSize.Y * t.Scale.Y < 0)
+                    t.Expire();
             }
 
-            bool useRandomX = Children.Count() < aimTriangleCount / 2;
-            while (Children.Count() < aimTriangleCount)
-                addTriangle(useRandomX);
-
+            if (CreateNewTriangles)
+                addTriangles(false);
         }
 
         protected virtual Triangle CreateTriangle()
         {
-            var scale = triangleScale * RNG.NextSingle() * 0.4f + 0.2f;
+            const float std_dev = 0.16f;
+            const float mean = 0.5f;
+
+            float u1 = 1 - RNG.NextSingle(); //uniform(0,1] random floats
+            float u2 = 1 - RNG.NextSingle();
+            float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); //random normal(0,1)
+            var scale = Math.Max(triangleScale * (mean + std_dev * randStdNormal), 0.1f); //random normal(mean,stdDev^2)
+
             const float size = 100;
 
-            return new Triangle
+            return new EquilateralTriangle
             {
                 Origin = Anchor.TopCentre,
                 RelativePositionAxes = Axes.Both,
+                Size = new Vector2(size),
                 Scale = new Vector2(scale),
-                // Scaling height by 0.866 results in equiangular triangles (== 60° and equal side length)
-                Size = new Vector2(size, 0.866f * size),
-                Alpha = RNG.NextSingle(),
+                EdgeSmoothness = new Vector2(1),
+                Colour = GetTriangleShade(),
                 Depth = scale,
             };
         }
 
-        private void addTriangle(bool randomX)
+        protected virtual Color4 GetTriangleShade() => Interpolation.ValueAt(RNG.NextSingle(), ColourDark, ColourLight, 0, 1);
+
+        private void addTriangles(bool randomY)
         {
-            var sprite = CreateTriangle();
-            sprite.Position = new Vector2(RNG.NextSingle(), randomX ? RNG.NextSingle() : 1);
-            Add(sprite);
+            int addCount = aimTriangleCount - Children.Count();
+            for (int i = 0; i < addCount; i++)
+            {
+                var sprite = CreateTriangle();
+                float triangleHeight = sprite.DrawHeight / DrawHeight;
+                sprite.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() * (1 + triangleHeight) - triangleHeight : 1);
+                Add(sprite);
+            }
         }
     }
 }

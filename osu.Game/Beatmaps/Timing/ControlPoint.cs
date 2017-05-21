@@ -1,25 +1,20 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 namespace osu.Game.Beatmaps.Timing
 {
     public class ControlPoint
     {
+        public string SampleBank;
+        public int SampleVolume;
+        public TimeSignatures TimeSignature = TimeSignatures.SimpleQuadruple;
         public double Time;
-        public double BeatLength;
-        public double VelocityAdjustment;
-        public bool TimingChange;
-    }
+        public double BeatLength = 500;
+        public double SpeedMultiplier = 1;
+        public bool TimingChange = true;
+        public bool KiaiMode;
+        public bool OmitFirstBarLine;
 
-    internal enum TimeSignatures
-    {
-        SimpleQuadruple = 4,
-        SimpleTriple = 3
+        public ControlPoint Clone() => (ControlPoint)MemberwiseClone();
     }
 }

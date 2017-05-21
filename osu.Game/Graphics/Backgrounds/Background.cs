@@ -1,13 +1,11 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.Backgrounds
@@ -16,10 +14,12 @@ namespace osu.Game.Graphics.Backgrounds
     {
         public Sprite Sprite;
 
-        string textureName;
+        private readonly string textureName;
 
         public Background(string textureName = @"")
         {
+            CacheDrawnFrameBuffer = true;
+
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
             Depth = float.MaxValue;

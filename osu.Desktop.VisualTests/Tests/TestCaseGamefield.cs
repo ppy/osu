@@ -1,88 +1,115 @@
-﻿//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Framework.GameModes.Testing;
+using OpenTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
+using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Modes.Catch;
-using osu.Game.Modes.Catch.UI;
-using osu.Game.Modes.Mania;
-using osu.Game.Modes.Mania.UI;
-using osu.Game.Modes.Objects;
-using osu.Game.Modes.Osu;
-using osu.Game.Modes.Osu.Objects;
-using osu.Game.Modes.Osu.UI;
-using osu.Game.Modes.Taiko;
-using osu.Game.Modes.Taiko.UI;
-using OpenTK;
+using osu.Game.Database;
+using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Taiko.UI;
+using System.Collections.Generic;
+using osu.Desktop.VisualTests.Beatmaps;
+using osu.Framework.Allocation;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    class TestCaseGamefield : TestCase
+    internal class TestCaseGamefield : TestCase
     {
-        public override string Name => @"Gamefield";
+        private RulesetDatabase rulesets;
 
         public override string Description => @"Showing hitobjects and what not.";
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetDatabase rulesets)
+        {
+            this.rulesets = rulesets;
+        }
 
         public override void Reset()
         {
             base.Reset();
-
-            //ensure we are at offset 0
-            Clock = new FramedClock();
 
             List<HitObject> objects = new List<HitObject>();
 
             int time = 500;
             for (int i = 0; i < 100; i++)
             {
-                objects.Add(new HitCircle()
+                objects.Add(new HitCircle
                 {
                     StartTime = time,
-                    Position = new Vector2(RNG.Next(0, 512), RNG.Next(0, 384)),
+                    Position = new Vector2(RNG.Next(0, (int)OsuPlayfield.BASE_SIZE.X), RNG.Next(0, (int)OsuPlayfield.BASE_SIZE.Y)),
                     Scale = RNG.NextSingle(0.5f, 1.0f),
                 });
 
                 time += RNG.Next(50, 500);
             }
 
-            Beatmap beatmap = new Beatmap
+            TimingInfo timing = new TimingInfo();
+            timing.ControlPoints.Add(new ControlPoint
             {
-                HitObjects = objects
-            };
+                BeatLength = 200
+            });
+
+            WorkingBeatmap beatmap = new TestWorkingBeatmap(new Beatmap
+            {
+                HitObjects = objects,
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty(),
+                    Ruleset = rulesets.Query<RulesetInfo>().First(),
+                    Metadata = new BeatmapMetadata
+                    {
+                        Artist = @"Unknown",
+                        Title = @"Sample Beatmap",
+                        Author = @"peppy",
+                    },
+                },
+                TimingInfo = timing
+            });
 
             Add(new Drawable[]
             {
-                new OsuHitRenderer
+                new Container
                 {
-                    Objects = beatmap.HitObjects,
-                    Scale = new Vector2(0.5f),
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft
-                },
-                new TaikoHitRenderer
-                {
-                    Objects = beatmap.HitObjects,
-                    Scale = new Vector2(0.5f),
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
-                },
-                new CatchHitRenderer
-                {
-                    Objects = beatmap.HitObjects,
-                    Scale = new Vector2(0.5f),
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft
-                },
-                new ManiaHitRenderer
-                {
-                    Objects = beatmap.HitObjects,
-                    Scale = new Vector2(0.5f),
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight
+                    RelativeSizeAxes = Axes.Both,
+                    //ensure we are at offset 0
+                    Clock = new FramedClock(),
+                    Children = new Drawable[]
+                    {
+                        new OsuHitRenderer(beatmap, false)
+                        {
+                            Scale = new Vector2(0.5f),
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft
+                        },
+                        new TaikoHitRenderer(beatmap, false)
+                        {
+                            Scale = new Vector2(0.5f),
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight
+                        },
+                        new CatchHitRenderer(beatmap, false)
+                        {
+                            Scale = new Vector2(0.5f),
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft
+                        },
+                        new ManiaHitRenderer(beatmap, false)
+                        {
+                            Scale = new Vector2(0.5f),
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight
+                        }
+                    }
                 }
             });
         }

@@ -1,15 +1,11 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.MathUtils;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -17,26 +13,31 @@ using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
-using osu.Game.Modes;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapPanel : Panel
+    public class BeatmapPanel : Panel
     {
         public BeatmapInfo Beatmap;
-        private Sprite background;
+        private readonly Sprite background;
 
         public Action<BeatmapPanel> GainedSelection;
         public Action<BeatmapPanel> StartRequested;
+        private readonly Triangles triangles;
+        private readonly StarCounter starCounter;
 
         protected override void Selected()
         {
             base.Selected();
+
             GainedSelection?.Invoke(this);
 
             background.ColourInfo = ColourInfo.GradientVertical(
                 new Color4(20, 43, 51, 255),
                 new Color4(40, 86, 102, 255));
+
+            triangles.Colour = Color4.White;
         }
 
         protected override void Deselected()
@@ -44,6 +45,7 @@ namespace osu.Game.Beatmaps.Drawables
             base.Deselected();
 
             background.Colour = new Color4(20, 43, 51, 255);
+            triangles.Colour = OsuColour.Gray(0.5f);
         }
 
         protected override bool OnClick(InputState state)
@@ -52,6 +54,16 @@ namespace osu.Game.Beatmaps.Drawables
                 StartRequested?.Invoke(this);
 
             return base.OnClick(state);
+        }
+
+        protected override void ApplyState(PanelSelectedState last = PanelSelectedState.Hidden)
+        {
+            if (!IsLoaded) return;
+
+            base.ApplyState(last);
+
+            if (last == PanelSelectedState.Hidden && State != last)
+                starCounter.ReplayAnimation();
         }
 
         public BeatmapPanel(BeatmapInfo beatmap)
@@ -65,20 +77,17 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                new Triangles
+                triangles = new Triangles
                 {
-                    // The border is drawn in the shader of the children. Being additive, triangles would over-emphasize
-                    // the border wherever they cross it, and thus they get their own masking container without a border.
-                    Masking = true,
-                    CornerRadius = Content.CornerRadius,
+                    TriangleScale = 2,
                     RelativeSizeAxes = Axes.Both,
-                    BlendingMode = BlendingMode.Additive,
-                    Colour = new Color4(20, 43, 51, 255),
+                    ColourLight = OsuColour.FromHex(@"3a7285"),
+                    ColourDark = OsuColour.FromHex(@"123744")
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
                     Padding = new MarginPadding(5),
-                    Direction = FlowDirection.HorizontalOnly,
+                    Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -87,25 +96,22 @@ namespace osu.Game.Beatmaps.Drawables
                         new DifficultyIcon(beatmap)
                         {
                             Scale = new Vector2(1.8f),
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             Padding = new MarginPadding { Left = 5 },
-                            Spacing = new Vector2(0, 5),
-                            Direction = FlowDirection.VerticalOnly,
+                            Direction = FillDirection.Vertical,
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new FlowContainer
+                                new FillFlowContainer
                                 {
-                                    Direction = FlowDirection.HorizontalOnly,
-                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(4, 0),
+                                    AutoSizeAxes = Axes.Both,
                                     Children = new[]
                                     {
-                                        new SpriteText
+                                        new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Medium",
                                             Text = beatmap.Version,
@@ -113,7 +119,7 @@ namespace osu.Game.Beatmaps.Drawables
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
-                                        new SpriteText
+                                        new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-Medium",
                                             Text = "mapped by",
@@ -121,7 +127,7 @@ namespace osu.Game.Beatmaps.Drawables
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
-                                        new SpriteText
+                                        new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-MediumItalic",
                                             Text = $"{(beatmap.Metadata ?? beatmap.BeatmapSet.Metadata).Author}",
@@ -131,7 +137,11 @@ namespace osu.Game.Beatmaps.Drawables
                                         },
                                     }
                                 },
-                                new StarCounter { Count = beatmap.StarDifficulty, StarSize = 8 }
+                                starCounter = new StarCounter
+                                {
+                                    Count = (float)beatmap.StarDifficulty,
+                                    Scale = new Vector2(0.8f),
+                                }
                             }
                         }
                     }

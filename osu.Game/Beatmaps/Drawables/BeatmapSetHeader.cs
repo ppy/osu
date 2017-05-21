@@ -1,30 +1,28 @@
-//Copyright (c) 2007-2016 ppy Pty Ltd <contact@ppy.sh>.
-//Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
 using System.Collections.Generic;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Configuration;
-using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
+using osu.Framework.Localisation;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    class BeatmapSetHeader : Panel
+    public class BeatmapSetHeader : Panel
     {
         public Action<BeatmapSetHeader> GainedSelection;
-        private SpriteText title, artist;
-        private OsuConfigManager config;
-        private Bindable<bool> preferUnicode;
-        private WorkingBeatmap beatmap;
-        private FlowContainer difficultyIcons;
+        private readonly SpriteText title;
+        private readonly SpriteText artist;
+
+        private readonly WorkingBeatmap beatmap;
+        private readonly FillFlowContainer difficultyIcons;
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
@@ -32,33 +30,36 @@ namespace osu.Game.Beatmaps.Drawables
 
             Children = new Drawable[]
             {
-                new PanelBackground(beatmap)
+                new DelayedLoadWrapper(
+                    new PanelBackground(beatmap)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
+                    }
+                )
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    TimeBeforeLoad = 300,
                 },
-                new FlowContainer
+                new FillFlowContainer
                 {
-                    Direction = FlowDirection.VerticalOnly,
+                    Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
-                        title = new SpriteText
+                        title = new OsuSpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
-                            Text = beatmap.BeatmapSetInfo.Metadata.Title,
                             TextSize = 22,
                             Shadow = true,
                         },
-                        artist = new SpriteText
+                        artist = new OsuSpriteText
                         {
-                            Margin = new MarginPadding { Top = -1 },
                             Font = @"Exo2.0-SemiBoldItalic",
-                            Text = beatmap.BeatmapSetInfo.Metadata.Artist,
                             TextSize = 17,
                             Shadow = true,
                         },
-                        difficultyIcons = new FlowContainer
+                        difficultyIcons = new FillFlowContainer
                         {
                             Margin = new MarginPadding { Top = 5 },
                             AutoSizeAxes = Axes.Both,
@@ -68,12 +69,6 @@ namespace osu.Game.Beatmaps.Drawables
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            FadeInFromZero(250);
-        }
-
         protected override void Selected()
         {
             base.Selected();
@@ -81,46 +76,32 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(LocalisationEngine localisation)
         {
-            this.config = config;
-
-            preferUnicode = config.GetBindable<bool>(OsuConfig.ShowUnicode);
-            preferUnicode.ValueChanged += preferUnicode_changed;
-            preferUnicode_changed(preferUnicode, null);
+            title.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
+            artist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
         }
 
-        private void preferUnicode_changed(object sender, EventArgs e)
+        private class PanelBackground : BufferedContainer
         {
-            title.Text = config.GetUnicodeString(beatmap.BeatmapSetInfo.Metadata.Title, beatmap.BeatmapSetInfo.Metadata.TitleUnicode);
-            artist.Text = config.GetUnicodeString(beatmap.BeatmapSetInfo.Metadata.Artist, beatmap.BeatmapSetInfo.Metadata.ArtistUnicode);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            if (preferUnicode != null)
-                preferUnicode.ValueChanged -= preferUnicode_changed;
-            base.Dispose(isDisposing);
-        }
-
-        class PanelBackground : BufferedContainer
-        {
-            private readonly WorkingBeatmap working;
-
             public PanelBackground(WorkingBeatmap working)
             {
-                this.working = working;
-
                 CacheDrawnFrameBuffer = true;
 
-                Children = new[]
+                Children = new Drawable[]
                 {
-                    new FlowContainer
+                    new BeatmapBackgroundSprite(working)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        FillMode = FillMode.Fill,
+                    },
+                    new FillFlowContainer
                     {
                         Depth = -1,
-                        Direction = FlowDirection.HorizontalOnly,
+                        Direction = FillDirection.Horizontal,
                         RelativeSizeAxes = Axes.Both,
-                        // This makes the gradient not be perfectly horizontal, but diagonal at a ~40� angle
+                        // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
                         Alpha = 0.5f,
                         Children = new[]
@@ -157,21 +138,6 @@ namespace osu.Game.Beatmaps.Drawables
                         }
                     },
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuGameBase game)
-            {
-                new BeatmapBackgroundSprite(working)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    FillMode = FillMode.Fill,
-                }.Preload(game, (bg) =>
-                {
-                    Add(bg);
-                    ForceRedraw();
-                });
             }
         }
 
