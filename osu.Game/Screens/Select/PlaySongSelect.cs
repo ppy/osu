@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Select
 
             if (base.OnExiting(next))
                 return true;
-            
+
             if(Beatmap != null)
                 Beatmap.Track.Looping = false;
 
