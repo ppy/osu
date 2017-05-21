@@ -7,6 +7,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -123,12 +124,17 @@ namespace osu.Game.Overlays
             panels.Children = BeatmapSets.Select(b => displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)new DirectGridPanel(b) { Width = 400 } : new DirectListPanel(b));
         }
 
+        protected override bool OnFocus(InputState state)
+        {
+            filter.Search.TriggerFocus();
+            return false;
+        }
+
         protected override void PopIn()
         {
             base.PopIn();
 
             filter.Search.HoldFocus = true;
-            Schedule(() => filter.Search.TriggerFocus());
         }
 
         protected override void PopOut()
