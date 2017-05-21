@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            glowColour = colours.BlueDarker.Opacity(0.4f);
+            glowColour = Color4.Gray.Opacity(0.2f);
             layout();
         }
 
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     EdgeEffect = new EdgeEffect
                     {
                         Type = EdgeEffectType.Glow,
-                        Radius = 20,
+                        Radius = 10,
                         Colour = glowColour,
                     },
                     RelativePositionAxes = Axes.Both,
