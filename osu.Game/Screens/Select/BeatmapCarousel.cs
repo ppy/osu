@@ -409,7 +409,14 @@ namespace osu.Game.Screens.Select
             int firstIndex = yPositions.BinarySearch(Current - Panel.MAX_HEIGHT);
             if (firstIndex < 0) firstIndex = ~firstIndex;
             int lastIndex = yPositions.BinarySearch(Current + drawHeight);
-            if (lastIndex < 0) lastIndex = ~lastIndex;
+            if (lastIndex < 0)
+            {
+                lastIndex = ~lastIndex;
+
+                // Add the first panel of the last visible beatmap group to preload its data.
+                if (lastIndex != yPositions.Count)
+                    lastIndex++;
+            }
 
             // Add those panels within the previously found index range that should be displayed.
             for (int i = firstIndex; i < lastIndex; ++i)
