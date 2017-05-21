@@ -72,8 +72,6 @@ namespace osu.Game.Screens.Select
         {
             player = null;
 
-            if (!Beatmap.Track.IsRunning)
-                Beatmap.Track.Start();
             Beatmap.Track.Looping = true;
 
             base.OnResuming(last);
