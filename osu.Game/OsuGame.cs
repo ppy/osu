@@ -164,7 +164,7 @@ namespace osu.Game
             });
 
             //overlay elements
-            LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, overlayContent.Add);
+            LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
             LoadComponentAsync(musicController = new MusicController
