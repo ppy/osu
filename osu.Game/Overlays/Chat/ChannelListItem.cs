@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -36,6 +37,8 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
+        public Action<Channel> OnRequestJoin;
+
         private Channel channel;
         public Channel Channel
         {
@@ -43,11 +46,13 @@ namespace osu.Game.Overlays.Chat
             set
             {
                 if (value == channel) return;
+                if (channel != null) channel.Joined.ValueChanged -= updateColour;
                 channel = value;
 
                 name.Text = Channel.ToString();
                 topic.Text = Channel.Topic;
-                updateColour();
+                channel.Joined.ValueChanged += updateColour;
+                updateColour(Channel.Joined);
             }
         }
 
@@ -55,6 +60,8 @@ namespace osu.Game.Overlays.Chat
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
+            Action = () => { if (!Channel.Joined) OnRequestJoin?.Invoke(Channel); };
 
             Children = new Drawable[]
             {
@@ -141,15 +148,21 @@ namespace osu.Game.Overlays.Chat
             topicColour = colours.Gray9;
             joinedColour = colours.Blue;
 
-            updateColour();
+            updateColour(Channel.Joined);
         }
 
-        private void updateColour()
+        protected override void Dispose(bool isDisposing)
         {
-            joinedCheckmark.FadeTo(Channel.Joined ? 1f : 0f, transition_duration);
-            topic.FadeTo(Channel.Joined ? 0.8f : 1f, transition_duration);
-            topic.FadeColour(Channel.Joined ? Color4.White : topicColour ?? Color4.White, transition_duration);
-            FadeColour(Channel.Joined ? joinedColour ?? Color4.White : Color4.White, transition_duration);
+            if(channel != null) channel.Joined.ValueChanged -= updateColour;
+            base.Dispose(isDisposing);
+        }
+
+        private void updateColour(bool joined)
+        {
+            joinedCheckmark.FadeTo(joined ? 1f : 0f, transition_duration);
+            topic.FadeTo(joined ? 0.8f : 1f, transition_duration);
+            topic.FadeColour(joined ? Color4.White : topicColour ?? Color4.White, transition_duration);
+            FadeColour(joined ? joinedColour ?? Color4.White : Color4.White, transition_duration);
         }
     }
 }

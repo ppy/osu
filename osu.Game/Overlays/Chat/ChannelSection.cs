@@ -13,14 +13,15 @@ namespace osu.Game.Overlays.Chat
 {
     public class ChannelSection : Container, IHasFilterableChildren
     {
-        private readonly FillFlowContainer<ChannelListItem> items;
         private readonly OsuSpriteText header;
 
-        public IEnumerable<IFilterable> FilterableChildren => items.Children.OfType<IFilterable>();
+        public readonly FillFlowContainer<ChannelListItem> ChannelFlow;
+
+        public IEnumerable<IFilterable> FilterableChildren => ChannelFlow.Children.OfType<ChannelListItem>();
         public string[] FilterTerms => new[] { Header };
         public bool MatchingCurrentFilter
         {
-        	set
+            set
             {
                 FadeTo(value ? 1f : 0f, 100);
             }
@@ -34,8 +35,9 @@ namespace osu.Game.Overlays.Chat
 
         public IEnumerable<Channel> Channels
         {
-            set { items.Children = value.Select(c => new ChannelListItem { Channel = c }); }
+            set { ChannelFlow.Children = value.Select(c => new ChannelListItem { Channel = c }); }
         }
+
 
         public ChannelSection()
         {
@@ -49,7 +51,7 @@ namespace osu.Game.Overlays.Chat
                     TextSize = 15,
                     Font = @"Exo2.0-Bold",
                 },
-                items = new FillFlowContainer<ChannelListItem>
+                ChannelFlow = new FillFlowContainer<ChannelListItem>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,

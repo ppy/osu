@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Configuration;
 using osu.Framework.Lists;
 
 namespace osu.Game.Online.Chat
@@ -23,7 +24,7 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"channel_id")]
         public int Id;
 
-        public bool Joined;
+        public Bindable<bool> Joined = new Bindable<bool>();
 
         public readonly SortedList<Message> Messages = new SortedList<Message>((m1, m2) => m1.Id.CompareTo(m2.Id));
 

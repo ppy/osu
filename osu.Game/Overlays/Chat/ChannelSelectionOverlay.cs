@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
@@ -16,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -29,11 +31,21 @@ namespace osu.Game.Overlays.Chat
         private readonly SearchTextBox search;
         private readonly SearchContainer<ChannelSection> sectionsFlow;
 
+        public Action<Channel> OnRequestJoin;
+
         public IEnumerable<ChannelSection> Sections
         {
             set
             {
                 sectionsFlow.Children = value;
+
+                foreach (ChannelSection s in sectionsFlow.Children)
+                {
+                    foreach (ChannelListItem c in s.ChannelFlow.Children)
+                    {
+                        c.OnRequestJoin = channel => { OnRequestJoin?.Invoke(channel); };
+                    }
+                }
             }
         }
 
