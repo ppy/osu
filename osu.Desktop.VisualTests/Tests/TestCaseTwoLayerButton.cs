@@ -16,7 +16,7 @@ namespace osu.Desktop.VisualTests.Tests
             base.Reset();
 
             Add(new BackButton());
-            Add(new SkipButton());
+            Add(new SkipButton(Clock.CurrentTime + 5000));
         }
     }
 }
