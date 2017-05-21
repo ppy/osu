@@ -71,9 +71,7 @@ namespace osu.Game.Screens.Select
         protected override void OnResuming(Screen last)
         {
             player = null;
-
-            Beatmap.Track.Reset();
-            Beatmap.Track.Start();
+            
             Beatmap.Track.Looping = true;
 
             base.OnResuming(last);
