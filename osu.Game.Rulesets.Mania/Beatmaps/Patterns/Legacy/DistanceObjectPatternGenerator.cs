@@ -47,9 +47,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             double speedAdjustment = beatmap.TimingInfo.SpeedMultiplierAt(hitObject.StartTime);
             double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(hitObject.StartTime) * speedAdjustment;
 
-            // The true distance, accounting for any repeats. This ends up being the drum roll distance later
+            // The true distance, accounting for any repeats
             double distance = (distanceData?.Distance ?? 0) * repeatCount;
-
             // The velocity of the osu! hit object - calculated as the velocity of a slider
             double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength;
             // The duration of the osu! hit object
@@ -82,7 +81,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 if (duration >= 4000)
                     return generateNRandomNotes(HitObject.StartTime, 0.23, 0, 0);
 
-                if (segmentDuration > 400 && duration < 4000 && repeatCount < AvailableColumns - 1 - RandomStart)
+                if (segmentDuration > 400 && repeatCount < AvailableColumns - 1 - RandomStart)
                     return generateTiledHoldNotes(HitObject.StartTime);
 
                 return generateHoldAndNormalNotes(HitObject.StartTime);
