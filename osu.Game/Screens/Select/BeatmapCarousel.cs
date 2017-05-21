@@ -171,10 +171,8 @@ namespace osu.Game.Screens.Select
             if (visibleGroups.Count < 1)
                 return;
             BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];
-            BeatmapPanel panel = group?.BeatmapPanels.First();
 
-            if (panel == null)
-                return;
+            BeatmapPanel panel = group.BeatmapPanels[RNG.Next(group.BeatmapPanels.Count)];
 
             selectGroup(group, panel);
         }
