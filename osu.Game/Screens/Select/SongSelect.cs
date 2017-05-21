@@ -365,6 +365,13 @@ namespace osu.Game.Screens.Select
                 dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap));
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            ensurePlayingSelected();
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
