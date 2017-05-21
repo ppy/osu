@@ -2,12 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -15,24 +13,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class SpinnerTicks : Container
     {
-        private Color4 glowColour;
-
         public SpinnerTicks()
         {
             Origin = Anchor.Centre;
             Anchor = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            glowColour = Color4.Gray.Opacity(0.2f);
-            layout();
-        }
-
-        private void layout()
-        {
             const int count = 18;
 
             for (int i = 0; i < count; i++)
@@ -45,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     {
                         Type = EdgeEffectType.Glow,
                         Radius = 10,
-                        Colour = glowColour,
+                        Colour = Color4.Gray.Opacity(0.2f),
                     },
                     RelativePositionAxes = Axes.Both,
                     Masking = true,
