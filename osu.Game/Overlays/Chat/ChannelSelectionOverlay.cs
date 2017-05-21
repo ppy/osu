@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -21,7 +21,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelSelectionOverlay : FocusedOverlayContainer
+    public class ChannelSelectionOverlay : OverlayContainer
     {
         public static readonly float WIDTH_PADDING = 170;
 
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Chat
                             LayoutDuration = 200,
                             LayoutEasing = EasingTypes.OutQuint,
                             Spacing = new Vector2(0f, 20f),
-                            Padding = new MarginPadding { Top = 20, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
+                            Padding = new MarginPadding { Top = 20, Bottom = 20, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
                         },
                     },
                 },
@@ -114,6 +114,7 @@ namespace osu.Game.Overlays.Chat
                                 {
                                     Text = @"Chat Channels",
                                     TextSize = 20,
+                                    Shadow = false,
                                 },
                                 search = new HeaderSearchTextBox
                                 {
@@ -146,8 +147,6 @@ namespace osu.Game.Overlays.Chat
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             search.HoldFocus = true;
             Schedule(() => search.TriggerFocus());
 
@@ -157,8 +156,6 @@ namespace osu.Game.Overlays.Chat
 
         protected override void PopOut()
         {
-            base.PopOut();
-
             search.HoldFocus = false;
 
             FadeOut(500, EasingTypes.InQuint);

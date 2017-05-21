@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -82,6 +82,7 @@ namespace osu.Game.Overlays.Chat
                                     Origin = Anchor.TopRight,
                                     Icon = FontAwesome.fa_check_circle,
                                     TextSize = text_size,
+                                    Shadow = false,
                                     Margin = new MarginPadding { Right = 10f },
                                     Alpha = 0f,
                                 },
@@ -97,6 +98,7 @@ namespace osu.Game.Overlays.Chat
                                 {
                                     TextSize = text_size,
                                     Font = @"Exo2.0-Bold",
+                                    Shadow = false,
                                 },
                             },
                         },
@@ -111,6 +113,7 @@ namespace osu.Game.Overlays.Chat
                                 {
                                     TextSize = text_size,
                                     Font = @"Exo2.0-SemiBold",
+                                    Shadow = false,
                                     Alpha = 0.8f,
                                 },
                             },
@@ -127,6 +130,7 @@ namespace osu.Game.Overlays.Chat
                                 {
                                     Icon = FontAwesome.fa_user,
                                     TextSize = text_size - 2,
+                                    Shadow = false,
                                     Margin = new MarginPadding { Top = 1 },
                                 },
                                 new OsuSpriteText
@@ -134,6 +138,7 @@ namespace osu.Game.Overlays.Chat
                                     Text = @"0",
                                     TextSize = text_size,
                                     Font = @"Exo2.0-SemiBold",
+                                    Shadow = false,
                                 },
                             },
                         },
