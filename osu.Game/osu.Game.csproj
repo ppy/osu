@@ -239,7 +239,7 @@
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
     <Compile Include="Screens\Play\Settings\CollectionSettings.cs" />
     <Compile Include="Screens\Play\Settings\DiscussionSettings.cs" />
-    <Compile Include="Graphics\UserInterface\SettingsContainer.cs" />
+    <Compile Include="Graphics\UserInterface\SettingsDropdownContainer.cs" />
     <Compile Include="Screens\Play\Settings\ReplaySettingsOverlay.cs" />
     <Compile Include="Screens\Play\Settings\PlaybackSettings.cs" />
     <Compile Include="Screens\Play\PauseContainer.cs" />
