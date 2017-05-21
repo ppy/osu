@@ -28,9 +28,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 EdgeEffect = new EdgeEffect
                 {
+                    Hollow = true,
                     Type = EdgeEffectType.Glow,
-                    Radius = 14,
-                    Colour = value.Opacity(0.3f),
+                    Radius = 40,
+                    Colour = value,
                 };
             }
         }
