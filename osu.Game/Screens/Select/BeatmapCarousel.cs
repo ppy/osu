@@ -414,7 +414,7 @@ namespace osu.Game.Screens.Select
                 lastIndex = ~lastIndex;
 
                 // Add the first panel of the last visible beatmap group to preload its data.
-                if (lastIndex != yPositions.Count)
+                if (panels[lastIndex - 1] is BeatmapSetHeader)
                     lastIndex++;
             }
 
