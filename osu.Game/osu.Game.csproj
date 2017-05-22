@@ -74,10 +74,6 @@
     <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
-    <Compile Include="Beatmaps\Events\BackgroundEvent.cs" />
-    <Compile Include="Beatmaps\Events\BreakEvent.cs" />
-    <Compile Include="Beatmaps\Events\Event.cs" />
-    <Compile Include="Beatmaps\Events\EventInfo.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
@@ -91,6 +87,7 @@
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
+    <Compile Include="Beatmaps\Timing\BreakPeriod.cs" />
     <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
     <Compile Include="Beatmaps\Timing\TimingInfo.cs" />
     <Compile Include="Database\BeatmapMetrics.cs" />
