@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
@@ -21,16 +20,16 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         public IEnumerable<ManiaHitObject> HitObjects => hitObjects;
 
         /// <summary>
-        /// Whether this pattern already contains a hit object in a code.
+        /// Check whether a column of this patterns contains a hit object.
         /// </summary>
         /// <param name="column">The column index.</param>
-        /// <returns>Whether this pattern already contains a hit object in <paramref name="column"/></returns>
-        public bool IsFilled(int column) => hitObjects.Exists(h => h.Column == column);
+        /// <returns>Whether the column with index <paramref name="column"/> contains a hit object.</returns>
+        public bool ColumnHasObject(int column) => hitObjects.Exists(h => h.Column == column);
 
         /// <summary>
         /// Amount of columns taken up by hit objects in this pattern.
         /// </summary>
-        public int ColumnsFilled => HitObjects.GroupBy(h => h.Column).Count();
+        public int ColumnWithObjects => HitObjects.GroupBy(h => h.Column).Count();
 
         /// <summary>
         /// Adds a hit object to this pattern.
@@ -42,10 +41,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// Copies hit object from another pattern to this one.
         /// </summary>
         /// <param name="other">The other pattern.</param>
-        public void Add(Pattern other)
-        {
-            other.HitObjects.ForEach(Add);
-        }
+        public void Add(Pattern other) => hitObjects.AddRange(other.HitObjects);
 
         /// <summary>
         /// Clears this pattern, removing all hit objects.
