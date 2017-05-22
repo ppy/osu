@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Chat
     public class DrawableChannel : Container
     {
         public readonly Channel Channel;
-        private readonly FillFlowContainer flow;
+        private readonly FillFlowContainer<ChatLine> flow;
         private readonly ScrollContainer scroll;
 
         public DrawableChannel(Channel channel)
@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Chat
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        flow = new FillFlowContainer
+                        flow = new FillFlowContainer<ChatLine>
                         {
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
@@ -63,19 +63,18 @@ namespace osu.Game.Overlays.Chat
 
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
+            //up to last Channel.MAX_HISTORY messages
+            flow.Add(displayMessages.Select(m => new ChatLine(m)));
+
             if (scroll.IsScrolledToEnd(10) || !flow.Children.Any())
                 scrollToEnd();
 
-            //up to last Channel.MAX_HISTORY messages
-            foreach (Message m in displayMessages)
-            {
-                var d = new ChatLine(m);
-                flow.Add(d);
-            }
+            var staleMessages = flow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
+            int count = staleMessages.Length - Channel.MAX_HISTORY;
 
-            while (flow.Children.Count(c => c.LifetimeEnd == double.MaxValue) > Channel.MAX_HISTORY)
+            for (int i = 0; i < count; i++)
             {
-                var d = flow.Children.First(c => c.LifetimeEnd == double.MaxValue);
+                var d = staleMessages[i];
                 if (!scroll.IsScrolledToEnd(10))
                     scroll.OffsetScrollPosition(-d.DrawHeight);
                 d.Expire();
