@@ -162,8 +162,7 @@ namespace osu.Game.Overlays
                 Add(headerBackground = new Box
                 {
                     Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.X,
-                    Depth = float.MaxValue
+                    RelativeSizeAxes = Axes.X
                 });
             }
 
