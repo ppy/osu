@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// <summary>
         /// The default play field height.
         /// </summary>
-        public const float DEFAULT_PLAYFIELD_HEIGHT = 168f;
+        public const float DEFAULT_PLAYFIELD_HEIGHT = 178f;
 
         /// <summary>
         /// The offset from <see cref="left_area_size"/> which the center of the hit target lies at.
@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// <summary>
         /// This is a very special type of container. It serves a similar purpose to <see cref="FillMode.Fit"/>, however unlike <see cref="FillMode.Fit"/>,
         /// this will only adjust the scale relative to the height of its parent and will maintain the original width relative to its parent.
-        /// 
+        ///
         /// <para>
         /// By adjusting the scale relative to the height of its parent, the aspect ratio of this container's children is maintained, however this is undesirable
         /// in the case where the hit object container should not have its width adjusted by scale. To counteract this, another container is nested inside this

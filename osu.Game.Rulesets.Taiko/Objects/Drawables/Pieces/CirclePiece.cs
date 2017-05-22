@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             {
                 Type = EdgeEffectType.Glow,
                 Colour = AccentColour,
-                Radius = KiaiMode ? 50 : 8
+                Radius = KiaiMode ? 40 : 8
             };
         }
     }
