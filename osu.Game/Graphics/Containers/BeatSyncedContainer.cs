@@ -30,8 +30,9 @@ namespace osu.Game.Graphics.Containers
             if (controlPoint == null)
                 return;
 
+            bool kiai = (controlPoint ?? controlPoint).KiaiMode;
+
             double beatLength = controlPoint.BeatLength;
-            bool kiai = kiaiControlPoint?.KiaiMode ?? false;
             double timingPointStart = controlPoint.Time;
             int beat = beatLength > min_beat_length ? (int)((trackCurrentTime - timingPointStart) / beatLength) : 0;
 
