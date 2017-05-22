@@ -43,5 +43,10 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
                 EndTime = endTime
             };
         }
+
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, double endTime)
+        {
+            return null;
+        }
     }
 }
