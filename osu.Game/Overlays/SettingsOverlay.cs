@@ -7,10 +7,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Overlays.Settings;
-using System;
-using osu.Game.Overlays.Settings.Sections;
 using osu.Framework.Input;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
+using osu.Game.Overlays.Settings.Sections;
 
 namespace osu.Game.Overlays
 {
@@ -26,18 +27,13 @@ namespace osu.Game.Overlays
 
         private const float sidebar_padding = 10;
 
-        private ScrollContainer scrollContainer;
         private Sidebar sidebar;
         private SidebarButton[] sidebarButtons;
-        private SettingsSection[] sections;
+        private SidebarButton selectedSidebarButton;
 
-        private SettingsHeader header;
+        private SettingsSectionsContainer sectionsContainer;
 
-        private SettingsFooter footer;
-
-        private SearchContainer searchContainer;
-
-        private float lastKnownScroll;
+        private SearchTextBox searchTextBox;
 
         public SettingsOverlay()
         {
@@ -48,7 +44,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGame game)
         {
-            sections = new SettingsSection[]
+            var sections = new SettingsSection[]
             {
                 new GeneralSection(),
                 new GraphicsSection(),
@@ -68,27 +64,27 @@ namespace osu.Game.Overlays
                     Colour = Color4.Black,
                     Alpha = 0.6f,
                 },
-                scrollContainer = new ScrollContainer
+                sectionsContainer = new SettingsSectionsContainer
                 {
-                    ScrollDraggerVisible = false,
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
                     Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
-                    Children = new Drawable[]
+                    ExpandableHeader = new SettingsHeader(),
+                    FixedHeader = searchTextBox = new SearchTextBox
                     {
-                        searchContainer = new SearchContainer
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Width = 0.95f,
+                        Margin = new MarginPadding
                         {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                            Direction = FillDirection.Vertical,
-                            Children = sections,
+                            Top = 20,
+                            Bottom = 20
                         },
-                        footer = new SettingsFooter(),
-                        header = new SettingsHeader(() => scrollContainer.Current)
-                        {
-                            Exit = Hide,
-                        },
-                    }
+                        Exit = Hide,
+                    },
+                    Sections = sections,
+                    Footer = new SettingsFooter()
                 },
                 sidebar = new Sidebar
                 {
@@ -96,84 +92,89 @@ namespace osu.Game.Overlays
                     Children = sidebarButtons = sections.Select(section =>
                         new SidebarButton
                         {
-                            Selected = sections[0] == section,
                             Section = section,
-                            Action = () => scrollContainer.ScrollIntoView(section),
+                            Action = sectionsContainer.ScrollContainer.ScrollIntoView,
                         }
                     ).ToArray()
                 }
             };
 
-            header.SearchTextBox.Current.ValueChanged += newValue => searchContainer.SearchTerm = newValue;
+            selectedSidebarButton = sidebarButtons[0];
+            selectedSidebarButton.Selected = true;
 
-            scrollContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            //we need to update these manually because we can't put the SettingsHeader inside the SearchContainer (due to its anchoring).
-            searchContainer.Y = header.DrawHeight;
-            footer.Y = searchContainer.Y + searchContainer.DrawHeight;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            float currentScroll = scrollContainer.Current;
-            if (currentScroll != lastKnownScroll)
+            sectionsContainer.SelectedSection.ValueChanged += section =>
             {
-                lastKnownScroll = currentScroll;
+                selectedSidebarButton.Selected = false;
+                selectedSidebarButton = sidebarButtons.Single(b => b.Section == section);
+                selectedSidebarButton.Selected = true;
+            };
 
-                SettingsSection bestCandidate = null;
-                float bestDistance = float.MaxValue;
+            searchTextBox.Current.ValueChanged += newValue => sectionsContainer.SearchContainer.SearchTerm = newValue;
 
-                foreach (SettingsSection section in sections)
-                {
-                    float distance = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll);
-                    if (distance < bestDistance)
-                    {
-                        bestDistance = distance;
-                        bestCandidate = section;
-                    }
-                }
-
-                var previous = sidebarButtons.SingleOrDefault(sb => sb.Selected);
-                var next = sidebarButtons.SingleOrDefault(sb => sb.Section == bestCandidate);
-                if (previous != null) previous.Selected = false;
-                if (next != null) next.Selected = true;
-            }
+            sectionsContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
         }
 
         protected override void PopIn()
         {
             base.PopIn();
 
-            scrollContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
+            sectionsContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(1, TRANSITION_LENGTH / 2);
 
-            header.SearchTextBox.HoldFocus = true;
+            searchTextBox.HoldFocus = true;
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            scrollContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
+            sectionsContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
             FadeTo(0, TRANSITION_LENGTH / 2);
 
-            header.SearchTextBox.HoldFocus = false;
-            header.SearchTextBox.TriggerFocusLost();
+            searchTextBox.HoldFocus = false;
+            searchTextBox.TriggerFocusLost();
         }
 
         protected override bool OnFocus(InputState state)
         {
-            header.SearchTextBox.TriggerFocus(state);
+            searchTextBox.TriggerFocus(state);
             return false;
+        }
+
+        private class SettingsSectionsContainer : SectionsContainer
+        {
+            public SearchContainer SearchContainer;
+            private readonly Box headerBackground;
+
+            protected override Container<Drawable> CreateScrollContentContainer()
+                => SearchContainer = new SearchContainer
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Direction = FillDirection.Vertical,
+                };
+
+            public SettingsSectionsContainer()
+            {
+                ScrollContainer.ScrollDraggerVisible = false;
+                Add(headerBackground = new Box
+                {
+                    Colour = Color4.Black,
+                    RelativeSizeAxes = Axes.X
+                });
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                // no null check because the usage of this class is strict
+                headerBackground.Height = ExpandableHeader.LayoutSize.Y + FixedHeader.LayoutSize.Y;
+                headerBackground.Y = ExpandableHeader.Y;
+                headerBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
+            }
         }
     }
 }

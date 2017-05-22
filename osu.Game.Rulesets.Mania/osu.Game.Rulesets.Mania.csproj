@@ -57,6 +57,7 @@
     <Compile Include="Beatmaps\Patterns\Pattern.cs" />
     <Compile Include="MathUtils\FastRandom.cs" />
     <Compile Include="Judgements\HitWindows.cs" />
+    <Compile Include="Judgements\ManiaHitResult.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
     <Compile Include="Objects\Drawables\DrawableHoldNote.cs" />
