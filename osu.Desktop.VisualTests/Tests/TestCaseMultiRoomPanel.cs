@@ -3,7 +3,6 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Screens.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Multiplayer;
@@ -13,14 +12,15 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Testing;
 
 namespace osu.Desktop.VisualTests.Tests
 {
     class TestCaseMultiRoomPanel : TestCase
     {
         private MultiRoomPanel test;
-        private FlowContainer panelContainer;
-        public override string Name => @"MultiRoomPanel";
+        private FillFlowContainer panelContainer;
+
         public override string Description => @"Select your favourite room";
 
         private void action(int action)
@@ -37,14 +37,14 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            AddButton(@"ChangeState", () => action(0));
+            AddStep(@"ChangeState", () => action(0));
 
-            Add(panelContainer = new FlowContainer //Positionning container
+            Add(panelContainer = new FillFlowContainer //Positionning container
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Direction = FlowDirections.Vertical,
+                Direction = FillDirection.Vertical,
                 Size = new Vector2(0.4f, 0.5f),
                 Children = new Drawable[]
                 {
