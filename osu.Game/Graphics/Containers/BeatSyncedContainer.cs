@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         private const int seek_tolerance = 20;
 
-        private Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         private int lastBeat;
         private ControlPoint lastControlPoint;
