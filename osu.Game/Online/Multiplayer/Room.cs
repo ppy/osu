@@ -7,7 +7,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.Multiplayer
 {
-    public class MultiplayerRoom
+    public class Room
     {
         public string Name { get; set; }
         public User Host { get; set; }

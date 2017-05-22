@@ -11,7 +11,7 @@ using osu.Game.Database;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    internal class TestCaseDrawableMultiplayerRoom : TestCase
+    internal class TestCaseDrawableRoom : TestCase
     {
         public override string Description => @"Select your favourite room";
 
@@ -19,7 +19,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            DrawableMultiplayerRoom p;
+            DrawableRoom p;
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
@@ -29,14 +29,14 @@ namespace osu.Desktop.VisualTests.Tests
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    p = new DrawableMultiplayerRoom(new MultiplayerRoom
+                    p = new DrawableRoom(new Room
                     {
                         Name = @"Great Room Right Here",
                         Host = new User { Username = @"Naeferith", Id = 9492835, Country = new Country { FlagName = @"FR" }},
                         Status = MultiplayerRoomStatus.Open,
                         CurrentBeatmap = new BeatmapMetadata { Title = @"Seiryu", Artist = @"Critical Crystal" },
                     }),
-                    new DrawableMultiplayerRoom(new MultiplayerRoom
+                    new DrawableRoom(new Room
                     {
                         Name = @"Relax It's The Weekend",
                         Host = new User{ Username = @"peppy", Id = 2, Country = new Country { FlagName = @"AU" }},

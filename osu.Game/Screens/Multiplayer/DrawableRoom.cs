@@ -18,7 +18,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Multiplayer
 {
-    public class DrawableMultiplayerRoom : ClickableContainer
+    public class DrawableRoom : ClickableContainer
     {
         private const float content_padding = 5;
         private const float height = 90;
@@ -39,11 +39,11 @@ namespace osu.Game.Screens.Multiplayer
         private Color4 playingColour;
         private LocalisationEngine localisation;
 
-        public readonly Bindable<MultiplayerRoom> Room;
+        public readonly Bindable<Room> Room;
 
-        public DrawableMultiplayerRoom(MultiplayerRoom room)
+        public DrawableRoom(Room room)
         {
-            Room = new Bindable<MultiplayerRoom>(room);
+            Room = new Bindable<Room>(room);
 
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -206,7 +206,7 @@ namespace osu.Game.Screens.Multiplayer
             Room.TriggerChange();
         }
 
-        private void displayRoom(MultiplayerRoom room)
+        private void displayRoom(Room room)
         {
             name.Text = room.Name;
             status.Text = room.Status.GetDescription();
