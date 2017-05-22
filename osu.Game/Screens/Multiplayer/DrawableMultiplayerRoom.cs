@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
