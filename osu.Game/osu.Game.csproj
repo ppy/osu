@@ -430,11 +430,11 @@
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\osu-framework\osu.Framework\osu.Framework.csproj">
+    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
       <Project>{c76bf5b3-985e-4d39-95fe-97c9c879b83a}</Project>
       <Name>osu.Framework</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
+    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
       <Project>{d9a367c9-4c1a-489f-9b05-a0cea2b53b58}</Project>
       <Name>osu.Game.Resources</Name>
     </ProjectReference>
