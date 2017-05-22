@@ -22,6 +22,9 @@ namespace osu.Game.Screens.Menu
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
+        private static readonly ColourInfo gradient_white_to_transparent_black = ColourInfo.GradientHorizontal(new Color4(255, 255, 255, box_max_alpha), Color4.Black.Opacity(0));
+        private static readonly ColourInfo gradient_transparent_black_to_white = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0), new Color4(255, 255, 255, box_max_alpha));
+
         private readonly Box leftBox;
         private readonly Box rightBox;
 
@@ -30,6 +33,7 @@ namespace osu.Game.Screens.Menu
         private const float kiai_multiplier = (1 - amplitude_dead_zone * 0.95f) / 0.8f;
         private const int box_max_alpha = 200;
         private const double box_fade_in_time = 65;
+        private const int box_width = 300;
 
         public MenuSideFlashes()
         {
@@ -44,47 +48,47 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Y,
-                    Width = 300,
+                    Width = box_width,
                     Alpha = 0,
                     BlendingMode = BlendingMode.Additive,
-                    ColourInfo = ColourInfo.GradientHorizontal(new Color4(255, 255, 255, box_max_alpha), Color4.Black.Opacity(0)),
+                    ColourInfo = gradient_white_to_transparent_black,
                 },
                 rightBox = new Box
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     RelativeSizeAxes = Axes.Y,
-                    Width = 300,
+                    Width = box_width,
                     Alpha = 0,
                     BlendingMode = BlendingMode.Additive,
-                    ColourInfo = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0), new Color4(255, 255, 255, box_max_alpha)),
+                    ColourInfo = gradient_transparent_black_to_white,
                 }
             };
         }
+
+        private bool kiai;
+        private double beatLength;
 
         protected override void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
         {
             if (newBeat < 0)
                 return;
 
-            TrackAmplitudes amp = beatmap.Value.Track.CurrentAmplitudes;
-            if (kiai ? newBeat % 2 == 0 : newBeat % (int)timeSignature == 0)
-            {
-                leftBox.ClearTransforms();
-                leftBox.FadeTo(Math.Max(0, (amp.LeftChannel - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), 65);
-                using (leftBox.BeginDelayedSequence(box_fade_in_time))
-                    leftBox.FadeOut(beatLength, EasingTypes.In);
-                leftBox.DelayReset();
-            }
+            this.kiai = kiai;
+            this.beatLength = beatLength;
 
+            if (kiai ? newBeat % 2 == 0 : newBeat % (int)timeSignature == 0)
+                flash(leftBox);
             if (kiai ? newBeat % 2 == 1 : newBeat % (int)timeSignature == 0)
-            {
-                rightBox.ClearTransforms();
-                rightBox.FadeTo(Math.Max(0, (amp.RightChannel - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), 65);
-                using (rightBox.BeginDelayedSequence(box_fade_in_time))
-                    rightBox.FadeOut(beatLength, EasingTypes.In);
-                rightBox.DelayReset();
-            }
+                flash(rightBox);
+        }
+
+        private void flash(Drawable d)
+        {
+            TrackAmplitudes amp = beatmap.Value.Track.CurrentAmplitudes;
+            d.FadeTo(Math.Max(0, ((d.Equals(leftBox) ? amp.LeftChannel : amp.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time);
+            using (d.BeginDelayedSequence(box_fade_in_time))
+                d.FadeOut(beatLength, EasingTypes.In);
         }
 
         [BackgroundDependencyLoader]
