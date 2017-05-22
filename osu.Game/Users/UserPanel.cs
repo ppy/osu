@@ -159,28 +159,44 @@ namespace osu.Game.Users
                 },
             };
 
+            cover.Add(new AsyncLoadWrapper(new CoverBackgroundSprite(user)
+            {
+            	Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                FillMode = FillMode.Fill,
+                OnLoadComplete = d => d.FadeInFromZero(200),
+            }) { RelativeSizeAxes = Axes.Both });
+
             Status.ValueChanged += displayStatus;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures)
+        private void load(OsuColour colours)
         {
             this.colours = colours;
-
-            cover.Add(new AsyncLoadWrapper(new Sprite
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Texture = textures.Get(user.CoverUrl),
-                FillMode = FillMode.Fill,
-                OnLoadComplete = d => d.FadeInFromZero(200),
-            }) { RelativeSizeAxes = Axes.Both });
         }
 
         private void displayStatus(UserStatus status)
         {
             statusBg.FadeColour(status.GetAppropriateColour(colours), 500, EasingTypes.OutQuint);
             statusMessage.Text = status.Message;
+        }
+
+        private class CoverBackgroundSprite : Sprite
+        {
+            private readonly User user;
+
+            public CoverBackgroundSprite(User user)
+            {
+                this.user = user;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                if (!string.IsNullOrEmpty(user.CoverUrl))
+                    Texture = textures.Get(user.CoverUrl);
+            }
         }
     }
 }
