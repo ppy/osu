@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Multiplayer
             }
 
             foreach (Drawable d in new Drawable[] { sideStrip, status })
-                d.FadeColour(room.Status == MultiplayerRoomStatus.Playing? playingColour : openColour, 100);
+                d.FadeColour(room.Status == RoomStatus.Playing? playingColour : openColour, 100);
         }
     }
 }

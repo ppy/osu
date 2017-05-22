@@ -11,11 +11,11 @@ namespace osu.Game.Online.Multiplayer
     {
         public string Name { get; set; }
         public User Host { get; set; }
-        public MultiplayerRoomStatus Status { get; set; }
+        public RoomStatus Status { get; set; }
         public BeatmapMetadata Beatmap { get; set; }
     }
 
-    public enum MultiplayerRoomStatus
+    public enum RoomStatus
     {
         [Description(@"Welcoming Players")]
         Open,
