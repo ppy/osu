@@ -22,7 +22,6 @@ namespace osu.Game.Overlays.Toolbar
         private void load(NotificationManager notificationManager)
         {
             StateContainer = notificationManager;
-            Action = notificationManager.ToggleVisibility;
         }
     }
 }

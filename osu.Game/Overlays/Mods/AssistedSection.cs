@@ -16,7 +16,6 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            ButtonColour = colours.Blue;
             SelectedColour = colours.BlueLight;
         }
 

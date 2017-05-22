@@ -17,7 +17,6 @@ namespace osu.Game.Overlays.Toolbar
         private void load(MusicController music)
         {
             StateContainer = music;
-            Action = music.ToggleVisibility;
         }
     }
 }

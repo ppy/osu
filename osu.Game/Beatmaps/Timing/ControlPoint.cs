@@ -7,7 +7,7 @@ namespace osu.Game.Beatmaps.Timing
     {
         public string SampleBank;
         public int SampleVolume;
-        public TimeSignatures TimeSignature;
+        public TimeSignatures TimeSignature = TimeSignatures.SimpleQuadruple;
         public double Time;
         public double BeatLength = 500;
         public double SpeedMultiplier = 1;

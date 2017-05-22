@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Scoring
             score.MaxCombo = HighestCombo;
             score.Accuracy = Accuracy;
             score.Rank = rankFrom(Accuracy);
-            score.Date = DateTime.Now;
+            score.Date = DateTimeOffset.Now;
             score.Health = Health;
         }
     }

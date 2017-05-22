@@ -7,12 +7,17 @@ namespace osu.Game.Database
 {
     public class BeatmapDifficulty
     {
+        /// <summary>
+        /// The default value used for all difficulty settings except <see cref="SliderMultiplier"/> and <see cref="SliderTickRate"/>.
+        /// </summary>
+        public const float DEFAULT_DIFFICULTY = 5;
+
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
-        public float DrainRate { get; set; } = 5;
-        public float CircleSize { get; set; } = 5;
-        public float OverallDifficulty { get; set; } = 5;
-        public float ApproachRate { get; set; } = 5;
+        public float DrainRate { get; set; } = DEFAULT_DIFFICULTY;
+        public float CircleSize { get; set; } = DEFAULT_DIFFICULTY;
+        public float OverallDifficulty { get; set; } = DEFAULT_DIFFICULTY;
+        public float ApproachRate { get; set; } = DEFAULT_DIFFICULTY;
         public float SliderMultiplier { get; set; } = 1;
         public float SliderTickRate { get; set; } = 1;
 

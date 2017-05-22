@@ -6,7 +6,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using OpenTK;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Audio;
 using osu.Framework.Allocation;
 

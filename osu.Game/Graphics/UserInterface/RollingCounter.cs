@@ -181,7 +181,7 @@ namespace osu.Game.Graphics.UserInterface
         protected virtual void TransformCount(T currentValue, T newValue)
         {
             Debug.Assert(
-                TransformType.IsSubclassOf(typeof(Transform<T>)) || TransformType == typeof(Transform<T>),
+                typeof(Transform<T>).IsAssignableFrom(TransformType),
                 @"transformType should be a subclass of Transform<T>."
             );
 

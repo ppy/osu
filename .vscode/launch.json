@@ -2,46 +2,60 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch VisualTests",
+            "name": "VisualTests (debug)",
             "windows": {
                 "type": "clr"
             },
             "type": "mono",
             "request": "launch",
             "program": "${workspaceRoot}/osu.Desktop.VisualTests/bin/Debug/osu!.exe",
-            "args": [],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "build",
+            "preLaunchTask": "Build (Debug)",
             "runtimeExecutable": null,
             "env": {},
             "console": "internalConsole"
         },
         {
-            "name": "Launch Desktop",
+            "name": "VisualTests (release)",
+            "windows": {
+                "type": "clr"
+            },
+            "type": "mono",
+            "request": "launch",
+            "program": "${workspaceRoot}/osu.Desktop.VisualTests/bin/Release/osu!.exe",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Release)",
+            "runtimeExecutable": null,
+            "env": {},
+            "console": "internalConsole"
+        },
+        {
+            "name": "osu! (debug)",
             "windows": {
                 "type": "clr"
             },
             "type": "mono",
             "request": "launch",
             "program": "${workspaceRoot}/osu.Desktop/bin/Debug/osu!.exe",
-            "args": [],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "build",
+            "preLaunchTask": "Build (Debug)",
             "runtimeExecutable": null,
             "env": {},
             "console": "internalConsole"
         },
         {
-            "name": "Attach",
+            "name": "osu! (release)",
             "windows": {
-                "type": "clr",
-                "request": "attach",
-                "processName": "osu!"
+                "type": "clr"
             },
             "type": "mono",
-            "request": "attach",
-            "address": "localhost",
-            "port": 55555
+            "request": "launch",
+            "program": "${workspaceRoot}/osu.Desktop/bin/Release/osu!.exe",
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Release)",
+            "runtimeExecutable": null,
+            "env": {},
+            "console": "internalConsole"
         }
     ]
 }

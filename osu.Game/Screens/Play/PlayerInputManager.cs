@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            mouseDisabled = config.GetBindable<bool>(OsuConfig.MouseDisableButtons);
+            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
         protected override void LoadComplete()

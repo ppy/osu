@@ -37,6 +37,11 @@ namespace osu.Game.Online.Chat
         {
         }
 
+        public Message(long id)
+        {
+            Id = id;
+        }
+
         public override bool Equals(object obj)
         {
             var objMessage = obj as Message;

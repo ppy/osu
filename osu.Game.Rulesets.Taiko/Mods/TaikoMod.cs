@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
         protected override Score CreateReplayScore(Beatmap<TaikoHitObject> beatmap) => new Score
         {
             User = new User { Username = "mekkadosu!" },
-            Replay = new TaikoAutoReplay(beatmap).Generate(),
+            Replay = new TaikoAutoGenerator(beatmap).Generate(),
         };
     }
 }

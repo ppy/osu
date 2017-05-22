@@ -16,10 +16,9 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load(OptionsOverlay options)
+        private void load(SettingsOverlay settings)
         {
-            StateContainer = options;
-            Action = options.ToggleVisibility;
+            StateContainer = settings;
         }
     }
 }

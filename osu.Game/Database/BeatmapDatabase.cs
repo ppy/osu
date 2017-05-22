@@ -36,13 +36,11 @@ namespace osu.Game.Database
 
         private void deletePending()
         {
-            foreach (var b in Query<BeatmapSetInfo>().Where(b => b.DeletePending))
+            foreach (var b in GetAllWithChildren<BeatmapSetInfo>(b => b.DeletePending))
             {
                 try
                 {
                     Storage.Delete(b.Path);
-
-                    GetChildren(b, true);
 
                     foreach (var i in b.Beatmaps)
                     {
@@ -269,20 +267,16 @@ namespace osu.Game.Database
 
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null, bool withStoryboard = false)
         {
-            var beatmapSetInfo = Query<BeatmapSetInfo>().FirstOrDefault(s => s.ID == beatmapInfo.BeatmapSetInfoID);
+            if (beatmapInfo.BeatmapSet == null || beatmapInfo.Ruleset == null)
+                beatmapInfo = GetChildren(beatmapInfo, true);
 
-            if (beatmapSetInfo == null)
+            if (beatmapInfo.BeatmapSet == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
 
-            //we need metadata
-            GetChildren(beatmapSetInfo);
-            //we also need a ruleset
-            GetChildren(beatmapInfo);
-
             if (beatmapInfo.Metadata == null)
-                beatmapInfo.Metadata = beatmapSetInfo.Metadata;
+                beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo, beatmapSetInfo, withStoryboard);
+            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo, withStoryboard);
 
             previous?.TransferTo(working);
 

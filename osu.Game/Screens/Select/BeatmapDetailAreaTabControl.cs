@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Select
         {
             modsCheckbox.AccentColour = tabs.AccentColour = colour.YellowLight;
 
-            selectedTab = config.GetBindable<BeatmapDetailTab>(OsuConfig.BeatmapDetailTab);
+            selectedTab = config.GetBindable<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab);
 
             tabs.Current.BindTo(selectedTab);
             tabs.Current.TriggerChange();

@@ -8,13 +8,13 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Scoring
 {
-    internal class ManiaScoreProcessor : ScoreProcessor<ManiaBaseHit, ManiaJudgement>
+    internal class ManiaScoreProcessor : ScoreProcessor<ManiaHitObject, ManiaJudgement>
     {
         public ManiaScoreProcessor()
         {
         }
 
-        public ManiaScoreProcessor(HitRenderer<ManiaBaseHit, ManiaJudgement> hitRenderer)
+        public ManiaScoreProcessor(HitRenderer<ManiaHitObject, ManiaJudgement> hitRenderer)
             : base(hitRenderer)
         {
         }

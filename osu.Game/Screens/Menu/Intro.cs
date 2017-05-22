@@ -64,8 +64,8 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
         {
-            menuVoice = config.GetBindable<bool>(OsuConfig.MenuVoice);
-            menuMusic = config.GetBindable<bool>(OsuConfig.MenuMusic);
+            menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
+            menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
             bgm = audio.Track.Get(@"circles");
             bgm.Looping = true;

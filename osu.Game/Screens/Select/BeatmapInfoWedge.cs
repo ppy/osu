@@ -11,7 +11,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -124,7 +123,7 @@ namespace osu.Game.Screens.Select
                         Content = getBPMRange(beatmap.Beatmap),
                     }));
 
-                    //get statistics fromt he current ruleset.
+                    //get statistics from the current ruleset.
                     labels.AddRange(beatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
                 }
 

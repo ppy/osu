@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Graphics.Primitives;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {

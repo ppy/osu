@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania
 {
-    public class ManiaDifficultyCalculator : DifficultyCalculator<ManiaBaseHit>
+    public class ManiaDifficultyCalculator : DifficultyCalculator<ManiaHitObject>
     {
         public ManiaDifficultyCalculator(Beatmap beatmap)
             : base(beatmap)
@@ -21,6 +21,6 @@ namespace osu.Game.Rulesets.Mania
             return 0;
         }
 
-        protected override BeatmapConverter<ManiaBaseHit> CreateBeatmapConverter() => new ManiaBeatmapConverter();
+        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter();
     }
 }

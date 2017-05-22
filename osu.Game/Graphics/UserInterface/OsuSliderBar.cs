@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -13,7 +14,8 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip where T : struct
+    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip
+        where T : struct, IEquatable<T>
     {
         private SampleChannel sample;
         private double lastSampleTime;

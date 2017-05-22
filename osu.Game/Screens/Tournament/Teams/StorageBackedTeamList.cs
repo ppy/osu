@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Tournament.Teams
 {
@@ -21,16 +20,16 @@ namespace osu.Game.Screens.Tournament.Teams
             this.storage = storage;
         }
 
-        public IEnumerable<Country> Teams
+        public IEnumerable<DrawingsTeam> Teams
         {
             get
             {
-                var teams = new List<Country>();
+                var teams = new List<DrawingsTeam>();
 
                 try
                 {
                     using (Stream stream = storage.GetStream(teams_filename, FileAccess.Read, FileMode.Open))
-                    using (StreamReader sr = new StreamReader(stream))
+                    using (var sr = new StreamReader(stream))
                     {
                         while (sr.Peek() != -1)
                         {
@@ -53,7 +52,7 @@ namespace osu.Game.Screens.Tournament.Teams
                             string acronym = split.Length >= 3 ? split[2].Trim() : teamName;
                             acronym = acronym.Substring(0, Math.Min(3, acronym.Length));
 
-                            teams.Add(new Country
+                            teams.Add(new DrawingsTeam
                             {
                                 FlagName = flagName,
                                 FullName = teamName,

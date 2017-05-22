@@ -216,6 +216,11 @@ namespace osu.Game.Graphics.UserInterface
                 });
         }
 
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            return true;
+        }
+
         protected override bool OnClick(InputState state)
         {
             var flash = new Box

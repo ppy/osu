@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select
 
             Icon = FontAwesome.fa_trash_o;
             HeaderText = @"Confirm deletion of";
-            BodyText = $@"{beatmap.Beatmap?.Metadata?.Artist} - {beatmap.Beatmap?.Metadata?.Title}";
+            BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton

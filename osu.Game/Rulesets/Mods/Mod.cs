@@ -22,6 +22,11 @@ namespace osu.Game.Rulesets.Mods
         public virtual FontAwesome Icon => FontAwesome.fa_question;
 
         /// <summary>
+        /// The type of this mod.
+        /// </summary>
+        public virtual ModType Type => ModType.Special;
+
+        /// <summary>
         /// The user readable description of this mod.
         /// </summary>
         public virtual string Description => string.Empty;

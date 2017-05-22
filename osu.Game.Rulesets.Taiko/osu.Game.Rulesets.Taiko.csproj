@@ -79,7 +79,7 @@
     <Compile Include="Objects\RimHit.cs" />
     <Compile Include="Objects\Swell.cs" />
     <Compile Include="Replays\TaikoFramedReplayInputHandler.cs" />
-    <Compile Include="Replays\TaikoAutoReplay.cs" />
+    <Compile Include="Replays\TaikoAutoGenerator.cs" />
     <Compile Include="Objects\TaikoHitObject.cs" />
     <Compile Include="Objects\TaikoHitObjectDifficulty.cs" />
     <Compile Include="TaikoDifficultyCalculator.cs" />
