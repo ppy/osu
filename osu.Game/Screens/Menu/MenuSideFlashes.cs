@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using System;
+using osu.Framework.Audio.Track;
 
 namespace osu.Game.Screens.Menu
 {
@@ -23,8 +24,8 @@ namespace osu.Game.Screens.Menu
         private Box leftBox;
         private Box rightBox;
 
-        private const int amplitude_dead_zone = 9000;
-        private const float alpha_multiplier = (short.MaxValue - amplitude_dead_zone) / 0.55f;
+        private const float amplitude_dead_zone = 0.25f;
+        private const float alpha_multiplier = (1 - amplitude_dead_zone) / 0.55f;
         private const int box_max_alpha = 200;
         private const double box_fade_in_time = 65;
 
@@ -68,12 +69,13 @@ namespace osu.Game.Screens.Menu
             }
             else if (newBeat >= 0)
             {
-                short[] lev = beatmap.Value.Track.ChannelPeakAmplitudes;
+
+                TrackAmplitudes amp = beatmap.Value.Track.PeakAmplitudes;
                 bool nextIsLeft = newBeat % 2 == 0;
                 if (kiai ? nextIsLeft : newBeat % (int)timeSignature == 0)
                 {
                     leftBox.ClearTransforms();
-                    leftBox.FadeTo(Math.Max(0, (lev[0] - amplitude_dead_zone) / alpha_multiplier), 65);
+                    leftBox.FadeTo(Math.Max(0, (amp.LeftChannel - amplitude_dead_zone) / alpha_multiplier), 65);
                     using (leftBox.BeginDelayedSequence(box_fade_in_time))
                         leftBox.FadeOut(beatLength, EasingTypes.In);
                     leftBox.DelayReset();
@@ -81,7 +83,7 @@ namespace osu.Game.Screens.Menu
                 if (kiai ? !nextIsLeft : newBeat % (int)timeSignature == 0)
                 {
                     rightBox.ClearTransforms();
-                    rightBox.FadeTo(Math.Max(0, (lev[1] - amplitude_dead_zone) / alpha_multiplier), 65);
+                    rightBox.FadeTo(Math.Max(0, (amp.LeftChannel - amplitude_dead_zone) / alpha_multiplier), 65);
                     using (rightBox.BeginDelayedSequence(box_fade_in_time))
                         rightBox.FadeOut(beatLength, EasingTypes.In);
                     rightBox.DelayReset();
