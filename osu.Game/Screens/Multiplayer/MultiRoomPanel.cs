@@ -4,12 +4,12 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 
@@ -132,12 +132,12 @@ namespace osu.Game.Screens.Multiplayer
                     RelativeSizeAxes = Axes.Both,
                 }
                 ,
-                new FlowContainer
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Direction = FlowDirections.Vertical,
+                    Direction = FillDirection.Vertical,
                     Size = new Vector2(0.75f,1),
 
                     Children = new Drawable[]
@@ -148,11 +148,11 @@ namespace osu.Game.Screens.Multiplayer
                             TextSize = 18,
                             Margin = new MarginPadding { Top = CONTENT_PADDING },
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 20,
-                            Direction = FlowDirections.Horizontal,
+                            Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(5,0),
                             Children = new Drawable[]
                             {
@@ -225,10 +225,10 @@ namespace osu.Game.Screens.Multiplayer
                             Colour = statusColour,
                             Margin = new MarginPadding { Top = 10 }
                         },
-                        new FlowContainer
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
-                            Direction = FlowDirections.Horizontal,
+                            Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
