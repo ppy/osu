@@ -86,6 +86,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (args.Key != Key)
                 return false;
 
+            if (args.Repeat)
+                return false;
+
             return UpdateJudgement(true);
         }
     }
