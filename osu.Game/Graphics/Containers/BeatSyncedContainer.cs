@@ -47,14 +47,14 @@ namespace osu.Game.Graphics.Containers
             lastControlPoint = controlPoint;
         }
 
-        protected virtual void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
             beatmap.BindTo(game.Beatmap);
+        }
+
+        protected virtual void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
+        {
         }
     }
 }
