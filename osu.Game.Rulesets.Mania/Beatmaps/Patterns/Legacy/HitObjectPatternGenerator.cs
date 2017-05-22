@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         {
             int lastColumn = PreviousPattern.HitObjects.First().Column;
 
-            if ((convertType & PatternType.Reverse) > 0 && PreviousPattern.HitObjects.Count() > 0)
+            if ((convertType & PatternType.Reverse) > 0 && PreviousPattern.HitObjects.Any())
             {
                 // Generate a new pattern by copying the last hit objects in reverse-column order
                 var pattern = new Pattern();
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 return pattern;
             }
 
-            if ((convertType & PatternType.ForceStack) > 0 && PreviousPattern.HitObjects.Count() > 0)
+            if ((convertType & PatternType.ForceStack) > 0 && PreviousPattern.HitObjects.Any())
             {
                 // Generate a new pattern by placing on the already filled columns
                 var pattern = new Pattern();
@@ -217,7 +217,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
             for (int i = 0; i < noteCount; i++)
             {
-                while (pattern.ColumnHasObject(nextColumn) || (PreviousPattern.ColumnHasObject(nextColumn) && !allowStacking))
+                while (pattern.ColumnHasObject(nextColumn) || PreviousPattern.ColumnHasObject(nextColumn) && !allowStacking)
                 {
                     if ((convertType & PatternType.Gathered) > 0)
                     {
