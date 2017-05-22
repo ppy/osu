@@ -141,6 +141,26 @@ namespace osu.Game.Rulesets.Mania.Judgements
         }
 
         /// <summary>
+        /// Retrieves the hit result for a time offset.
+        /// </summary>
+        /// <param name="hitOffset">The time offset.</param>
+        /// <returns>The hit result, or null if the time offset results in a miss.</returns>
+        public ManiaHitResult? ResultFor(double hitOffset)
+        {
+            if (hitOffset <= Perfect / 2)
+                return ManiaHitResult.Perfect;
+            if (hitOffset <= Great / 2)
+                return ManiaHitResult.Great;
+            if (hitOffset <= Good / 2)
+                return ManiaHitResult.Good;
+            if (hitOffset <= Ok / 2)
+                return ManiaHitResult.Ok;
+            if (hitOffset <= Bad / 2)
+                return ManiaHitResult.Bad;
+            return null;
+        }
+
+        /// <summary>
         /// Constructs new hit windows which have been multiplied by a value.
         /// </summary>
         /// <param name="windows">The original hit windows.</param>
