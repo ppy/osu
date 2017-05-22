@@ -4,6 +4,7 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -24,21 +25,26 @@ namespace osu.Game.Screens.Multiplayer
         private const float height = 90;
 
         private readonly Box sideStrip;
-        private readonly OsuSpriteText status;
+        private readonly UpdateableAvatar avatar;
+        private readonly OsuSpriteText name;
+        private readonly Container flagContainer;
         private readonly OsuSpriteText host;
         private readonly OsuSpriteText rankBounds;
+        private readonly OsuSpriteText status;
         private readonly FillFlowContainer<OsuSpriteText> beatmapInfoFlow;
         private readonly OsuSpriteText beatmapTitle;
+        private readonly OsuSpriteText beatmapDash;
         private readonly OsuSpriteText beatmapArtist;
 
         private Color4 openColour;
         private Color4 playingColour;
+        private LocalisationEngine localisation;
 
-        public readonly MultiplayerRoom Room;
+        public readonly Bindable<MultiplayerRoom> Room;
 
         public DrawableMultiplayerRoom(MultiplayerRoom room)
         {
-            Room = room;
+            Room = new Bindable<MultiplayerRoom>(room);
 
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -65,12 +71,19 @@ namespace osu.Game.Screens.Multiplayer
                 sideStrip = new Box
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Width = 5,
+                    Width = content_padding,
+                },
+                avatar = new UpdateableAvatar
+                {
+                    Size = new Vector2(Height - content_padding* 2),
+                    Masking = true,
+                    CornerRadius = 5f,
+                    Margin = new MarginPadding { Left = content_padding * 2, Top = content_padding },
                 },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = content_padding, Bottom = content_padding * 2, Left = Height + content_padding * 2, Right = content_padding },
+                    Padding = new MarginPadding { Top = content_padding, Bottom = content_padding, Left = Height + content_padding * 2, Right = content_padding },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -81,9 +94,8 @@ namespace osu.Game.Screens.Multiplayer
                             Spacing = new Vector2(5f),
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                name = new OsuSpriteText
                                 {
-                                    Text = Room.Name,
                                     TextSize = 18,
                                 },
                                 new Container
@@ -100,7 +112,7 @@ namespace osu.Game.Screens.Multiplayer
                                             Spacing = new Vector2(5f, 0f),
                                             Children = new Drawable[]
                                             {
-                                                new DrawableFlag(Room.Host?.Country?.FlagName ?? "__")
+                                                flagContainer = new Container
                                                 {
                                                     Width = 30f,
                                                     RelativeSizeAxes = Axes.Y,
@@ -121,7 +133,6 @@ namespace osu.Game.Screens.Multiplayer
                                                 {
                                                     Anchor = Anchor.CentreLeft,
                                                     Origin = Anchor.CentreLeft,
-                                                    Text = Room.Host?.Username ?? @"",
                                                     TextSize = 14,
                                                     Font = @"Exo2.0-BoldItalic",
                                                 },
@@ -131,7 +142,7 @@ namespace osu.Game.Screens.Multiplayer
                                         {
                                             Anchor = Anchor.CentreRight,
                                             Origin = Anchor.CentreRight,
-                                            Text = "#6895 - #50024",
+                                            Text = "#0 - #0",
                                             TextSize = 14,
                                             Margin = new MarginPadding { Right = 10 },
                                         },
@@ -146,6 +157,7 @@ namespace osu.Game.Screens.Multiplayer
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
+                            Margin = new MarginPadding { Bottom = content_padding },
                             Children = new Drawable[]
                             {
                                 status = new OsuSpriteText
@@ -165,9 +177,8 @@ namespace osu.Game.Screens.Multiplayer
                                             TextSize = 14,
                                             Font = @"Exo2.0-BoldItalic",
                                         },
-                                        new OsuSpriteText
+                                        beatmapDash = new OsuSpriteText
                                         {
-                                            Text = @" - ",
                                             TextSize = 14,
                                             Font = @"Exo2.0-RegularItalic",
                                         },
@@ -183,33 +194,49 @@ namespace osu.Game.Screens.Multiplayer
                     },
                 },
             };
+
+            Room.ValueChanged += displayRoom;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, LocalisationEngine localisation)
         {
+            this.localisation = localisation;
+
             openColour = colours.GreenLight;
             playingColour = colours.Purple;
             beatmapInfoFlow.Colour = rankBounds.Colour = colours.Gray9;
             host.Colour = colours.Blue;
 
-            if (Room.CurrentBeatmap != null)
-            {
-                beatmapTitle.Current = localisation.GetUnicodePreference(Room.CurrentBeatmap.TitleUnicode, Room.CurrentBeatmap.Title);
-                beatmapArtist.Current = localisation.GetUnicodePreference(Room.CurrentBeatmap.ArtistUnicode, Room.CurrentBeatmap.Artist);
-            }
-
-            updateStatus();
+            Room.TriggerChange();
         }
 
-        private void updateStatus()
+        private void displayRoom(MultiplayerRoom room)
         {
-            if (Room == null) return;
+            name.Text = room.Name;
+            status.Text = room.Status.GetDescription();
+            host.Text = room.Host.Username;
+            flagContainer.Children = new[] { new DrawableFlag(room.Host.Country?.FlagName ?? @"__") { RelativeSizeAxes = Axes.Both } };
+            avatar.User = room.Host;
 
-            status.Text = Room.Status.GetDescription();
+            if (room.CurrentBeatmap != null)
+            {
+                beatmapTitle.Current = localisation.GetUnicodePreference(room.CurrentBeatmap.TitleUnicode, room.CurrentBeatmap.Title);
+                beatmapDash.Text = @" - ";
+                beatmapArtist.Current = localisation.GetUnicodePreference(room.CurrentBeatmap.ArtistUnicode, room.CurrentBeatmap.Artist);
+            }
+            else
+            {
+                beatmapTitle.Current = null;
+                beatmapArtist.Current = null;
+
+                beatmapTitle.Text = @"Changing map";
+                beatmapDash.Text = string.Empty;
+                beatmapArtist.Text = string.Empty;
+            }
 
             foreach (Drawable d in new Drawable[] { sideStrip, status })
-                d.FadeColour(Room.Status == MultiplayerRoomStatus.Playing? playingColour : openColour);
+                d.FadeColour(room.Status == MultiplayerRoomStatus.Playing? playingColour : openColour, 100);
         }
     }
 }
