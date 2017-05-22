@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Database;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Judgements
 {
@@ -138,6 +139,26 @@ namespace osu.Game.Rulesets.Mania.Judgements
             Ok = BeatmapDifficulty.DifficultyRange(difficulty, ok_max, ok_mid, ok_min);
             Bad = BeatmapDifficulty.DifficultyRange(difficulty, bad_max, bad_mid, bad_min);
             Miss = BeatmapDifficulty.DifficultyRange(difficulty, miss_max, miss_mid, miss_min);
+        }
+
+        /// <summary>
+        /// Retrieves the hit result for a time offset.
+        /// </summary>
+        /// <param name="hitOffset">The time offset.</param>
+        /// <returns>The hit result, or null if the time offset results in a miss.</returns>
+        public ManiaHitResult? ResultFor(double hitOffset)
+        {
+            if (hitOffset <= Perfect / 2)
+                return ManiaHitResult.Perfect;
+            if (hitOffset <= Great / 2)
+                return ManiaHitResult.Great;
+            if (hitOffset <= Good / 2)
+                return ManiaHitResult.Good;
+            if (hitOffset <= Ok / 2)
+                return ManiaHitResult.Ok;
+            if (hitOffset <= Bad / 2)
+                return ManiaHitResult.Bad;
+            return null;
         }
 
         /// <summary>
