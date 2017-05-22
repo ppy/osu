@@ -4,6 +4,7 @@
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics.Containers;
@@ -11,7 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using System;
-using osu.Framework.Audio.Track;
+using TrackAmplitudes = osu.Framework.Audio.Track.Track.TrackAmplitudes;
 
 namespace osu.Game.Screens.Menu
 {
@@ -19,13 +20,14 @@ namespace osu.Game.Screens.Menu
     {
         public override bool HandleInput => false;
 
-        private Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         private Box leftBox;
         private Box rightBox;
 
         private const float amplitude_dead_zone = 0.25f;
         private const float alpha_multiplier = (1 - amplitude_dead_zone) / 0.55f;
+        private const float kiai_multiplier = (1 - (amplitude_dead_zone * 0.9f)) / 0.8f;
         private const int box_max_alpha = 200;
         private const double box_fade_in_time = 65;
 
@@ -45,7 +47,7 @@ namespace osu.Game.Screens.Menu
                     Width = 300,
                     Alpha = 0,
                     BlendingMode = BlendingMode.Additive,
-                    ColourInfo = ColourInfo.GradientHorizontal(new Color4(255, 255, 255, box_max_alpha), Color4.Transparent),
+                    ColourInfo = ColourInfo.GradientHorizontal(new Color4(255, 255, 255, box_max_alpha), Color4.Black.Opacity(0)),
                 },
                 rightBox = new Box
                 {
@@ -55,46 +57,38 @@ namespace osu.Game.Screens.Menu
                     Width = 300,
                     Alpha = 0,
                     BlendingMode = BlendingMode.Additive,
-                    ColourInfo = ColourInfo.GradientHorizontal(Color4.Transparent, new Color4(255, 255, 255, box_max_alpha)),
+                    ColourInfo = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0), new Color4(255, 255, 255, box_max_alpha)),
                 }
             };
         }
 
         protected override void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
         {
-            if (!beatmap?.Value?.Track?.IsRunning ?? false)
+            if (newBeat < 0)
+                return;
+            TrackAmplitudes amp = beatmap.Value.Track.CurrentAmplitudes;
+            if (newBeat % (kiai ? 2 : (int)timeSignature) == 0)
             {
-                leftBox.FadeOut(50);
-                rightBox.FadeOut(50);
+                leftBox.ClearTransforms();
+                leftBox.FadeTo(Math.Max(0, (amp.LeftChannel - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), 65);
+                using (leftBox.BeginDelayedSequence(box_fade_in_time))
+                    leftBox.FadeOut(beatLength, EasingTypes.In);
+                leftBox.DelayReset();
             }
-            else if (newBeat >= 0)
+            if (kiai ? newBeat % 2 == 1 : newBeat % (int)timeSignature == 0)
             {
-
-                TrackAmplitudes amp = beatmap.Value.Track.PeakAmplitudes;
-                bool nextIsLeft = newBeat % 2 == 0;
-                if (kiai ? nextIsLeft : newBeat % (int)timeSignature == 0)
-                {
-                    leftBox.ClearTransforms();
-                    leftBox.FadeTo(Math.Max(0, (amp.LeftChannel - amplitude_dead_zone) / alpha_multiplier), 65);
-                    using (leftBox.BeginDelayedSequence(box_fade_in_time))
-                        leftBox.FadeOut(beatLength, EasingTypes.In);
-                    leftBox.DelayReset();
-                }
-                if (kiai ? !nextIsLeft : newBeat % (int)timeSignature == 0)
-                {
-                    rightBox.ClearTransforms();
-                    rightBox.FadeTo(Math.Max(0, (amp.LeftChannel - amplitude_dead_zone) / alpha_multiplier), 65);
-                    using (rightBox.BeginDelayedSequence(box_fade_in_time))
-                        rightBox.FadeOut(beatLength, EasingTypes.In);
-                    rightBox.DelayReset();
-                }
+                rightBox.ClearTransforms();
+                rightBox.FadeTo(Math.Max(0, (amp.RightChannel - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), 65);
+                using (rightBox.BeginDelayedSequence(box_fade_in_time))
+                    rightBox.FadeOut(beatLength, EasingTypes.In);
+                rightBox.DelayReset();
             }
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
-            beatmap = game.Beatmap;
+            beatmap.BindTo(game.Beatmap);
         }
     }
 }
