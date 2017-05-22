@@ -214,11 +214,11 @@ namespace osu.Game.Screens.Multiplayer
             flagContainer.Children = new[] { new DrawableFlag(room.Host.Country?.FlagName ?? @"__") { RelativeSizeAxes = Axes.Both } };
             avatar.User = room.Host;
 
-            if (room.CurrentBeatmap != null)
+            if (room.Beatmap != null)
             {
-                beatmapTitle.Current = localisation.GetUnicodePreference(room.CurrentBeatmap.TitleUnicode, room.CurrentBeatmap.Title);
+                beatmapTitle.Current = localisation.GetUnicodePreference(room.Beatmap.TitleUnicode, room.Beatmap.Title);
                 beatmapDash.Text = @" - ";
-                beatmapArtist.Current = localisation.GetUnicodePreference(room.CurrentBeatmap.ArtistUnicode, room.CurrentBeatmap.Artist);
+                beatmapArtist.Current = localisation.GetUnicodePreference(room.Beatmap.ArtistUnicode, room.Beatmap.Artist);
             }
             else
             {

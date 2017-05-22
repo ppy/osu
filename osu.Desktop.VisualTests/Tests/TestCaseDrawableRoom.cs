@@ -34,14 +34,14 @@ namespace osu.Desktop.VisualTests.Tests
                         Name = @"Great Room Right Here",
                         Host = new User { Username = @"Naeferith", Id = 9492835, Country = new Country { FlagName = @"FR" }},
                         Status = MultiplayerRoomStatus.Open,
-                        CurrentBeatmap = new BeatmapMetadata { Title = @"Seiryu", Artist = @"Critical Crystal" },
+                        Beatmap = new BeatmapMetadata { Title = @"Seiryu", Artist = @"Critical Crystal" },
                     }),
                     new DrawableRoom(new Room
                     {
                         Name = @"Relax It's The Weekend",
                         Host = new User{ Username = @"peppy", Id = 2, Country = new Country { FlagName = @"AU" }},
                         Status = MultiplayerRoomStatus.Playing,
-                        CurrentBeatmap = new BeatmapMetadata { Title = @"ZAQ", Artist = @"Serendipity" },
+                        Beatmap = new BeatmapMetadata { Title = @"ZAQ", Artist = @"Serendipity" },
                     }),
                 }
             });
@@ -66,7 +66,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddStep(@"change beatmap", () =>
             {
-                p.Room.Value.CurrentBeatmap = null;
+                p.Room.Value.Beatmap = null;
                 p.Room.TriggerChange();
             });
 
