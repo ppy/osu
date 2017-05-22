@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using OpenTK.Input;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -13,32 +13,23 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     public abstract class DrawableManiaHitObject<TObject> : DrawableHitObject<ManiaHitObject, ManiaJudgement>
         where TObject : ManiaHitObject
     {
+        /// <summary>
+        /// The key that will trigger input for this hit object.
+        /// </summary>
+        protected Bindable<Key> Key { get; private set; } = new Bindable<Key>();
+
         public new TObject HitObject;
 
-        private readonly Container glowContainer;
-
-        protected DrawableManiaHitObject(TObject hitObject)
+        protected DrawableManiaHitObject(TObject hitObject, Bindable<Key> key = null)
             : base(hitObject)
         {
             HitObject = hitObject;
 
+            if (key != null)
+                Key.BindTo(key);
+
             RelativePositionAxes = Axes.Y;
             Y = (float)HitObject.StartTime;
-
-            Add(glowContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                Children = new[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                        AlwaysPresent = true
-                    }
-                }
-            });
         }
 
         public override Color4 AccentColour
@@ -49,13 +40,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (base.AccentColour == value)
                     return;
                 base.AccentColour = value;
-
-                glowContainer.EdgeEffect = new EdgeEffect
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 5,
-                    Colour = value
-                };
             }
         }
 

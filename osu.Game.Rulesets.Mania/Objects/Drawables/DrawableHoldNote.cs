@@ -5,6 +5,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
+using osu.Framework.Configuration;
+using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -14,8 +16,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly BodyPiece bodyPiece;
         private readonly NotePiece tailPiece;
 
-        public DrawableHoldNote(HoldNote hitObject)
-            : base(hitObject)
+        public DrawableHoldNote(HoldNote hitObject, Bindable<Key> key = null)
+            : base(hitObject, key)
         {
             RelativeSizeAxes = Axes.Both;
             Height = (float)HitObject.Duration;
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tailPiece = new NotePiece
                 {
                     Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre
+                    Origin = Anchor.TopCentre
                 }
             });
         }
@@ -60,6 +62,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+        }
+
+        protected override void Update()
+        {
+            if (Time.Current > HitObject.StartTime)
+                headPiece.Colour = Color4.Green;
+            if (Time.Current > HitObject.EndTime)
+            {
+                bodyPiece.Colour = Color4.Green;
+                tailPiece.Colour = Color4.Green;
+            }
         }
     }
 }

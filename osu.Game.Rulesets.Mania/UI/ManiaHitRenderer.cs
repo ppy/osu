@@ -4,6 +4,8 @@
 using System;
 using System.Linq;
 using OpenTK;
+using OpenTK.Input;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
@@ -24,8 +26,8 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public int? Columns;
 
-        public ManiaHitRenderer(WorkingBeatmap beatmap)
-            : base(beatmap)
+        public ManiaHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(beatmap, isForCurrentRuleset)
         {
         }
 
@@ -34,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.UI
             ControlPoint firstTimingChange = Beatmap.TimingInfo.ControlPoints.FirstOrDefault(t => t.TimingChange);
 
             if (firstTimingChange == null)
-                throw new Exception("The Beatmap contains no timing points!");
+                throw new InvalidOperationException("The Beatmap contains no timing points!");
 
             // Generate the timing points, making non-timing changes use the previous timing change
             var timingChanges = Beatmap.TimingInfo.ControlPoints.Select(c =>
@@ -49,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 return t;
             });
 
-            double lastObjectTime = (Objects.Last() as IHasEndTime)?.EndTime ?? Objects.Last().StartTime;
+            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
             // Perform some post processing of the timing changes
             timingChanges = timingChanges
@@ -76,9 +78,19 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
         {
+            var maniaPlayfield = Playfield as ManiaPlayfield;
+            if (maniaPlayfield == null)
+                return null;
+
+            Bindable<Key> key = maniaPlayfield.Columns.ElementAt(h.Column).Key;
+
+            var holdNote = h as HoldNote;
+            if (holdNote != null)
+                return new DrawableHoldNote(holdNote, key);
+
             var note = h as Note;
             if (note != null)
-                return new DrawableNote(note);
+                return new DrawableNote(note, key);
 
             return null;
         }

@@ -146,7 +146,7 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            AddInternal(ratioContainer = new RatioAdjust
+            base.Content.Add(ratioContainer = new RatioAdjust
             {
                 Children = new Drawable[]
                 {
