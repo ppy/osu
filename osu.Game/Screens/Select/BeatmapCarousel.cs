@@ -155,7 +155,11 @@ namespace osu.Game.Screens.Select
                 index = (index + direction + groups.Count) % groups.Count;
                 if (groups[index].State != BeatmapGroupState.Hidden)
                 {
-                    SelectBeatmap(groups[index].BeatmapPanels.First().Beatmap);
+                    if (skipDifficulties)
+                        SelectBeatmap(groups[index].SelectedPanel != null ? groups[index].SelectedPanel.Beatmap : groups[index].BeatmapPanels.First().Beatmap);
+                    else
+                        SelectBeatmap(direction == 1 ? groups[index].BeatmapPanels.First().Beatmap : groups[index].BeatmapPanels.Last().Beatmap);
+
                     return;
                 }
             } while (index != startIndex);
@@ -167,10 +171,8 @@ namespace osu.Game.Screens.Select
             if (visibleGroups.Count < 1)
                 return;
             BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];
-            BeatmapPanel panel = group?.BeatmapPanels.First();
 
-            if (panel == null)
-                return;
+            BeatmapPanel panel = group.BeatmapPanels[RNG.Next(group.BeatmapPanels.Count)];
 
             selectGroup(group, panel);
         }
@@ -409,7 +411,14 @@ namespace osu.Game.Screens.Select
             int firstIndex = yPositions.BinarySearch(Current - Panel.MAX_HEIGHT);
             if (firstIndex < 0) firstIndex = ~firstIndex;
             int lastIndex = yPositions.BinarySearch(Current + drawHeight);
-            if (lastIndex < 0) lastIndex = ~lastIndex;
+            if (lastIndex < 0)
+            {
+                lastIndex = ~lastIndex;
+
+                // Add the first panel of the last visible beatmap group to preload its data.
+                if (lastIndex != 0 && panels[lastIndex - 1] is BeatmapSetHeader)
+                    lastIndex++;
+            }
 
             // Add those panels within the previously found index range that should be displayed.
             for (int i = firstIndex; i < lastIndex; ++i)
