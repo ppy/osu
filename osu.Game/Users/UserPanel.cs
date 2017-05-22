@@ -78,7 +78,7 @@ namespace osu.Game.Users
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Margin = new MarginPadding { Left = height - status_height - content_padding },
+                            Padding = new MarginPadding { Left = height - status_height - content_padding },
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
@@ -179,7 +179,7 @@ namespace osu.Game.Users
 
         private void displayStatus(UserStatus status)
         {
-            statusBg.FadeColour(status.Colour(colours), 200);
+            statusBg.FadeColour(status.GetAppropriateColour(colours), 500, EasingTypes.OutQuint);
             statusMessage.Text = status.Message;
         }
     }
