@@ -110,7 +110,13 @@ namespace osu.Game.Overlays.Direct
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
-                                    Padding = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding, Left = horizontal_padding, Right = horizontal_padding },
+                                    Padding = new MarginPadding
+                                    {
+                                        Top = vertical_padding,
+                                        Bottom = vertical_padding,
+                                        Left = horizontal_padding,
+                                        Right = horizontal_padding,
+                                    },
                                     Children = new Drawable[]
                                     {
                                         new FillFlowContainer
