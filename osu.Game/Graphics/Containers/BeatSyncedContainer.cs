@@ -11,7 +11,8 @@ namespace osu.Game.Graphics.Containers
 {
     public class BeatSyncedContainer : Container
     {
-        private Bindable<WorkingBeatmap> beatmap;
+        private Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
         private int lastBeat;
         private double lastTimingPointStart;
         //This is to avoid sending new beats when not at the very start of the beat
@@ -20,7 +21,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void Update()
         {
-            if (beatmap.Value == null)
+            if (beatmap.Value?.Track == null)
                 return;
 
             double trackCurrentTime = beatmap.Value.Track.CurrentTime;
@@ -53,7 +54,7 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
-            beatmap = game.Beatmap;
+            beatmap.BindTo(game.Beatmap);
         }
     }
 }
