@@ -63,8 +63,6 @@ namespace osu.Game.Screens.Play
 
         #endregion
 
-        private SkipButton skipButton;
-
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
 
@@ -89,7 +87,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, ruleset.ID == Beatmap.BeatmapInfo.Ruleset.ID);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
@@ -97,7 +95,7 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = Beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap);
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, true);
                 }
 
                 if (!HitRenderer.Objects.Any())
@@ -162,6 +160,7 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
+                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -169,11 +168,6 @@ namespace osu.Game.Screens.Play
                             Children = new Drawable[]
                             {
                                 HitRenderer,
-                                skipButton = new SkipButton
-                                {
-                                    Alpha = 0,
-                                    Margin = new MarginPadding { Bottom = 140 } // this is temporary
-                                },
                             }
                         },
                         hudOverlay = new StandardHUDOverlay
@@ -219,33 +213,6 @@ namespace osu.Game.Screens.Play
             scoreProcessor.Failed += onFail;
         }
 
-        private void initializeSkipButton()
-        {
-            const double skip_required_cutoff = 3000;
-            const double fade_time = 300;
-
-            double firstHitObject = Beatmap.Beatmap.HitObjects.First().StartTime;
-
-            if (firstHitObject < skip_required_cutoff)
-            {
-                skipButton.Alpha = 0;
-                skipButton.Expire();
-                return;
-            }
-
-            skipButton.FadeInFromZero(fade_time);
-
-            skipButton.Action = () =>
-            {
-                decoupledClock.Seek(firstHitObject - skip_required_cutoff - fade_time);
-                skipButton.Action = null;
-            };
-
-            skipButton.Delay(firstHitObject - skip_required_cutoff - fade_time);
-            skipButton.FadeOut(fade_time);
-            skipButton.Expire();
-        }
-
         public void Restart()
         {
             ValidForResume = false;
@@ -263,18 +230,20 @@ namespace osu.Game.Screens.Play
 
             ValidForResume = false;
 
-            Delay(1000);
-            onCompletionEvent = Schedule(delegate
+            using (BeginDelayedSequence(1000))
             {
-                var score = new Score
+                onCompletionEvent = Schedule(delegate
                 {
-                    Beatmap = Beatmap.BeatmapInfo,
-                    Ruleset = ruleset
-                };
-                scoreProcessor.PopulateScore(score);
-                score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
-                Push(new Results(score));
-            });
+                    var score = new Score
+                    {
+                        Beatmap = Beatmap.BeatmapInfo,
+                        Ruleset = ruleset
+                    };
+                    scoreProcessor.PopulateScore(score);
+                    score.User = HitRenderer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
+                    Push(new Results(score));
+                });
+            }
         }
 
         private void onFail()
@@ -299,17 +268,18 @@ namespace osu.Game.Screens.Play
 
             Content.ScaleTo(0.7f);
 
-            Content.Delay(250);
-            Content.FadeIn(250);
+            using (Content.BeginDelayedSequence(250))
+                Content.FadeIn(250);
 
             Content.ScaleTo(1, 750, EasingTypes.OutQuint);
 
-            Delay(750);
-            Schedule(() =>
-            {
-                decoupledClock.Start();
-                initializeSkipButton();
-            });
+            using (BeginDelayedSequence(750))
+                Schedule(() =>
+                {
+                    if (!pauseContainer.IsPaused)
+                        decoupledClock.Start();
+
+                });
 
             pauseContainer.Alpha = 0;
             pauseContainer.FadeIn(750, EasingTypes.OutQuint);
