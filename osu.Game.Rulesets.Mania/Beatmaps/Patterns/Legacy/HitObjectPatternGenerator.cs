@@ -94,11 +94,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 // Generate a new pattern by copying the last hit objects in reverse-column order
                 var pattern = new Pattern();
 
-                int siblings = PreviousPattern.HitObjects.Count(h => h.Column >= RandomStart);
-
                 for (int i = RandomStart; i < AvailableColumns; i++)
                     if (PreviousPattern.IsFilled(i))
-                        addToPattern(pattern, RandomStart + AvailableColumns - i - 1, siblings);
+                        addToPattern(pattern, RandomStart + AvailableColumns - i - 1);
 
                 return pattern;
             }
@@ -123,11 +121,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 // Generate a new pattern by placing on the already filled columns
                 var pattern = new Pattern();
 
-                int siblings = PreviousPattern.HitObjects.Count(h => h.Column >= RandomStart);
-
                 for (int i = RandomStart; i < AvailableColumns; i++)
                     if (PreviousPattern.IsFilled(i))
-                        addToPattern(pattern, i, siblings);
+                        addToPattern(pattern, i);
 
                 return pattern;
             }
@@ -208,9 +204,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </para>
         /// </summary>
         /// <param name="noteCount">The amount of notes to generate.</param>
-        /// <param name="siblingsOverride">Custom siblings count if <paramref name="noteCount"/> is not the number of siblings in this pattern.</param>
         /// <returns>The <see cref="Pattern"/> containing the hit objects.</returns>
-        private Pattern generateRandomNotes(int noteCount, int siblingsOverride = -1)
+        private Pattern generateRandomNotes(int noteCount)
         {
             var pattern = new Pattern();
 
@@ -234,7 +229,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                         nextColumn = Random.Next(RandomStart, AvailableColumns);
                 }
 
-                addToPattern(pattern, nextColumn, siblingsOverride != -1 ?  siblingsOverride : noteCount);
+                addToPattern(pattern, nextColumn);
             }
 
             return pattern;
@@ -257,16 +252,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         {
             var pattern = new Pattern();
 
-            int noteCount = getRandomNoteCount(p2, p3, p4, p5);
-            int siblings = noteCount;
+            pattern.Add(generateRandomNotes(getRandomNoteCount(p2, p3, p4, p5)));
 
             if (RandomStart > 0 && hasSpecialColumn)
-            {
-                siblings++;
-                addToPattern(pattern, 0, siblings);
-            }
-
-            pattern.Add(generateRandomNotes(noteCount, siblings));
+                addToPattern(pattern, 0);
 
             return pattern;
         }
@@ -284,12 +273,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             bool addToCentre;
             int noteCount = getRandomNoteCountMirrored(centreProbability, p2, p3, out addToCentre);
-            int siblings = noteCount;
-
-            if (addToCentre)
-                siblings++;
-            if (RandomStart > 0 && hasSpecialColumn)
-                siblings++;
 
             int columnLimit = (AvailableColumns % 2 == 0 ? AvailableColumns : AvailableColumns - 1) / 2;
             int nextColumn = Random.Next(RandomStart, columnLimit);
@@ -297,17 +280,18 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 while (pattern.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, columnLimit);
+
                 // Add normal note
-                addToPattern(pattern, nextColumn, siblings);
+                addToPattern(pattern, nextColumn);
                 // Add mirrored note
                 addToPattern(pattern, RandomStart + AvailableColumns - nextColumn - 1);
             }
 
             if (addToCentre)
-                addToPattern(pattern, AvailableColumns / 2, siblings);
+                addToPattern(pattern, AvailableColumns / 2);
 
             if (RandomStart > 0 && hasSpecialColumn)
-                addToPattern(pattern, 0, siblings);
+                addToPattern(pattern, 0);
 
             return pattern;
         }
@@ -410,15 +394,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </summary>
         /// <param name="pattern">The pattern to add to.</param>
         /// <param name="column">The column to add the note to.</param>
-        /// <param name="siblings">The number of children alongside this note (these will not be generated, but are used for volume calculations).</param>
-        private void addToPattern(Pattern pattern, int column, int siblings = 1)
+        private void addToPattern(Pattern pattern, int column)
         {
             pattern.Add(new Note
             {
                 StartTime = HitObject.StartTime,
                 Samples = HitObject.Samples,
-                Column = column,
-                Siblings = siblings
+                Column = column
             });
         }
     }
