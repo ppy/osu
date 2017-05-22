@@ -44,7 +44,11 @@ namespace osu.Game.Overlays.Direct
         public ResultCounts ResultCounts
         {
             get { return resultCounts; }
-            set { resultCounts = value; updateResultCounts(); }
+            set
+            {
+                resultCounts = value;
+                updateResultCounts();
+            }
         }
 
         protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || RankStatusDropdown.Contains(screenSpacePos);
