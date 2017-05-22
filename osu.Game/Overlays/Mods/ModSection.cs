@@ -6,11 +6,12 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -18,7 +19,7 @@ namespace osu.Game.Overlays.Mods
     {
         private readonly OsuSpriteText headerLabel;
 
-        public FillFlowContainer<ModButton> ButtonsContainer { get; }
+        public FillFlowContainer<ModButtonEmpty> ButtonsContainer { get; }
 
         public Action<Mod> Action;
         protected abstract Key[] ToggleKeys { get; }
@@ -36,47 +37,30 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
+        public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
+
+        public IEnumerable<Mod> Mods
+        {
+            set
+            {
+                var modContainers = value.Select(m =>
+                {
+                    if (m == null)
+                        return new ModButtonEmpty();
+                    else
+                        return new ModButton(m)
+                        {
+                            SelectedColour = selectedColour,
+                            Action = Action,
+                        };
+                }).ToArray();
+
+                ButtonsContainer.Children = modContainers;
+                buttons = modContainers.OfType<ModButton>().ToArray();
+            }
+        }
+
         private ModButton[] buttons = { };
-        public ModButton[] Buttons
-        {
-            get
-            {
-                return buttons;
-            }
-            set
-            {
-                if (value == buttons) return;
-                buttons = value;
-
-                foreach (ModButton button in value)
-                {
-                    button.ButtonColour = ButtonColour;
-                    button.SelectedColour = selectedColour;
-                    button.Action = Action;
-                }
-
-                ButtonsContainer.Children = value;
-            }
-        }
-
-        private Color4 buttonsBolour = Color4.White;
-        public Color4 ButtonColour
-        {
-            get
-            {
-                return buttonsBolour;
-            }
-            set
-            {
-                if (value == buttonsBolour) return;
-                buttonsBolour = value;
-
-                foreach (ModButton button in buttons)
-                {
-                    button.ButtonColour = value;
-                }
-            }
-        }
 
         private Color4 selectedColour = Color4.White;
         public Color4 SelectedColour
@@ -91,17 +75,15 @@ namespace osu.Game.Overlays.Mods
                 selectedColour = value;
 
                 foreach (ModButton button in buttons)
-                {
                     button.SelectedColour = value;
-                }
             }
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             var index = Array.IndexOf(ToggleKeys, args.Key);
-            if (index > -1 && index < Buttons.Length)
-                Buttons[index].SelectNext();
+            if (index > -1 && index < buttons.Length)
+                buttons[index].SelectNext();
 
             return base.OnKeyDown(state, args);
         }
@@ -109,8 +91,18 @@ namespace osu.Game.Overlays.Mods
         public void DeselectAll()
         {
             foreach (ModButton button in buttons)
-            {
                 button.Deselect();
+        }
+
+        public void DeselectTypes(Type[] modTypes)
+        {
+            foreach (var button in buttons)
+            {
+                Mod selected = button.SelectedMod;
+                if (selected == null) continue;
+                foreach (Type type in modTypes)
+                    if (type.IsInstanceOfType(selected))
+                        button.Deselect();
             }
         }
 
@@ -127,7 +119,7 @@ namespace osu.Game.Overlays.Mods
                     Position = new Vector2(0f, 0f),
                     Font = @"Exo2.0-Bold"
                 },
-                ButtonsContainer = new FillFlowContainer<ModButton>
+                ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
                 {
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.BottomLeft,

@@ -20,7 +20,7 @@ namespace osu.Game.Online.API
     {
         private readonly OAuth authentication;
 
-        public string Endpoint = @"https://new.ppy.sh";
+        public string Endpoint = @"https://osu.ppy.sh";
         private const string client_id = @"5";
         private const string client_secret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
 
@@ -34,7 +34,7 @@ namespace osu.Game.Online.API
 
         public string Password;
 
-        public Bindable<User> LocalUser = new Bindable<User>();
+        public Bindable<User> LocalUser = new Bindable<User>(createGuestUser());
 
         public string Token
         {
@@ -191,7 +191,7 @@ namespace osu.Game.Online.API
                 req.Perform(this);
 
                 //we could still be in initialisation, at which point we don't want to say we're Online yet.
-                if (LocalUser.Value != null)
+                if (IsLoggedIn)
                     State = APIState.Online;
 
                 failureCount = 0;
@@ -266,6 +266,8 @@ namespace osu.Game.Online.API
             }
         }
 
+        public bool IsLoggedIn => LocalUser.Value.Id > 1;
+
         public void Queue(APIRequest request)
         {
             queue.Enqueue(request);
@@ -295,7 +297,14 @@ namespace osu.Game.Online.API
             clearCredentials();
             authentication.Clear();
             State = APIState.Offline;
+            LocalUser.Value = createGuestUser();
         }
+
+        private static User createGuestUser() => new User
+        {
+            Username = @"Guest",
+            Id = 1,
+        };
 
         public void Update()
         {

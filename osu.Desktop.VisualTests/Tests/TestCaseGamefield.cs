@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Taiko.UI;
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Beatmaps;
 using osu.Framework.Allocation;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -52,6 +53,12 @@ namespace osu.Desktop.VisualTests.Tests
                 time += RNG.Next(50, 500);
             }
 
+            TimingInfo timing = new TimingInfo();
+            timing.ControlPoints.Add(new ControlPoint
+            {
+                BeatLength = 200
+            });
+
             WorkingBeatmap beatmap = new TestWorkingBeatmap(new Beatmap
             {
                 HitObjects = objects,
@@ -64,8 +71,9 @@ namespace osu.Desktop.VisualTests.Tests
                         Artist = @"Unknown",
                         Title = @"Sample Beatmap",
                         Author = @"peppy",
-                    }
-                }
+                    },
+                },
+                TimingInfo = timing
             });
 
             Add(new Drawable[]
@@ -77,25 +85,25 @@ namespace osu.Desktop.VisualTests.Tests
                     Clock = new FramedClock(),
                     Children = new Drawable[]
                     {
-                        new OsuHitRenderer(beatmap)
+                        new OsuHitRenderer(beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft
                         },
-                        new TaikoHitRenderer(beatmap)
+                        new TaikoHitRenderer(beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight
                         },
-                        new CatchHitRenderer(beatmap)
+                        new CatchHitRenderer(beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft
                         },
-                        new ManiaHitRenderer(beatmap)
+                        new ManiaHitRenderer(beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomRight,

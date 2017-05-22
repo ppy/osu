@@ -5,7 +5,6 @@ using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -67,6 +66,13 @@ namespace osu.Game.Screens.Select
         {
             player = null;
             base.OnResuming(last);
+        }
+
+        protected override void OnSuspending(Screen next)
+        {
+            modSelect.Hide();
+
+            base.OnSuspending(next);
         }
 
         protected override bool OnExiting(Screen next)

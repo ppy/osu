@@ -11,7 +11,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -183,7 +182,7 @@ namespace osu.Game.Screens.Select
             initialAddSetsTask = new CancellationTokenSource();
 
             carousel.BeatmapsChanged = beatmapsLoaded;
-            carousel.Beatmaps = database.Query<BeatmapSetInfo>().Where(b => !b.DeletePending);
+            carousel.Beatmaps = database.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending);
         }
 
         private void beatmapsLoaded()
@@ -199,8 +198,11 @@ namespace osu.Game.Screens.Select
             var pendingSelection = selectionChangedDebounce;
             selectionChangedDebounce = null;
 
-            pendingSelection?.RunTask();
-            pendingSelection?.Cancel(); // cancel the already scheduled task.
+            if (pendingSelection?.Completed == false)
+            {
+                pendingSelection?.RunTask();
+                pendingSelection?.Cancel(); // cancel the already scheduled task.
+            }
 
             if (Beatmap == null) return;
 
@@ -314,15 +316,15 @@ namespace osu.Game.Screens.Select
         {
             bool beatmapSetChange = false;
 
-            if (!beatmap.Equals(Beatmap?.BeatmapInfo))
+            if (beatmap.Equals(Beatmap?.BeatmapInfo))
+                return;
+
+            if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
+                sampleChangeDifficulty.Play();
+            else
             {
-                if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
-                    sampleChangeDifficulty.Play();
-                else
-                {
-                    sampleChangeBeatmap.Play();
-                    beatmapSetChange = true;
-                }
+                sampleChangeBeatmap.Play();
+                beatmapSetChange = true;
             }
 
             selectionChangeNoBounce = beatmap;
@@ -343,7 +345,7 @@ namespace osu.Game.Screens.Select
             {
                 trackManager.SetExclusive(track);
                 if (preview)
-                    track.Seek(Beatmap.Beatmap.Metadata.PreviewTime);
+                    track.Seek(Beatmap.Metadata.PreviewTime);
                 track.Start();
             }
         }

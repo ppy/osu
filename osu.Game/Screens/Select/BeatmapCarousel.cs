@@ -107,6 +107,8 @@ namespace osu.Game.Screens.Select
                 return;
             }
 
+            if (beatmap == SelectedBeatmap) return;
+
             foreach (BeatmapGroup group in groups)
             {
                 var panel = group.BeatmapPanels.FirstOrDefault(p => p.Beatmap.Equals(beatmap));
@@ -204,7 +206,7 @@ namespace osu.Game.Screens.Select
                 if (selectedGroup == null || selectedGroup.State == BeatmapGroupState.Hidden)
                     SelectNext();
                 else
-                    selectGroup(selectedGroup);
+                    selectGroup(selectedGroup, selectedPanel);
             };
 
             filterTask?.Cancel();
@@ -220,13 +222,11 @@ namespace osu.Game.Screens.Select
 
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
         {
-            database.GetChildren(beatmapSet);
-            beatmapSet.Beatmaps.ForEach(b =>
+            foreach(var b in beatmapSet.Beatmaps)
             {
-                database.GetChildren(b);
                 if (b.Metadata == null)
                     b.Metadata = beatmapSet.Metadata;
-            });
+            }
 
             return new BeatmapGroup(beatmapSet, database)
             {
@@ -341,6 +341,8 @@ namespace osu.Game.Screens.Select
                     selectedGroup.State = BeatmapGroupState.Collapsed;
 
                 group.State = BeatmapGroupState.Expanded;
+                group.SelectedPanel = panel;
+
                 panel.State = PanelSelectedState.Selected;
 
                 if (selectedPanel == panel) return;

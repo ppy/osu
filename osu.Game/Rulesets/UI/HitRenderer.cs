@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected abstract bool AllObjectsJudged { get; }
 
-        protected HitRenderer()
+        internal HitRenderer()
         {
             KeyConversionInputManager = CreateKeyConversionInputManager();
             KeyConversionInputManager.RelativeSizeAxes = Axes.Both;
@@ -120,7 +120,12 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public Beatmap<TObject> Beatmap;
 
-        protected HitRenderer(WorkingBeatmap beatmap)
+        /// <summary>
+        /// Creates a hit renderer for a beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
+        internal HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
         {
             Debug.Assert(beatmap != null, "HitRenderer initialized with a null beatmap.");
 
@@ -134,7 +139,7 @@ namespace osu.Game.Rulesets.UI
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can't be converted for the current ruleset.");
 
             // Convert the beatmap
-            Beatmap = converter.Convert(beatmap.Beatmap);
+            Beatmap = converter.Convert(beatmap.Beatmap, isForCurrentRuleset);
 
             // Apply defaults
             foreach (var h in Beatmap.HitObjects)
@@ -187,23 +192,28 @@ namespace osu.Game.Rulesets.UI
 
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
-        protected override Container<Drawable> Content => content;
-        protected override bool AllObjectsJudged => Playfield.HitObjects.Children.All(h => h.Judgement.Result != HitResult.None);
+        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
+
+        protected override bool AllObjectsJudged => drawableObjects.All(h => h.Judged);
 
         /// <summary>
         /// The playfield.
         /// </summary>
         protected Playfield<TObject, TJudgement> Playfield;
 
+        protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
+        private readonly List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
-        protected HitRenderer(WorkingBeatmap beatmap)
-            : base(beatmap)
+        /// <summary>
+        /// Creates a hit renderer for a beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
+        protected HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(beatmap, isForCurrentRuleset)
         {
-            KeyConversionInputManager.Add(Playfield = CreatePlayfield());
-
             InputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -216,6 +226,8 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load()
         {
+            KeyConversionInputManager.Add(Playfield = CreatePlayfield());
+
             loadObjects();
 
             if (InputManager?.ReplayInputHandler != null)
@@ -224,6 +236,8 @@ namespace osu.Game.Rulesets.UI
 
         private void loadObjects()
         {
+            drawableObjects.Capacity = Beatmap.HitObjects.Count;
+
             foreach (TObject h in Beatmap.HitObjects)
             {
                 var drawableObject = GetVisualRepresentation(h);
@@ -233,6 +247,7 @@ namespace osu.Game.Rulesets.UI
 
                 drawableObject.OnJudgement += onJudgement;
 
+                drawableObjects.Add(drawableObject);
                 Playfield.Add(drawableObject);
             }
 
@@ -279,7 +294,7 @@ namespace osu.Game.Rulesets.UI
         protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
     }
 
-    public class BeatmapInvalidForRulesetException : Exception
+    public class BeatmapInvalidForRulesetException : ArgumentException
     {
         public BeatmapInvalidForRulesetException(string text)
             : base(text)

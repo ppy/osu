@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Notifications;
 using OpenTK.Graphics;
@@ -82,7 +81,7 @@ namespace osu.Game.Overlays
                 hasCompletionTarget.CompletionTarget = Post;
 
             var ourType = notification.GetType();
-            sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => ourType == accept || ourType.IsSubclassOf(accept)))?.Add(notification);
+            sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
         }
 
         protected override void PopIn()
