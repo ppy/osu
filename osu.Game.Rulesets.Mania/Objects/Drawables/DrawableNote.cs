@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using OpenTK.Input;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -12,8 +14,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         private readonly NotePiece headPiece;
 
-        public DrawableNote(Note hitObject)
-            : base(hitObject)
+        public DrawableNote(Note hitObject, Bindable<Key> key = null)
+            : base(hitObject, key)
         {
             RelativeSizeAxes = Axes.Both;
             Height = 100;

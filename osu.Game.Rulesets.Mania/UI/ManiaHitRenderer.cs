@@ -4,6 +4,8 @@
 using System;
 using System.Linq;
 using OpenTK;
+using OpenTK.Input;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
@@ -76,13 +78,19 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
         {
+            var maniaPlayfield = Playfield as ManiaPlayfield;
+            if (maniaPlayfield == null)
+                return null;
+
+            Bindable<Key> key = maniaPlayfield.Columns.ElementAt(h.Column).Key;
+
             var holdNote = h as HoldNote;
             if (holdNote != null)
-                return new DrawableHoldNote(holdNote);
+                return new DrawableHoldNote(holdNote, key);
 
             var note = h as Note;
             if (note != null)
-                return new DrawableNote(note);
+                return new DrawableNote(note, key);
 
             return null;
         }
