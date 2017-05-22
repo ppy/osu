@@ -21,10 +21,8 @@ namespace osu.Game.Users
         private const float content_padding = 10;
         private const float status_height = 30;
 
-        private readonly User user;
         private OsuColour colours;
 
-        private readonly Container cover;
         private readonly Box statusBg;
         private readonly OsuSpriteText statusMessage;
 
@@ -32,8 +30,6 @@ namespace osu.Game.Users
 
         public UserPanel(User user)
         {
-            this.user = user;
-
             Width = 300;
             Height = height;
             Masking = true;
@@ -45,6 +41,7 @@ namespace osu.Game.Users
                 Radius = 4,
             };
 
+            Container cover;
             Children = new Drawable[]
             {
                 cover = new Container
