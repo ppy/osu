@@ -34,6 +34,7 @@ namespace osu.Game.Users
         {
             this.user = user;
 
+            Width = 300;
             Height = height;
             Masking = true;
             CornerRadius = 5;
@@ -168,6 +169,8 @@ namespace osu.Game.Users
 
             cover.Add(new AsyncLoadWrapper(new Sprite
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Texture = textures.Get(user.CoverUrl),
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(200),
