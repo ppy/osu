@@ -161,7 +161,7 @@ namespace osu.Game.Users
 
             cover.Add(new AsyncLoadWrapper(new CoverBackgroundSprite(user)
             {
-            	Anchor = Anchor.Centre,
+                Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(200),
