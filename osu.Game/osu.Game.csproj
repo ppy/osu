@@ -425,8 +425,8 @@
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
-    <Compile Include="Screens\Multiplayer\DrawableMultiplayerRoom.cs" />
-    <Compile Include="Online\Multiplayer\MultiplayerRoom.cs" />
+    <Compile Include="Screens\Multiplayer\DrawableRoom.cs" />
+    <Compile Include="Online\Multiplayer\Room.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
