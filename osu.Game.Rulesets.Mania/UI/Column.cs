@@ -95,6 +95,12 @@ namespace osu.Game.Rulesets.Mania.UI
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,
                         },
+                        // For column lighting, we need to capture input events before the notes
+                        new InputTarget
+                        {
+                            KeyDown = onKeyDown,
+                            KeyUp = onKeyUp
+                        }
                     }
                 },
                 new Container
@@ -178,12 +184,9 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject)
-        {
-            ControlPointContainer.Add(hitObject);
-        }
+        public void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject) => ControlPointContainer.Add(hitObject);
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        private bool onKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat)
                 return false;
@@ -197,7 +200,7 @@ namespace osu.Game.Rulesets.Mania.UI
             return false;
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        private bool onKeyUp(InputState state, KeyUpEventArgs args)
         {
             if (args.Key == Key)
             {
@@ -206,6 +209,25 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// This is a simple container which delegates various input events that have to be captured before the notes.
+        /// </summary>
+        private class InputTarget : Container
+        {
+            public Func<InputState, KeyDownEventArgs, bool> KeyDown;
+            public Func<InputState, KeyUpEventArgs, bool> KeyUp;
+
+            public InputTarget()
+            {
+                RelativeSizeAxes = Axes.Both;
+                AlwaysPresent = true;
+                Alpha = 0;
+            }
+
+            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => KeyDown?.Invoke(state, args) ?? false;
+            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => KeyUp?.Invoke(state, args) ?? false;
         }
     }
 }
