@@ -89,9 +89,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (distanceData != null)
                 conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern);
             else if (endTimeData != null)
-            {
-                // Spinner
-            }
+                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap);
             else if (positionData != null)
             {
                 // Circle
