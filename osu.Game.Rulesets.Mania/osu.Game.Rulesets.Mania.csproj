@@ -47,6 +47,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beatmaps\Patterns\Legacy\EndTimeObjectPatternGenerator.cs" />
+    <Compile Include="Beatmaps\Patterns\Legacy\DistanceObjectPatternGenerator.cs" />
     <Compile Include="Beatmaps\Patterns\Legacy\PatternGenerator.cs" />
     <Compile Include="Beatmaps\Patterns\PatternGenerator.cs" />
     <Compile Include="Beatmaps\Patterns\Legacy\PatternType.cs" />

@@ -5,7 +5,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using OpenTK.Graphics;
-using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects.Legacy;
@@ -217,18 +216,12 @@ namespace osu.Game.Beatmaps.Formats
                 case EventType.Background:
                     string filename = split[2].Trim('"');
 
-                    beatmap.EventInfo.Backgrounds.Add(new BackgroundEvent
-                    {
-                        StartTime = double.Parse(split[1], NumberFormatInfo.InvariantInfo),
-                        Filename = filename
-                    });
-
                     if (type == EventType.Background)
                         beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
 
                     break;
                 case EventType.Break:
-                    var breakEvent = new BreakEvent
+                    var breakEvent = new BreakPeriod
                     {
                         StartTime = double.Parse(split[1], NumberFormatInfo.InvariantInfo),
                         EndTime = double.Parse(split[2], NumberFormatInfo.InvariantInfo)
@@ -237,7 +230,7 @@ namespace osu.Game.Beatmaps.Formats
                     if (!breakEvent.HasEffect)
                         return;
 
-                    beatmap.EventInfo.Breaks.Add(breakEvent);
+                    beatmap.Breaks.Add(breakEvent);
                     break;
             }
         }
