@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
@@ -39,11 +40,11 @@ namespace osu.Game.Screens.Multiplayer
         private Color4 playingColour;
         private LocalisationEngine localisation;
 
-        public readonly Bindable<Room> Room;
+        public readonly Room Room;
 
         public DrawableRoom(Room room)
         {
-            Room = new Bindable<Room>(room);
+            Room = room;
 
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -190,7 +191,10 @@ namespace osu.Game.Screens.Multiplayer
                 },
             };
 
-            Room.ValueChanged += displayRoom;
+            Room.Name.ValueChanged += displayName;
+            Room.Host.ValueChanged += displayUser;
+            Room.Status.ValueChanged += displayStatus;
+            Room.Beatmap.ValueChanged += displayBeatmap;
         }
 
         [BackgroundDependencyLoader]
@@ -203,22 +207,36 @@ namespace osu.Game.Screens.Multiplayer
             beatmapInfoFlow.Colour = rankBounds.Colour = colours.Gray9;
             host.Colour = colours.Blue;
 
-            Room.TriggerChange();
+            displayStatus(Room.Status.Value);
         }
 
-        private void displayRoom(Room room)
+        private void displayName(string value)
         {
-            name.Text = room.Name;
-            status.Text = room.Status.GetDescription();
-            host.Text = room.Host.Username;
-            flagContainer.Children = new[] { new DrawableFlag(room.Host.Country?.FlagName ?? @"__") { RelativeSizeAxes = Axes.Both } };
-            avatar.User = room.Host;
+            name.Text = value;
+        }
 
-            if (room.Beatmap != null)
+        private void displayUser(User value)
+        {
+            avatar.User = value;
+            host.Text = value.Username;
+            flagContainer.Children = new[] { new DrawableFlag(value.Country?.FlagName ?? @"__") { RelativeSizeAxes = Axes.Both } };
+        }
+
+        private void displayStatus(RoomStatus value)
+        {
+            status.Text = value.GetDescription() ?? value.ToString();
+
+            foreach (Drawable d in new Drawable[] { sideStrip, status })
+                d.FadeColour(value == RoomStatus.Playing ? playingColour : openColour, 100);
+        }
+
+        private void displayBeatmap(BeatmapMetadata value)
+        {
+            if (value != null)
             {
-                beatmapTitle.Current = localisation.GetUnicodePreference(room.Beatmap.TitleUnicode, room.Beatmap.Title);
+                beatmapTitle.Current = localisation.GetUnicodePreference(value.TitleUnicode, value.Title);
                 beatmapDash.Text = @" - ";
-                beatmapArtist.Current = localisation.GetUnicodePreference(room.Beatmap.ArtistUnicode, room.Beatmap.Artist);
+                beatmapArtist.Current = localisation.GetUnicodePreference(value.ArtistUnicode, value.Artist);
             }
             else
             {
@@ -229,9 +247,6 @@ namespace osu.Game.Screens.Multiplayer
                 beatmapDash.Text = string.Empty;
                 beatmapArtist.Text = string.Empty;
             }
-
-            foreach (Drawable d in new Drawable[] { sideStrip, status })
-                d.FadeColour(room.Status == RoomStatus.Playing? playingColour : openColour, 100);
         }
     }
 }

@@ -19,7 +19,8 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            DrawableRoom p;
+            DrawableRoom first;
+            DrawableRoom second;
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
@@ -29,51 +30,44 @@ namespace osu.Desktop.VisualTests.Tests
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    p = new DrawableRoom(new Room
-                    {
-                        Name = @"Great Room Right Here",
-                        Host = new User { Username = @"Naeferith", Id = 9492835, Country = new Country { FlagName = @"FR" }},
-                        Status = RoomStatus.Open,
-                        Beatmap = new BeatmapMetadata { Title = @"Seiryu", Artist = @"Critical Crystal" },
-                    }),
-                    new DrawableRoom(new Room
-                    {
-                        Name = @"Relax It's The Weekend",
-                        Host = new User{ Username = @"peppy", Id = 2, Country = new Country { FlagName = @"AU" }},
-                        Status = RoomStatus.Playing,
-                        Beatmap = new BeatmapMetadata { Title = @"ZAQ", Artist = @"Serendipity" },
-                    }),
+                    first = new DrawableRoom(new Room()),
+                    second = new DrawableRoom(new Room()),
                 }
             });
 
+            first.Room.Name.Value = @"Great Room Right Here";
+            first.Room.Host.Value = new User { Username = @"Naeferith", Id = 9492835, Country = new Country { FlagName = @"FR" }};
+            first.Room.Status.Value = RoomStatus.Open;
+            first.Room.Beatmap.Value = new BeatmapMetadata { Title = @"Seiryu", Artist = @"Critical Crystal" };
+
+            second.Room.Name.Value = @"Relax It's The Weekend";
+            second.Room.Host.Value = new User { Username = @"peppy", Id = 2, Country = new Country { FlagName = @"AU" }};
+            second.Room.Status.Value = RoomStatus.Playing;
+            second.Room.Beatmap.Value = new BeatmapMetadata { Title = @"ZAQ", Artist = @"Serendipity" };
+
             AddStep(@"change state", () =>
             {
-                p.Room.Value.Status = RoomStatus.Playing;
-                p.Room.TriggerChange();
+                first.Room.Status.Value = RoomStatus.Playing;
             });
 
             AddStep(@"change name", () =>
             {
-                p.Room.Value.Name = @"I Changed Name";
-                p.Room.TriggerChange();
+                first.Room.Name.Value = @"I Changed Name";
             });
 
             AddStep(@"change host", () =>
             {
-                p.Room.Value.Host = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } };
-                p.Room.TriggerChange();
+                first.Room.Host.Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } };
             });
 
             AddStep(@"change beatmap", () =>
             {
-                p.Room.Value.Beatmap = null;
-                p.Room.TriggerChange();
+                first.Room.Beatmap.Value = null;
             });
 
             AddStep(@"change state", () =>
             {
-                p.Room.Value.Status = RoomStatus.Open;
-                p.Room.TriggerChange();
+                first.Room.Status.Value = RoomStatus.Open;
             });
         }
     }
