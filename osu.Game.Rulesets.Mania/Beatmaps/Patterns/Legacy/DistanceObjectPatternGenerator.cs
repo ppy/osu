@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 while (pattern.IsFilled(nextColumn) || PreviousPattern.IsFilled(nextColumn))  //find available column
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
-                addToPattern(pattern, nextColumn, startTime, endTime, noteCount);
+                addToPattern(pattern, nextColumn, startTime, endTime);
             }
 
             // This is can't be combined with the above loop due to RNG
@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 while (pattern.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
-                addToPattern(pattern, nextColumn, startTime, endTime, noteCount);
+                addToPattern(pattern, nextColumn, startTime, endTime);
             }
 
             return pattern;
@@ -267,7 +267,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
             for (int i = 0; i <= repeatCount; i++)
             {
-                addToPattern(pattern, nextColumn, startTime, startTime, 2);
+                addToPattern(pattern, nextColumn, startTime, startTime);
 
                 nextColumn += interval;
                 if (nextColumn >= AvailableColumns - RandomStart)
@@ -276,7 +276,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
                 // If we're in 2K, let's not add many consecutive doubles
                 if (AvailableColumns > 2)
-                    addToPattern(pattern, nextColumn, startTime, startTime, 2);
+                    addToPattern(pattern, nextColumn, startTime, startTime);
 
                 nextColumn = Random.Next(RandomStart, AvailableColumns);
                 startTime += segmentDuration;
@@ -367,7 +367,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 while (pattern.IsFilled(nextColumn))
                     nextColumn = Random.Next(RandomStart, AvailableColumns);
 
-                addToPattern(pattern, nextColumn, startTime, endTime, repeatCount);
+                addToPattern(pattern, nextColumn, startTime, endTime);
                 startTime += segmentDuration;
             }
 
@@ -420,7 +420,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     {
                         while (rowPattern.IsFilled(nextColumn) || nextColumn == holdColumn)
                             nextColumn = Random.Next(RandomStart, AvailableColumns);
-                        addToPattern(rowPattern, nextColumn, startTime, startTime, noteCount + 1);
+                        addToPattern(rowPattern, nextColumn, startTime, startTime);
                     }
                 }
 
@@ -459,8 +459,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <param name="column">The column to add the note to.</param>
         /// <param name="startTime">The start time of the note.</param>
         /// <param name="endTime">The end time of the note (set to <paramref name="startTime"/> for a non-hold note).</param>
-        /// <param name="siblings">The number of children alongside this note (these will not be generated, but are used for volume calculations).</param>
-        private void addToPattern(Pattern pattern, int column, double startTime, double endTime, int siblings = 1)
+        private void addToPattern(Pattern pattern, int column, double startTime, double endTime)
         {
             ManiaHitObject newObject;
 
@@ -470,8 +469,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     StartTime = startTime,
                     Samples = sampleInfoListAt(startTime),
-                    Column = column,
-                    Siblings = siblings
+                    Column = column
                 };
             }
             else
@@ -482,8 +480,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     Samples = sampleInfoListAt(startTime),
                     EndSamples = sampleInfoListAt(endTime),
                     Column = column,
-                    Duration = endTime - startTime,
-                    Siblings = siblings
+                    Duration = endTime - startTime
                 };
             }
 
