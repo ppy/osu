@@ -21,6 +21,8 @@ namespace osu.Game.Overlays.Direct
 {
     public class FilterControl : Container
     {
+        public static readonly float HEIGHT = 35 + 32 + 30 + padding * 2; // search + mode toggle buttons + sort tabs + padding
+
         /// <summary>
         /// The height of the content below the filter control (tab strip + result count text).
         /// </summary>
@@ -50,7 +52,7 @@ namespace osu.Game.Overlays.Direct
         public FilterControl()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 35 + 32 + 30 + padding * 2; // search + mode toggle buttons + sort tabs + padding
+            Height = HEIGHT;
             DisplayStyle.Value = PanelDisplayStyle.Grid;
 
             Children = new Drawable[]

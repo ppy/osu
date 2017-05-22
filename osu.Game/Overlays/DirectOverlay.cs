@@ -77,24 +77,18 @@ namespace osu.Game.Overlays
                         },
                     },
                 },
-                new ScrollContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollDraggerVisible = false,
-                    Padding = new MarginPadding { Top = Header.HEIGHT },
-                    Children = new Drawable[]
+                    Padding = new MarginPadding { Top = Header.HEIGHT + FilterControl.HEIGHT },
+                    Children = new[]
                     {
-                        new ReverseDepthFillFlowContainer<Drawable>
+                        new ScrollContainer
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
+                            RelativeSizeAxes = Axes.Both,
+                            ScrollDraggerVisible = false,
                             Children = new Drawable[]
                             {
-                                filter = new FilterControl
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                },
                                 panels = new FillFlowContainer<DirectPanel>
                                 {
                                     RelativeSizeAxes = Axes.X,
@@ -105,6 +99,11 @@ namespace osu.Game.Overlays
                             },
                         },
                     },
+                },
+                filter = new FilterControl
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Margin = new MarginPadding { Top = Header.HEIGHT },
                 },
                 header = new Header
                 {
