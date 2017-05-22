@@ -75,10 +75,6 @@
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Graphics\UserInterface\SimpleButton.cs" />
-    <Compile Include="Beatmaps\Events\BackgroundEvent.cs" />
-    <Compile Include="Beatmaps\Events\BreakEvent.cs" />
-    <Compile Include="Beatmaps\Events\Event.cs" />
-    <Compile Include="Beatmaps\Events\EventInfo.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
