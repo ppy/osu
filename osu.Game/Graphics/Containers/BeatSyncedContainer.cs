@@ -11,11 +11,6 @@ namespace osu.Game.Graphics.Containers
 {
     public class BeatSyncedContainer : Container
     {
-        /// <summary>
-        /// A new beat will not be sent if the time since the beat is larger than this tolerance.
-        /// </summary>
-        private const int seek_tolerance = 20;
-
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         private int lastBeat;
@@ -40,10 +35,10 @@ namespace osu.Game.Graphics.Containers
             if (controlPoint == lastControlPoint && beat == lastBeat)
                 return;
 
-            if ((currentTrackTime - controlPoint.Time) % controlPoint.BeatLength > seek_tolerance)
-                return;
+            double offsetFromBeat = (controlPoint.Time - currentTrackTime) % controlPoint.BeatLength;
 
-            OnNewBeat(beat, controlPoint.BeatLength, controlPoint.TimeSignature, kiai);
+            using (BeginDelayedSequence(offsetFromBeat, true))
+                OnNewBeat(beat, controlPoint.BeatLength, controlPoint.TimeSignature, kiai);
 
             lastBeat = beat;
             lastControlPoint = controlPoint;
