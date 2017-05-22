@@ -36,10 +36,9 @@ namespace osu.Game.Overlays.Direct
 
         protected Drawable GetBackground(TextureStore textures)
         {
-            return new AsyncLoadWrapper(new Sprite
+            return new AsyncLoadWrapper(new BeatmapBackgroundSprite(new OnlineWorkingBeatmap(SetInfo.Beatmaps.FirstOrDefault(), textures, null))
             {
                 FillMode = FillMode.Fill,
-                Texture = new OnlineWorkingBeatmap(SetInfo.Beatmaps.FirstOrDefault(), textures, null).Background,
                 OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
             }) { RelativeSizeAxes = Axes.Both };
         }
