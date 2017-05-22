@@ -10,5 +10,7 @@ namespace osu.Game.Rulesets.Mania.Judgements
         public override string ResultString => string.Empty;
 
         public override string MaxResultString => string.Empty;
+
+        public ManiaHitResult ManiaResult;
     }
 }
