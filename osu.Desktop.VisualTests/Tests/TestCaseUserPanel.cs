@@ -3,7 +3,6 @@
 
 using osu.Framework.Testing;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
