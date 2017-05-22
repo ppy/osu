@@ -198,8 +198,11 @@ namespace osu.Game.Screens.Select
             var pendingSelection = selectionChangedDebounce;
             selectionChangedDebounce = null;
 
-            pendingSelection?.RunTask();
-            pendingSelection?.Cancel(); // cancel the already scheduled task.
+            if (pendingSelection?.Completed == false)
+            {
+                pendingSelection?.RunTask();
+                pendingSelection?.Cancel(); // cancel the already scheduled task.
+            }
 
             if (Beatmap == null) return;
 
@@ -225,6 +228,8 @@ namespace osu.Game.Screens.Select
             ensurePlayingSelected();
 
             changeBackground(Beatmap);
+
+            selectionChangeNoBounce = Beatmap?.BeatmapInfo;
 
             Content.FadeInFromZero(250);
 
@@ -313,15 +318,15 @@ namespace osu.Game.Screens.Select
         {
             bool beatmapSetChange = false;
 
-            if (!beatmap.Equals(Beatmap?.BeatmapInfo))
+            if (beatmap.Equals(Beatmap?.BeatmapInfo))
+                return;
+
+            if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
+                sampleChangeDifficulty.Play();
+            else
             {
-                if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
-                    sampleChangeDifficulty.Play();
-                else
-                {
-                    sampleChangeBeatmap.Play();
-                    beatmapSetChange = true;
-                }
+                sampleChangeBeatmap.Play();
+                beatmapSetChange = true;
             }
 
             selectionChangeNoBounce = beatmap;

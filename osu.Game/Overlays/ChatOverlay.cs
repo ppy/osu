@@ -206,18 +206,12 @@ namespace osu.Game.Overlays
 
         private long? lastMessageId;
 
-        private List<Channel> careChannels;
+        private readonly List<Channel> careChannels = new List<Channel>();
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
         private void initializeChannels()
         {
-            currentChannelContainer.Clear();
-
-            loadedChannels.Clear();
-
-            careChannels = new List<Channel>();
-
             SpriteText loading;
             Add(loading = new OsuSpriteText
             {
@@ -232,11 +226,10 @@ namespace osu.Game.Overlays
             ListChannelsRequest req = new ListChannelsRequest();
             req.Success += delegate (List<Channel> channels)
             {
-                Debug.Assert(careChannels.Count == 0);
-
                 Scheduler.Add(delegate
                 {
                     loading.FadeOut(100);
+                    loading.Expire();
 
                     addChannel(channels.Find(c => c.Name == @"#lazer"));
                     addChannel(channels.Find(c => c.Name == @"#osu"));
@@ -330,11 +323,8 @@ namespace osu.Game.Overlays
             fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
             fetchReq.Success += delegate (List<Message> messages)
             {
-                var ids = messages.Where(m => m.TargetType == TargetType.Channel).Select(m => m.TargetId).Distinct();
-
-                //batch messages per channel.
-                foreach (var id in ids)
-                    careChannels.Find(c => c.Id == id)?.AddNewMessages(messages.Where(m => m.TargetId == id).ToArray());
+                foreach (var group in messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
+                    careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
                 lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
 
