@@ -20,29 +20,29 @@ namespace osu.Game.Graphics.Containers
 
         protected override void Update()
         {
-            if (beatmap.Value != null)
-            {
-                double trackCurrentTime = beatmap.Value.Track.CurrentTime;
-                ControlPoint kiaiControlPoint;
-                ControlPoint controlPoint = beatmap.Value.Beatmap.TimingInfo.TimingPointAt(trackCurrentTime, out kiaiControlPoint);
+            if (beatmap.Value == null)
+                return;
 
-                if (controlPoint != null)
-                {
-                    double beatLength = controlPoint.BeatLength;
-                    bool kiai = kiaiControlPoint?.KiaiMode ?? false;
-                    double timingPointStart = controlPoint.Time;
-                    int beat = beatLength > min_beat_length ? (int)((trackCurrentTime - timingPointStart) / beatLength) : 0;
+            double trackCurrentTime = beatmap.Value.Track.CurrentTime;
+            ControlPoint kiaiControlPoint;
+            ControlPoint controlPoint = beatmap.Value.Beatmap.TimingInfo.TimingPointAt(trackCurrentTime, out kiaiControlPoint);
 
-                    //The beats before the start of the first control point are off by 1, this should do the trick
-                    if (trackCurrentTime < timingPointStart)
-                        beat--;
+            if (controlPoint == null)
+                return;
 
-                    if ((timingPointStart != lastTimingPointStart || beat != lastBeat) && (int)((trackCurrentTime - timingPointStart) % beatLength) <= seek_tolerance)
-                        OnNewBeat(beat, beatLength, controlPoint.TimeSignature, kiai);
-                    lastBeat = beat;
-                    lastTimingPointStart = timingPointStart;
-                }
-            }
+            double beatLength = controlPoint.BeatLength;
+            bool kiai = kiaiControlPoint?.KiaiMode ?? false;
+            double timingPointStart = controlPoint.Time;
+            int beat = beatLength > min_beat_length ? (int)((trackCurrentTime - timingPointStart) / beatLength) : 0;
+
+            //The beats before the start of the first control point are off by 1, this should do the trick
+            if (trackCurrentTime < timingPointStart)
+                beat--;
+
+            if ((timingPointStart != lastTimingPointStart || beat != lastBeat) && (int)((trackCurrentTime - timingPointStart) % beatLength) <= seek_tolerance)
+                OnNewBeat(beat, beatLength, controlPoint.TimeSignature, kiai);
+            lastBeat = beat;
+            lastTimingPointStart = timingPointStart;
         }
 
         protected virtual void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
