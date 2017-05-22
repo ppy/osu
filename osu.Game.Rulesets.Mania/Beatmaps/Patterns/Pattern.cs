@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
