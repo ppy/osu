@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.IO.Network;
 using osu.Game.Online.Chat;
 
@@ -20,10 +21,7 @@ namespace osu.Game.Online.API.Requests
 
         protected override WebRequest CreateWebRequest()
         {
-            string channelString = string.Empty;
-            foreach (Channel c in channels)
-                channelString += c.Id + ",";
-            channelString = channelString.TrimEnd(',');
+            string channelString = string.Join(",", channels.Select(x => x.Id));
 
             var req = base.CreateWebRequest();
             req.AddParameter(@"channels", channelString);
