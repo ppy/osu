@@ -25,8 +25,11 @@ namespace osu.Game.Graphics.Containers
             ControlPoint overridePoint;
             ControlPoint controlPoint = beatmap.Value.Beatmap.TimingInfo.TimingPointAt(currentTrackTime, out overridePoint);
 
+            if (controlPoint.BeatLength == 0)
+                return;
+
             bool kiai = (overridePoint ?? controlPoint).KiaiMode;
-            int beat = controlPoint.BeatLength > 0 ? (int)((currentTrackTime - controlPoint.Time) / controlPoint.BeatLength) : 0;
+            int beat = (int)((currentTrackTime - controlPoint.Time) / controlPoint.BeatLength);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
             if (currentTrackTime < controlPoint.Time)
