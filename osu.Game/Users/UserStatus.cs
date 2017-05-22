@@ -9,23 +9,23 @@ namespace osu.Game.Users
     public abstract class UserStatus
     {
         public abstract string Message { get; }
-        public abstract Color4 Colour(OsuColour colours);
+        public abstract Color4 GetAppropriateColour(OsuColour colours);
     }
 
     public abstract class UserStatusAvailable : UserStatus
     {
-        public override Color4 Colour(OsuColour colours) => colours.BlueDarker;
+        public override Color4 GetAppropriateColour(OsuColour colours) => colours.BlueDarker;
     }
 
     public abstract class UserStatusBusy : UserStatus
     {
-        public override Color4 Colour(OsuColour colours) => colours.YellowDark;
+        public override Color4 GetAppropriateColour(OsuColour colours) => colours.YellowDark;
     }
 
     public class UserStatusOffline : UserStatus
     {
         public override string Message => @"Offline";
-        public override Color4 Colour(OsuColour colours) => colours.Gray7;
+        public override Color4 GetAppropriateColour(OsuColour colours) => colours.Gray7;
     }
 
     public class UserStatusOnline : UserStatusAvailable
@@ -56,6 +56,6 @@ namespace osu.Game.Users
     public class UserStatusModding : UserStatus
     {
         public override string Message => @"Modding a map";
-        public override Color4 Colour(OsuColour colours) => colours.PurpleDark;
+        public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
     }
 }
