@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using OpenTK;
-using osu.Game.Screens.Play.Settings;
+using osu.Game.Screens.Play.ReplaySettings;
 
 namespace osu.Game.Screens.Play
 {

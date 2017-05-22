@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 
-namespace osu.Game.Screens.Play.Settings
+namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class ReplaySettingsOverlay : FillFlowContainer
     {

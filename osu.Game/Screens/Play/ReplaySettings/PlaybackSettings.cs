@@ -6,7 +6,7 @@ using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Screens.Play.Settings
+namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class PlaybackSettings : SettingsDropdownContainer
     {

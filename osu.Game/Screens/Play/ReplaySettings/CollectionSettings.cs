@@ -8,7 +8,7 @@ using osu.Game.Overlays.Music;
 using System.Collections.Generic;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Screens.Play.Settings
+namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class CollectionSettings : SettingsDropdownContainer
     {

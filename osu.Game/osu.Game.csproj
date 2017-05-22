@@ -237,11 +237,11 @@
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
-    <Compile Include="Screens\Play\Settings\CollectionSettings.cs" />
-    <Compile Include="Screens\Play\Settings\DiscussionSettings.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\CollectionSettings.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\DiscussionSettings.cs" />
     <Compile Include="Graphics\UserInterface\SettingsDropdownContainer.cs" />
-    <Compile Include="Screens\Play\Settings\ReplaySettingsOverlay.cs" />
-    <Compile Include="Screens\Play\Settings\PlaybackSettings.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplaySettingsOverlay.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\PlaybackSettings.cs" />
     <Compile Include="Screens\Play\PauseContainer.cs" />
     <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
