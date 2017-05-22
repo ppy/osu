@@ -24,13 +24,13 @@ namespace osu.Game.Graphics.Containers
                 return;
 
             double trackCurrentTime = beatmap.Value.Track.CurrentTime;
-            ControlPoint kiaiControlPoint;
-            ControlPoint controlPoint = beatmap.Value.Beatmap.TimingInfo.TimingPointAt(trackCurrentTime, out kiaiControlPoint);
+            ControlPoint overridePoint;
+            ControlPoint controlPoint = beatmap.Value.Beatmap.TimingInfo.TimingPointAt(trackCurrentTime, out overridePoint);
 
             if (controlPoint == null)
                 return;
 
-            bool kiai = (controlPoint ?? controlPoint).KiaiMode;
+            bool kiai = (overridePoint ?? controlPoint).KiaiMode;
 
             double beatLength = controlPoint.BeatLength;
             double timingPointStart = controlPoint.Time;
