@@ -7,7 +7,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
-namespace osu.Game.Screens.Play.Settings
+namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class DiscussionSettings : SettingsDropdownContainer
     {
