@@ -22,6 +22,12 @@ namespace osu.Game.Users
         public override Color4 Colour(OsuColour colours) => colours.YellowDark;
     }
 
+    public class UserStatusOffline : UserStatus
+    {
+    	public override string Message => @"Offline";
+        public override Color4 Colour(OsuColour colours) => colours.Gray7;
+    }
+
     public class UserStatusOnline : UserStatusAvailable
     {
         public override string Message => @"Online";
