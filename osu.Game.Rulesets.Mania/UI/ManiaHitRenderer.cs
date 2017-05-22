@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.UI
             ControlPoint firstTimingChange = Beatmap.TimingInfo.ControlPoints.FirstOrDefault(t => t.TimingChange);
 
             if (firstTimingChange == null)
-                throw new Exception("The Beatmap contains no timing points!");
+                throw new InvalidOperationException("The Beatmap contains no timing points!");
 
             // Generate the timing points, making non-timing changes use the previous timing change
             var timingChanges = Beatmap.TimingInfo.ControlPoints.Select(c =>
