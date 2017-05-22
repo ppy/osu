@@ -11,7 +11,6 @@ using osu.Framework.Input;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Direct;
 
 namespace osu.Game.Overlays
