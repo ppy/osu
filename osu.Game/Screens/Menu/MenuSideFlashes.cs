@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Menu
                 return;
 
             TrackAmplitudes amp = beatmap.Value.Track.CurrentAmplitudes;
-            if (kiai ? newBeat % 2 == 0 : newBeat % (int)timeSignature) == 0)
+            if (kiai ? newBeat % 2 == 0 : newBeat % (int)timeSignature == 0)
             {
                 leftBox.ClearTransforms();
                 leftBox.FadeTo(Math.Max(0, (amp.LeftChannel - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), 65);
