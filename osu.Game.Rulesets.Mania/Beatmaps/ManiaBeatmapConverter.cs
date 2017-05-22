@@ -113,13 +113,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
-            {
-                // Slider
-            }
+                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern);
             else if (endTimeData != null)
-            {
-                // Spinner
-            }
+                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap);
             else if (positionData != null)
             {
                 computeDensity(original.StartTime);

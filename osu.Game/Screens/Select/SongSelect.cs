@@ -229,6 +229,8 @@ namespace osu.Game.Screens.Select
 
             changeBackground(Beatmap);
 
+            selectionChangeNoBounce = Beatmap?.BeatmapInfo;
+
             Content.FadeInFromZero(250);
 
             beatmapInfoWedge.State = Visibility.Visible;
