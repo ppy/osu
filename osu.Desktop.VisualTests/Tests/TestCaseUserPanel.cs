@@ -10,10 +10,10 @@ using OpenTK;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-	internal class TestCaseUserPanel : TestCase
-	{
-		public override string Description => @"Panels for displaying a user's status";
-        
+    internal class TestCaseUserPanel : TestCase
+    {
+        public override string Description => @"Panels for displaying a user's status";
+
         public override void Reset()
         {
             base.Reset();
