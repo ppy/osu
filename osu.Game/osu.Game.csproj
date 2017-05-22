@@ -425,6 +425,8 @@
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
+    <Compile Include="Users\UserPanel.cs" />
+    <Compile Include="Users\UserStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
