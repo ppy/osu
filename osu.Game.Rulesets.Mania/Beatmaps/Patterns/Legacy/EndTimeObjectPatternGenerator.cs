@@ -74,8 +74,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     StartTime = HitObject.StartTime,
                     EndSamples = HitObject.Samples,
                     Column = column,
-                    Duration = endTime - HitObject.StartTime,
-                    Siblings = 1
+                    Duration = endTime - HitObject.StartTime
                 };
 
                 newObject.Samples.Add(new SampleInfo
@@ -89,8 +88,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     StartTime = HitObject.StartTime,
                     Samples = HitObject.Samples,
-                    Column = column,
-                    Siblings = 1
+                    Column = column
                 };
             }
 
