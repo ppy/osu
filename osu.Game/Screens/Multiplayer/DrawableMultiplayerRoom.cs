@@ -64,10 +64,6 @@ namespace osu.Game.Screens.Multiplayer
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(34),
                 },
-                new Background(@"Backgrounds/bg4")
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
                 sideStrip = new Box
                 {
                     RelativeSizeAxes = Axes.Y,
