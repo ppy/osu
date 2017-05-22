@@ -18,6 +18,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Beatmaps.Timing;
+using System;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -33,7 +35,10 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
-        public Key Key;
+        /// <summary>
+        /// The key that will trigger input actions for this column and hit objects contained inside it.
+        /// </summary>
+        public Bindable<Key> Key = new Bindable<Key>();
 
         private readonly Box background;
         private readonly Container hitTargetBar;
