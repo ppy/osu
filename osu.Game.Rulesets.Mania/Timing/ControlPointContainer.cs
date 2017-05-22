@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Timing
             var controlPoint = drawableControlPoints.LastOrDefault(t => t.CanContain(drawable)) ?? drawableControlPoints.FirstOrDefault();
 
             if (controlPoint == null)
-                throw new Exception("Could not find suitable timing section to add object to.");
+                throw new InvalidOperationException("Could not find suitable timing section to add object to.");
 
             controlPoint.Add(drawable);
         }
