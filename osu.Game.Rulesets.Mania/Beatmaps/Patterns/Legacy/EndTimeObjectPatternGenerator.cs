@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 else
                     addToPattern(pattern, getNextRandomColumn(RandomStart), generateHold);
             }
-            else
+            else if (AvailableColumns > 0)
                 addToPattern(pattern, getNextRandomColumn(0), generateHold);
 
             return pattern;
