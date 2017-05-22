@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         public override Pattern Generate()
         {
-            int lastColumn = PreviousPattern.HitObjects.First().Column;
+            int lastColumn = PreviousPattern.HitObjects.FirstOrDefault()?.Column ?? 0;
 
             if ((convertType & PatternType.Reverse) > 0 && PreviousPattern.HitObjects.Any())
             {
