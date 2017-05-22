@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 var pattern = new Pattern();
 
                 for (int i = RandomStart; i < AvailableColumns; i++)
-                    if (PreviousPattern.IsFilled(i))
+                    if (PreviousPattern.ColumnHasObject(i))
                         addToPattern(pattern, RandomStart + AvailableColumns - i - 1);
 
                 return pattern;
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 var pattern = new Pattern();
 
                 for (int i = RandomStart; i < AvailableColumns; i++)
-                    if (PreviousPattern.IsFilled(i))
+                    if (PreviousPattern.ColumnHasObject(i))
                         addToPattern(pattern, i);
 
                 return pattern;
@@ -212,12 +212,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             bool allowStacking = (convertType & PatternType.ForceNotStack) == 0;
 
             if (!allowStacking)
-                noteCount = Math.Min(noteCount, AvailableColumns - RandomStart - PreviousPattern.ColumnsFilled);
+                noteCount = Math.Min(noteCount, AvailableColumns - RandomStart - PreviousPattern.ColumnWithObjects);
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
             for (int i = 0; i < noteCount; i++)
             {
-                while (pattern.IsFilled(nextColumn) || (PreviousPattern.IsFilled(nextColumn) && !allowStacking))
+                while (pattern.ColumnHasObject(nextColumn) || (PreviousPattern.ColumnHasObject(nextColumn) && !allowStacking))
                 {
                     if ((convertType & PatternType.Gathered) > 0)
                     {
@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int nextColumn = Random.Next(RandomStart, columnLimit);
             for (int i = 0; i < noteCount; i++)
             {
-                while (pattern.IsFilled(nextColumn))
+                while (pattern.ColumnHasObject(nextColumn))
                     nextColumn = Random.Next(RandomStart, columnLimit);
 
                 // Add normal note
