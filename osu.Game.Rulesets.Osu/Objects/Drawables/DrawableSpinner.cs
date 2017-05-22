@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             background.AccentColour = normalColour;
 
-            completeColour = colours.YellowLight.Opacity(0.6f);
+            completeColour = colours.YellowLight.Opacity(0.75f);
 
             disc.AccentColour = colours.SpinnerFill;
             circle.Colour = colours.BlueDark;
