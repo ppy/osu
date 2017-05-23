@@ -16,12 +16,19 @@ namespace osu.Game.Graphics.Containers
         private int lastBeat;
         private ControlPoint lastControlPoint;
 
+        /// <summary>
+        /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, double, TimeSignatures, bool)"/>.
+        /// This allows for adding easing to animations that may be synchronised to the beat.
+        /// </summary>
+        protected double EarlyActivationMilliseconds;
+
         protected override void Update()
         {
             if (beatmap.Value?.Track == null)
                 return;
 
-            double currentTrackTime = beatmap.Value.Track.CurrentTime;
+            double currentTrackTime = beatmap.Value.Track.CurrentTime + EarlyActivationMilliseconds;
+
             ControlPoint overridePoint;
             ControlPoint controlPoint = beatmap.Value.Beatmap.TimingInfo.TimingPointAt(currentTrackTime, out overridePoint);
 
