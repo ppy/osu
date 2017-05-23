@@ -2,11 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -38,11 +40,14 @@ namespace osu.Game.Rulesets.Mania.UI
             double lastSpeedMultiplier = 1;
             double lastBeatLength = 500;
 
-            // Generate the timing points, making non-timing changes use the previous timing change
-            var timingChanges = Beatmap.ControlPointInfo.ControlPoints.Where(c => c is TimingControlPoint || c is DifficultyControlPoint).Select(c =>
-            {
-                var change = new TimingChange();
+            // Merge timing + difficulty points
+            var allPoints = new SortedList<ControlPoint>(Comparer<ControlPoint>.Default);
+            allPoints.AddRange(Beatmap.ControlPointInfo.TimingPoints);
+            allPoints.AddRange(Beatmap.ControlPointInfo.DifficultyPoints);
 
+            // Generate the timing points, making non-timing changes use the previous timing change
+            var timingChanges = allPoints.Select(c =>
+            {
                 var timingPoint = c as TimingControlPoint;
                 var difficultyPoint = c as DifficultyControlPoint;
 

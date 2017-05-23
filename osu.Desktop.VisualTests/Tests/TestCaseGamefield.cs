@@ -55,7 +55,7 @@ namespace osu.Desktop.VisualTests.Tests
             }
 
             var controlPointInfo = new ControlPointInfo();
-            controlPointInfo.ControlPoints.Add(new TimingControlPoint
+            controlPointInfo.TimingPoints.Add(new TimingControlPoint
             {
                 BeatLength = 200
             });

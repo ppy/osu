@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             TaikoHitObject lastObject = Beatmap.HitObjects[Beatmap.HitObjects.Count - 1];
             double lastHitTime = 1 + (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
 
-            var timingPoints = Beatmap.ControlPointInfo.ControlPoints.OfType<TimingControlPoint>().ToList();
+            var timingPoints = Beatmap.ControlPointInfo.TimingPoints.ToList();
 
             if (timingPoints.Count == 0)
                 return;

@@ -285,7 +285,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (timingChange && (beatLength != timingPoint.BeatLength || timeSignature != timingPoint.TimeSignature))
             {
-                beatmap.ControlPointInfo.ControlPoints.Add(new TimingControlPoint
+                beatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint
                 {
                     Time = time,
                     BeatLength = beatLength,
@@ -295,7 +295,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (speedMultiplier != difficultyPoint.SpeedMultiplier)
             {
-                beatmap.ControlPointInfo.ControlPoints.Add(new DifficultyControlPoint
+                beatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint
                 {
                     Time = time,
                     SpeedMultiplier = speedMultiplier
@@ -304,7 +304,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (stringSampleSet != soundPoint.SampleBank || sampleVolume != soundPoint.SampleVolume)
             {
-                beatmap.ControlPointInfo.ControlPoints.Add(new SoundControlPoint
+                beatmap.ControlPointInfo.SoundPoints.Add(new SoundControlPoint
                 {
                     Time = time,
                     SampleBank = stringSampleSet,
@@ -314,7 +314,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (kiaiMode != effectPoint.KiaiMode || omitFirstBarSignature != effectPoint.OmitFirstBarLine)
             {
-                beatmap.ControlPointInfo.ControlPoints.Add(new EffectControlPoint
+                beatmap.ControlPointInfo.EffectPoints.Add(new EffectControlPoint
                 {
                     Time = time,
                     KiaiMode = kiaiMode,
