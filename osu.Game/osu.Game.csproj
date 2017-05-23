@@ -87,10 +87,15 @@
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
+    <Compile Include="Beatmaps\ControlPoints\ControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\ControlPointInfo.cs" />
+    <Compile Include="Beatmaps\ControlPoints\DifficultyControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\EffectControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\SoundControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\TimingControlPoint.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
     <Compile Include="Beatmaps\Timing\BreakPeriod.cs" />
     <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
-    <Compile Include="Beatmaps\Timing\TimingInfo.cs" />
     <Compile Include="Database\BeatmapMetrics.cs" />
     <Compile Include="Database\Database.cs" />
     <Compile Include="Database\RulesetInfo.cs" />
@@ -202,7 +207,6 @@
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Rulesets\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitObject.cs" />
-    <Compile Include="Beatmaps\Timing\ControlPoint.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
     <Compile Include="Overlays\Notifications\Notification.cs" />
