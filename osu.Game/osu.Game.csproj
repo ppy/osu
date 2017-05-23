@@ -83,6 +83,7 @@
     <Compile Include="Overlays\Music\PlaylistItem.cs" />
     <Compile Include="Overlays\Music\PlaylistList.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
+    <Compile Include="Graphics\Containers\SectionsContainer.cs" />
     <Compile Include="Overlays\Settings\SettingsHeader.cs" />
     <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
@@ -299,6 +300,7 @@
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
     <Compile Include="Graphics\Backgrounds\Background.cs" />
+    <Compile Include="Graphics\Containers\BeatSyncedContainer.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\MenuCursor.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />

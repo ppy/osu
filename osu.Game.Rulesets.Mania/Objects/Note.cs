@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The key-press hit window for this note.
         /// </summary>
-        protected HitWindows HitWindows = new HitWindows();
+        public HitWindows HitWindows { get; protected set; } = new HitWindows();
 
         public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {
