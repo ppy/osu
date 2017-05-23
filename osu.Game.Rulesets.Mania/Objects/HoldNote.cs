@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The key-release hit windows for this hold note.
         /// </summary>
-        protected HitWindows ReleaseHitWindows = new HitWindows();
+        public HitWindows ReleaseHitWindows { get; protected set; } = new HitWindows();
 
         public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
         {

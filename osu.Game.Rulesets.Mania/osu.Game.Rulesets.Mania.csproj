@@ -51,11 +51,13 @@
     <Compile Include="Beatmaps\Patterns\Legacy\DistanceObjectPatternGenerator.cs" />
     <Compile Include="Beatmaps\Patterns\Legacy\PatternGenerator.cs" />
     <Compile Include="Beatmaps\Patterns\PatternGenerator.cs" />
+    <Compile Include="Beatmaps\Patterns\Legacy\HitObjectPatternGenerator.cs" />
     <Compile Include="Beatmaps\Patterns\Legacy\PatternType.cs" />
     <Compile Include="Beatmaps\ManiaBeatmapConverter.cs" />
     <Compile Include="Beatmaps\Patterns\Pattern.cs" />
     <Compile Include="MathUtils\FastRandom.cs" />
     <Compile Include="Judgements\HitWindows.cs" />
+    <Compile Include="Judgements\ManiaHitResult.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
     <Compile Include="Objects\Drawables\DrawableHoldNote.cs" />
