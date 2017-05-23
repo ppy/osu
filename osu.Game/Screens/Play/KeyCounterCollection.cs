@@ -6,11 +6,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK.Graphics;
 using osu.Framework.Input;
+using osu.Framework.Configuration;
+using osu.Framework.Allocation;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Play
 {
     public class KeyCounterCollection : FillFlowContainer<KeyCounter>
     {
+        private const int duration = 100;
+
+        private Bindable<bool> showKeyCounter;
+
         public KeyCounterCollection()
         {
             AlwaysReceiveInput = true;
@@ -32,6 +39,14 @@ namespace osu.Game.Screens.Play
         {
             foreach (var counter in Children)
                 counter.ResetCount();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            showKeyCounter = config.GetBindable<bool>(OsuSetting.KeyOverlay);
+            showKeyCounter.ValueChanged += keyCounterVisibility => FadeTo(keyCounterVisibility ? 1 : 0, duration);
+            showKeyCounter.TriggerChange();
         }
 
         //further: change default values here and in KeyCounter if needed, instead of passing them in every constructor
