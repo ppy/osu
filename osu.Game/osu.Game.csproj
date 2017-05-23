@@ -427,6 +427,7 @@
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
     <Compile Include="Screens\Multiplayer\DrawableRoom.cs" />
     <Compile Include="Online\Multiplayer\Room.cs" />
+    <Compile Include="Online\Multiplayer\RoomStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
