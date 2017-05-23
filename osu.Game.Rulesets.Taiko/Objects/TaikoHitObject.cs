@@ -31,12 +31,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public const float DEFAULT_STRONG_CIRCLE_DIAMETER = DEFAULT_CIRCLE_DIAMETER * STRONG_CIRCLE_DIAMETER_SCALE;
 
         /// <summary>
-        /// The time taken from the initial (off-screen) spawn position to the centre of the hit target for a <see cref="ControlPoint.BeatLength"/> of 1000ms.
+        /// The time taken from the initial (off-screen) spawn position to the centre of the hit target for a <see cref="TimingControlPoint.BeatLength"/> of 1000ms.
         /// </summary>
         private const double scroll_time = 6000;
 
         /// <summary>
-        /// Our adjusted <see cref="scroll_time"/> taking into consideration local <see cref="ControlPoint.BeatLength"/> and other speed multipliers.
+        /// Our adjusted <see cref="scroll_time"/> taking into consideration local <see cref="TimingControlPoint.BeatLength"/> and other speed multipliers.
         /// </summary>
         public double ScrollTime;
 
