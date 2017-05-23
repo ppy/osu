@@ -16,23 +16,25 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// A circle explodes from the hit target to indicate a hitobject has been hit.
     /// </summary>
-    internal class HitExplosion : CircularContainer
+    internal class HitExplosion : Container
     {
-        /// <summary>
-        /// The judgement this hit explosion visualises.
-        /// </summary>
         public readonly TaikoJudgement Judgement;
 
         private readonly Box innerFill;
 
-        public HitExplosion(TaikoJudgement judgement)
+        private bool isRim;
+
+        public HitExplosion(TaikoJudgement judgement, bool isRim)
         {
+            this.isRim = isRim;
+
             Judgement = judgement;
 
-            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER);
+            RelativeSizeAxes = Axes.Y;
+            Width = TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_CIRCLE_DIAMETER;
 
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
+            Anchor = Anchor.CentreLeft;
+            Origin = Anchor.CentreLeft;
 
             RelativePositionAxes = Axes.Both;
 
@@ -54,22 +56,17 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            switch (Judgement.TaikoResult)
-            {
-                case TaikoHitResult.Good:
-                    innerFill.Colour = colours.Green;
-                    break;
-                case TaikoHitResult.Great:
-                    innerFill.Colour = colours.Blue;
-                    break;
-            }
+            if (isRim)
+                innerFill.Colour = colours.BlueDarker;
+            else
+                innerFill.Colour = colours.PinkDarker;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            ScaleTo(5f, 1000, EasingTypes.OutQuint);
+            ScaleTo(new Vector2(2f, 1), 1000, EasingTypes.OutQuint);
             FadeOut(500);
 
             Expire();
@@ -80,7 +77,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         public void VisualiseSecondHit()
         {
-            ResizeTo(Size * TaikoHitObject.STRONG_CIRCLE_DIAMETER_SCALE, 50);
+            ResizeTo(new Vector2(TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER, 1), 50);
         }
     }
 }
