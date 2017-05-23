@@ -57,10 +57,15 @@ namespace osu.Game.Screens
                     beatmap.Value = localMap;
             }
 
-            beatmap.ValueChanged += OnBeatmapChanged;
-
             if (osuGame != null)
                 ruleset.BindTo(osuGame.Ruleset);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            beatmap.ValueChanged += OnBeatmapChanged;
         }
 
         /// <summary>

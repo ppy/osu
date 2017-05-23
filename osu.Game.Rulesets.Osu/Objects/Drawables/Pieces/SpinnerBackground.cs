@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -28,9 +27,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 EdgeEffect = new EdgeEffect
                 {
+                    Hollow = true,
                     Type = EdgeEffectType.Glow,
-                    Radius = 14,
-                    Colour = value.Opacity(0.3f),
+                    Radius = 40,
+                    Colour = value,
                 };
             }
         }

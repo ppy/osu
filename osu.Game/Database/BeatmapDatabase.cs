@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.IPC;
+using osu.Game.Screens.Menu;
 using SQLite.Net;
 using SQLiteNetExtensions.Extensions;
 
@@ -38,6 +39,10 @@ namespace osu.Game.Database
         {
             foreach (var b in GetAllWithChildren<BeatmapSetInfo>(b => b.DeletePending))
             {
+                if (b.Hash == Intro.MENU_MUSIC_BEATMAP_HASH)
+                    // this is a bit hacky, but will do for now.
+                    continue;
+
                 try
                 {
                     Storage.Delete(b.Path);
@@ -97,50 +102,49 @@ namespace osu.Game.Database
             typeof(BeatmapDifficulty),
         };
 
+        public void Import(string path)
+        {
+            try
+            {
+                Import(ArchiveReader.GetReader(Storage, path));
+
+                // We may or may not want to delete the file depending on where it is stored.
+                //  e.g. reconstructing/repairing database with beatmaps from default storage.
+                // Also, not always a single file, i.e. for LegacyFilesystemReader
+                // TODO: Add a check to prevent files from storage to be deleted.
+                try
+                {
+                    File.Delete(path);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not delete file at {path}");
+                }
+            }
+            catch (Exception e)
+            {
+                e = e.InnerException ?? e;
+                Logger.Error(e, @"Could not import beatmap set");
+            }
+        }
+
+        public void Import(ArchiveReader archiveReader)
+        {
+            BeatmapSetInfo set = getBeatmapSet(archiveReader);
+
+            //If we have an ID then we already exist in the database.
+            if (set.ID == 0)
+                Import(new[] { set });
+        }
+
         /// <summary>
         /// Import multiple <see cref="BeatmapSetInfo"/> from <paramref name="paths"/>.
         /// </summary>
         /// <param name="paths">Multiple locations on disk</param>
-        public void Import(IEnumerable<string> paths)
+        public void Import(params string[] paths)
         {
             foreach (string p in paths)
-            {
-                try
-                {
-                    BeatmapSetInfo set = getBeatmapSet(p);
-
-                    //If we have an ID then we already exist in the database.
-                    if (set.ID == 0)
-                        Import(new[] { set });
-
-                    // We may or may not want to delete the file depending on where it is stored.
-                    //  e.g. reconstructing/repairing database with beatmaps from default storage.
-                    // Also, not always a single file, i.e. for LegacyFilesystemReader
-                    // TODO: Add a check to prevent files from storage to be deleted.
-                    try
-                    {
-                        File.Delete(p);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $@"Could not delete file at {p}");
-                    }
-                }
-                catch (Exception e)
-                {
-                    e = e.InnerException ?? e;
-                    Logger.Error(e, @"Could not import beatmap set");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Import <see cref="BeatmapSetInfo"/> from <paramref name="path"/>.
-        /// </summary>
-        /// <param name="path">Location on disk</param>
-        public void Import(string path)
-        {
-            Import(new[] { path });
+                Import(p);
         }
 
         /// <summary>
@@ -148,29 +152,26 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="path">Content location</param>
         /// <returns><see cref="BeatmapSetInfo"/></returns>
-        private BeatmapSetInfo getBeatmapSet(string path)
-        {
-            string hash = null;
+        private BeatmapSetInfo getBeatmapSet(string path) => getBeatmapSet(ArchiveReader.GetReader(Storage, path));
 
+        private BeatmapSetInfo getBeatmapSet(ArchiveReader archiveReader)
+        {
             BeatmapMetadata metadata;
 
-            using (var reader = ArchiveReader.GetReader(Storage, path))
-            {
-                using (var stream = new StreamReader(reader.GetStream(reader.BeatmapFilenames[0])))
-                    metadata = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
-            }
+            using (var stream = new StreamReader(archiveReader.GetStream(archiveReader.BeatmapFilenames[0])))
+                metadata = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
 
-            if (File.Exists(path)) // Not always the case, i.e. for LegacyFilesystemReader
+            string hash;
+            string path;
+
+            using (var input = archiveReader.GetUnderlyingStream())
             {
-                using (var input = Storage.GetStream(path))
-                {
-                    hash = input.GetMd5Hash();
-                    input.Seek(0, SeekOrigin.Begin);
-                    path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
-                    if (!Storage.Exists(path))
-                        using (var output = Storage.GetStream(path, FileAccess.Write))
-                            input.CopyTo(output);
-                }
+                hash = input.GetMd5Hash();
+                input.Seek(0, SeekOrigin.Begin);
+                path = Path.Combine(@"beatmaps", hash.Remove(1), hash.Remove(2), hash);
+                if (!Storage.Exists(path))
+                    using (var output = Storage.GetStream(path, FileAccess.Write))
+                        input.CopyTo(output);
             }
 
             var existing = Connection.Table<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
