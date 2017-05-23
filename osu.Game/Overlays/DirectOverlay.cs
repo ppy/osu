@@ -170,13 +170,13 @@ namespace osu.Game.Overlays
             if (ResultCounts == null) return;
 
             resultCountsText.Text = pluralize(@"Artist", ResultCounts?.Artists ?? 0) + ", " +
-            						pluralize(@"Song", ResultCounts?.Songs ?? 0) + ", " +
-            						pluralize(@"Tag", ResultCounts?.Tags ?? 0);
+                pluralize(@"Song", ResultCounts?.Songs ?? 0) + ", " +
+                pluralize(@"Tag", ResultCounts?.Tags ?? 0);
         }
 
         private string pluralize(string prefix, int value)
         {
-        	return $@"{value} {prefix}" + (value == 1 ? string.Empty : @"s");
+    	    return $@"{value} {prefix}" + (value == 1 ? string.Empty : @"s");
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
