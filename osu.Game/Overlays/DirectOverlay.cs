@@ -176,7 +176,7 @@ namespace osu.Game.Overlays
 
         private string pluralize(string prefix, int value)
         {
-    	    return $@"{value} {prefix}" + (value == 1 ? string.Empty : @"s");
+            return $@"{value} {prefix}" + (value == 1 ? string.Empty : @"s");
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
