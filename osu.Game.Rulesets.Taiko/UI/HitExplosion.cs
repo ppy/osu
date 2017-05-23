@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private readonly Box innerFill;
 
-        private bool isRim;
+        private readonly bool isRim;
 
         public HitExplosion(TaikoJudgement judgement, bool isRim)
         {
@@ -56,10 +56,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (isRim)
-                innerFill.Colour = colours.BlueDarker;
-            else
-                innerFill.Colour = colours.PinkDarker;
+            innerFill.Colour = isRim ? colours.BlueDarker : colours.PinkDarker;
         }
 
         protected override void LoadComplete()
