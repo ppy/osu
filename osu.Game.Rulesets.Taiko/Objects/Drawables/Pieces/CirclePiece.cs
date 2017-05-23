@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK.Graphics;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework.Audio.Track;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
@@ -147,6 +149,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
                 Colour = AccentColour,
                 Radius = KiaiMode ? 40 : 8
             };
+        }
+
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        {
+            if (!effectPoint.KiaiMode)
+                return;
+
+            if (beatIndex % (int)timingPoint.TimeSignature != 0)
+                return;
+
+            background.FadeEdgeEffectTo(Color4.White);
+            using (BeginDelayedSequence(200))
+                background.FadeEdgeEffectTo(AccentColour, 500, EasingTypes.OutQuint);
         }
     }
 }
