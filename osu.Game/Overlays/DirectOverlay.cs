@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -11,6 +12,7 @@ using osu.Framework.Input;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Direct;
 
 namespace osu.Game.Overlays
@@ -21,6 +23,8 @@ namespace osu.Game.Overlays
         private const float panel_padding = 10f;
 
         private readonly FilterControl filter;
+        private readonly FillFlowContainer resultCountsContainer;
+        private readonly OsuSpriteText resultCountsText;
         private readonly FillFlowContainer<DirectPanel> panels;
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;
@@ -36,10 +40,17 @@ namespace osu.Game.Overlays
             }
         }
 
+        private ResultCounts resultCounts;
         public ResultCounts ResultCounts
         {
-            get { return filter.ResultCounts; }
-            set { filter.ResultCounts = value; }
+            get { return resultCounts; }
+            set
+            {
+                if (value == ResultCounts) return;
+                resultCounts = value;
+
+                updateResultCounts();
+            }
         }
 
         public DirectOverlay()
@@ -88,12 +99,40 @@ namespace osu.Game.Overlays
                             ScrollDraggerVisible = false,
                             Children = new Drawable[]
                             {
-                                panels = new FillFlowContainer<DirectPanel>
+                                new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Top = FilterControl.LOWER_HEIGHT + panel_padding, Bottom = panel_padding, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
-                                    Spacing = new Vector2(panel_padding),
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
+                                    {
+                                        resultCountsContainer = new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Margin = new MarginPadding { Left = WIDTH_PADDING, Top = 6 },
+                                            Children = new Drawable[]
+                                            {
+                                                new OsuSpriteText
+                                                {
+                                                    Text = @"Found ",
+                                                    TextSize = 15,
+                                                },
+                                                resultCountsText = new OsuSpriteText
+                                                {
+                                                    TextSize = 15,
+                                                    Font = @"Exo2.0-Bold",
+                                                },
+                                            }
+                                        },
+                                        panels = new FillFlowContainer<DirectPanel>
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Padding = new MarginPadding { Top = panel_padding, Bottom = panel_padding, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
+                                            Spacing = new Vector2(panel_padding),
+                                        },
+                                    },
                                 },
                             },
                         },
@@ -115,6 +154,29 @@ namespace osu.Game.Overlays
             filter.Search.Exit = Hide;
             filter.Search.Current.ValueChanged += text => { if (text != string.Empty) header.Tabs.Current.Value = DirectTab.Search; };
             filter.DisplayStyle.ValueChanged += recreatePanels;
+
+            updateResultCounts();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            resultCountsContainer.Colour = colours.Yellow;
+        }
+
+        private void updateResultCounts()
+        {
+            resultCountsContainer.FadeTo(ResultCounts == null ? 0f : 1f, 200, EasingTypes.Out);
+            if (ResultCounts == null) return;
+
+            resultCountsText.Text = pluralize(@"Artist", ResultCounts?.Artists ?? 0) + ", " +
+            						pluralize(@"Song", ResultCounts?.Songs ?? 0) + ", " +
+            						pluralize(@"Tag", ResultCounts?.Tags ?? 0);
+        }
+
+        private string pluralize(string prefix, int value)
+        {
+        	return $@"{value} {prefix}" + (value == 1 ? string.Empty : @"s");
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)

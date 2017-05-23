@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
 using Container = osu.Framework.Graphics.Containers.Container;
@@ -23,33 +22,15 @@ namespace osu.Game.Overlays.Direct
     {
         public static readonly float HEIGHT = 35 + 32 + 30 + padding * 2; // search + mode toggle buttons + sort tabs + padding
 
-        /// <summary>
-        /// The height of the content below the filter control (tab strip + result count text).
-        /// </summary>
-        public static readonly float LOWER_HEIGHT = 21;
-
         private const float padding = 10;
 
         private readonly Box tabStrip;
         private readonly FillFlowContainer<RulesetToggleButton> modeButtons;
-        private readonly FillFlowContainer resultCountsContainer;
-        private readonly OsuSpriteText resultCountsText;
 
         public readonly SearchTextBox Search;
         public readonly SortTabControl SortTabs;
         public readonly OsuEnumDropdown<RankStatus> RankStatusDropdown;
         public readonly Bindable<PanelDisplayStyle> DisplayStyle = new Bindable<PanelDisplayStyle>();
-
-        private ResultCounts resultCounts;
-        public ResultCounts ResultCounts
-        {
-            get { return resultCounts; }
-            set
-            {
-                resultCounts = value;
-                updateResultCounts();
-            }
-        }
 
         protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || RankStatusDropdown.Contains(screenSpacePos);
 
@@ -127,41 +108,17 @@ namespace osu.Game.Overlays.Direct
                         },
                     },
                 },
-                resultCountsContainer = new FillFlowContainer
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Left = DirectOverlay.WIDTH_PADDING, Top = 6 },
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Text = @"Found ",
-                            TextSize = 15,
-                        },
-                        resultCountsText = new OsuSpriteText
-                        {
-                            TextSize = 15,
-                            Font = @"Exo2.0-Bold",
-                        },
-                    }
-                },
             };
 
             RankStatusDropdown.Current.Value = RankStatus.RankedApproved;
             SortTabs.Current.Value = SortCriteria.Title;
             SortTabs.Current.TriggerChange();
-
-            updateResultCounts();
         }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game, RulesetDatabase rulesets, OsuColour colours)
         {
             tabStrip.Colour = colours.Yellow;
-            resultCountsContainer.Colour = colours.Yellow;
             RankStatusDropdown.AccentColour = colours.BlueDark;
 
             var b = new Bindable<RulesetInfo>(); //backup bindable incase the game is null
@@ -169,21 +126,6 @@ namespace osu.Game.Overlays.Direct
             {
                 modeButtons.Add(new RulesetToggleButton(game?.Ruleset ?? b, r));
             }
-        }
-
-        private void updateResultCounts()
-        {
-            resultCountsContainer.FadeTo(ResultCounts == null ? 0 : 1, 200, EasingTypes.Out);
-            if (resultCounts == null) return;
-
-            resultCountsText.Text = pluralize(@"Artist", ResultCounts?.Artists ?? 0) + ", " +
-                                    pluralize(@"Song", ResultCounts?.Songs ?? 0) + ", " +
-                                    pluralize(@"Tag", ResultCounts?.Tags ?? 0);
-        }
-
-        private string pluralize(string prefix, int value)
-        {
-            return $@"{value} {prefix}" + (value == 1 ? string.Empty : @"s");
         }
 
         private class DirectSearchTextBox : SearchTextBox

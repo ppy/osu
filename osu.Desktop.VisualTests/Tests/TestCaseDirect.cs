@@ -23,9 +23,9 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(direct = new DirectOverlay());
             newBeatmaps();
-            direct.ResultCounts = new ResultCounts(1, 432, 3);
 
-            AddStep(@"Toggle", direct.ToggleVisibility);
+            AddStep(@"toggle", direct.ToggleVisibility);
+            AddStep(@"result counts", () => direct.ResultCounts = new ResultCounts(1, 4, 13));
         }
 
         [BackgroundDependencyLoader]
