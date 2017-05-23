@@ -7,7 +7,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Graphics.Containers
 {

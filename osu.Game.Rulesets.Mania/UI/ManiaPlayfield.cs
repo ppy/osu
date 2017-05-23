@@ -19,10 +19,8 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Framework.Input;
-using osu.Game.Beatmaps.Timing;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
-using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Mania.UI
 {

@@ -8,7 +8,6 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects.Legacy;
-using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Beatmaps.Formats

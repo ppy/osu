@@ -7,11 +7,9 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.UI;
 using System;
 using System.Collections.Generic;
-using osu.Game.Beatmaps.Timing;
 using OpenTK;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.Timing;
 
 namespace osu.Desktop.VisualTests.Tests

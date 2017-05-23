@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Taiko.Replays;
 using OpenTK;
 using osu.Game.Rulesets.Beatmaps;
 using System.Linq;
-using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {

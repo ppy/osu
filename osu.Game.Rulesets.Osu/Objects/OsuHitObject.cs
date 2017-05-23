@@ -6,7 +6,6 @@ using OpenTK;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Beatmaps.ControlPoints;
 
