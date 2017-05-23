@@ -278,12 +278,11 @@ namespace osu.Game.Beatmaps.Formats
             if (stringSampleSet == @"none")
                 stringSampleSet = @"normal";
 
-            TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(time);
             DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(time);
             SoundControlPoint soundPoint = beatmap.ControlPointInfo.SoundPointAt(time);
             EffectControlPoint effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
 
-            if (timingChange && (beatLength != timingPoint.BeatLength || timeSignature != timingPoint.TimeSignature))
+            if (timingChange)
             {
                 beatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint
                 {
