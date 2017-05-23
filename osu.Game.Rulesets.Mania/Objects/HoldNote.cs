@@ -3,7 +3,6 @@
 
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Types;

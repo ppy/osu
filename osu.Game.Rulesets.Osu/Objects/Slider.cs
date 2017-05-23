@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;

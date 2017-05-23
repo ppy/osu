@@ -17,8 +17,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Beatmaps.Timing;
-using osu.Game.Beatmaps.ControlPoints;
 using System;
 using osu.Framework.Configuration;
 

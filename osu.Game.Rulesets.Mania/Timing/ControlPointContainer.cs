@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Mania.Timing

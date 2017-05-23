@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;

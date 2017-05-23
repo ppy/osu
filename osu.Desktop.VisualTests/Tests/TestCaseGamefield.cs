@@ -18,7 +18,6 @@ using osu.Game.Rulesets.Taiko.UI;
 using System.Collections.Generic;
 using osu.Desktop.VisualTests.Beatmaps;
 using osu.Framework.Allocation;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Desktop.VisualTests.Tests

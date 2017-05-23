@@ -1,3 +1,6 @@
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Lists;
@@ -6,9 +9,24 @@ namespace osu.Game.Beatmaps.ControlPoints
 {
     public class ControlPointInfo
     {
+        /// <summary>
+        /// All timing points.
+        /// </summary>
         public readonly SortedList<TimingControlPoint> TimingPoints = new SortedList<TimingControlPoint>(Comparer<TimingControlPoint>.Default);
+
+        /// <summary>
+        /// All difficulty points.
+        /// </summary>
         public readonly SortedList<DifficultyControlPoint> DifficultyPoints = new SortedList<DifficultyControlPoint>(Comparer<DifficultyControlPoint>.Default);
+
+        /// <summary>
+        /// All sound points.
+        /// </summary>
         public readonly SortedList<SoundControlPoint> SoundPoints = new SortedList<SoundControlPoint>(Comparer<SoundControlPoint>.Default);
+
+        /// <summary>
+        /// All effect points.
+        /// </summary>
         public readonly SortedList<EffectControlPoint> EffectPoints = new SortedList<EffectControlPoint>(Comparer<EffectControlPoint>.Default);
 
         /// <summary>
