@@ -77,12 +77,12 @@ namespace osu.Game.Beatmaps.ControlPoints
             60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
         /// <summary>
-        /// Binary searches one of the control point lists to find the active contro point at <paramref name="time"/>.
+        /// Binary searches one of the control point lists to find the active control point at <paramref name="time"/>.
         /// </summary>
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
         /// <param name="prePoint">The control point to use when <paramref name="time"/> is before any control points.</param>
-        /// <returns></returns>
+        /// <returns>The active control point at <paramref name="time"/>.</returns>
         private T binarySearch<T>(SortedList<T> list, double time, Func<T> prePoint = null)
             where T : ControlPoint, new()
         {
