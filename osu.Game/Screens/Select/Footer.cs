@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
 
@@ -68,8 +69,6 @@ namespace osu.Game.Screens.Select
 
         public Footer()
         {
-            AlwaysReceiveInput = true;
-
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
             Anchor = Anchor.BottomCentre;
@@ -124,5 +123,13 @@ namespace osu.Game.Screens.Select
 
             updateModeLight();
         }
+
+        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || StartButton.Contains(screenSpacePos);
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+
+        protected override bool OnClick(InputState state) => true;
+
+        protected override bool OnDragStart(InputState state) => true;
     }
 }
