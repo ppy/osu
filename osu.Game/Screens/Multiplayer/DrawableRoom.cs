@@ -4,7 +4,6 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -35,8 +34,7 @@ namespace osu.Game.Screens.Multiplayer
         private readonly OsuSpriteText beatmapDash;
         private readonly OsuSpriteText beatmapArtist;
 
-        private Color4 openColour;
-        private Color4 playingColour;
+        private OsuColour colours;
         private LocalisationEngine localisation;
 
         public readonly Room Room;
@@ -200,9 +198,8 @@ namespace osu.Game.Screens.Multiplayer
         private void load(OsuColour colours, LocalisationEngine localisation)
         {
             this.localisation = localisation;
+            this.colours = colours;
 
-            openColour = colours.GreenLight;
-            playingColour = colours.Purple;
             beatmapInfoFlow.Colour = rankBounds.Colour = colours.Gray9;
             host.Colour = colours.Blue;
 
@@ -223,10 +220,11 @@ namespace osu.Game.Screens.Multiplayer
 
         private void displayStatus(RoomStatus value)
         {
-            status.Text = value.GetDescription() ?? value.ToString();
+            if (value == null) return;
+            status.Text = value.Message;
 
             foreach (Drawable d in new Drawable[] { sideStrip, status })
-                d.FadeColour(value == RoomStatus.Playing ? playingColour : openColour, 100);
+                d.FadeColour(value.GetAppropriateColour(colours), 100);
         }
 
         private void displayBeatmap(BeatmapMetadata value)
