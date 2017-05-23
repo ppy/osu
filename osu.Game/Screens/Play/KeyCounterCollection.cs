@@ -21,7 +21,6 @@ namespace osu.Game.Screens.Play
         public KeyCounterCollection()
         {
             AlwaysReceiveInput = true;
-            AlwaysPresent = true;
 
             Direction = FillDirection.Horizontal;
             AutoSizeAxes = Axes.Both;
