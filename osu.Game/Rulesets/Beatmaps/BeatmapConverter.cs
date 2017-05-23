@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Beatmaps
             return new Beatmap<T>
             {
                 BeatmapInfo = original.BeatmapInfo,
-                TimingInfo = original.TimingInfo,
+                ControlPointInfo = original.ControlPointInfo,
                 HitObjects = original.HitObjects.SelectMany(h => convert(h, original)).ToList()
             };
         }
