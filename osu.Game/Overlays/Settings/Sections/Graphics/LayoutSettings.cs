@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -11,10 +12,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override string Header => "Layout";
 
-        private SettingsSlider<double> letterboxPositionX;
-        private SettingsSlider<double> letterboxPositionY;
+        private FillFlowContainer letterboxSettings;
 
         private Bindable<bool> letterboxing;
+
+        private const int letterbox_container_height = 75;
+        private const int duration = 200;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config)
@@ -33,34 +36,30 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Letterboxing",
                     Bindable = letterboxing,
                 },
-                letterboxPositionX = new SettingsSlider<double>
+                letterboxSettings = new FillFlowContainer
                 {
-                    LabelText = "Horizontal position",
-                    Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionX)
-                },
-                letterboxPositionY = new SettingsSlider<double>
-                {
-                    LabelText = "Vertical position",
-                    Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionY)
+                    Direction = FillDirection.Vertical,
+                    RelativeSizeAxes = Axes.X,
+                    Masking = true,
+
+                    Children = new Drawable[]
+                    {
+                        new SettingsSlider<double>
+                        {
+                            LabelText = "Horizontal position",
+                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionX)
+                        },
+                        new SettingsSlider<double>
+                        {
+                            LabelText = "Vertical position",
+                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionY)
+                        },
+                    }
                 },
             };
 
-            letterboxing.ValueChanged += visibilityChanged;
+            letterboxing.ValueChanged += isVisible => letterboxSettings.ResizeHeightTo(isVisible ? letterbox_container_height : 0, duration, EasingTypes.OutQuint);
             letterboxing.TriggerChange();
-        }
-
-        private void visibilityChanged(bool newVisibility)
-        {
-            if (newVisibility)
-            {
-                letterboxPositionX.Show();
-                letterboxPositionY.Show();
-            }
-            else
-            {
-                letterboxPositionX.Hide();
-                letterboxPositionY.Hide();
-            }
         }
     }
 }
