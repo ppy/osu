@@ -293,6 +293,7 @@
     <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
     <Compile Include="Graphics\Backgrounds\Background.cs" />
+    <Compile Include="Graphics\Containers\BeatSyncedContainer.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\MenuCursor.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
