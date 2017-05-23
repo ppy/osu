@@ -2,11 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -30,21 +30,21 @@ namespace osu.Game.Graphics.Containers
             if (timingPoint.BeatLength == 0)
                 return;
 
-            int beat = (int)((currentTrackTime - timingPoint.Time) / timingPoint.BeatLength);
+            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / timingPoint.BeatLength);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
             if (currentTrackTime < timingPoint.Time)
-                beat--;
+                beatIndex--;
 
-            if (timingPoint == lastTimingPoint && beat == lastBeat)
+            if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
                 return;
 
             double offsetFromBeat = (timingPoint.Time - currentTrackTime) % timingPoint.BeatLength;
 
             using (BeginDelayedSequence(offsetFromBeat, true))
-                OnNewBeat(beat, timingPoint.BeatLength, timingPoint.TimeSignature, effectPoint.KiaiMode);
+                OnNewBeat(beatIndex, timingPoint, effectPoint, beatmap.Value.Track.CurrentAmplitudes);
 
-            lastBeat = beat;
+            lastBeat = beatIndex;
             lastTimingPoint = timingPoint;
         }
 
@@ -54,7 +54,7 @@ namespace osu.Game.Graphics.Containers
             beatmap.BindTo(game.Beatmap);
         }
 
-        protected virtual void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
+        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
         }
     }
