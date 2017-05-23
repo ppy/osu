@@ -41,7 +41,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Clear();
 
                 ManiaPlayfield playField;
-                Add(playField = new ManiaPlayfield(cols, new List<TimingChange>())
+                Add(playField = new ManiaPlayfield(cols, new List<TimingChange> { new TimingChange { BeatLength = 200 } })
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
