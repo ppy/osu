@@ -31,6 +31,7 @@ namespace osu.Game.Screens.Menu
         private readonly CircularContainer logoContainer;
         private readonly Container logoBounceContainer;
         private readonly Container logoBeatContainer;
+        private readonly Container logoAmplitudeContainer;
         private readonly Container logoHoverContainer;
 
         private SampleChannel sampleClick;
@@ -112,88 +113,95 @@ namespace osu.Game.Screens.Menu
                                         }
                                     }
                                 },
-                                logoBeatContainer = new Container
+                                logoAmplitudeContainer = new Container
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        new BufferedContainer
+                                        logoBeatContainer = new Container
                                         {
                                             AutoSizeAxes = Axes.Both,
                                             Children = new Drawable[]
                                             {
-                                                logoContainer = new CircularContainer
+                                                new BufferedContainer
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        logoContainer = new CircularContainer
+                                                        {
+                                                            Anchor = Anchor.Centre,
+                                                            Origin = Anchor.Centre,
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Scale = new Vector2(0.88f),
+                                                            Masking = true,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                colourAndTriangles = new Container
+                                                                {
+                                                                    RelativeSizeAxes = Axes.Both,
+                                                                    Anchor = Anchor.Centre,
+                                                                    Origin = Anchor.Centre,
+                                                                    Children = new Drawable[]
+                                                                    {
+                                                                        new Box
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.Both,
+                                                                            Colour = OsuPink,
+                                                                        },
+                                                                        new Triangles
+                                                                        {
+                                                                            TriangleScale = 4,
+                                                                            ColourLight = OsuColour.FromHex(@"ff7db7"),
+                                                                            ColourDark = OsuColour.FromHex(@"de5b95"),
+                                                                            RelativeSizeAxes = Axes.Both,
+                                                                        },
+                                                                    }
+                                                                },
+                                                                flashLayer = new Box
+                                                                {
+                                                                    RelativeSizeAxes = Axes.Both,
+                                                                    BlendingMode = BlendingMode.Additive,
+                                                                    Colour = Color4.White,
+                                                                    Alpha = 0,
+                                                                },
+                                                            },
+                                                        },
+                                                        logo = new Sprite
+                                                        {
+                                                            Anchor = Anchor.Centre,
+                                                            Origin = Anchor.Centre,
+                                                        },
+                                                    }
+                                                },
+                                                impactContainer = new CircularContainer
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
+                                                    Alpha = 0,
+                                                    BorderColour = Color4.White,
                                                     RelativeSizeAxes = Axes.Both,
-                                                    Scale = new Vector2(0.88f),
+                                                    BorderThickness = 10,
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        colourAndTriangles = new Container
+                                                        new Box
                                                         {
                                                             RelativeSizeAxes = Axes.Both,
-                                                            Anchor = Anchor.Centre,
-                                                            Origin = Anchor.Centre,
-                                                            Children = new Drawable[]
-                                                            {
-                                                                new Box
-                                                                {
-                                                                    RelativeSizeAxes = Axes.Both,
-                                                                    Colour = OsuPink,
-                                                                },
-                                                                new Triangles
-                                                                {
-                                                                    TriangleScale = 4,
-                                                                    ColourLight = OsuColour.FromHex(@"ff7db7"),
-                                                                    ColourDark = OsuColour.FromHex(@"de5b95"),
-                                                                    RelativeSizeAxes = Axes.Both,
-                                                                },
-                                                            }
-                                                        },
-                                                        flashLayer = new Box
-                                                        {
-                                                            RelativeSizeAxes = Axes.Both,
-                                                            BlendingMode = BlendingMode.Additive,
-                                                            Colour = Color4.White,
+                                                            AlwaysPresent = true,
                                                             Alpha = 0,
-                                                        },
-                                                    },
+                                                        }
+                                                    }
                                                 },
-                                                logo = new Sprite
+                                                new MenuVisualisation
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                },
-                                            }
-                                        },
-                                        impactContainer = new CircularContainer
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Alpha = 0,
-                                            BorderColour = Color4.White,
-                                            RelativeSizeAxes = Axes.Both,
-                                            BorderThickness = 10,
-                                            Masking = true,
-                                            Children = new Drawable[]
-                                            {
-                                                new Box
-                                                {
                                                     RelativeSizeAxes = Axes.Both,
-                                                    AlwaysPresent = true,
-                                                    Alpha = 0,
+                                                    BlendingMode = BlendingMode.Additive,
+                                                    Alpha = 0.2f,
                                                 }
                                             }
-                                        },
-                                        new MenuVisualisation
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            RelativeSizeAxes = Axes.Both,
-                                            BlendingMode = BlendingMode.Additive,
-                                            Alpha = 0.2f,
                                         }
                                     }
                                 }
@@ -205,41 +213,55 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, AudioManager audio)
+        private void load(TextureStore textures, AudioManager audio, OsuGameBase game)
         {
             sampleClick = audio.Sample.Get(@"Menu/menuhit");
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
         }
 
+        private int lastBeatIndex;
+
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
+            lastBeatIndex = beatIndex;
+
             var beatLength = timingPoint.BeatLength;
+
+            float amplitudeAdjust = Math.Min(1, 0.4f + amplitudes.Maximum);
 
             if (beatIndex < 0) return;
 
-            logoBeatContainer.ScaleTo(0.98f, beat_in_time, EasingTypes.Out);
+            logoBeatContainer.ScaleTo(1 - 0.02f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
             using (logoBeatContainer.BeginDelayedSequence(beat_in_time))
                 logoBeatContainer.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
 
             ripple.ClearTransforms();
 
-            ripple.ScaleTo(Vector2.One);
-            ripple.Alpha = 0.15f;
+            ripple.ScaleTo(logoAmplitudeContainer.Scale);
+            ripple.Alpha = 0.15f * amplitudeAdjust;
 
-            ripple.ScaleTo(ripple.Scale * 1.04f, beatLength, EasingTypes.OutQuint);
-            ripple.FadeOut(beatLength);
+            ripple.ScaleTo(logoAmplitudeContainer.Scale * (1 + 0.04f * amplitudeAdjust), beatLength, EasingTypes.OutQuint);
+            ripple.FadeOut(beatLength, EasingTypes.OutQuint);
 
             if (effectPoint.KiaiMode && flashLayer.Alpha < 0.4f)
             {
                 flashLayer.ClearTransforms();
 
-                flashLayer.FadeTo(0.14f, beat_in_time, EasingTypes.Out);
+                flashLayer.FadeTo(0.2f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
                 using (flashLayer.BeginDelayedSequence(beat_in_time))
                     flashLayer.FadeOut(beatLength);
             }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track.CurrentAmplitudes.Maximum : 0;
+            logoAmplitudeContainer.ScaleTo(1 - maxAmplitude * 0.04f, 50, EasingTypes.OutQuint);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
