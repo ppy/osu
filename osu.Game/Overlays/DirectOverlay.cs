@@ -169,9 +169,9 @@ namespace osu.Game.Overlays
             resultCountsContainer.FadeTo(ResultCounts == null ? 0f : 1f, 200, EasingTypes.Out);
             if (ResultCounts == null) return;
 
-            resultCountsText.Text = pluralize(@"Artist", ResultCounts?.Artists ?? 0) + ", " +
-                                    pluralize(@"Song", ResultCounts?.Songs ?? 0) + ", " +
-                                    pluralize(@"Tag", ResultCounts?.Tags ?? 0);
+            resultCountsText.Text = pluralize(@"Artist", ResultCounts.Artists) + ", " +
+                                    pluralize(@"Song", ResultCounts.Songs) + ", " +
+                                    pluralize(@"Tag", ResultCounts.Tags);
         }
 
         private string pluralize(string prefix, int value)
