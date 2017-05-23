@@ -131,7 +131,12 @@ namespace osu.Game.Screens
                     Background.Exit();
             }
 
-            return base.OnExiting(next);
+            if (base.OnExiting(next))
+                return true;
+
+            beatmap.ValueChanged -= OnBeatmapChanged;
+
+            return false;
         }
     }
 }
