@@ -5,11 +5,11 @@ using System;
 using System.Linq;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
@@ -32,11 +32,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         public DistanceObjectPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, Pattern previousPattern)
             : base(random, hitObject, beatmap, previousPattern)
         {
-            ControlPoint overridePoint;
-            ControlPoint controlPoint = Beatmap.TimingInfo.TimingPointAt(hitObject.StartTime, out overridePoint);
-
             convertType = PatternType.None;
-            if ((overridePoint ?? controlPoint)?.KiaiMode == false)
+            if (Beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime).KiaiMode)
                 convertType = PatternType.LowProbability;
 
             var distanceData = hitObject as IHasDistance;
@@ -44,13 +41,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             repeatCount = repeatsData?.RepeatCount ?? 1;
 
-            double speedAdjustment = beatmap.TimingInfo.SpeedMultiplierAt(hitObject.StartTime);
-            double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(hitObject.StartTime) * speedAdjustment;
+            TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
+            DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(hitObject.StartTime);
 
             // The true distance, accounting for any repeats
             double distance = (distanceData?.Distance ?? 0) * repeatCount;
             // The velocity of the osu! hit object - calculated as the velocity of a slider
-            double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / speedAdjustedBeatLength;
+            double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / (timingPoint.BeatLength * difficultyPoint.SpeedMultiplier);
             // The duration of the osu! hit object
             double osuDuration = distance / osuVelocity;
 
