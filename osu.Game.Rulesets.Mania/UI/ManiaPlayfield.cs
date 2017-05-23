@@ -19,7 +19,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Framework.Input;
-using osu.Game.Beatmaps.Timing;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 
@@ -65,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly int columnCount;
 
-        public ManiaPlayfield(int columnCount, IEnumerable<ControlPoint> timingChanges)
+        public ManiaPlayfield(int columnCount, IEnumerable<TimingChange> timingChanges)
         {
             this.columnCount = columnCount;
 
