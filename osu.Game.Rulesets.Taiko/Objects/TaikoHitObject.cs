@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects;
@@ -51,17 +52,17 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public bool Kiai { get; protected set; }
 
-        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
+        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(timing, difficulty);
+            base.ApplyDefaults(controlPointInfo, difficulty);
 
-            ScrollTime = scroll_time * (timing.BeatLengthAt(StartTime) * timing.SpeedMultiplierAt(StartTime) / 1000) / difficulty.SliderMultiplier;
+            TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
+            EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
 
-            ControlPoint overridePoint;
-            Kiai = timing.TimingPointAt(StartTime, out overridePoint).KiaiMode;
+            ScrollTime = scroll_time * (timingPoint.BeatLength * difficultyPoint.SpeedMultiplier / 1000) / difficulty.SliderMultiplier;
 
-            if (overridePoint != null)
-                Kiai |= overridePoint.KiaiMode;
+            Kiai |= effectPoint.KiaiMode;
         }
     }
 }

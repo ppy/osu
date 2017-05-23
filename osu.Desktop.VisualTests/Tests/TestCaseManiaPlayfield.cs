@@ -11,6 +11,8 @@ using osu.Game.Beatmaps.Timing;
 using OpenTK;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Mania.Timing;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -27,7 +29,7 @@ namespace osu.Desktop.VisualTests.Tests
             Action<int, SpecialColumnPosition> createPlayfield = (cols, pos) =>
             {
                 Clear();
-                Add(new ManiaPlayfield(cols, new List<ControlPoint>())
+                Add(new ManiaPlayfield(cols, new List<TimingChange>())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -41,7 +43,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Clear();
 
                 ManiaPlayfield playField;
-                Add(playField = new ManiaPlayfield(cols, new List<ControlPoint> { new ControlPoint { BeatLength = 200 } })
+                Add(playField = new ManiaPlayfield(cols, new List<TimingChange>())
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

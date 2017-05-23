@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Mania.Timing
 {
@@ -26,9 +27,9 @@ namespace osu.Game.Rulesets.Mania.Timing
         /// </summary>
         public double TimeSpan { get; set; }
 
-        private readonly List<DrawableControlPoint> drawableControlPoints;
+        private readonly List<DrawableControlPoint> drawableControlPoints = new List<DrawableControlPoint>();
 
-        public ControlPointContainer(IEnumerable<ControlPoint> timingChanges)
+        public ControlPointContainer(IEnumerable<TimingChange> timingChanges)
         {
             drawableControlPoints = timingChanges.Select(t => new DrawableControlPoint(t)).ToList();
             Children = drawableControlPoints;
@@ -64,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.Timing
         /// </summary>
         private class DrawableControlPoint : Container
         {
-            private readonly ControlPoint timingChange;
+            private readonly TimingChange timingChange;
 
             protected override Container<Drawable> Content => content;
             private readonly Container content;
@@ -76,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Timing
             /// the content container will scroll at twice the normal rate.
             /// </summary>
             /// <param name="timingChange">The control point to create the drawable control point for.</param>
-            public DrawableControlPoint(ControlPoint timingChange)
+            public DrawableControlPoint(TimingChange timingChange)
             {
                 this.timingChange = timingChange;
 

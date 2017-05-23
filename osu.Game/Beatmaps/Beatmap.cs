@@ -7,6 +7,7 @@ using osu.Game.Database;
 using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Beatmaps
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Beatmaps
         where T : HitObject
     {
         public BeatmapInfo BeatmapInfo;
-        public TimingInfo TimingInfo = new TimingInfo();
+        public ControlPointInfo ControlPointInfo = new ControlPointInfo();
         public List<BreakPeriod> Breaks = new List<BreakPeriod>();
         public readonly List<Color4> ComboColors = new List<Color4>
         {
@@ -46,7 +47,7 @@ namespace osu.Game.Beatmaps
         public Beatmap(Beatmap original = null)
         {
             BeatmapInfo = original?.BeatmapInfo ?? BeatmapInfo;
-            TimingInfo = original?.TimingInfo ?? TimingInfo;
+            ControlPointInfo = original?.ControlPointInfo ?? ControlPointInfo;
             Breaks = original?.Breaks ?? Breaks;
             ComboColors = original?.ComboColors ?? ComboColors;
         }

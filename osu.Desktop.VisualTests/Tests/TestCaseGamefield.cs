@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using osu.Desktop.VisualTests.Beatmaps;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -53,8 +54,8 @@ namespace osu.Desktop.VisualTests.Tests
                 time += RNG.Next(50, 500);
             }
 
-            TimingInfo timing = new TimingInfo();
-            timing.ControlPoints.Add(new ControlPoint
+            var controlPointInfo = new ControlPointInfo();
+            controlPointInfo.ControlPoints.Add(new TimingControlPoint
             {
                 BeatLength = 200
             });
@@ -73,7 +74,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Author = @"peppy",
                     },
                 },
-                TimingInfo = timing
+                ControlPointInfo = controlPointInfo
             });
 
             Add(new Drawable[]
