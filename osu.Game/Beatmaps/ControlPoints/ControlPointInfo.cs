@@ -82,7 +82,7 @@ namespace osu.Game.Beatmaps.ControlPoints
                 return new T();
 
             if (time < list[0].Time)
-                return new T();
+                return list[0];
 
             int index = list.BinarySearch(new T() { Time = time });
 
