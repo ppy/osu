@@ -82,7 +82,7 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                Task.Run(() => BeatmapDatabase.Import(paths));
+                Task.Run(() => BeatmapDatabase.Import(paths.ToArray()));
             }
 
             Dependencies.Cache(this);

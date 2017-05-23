@@ -49,5 +49,7 @@ namespace osu.Game.Beatmaps.IO
             archive.Dispose();
             archiveStream.Dispose();
         }
+
+        public override Stream GetUnderlyingStream() => archiveStream;
     }
 }
