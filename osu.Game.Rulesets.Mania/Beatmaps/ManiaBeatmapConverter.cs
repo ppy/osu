@@ -11,11 +11,18 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Database;
+using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
     public class ManiaBeatmapConverter : BeatmapConverter<ManiaHitObject>
     {
+        /// <summary>
+        /// Maximum number of previous notes to consider for density calculation.
+        /// </summary>
+        private const int max_notes_for_density = 7;
+
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
         private Pattern lastPattern = new Pattern();
@@ -55,6 +62,26 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 yield return obj;
         }
 
+        private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
+        private double density = int.MaxValue;
+        private void computeDensity(double newNoteTime)
+        {
+            if (prevNoteTimes.Count == max_notes_for_density)
+                prevNoteTimes.RemoveAt(0);
+            prevNoteTimes.Add(newNoteTime);
+
+            density = (prevNoteTimes[prevNoteTimes.Count - 1] - prevNoteTimes[0]) / prevNoteTimes.Count;
+        }
+
+        private double lastTime;
+        private Vector2 lastPosition;
+        private PatternType lastStair;
+        private void recordNote(double time, Vector2 position)
+        {
+            lastTime = time;
+            lastPosition = position;
+        }
+
         /// <summary>
         /// Method that generates hit objects for osu!mania specific beatmaps.
         /// </summary>
@@ -83,28 +110,31 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             // Following lines currently commented out to appease resharper
 
-            //Patterns.PatternGenerator conversion = null;
+            Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
-            {
-                // Slider
-            }
+                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern);
             else if (endTimeData != null)
-            {
-                // Spinner
-            }
+                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap);
             else if (positionData != null)
             {
-                // Circle
+                computeDensity(original.StartTime);
+
+                conversion = new HitObjectPatternGenerator(random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair);
+
+                recordNote(original.StartTime, positionData.Position);
             }
 
-            //if (conversion == null)
-            return null;
+            if (conversion == null)
+                return null;
 
-            //Pattern newPattern = conversion.Generate();
-            //lastPattern = newPattern;
+            Pattern newPattern = conversion.Generate();
+            lastPattern = newPattern;
 
-            //return newPattern.HitObjects;
+            var stairPatternGenerator = (HitObjectPatternGenerator)conversion;
+            lastStair = stairPatternGenerator.StairType;
+
+            return newPattern.HitObjects;
         }
 
         /// <summary>
