@@ -30,6 +30,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly TextAwesome symbol;
 
+        private readonly Color4 baseColour = OsuColour.FromHex(@"002c3c");
+        private readonly Color4 fillColour = OsuColour.FromHex(@"005b7c");
+
         private Color4 normalColour;
         private Color4 completeColour;
 
@@ -154,13 +157,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            normalColour = colours.SpinnerBase;
+            normalColour = baseColour;
 
             background.AccentColour = normalColour;
 
-            completeColour = colours.YellowLight.Opacity(0.6f);
+            completeColour = colours.YellowLight.Opacity(0.75f);
 
-            disc.AccentColour = colours.SpinnerFill;
+            disc.AccentColour = fillColour;
             circle.Colour = colours.BlueDark;
             glow.Colour = colours.BlueDark;
         }
