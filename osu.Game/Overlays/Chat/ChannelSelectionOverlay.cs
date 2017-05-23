@@ -6,13 +6,10 @@ using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -72,22 +69,29 @@ namespace osu.Game.Overlays.Chat
                         },
                     },
                 },
-                new ScrollContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollDraggerVisible = false,
                     Padding = new MarginPadding { Top = 85 },
                     Children = new[]
                     {
-                        sectionsFlow = new SearchContainer<ChannelSection>
+                        new ScrollContainer
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            LayoutDuration = 200,
-                            LayoutEasing = EasingTypes.OutQuint,
-                            Spacing = new Vector2(0f, 20f),
-                            Padding = new MarginPadding { Top = 20, Bottom = 20, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
+                            RelativeSizeAxes = Axes.Both,
+                            ScrollDraggerVisible = false,
+                            Children = new[]
+                            {
+                                sectionsFlow = new SearchContainer<ChannelSection>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    LayoutDuration = 200,
+                                    LayoutEasing = EasingTypes.OutQuint,
+                                    Spacing = new Vector2(0f, 20f),
+                                    Padding = new MarginPadding { Top = 20, Bottom = 20, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
+                                },
+                            },
                         },
                     },
                 },
@@ -126,10 +130,6 @@ namespace osu.Game.Overlays.Chat
                         },
                     },
                 },
-                new SettingsButton
-                {
-                    Margin = new MarginPadding { Top = 160 },
-                },
             };
 
             search.Current.ValueChanged += newValue => sectionsFlow.SearchTerm = newValue;
@@ -166,93 +166,6 @@ namespace osu.Game.Overlays.Chat
         {
             protected override Color4 BackgroundFocused => Color4.Black.Opacity(0.2f);
             protected override Color4 BackgroundUnfocused => Color4.Black.Opacity(0.2f);
-        }
-
-        private class SettingsButton : ClickableContainer
-        {
-            private const float width = 60f;
-
-            private readonly Box bg;
-            private readonly Container bgContainer;
-
-            private SampleChannel clickSample;
-
-            public SettingsButton()
-            {
-                Size = new Vector2(width, 50f);
-
-                Children = new Drawable[]
-                {
-                    bgContainer = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Shear = new Vector2(0.2f, 0f),
-                        Masking = true,
-                        MaskingSmoothness = 2,
-                        EdgeEffect = new EdgeEffect
-                        {
-                            Type = EdgeEffectType.Shadow,
-                            Colour = Color4.Black.Opacity(0.2f),
-                            Offset = new Vector2(2, 0),
-                            Radius = 2,
-                        },
-                        Children = new[]
-                        {
-                            bg = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                EdgeSmoothness = new Vector2(2f, 0f),
-                            },
-                        },
-                    },
-                    new TextAwesome
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = FontAwesome.fa_osu_gear,
-                        TextSize = 20,
-                        Shadow = true,
-                        UseFullGlyphHeight = false,
-                    },
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours, AudioManager audio)
-            {
-            	bg.Colour = colours.Pink;
-                clickSample = audio.Sample.Get(@"Menu/menuclick");
-            }
-
-            protected override bool OnHover(InputState state)
-            {
-                ResizeWidthTo(width + 20f, 500, EasingTypes.OutElastic);
-
-                return base.OnHover(state);
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                ResizeWidthTo(width, 500, EasingTypes.OutElastic);
-            }
-
-            protected override bool OnClick(InputState state)
-            {
-                var flash = new Box
-                {
-                	RelativeSizeAxes = Axes.Both,
-                	Colour = Color4.White.Opacity(0.5f),
-                };
-
-    			bgContainer.Add(flash);
-
-                flash.Alpha = 1;
-                flash.FadeOut(500, EasingTypes.OutQuint);
-                flash.Expire();
-
-                clickSample.Play();
-                return base.OnClick(state);
-            }
         }
     }
 }
