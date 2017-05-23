@@ -260,7 +260,7 @@ namespace osu.Game.Screens.Menu
         {
             base.Update();
 
-            var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track.CurrentAmplitudes.Maximum : 0;
+            var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value?.Track?.CurrentAmplitudes.Maximum ?? 0 : 0;
             logoAmplitudeContainer.ScaleTo(1 - maxAmplitude * 0.04f, 50, EasingTypes.OutQuint);
         }
 
