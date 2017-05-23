@@ -16,8 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private Bindable<bool> letterboxing;
 
-        private const int letterbox_container_height = 75;
-        private const int duration = 300;
+        private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config)
@@ -40,6 +39,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    AutoSizeDuration = transition_duration,
+                    AutoSizeEasing = EasingTypes.OutQuint,
                     Masking = true,
 
                     Children = new Drawable[]
@@ -58,7 +60,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
             };
 
-            letterboxing.ValueChanged += isVisible => letterboxSettings.ResizeHeightTo(isVisible ? letterbox_container_height : 0, duration, EasingTypes.OutQuint);
+            letterboxing.ValueChanged += isVisible =>
+            {
+                letterboxSettings.ClearTransforms();
+                letterboxSettings.AutoSizeAxes = isVisible ? Axes.Y : Axes.None;
+
+                if(!isVisible)
+                    letterboxSettings.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
+            };
             letterboxing.TriggerChange();
         }
     }
