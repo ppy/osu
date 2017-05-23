@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// <summary>
         /// The offset from <see cref="left_area_size"/> which the center of the hit target lies at.
         /// </summary>
-        private const float hit_target_offset = TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER / 2f + 40;
+        public const float HIT_TARGET_OFFSET = TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER / 2f + 40;
 
         /// <summary>
         /// The size of the left area of the playfield. This area contains the input drum.
@@ -89,21 +89,19 @@ namespace osu.Game.Rulesets.Taiko.UI
                             Margin = new MarginPadding { Left = left_area_size },
                             Children = new Drawable[]
                             {
+                                hitExplosionContainer = new Container<HitExplosion>
+                                {
+                                    RelativeSizeAxes = Axes.Y,
+                                    BlendingMode = BlendingMode.Additive
+                                },
                                 new Container
                                 {
                                     Name = "Masked elements",
                                     RelativeSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Left = hit_target_offset },
+                                    Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
                                     Masking = true,
                                     Children = new Drawable[]
                                     {
-                                        hitExplosionContainer = new Container<HitExplosion>
-                                        {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.Centre,
-                                            RelativeSizeAxes = Axes.Y,
-                                            BlendingMode = BlendingMode.Additive
-                                        },
                                         barLineContainer = new Container<DrawableBarLine>
                                         {
                                             RelativeSizeAxes = Axes.Both,
@@ -123,7 +121,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 {
                                     Name = "Judgements",
                                     RelativeSizeAxes = Axes.Y,
-                                    Margin = new MarginPadding { Left = hit_target_offset },
+                                    Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
                                     BlendingMode = BlendingMode.Additive
                                 },
                             }
@@ -217,7 +215,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     topLevelHitContainer.Add(judgedObject.CreateProxy());
                 }
 
-                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement));
+                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement, judgedObject is DrawableRimHit));
             }
             else
                 hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
