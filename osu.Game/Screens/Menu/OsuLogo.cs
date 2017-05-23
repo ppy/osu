@@ -228,6 +228,15 @@ namespace osu.Game.Screens.Menu
 
             ripple.ScaleTo(ripple.Scale * 1.04f, beatLength, EasingTypes.OutQuint);
             ripple.FadeOut(beatLength);
+
+            if (kiai && flashLayer.Alpha < 0.4f)
+            {
+                flashLayer.ClearTransforms();
+
+                flashLayer.FadeTo(0.14f, beat_in_time, EasingTypes.Out);
+                using (flashLayer.BeginDelayedSequence(beat_in_time))
+                    flashLayer.FadeOut(beatLength);
+            }
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
