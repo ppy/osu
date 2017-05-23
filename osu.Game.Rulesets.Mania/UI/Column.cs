@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Beatmaps.Timing;
 using System;
 using osu.Framework.Configuration;
 
@@ -46,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly ControlPointContainer ControlPointContainer;
 
-        public Column(IEnumerable<ControlPoint> timingChanges)
+        public Column(IEnumerable<TimingChange> timingChanges)
         {
             RelativeSizeAxes = Axes.Y;
             Width = column_width;

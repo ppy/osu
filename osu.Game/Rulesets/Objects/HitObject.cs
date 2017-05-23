@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Audio;
-using osu.Game.Beatmaps.Timing;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -33,31 +33,28 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Applies default values to this HitObject.
         /// </summary>
+        /// <param name="controlPointInfo">The control points.</param>
         /// <param name="difficulty">The difficulty settings to use.</param>
-        /// <param name="timing">The timing settings to use.</param>
-        public virtual void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
+        public virtual void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            ControlPoint overridePoint;
-            ControlPoint timingPoint = timing.TimingPointAt(StartTime, out overridePoint);
-
-            ControlPoint samplePoint = overridePoint ?? timingPoint;
+            SoundControlPoint soundPoint = controlPointInfo.SoundPointAt(StartTime);
 
             // Initialize first sample
-            Samples.ForEach(s => initializeSampleInfo(s, samplePoint));
+            Samples.ForEach(s => initializeSampleInfo(s, soundPoint));
 
             // Initialize any repeat samples
             var repeatData = this as IHasRepeats;
-            repeatData?.RepeatSamples?.ForEach(r => r.ForEach(s => initializeSampleInfo(s, samplePoint)));
+            repeatData?.RepeatSamples?.ForEach(r => r.ForEach(s => initializeSampleInfo(s, soundPoint)));
         }
 
-        private void initializeSampleInfo(SampleInfo sample, ControlPoint controlPoint)
+        private void initializeSampleInfo(SampleInfo sample, SoundControlPoint soundPoint)
         {
             if (sample.Volume == 0)
-                sample.Volume = controlPoint?.SampleVolume ?? 0;
+                sample.Volume = soundPoint?.SampleVolume ?? 0;
 
             // If the bank is not assigned a name, assign it from the control point
             if (string.IsNullOrEmpty(sample.Bank))
-                sample.Bank = controlPoint?.SampleBank ?? @"normal";
+                sample.Bank = soundPoint?.SampleBank ?? @"normal";
         }
     }
 }

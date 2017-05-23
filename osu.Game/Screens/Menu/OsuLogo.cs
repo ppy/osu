@@ -5,17 +5,18 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Menu
 {
@@ -211,11 +212,13 @@ namespace osu.Game.Screens.Menu
             ripple.Texture = textures.Get(@"Menu/logo");
         }
 
-        protected override void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
-            base.OnNewBeat(newBeat, beatLength, timeSignature, kiai);
+            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-            if (newBeat < 0) return;
+            var beatLength = timingPoint.BeatLength;
+
+            if (beatIndex < 0) return;
 
             logoBeatContainer.ScaleTo(0.98f, beat_in_time, EasingTypes.Out);
             using (logoBeatContainer.BeginDelayedSequence(beat_in_time))
@@ -229,7 +232,7 @@ namespace osu.Game.Screens.Menu
             ripple.ScaleTo(ripple.Scale * 1.04f, beatLength, EasingTypes.OutQuint);
             ripple.FadeOut(beatLength);
 
-            if (kiai && flashLayer.Alpha < 0.4f)
+            if (effectPoint.KiaiMode && flashLayer.Alpha < 0.4f)
             {
                 flashLayer.ClearTransforms();
 

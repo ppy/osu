@@ -8,6 +8,7 @@ using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -241,6 +242,7 @@ namespace osu.Game.Beatmaps.Formats
 
             double time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo);
             double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
+            double speedMultiplier = beatLength < 0 ? -beatLength / 100.0 : 1;
 
             TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
             if (split.Length >= 3)
@@ -275,18 +277,48 @@ namespace osu.Game.Beatmaps.Formats
             if (stringSampleSet == @"none")
                 stringSampleSet = @"normal";
 
-            beatmap.TimingInfo.ControlPoints.Add(new ControlPoint
+            DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(time);
+            SoundControlPoint soundPoint = beatmap.ControlPointInfo.SoundPointAt(time);
+            EffectControlPoint effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
+
+            if (timingChange)
             {
-                Time = time,
-                BeatLength = beatLength,
-                SpeedMultiplier = beatLength < 0 ? -beatLength / 100.0 : 1,
-                TimingChange = timingChange,
-                TimeSignature = timeSignature,
-                SampleBank = stringSampleSet,
-                SampleVolume = sampleVolume,
-                KiaiMode = kiaiMode,
-                OmitFirstBarLine = omitFirstBarSignature
-            });
+                beatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint
+                {
+                    Time = time,
+                    BeatLength = beatLength,
+                    TimeSignature = timeSignature
+                });
+            }
+
+            if (speedMultiplier != difficultyPoint.SpeedMultiplier)
+            {
+                beatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint
+                {
+                    Time = time,
+                    SpeedMultiplier = speedMultiplier
+                });
+            }
+
+            if (stringSampleSet != soundPoint.SampleBank || sampleVolume != soundPoint.SampleVolume)
+            {
+                beatmap.ControlPointInfo.SoundPoints.Add(new SoundControlPoint
+                {
+                    Time = time,
+                    SampleBank = stringSampleSet,
+                    SampleVolume = sampleVolume
+                });
+            }
+
+            if (kiaiMode != effectPoint.KiaiMode || omitFirstBarSignature != effectPoint.OmitFirstBarLine)
+            {
+                beatmap.ControlPointInfo.EffectPoints.Add(new EffectControlPoint
+                {
+                    Time = time,
+                    KiaiMode = kiaiMode,
+                    OmitFirstBarLine = omitFirstBarSignature
+                });
+            }
         }
 
         private void handleColours(Beatmap beatmap, string key, string val, ref bool hasCustomColours)
