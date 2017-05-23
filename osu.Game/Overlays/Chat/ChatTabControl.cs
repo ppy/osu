@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Chat
 
         private const float shear_width = 10;
 
-        private Bindable<bool> channelSelectorActive = new Bindable<bool>();
+        private readonly Bindable<bool> channelSelectorActive = new Bindable<bool>();
 
         public Bindable<bool> ChannelSelectorActive => channelSelectorActive;
 
@@ -212,7 +212,7 @@ namespace osu.Game.Overlays.Chat
                     }
                 }
 
-                private Bindable<bool> activeBindable;
+                private readonly Bindable<bool> activeBindable;
 
                 public ChannelSelectorTabItem(Channel value, Bindable<bool> active) : base(value)
                 {
