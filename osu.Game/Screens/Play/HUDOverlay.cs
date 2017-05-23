@@ -45,7 +45,6 @@ namespace osu.Game.Screens.Play
         protected HUDOverlay()
         {
             RelativeSizeAxes = Axes.Both;
-            AlwaysPresent = true;
 
             Add(content = new Container
             {
@@ -68,7 +67,7 @@ namespace osu.Game.Screens.Play
         private void load(OsuConfigManager config, NotificationManager notificationManager)
         {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.ValueChanged += hudVisibility => FadeTo(hudVisibility ? 1 : 0, duration);
+            showHud.ValueChanged += hudVisibility => content.FadeTo(hudVisibility ? 1 : 0, duration);
             showHud.TriggerChange();
 
             if (!showHud && !hasShownNotificationOnce)
