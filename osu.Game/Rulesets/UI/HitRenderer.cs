@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.UI
 
             // Apply defaults
             foreach (var h in Beatmap.HitObjects)
-                h.ApplyDefaults(Beatmap.TimingInfo, Beatmap.BeatmapInfo.Difficulty);
+                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.Difficulty);
 
             // Post-process the beatmap
             processor.PostProcess(Beatmap);
