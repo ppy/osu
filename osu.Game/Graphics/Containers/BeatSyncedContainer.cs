@@ -2,11 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -16,7 +16,6 @@ namespace osu.Game.Graphics.Containers
 
         private int lastBeat;
         private TimingControlPoint lastTimingPoint;
-        private EffectControlPoint lastEffectPoint;
 
         protected override void Update()
         {
@@ -31,21 +30,21 @@ namespace osu.Game.Graphics.Containers
             if (timingPoint.BeatLength == 0)
                 return;
 
-            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / timingPoint.BeatLength);
+            int beat = (int)((currentTrackTime - timingPoint.Time) / timingPoint.BeatLength);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
             if (currentTrackTime < timingPoint.Time)
-                beatIndex--;
+                beat--;
 
-            if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
+            if (timingPoint == lastTimingPoint && beat == lastBeat)
                 return;
 
             double offsetFromBeat = (timingPoint.Time - currentTrackTime) % timingPoint.BeatLength;
 
             using (BeginDelayedSequence(offsetFromBeat, true))
-                OnNewBeat(beatIndex, timingPoint, effectPoint, beatmap.Value.Track.CurrentAmplitudes);
+                OnNewBeat(beat, timingPoint.BeatLength, timingPoint.TimeSignature, effectPoint.KiaiMode);
 
-            lastBeat = beatIndex;
+            lastBeat = beat;
             lastTimingPoint = timingPoint;
         }
 
@@ -55,7 +54,7 @@ namespace osu.Game.Graphics.Containers
             beatmap.BindTo(game.Beatmap);
         }
 
-        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        protected virtual void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
         {
         }
     }
