@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private Bindable<bool> letterboxing;
 
         private const int letterbox_container_height = 75;
-        private const int duration = 200;
+        private const int duration = 300;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config)
