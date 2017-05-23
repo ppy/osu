@@ -5,6 +5,9 @@ namespace osu.Game.Beatmaps.ControlPoints
 {
     public class ControlPoint
     {
+        /// <summary>
+        /// The time at which the control point takes effect.
+        /// </summary>
         public double Time;
     }
 }
