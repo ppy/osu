@@ -26,9 +26,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private FillFlowContainer content;
         private SimpleButton button;
-        private bool buttonIsPressed;
+        private bool buttonIsActive;
 
-        private Color4 buttonPressedColour;
+        private Color4 buttonActiveColour;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.UserInterface
                                     Position = new Vector2(-15,0),
                                     Icon = FontAwesome.fa_bars,
                                     Scale = new Vector2(0.75f),
-                                    Colour = buttonPressedColour = colours.Yellow,
+                                    Colour = buttonActiveColour = colours.Yellow,
                                     Action = triggerContentVisibility,
                                 },
                             }
@@ -92,9 +92,9 @@ namespace osu.Game.Graphics.UserInterface
                             Name = @"Content",
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
                             AutoSizeDuration = transition_duration,
                             AutoSizeEasing = EasingTypes.OutQuint,
+                            AutoSizeAxes = Axes.Y,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
                             Padding = new MarginPadding(15),
@@ -112,20 +112,15 @@ namespace osu.Game.Graphics.UserInterface
 
         private void triggerContentVisibility()
         {
-            if (buttonIsPressed)
-            {
-                content.ClearTransforms();
-                content.AutoSizeAxes = Axes.Y;
-            }
-            else
-            {
-                content.AutoSizeAxes = Axes.None;
+            content.ClearTransforms();
+            content.AutoSizeAxes = buttonIsActive ? Axes.Y : Axes.None;
+
+            if (!buttonIsActive)
                 content.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
-            }
 
-            button.FadeColour(buttonIsPressed ? buttonPressedColour : Color4.White, 200, EasingTypes.OutQuint);
+            button.FadeColour(buttonIsActive ? buttonActiveColour : Color4.White, 200, EasingTypes.OutQuint);
 
-            buttonIsPressed = !buttonIsPressed;
+            buttonIsActive = !buttonIsActive;
         }
     }
 }

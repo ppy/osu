@@ -21,7 +21,10 @@ namespace osu.Game.Screens.Play.ReplaySettings
             set
             {
                 isAvaliable = value;
-                if (!isAvaliable) Hide();
+                if (isAvaliable)
+                    Show();
+                else
+                    Hide();
             }
             get
             {
@@ -62,11 +65,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
         {
             if (isAvaliable)
             {
-                if (isVisible)
-                    FadeIn(fade_duration);
-                else
-                    FadeOut(fade_duration);
-
+                FadeTo(isVisible ? 1 : 0, fade_duration);
                 isVisible = !isVisible;
             }
         }
