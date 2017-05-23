@@ -44,10 +44,12 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private readonly Container hitObjectContainer;
         private readonly Container topLevelHitContainer;
-        private readonly Container leftBackgroundContainer;
-        private readonly Container rightBackgroundContainer;
-        private readonly Box leftBackground;
-        private readonly Box rightBackground;
+
+        private readonly Container overlayBackgroundContainer;
+        private readonly Container backgroundContainer;
+
+        private readonly Box overlayBackground;
+        private readonly Box background;
 
         public TaikoPlayfield()
         {
@@ -59,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Height = DEFAULT_PLAYFIELD_HEIGHT,
                     Children = new[]
                     {
-                        rightBackgroundContainer = new Container
+                        backgroundContainer = new Container
                         {
                             Name = "Transparent playfield background",
                             RelativeSizeAxes = Axes.Both,
@@ -73,7 +75,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             },
                             Children = new Drawable[]
                             {
-                                rightBackground = new Box
+                                background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0.6f
@@ -82,16 +84,17 @@ namespace osu.Game.Rulesets.Taiko.UI
                         },
                         new Container
                         {
-                            Name = "Transparent playfield elements",
+                            Name = "Right area",
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = left_area_size },
+                            Margin = new MarginPadding { Left = left_area_size },
                             Children = new Drawable[]
                             {
                                 new Container
                                 {
-                                    Name = "Hit target container",
-                                    X = hit_target_offset,
+                                    Name = "Masked elements",
                                     RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Left = hit_target_offset },
+                                    Masking = true,
                                     Children = new Drawable[]
                                     {
                                         hitExplosionContainer = new Container<HitExplosion>
@@ -114,23 +117,25 @@ namespace osu.Game.Rulesets.Taiko.UI
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
-                                        judgementContainer = new Container<DrawableTaikoJudgement>
-                                        {
-                                            RelativeSizeAxes = Axes.Y,
-                                            BlendingMode = BlendingMode.Additive
-                                        },
-                                    },
+                                    }
+                                },
+                                judgementContainer = new Container<DrawableTaikoJudgement>
+                                {
+                                    Name = "Judgements",
+                                    RelativeSizeAxes = Axes.Y,
+                                    Margin = new MarginPadding { Left = hit_target_offset },
+                                    BlendingMode = BlendingMode.Additive
                                 },
                             }
                         },
-                        leftBackgroundContainer = new Container
+                        overlayBackgroundContainer = new Container
                         {
                             Name = "Left overlay",
                             Size = new Vector2(left_area_size, DEFAULT_PLAYFIELD_HEIGHT),
                             BorderThickness = 1,
                             Children = new Drawable[]
                             {
-                                leftBackground = new Box
+                                overlayBackground = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
@@ -164,11 +169,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            leftBackgroundContainer.BorderColour = colours.Gray0;
-            leftBackground.Colour = colours.Gray1;
+            overlayBackgroundContainer.BorderColour = colours.Gray0;
+            overlayBackground.Colour = colours.Gray1;
 
-            rightBackgroundContainer.BorderColour = colours.Gray1;
-            rightBackground.Colour = colours.Gray0;
+            backgroundContainer.BorderColour = colours.Gray1;
+            background.Colour = colours.Gray0;
         }
 
         public override void Add(DrawableHitObject<TaikoHitObject, TaikoJudgement> h)
