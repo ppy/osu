@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Lists;
@@ -55,7 +56,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <returns>The timing control point.</returns>
-        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time);
+        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, () => TimingPoints[0]);
 
         /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
@@ -75,14 +76,21 @@ namespace osu.Game.Beatmaps.ControlPoints
         public double BPMMode =>
             60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
-        private T binarySearch<T>(SortedList<T> list, double time)
+        /// <summary>
+        /// Binary searches one of the control point lists to find the active contro point at <paramref name="time"/>.
+        /// </summary>
+        /// <param name="list">The list to search.</param>
+        /// <param name="time">The time to find the control point at.</param>
+        /// <param name="prePoint">The control point to use when <paramref name="time"/> is before any control points.</param>
+        /// <returns></returns>
+        private T binarySearch<T>(SortedList<T> list, double time, Func<T> prePoint = null)
             where T : ControlPoint, new()
         {
             if (list.Count == 0)
                 return new T();
 
             if (time < list[0].Time)
-                return list[0];
+                return prePoint?.Invoke() ?? new T();
 
             int index = list.BinarySearch(new T() { Time = time });
 
