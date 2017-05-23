@@ -213,7 +213,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, AudioManager audio, OsuGameBase game)
+        private void load(TextureStore textures, AudioManager audio)
         {
             sampleClick = audio.Sample.Get(@"Menu/menuhit");
             logo.Texture = textures.Get(@"Menu/logo");
