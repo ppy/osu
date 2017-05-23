@@ -100,6 +100,8 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             index = ~index;
 
+            // BinarySearch will return the index of the first element _greater_ than the search
+            // This is the inactive point - the active point is the one before it (index - 1)
             return list[index - 1];
         }
     }
