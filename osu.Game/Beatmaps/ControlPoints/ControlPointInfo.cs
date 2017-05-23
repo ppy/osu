@@ -92,8 +92,6 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             index = ~index;
 
-            if (index == list.Count)
-                return list[list.Count - 1];
             return list[index - 1];
         }
     }
