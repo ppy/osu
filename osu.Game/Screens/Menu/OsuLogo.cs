@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Menu
 
             Children = new Drawable[]
             {
-                logoBeatContainer  = new Container
+                logoHoverContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -95,7 +95,23 @@ namespace osu.Game.Screens.Menu
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                logoHoverContainer = new Container
+                                rippleContainer = new Container
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        ripple = new Sprite
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            BlendingMode = BlendingMode.Additive,
+                                            Alpha = 0
+                                        }
+                                    }
+                                },
+                                logoBeatContainer = new Container
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
@@ -151,22 +167,6 @@ namespace osu.Game.Screens.Menu
                                                 },
                                             }
                                         },
-                                        rippleContainer = new Container
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            RelativeSizeAxes = Axes.Both,
-                                            Children = new Drawable[]
-                                            {
-                                                ripple = new Sprite
-                                                {
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    BlendingMode = BlendingMode.Additive,
-                                                    Alpha = 0.15f
-                                                }
-                                            }
-                                        },
                                         impactContainer = new CircularContainer
                                         {
                                             Anchor = Anchor.Centre,
@@ -211,22 +211,23 @@ namespace osu.Game.Screens.Menu
             ripple.Texture = textures.Get(@"Menu/logo");
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            ripple.ScaleTo(ripple.Scale * 1.1f, 500);
-            ripple.FadeOut(500);
-            ripple.Loop(300);
-        }
-
         protected override void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
         {
             base.OnNewBeat(newBeat, beatLength, timeSignature, kiai);
 
-            logoBeatContainer.ScaleTo(0.97f, beat_in_time, EasingTypes.Out);
+            if (newBeat < 0) return;
+
+            logoBeatContainer.ScaleTo(0.98f, beat_in_time, EasingTypes.Out);
             using (logoBeatContainer.BeginDelayedSequence(beat_in_time))
                 logoBeatContainer.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
+
+            ripple.ClearTransforms();
+
+            ripple.ScaleTo(Vector2.One);
+            ripple.Alpha = 0.15f;
+
+            ripple.ScaleTo(ripple.Scale * 1.04f, beatLength, EasingTypes.OutQuint);
+            ripple.FadeOut(beatLength);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
