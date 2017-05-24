@@ -9,7 +9,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    internal class DifficultyColouredContainer : Container, IHasAccentColour
+    public class DifficultyColouredContainer : Container, IHasAccentColour
     {
         public Color4 AccentColour { get; set; }
 
