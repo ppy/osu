@@ -51,8 +51,7 @@ namespace osu.Game.Overlays.Direct
                 tabStrip = new Box
                 {
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Position = new Vector2(0f, 1f),
+                    Origin = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = 1,
                 },
@@ -87,7 +86,7 @@ namespace osu.Game.Overlays.Direct
                     Origin = Anchor.TopRight,
                     Spacing = new Vector2(10f, 0f),
                     Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Top = Height - SlimEnumDropdown<DirectTab>.HEIGHT - padding, Right = DirectOverlay.WIDTH_PADDING },
+                    Margin = new MarginPadding { Top = HEIGHT - SlimEnumDropdown<DirectTab>.HEIGHT - padding, Right = DirectOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer

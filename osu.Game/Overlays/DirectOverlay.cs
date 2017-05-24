@@ -115,7 +115,7 @@ namespace osu.Game.Overlays
                                             {
                                                 new OsuSpriteText
                                                 {
-                                                    Text = @"Found ",
+                                                    Text = "Found ",
                                                     TextSize = 15,
                                                 },
                                                 resultCountsText = new OsuSpriteText
@@ -169,9 +169,9 @@ namespace osu.Game.Overlays
             resultCountsContainer.FadeTo(ResultCounts == null ? 0f : 1f, 200, EasingTypes.Out);
             if (ResultCounts == null) return;
 
-            resultCountsText.Text = pluralize(@"Artist", ResultCounts.Artists) + ", " +
-                                    pluralize(@"Song", ResultCounts.Songs) + ", " +
-                                    pluralize(@"Tag", ResultCounts.Tags);
+            resultCountsText.Text = pluralize("Artist", ResultCounts.Artists) + ", " +
+                                    pluralize("Song", ResultCounts.Songs) + ", " +
+                                    pluralize("Tag", ResultCounts.Tags);
         }
 
         private string pluralize(string prefix, int value)

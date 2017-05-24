@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Direct
                                     {
                                         new OsuSpriteText
                                         {
-                                            Text = @"mapped by ",
+                                            Text = "mapped by ",
                                             TextSize = 14,
                                         },
                                         new OsuSpriteText
@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Direct
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $@"from {SetInfo.Metadata.Source}",
+                                    Text = $"from {SetInfo.Metadata.Source}",
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     TextSize = 14,
