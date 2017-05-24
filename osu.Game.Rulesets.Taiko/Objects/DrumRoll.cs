@@ -5,9 +5,9 @@ using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
@@ -55,11 +55,13 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         private double tickSpacing = 100;
 
-        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
+        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(timing, difficulty);
+            base.ApplyDefaults(controlPointInfo, difficulty);
 
-            tickSpacing = timing.BeatLengthAt(StartTime) / TickRate;
+            TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+
+            tickSpacing = timingPoint.BeatLength / TickRate;
 
             RequiredGoodHits = TotalTicks * Math.Min(0.15, 0.05 + 0.10 / 6 * difficulty.OverallDifficulty);
             RequiredGreatHits = TotalTicks * Math.Min(0.30, 0.10 + 0.20 / 6 * difficulty.OverallDifficulty);
