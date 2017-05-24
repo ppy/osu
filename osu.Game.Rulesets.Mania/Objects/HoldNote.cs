@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Audio;
-using osu.Game.Beatmaps.Timing;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// </summary>
         public HitWindows ReleaseHitWindows { get; protected set; } = new HitWindows();
 
-        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
+        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(timing, difficulty);
+            base.ApplyDefaults(controlPointInfo, difficulty);
 
             ReleaseHitWindows = HitWindows * release_window_lenience;
         }
