@@ -18,21 +18,22 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     internal class HitExplosion : CircularContainer
     {
-        /// <summary>
-        /// The judgement this hit explosion visualises.
-        /// </summary>
         public readonly TaikoJudgement Judgement;
 
         private readonly Box innerFill;
 
-        public HitExplosion(TaikoJudgement judgement)
-        {
-            Judgement = judgement;
+        private readonly bool isRim;
 
-            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER);
+        public HitExplosion(TaikoJudgement judgement, bool isRim)
+        {
+            this.isRim = isRim;
+
+            Judgement = judgement;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+
+            Size = new Vector2(TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_CIRCLE_DIAMETER);
 
             RelativePositionAxes = Axes.Both;
 
@@ -54,22 +55,14 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            switch (Judgement.TaikoResult)
-            {
-                case TaikoHitResult.Good:
-                    innerFill.Colour = colours.Green;
-                    break;
-                case TaikoHitResult.Great:
-                    innerFill.Colour = colours.Blue;
-                    break;
-            }
+            innerFill.Colour = isRim ? colours.BlueDarker : colours.PinkDarker;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            ScaleTo(5f, 1000, EasingTypes.OutQuint);
+            ScaleTo(3f, 1000, EasingTypes.OutQuint);
             FadeOut(500);
 
             Expire();
@@ -80,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         public void VisualiseSecondHit()
         {
-            ResizeTo(Size * TaikoHitObject.STRONG_CIRCLE_DIAMETER_SCALE, 50);
+            ResizeTo(new Vector2(TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER), 50);
         }
     }
 }
