@@ -37,5 +37,7 @@ namespace osu.Desktop.Beatmaps.IO
         {
             // no-op
         }
+
+        public override Stream GetUnderlyingStream() => null;
     }
 }
