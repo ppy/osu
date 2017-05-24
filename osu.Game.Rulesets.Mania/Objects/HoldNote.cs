@@ -16,14 +16,20 @@ namespace osu.Game.Rulesets.Mania.Objects
         public double Duration { get; set; }
         public double EndTime => StartTime + Duration;
 
-        private Note headNote;
-        public Note HeadNote => headNote ?? (headNote = new Note { StartTime = StartTime });
+        private Note head;
+        /// <summary>
+        /// The head note of the hold.
+        /// </summary>
+        public Note Head => head ?? (head = new Note { StartTime = StartTime });
 
-        private Note tailNote;
-        public Note TailNote => tailNote ?? (tailNote = new HoldNoteTail { StartTime = EndTime });
+        private Note tail;
+        /// <summary>
+        /// The tail note of the hold.
+        /// </summary>
+        public Note Tail => tail ?? (tail = new TailNote { StartTime = EndTime });
 
         /// <summary>
-        /// The length (in milliseconds) between ticks of this hold.
+        /// The time between ticks of this hold.
         /// </summary>
         private double tickSpacing = 50;
 
@@ -35,6 +41,9 @@ namespace osu.Game.Rulesets.Mania.Objects
             tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
         }
 
+        /// <summary>
+        /// The scoring scoring ticks of the hold note.
+        /// </summary>
         public IEnumerable<HoldNoteTick> Ticks => ticks ?? (ticks = createTicks());
         private List<HoldNoteTick> ticks;
 
@@ -45,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Objects
             if (tickSpacing == 0)
                 return ret;
 
-            for (double t = StartTime + HeadNote.HitWindows.Great / 2; t <= EndTime - TailNote.HitWindows.Great / 2; t+= tickSpacing)
+            for (double t = StartTime + Head.HitWindows.Great / 2; t <= EndTime - Tail.HitWindows.Great / 2; t+= tickSpacing)
             {
                 ret.Add(new HoldNoteTick
                 {
@@ -54,6 +63,25 @@ namespace osu.Game.Rulesets.Mania.Objects
             }
 
             return ret;
+        }
+
+        /// <summary>
+        /// The tail of the hold note.
+        /// </summary>
+        private class TailNote : Note
+        {
+            /// <summary>
+            /// Lenience of release hit windows. This is to make cases where the hold note release
+            /// is timed alongside presses of other hit objects less awkward.
+            /// </summary>
+            private const double release_window_lenience = 1.5;
+
+            public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+            {
+                base.ApplyDefaults(controlPointInfo, difficulty);
+
+                HitWindows *= release_window_lenience;
+            }
         }
     }
 }

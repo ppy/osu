@@ -478,8 +478,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     Duration = endTime - startTime
                 };
 
-                holdNote.HeadNote.Samples = sampleInfoListAt(startTime);
-                holdNote.TailNote.Samples = sampleInfoListAt(endTime);
+                holdNote.Head.Samples = sampleInfoListAt(startTime);
+                holdNote.Tail.Samples = sampleInfoListAt(endTime);
 
                 newObject = holdNote;
             }

@@ -15,15 +15,19 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
+    /// <summary>
+    /// Visualises a <see cref="HoldNote"/> hit object.
+    /// </summary>
     public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>
     {
-        private readonly DrawableNote headNote;
-        private readonly DrawableNote tailNote;
+        private readonly DrawableNote head;
+        private readonly DrawableNote tail;
+
         private readonly BodyPiece bodyPiece;
         private readonly Container<DrawableHoldNoteTick> tickContainer;
 
         /// <summary>
-        /// Relative time at which the user started holding this note.
+        /// Time at which the user started holding this hold note.
         /// </summary>
         private double holdStartTime;
 
@@ -34,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private bool _holding;
         /// <summary>
-        /// Whether the user is holding the hold note.
+        /// Whether the user is currently holding the hold note.
         /// </summary>
         private bool holding
         {
@@ -71,12 +75,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     RelativeCoordinateSpace = new Vector2(1, (float)HitObject.Duration)
                 },
-                headNote = new DrawableHoldNoteHead(this, key)
+                head = new HeadNote(this, key)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 },
-                tailNote = new DrawableHoldNoteTail(this, key)
+                tail = new TailNote(this, key)
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre
@@ -91,14 +95,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     HoldStartTime = () => holdStartTime
                 };
 
+                // To make the ticks relative to ourselves we need to offset them backwards
                 drawableTick.Y -= (float)HitObject.StartTime;
 
                 tickContainer.Add(drawableTick);
                 AddNested(drawableTick);
             }
 
-            AddNested(headNote);
-            AddNested(tailNote);
+            AddNested(head);
+            AddNested(tail);
         }
 
         public override Color4 AccentColour
@@ -113,8 +118,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tickContainer.Children.ForEach(t => t.AccentColour = value);
 
                 bodyPiece.AccentColour = value;
-                headNote.AccentColour = value;
-                tailNote.AccentColour = value;
+                head.AccentColour = value;
+                tail.AccentColour = value;
             }
         }
 
@@ -163,18 +168,21 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             holding = false;
 
             // If the key has been released too early, they should not receive full score for the release
-            if (!tailNote.Judged)
+            if (!tail.Judged)
                 hasBroken = true;
 
             return true;
         }
 
-        private class DrawableHoldNoteHead : DrawableNote
+        /// <summary>
+        /// The head note of a hold.
+        /// </summary>
+        private class HeadNote : DrawableNote
         {
             private readonly DrawableHoldNote holdNote;
 
-            public DrawableHoldNoteHead(DrawableHoldNote holdNote, Bindable<Key> key = null)
-                : base(holdNote.HitObject.HeadNote, key)
+            public HeadNote(DrawableHoldNote holdNote, Bindable<Key> key = null)
+                : base(holdNote.HitObject.Head, key)
             {
                 this.holdNote = holdNote;
 
@@ -201,12 +209,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        private class DrawableHoldNoteTail : DrawableNote
+        /// <summary>
+        /// The tail note of a hold.
+        /// </summary>
+        private class TailNote : DrawableNote
         {
             private readonly DrawableHoldNote holdNote;
 
-            public DrawableHoldNoteTail(DrawableHoldNote holdNote, Bindable<Key> key = null)
-                : base(holdNote.HitObject.TailNote, key)
+            public TailNote(DrawableHoldNote holdNote, Bindable<Key> key = null)
+                : base(holdNote.HitObject.Tail, key)
             {
                 this.holdNote = holdNote;
 
