@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override DropdownMenuItem<T> CreateMenuItem(string text, T value) => new OsuDropdownMenuItem(text, value) { AccentColour = AccentColour };
 
-        private class OsuDropdownMenuItem : DropdownMenuItem<T>
+        public class OsuDropdownMenuItem : DropdownMenuItem<T>
         {
             public OsuDropdownMenuItem(string text, T current) : base(text, current)
             {
@@ -115,11 +115,11 @@ namespace osu.Game.Graphics.UserInterface
 
         public class OsuDropdownHeader : DropdownHeader
         {
-            private readonly SpriteText label;
+            protected readonly SpriteText Text;
             protected override string Label
             {
-                get { return label.Text; }
-                set { label.Text = value; }
+                get { return Text.Text; }
+                set { Text.Text = value; }
             }
 
             protected readonly TextAwesome Icon;
@@ -146,7 +146,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 Foreground.Children = new Drawable[]
                 {
-                    label = new OsuSpriteText
+                    Text = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
