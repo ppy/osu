@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Menu
 
         public MenuSideFlashes()
         {
+            EarlyActivationMilliseconds = box_fade_in_time;
+
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
