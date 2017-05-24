@@ -11,6 +11,7 @@ using osu.Framework.Input;
 using OpenTK;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -108,6 +109,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (base.AccentColour == value)
                     return;
                 base.AccentColour = value;
+
+                tickContainer.Children.ForEach(t => t.AccentColour = value);
 
                 bodyPiece.AccentColour = value;
                 headNote.AccentColour = value;

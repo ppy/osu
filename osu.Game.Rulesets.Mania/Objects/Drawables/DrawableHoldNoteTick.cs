@@ -2,12 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
-using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -18,19 +18,55 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public Func<double> HoldStartTime;
         public Func<bool> IsHolding;
 
+        private readonly Container glowContainer;
+
         public DrawableHoldNoteTick(HoldNoteTick hitObject)
             : base(hitObject, null)
         {
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.TopCentre;
+
             RelativeSizeAxes = Axes.X;
+            Size = new Vector2(1);
 
             Children = new[]
             {
-                new Box
+                glowContainer = new CircularContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        }
+                    }
                 }
             };
+
+            AccentColour = Color4.White;
+        }
+
+        public override Color4 AccentColour
+        {
+            get { return base.AccentColour; }
+            set
+            {
+                base.AccentColour = value;
+
+                glowContainer.EdgeEffect = new EdgeEffect
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 2f,
+                    Roundness = 15f,
+                    Colour = value.Opacity(0.3f)
+                };
+            }
         }
 
         protected override ManiaJudgement CreateJudgement() => new HoldNoteTickJudgement();
@@ -56,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             switch (State)
             {
                 case ArmedState.Hit:
-                    Colour = Color4.Green;
+                    AccentColour = Color4.Green;
                     break;
             }
         }
