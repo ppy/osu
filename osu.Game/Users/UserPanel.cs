@@ -41,13 +41,15 @@ namespace osu.Game.Users
                 Radius = 4,
             };
 
-            Container cover;
             Children = new Drawable[]
             {
-                cover = new Container
+                new AsyncLoadWrapper(new CoverBackgroundSprite(user)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    FillMode = FillMode.Fill,
+                    OnLoadComplete = d => d.FadeInFromZero(200),
+                }) { RelativeSizeAxes = Axes.Both },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -156,14 +158,6 @@ namespace osu.Game.Users
                     },
                 },
             };
-
-            cover.Add(new AsyncLoadWrapper(new CoverBackgroundSprite(user)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fill,
-                OnLoadComplete = d => d.FadeInFromZero(200),
-            }) { RelativeSizeAxes = Axes.Both });
 
             Status.ValueChanged += displayStatus;
         }
