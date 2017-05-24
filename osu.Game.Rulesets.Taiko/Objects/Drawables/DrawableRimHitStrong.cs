@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private void load(OsuColour colours)
         {
             MainPiece.AccentColour = colours.BlueDarker;
+            MainPiece.KiaiFlashColour = colours.BlueLight;
         }
     }
 }

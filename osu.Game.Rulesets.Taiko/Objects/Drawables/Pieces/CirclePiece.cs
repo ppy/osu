@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             if (beatIndex % (int)timingPoint.TimeSignature != 0)
                 return;
 
-            background.FadeEdgeEffectTo(Color4.White);
+            background.FadeEdgeEffectTo(KiaiFlashColour);
             using (BeginDelayedSequence(200))
                 background.FadeEdgeEffectTo(AccentColour, 500, EasingTypes.OutQuint);
         }
