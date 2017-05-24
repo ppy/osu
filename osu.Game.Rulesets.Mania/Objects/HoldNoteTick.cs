@@ -3,6 +3,9 @@
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
+    /// <summary>
+    /// A scoring tick of a hold note.
+    /// </summary>
     public class HoldNoteTick : ManiaHitObject
     {
     }

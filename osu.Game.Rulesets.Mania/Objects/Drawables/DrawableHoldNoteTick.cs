@@ -13,9 +13,19 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
+    /// <summary>
+    /// Visualises a <see cref="HoldNoteTick"/> hit object.
+    /// </summary>
     public class DrawableHoldNoteTick : DrawableManiaHitObject<HoldNoteTick>
     {
+        /// <summary>
+        /// References the time at which the user started holding the hold note.
+        /// </summary>
         public Func<double> HoldStartTime;
+
+        /// <summary>
+        /// References whether the user is currently holding the hold note.
+        /// </summary>
         public Func<bool> IsHolding;
 
         private readonly Container glowContainer;
@@ -49,6 +59,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 }
             };
 
+            // Set the default glow
             AccentColour = Color4.White;
         }
 

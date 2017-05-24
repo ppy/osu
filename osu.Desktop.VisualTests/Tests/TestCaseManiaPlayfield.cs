@@ -66,7 +66,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 Clear();
 
-                var rateAdjustClock = new StopwatchClock(true) { Rate = 0.2 };
+                var rateAdjustClock = new StopwatchClock(true) { Rate = 0.5 };
 
                 ManiaPlayfield playField;
                 Add(playField = new ManiaPlayfield(4, new List<TimingChange> { new TimingChange { BeatLength = 200 } })
@@ -83,7 +83,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         StartTime = t,
                         Column = 0
-                    }, new Bindable<Key>(Key.J)));
+                    }, new Bindable<Key>(Key.D)));
 
                     playField.Add(new DrawableNote(new Note
                     {
@@ -125,7 +125,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Right special style", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Right));
             AddWaitStep(10);
 
-            AddStep("Test", () => createPlayfieldWithNotesAcceptingInput());
+            AddStep("Notes with input", () => createPlayfieldWithNotesAcceptingInput());
         }
 
         private void triggerKeyDown(Column column)
