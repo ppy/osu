@@ -2,10 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Mania.Objects
@@ -28,6 +26,14 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// The length (in milliseconds) between ticks of this hold.
         /// </summary>
         private double tickSpacing = 50;
+
+        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        {
+            base.ApplyDefaults(controlPointInfo, difficulty);
+
+            TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+            tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
+        }
 
         public IEnumerable<HoldNoteTick> Ticks => ticks ?? (ticks = createTicks());
         private List<HoldNoteTick> ticks;
