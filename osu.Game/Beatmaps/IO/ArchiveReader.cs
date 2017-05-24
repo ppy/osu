@@ -63,5 +63,7 @@ namespace osu.Game.Beatmaps.IO
                 return buffer;
             }
         }
+
+        public abstract Stream GetUnderlyingStream();
     }
 }

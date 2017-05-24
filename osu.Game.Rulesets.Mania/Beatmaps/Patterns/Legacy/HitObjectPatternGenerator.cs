@@ -6,7 +6,7 @@ using System.Linq;
 using OpenTK;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Timing;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
@@ -25,16 +25,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         {
             StairType = lastStair;
 
-            ControlPoint overridePoint;
-            ControlPoint controlPoint = beatmap.TimingInfo.TimingPointAt(hitObject.StartTime, out overridePoint);
+            TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
+            EffectControlPoint effectPoint = beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime);
 
             var positionData = hitObject as IHasPosition;
 
             float positionSeparation = ((positionData?.Position ?? Vector2.Zero) - previousPosition).Length;
             double timeSeparation = hitObject.StartTime - previousTime;
-
-            double beatLength = controlPoint.BeatLength;
-            bool kiai = (overridePoint ?? controlPoint).KiaiMode;
 
             if (timeSeparation <= 125)
             {
@@ -72,12 +69,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 // More than 100 BPM stream
                 convertType |= PatternType.ForceStack | PatternType.LowProbability;
             }
-            else if (positionSeparation < 20 && density >= beatLength / 2.5)
+            else if (positionSeparation < 20 && density >= timingPoint.BeatLength / 2.5)
             {
                 // Low density stream
                 convertType |= PatternType.Reverse | PatternType.LowProbability;
             }
-            else if (density < beatLength / 2.5 || kiai)
+            else if (density < timingPoint.BeatLength / 2.5 || effectPoint.KiaiMode)
             {
                 // High density
             }

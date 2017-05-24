@@ -78,6 +78,7 @@
     <Compile Include="Mods\ManiaMod.cs" />
     <Compile Include="UI\SpecialColumnPosition.cs" />
     <Compile Include="Timing\ControlPointContainer.cs" />
+    <Compile Include="Timing\TimingChange.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
