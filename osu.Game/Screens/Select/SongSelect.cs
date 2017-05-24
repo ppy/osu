@@ -319,7 +319,10 @@ namespace osu.Game.Screens.Select
             bool beatmapSetChange = false;
 
             if (beatmap.Equals(Beatmap?.BeatmapInfo))
+            {
+                selectionChangedDebounce?.Cancel();
                 return;
+            }
 
             if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
                 sampleChangeDifficulty.Play();
@@ -330,7 +333,7 @@ namespace osu.Game.Screens.Select
             }
 
             selectionChangeNoBounce = beatmap;
-
+            
             selectionChangedDebounce?.Cancel();
             selectionChangedDebounce = Scheduler.AddDelayed(delegate
             {
