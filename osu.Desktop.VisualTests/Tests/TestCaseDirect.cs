@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Database;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Direct;
 
 namespace osu.Desktop.VisualTests.Tests
 {

@@ -223,7 +223,7 @@ namespace osu.Game.Overlays
 
         public enum PanelDisplayStyle
         {
-	        Grid,
+            Grid,
             List,
         }
     }
