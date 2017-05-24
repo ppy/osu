@@ -209,16 +209,16 @@ namespace osu.Game.Overlays
 
         public class ResultCounts
         {
-        	public readonly int Artists;
-        	public readonly int Songs;
-        	public readonly int Tags;
+            public readonly int Artists;
+            public readonly int Songs;
+            public readonly int Tags;
 
-        	public ResultCounts(int artists, int songs, int tags)
-        	{
-        		Artists = artists;
-        		Songs = songs;
-        		Tags = tags;
-        	}
+            public ResultCounts(int artists, int songs, int tags)
+            {
+                Artists = artists;
+                Songs = songs;
+                Tags = tags;
+            }
         }
 
         public enum PanelDisplayStyle
