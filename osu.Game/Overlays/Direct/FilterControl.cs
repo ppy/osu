@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.ComponentModel;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -13,8 +12,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-
-using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -30,7 +27,7 @@ namespace osu.Game.Overlays.Direct
         public readonly SearchTextBox Search;
         public readonly SortTabControl SortTabs;
         public readonly OsuEnumDropdown<RankStatus> RankStatusDropdown;
-        public readonly Bindable<PanelDisplayStyle> DisplayStyle = new Bindable<PanelDisplayStyle>();
+        public readonly Bindable<DirectOverlay.PanelDisplayStyle> DisplayStyle = new Bindable<DirectOverlay.PanelDisplayStyle>();
 
         protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || RankStatusDropdown.Contains(screenSpacePos);
 
@@ -38,7 +35,7 @@ namespace osu.Game.Overlays.Direct
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
-            DisplayStyle.Value = PanelDisplayStyle.Grid;
+            DisplayStyle.Value = DirectOverlay.PanelDisplayStyle.Grid;
 
             Children = new Drawable[]
             {
@@ -96,8 +93,8 @@ namespace osu.Game.Overlays.Direct
                             Direction = FillDirection.Horizontal,
                             Children = new[]
                             {
-                                new DisplayStyleToggleButton(FontAwesome.fa_th_large, PanelDisplayStyle.Grid, DisplayStyle),
-                                new DisplayStyleToggleButton(FontAwesome.fa_list_ul, PanelDisplayStyle.List, DisplayStyle),
+                                new DisplayStyleToggleButton(FontAwesome.fa_th_large, DirectOverlay.PanelDisplayStyle.Grid, DisplayStyle),
+                                new DisplayStyleToggleButton(FontAwesome.fa_list_ul, DirectOverlay.PanelDisplayStyle.List, DisplayStyle),
                             },
                         },
                         RankStatusDropdown = new SlimEnumDropdown<RankStatus>
@@ -195,10 +192,10 @@ namespace osu.Game.Overlays.Direct
         private class DisplayStyleToggleButton : ClickableContainer
         {
             private readonly TextAwesome icon;
-            private readonly PanelDisplayStyle style;
-            private readonly Bindable<PanelDisplayStyle> bindable;
+            private readonly DirectOverlay.PanelDisplayStyle style;
+            private readonly Bindable<DirectOverlay.PanelDisplayStyle> bindable;
 
-            public DisplayStyleToggleButton(FontAwesome icon, PanelDisplayStyle style, Bindable<PanelDisplayStyle> bindable)
+            public DisplayStyleToggleButton(FontAwesome icon, DirectOverlay.PanelDisplayStyle style, Bindable<DirectOverlay.PanelDisplayStyle> bindable)
             {
                 this.bindable = bindable;
                 this.style = style;
@@ -222,7 +219,7 @@ namespace osu.Game.Overlays.Direct
                 Action = () => bindable.Value = this.style;
             }
 
-            private void Bindable_ValueChanged(PanelDisplayStyle style)
+            private void Bindable_ValueChanged(DirectOverlay.PanelDisplayStyle style)
             {
                 icon.FadeTo(style == this.style ? 1.0f : 0.5f, 100);
             }
@@ -232,41 +229,5 @@ namespace osu.Game.Overlays.Direct
                 bindable.ValueChanged -= Bindable_ValueChanged;
             }
         }
-    }
-
-    public class ResultCounts
-    {
-        public readonly int Artists;
-        public readonly int Songs;
-        public readonly int Tags;
-
-        public ResultCounts(int artists, int songs, int tags)
-        {
-            Artists = artists;
-            Songs = songs;
-            Tags = tags;
-        }
-    }
-
-    public enum RankStatus
-    {
-        Any,
-        [Description("Ranked & Approved")]
-        RankedApproved,
-        Approved,
-        Loved,
-        Favourites,
-        [Description("Mod Requests")]
-        ModRequests,
-        Pending,
-        Graveyard,
-        [Description("My Maps")]
-        MyMaps,
-    }
-
-    public enum PanelDisplayStyle
-    {
-        Grid,
-        List,
     }
 }
