@@ -77,31 +77,34 @@ namespace osu.Desktop.VisualTests.Tests
                     Clock = new FramedClock(rateAdjustClock)
                 });
 
-                playField.Add(new DrawableNote(new Note
+                for (int t = 1000; t <= 2000; t += 100)
                 {
-                    StartTime = 1000,
-                    Column = 0
-                }, new Bindable<Key>(Key.D)));
+                    playField.Add(new DrawableNote(new Note
+                    {
+                        StartTime = t,
+                        Column = 0
+                    }, new Bindable<Key>(Key.J)));
+
+                    playField.Add(new DrawableNote(new Note
+                    {
+                        StartTime = t,
+                        Column = 3
+                    }, new Bindable<Key>(Key.K)));
+                }
 
                 playField.Add(new DrawableHoldNote(new HoldNote
                 {
                     StartTime = 1000,
-                    Duration = 2000,
+                    Duration = 1000,
                     Column = 1
                 }, new Bindable<Key>(Key.F)));
 
                 playField.Add(new DrawableHoldNote(new HoldNote
                 {
                     StartTime = 1000,
-                    Duration = 2000,
+                    Duration = 1000,
                     Column = 2
                 }, new Bindable<Key>(Key.J)));
-
-                playField.Add(new DrawableNote(new Note
-                {
-                    StartTime = 1000,
-                    Column = 3
-                }, new Bindable<Key>(Key.K)));
             };
 
             AddStep("1 column", () => createPlayfield(1, SpecialColumnPosition.Normal));
