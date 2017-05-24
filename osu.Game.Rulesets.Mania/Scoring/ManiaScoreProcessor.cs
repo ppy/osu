@@ -22,5 +22,12 @@ namespace osu.Game.Rulesets.Mania.Scoring
         protected override void OnNewJudgement(ManiaJudgement judgement)
         {
         }
+
+        protected override void Reset()
+        {
+            base.Reset();
+
+            Health.Value = 1;
+        }
     }
 }
