@@ -176,13 +176,23 @@ namespace osu.Game.Users
 
         private void displayStatus(UserStatus status)
         {
-            statusBar.ResizeHeightTo(status == null ? 0f : status_height, 500, EasingTypes.OutQuint);
-            statusBar.FadeTo(status == null ? 0f : 1f, 500, EasingTypes.OutQuint);
-            ResizeHeightTo(status == null ? height - status_height : height, 500, EasingTypes.OutQuint);
-            if (status == null) return;
+            float transition_duration = 500;
 
-            statusBg.FadeColour(status.GetAppropriateColour(colours), 500, EasingTypes.OutQuint);
-            statusMessage.Text = status.Message;
+            if (status == null)
+            {
+                statusBar.ResizeHeightTo(0f, transition_duration, EasingTypes.OutQuint);
+                statusBar.FadeOut(transition_duration, EasingTypes.OutQuint);
+                ResizeHeightTo(height - status_height, transition_duration, EasingTypes.OutQuint);
+            }
+            else
+            {
+                statusBar.ResizeHeightTo(status_height, transition_duration, EasingTypes.OutQuint);
+                statusBar.FadeIn(transition_duration, EasingTypes.OutQuint);
+                ResizeHeightTo(height, transition_duration, EasingTypes.OutQuint);
+
+                statusBg.FadeColour(status.GetAppropriateColour(colours), 500, EasingTypes.OutQuint);
+                statusMessage.Text = status.Message;
+            }
         }
 
         private class CoverBackgroundSprite : Sprite
