@@ -42,14 +42,14 @@ namespace osu.Game.Overlays
             }
         }
 
-        private ResultCounts resultCounts;
+        private ResultCounts resultAmounts;
         public ResultCounts ResultAmounts
         {
-            get { return resultCounts; }
+            get { return resultAmounts; }
             set
             {
                 if (value == ResultAmounts) return;
-                resultCounts = value;
+                resultAmounts = value;
 
                 updateResultCounts();
             }
