@@ -225,7 +225,7 @@ namespace osu.Game.Overlays
                 progressBar.UpdatePosition(track.Length == 0 ? 0 : (float)(track.CurrentTime / track.Length));
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping) next();
+                if (track.HasCompleted && !track.Looping && !progressBar.IsSeeking) next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
