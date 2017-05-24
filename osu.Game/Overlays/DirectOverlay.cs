@@ -46,7 +46,7 @@ namespace osu.Game.Overlays
             get { return resultCounts; }
             set
             {
-                if (value == ResultCounts) return;
+                if (value == resultCounts) return;
                 resultCounts = value;
 
                 updateResultCounts();
