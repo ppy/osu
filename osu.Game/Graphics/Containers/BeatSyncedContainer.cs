@@ -12,20 +12,26 @@ namespace osu.Game.Graphics.Containers
 {
     public class BeatSyncedContainer : Container
     {
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private int lastBeat;
         private TimingControlPoint lastTimingPoint;
 
+        /// <summary>
+        /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, TrackAmplitudes)"/>.
+        /// This allows for adding easing to animations that may be synchronised to the beat.
+        /// </summary>
+        protected double EarlyActivationMilliseconds;
+
         protected override void Update()
         {
-            if (beatmap.Value?.Track == null)
+            if (Beatmap.Value?.Track == null)
                 return;
 
-            double currentTrackTime = beatmap.Value.Track.CurrentTime;
+            double currentTrackTime = Beatmap.Value.Track.CurrentTime + EarlyActivationMilliseconds;
 
-            TimingControlPoint timingPoint = beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
-            EffectControlPoint effectPoint = beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
+            TimingControlPoint timingPoint = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
+            EffectControlPoint effectPoint = Beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
 
             if (timingPoint.BeatLength == 0)
                 return;
@@ -42,7 +48,7 @@ namespace osu.Game.Graphics.Containers
             double offsetFromBeat = (timingPoint.Time - currentTrackTime) % timingPoint.BeatLength;
 
             using (BeginDelayedSequence(offsetFromBeat, true))
-                OnNewBeat(beatIndex, timingPoint, effectPoint, beatmap.Value.Track.CurrentAmplitudes);
+                OnNewBeat(beatIndex, timingPoint, effectPoint, Beatmap.Value.Track.CurrentAmplitudes);
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;
@@ -51,7 +57,7 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
-            beatmap.BindTo(game.Beatmap);
+            Beatmap.BindTo(game.Beatmap);
         }
 
         protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
