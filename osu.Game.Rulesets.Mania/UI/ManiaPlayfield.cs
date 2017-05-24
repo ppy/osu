@@ -19,7 +19,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Framework.Input;
-using osu.Game.Beatmaps.Timing;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 
@@ -55,7 +54,8 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public readonly FlowContainer<Column> Columns;
+        private readonly FlowContainer<Column> columns;
+        public IEnumerable<Column> Columns => columns.Children;
 
         private readonly ControlPointContainer barlineContainer;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly int columnCount;
 
-        public ManiaPlayfield(int columnCount, IEnumerable<ControlPoint> timingChanges)
+        public ManiaPlayfield(int columnCount, IEnumerable<TimingChange> timingChanges)
         {
             this.columnCount = columnCount;
 
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Black
                         },
-                        Columns = new FillFlowContainer<Column>
+                        columns = new FillFlowContainer<Column>
                         {
                             Name = "Columns",
                             RelativeSizeAxes = Axes.Y,
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < columnCount; i++)
-                Columns.Add(new Column(timingChanges));
+                columns.Add(new Column(timingChanges));
 
             TimeSpan = time_span_default;
         }
@@ -133,17 +133,17 @@ namespace osu.Game.Rulesets.Mania.UI
             // Set the special column + colour + key
             for (int i = 0; i < columnCount; i++)
             {
-                Column column = Columns.Children.ElementAt(i);
+                Column column = Columns.ElementAt(i);
                 column.IsSpecial = isSpecialColumn(i);
 
                 if (!column.IsSpecial)
                     continue;
 
-                column.Key = Key.Space;
+                column.Key.Value = Key.Space;
                 column.AccentColour = specialColumnColour;
             }
 
-            var nonSpecialColumns = Columns.Children.Where(c => !c.IsSpecial).ToList();
+            var nonSpecialColumns = Columns.Where(c => !c.IsSpecial).ToList();
 
             // We'll set the colours of the non-special columns in a separate loop, because the non-special
             // column colours are mirrored across their centre and special styles mess with this
@@ -162,11 +162,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 int keyOffset = default_keys.Length / 2 - nonSpecialColumns.Count / 2 + i;
                 if (keyOffset >= 0 && keyOffset < default_keys.Length)
-                    column.Key = default_keys[keyOffset];
+                    column.Key.Value = default_keys[keyOffset];
                 else
                     // There is no default key defined for this column. Let's set this to Unknown for now
                     // however note that this will be gone after bindings are in place
-                    column.Key = Key.Unknown;
+                    column.Key.Value = Key.Unknown;
             }
         }
 
@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.Children.ElementAt(h.HitObject.Column).Add(h);
+        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 timeSpan = MathHelper.Clamp(timeSpan, time_span_min, time_span_max);
 
                 barlineContainer.TimeSpan = value;
-                Columns.Children.ForEach(c => c.ControlPointContainer.TimeSpan = value);
+                Columns.ForEach(c => c.ControlPointContainer.TimeSpan = value);
             }
         }
 

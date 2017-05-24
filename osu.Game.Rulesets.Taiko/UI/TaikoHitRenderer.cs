@@ -17,6 +17,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
 using OpenTK;
 using osu.Game.Rulesets.Beatmaps;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             TaikoHitObject lastObject = Beatmap.HitObjects[Beatmap.HitObjects.Count - 1];
             double lastHitTime = 1 + (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
 
-            var timingPoints = Beatmap.TimingInfo.ControlPoints.FindAll(cp => cp.TimingChange);
+            var timingPoints = Beatmap.ControlPointInfo.TimingPoints.ToList();
 
             if (timingPoints.Count == 0)
                 return;
@@ -68,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     StartTime = time,
                 };
 
-                barLine.ApplyDefaults(Beatmap.TimingInfo, Beatmap.BeatmapInfo.Difficulty);
+                barLine.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.Difficulty);
 
                 bool isMajor = currentBeat % (int)currentPoint.TimeSignature == 0;
                 taikoPlayfield.AddBarLine(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));

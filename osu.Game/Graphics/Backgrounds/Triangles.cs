@@ -44,6 +44,11 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         public bool HideAlphaDiscrepancies = true;
 
+        /// <summary>
+        /// The relative velocity of the triangles. Default is 1.
+        /// </summary>
+        public float Velocity = 1;
+
         public float TriangleScale
         {
             get { return triangleScale; }
@@ -78,7 +83,7 @@ namespace osu.Game.Graphics.Backgrounds
             foreach (var t in Children)
             {
                 t.Alpha = adjustedAlpha;
-                t.Position -= new Vector2(0, (float)(t.Scale.X * (50 / DrawHeight) * (Time.Elapsed / 950)) / triangleScale);
+                t.Position -= new Vector2(0, (float)(t.Scale.X * (50 / DrawHeight) * (Time.Elapsed / 950)) / triangleScale * Velocity);
                 if (ExpireOffScreenTriangles && t.DrawPosition.Y + t.DrawSize.Y * t.Scale.Y < 0)
                     t.Expire();
             }
