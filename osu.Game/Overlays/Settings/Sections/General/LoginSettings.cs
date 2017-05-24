@@ -72,10 +72,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     };
                     break;
                 case APIState.Online:
-                    UserPanel p;
                     Children = new Drawable[]
                     {
-                        p = new UserPanel(api.LocalUser.Value)
+                        new UserPanel(api.LocalUser.Value)
                         {
                             RelativeSizeAxes = Axes.X,
                         },
@@ -86,7 +85,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             Action = api.Logout
                         }
                     };
-                    p.Status.Value = new UserStatusOnline();
                     break;
             }
 

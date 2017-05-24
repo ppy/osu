@@ -23,6 +23,7 @@ namespace osu.Game.Users
 
         private OsuColour colours;
 
+        private readonly Container statusBar;
         private readonly Box statusBg;
         private readonly OsuSpriteText statusMessage;
 
@@ -30,7 +31,7 @@ namespace osu.Game.Users
 
         public UserPanel(User user)
         {
-            Height = height;
+            Height = height - status_height;
             Masking = true;
             CornerRadius = 5;
             EdgeEffect = new EdgeEffect
@@ -54,8 +55,9 @@ namespace osu.Game.Users
                 },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = content_padding, Bottom = status_height + content_padding, Left = content_padding, Right = content_padding },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Top = content_padding, Left = content_padding, Right = content_padding },
                     Children = new Drawable[]
                     {
                         new UpdateableAvatar
@@ -114,12 +116,12 @@ namespace osu.Game.Users
                         },
                     },
                 },
-                new Container
+                statusBar = new Container
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    Height = status_height,
+                    Alpha = 0f,
                     Children = new Drawable[]
                     {
                         statusBg = new Box
@@ -174,6 +176,11 @@ namespace osu.Game.Users
 
         private void displayStatus(UserStatus status)
         {
+            statusBar.ResizeHeightTo(status == null ? 0f : status_height, 500, EasingTypes.OutQuint);
+            statusBar.FadeTo(status == null ? 0f : 1f, 500, EasingTypes.OutQuint);
+            ResizeHeightTo(status == null ? height - status_height : height, 500, EasingTypes.OutQuint);
+            if (status == null) return;
+
             statusBg.FadeColour(status.GetAppropriateColour(colours), 500, EasingTypes.OutQuint);
             statusMessage.Text = status.Message;
         }
