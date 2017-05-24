@@ -2,58 +2,65 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Timing;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Graphics.Containers
 {
     public class BeatSyncedContainer : Container
     {
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private int lastBeat;
-        private ControlPoint lastControlPoint;
+        private TimingControlPoint lastTimingPoint;
+
+        /// <summary>
+        /// The amount of time before a beat we should fire <see cref="OnNewBeat(int, TimingControlPoint, EffectControlPoint, TrackAmplitudes)"/>.
+        /// This allows for adding easing to animations that may be synchronised to the beat.
+        /// </summary>
+        protected double EarlyActivationMilliseconds;
 
         protected override void Update()
         {
-            if (beatmap.Value?.Track == null)
+            if (Beatmap.Value?.Track == null)
                 return;
 
-            double currentTrackTime = beatmap.Value.Track.CurrentTime;
-            ControlPoint overridePoint;
-            ControlPoint controlPoint = beatmap.Value.Beatmap.TimingInfo.TimingPointAt(currentTrackTime, out overridePoint);
+            double currentTrackTime = Beatmap.Value.Track.CurrentTime + EarlyActivationMilliseconds;
 
-            if (controlPoint.BeatLength == 0)
+            TimingControlPoint timingPoint = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
+            EffectControlPoint effectPoint = Beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
+
+            if (timingPoint.BeatLength == 0)
                 return;
 
-            bool kiai = (overridePoint ?? controlPoint).KiaiMode;
-            int beat = (int)((currentTrackTime - controlPoint.Time) / controlPoint.BeatLength);
+            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / timingPoint.BeatLength);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
-            if (currentTrackTime < controlPoint.Time)
-                beat--;
+            if (currentTrackTime < timingPoint.Time)
+                beatIndex--;
 
-            if (controlPoint == lastControlPoint && beat == lastBeat)
+            if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
                 return;
 
-            double offsetFromBeat = (controlPoint.Time - currentTrackTime) % controlPoint.BeatLength;
+            double offsetFromBeat = (timingPoint.Time - currentTrackTime) % timingPoint.BeatLength;
 
             using (BeginDelayedSequence(offsetFromBeat, true))
-                OnNewBeat(beat, controlPoint.BeatLength, controlPoint.TimeSignature, kiai);
+                OnNewBeat(beatIndex, timingPoint, effectPoint, Beatmap.Value.Track.CurrentAmplitudes);
 
-            lastBeat = beat;
-            lastControlPoint = controlPoint;
+            lastBeat = beatIndex;
+            lastTimingPoint = timingPoint;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
-            beatmap.BindTo(game.Beatmap);
+            Beatmap.BindTo(game.Beatmap);
         }
 
-        protected virtual void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
+        protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
         }
     }
