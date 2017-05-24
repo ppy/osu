@@ -471,14 +471,17 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             }
             else
             {
-                newObject = new HoldNote
+                var holdNote = new HoldNote
                 {
                     StartTime = startTime,
-                    Samples = sampleInfoListAt(startTime),
-                    EndSamples = sampleInfoListAt(endTime),
                     Column = column,
                     Duration = endTime - startTime
                 };
+
+                holdNote.HeadNote.Samples = sampleInfoListAt(startTime);
+                holdNote.TailNote.Samples = sampleInfoListAt(endTime);
+
+                newObject = holdNote;
             }
 
             pattern.Add(newObject);
