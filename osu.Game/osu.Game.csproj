@@ -189,6 +189,7 @@
     <Compile Include="Database\RulesetDatabase.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
+    <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
     <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />
     <Compile Include="Screens\Play\HUDOverlay.cs" />
     <Compile Include="Screens\Play\HUD\StandardHealthDisplay.cs" />
