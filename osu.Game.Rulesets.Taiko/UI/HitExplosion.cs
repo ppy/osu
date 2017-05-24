@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// A circle explodes from the hit target to indicate a hitobject has been hit.
     /// </summary>
-    internal class HitExplosion : Container
+    internal class HitExplosion : CircularContainer
     {
         public readonly TaikoJudgement Judgement;
 
@@ -30,11 +30,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             Judgement = judgement;
 
-            RelativeSizeAxes = Axes.Y;
-            Width = TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_CIRCLE_DIAMETER;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
 
-            Anchor = Anchor.CentreLeft;
-            Origin = Anchor.CentreLeft;
+            Size = new Vector2(TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_CIRCLE_DIAMETER);
 
             RelativePositionAxes = Axes.Both;
 
@@ -63,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             base.LoadComplete();
 
-            ScaleTo(new Vector2(2f, 1), 1000, EasingTypes.OutQuint);
+            ScaleTo(3f, 1000, EasingTypes.OutQuint);
             FadeOut(500);
 
             Expire();
@@ -74,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         public void VisualiseSecondHit()
         {
-            ResizeTo(new Vector2(TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER, 1), 50);
+            ResizeTo(new Vector2(TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER), 50);
         }
     }
 }

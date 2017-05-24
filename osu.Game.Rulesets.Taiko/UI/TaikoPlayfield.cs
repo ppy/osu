@@ -90,11 +90,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                             Margin = new MarginPadding { Left = left_area_size },
                             Children = new Drawable[]
                             {
-                                hitExplosionContainer = new Container<HitExplosion>
-                                {
-                                    RelativeSizeAxes = Axes.Y,
-                                    BlendingMode = BlendingMode.Additive
-                                },
                                 new Container
                                 {
                                     Name = "Masked elements",
@@ -103,6 +98,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Masking = true,
                                     Children = new Drawable[]
                                     {
+                                        hitExplosionContainer = new Container<HitExplosion>
+                                        {
+                                            RelativeSizeAxes = Axes.Y,
+                                            BlendingMode = BlendingMode.Additive,
+                                        },
                                         barLineContainer = new Container<DrawableBarLine>
                                         {
                                             RelativeSizeAxes = Axes.Both,
