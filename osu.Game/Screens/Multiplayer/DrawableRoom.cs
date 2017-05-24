@@ -245,5 +245,15 @@ namespace osu.Game.Screens.Multiplayer
                 beatmapArtist.Text = string.Empty;
             }
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            Room.Name.ValueChanged -= displayName;
+            Room.Host.ValueChanged -= displayUser;
+            Room.Status.ValueChanged -= displayStatus;
+            Room.Beatmap.ValueChanged -= displayBeatmap;
+
+            base.Dispose(isDisposing);
+        }
     }
 }
