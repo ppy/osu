@@ -189,7 +189,12 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
+        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h)
+        {
+            h.Depth = (float)h.HitObject.StartTime;
+
+            Columns.ElementAt(h.HitObject.Column).Add(h);
+        }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
