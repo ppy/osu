@@ -12,6 +12,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using OpenTK;
 using osu.Framework.Input;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
@@ -73,9 +74,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 case APIState.Online:
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        new UserPanel(api.LocalUser.Value)
                         {
-                            Text = $"Connected as {api.Username}!",
+                            RelativeSizeAxes = Axes.X,
                         },
                         new OsuButton
                         {

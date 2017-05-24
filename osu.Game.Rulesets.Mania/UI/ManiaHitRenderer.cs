@@ -2,19 +2,22 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Timing;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -33,22 +36,32 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
         {
-            ControlPoint firstTimingChange = Beatmap.TimingInfo.ControlPoints.FirstOrDefault(t => t.TimingChange);
+            double lastSpeedMultiplier = 1;
+            double lastBeatLength = 500;
 
-            if (firstTimingChange == null)
-                throw new InvalidOperationException("The Beatmap contains no timing points!");
+            // Merge timing + difficulty points
+            var allPoints = new SortedList<ControlPoint>(Comparer<ControlPoint>.Default);
+            allPoints.AddRange(Beatmap.ControlPointInfo.TimingPoints);
+            allPoints.AddRange(Beatmap.ControlPointInfo.DifficultyPoints);
 
             // Generate the timing points, making non-timing changes use the previous timing change
-            var timingChanges = Beatmap.TimingInfo.ControlPoints.Select(c =>
+            var timingChanges = allPoints.Select(c =>
             {
-                ControlPoint t = c.Clone();
+                var timingPoint = c as TimingControlPoint;
+                var difficultyPoint = c as DifficultyControlPoint;
 
-                if (c.TimingChange)
-                    firstTimingChange = c;
-                else
-                    t.BeatLength = firstTimingChange.BeatLength;
+                if (timingPoint != null)
+                    lastBeatLength = timingPoint.BeatLength;
 
-                return t;
+                if (difficultyPoint != null)
+                    lastSpeedMultiplier = difficultyPoint.SpeedMultiplier;
+
+                return new TimingChange
+                {
+                    Time = c.Time,
+                    BeatLength = lastBeatLength,
+                    SpeedMultiplier = lastSpeedMultiplier
+                };
             });
 
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
