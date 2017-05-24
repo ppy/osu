@@ -439,6 +439,7 @@
     <Compile Include="Database\BeatmapOnlineInfo.cs" />
     <Compile Include="Overlays\Direct\SlimEnumDropdown.cs" />
     <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
+    <Compile Include="Database\RankStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

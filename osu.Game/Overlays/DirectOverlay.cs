@@ -15,6 +15,8 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Direct;
 
+using Container = osu.Framework.Graphics.Containers.Container;
+
 namespace osu.Game.Overlays
 {
     public class DirectOverlay : WaveOverlayContainer
@@ -41,12 +43,12 @@ namespace osu.Game.Overlays
         }
 
         private ResultCounts resultCounts;
-        public ResultCounts ResultCounts
+        public ResultCounts ResultAmounts
         {
             get { return resultCounts; }
             set
             {
-                if (value == ResultCounts) return;
+                if (value == ResultAmounts) return;
                 resultCounts = value;
 
                 updateResultCounts();
@@ -166,12 +168,12 @@ namespace osu.Game.Overlays
 
         private void updateResultCounts()
         {
-            resultCountsContainer.FadeTo(ResultCounts == null ? 0f : 1f, 200, EasingTypes.Out);
-            if (ResultCounts == null) return;
+            resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, EasingTypes.Out);
+            if (ResultAmounts == null) return;
 
-            resultCountsText.Text = pluralize("Artist", ResultCounts.Artists) + ", " +
-                                    pluralize("Song", ResultCounts.Songs) + ", " +
-                                    pluralize("Tag", ResultCounts.Tags);
+            resultCountsText.Text = pluralize("Artist", ResultAmounts.Artists) + ", " +
+                                    pluralize("Song", ResultAmounts.Songs) + ", " +
+                                    pluralize("Tag", ResultAmounts.Tags);
         }
 
         private string pluralize(string prefix, int value)
@@ -203,6 +205,26 @@ namespace osu.Game.Overlays
             base.PopOut();
 
             filter.Search.HoldFocus = false;
+        }
+
+        public class ResultCounts
+        {
+        	public readonly int Artists;
+        	public readonly int Songs;
+        	public readonly int Tags;
+
+        	public ResultCounts(int artists, int songs, int tags)
+        	{
+        		Artists = artists;
+        		Songs = songs;
+        		Tags = tags;
+        	}
+        }
+
+        public enum PanelDisplayStyle
+        {
+	        Grid,
+            List,
         }
     }
 }
