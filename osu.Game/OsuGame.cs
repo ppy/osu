@@ -86,7 +86,7 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                Task.Run(() => BeatmapDatabase.Import(paths));
+                Task.Run(() => BeatmapDatabase.Import(paths.ToArray()));
             }
 
             Dependencies.Cache(this);
@@ -288,6 +288,7 @@ namespace osu.Game
                 Toolbar.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;
+                direct.State = Visibility.Hidden;
             }
             else
             {
