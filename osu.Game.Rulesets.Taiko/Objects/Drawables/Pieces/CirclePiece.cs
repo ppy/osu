@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         public const float SYMBOL_SIZE = TaikoHitObject.DEFAULT_CIRCLE_DIAMETER * 0.45f;
         public const float SYMBOL_BORDER = 8;
         public const float SYMBOL_INNER_SIZE = SYMBOL_SIZE - 2 * SYMBOL_BORDER;
+        private const double pre_beat_transition_time = 50;
 
         /// <summary>
         /// The colour of the inner circle and outer glows.
@@ -65,6 +66,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
         public CirclePiece(bool isStrong = false)
         {
+            EarlyActivationMilliseconds = pre_beat_transition_time;
+
             AddInternal(new Drawable[]
             {
                 background = new CircularContainer
@@ -159,9 +162,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             if (beatIndex % (int)timingPoint.TimeSignature != 0)
                 return;
 
-            background.FadeEdgeEffectTo(KiaiFlashColour);
-            using (BeginDelayedSequence(200))
-                background.FadeEdgeEffectTo(AccentColour, 500, EasingTypes.OutQuint);
+            double duration = timingPoint.BeatLength * (int)timingPoint.TimeSignature;
+
+            background.FadeEdgeEffectTo(KiaiFlashColour, pre_beat_transition_time, EasingTypes.OutQuint);
+            using (background.BeginDelayedSequence(pre_beat_transition_time))
+                background.FadeEdgeEffectTo(AccentColour, duration, EasingTypes.OutQuint);
         }
     }
 }
