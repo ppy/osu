@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected override Container<Drawable> Content => hitObjectContainer;
 
         private readonly Container<HitExplosion> hitExplosionContainer;
+        private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly Container<DrawableBarLine> barLineContainer;
         private readonly Container<DrawableTaikoJudgement> judgementContainer;
 
@@ -116,6 +117,13 @@ namespace osu.Game.Rulesets.Taiko.UI
                                             RelativeSizeAxes = Axes.Both,
                                         },
                                     }
+                                },
+                                kiaiExplosionContainer = new Container<KiaiHitExplosion>
+                                {
+                                    Name = "Kiai hit explosions",
+                                    RelativeSizeAxes = Axes.Y,
+                                    Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                                    BlendingMode = BlendingMode.Additive
                                 },
                                 judgementContainer = new Container<DrawableTaikoJudgement>
                                 {
@@ -207,6 +215,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (!wasHit)
                 return;
 
+            bool isRim = judgedObject.HitObject is RimHit;
+
             if (!secondHit)
             {
                 if (judgedObject.X >= -0.05f && !(judgedObject is DrawableSwell))
@@ -215,7 +225,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                     topLevelHitContainer.Add(judgedObject.CreateProxy());
                 }
 
-                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement, judgedObject is DrawableRimHit));
+                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement, isRim));
+
+                if (judgedObject.HitObject.Kiai)
+                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject.Judgement, isRim));
+
             }
             else
                 hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
