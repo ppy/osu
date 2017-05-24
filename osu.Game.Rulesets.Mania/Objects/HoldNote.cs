@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
@@ -12,32 +13,41 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// <summary>
     /// Represents a hit object which requires pressing, holding, and releasing a key.
     /// </summary>
-    public class HoldNote : Note, IHasEndTime
+    public class HoldNote : ManiaHitObject, IHasEndTime
     {
-        /// <summary>
-        /// Lenience of release hit windows. This is to make cases where the hold note release
-        /// is timed alongside presses of other hit objects less awkward.
-        /// </summary>
-        private const double release_window_lenience = 1.5;
-
         public double Duration { get; set; }
         public double EndTime => StartTime + Duration;
 
-        /// <summary>
-        /// The samples to be played when this hold note is released.
-        /// </summary>
-        public SampleInfoList EndSamples = new SampleInfoList();
+        private Note headNote;
+        public Note HeadNote => headNote ?? (headNote = new Note { StartTime = StartTime });
+
+        private Note tailNote;
+        public Note TailNote => tailNote ?? (tailNote = new HoldNoteTail { StartTime = EndTime });
 
         /// <summary>
-        /// The key-release hit windows for this hold note.
+        /// The length (in milliseconds) between ticks of this hold.
         /// </summary>
-        public HitWindows ReleaseHitWindows { get; protected set; } = new HitWindows();
+        private double tickSpacing = 50;
 
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        public IEnumerable<HoldNoteTick> Ticks => ticks ?? (ticks = createTicks());
+        private List<HoldNoteTick> ticks;
+
+        private List<HoldNoteTick> createTicks()
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            var ret = new List<HoldNoteTick>();
 
-            ReleaseHitWindows = HitWindows * release_window_lenience;
+            if (tickSpacing == 0)
+                return ret;
+
+            for (double t = StartTime + HeadNote.HitWindows.Great / 2; t <= EndTime - TailNote.HitWindows.Great / 2; t+= tickSpacing)
+            {
+                ret.Add(new HoldNoteTick
+                {
+                    StartTime = t
+                });
+            }
+
+            return ret;
         }
     }
 }
