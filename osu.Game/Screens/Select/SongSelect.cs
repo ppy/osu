@@ -333,7 +333,7 @@ namespace osu.Game.Screens.Select
             }
 
             selectionChangeNoBounce = beatmap;
-            
+
             selectionChangedDebounce?.Cancel();
             selectionChangedDebounce = Scheduler.AddDelayed(delegate
             {
