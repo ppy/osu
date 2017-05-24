@@ -3,17 +3,17 @@
 
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Game.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Timing;
-using System;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
-using TrackAmplitudes = osu.Framework.Audio.Track.Track.TrackAmplitudes;
+using osu.Game.Graphics.Containers;
+using System;
 
 namespace osu.Game.Screens.Menu
 {
@@ -75,22 +75,20 @@ namespace osu.Game.Screens.Menu
             rightBox.ColourInfo = ColourInfo.GradientHorizontal(gradientDark, gradientLight);
         }
 
-        protected override void OnNewBeat(int newBeat, double beatLength, TimeSignatures timeSignature, bool kiai)
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
-            if (newBeat < 0)
+            if (beatIndex < 0)
                 return;
 
-            if (kiai ? newBeat % 2 == 0 : newBeat % (int)timeSignature == 0)
-                flash(leftBox, beatLength, kiai);
-            if (kiai ? newBeat % 2 == 1 : newBeat % (int)timeSignature == 0)
-                flash(rightBox, beatLength, kiai);
+            if (effectPoint.KiaiMode ? beatIndex % 2 == 0 : beatIndex % (int)timingPoint.TimeSignature == 0)
+                flash(leftBox, timingPoint.BeatLength, effectPoint.KiaiMode, amplitudes);
+            if (effectPoint.KiaiMode ? beatIndex % 2 == 1 : beatIndex % (int)timingPoint.TimeSignature == 0)
+                flash(rightBox, timingPoint.BeatLength, effectPoint.KiaiMode, amplitudes);
         }
 
-        private void flash(Drawable d, double beatLength, bool kiai)
+        private void flash(Drawable d, double beatLength, bool kiai, TrackAmplitudes amplitudes)
         {
-            TrackAmplitudes amp = beatmap.Value.Track.CurrentAmplitudes;
-
-            d.FadeTo(Math.Max(0, ((d.Equals(leftBox) ? amp.LeftChannel : amp.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time);
+            d.FadeTo(Math.Max(0, ((d.Equals(leftBox) ? amplitudes.LeftChannel : amplitudes.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time);
             using (d.BeginDelayedSequence(box_fade_in_time))
                 d.FadeOut(beatLength, EasingTypes.In);
         }
