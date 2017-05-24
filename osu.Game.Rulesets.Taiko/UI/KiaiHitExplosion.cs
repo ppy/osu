@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER, 1);
 
             Masking = true;
-            Alpha = 0.15f;
+            Alpha = 0.25f;
 
             Children = new[]
             {
