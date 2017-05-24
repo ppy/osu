@@ -176,7 +176,7 @@ namespace osu.Game.Users
 
         private void displayStatus(UserStatus status)
         {
-            float transition_duration = 500;
+            const float transition_duration = 500;
 
             if (status == null)
             {
