@@ -5,18 +5,21 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Graphics.Containers;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework.Audio.Track;
+using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class TwoLayerButton : ClickableContainer
     {
-        private readonly TextAwesome icon;
+        private readonly IconBeatSyncedContainer iconBeatSyncedContainer;
 
         public Box IconLayer;
         public Box TextLayer;
@@ -95,11 +98,10 @@ namespace osu.Game.Graphics.UserInterface
                                 },
                             }
                         },
-                        icon = new TextAwesome
+                        iconBeatSyncedContainer = new IconBeatSyncedContainer
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            TextSize = 25,
                         },
                     }
                 },
@@ -146,7 +148,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
-                icon.Icon = value;
+                iconBeatSyncedContainer.Icon = value;
             }
         }
 
@@ -162,58 +164,16 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            icon.ClearTransforms();
-
             ResizeTo(SIZE_EXTENDED, transform_time, EasingTypes.OutElastic);
-
-            int duration = 0; //(int)(Game.Audio.BeatLength / 2);
-            if (duration == 0) duration = pulse_length;
-
             IconLayer.FadeColour(HoverColour, transform_time, EasingTypes.OutElastic);
-
-            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
-            double startTime = Time.Current + offset;
-
-            // basic pulse
-            icon.Transforms.Add(new TransformScale
-                {
-                    StartValue = new Vector2(1.1f),
-                    EndValue = Vector2.One,
-                    StartTime = startTime,
-                    EndTime = startTime + duration,
-                    Easing = EasingTypes.Out,
-                    LoopCount = -1,
-                    LoopDelay = duration
-                });
 
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            icon.ClearTransforms();
-
             ResizeTo(SIZE_RETRACTED, transform_time, EasingTypes.OutElastic);
-
             IconLayer.FadeColour(TextLayer.Colour, transform_time, EasingTypes.OutElastic);
-
-            int duration = 0; //(int)(Game.Audio.BeatLength);
-            if (duration == 0) duration = pulse_length * 2;
-
-            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
-            double startTime = Time.Current + offset;
-
-            // slow pulse
-            icon.Transforms.Add(new TransformScale
-                {
-                    StartValue = new Vector2(1.1f),
-                    EndValue = Vector2.One,
-                    StartTime = startTime,
-                    EndTime = startTime + duration,
-                    Easing = EasingTypes.Out,
-                    LoopCount = -1,
-                    LoopDelay = duration
-                });
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -238,6 +198,70 @@ namespace osu.Game.Graphics.UserInterface
             ActivationSound.Play();
 
             return base.OnClick(state);
+        }
+
+        private class IconBeatSyncedContainer : BeatSyncedContainer
+        {
+            private const double beat_in_time = 60;
+
+            private readonly TextAwesome icon;
+            private readonly Container amplitudeContainer;
+
+            public FontAwesome Icon { set { icon.Icon = value; } }
+
+            public IconBeatSyncedContainer()
+            {
+                EarlyActivationMilliseconds = beat_in_time;
+                AutoSizeAxes = Axes.Both;
+
+                Children = new Drawable[]
+                {
+                    amplitudeContainer = new Container
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Children = new Drawable[]
+                        {
+                            icon = new TextAwesome
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                TextSize = 25
+                            }
+                        }
+                    },
+                };
+            }
+
+            private int lastBeatIndex;
+
+            protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+            {
+                base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+                lastBeatIndex = beatIndex;
+
+                var beatLength = timingPoint.BeatLength;
+
+                float amplitudeAdjust = Math.Min(1, 0.4f + amplitudes.Maximum);
+
+                if (beatIndex < 0) return;
+
+                icon.ScaleTo(1 - 0.1f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
+                using (icon.BeginDelayedSequence(beat_in_time))
+                    icon.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                const float scale_adjust_cutoff = 0.4f;
+
+                var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value?.Track?.CurrentAmplitudes.Maximum ?? 0 : 0;
+                amplitudeContainer.ScaleTo(1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.1f, 75, EasingTypes.OutQuint);
+            }
         }
     }
 }
