@@ -48,7 +48,8 @@ namespace osu.Game.Screens.Menu
                             OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnExit = delegate { Exit(); },
-                        }
+                        },
+                        new MenuSideFlashes(),
                     }
                 }
             };
