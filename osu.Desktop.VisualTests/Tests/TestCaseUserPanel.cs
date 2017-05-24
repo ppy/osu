@@ -51,6 +51,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep(@"multiplaying", () => { flyte.Status.Value = new UserStatusMultiplayerGame(); });
             AddStep(@"modding", () => { flyte.Status.Value = new UserStatusModding(); });
             AddStep(@"offline", () => { flyte.Status.Value = new UserStatusOffline(); });
+            AddStep(@"null status", () => { flyte.Status.Value = null; });
         }
     }
 }
