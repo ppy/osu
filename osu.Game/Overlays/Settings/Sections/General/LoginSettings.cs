@@ -13,15 +13,19 @@ using osu.Game.Online.API;
 using OpenTK;
 using osu.Framework.Input;
 using osu.Game.Users;
+using System.ComponentModel;
+using osu.Game.Graphics;
+using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
+
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class LoginSettings : SettingsSubsection, IOnlineComponent
+    public class LoginSettings : FillFlowContainer, IOnlineComponent
     {
         private bool bounding = true;
         private LoginForm form;
-
-        protected override string Header => "Account";
 
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
@@ -33,6 +37,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 bounding = value;
                 Invalidate(Invalidation.Geometry);
             }
+        }
+
+        public LoginSettings()
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Direction = FillDirection.Vertical;
+            Spacing = new Vector2(0f, 5f);
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
@@ -50,6 +62,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 case APIState.Offline:
                     Children = new Drawable[]
                     {
+                        new OsuSpriteText
+                        {
+                            Text = "LOG IN",
+                            Margin = new MarginPadding { Bottom = 10 },
+                            Font = @"Exo2.0-Black",
+                        },
                         form = new LoginForm()
                     };
                     break;
@@ -67,23 +85,52 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         new OsuSpriteText
                         {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             Text = "Connecting...",
+                            Margin = new MarginPadding { Top = 10, Bottom = 10 },
                         },
                     };
                     break;
                 case APIState.Online:
                     Children = new Drawable[]
                     {
-                        new UserPanel(api.LocalUser.Value)
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding { Left = 20, Right = 20 },
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0f, 10f),
+                            Children = new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Children = new[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Text = "Signed in",
+                                            TextSize = 18,
+                                            Font = @"Exo2.0-Bold",
+                                            Margin = new MarginPadding { Top = 5, Bottom = 5 },
+                                        },
+                                    },
+                                },
+                                new UserPanel(api.LocalUser.Value)
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                },
+                                new UserDropdown
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                },
+                            },
                         },
-                        new OsuButton
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Sign out",
-                            Action = api.Logout
-                        }
                     };
                     break;
             }
@@ -170,6 +217,102 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                 return base.OnFocus(state);
             }
+        }
+
+        private class UserDropdown : OsuEnumDropdown<UserAction>
+        {
+            protected override DropdownHeader CreateHeader() => new UserDropdownHeader { AccentColour = AccentColour };
+            protected override Menu CreateMenu() => new UserDropdownMenu();
+            protected override DropdownMenuItem<UserAction> CreateMenuItem(string text, UserAction value) => new UserDropdownMenuItem(text, value) { AccentColour = AccentColour };
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                AccentColour = colours.Gray5;
+            }
+
+            private class UserDropdownHeader : OsuDropdownHeader
+            {
+                protected readonly TextAwesome statusIcon;
+
+                public UserDropdownHeader()
+                {
+                    Foreground.Padding = new MarginPadding { Left = 10, Right = 10 };
+                    Margin = new MarginPadding { Bottom = 5 };
+                    Masking = true;
+                    CornerRadius = 5;
+                    EdgeEffect = new EdgeEffect
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4.Black.Opacity(0.25f),
+                        Radius = 4,
+                    };
+
+                    Icon.TextSize = 14;
+                    Icon.Margin = new MarginPadding(0);
+
+                    Foreground.Add(statusIcon = new TextAwesome
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Icon = FontAwesome.fa_circle_o,
+                        TextSize = 14,
+                    });
+
+                    //todo: Magic number
+                    Text.Margin = new MarginPadding { Left = 20 };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    BackgroundColour = colours.Gray3;
+                }
+
+                public void SetStatusColour(Color4 colour) => statusIcon.FadeColour(colour, 500, EasingTypes.OutQuint);
+            }
+
+            private class UserDropdownMenu : OsuMenu
+            {
+                public UserDropdownMenu()
+                {
+                    CornerRadius = 5;
+                    ItemsContainer.Padding = new MarginPadding(0);
+                    Masking = true;
+                    EdgeEffect = new EdgeEffect
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4.Black.Opacity(0.25f),
+                        Radius = 4,
+                    };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    Background.Colour = colours.Gray3;
+                }
+            }
+
+            private class UserDropdownMenuItem : OsuDropdownMenuItem
+            {
+                public UserDropdownMenuItem(string text, UserAction current) : base(text, current)
+                {
+                    Foreground.Padding = new MarginPadding(5);
+                    CornerRadius = 5;
+                }
+            }
+        }
+
+        private enum UserAction
+        {
+            Online,
+            [Description(@"Do not disturb")]
+            DoNotDisturb,
+            [Description(@"Appear offline")]
+            AppearOffline,
+            [Description(@"Sign out")]
+            SignOut,
         }
     }
 }
