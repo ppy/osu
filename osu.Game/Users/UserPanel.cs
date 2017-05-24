@@ -30,7 +30,6 @@ namespace osu.Game.Users
 
         public UserPanel(User user)
         {
-            Width = 300;
             Height = height;
             Masking = true;
             CornerRadius = 5;
