@@ -322,7 +322,6 @@ namespace osu.Game.Screens.Select
                 return;
 
             bool beatmapSetChange = false;
-
             if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
                 sampleChangeDifficulty.Play();
             else
