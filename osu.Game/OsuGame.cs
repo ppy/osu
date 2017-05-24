@@ -288,6 +288,7 @@ namespace osu.Game
                 Toolbar.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;
+                direct.State = Visibility.Hidden;
             }
             else
             {
