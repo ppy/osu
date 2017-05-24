@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <returns>The timing control point.</returns>
-        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time);
+        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, TimingPoints.FirstOrDefault());
 
         /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
@@ -75,14 +75,21 @@ namespace osu.Game.Beatmaps.ControlPoints
         public double BPMMode =>
             60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
 
-        private T binarySearch<T>(SortedList<T> list, double time)
+        /// <summary>
+        /// Binary searches one of the control point lists to find the active control point at <paramref name="time"/>.
+        /// </summary>
+        /// <param name="list">The list to search.</param>
+        /// <param name="time">The time to find the control point at.</param>
+        /// <param name="prePoint">The control point to use when <paramref name="time"/> is before any control points. If null, a new control point will be constructed.</param>
+        /// <returns>The active control point at <paramref name="time"/>.</returns>
+        private T binarySearch<T>(SortedList<T> list, double time, T prePoint = null)
             where T : ControlPoint, new()
         {
             if (list.Count == 0)
                 return new T();
 
             if (time < list[0].Time)
-                return new T();
+                return prePoint ?? new T();
 
             int index = list.BinarySearch(new T() { Time = time });
 
@@ -92,8 +99,8 @@ namespace osu.Game.Beatmaps.ControlPoints
 
             index = ~index;
 
-            if (index == list.Count)
-                return list[list.Count - 1];
+            // BinarySearch will return the index of the first element _greater_ than the search
+            // This is the inactive point - the active point is the one before it (index - 1)
             return list[index - 1];
         }
     }

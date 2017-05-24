@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Timing
         /// </summary>
         public double TimeSpan { get; set; }
 
-        private readonly List<DrawableControlPoint> drawableControlPoints = new List<DrawableControlPoint>();
+        private readonly List<DrawableControlPoint> drawableControlPoints;
 
         public ControlPointContainer(IEnumerable<TimingChange> timingChanges)
         {
