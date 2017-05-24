@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Direct
                                             {
                                                 new OsuSpriteText
                                                 {
-                                                    Text = @"mapped by ",
+                                                    Text = "mapped by ",
                                                     TextSize = 14,
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.Direct
                                             {
                                                 new OsuSpriteText
                                                 {
-                                                    Text = $@"from {SetInfo.Metadata.Source}",
+                                                    Text = $"from {SetInfo.Metadata.Source}",
                                                     TextSize = 14,
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
