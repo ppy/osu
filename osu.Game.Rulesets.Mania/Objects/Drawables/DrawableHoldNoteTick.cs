@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly Container glowContainer;
 
         public DrawableHoldNoteTick(HoldNoteTick hitObject)
-            : base(hitObject, null)
+            : base(hitObject)
         {
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
