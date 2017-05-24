@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +10,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
 {
@@ -71,7 +70,7 @@ namespace osu.Game.Screens.Select.Options
                     Scale = new Vector2(1, 0),
                     Colour = Color4.Black.Opacity(0.5f),
                 },
-                buttonsContainer = new ButtonFlow
+                buttonsContainer = new ReverseDepthFillFlowContainer<BeatmapOptionsButton>
                 {
                     Height = height,
                     RelativePositionAxes = Axes.X,
@@ -108,17 +107,6 @@ namespace osu.Game.Screens.Select.Options
                 },
                 HotKey = hotkey
             });
-        }
-
-        private class ButtonFlow : FillFlowContainer<BeatmapOptionsButton>
-        {
-            protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
-            protected override IEnumerable<BeatmapOptionsButton> FlowingChildren => base.FlowingChildren.Reverse();
-
-            public ButtonFlow()
-            {
-                Direction = FillDirection.Horizontal;
-            }
         }
     }
 }

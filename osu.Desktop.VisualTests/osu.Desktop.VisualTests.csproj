@@ -220,6 +220,8 @@
     <Compile Include="Tests\TestCaseLeaderboard.cs" />
     <Compile Include="Beatmaps\TestWorkingBeatmap.cs" />
     <Compile Include="Tests\TestCaseBeatmapDetailArea.cs" />
+    <Compile Include="Tests\TestCaseUserPanel.cs" />
+    <Compile Include="Tests\TestCaseDirect.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
