@@ -20,11 +20,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             set { accentColour = value; }
         }
 
-        /// <summary>
-        /// The colour to be flashed on a kiai beat.
-        /// </summary>
-        public Color4 KiaiFlashColour;
-
         private bool kiaiMode;
         /// <summary>
         /// Whether Kiai mode effects are enabled for this circle piece.

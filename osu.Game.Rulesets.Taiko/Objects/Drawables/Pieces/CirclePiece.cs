@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         public const float SYMBOL_SIZE = TaikoHitObject.DEFAULT_CIRCLE_DIAMETER * 0.45f;
         public const float SYMBOL_BORDER = 8;
         public const float SYMBOL_INNER_SIZE = SYMBOL_SIZE - 2 * SYMBOL_BORDER;
-        private const double pre_beat_transition_time = 50;
+        private const double pre_beat_transition_time = 80;
 
         /// <summary>
         /// The colour of the inner circle and outer glows.
@@ -144,13 +144,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             Content.Width = 1 / Content.Scale.X;
         }
 
+        private const float edge_alpha_kiai = 0.5f;
+
         private void resetEdgeEffects()
         {
             background.EdgeEffect = new EdgeEffect
             {
                 Type = EdgeEffectType.Glow,
-                Colour = AccentColour,
-                Radius = KiaiMode ? 40 : 8
+                Colour = AccentColour.Opacity(KiaiMode ? edge_alpha_kiai : 1f),
+                Radius = KiaiMode ? 32 : 8
             };
         }
 
@@ -162,11 +164,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             if (beatIndex % (int)timingPoint.TimeSignature != 0)
                 return;
 
-            double duration = timingPoint.BeatLength * (int)timingPoint.TimeSignature;
+            double duration = timingPoint.BeatLength * 2;
 
-            background.FadeEdgeEffectTo(KiaiFlashColour, pre_beat_transition_time, EasingTypes.OutQuint);
+            background.FadeEdgeEffectTo(1, pre_beat_transition_time, EasingTypes.OutQuint);
             using (background.BeginDelayedSequence(pre_beat_transition_time))
-                background.FadeEdgeEffectTo(AccentColour, duration, EasingTypes.OutQuint);
+                background.FadeEdgeEffectTo(edge_alpha_kiai, duration, EasingTypes.OutQuint);
         }
     }
 }
