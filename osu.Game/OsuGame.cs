@@ -41,6 +41,8 @@ namespace osu.Game
 
         private DialogOverlay dialogOverlay;
 
+        private DirectOverlay direct;
+
         private Intro intro
         {
             get
@@ -69,6 +71,8 @@ namespace osu.Game
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
+
+        public void ToggleDirect() => direct.ToggleVisibility();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -160,6 +164,7 @@ namespace osu.Game
             });
 
             //overlay elements
+            LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
             LoadComponentAsync(musicController = new MusicController
@@ -249,6 +254,9 @@ namespace osu.Game
                     case Key.O:
                         settings.ToggleVisibility();
                         return true;
+                    case Key.D:
+                        direct.ToggleVisibility();
+                        return true;
                 }
             }
 
@@ -280,6 +288,7 @@ namespace osu.Game
                 Toolbar.State = Visibility.Hidden;
                 musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;
+                direct.State = Visibility.Hidden;
             }
             else
             {

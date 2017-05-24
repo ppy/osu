@@ -43,6 +43,9 @@ namespace osu.Game.Database
         [Ignore]
         public BeatmapMetrics Metrics { get; set; }
 
+        [Ignore]
+        public BeatmapOnlineInfo OnlineInfo { get; set; }
+
         public string Path { get; set; }
 
         [JsonProperty("file_md5")]
