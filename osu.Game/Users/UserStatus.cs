@@ -58,4 +58,10 @@ namespace osu.Game.Users
         public override string Message => @"Modding a map";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
     }
+
+    public class UserStatusDoNotDisturb : UserStatus
+    {
+        public override string Message => @"Do not disturb";
+        public override Color4 GetAppropriateColour(OsuColour colours) => colours.RedDark;
+    }
 }
