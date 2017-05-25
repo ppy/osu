@@ -432,6 +432,9 @@
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
+    <Compile Include="Screens\Multiplayer\DrawableRoom.cs" />
+    <Compile Include="Online\Multiplayer\Room.cs" />
+    <Compile Include="Online\Multiplayer\RoomStatus.cs" />
     <Compile Include="Users\UserPanel.cs" />
     <Compile Include="Users\UserStatus.cs" />
     <Compile Include="Overlays\DirectOverlay.cs" />
