@@ -66,8 +66,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         new OsuSpriteText
                         {
-                            Text = "LOG IN",
-                            Margin = new MarginPadding { Bottom = 10 },
+                            Text = "ACCOUNT",
+                            Margin = new MarginPadding { Bottom = 5 },
                             Font = @"Exo2.0-Black",
                         },
                         form = new LoginForm()
