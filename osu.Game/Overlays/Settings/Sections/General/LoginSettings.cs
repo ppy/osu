@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
     {
         private bool bounding = true;
         private LoginForm form;
+        private OsuColour colours;
 
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
@@ -48,8 +49,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api)
+        private void load(OsuColour colours, APIAccess api)
         {
+            this.colours = colours;
             api?.Register(this);
         }
 
@@ -93,6 +95,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     };
                     break;
                 case APIState.Online:
+                    UserDropdown dropdown;
+                    UserPanel panel;
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -121,17 +125,40 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                         },
                                     },
                                 },
-                                new UserPanel(api.LocalUser.Value)
+                                panel = new UserPanel(api.LocalUser.Value)
                                 {
                                     RelativeSizeAxes = Axes.X,
                                 },
-                                new UserDropdown
+                                dropdown = new UserDropdown
                                 {
                                     RelativeSizeAxes = Axes.X,
                                 },
                             },
                         },
                     };
+                    panel.Status.BindTo(api.LocalUser.Value.Status);
+                    dropdown.Current.ValueChanged += newValue =>
+                    {
+                        switch (newValue)
+                        {
+                            case UserAction.Online:
+                                api.LocalUser.Value.Status.Value = new UserStatusOnline();
+                                dropdown.StatusColour = colours.Green;
+                                break;
+                            case UserAction.DoNotDisturb:
+                                api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
+                                dropdown.StatusColour = colours.Red;
+                                break;
+                            case UserAction.AppearOffline:
+                                api.LocalUser.Value.Status.Value = new UserStatusOffline();
+                                dropdown.StatusColour = colours.Gray7;
+                                break;
+                            case UserAction.SignOut:
+                                api.Logout();
+                                break;
+                        }
+                    };
+                    dropdown.Current.TriggerChange();
                     break;
             }
 
@@ -225,6 +252,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
             protected override Menu CreateMenu() => new UserDropdownMenu();
             protected override DropdownMenuItem<UserAction> CreateMenuItem(string text, UserAction value) => new UserDropdownMenuItem(text, value) { AccentColour = AccentColour };
 
+            public Color4 StatusColour
+            {
+                set
+                {
+                    (Header as UserDropdownHeader).StatusColour = value;
+                }
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
@@ -234,6 +269,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
             private class UserDropdownHeader : OsuDropdownHeader
             {
                 protected readonly TextAwesome statusIcon;
+
+                public Color4 StatusColour
+                {
+                    set
+                    {
+                        statusIcon.FadeColour(value, 500, EasingTypes.OutQuint);
+                    }
+                }
 
                 public UserDropdownHeader()
                 {
@@ -268,8 +311,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     BackgroundColour = colours.Gray3;
                 }
-
-                public void SetStatusColour(Color4 colour) => statusIcon.FadeColour(colour, 500, EasingTypes.OutQuint);
             }
 
             private class UserDropdownMenu : OsuMenu
@@ -298,7 +339,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 public UserDropdownMenuItem(string text, UserAction current) : base(text, current)
                 {
-                    Foreground.Padding = new MarginPadding(5);
+                    //todo: Another magic number
+                    Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 19, Right = 5 };
                     CornerRadius = 5;
                 }
             }
