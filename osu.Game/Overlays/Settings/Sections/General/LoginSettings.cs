@@ -268,6 +268,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             private class UserDropdownHeader : OsuDropdownHeader
             {
+                public static readonly float LABEL_LEFT_MARGIN = 20;
+
                 protected readonly TextAwesome statusIcon;
 
                 public Color4 StatusColour
@@ -301,9 +303,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         Icon = FontAwesome.fa_circle_o,
                         TextSize = 14,
                     });
-
-                    //todo: Magic number
-                    Text.Margin = new MarginPadding { Left = 20 };
+                    
+                    Text.Margin = new MarginPadding { Left = LABEL_LEFT_MARGIN };
                 }
 
                 [BackgroundDependencyLoader]
@@ -340,8 +341,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 public UserDropdownMenuItem(string text, UserAction current) : base(text, current)
                 {
-                    //todo: Another magic number
-                    Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 19, Right = 5 };
+                    Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = UserDropdownHeader.LABEL_LEFT_MARGIN, Right = 5 };
+                    Chevron.Margin = new MarginPadding { Left = 2, Right = 3 };
                     CornerRadius = 5;
                 }
             }
