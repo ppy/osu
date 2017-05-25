@@ -1,19 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
-using System.Runtime.InteropServices;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.OpenGL.Buffers;
 using OpenTK.Graphics.ES30;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
@@ -74,7 +70,7 @@ namespace osu.Game.Graphics.Backgrounds
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders)
         {
-            shader = shaders?.Load("Triangles", FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            shader = shaders?.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
         protected override void LoadComplete()
@@ -110,7 +106,7 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 TriangleParticle newParticle = parts[i];
 
-                newParticle.Position += new Vector2(0, -(float)(parts[i].Scale * (50 / DrawHeight)) / triangleScale * Velocity) * ((float)Time.Elapsed / 950);
+                newParticle.Position += new Vector2(0, -(parts[i].Scale * (50 / DrawHeight)) / triangleScale * Velocity) * ((float)Time.Elapsed / 950);
 
                 float adjustedAlpha = HideAlphaDiscrepancies ?
                     // Cubically scale alpha to make it drop off more sharply.
@@ -174,12 +170,12 @@ namespace osu.Game.Graphics.Backgrounds
 
         protected override DrawNode CreateDrawNode() => new TrianglesDrawNode();
 
-        private TrianglesDrawNodeSharedData sharedData = new TrianglesDrawNodeSharedData();
+        private readonly TrianglesDrawNodeSharedData sharedData = new TrianglesDrawNodeSharedData();
         protected override void ApplyDrawNode(DrawNode node)
         {
             base.ApplyDrawNode(node);
 
-            var trianglesNode = node as TrianglesDrawNode;
+            var trianglesNode = (TrianglesDrawNode)node;
 
             trianglesNode.Shader = shader;
             trianglesNode.Texture = texture;
@@ -213,24 +209,15 @@ namespace osu.Game.Graphics.Backgrounds
                 Shader.Bind();
                 Texture.TextureGL.Bind();
 
-                int updateStart = -1, updateEnd = 0;
-                for (int i = 0; i < Parts.Count; ++i)
+                foreach (TriangleParticle particle in Parts)
                 {
-                    if (updateStart == -1)
-                        updateStart = i;
-                    updateEnd = i + 1;
-
-                    TriangleParticle particle = Parts[i];
-
-                    Vector2 offset = new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
+                    var offset = new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
 
                     var triangle = new Triangle(
-                        (particle.Position * Size) * DrawInfo.Matrix,
+                        particle.Position * Size * DrawInfo.Matrix,
                         (particle.Position * Size + offset * triangle_size) * DrawInfo.Matrix,
                         (particle.Position * Size + new Vector2(-offset.X, offset.Y) * triangle_size) * DrawInfo.Matrix
                     );
-
-                    int index = i * 6;
 
                     ColourInfo colourInfo = DrawInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
