@@ -288,7 +288,6 @@ namespace osu.Game.Overlays
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
 
-
                 updateDisplay(beatmapBacking, direction);
                 queuedDirection = null;
             }
