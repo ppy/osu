@@ -317,6 +317,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 public UserDropdownMenu()
                 {
+                    Margin = new MarginPadding { Bottom = 5 };
                     CornerRadius = 5;
                     ItemsContainer.Padding = new MarginPadding(0);
                     Masking = true;
