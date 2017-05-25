@@ -264,13 +264,13 @@ namespace osu.Game.Overlays
 
         private void beatmapChanged(WorkingBeatmap beatmap)
         {
+            progressBar.IsEnabled = beatmap != null;
+
+            TransformDirection direction = TransformDirection.None;
+
             if (current != null)
             {
-                progressBar.IsEnabled = beatmap != null;
-
                 bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
-
-                TransformDirection direction;
 
                 if (audioEquals)
                     direction = TransformDirection.None;
@@ -287,12 +287,12 @@ namespace osu.Game.Overlays
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
-
-                updateDisplay(beatmapBacking, direction);
-                queuedDirection = null;
             }
 
             current = beatmapBacking.Value;
+
+            updateDisplay(beatmapBacking, direction);
+            queuedDirection = null;
         }
 
         private ScheduledDelegate pendingBeatmapSwitch;
