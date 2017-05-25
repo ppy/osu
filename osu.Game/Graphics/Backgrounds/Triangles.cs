@@ -107,13 +107,13 @@ namespace osu.Game.Graphics.Backgrounds
             {
                 TriangleParticle newParticle = parts[i];
 
-                newParticle.Position += new Vector2(0, -(parts[i].Scale * (50 / DrawHeight)) / triangleScale * Velocity) * ((float)Time.Elapsed / 950);
-
                 float adjustedAlpha = HideAlphaDiscrepancies ?
                     // Cubically scale alpha to make it drop off more sharply.
                     (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3) :
                     1;
 
+
+                newParticle.Position += new Vector2(0, -(parts[i].Scale * (50 / DrawHeight)) / triangleScale * Velocity) * ((float)Time.Elapsed / 950);
                 newParticle.Colour.A = adjustedAlpha;
 
                 parts[i] = newParticle;
@@ -140,7 +140,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         private TriangleParticle createTriangle(bool randomY)
         {
-            var particle = CreateTriangle();
+            TriangleParticle particle = CreateTriangle();
 
             particle.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() : 1);
             particle.Colour = CreateTriangleShade();
@@ -189,17 +189,16 @@ namespace osu.Game.Graphics.Backgrounds
             trianglesNode.Parts.AddRange(parts);
         }
 
-        public class TrianglesDrawNodeSharedData
+        private class TrianglesDrawNodeSharedData
         {
-            public LinearBatch<TexturedVertex2D> VertexBatch = new LinearBatch<TexturedVertex2D>(100 * 3, 10, PrimitiveType.Triangles);
+            public readonly LinearBatch<TexturedVertex2D> VertexBatch = new LinearBatch<TexturedVertex2D>(100 * 3, 10, PrimitiveType.Triangles);
         }
 
-        public class TrianglesDrawNode : DrawNode
+        private class TrianglesDrawNode : DrawNode
         {
             public Shader Shader;
             public Texture Texture;
 
-            public float Time;
             public TrianglesDrawNodeSharedData Shared;
 
             public readonly List<TriangleParticle> Parts = new List<TriangleParticle>();
@@ -232,10 +231,21 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        public struct TriangleParticle : IComparable<TriangleParticle>
+        protected struct TriangleParticle : IComparable<TriangleParticle>
         {
+            /// <summary>
+            /// The position of the top vertex of the triangle.
+            /// </summary>
             public Vector2 Position;
+
+            /// <summary>
+            /// The colour of the triangle.
+            /// </summary>
             public Color4 Colour;
+
+            /// <summary>
+            /// The scale of the triangle.
+            /// </summary>
             public float Scale;
 
             /// <summary>
