@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Batches;
+using osu.Framework.Lists;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -57,7 +58,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         public float Velocity = 1;
 
-        private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
+        private readonly SortedList<TriangleParticle> parts = new SortedList<TriangleParticle>(Comparer<TriangleParticle>.Default);
 
         private Shader shader;
         private readonly Texture texture;
@@ -123,15 +124,17 @@ namespace osu.Game.Graphics.Backgrounds
                 float bottomPos = parts[i].Position.Y + triangle_size * parts[i].Scale * 0.866f / DrawHeight;
 
                 if (bottomPos < 0)
-                    parts[i] = createTriangle(false);
+                    parts.RemoveAt(i);
             }
+
+            addTriangles(false);
         }
 
         private void addTriangles(bool randomY)
         {
             int aimTriangleCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
 
-            for (int i = 0; i < aimTriangleCount; i++)
+            for (int i = 0; i < aimTriangleCount - parts.Count; i++)
                 parts.Add(createTriangle(randomY));
         }
 
@@ -229,11 +232,20 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        public struct TriangleParticle
+        public struct TriangleParticle : IComparable<TriangleParticle>
         {
             public Vector2 Position;
             public Color4 Colour;
             public float Scale;
+
+            /// <summary>
+            /// Compares two <see cref="TriangleParticle"/>s. This is a reverse comparer because when the
+            /// triangles are added to the particles list, they should be drawn from largest to smallest
+            /// such that the smaller triangles appear on top.
+            /// </summary>
+            /// <param name="other"></param>
+            /// <returns></returns>
+            public int CompareTo(TriangleParticle other) => other.Scale.CompareTo(Scale);
         }
     }
 }
