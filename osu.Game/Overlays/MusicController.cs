@@ -255,7 +255,6 @@ namespace osu.Game.Overlays
 
         private void next()
         {
-            progressBar.TriggerDragEnd();
             queuedDirection = TransformDirection.Next;
             playlist.PlayNext();
         }
@@ -354,7 +353,17 @@ namespace osu.Game.Overlays
             if (position < 1)
                 track?.Seek(track.Length * position);
             else
-                next();
+            {
+                progressBar.TriggerDragEnd();
+
+                if (track?.Looping == true)
+                {
+                    track.Seek(0);
+                    track.Start();
+                }
+                else
+                    next();
+            }
         }
 
         protected override void PopIn()
