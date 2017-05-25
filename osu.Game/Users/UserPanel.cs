@@ -158,14 +158,19 @@ namespace osu.Game.Users
                     },
                 },
             };
-
-            Status.ValueChanged += displayStatus;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             this.colours = colours;
+            Status.ValueChanged += displayStatus;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Status.TriggerChange();
         }
 
         private void displayStatus(UserStatus status)
