@@ -95,8 +95,33 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     };
                     break;
                 case APIState.Online:
-                    UserDropdown dropdown;
-                    UserPanel panel;
+                    UserDropdown dropdown = new UserDropdown { RelativeSizeAxes = Axes.X };
+                    dropdown.Current.ValueChanged += newValue =>
+                    {
+                        switch (newValue)
+                        {
+                            case UserAction.Online:
+                                api.LocalUser.Value.Status.Value = new UserStatusOnline();
+                                dropdown.StatusColour = colours.Green;
+                                break;
+                            case UserAction.DoNotDisturb:
+                                api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
+                                dropdown.StatusColour = colours.Red;
+                                break;
+                            case UserAction.AppearOffline:
+                                api.LocalUser.Value.Status.Value = new UserStatusOffline();
+                                dropdown.StatusColour = colours.Gray7;
+                                break;
+                            case UserAction.SignOut:
+                                api.Logout();
+                                break;
+                        }
+                    };
+                    dropdown.Current.TriggerChange();
+
+                    UserPanel panel = new UserPanel(api.LocalUser.Value) { RelativeSizeAxes = Axes.X };
+                    panel.Status.BindTo(api.LocalUser.Value.Status);
+
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -125,40 +150,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                         },
                                     },
                                 },
-                                panel = new UserPanel(api.LocalUser.Value)
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                },
-                                dropdown = new UserDropdown
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                },
+                                panel,
+                                dropdown,
                             },
                         },
                     };
-                    panel.Status.BindTo(api.LocalUser.Value.Status);
-                    dropdown.Current.ValueChanged += newValue =>
-                    {
-                        switch (newValue)
-                        {
-                            case UserAction.Online:
-                                api.LocalUser.Value.Status.Value = new UserStatusOnline();
-                                dropdown.StatusColour = colours.Green;
-                                break;
-                            case UserAction.DoNotDisturb:
-                                api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
-                                dropdown.StatusColour = colours.Red;
-                                break;
-                            case UserAction.AppearOffline:
-                                api.LocalUser.Value.Status.Value = new UserStatusOffline();
-                                dropdown.StatusColour = colours.Gray7;
-                                break;
-                            case UserAction.SignOut:
-                                api.Logout();
-                                break;
-                        }
-                    };
-                    dropdown.Current.TriggerChange();
                     break;
             }
 
