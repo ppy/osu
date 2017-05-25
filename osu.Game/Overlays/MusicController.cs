@@ -264,32 +264,36 @@ namespace osu.Game.Overlays
 
         private void beatmapChanged(WorkingBeatmap beatmap)
         {
-            progressBar.IsEnabled = beatmap != null;
-
-            bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
-
-            TransformDirection direction;
-
-            if (audioEquals)
-                direction = TransformDirection.None;
-            else if (queuedDirection.HasValue)
+            if (current != null)
             {
-                direction = queuedDirection.Value;
+                progressBar.IsEnabled = beatmap != null;
+
+                bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
+
+                TransformDirection direction;
+
+                if (audioEquals)
+                    direction = TransformDirection.None;
+                else if (queuedDirection.HasValue)
+                {
+                    direction = queuedDirection.Value;
+                    queuedDirection = null;
+                }
+                else
+                {
+                    //figure out the best direction based on order in playlist.
+                    var last = playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo.ID).Count();
+                    var next = beatmapBacking.Value == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmapBacking.Value.BeatmapSetInfo.ID).Count();
+
+                    direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
+                }
+
+
+                updateDisplay(beatmapBacking, direction);
                 queuedDirection = null;
-            }
-            else
-            {
-                //figure out the best direction based on order in playlist.
-                var last = current == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo.ID).Count();
-                var next = beatmapBacking.Value == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmapBacking.Value.BeatmapSetInfo.ID).Count();
-
-                direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
             }
 
             current = beatmapBacking.Value;
-
-            updateDisplay(beatmapBacking, direction);
-            queuedDirection = null;
         }
 
         private ScheduledDelegate pendingBeatmapSwitch;
