@@ -60,7 +60,7 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        chevron = new TextAwesome
+                        Chevron = new TextAwesome
                         {
                             AlwaysPresent = true,
                             Icon = FontAwesome.fa_chevron_right,
@@ -84,12 +84,12 @@ namespace osu.Game.Graphics.UserInterface
 
             private Color4? accentColour;
 
-            private readonly TextAwesome chevron;
+            protected readonly TextAwesome Chevron;
 
             protected override void FormatForeground(bool hover = false)
             {
                 base.FormatForeground(hover);
-                chevron.Alpha = hover ? 1 : 0;
+                Chevron.Alpha = hover ? 1 : 0;
             }
 
             public Color4 AccentColour
