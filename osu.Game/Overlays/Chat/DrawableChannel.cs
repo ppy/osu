@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.Chat
             {
                 scroll = new ScrollContainer
                 {
+                    AnchorToBottom = true,
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
@@ -48,7 +49,6 @@ namespace osu.Game.Overlays.Chat
             base.LoadComplete();
 
             newMessagesArrived(Channel.Messages);
-            scrollToEnd();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -65,9 +65,6 @@ namespace osu.Game.Overlays.Chat
 
             //up to last Channel.MAX_HISTORY messages
             flow.Add(displayMessages.Select(m => new ChatLine(m)));
-
-            if (scroll.IsScrolledToEnd(10) || !flow.Children.Any())
-                scrollToEnd();
 
             var staleMessages = flow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
             int count = staleMessages.Length - Channel.MAX_HISTORY;
