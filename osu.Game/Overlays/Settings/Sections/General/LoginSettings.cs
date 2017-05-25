@@ -134,7 +134,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                     panel.Status.BindTo(api.LocalUser.Value.Status);
 
-                    dropdown.Current.TriggerChange();
                     dropdown.Current.ValueChanged += newValue =>
                     {
                         switch (newValue)
@@ -156,6 +155,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                 break;
                         }
                     };
+                    dropdown.Current.TriggerChange();
+
                     break;
             }
 
