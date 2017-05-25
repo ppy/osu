@@ -24,12 +24,12 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// <summary>
         /// The default play field height.
         /// </summary>
-        public const float DEFAULT_PLAYFIELD_HEIGHT = 168f;
+        public const float DEFAULT_PLAYFIELD_HEIGHT = 178f;
 
         /// <summary>
         /// The offset from <see cref="left_area_size"/> which the center of the hit target lies at.
         /// </summary>
-        private const float hit_target_offset = TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER / 2f + 40;
+        public const float HIT_TARGET_OFFSET = TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER / 2f + 40;
 
         /// <summary>
         /// The size of the left area of the playfield. This area contains the input drum.
@@ -39,15 +39,18 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected override Container<Drawable> Content => hitObjectContainer;
 
         private readonly Container<HitExplosion> hitExplosionContainer;
+        private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly Container<DrawableBarLine> barLineContainer;
         private readonly Container<DrawableTaikoJudgement> judgementContainer;
 
         private readonly Container hitObjectContainer;
         private readonly Container topLevelHitContainer;
-        private readonly Container leftBackgroundContainer;
-        private readonly Container rightBackgroundContainer;
-        private readonly Box leftBackground;
-        private readonly Box rightBackground;
+
+        private readonly Container overlayBackgroundContainer;
+        private readonly Container backgroundContainer;
+
+        private readonly Box overlayBackground;
+        private readonly Box background;
 
         public TaikoPlayfield()
         {
@@ -59,7 +62,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Height = DEFAULT_PLAYFIELD_HEIGHT,
                     Children = new[]
                     {
-                        rightBackgroundContainer = new Container
+                        backgroundContainer = new Container
                         {
                             Name = "Transparent playfield background",
                             RelativeSizeAxes = Axes.Both,
@@ -73,7 +76,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                             },
                             Children = new Drawable[]
                             {
-                                rightBackground = new Box
+                                background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0.6f
@@ -82,24 +85,23 @@ namespace osu.Game.Rulesets.Taiko.UI
                         },
                         new Container
                         {
-                            Name = "Transparent playfield elements",
+                            Name = "Right area",
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = left_area_size },
+                            Margin = new MarginPadding { Left = left_area_size },
                             Children = new Drawable[]
                             {
                                 new Container
                                 {
-                                    Name = "Hit target container",
-                                    X = hit_target_offset,
+                                    Name = "Masked elements",
                                     RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                                    Masking = true,
                                     Children = new Drawable[]
                                     {
                                         hitExplosionContainer = new Container<HitExplosion>
                                         {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.Centre,
                                             RelativeSizeAxes = Axes.Y,
-                                            BlendingMode = BlendingMode.Additive
+                                            BlendingMode = BlendingMode.Additive,
                                         },
                                         barLineContainer = new Container<DrawableBarLine>
                                         {
@@ -114,23 +116,32 @@ namespace osu.Game.Rulesets.Taiko.UI
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
-                                        judgementContainer = new Container<DrawableTaikoJudgement>
-                                        {
-                                            RelativeSizeAxes = Axes.Y,
-                                            BlendingMode = BlendingMode.Additive
-                                        },
-                                    },
+                                    }
+                                },
+                                kiaiExplosionContainer = new Container<KiaiHitExplosion>
+                                {
+                                    Name = "Kiai hit explosions",
+                                    RelativeSizeAxes = Axes.Y,
+                                    Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                                    BlendingMode = BlendingMode.Additive
+                                },
+                                judgementContainer = new Container<DrawableTaikoJudgement>
+                                {
+                                    Name = "Judgements",
+                                    RelativeSizeAxes = Axes.Y,
+                                    Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                                    BlendingMode = BlendingMode.Additive
                                 },
                             }
                         },
-                        leftBackgroundContainer = new Container
+                        overlayBackgroundContainer = new Container
                         {
                             Name = "Left overlay",
                             Size = new Vector2(left_area_size, DEFAULT_PLAYFIELD_HEIGHT),
                             BorderThickness = 1,
                             Children = new Drawable[]
                             {
-                                leftBackground = new Box
+                                overlayBackground = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
@@ -164,11 +175,11 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            leftBackgroundContainer.BorderColour = colours.Gray0;
-            leftBackground.Colour = colours.Gray1;
+            overlayBackgroundContainer.BorderColour = colours.Gray0;
+            overlayBackground.Colour = colours.Gray1;
 
-            rightBackgroundContainer.BorderColour = colours.Gray1;
-            rightBackground.Colour = colours.Gray0;
+            backgroundContainer.BorderColour = colours.Gray1;
+            background.Colour = colours.Gray0;
         }
 
         public override void Add(DrawableHitObject<TaikoHitObject, TaikoJudgement> h)
@@ -204,6 +215,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (!wasHit)
                 return;
 
+            bool isRim = judgedObject.HitObject is RimHit;
+
             if (!secondHit)
             {
                 if (judgedObject.X >= -0.05f && !(judgedObject is DrawableSwell))
@@ -212,7 +225,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                     topLevelHitContainer.Add(judgedObject.CreateProxy());
                 }
 
-                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement));
+                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement, isRim));
+
+                if (judgedObject.HitObject.Kiai)
+                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject.Judgement, isRim));
+
             }
             else
                 hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
@@ -221,7 +238,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// <summary>
         /// This is a very special type of container. It serves a similar purpose to <see cref="FillMode.Fit"/>, however unlike <see cref="FillMode.Fit"/>,
         /// this will only adjust the scale relative to the height of its parent and will maintain the original width relative to its parent.
-        /// 
+        ///
         /// <para>
         /// By adjusting the scale relative to the height of its parent, the aspect ratio of this container's children is maintained, however this is undesirable
         /// in the case where the hit object container should not have its width adjusted by scale. To counteract this, another container is nested inside this
