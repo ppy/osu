@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Chat
                 Padding = new MarginPadding(10),
             });
 
-            AddTabItem(new ChannelTabItem.ChannelSelectorTabItem(new Channel(), channelSelectorActive));
+            AddTabItem(new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }, channelSelectorActive));
         }
 
         private class ChannelTabItem : TabItem<Channel>
@@ -218,18 +218,20 @@ namespace osu.Game.Overlays.Chat
                 {
                     activeBindable = active;
                     Depth = float.MaxValue;
-                    Width = 60;
+                    Width = 45;
 
-                    icon.Icon = FontAwesome.fa_plus;
+                    icon.Icon = 0;
                     icon.X = 0;
+
+                    text.TextSize = 45;
+                    textBold.TextSize = 45;
                 }
 
                 [BackgroundDependencyLoader]
                 private new void load(OsuColour colour)
                 {
-                    backgroundActive = colour.Green;
-                    backgroundInactive = colour.GreenDark;
-                    backgroundHover = colour.Green;
+                    backgroundInactive = colour.Gray2;
+                    backgroundActive = colour.Gray3;
 
                     updateState();
                 }
