@@ -303,7 +303,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         Icon = FontAwesome.fa_circle_o,
                         TextSize = 14,
                     });
-                    
+
                     Text.Margin = new MarginPadding { Left = LABEL_LEFT_MARGIN };
                 }
 
