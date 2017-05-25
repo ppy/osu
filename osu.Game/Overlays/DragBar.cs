@@ -64,9 +64,9 @@ namespace osu.Game.Overlays
 
         private void seek(InputState state)
         {
-            float seekLocation = state.Mouse.Position.X / DrawWidth;
-
             if (!IsEnabled) return;
+
+            float seekLocation = state.Mouse.Position.X / DrawWidth;
 
             SeekRequested?.Invoke(seekLocation);
             updatePosition(seekLocation);

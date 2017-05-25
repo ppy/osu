@@ -225,7 +225,7 @@ namespace osu.Game.Overlays
                 progressBar.UpdatePosition(track.Length == 0 ? 0 : (float)(track.CurrentTime / track.Length));
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping && !progressBar.IsSeeking) next();
+                if (track.HasCompleted && !track.Looping) next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
@@ -255,6 +255,7 @@ namespace osu.Game.Overlays
 
         private void next()
         {
+            progressBar.TriggerDragEnd();
             queuedDirection = TransformDirection.Next;
             playlist.PlayNext();
         }
@@ -350,7 +351,10 @@ namespace osu.Game.Overlays
         private void seek(float position)
         {
             var track = current?.Track;
-            track?.Seek(track.Length * position);
+            if (position < 1)
+                track?.Seek(track.Length * position);
+            else
+                next();
         }
 
         protected override void PopIn()
