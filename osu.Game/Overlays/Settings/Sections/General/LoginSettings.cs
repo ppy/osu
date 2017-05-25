@@ -256,7 +256,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 set
                 {
-                    (Header as UserDropdownHeader).StatusColour = value;
+                    var h = Header as UserDropdownHeader;
+                    if (h == null) return;
+                    h.StatusColour = value;
                 }
             }
 
@@ -268,10 +270,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             private class UserDropdownHeader : OsuDropdownHeader
             {
-                public static readonly float LABEL_LEFT_MARGIN = 20;
+                public const float LABEL_LEFT_MARGIN = 20;
 
-                protected readonly TextAwesome statusIcon;
-
+                private readonly TextAwesome statusIcon;
                 public Color4 StatusColour
                 {
                     set
