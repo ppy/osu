@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -83,6 +83,7 @@ namespace osu.Game.Overlays.Browse
             };
 
             if (controls != null) controlsContainer.Children = new[] { controls };
+
             Tabs.Current.Value = DefaultTab;
             Tabs.Current.TriggerChange();
         }

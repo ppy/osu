@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
@@ -13,13 +12,18 @@ using osu.Game.Overlays.Browse;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
 
-using Container = osu.Framework.Graphics.Containers.Container;
-
 namespace osu.Game.Overlays
 {
     public class SocialOverlay : BrowseOverlay<SocialTab, SocialSortCriteria>
     {
         private readonly FillFlowContainer<UserPanel> panelFlow;
+
+        protected override Color4 BackgroundColour => OsuColour.FromHex(@"60284b");
+        protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"672b51");
+        protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"5c2648");
+
+        protected override BrowseFilterControl<SocialSortCriteria> CreateFilterControl() => new FilterControl();
+        protected override BrowseHeader<SocialTab> CreateHeader() => new Header();
 
         private IEnumerable<User> users;
         public IEnumerable<User> Users
@@ -38,13 +42,6 @@ namespace osu.Game.Overlays
                 });
             }
         }
-
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"60284b");
-        protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"672b51");
-        protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"5c2648");
-
-        protected override BrowseFilterControl<SocialSortCriteria> CreateFilterControl() => new FilterControl();
-        protected override BrowseHeader<SocialTab> CreateHeader() => new Header();
 
         public SocialOverlay()
         {

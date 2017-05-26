@@ -13,9 +13,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.Browse;
 using OpenTK.Graphics;
-using System.ComponentModel;
-
-using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays
 {

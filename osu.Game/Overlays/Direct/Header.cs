@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Direct
         protected override float TabStripWidth => 298;
 
         protected override DirectTab DefaultTab => DirectTab.Search;
-        protected override Drawable CreateHeaderText() => new OsuSpriteText { Text = @"osu!direct", TextSize = 25, };
+        protected override Drawable CreateHeaderText() => new OsuSpriteText { Text = @"osu!direct", TextSize = 25 };
 
         public Header()
         {
