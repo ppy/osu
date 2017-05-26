@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Chat
 
         public readonly FillFlowContainer<ChannelListItem> ChannelFlow;
 
-        public IEnumerable<IFilterable> FilterableChildren => ChannelFlow.Children.OfType<ChannelListItem>();
+        public IEnumerable<IFilterable> FilterableChildren => ChannelFlow.Children;
         public string[] FilterTerms => new[] { Header };
         public bool MatchingCurrentFilter
         {

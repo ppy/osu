@@ -245,7 +245,7 @@ namespace osu.Game.Overlays
                     addChannel(channels.Find(c => c.Name == @"#osu"));
                     addChannel(channels.Find(c => c.Name == @"#lobby"));
 
-                    channelSelection.OnRequestJoin = channel => addChannel(channel);
+                    channelSelection.OnRequestJoin = addChannel;
                     channelSelection.Sections = new[]
                     {
                         new ChannelSection
