@@ -60,14 +60,17 @@ namespace osu.Game.Rulesets.Mania.Scoring
         private int maxTotalHits;
         private int totalHits;
 
-        private double hpIncreaseBad;
-        private double hpIncreaseOk;
-        private double hpIncreaseGood;
-        private double hpIncreaseGreat;
-        private double hpIncreasePerfect;
-        private double hpIncreaseTick;
-        private double hpIncreaseTickMiss;
-        private double hpIncreaseMiss;
+        private double hpMultiplier = 1;
+        private const double hp_increase_bad = 0.005;
+        private const double hp_increase_ok = 0.010;
+        private const double hp_increase_good = 0.035;
+        private const double hp_increase_tick = 0.040;
+        private const double hp_increase_great = 0.055;
+        private const double hp_increase_perfect = 0.065;
+
+        private double hpMissMultiplier = 1;
+        private const double hp_increase_tick_miss = -0.025;
+        private const double hp_increase_miss = -0.125;
 
         public ManiaScoreProcessor()
         {
@@ -80,41 +83,52 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
         protected override void ComputeTargets(Beatmap<ManiaHitObject> beatmap)
         {
-            foreach (var obj in beatmap.HitObjects)
+            while (true)
             {
-                if (obj is Note)
+                foreach (var obj in beatmap.HitObjects)
                 {
-                    AddJudgement(new ManiaJudgement
+                    if (obj is Note)
                     {
-                        Result = HitResult.Hit,
-                        ManiaResult = ManiaHitResult.Perfect
-                    });
-                }
-                else if (obj is HoldNote)
-                {
-                    // Head
-                    AddJudgement(new ManiaJudgement
-                    {
-                        Result = HitResult.Hit,
-                        ManiaResult = ManiaJudgement.MAX_HIT_RESULT
-                    });
-
-                    // Ticks
-                    for (int i = 0; i < ((HoldNote)obj).TotalTicks; i++)
-                    {
-                        AddJudgement(new HoldNoteTickJudgement
+                        AddJudgement(new ManiaJudgement
                         {
                             Result = HitResult.Hit,
-                            ManiaResult = ManiaJudgement.MAX_HIT_RESULT,
+                            ManiaResult = ManiaHitResult.Perfect
                         });
                     }
-
-                    AddJudgement(new HoldNoteTailJudgement
+                    else if (obj is HoldNote)
                     {
-                        Result = HitResult.Hit,
-                        ManiaResult = ManiaJudgement.MAX_HIT_RESULT
-                    });
+                        // Head
+                        AddJudgement(new ManiaJudgement
+                        {
+                            Result = HitResult.Hit,
+                            ManiaResult = ManiaJudgement.MAX_HIT_RESULT
+                        });
+
+                        // Ticks
+                        for (int i = 0; i < ((HoldNote)obj).TotalTicks; i++)
+                        {
+                            AddJudgement(new HoldNoteTickJudgement
+                            {
+                                Result = HitResult.Hit,
+                                ManiaResult = ManiaJudgement.MAX_HIT_RESULT,
+                            });
+                        }
+
+                        AddJudgement(new HoldNoteTailJudgement
+                        {
+                            Result = HitResult.Hit,
+                            ManiaResult = ManiaJudgement.MAX_HIT_RESULT
+                        });
+                    }
                 }
+
+                if (!HasFailed)
+                    break;
+
+                hpMultiplier *= 1.01;
+                hpMissMultiplier *= 0.98;
+
+                Reset();
             }
 
             maxTotalHits = totalHits;
@@ -132,14 +146,14 @@ namespace osu.Game.Rulesets.Mania.Scoring
             {
                 case HitResult.Miss:
                     if (isTick)
-                        Health.Value += hpIncreaseTickMiss;
+                        Health.Value += hpMissMultiplier * hp_increase_tick_miss;
                     else
-                        Health.Value += hpIncreaseMiss;
+                        Health.Value += hpMissMultiplier * hp_increase_miss;
                     break;
                 case HitResult.Hit:
                     if (isTick)
                     {
-                        Health.Value += hpIncreaseTick;
+                        Health.Value += hpMultiplier * hp_increase_tick;
                         bonusScore += judgement.ResultValueForScore;
                     }
                     else
@@ -147,19 +161,19 @@ namespace osu.Game.Rulesets.Mania.Scoring
                         switch (judgement.ManiaResult)
                         {
                             case ManiaHitResult.Bad:
-                                Health.Value += hpIncreaseBad;
+                                Health.Value += hpMultiplier * hp_increase_bad;
                                 break;
                             case ManiaHitResult.Ok:
-                                Health.Value += hpIncreaseOk;
+                                Health.Value += hpMultiplier * hp_increase_ok;
                                 break;
                             case ManiaHitResult.Good:
-                                Health.Value += hpIncreaseGood;
+                                Health.Value += hpMultiplier * hp_increase_good;
                                 break;
                             case ManiaHitResult.Great:
-                                Health.Value += hpIncreaseGreat;
+                                Health.Value += hpMultiplier * hp_increase_great;
                                 break;
                             case ManiaHitResult.Perfect:
-                                Health.Value += hpIncreasePerfect;
+                                Health.Value += hpMultiplier * hp_increase_perfect;
                                 break;
                         }
 
