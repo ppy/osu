@@ -36,8 +36,8 @@ namespace osu.Game.Overlays.Mods
 
         public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
 
-        private const EasingTypes modSwitchEasing = EasingTypes.InOutQuint;
-        private const double modSwitchDuration = 100;
+        private const EasingTypes mod_switch_easing = EasingTypes.InOutQuint;
+        private const double mod_switch_duration = 100;
 
         private int _selectedIndex = -1;
         private int selectedIndex
@@ -69,23 +69,23 @@ namespace osu.Game.Overlays.Mods
                 }
                 else
                 {
-                    foregroundIcon.RotateTo(15f, modSwitchDuration, modSwitchEasing);
-                    backgroundIcon.RotateTo(-15f, modSwitchDuration, modSwitchEasing);
-                    using (foregroundIcon.BeginDelayedSequence(modSwitchDuration))
+                    foregroundIcon.RotateTo(15f, mod_switch_duration, mod_switch_easing);
+                    backgroundIcon.RotateTo(-15f, mod_switch_duration, mod_switch_easing);
+                    using (foregroundIcon.BeginDelayedSequence(mod_switch_duration))
                     {
                         foregroundIcon.RotateTo(-15f);
-                        foregroundIcon.RotateTo(0f, modSwitchDuration, modSwitchEasing);
+                        foregroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
                     }
-                    using (backgroundIcon.BeginDelayedSequence(modSwitchDuration))
+                    using (backgroundIcon.BeginDelayedSequence(mod_switch_duration))
                     {
                         backgroundIcon.RotateTo(15f);
-                        backgroundIcon.RotateTo(0f, modSwitchDuration, modSwitchEasing);
+                        backgroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
                     }
                 }
                 foregroundIcon.Highlighted = Selected;
 
                 if (mod != null)
-                    Scheduler.AddDelayed(() => displayMod(SelectedMod ?? Mods[0]), beforeSelected ^ Selected ? 0 : modSwitchDuration);
+                    Scheduler.AddDelayed(() => displayMod(SelectedMod ?? Mods[0]), beforeSelected ^ Selected ? 0 : mod_switch_duration);
             }
         }
 
