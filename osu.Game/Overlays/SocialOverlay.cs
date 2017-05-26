@@ -31,7 +31,7 @@ namespace osu.Game.Overlays
             get { return users; }
             set
             {
-                if (users == value) return;
+                if (users?.Equals(value) ?? false) return;
                 users = value;
 
                 panelFlow.Children = users.Select(u =>
