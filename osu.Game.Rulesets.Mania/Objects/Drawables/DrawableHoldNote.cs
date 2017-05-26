@@ -127,15 +127,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
         }
 
-        /// <summary>
-        /// Handles key down events on the body of the hold note.
-        /// </summary>
-        /// <param name="state">The input state.</param>
-        /// <param name="args">The key down args.</param>
-        /// <returns>Whether the key press was handled.</returns>
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            // Make sure the keypress happened within reasonable bounds of the hold note
+            // Make sure the keypress happened within the body of the hold note
             if (Time.Current < HitObject.StartTime || Time.Current > HitObject.EndTime)
                 return false;
 
@@ -145,17 +139,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (args.Repeat)
                 return false;
 
+            // The user has pressed during the body of the hold note, after the head note and its hit windows have passed
+            // and within the limited range of the above if-statement. This state will be managed by the head note if the
+            // user has pressed during the hit windows of the head note.
             holding = true;
 
             return true;
         }
 
-        /// <summary>
-        /// Handles key up events on the body of the hold note.
-        /// </summary>
-        /// <param name="state">The input state.</param>
-        /// <param name="args">The key down args.</param>
-        /// <returns>Whether the key press was handled.</returns>
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
             // Make sure that the user started holding the key during the hold note
@@ -167,7 +158,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             holding = false;
 
-            // If the key has been released too early, they should not receive full score for the release
+            // If the key has been released too early, the user should not receive full score for the release
             if (!tail.Judged)
                 hasBroken = true;
 
@@ -196,13 +187,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return false;
 
                 // We only want to trigger a holding state from the head if the head has received a judgement
-                if (Judgement.Result == HitResult.None)
+                if (!Judged)
                     return false;
 
-                // If the head has been missed, make sure the user also can't receive a full score for the release
+                // If the key has been released too early, the user should not receive full score for the release
                 if (Judgement.Result == HitResult.Miss)
                     holdNote.hasBroken = true;
 
+                // The head note also handles early hits before the body, but we want accurate early hits to count as the body being held
+                // The body doesn't handle these early early hits, so we have to explicitly set the holding state here
                 holdNote.holding = true;
 
                 return true;
