@@ -188,6 +188,10 @@ namespace osu.Game.Rulesets.Mania.Scoring
             base.Reset();
 
             Health.Value = 1;
+
+            bonusScore = 0;
+            comboPortion = 0;
+            totalHits = 0;
         }
     }
 }
