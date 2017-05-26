@@ -24,9 +24,7 @@ namespace osu.Game.Overlays.Chat
 
         private const float shear_width = 10;
 
-        private readonly Bindable<bool> channelSelectorActive = new Bindable<bool>();
-
-        public Bindable<bool> ChannelSelectorActive => channelSelectorActive;
+        public readonly Bindable<bool> ChannelSelectorActive = new Bindable<bool>();
 
         public ChatTabControl()
         {
@@ -43,7 +41,7 @@ namespace osu.Game.Overlays.Chat
                 Padding = new MarginPadding(10),
             });
 
-            AddTabItem(new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }, channelSelectorActive));
+            AddTabItem(new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }, ChannelSelectorActive));
         }
 
         private class ChannelTabItem : TabItem<Channel>
@@ -122,6 +120,11 @@ namespace osu.Game.Overlays.Chat
                 backgroundHover = colours.Gray7;
 
                 highlightBox.Colour = colours.Yellow;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
 
                 updateState();
             }
@@ -232,8 +235,6 @@ namespace osu.Game.Overlays.Chat
                 {
                     backgroundInactive = colour.Gray2;
                     backgroundActive = colour.Gray3;
-
-                    updateState();
                 }
             }
         }
