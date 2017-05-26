@@ -13,7 +13,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using OpenTK.Graphics;
-using System;
 
 namespace osu.Game.Overlays
 {

@@ -4,7 +4,6 @@
 using System.ComponentModel;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
 
