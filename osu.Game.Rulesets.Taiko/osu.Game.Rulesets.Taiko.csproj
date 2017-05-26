@@ -87,6 +87,7 @@
     <Compile Include="Scoring\TaikoScoreProcessor.cs" />
     <Compile Include="UI\HitTarget.cs" />
     <Compile Include="UI\InputDrum.cs" />
+    <Compile Include="UI\KiaiHitExplosion.cs" />
     <Compile Include="UI\DrawableTaikoJudgement.cs" />
     <Compile Include="UI\HitExplosion.cs" />
     <Compile Include="UI\TaikoHitRenderer.cs" />

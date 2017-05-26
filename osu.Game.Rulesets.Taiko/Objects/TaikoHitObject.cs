@@ -13,12 +13,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// <summary>
         /// Diameter of a circle relative to the size of the <see cref="TaikoPlayfield"/>.
         /// </summary>
-        public const float PLAYFIELD_RELATIVE_DIAMETER = 0.5f;
+        public const float PLAYFIELD_RELATIVE_DIAMETER = 0.45f;
 
         /// <summary>
         /// Scale multiplier for a strong circle.
         /// </summary>
-        public const float STRONG_CIRCLE_DIAMETER_SCALE = 1.5f;
+        public const float STRONG_CIRCLE_DIAMETER_SCALE = 1.4f;
 
         /// <summary>
         /// Default circle diameter.
