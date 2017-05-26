@@ -28,8 +28,6 @@ namespace osu.Game.Online.Chat
 
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
 
-        public readonly SortedList<Message> Messages = new SortedList<Message>((m1, m2) => m1.Id.CompareTo(m2.Id));
-
         public bool ReadOnly => Name != "#lazer";
 
         public const int MAX_HISTORY = 300;
