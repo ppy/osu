@@ -37,6 +37,7 @@ namespace osu.Game.Overlays.Chat
         }
 
         public Action<Channel> OnRequestJoin;
+        public Action<Channel> OnRequestLeave;
 
         private Channel channel;
         public Channel Channel
@@ -60,7 +61,7 @@ namespace osu.Game.Overlays.Chat
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Action = () => { if (!Channel.Joined) OnRequestJoin?.Invoke(Channel); };
+            Action = () => { (Channel.Joined ? OnRequestLeave : OnRequestJoin)?.Invoke(Channel); };
 
             Children = new Drawable[]
             {
