@@ -24,11 +24,10 @@ namespace osu.Game.Graphics.UserInterface
                     var tIndex = TabContainer.IndexOf(t);
                     var tabIndex = TabContainer.IndexOf(TabMap[tab]);
                     var hide = tIndex < tabIndex;
-                    var hideChevron = tIndex <= tabIndex;
 
                     t.FadeTo(hide ? 0f : 1f, 500, EasingTypes.OutQuint);
                     t.ScaleTo(new Vector2(hide ? 0.8f : 1f, 1f), 500, EasingTypes.OutQuint);
-                    ((BreadcrumbTabItem)t).Chevron.FadeTo(hideChevron ? 0f : 1f, 500, EasingTypes.OutQuint);
+                    ((BreadcrumbTabItem)t).Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, EasingTypes.OutQuint);
                 }
             };
         }
