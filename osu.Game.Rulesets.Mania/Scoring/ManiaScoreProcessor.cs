@@ -30,6 +30,16 @@ namespace osu.Game.Rulesets.Mania.Scoring
         private const double accuracy_portion_max = max_score * 0.8;
 
         /// <summary>
+        /// The factor used to determine relevance of combos.
+        /// </summary>
+        private const double combo_base = 4;
+
+        /// <summary>
+        /// The combo value at which hit objects result in the max score possible.
+        /// </summary>
+        private const int combo_relevance_cap = 400;
+
+        /// <summary>
         /// The cumulative combo portion of the score.
         /// </summary>
         private double comboScore => combo_portion_max * comboPortion / maxComboPortion;
@@ -153,7 +163,9 @@ namespace osu.Game.Rulesets.Mania.Scoring
                                 break;
                         }
 
-                        comboPortion += judgement.ResultValueForScore;
+                        // A factor that is applied to make higher combos more relevant
+                        double comboRelevance = Math.Min(Math.Max(0.5, Math.Log(Combo.Value, combo_base)), Math.Log(combo_relevance_cap, combo_base));
+                        comboPortion += judgement.ResultValueForScore * comboRelevance;
                     }
                     break;
             }
