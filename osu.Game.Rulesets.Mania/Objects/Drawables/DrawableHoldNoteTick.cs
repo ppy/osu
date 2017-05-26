@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// <summary>
         /// References the time at which the user started holding the hold note.
         /// </summary>
-        public Func<double> HoldStartTime;
+        public Func<double?> HoldStartTime;
 
         /// <summary>
         /// References whether the user is currently holding the hold note.
@@ -89,7 +89,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             if (Time.Current < HitObject.StartTime)
                 return;
-
 
             if (HoldStartTime?.Invoke() > HitObject.StartTime)
                 return;

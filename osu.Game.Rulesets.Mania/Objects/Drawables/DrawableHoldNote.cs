@@ -27,32 +27,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly Container<DrawableHoldNoteTick> tickContainer;
 
         /// <summary>
-        /// Time at which the user started holding this hold note.
+        /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
         /// </summary>
-        private double holdStartTime;
+        private double? holdStartTime;
 
         /// <summary>
         /// Whether the hold note has been released too early and shouldn't give full score for the release.
         /// </summary>
         private bool hasBroken;
-
-        private bool _holding;
-        /// <summary>
-        /// Whether the user is currently holding the hold note.
-        /// </summary>
-        private bool holding
-        {
-            get { return _holding; }
-            set
-            {
-                if (_holding == value)
-                    return;
-                _holding = value;
-
-                if (holding)
-                    holdStartTime = Time.Current;
-            }
-        }
 
         public DrawableHoldNote(HoldNote hitObject, Bindable<Key> key = null)
             : base(hitObject, key)
@@ -91,7 +73,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 var drawableTick = new DrawableHoldNoteTick(tick)
                 {
-                    IsHolding = () => holding,
                     HoldStartTime = () => holdStartTime
                 };
 
@@ -142,7 +123,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // The user has pressed during the body of the hold note, after the head note and its hit windows have passed
             // and within the limited range of the above if-statement. This state will be managed by the head note if the
             // user has pressed during the hit windows of the head note.
-            holding = true;
+            holdStartTime = Time.Current;
 
             return true;
         }
@@ -150,13 +131,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
             // Make sure that the user started holding the key during the hold note
-            if (!holding)
+            if (!holdStartTime.HasValue)
                 return false;
 
             if (args.Key != Key)
                 return false;
 
-            holding = false;
+            holdStartTime = null;
 
             // If the key has been released too early, the user should not receive full score for the release
             if (!tail.Judged)
@@ -196,7 +177,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 // The head note also handles early hits before the body, but we want accurate early hits to count as the body being held
                 // The body doesn't handle these early early hits, so we have to explicitly set the holding state here
-                holdNote.holding = true;
+                holdNote.holdStartTime = Time.Current;
 
                 return true;
             }
@@ -234,7 +215,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
             {
                 // Make sure that the user started holding the key during the hold note
-                if (!holdNote.holding)
+                if (!holdNote.holdStartTime.HasValue)
                     return false;
 
                 if (Judgement.Result != HitResult.None)
