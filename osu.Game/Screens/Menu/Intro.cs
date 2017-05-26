@@ -8,7 +8,10 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
+using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using OpenTK.Graphics;
@@ -19,6 +22,8 @@ namespace osu.Game.Screens.Menu
     {
         private readonly OsuLogo logo;
 
+        public const string MENU_MUSIC_BEATMAP_HASH = "21c1271b91234385978b5418881fdd88";
+
         /// <summary>
         /// Whether we have loaded the menu previously.
         /// </summary>
@@ -27,7 +32,6 @@ namespace osu.Game.Screens.Menu
         private MainMenu mainMenu;
         private SampleChannel welcome;
         private SampleChannel seeya;
-        private Track bgm;
 
         internal override bool HasLocalCursorDisplayed => true;
 
@@ -60,15 +64,49 @@ namespace osu.Game.Screens.Menu
 
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
+        private Track track;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config)
+        private void load(AudioManager audio, OsuConfigManager config, BeatmapDatabase beatmaps, Framework.Game game)
         {
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
-            bgm = audio.Track.Get(@"circles");
-            bgm.Looping = true;
+            var trackManager = audio.Track;
+
+            BeatmapSetInfo setInfo = null;
+
+            if (!menuMusic)
+            {
+                var query = beatmaps.Query<BeatmapSetInfo>().Where(b => !b.DeletePending);
+                int count = query.Count();
+                if (count > 0)
+                    setInfo = query.ElementAt(RNG.Next(0, count - 1));
+            }
+
+            if (setInfo == null)
+            {
+                var query = beatmaps.Query<BeatmapSetInfo>().Where(b => b.Hash == MENU_MUSIC_BEATMAP_HASH);
+
+                setInfo = query.FirstOrDefault();
+
+                if (setInfo == null)
+                {
+                    // we need to import the default menu background beatmap
+                    beatmaps.Import(new OszArchiveReader(game.Resources.GetStream(@"Tracks/circles.osz")));
+
+                    setInfo = query.First();
+
+                    setInfo.DeletePending = true;
+                    beatmaps.Update(setInfo, false);
+                }
+            }
+
+            beatmaps.GetChildren(setInfo);
+            Beatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+
+            track = Beatmap.Track;
+            trackManager.SetExclusive(track);
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
@@ -83,8 +121,7 @@ namespace osu.Game.Screens.Menu
 
             Scheduler.AddDelayed(delegate
             {
-                if (menuMusic)
-                    bgm.Start();
+                track.Start();
 
                 LoadComponentAsync(mainMenu = new MainMenu());
 

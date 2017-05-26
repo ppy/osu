@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps
             Objects = CreateBeatmapConverter().Convert(beatmap, true).HitObjects;
 
             foreach (var h in Objects)
-                h.ApplyDefaults(beatmap.TimingInfo, beatmap.BeatmapInfo.Difficulty);
+                h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.Difficulty);
 
             PreprocessHitObjects();
         }

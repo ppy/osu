@@ -170,8 +170,8 @@ namespace osu.Game.Screens.Select
             List<BeatmapGroup> visibleGroups = groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden).ToList();
             if (visibleGroups.Count < 1)
                 return;
-            BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];
 
+            BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];
             BeatmapPanel panel = group.BeatmapPanels[RNG.Next(group.BeatmapPanels.Count)];
 
             selectGroup(group, panel);

@@ -238,12 +238,12 @@ namespace osu.Game.Screens.Select
 
             private string getBPMRange(Beatmap beatmap)
             {
-                double bpmMax = beatmap.TimingInfo.BPMMaximum;
-                double bpmMin = beatmap.TimingInfo.BPMMinimum;
+                double bpmMax = beatmap.ControlPointInfo.BPMMaximum;
+                double bpmMin = beatmap.ControlPointInfo.BPMMinimum;
 
                 if (Precision.AlmostEquals(bpmMin, bpmMax)) return Math.Round(bpmMin) + "bpm";
 
-                return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (mostly " + Math.Round(beatmap.TimingInfo.BPMMode) + "bpm)";
+                return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (mostly " + Math.Round(beatmap.ControlPointInfo.BPMMode) + "bpm)";
             }
 
             public class InfoLabel : Container

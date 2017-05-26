@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps.Timing;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
 
 namespace osu.Game.Rulesets.Taiko.Objects
@@ -23,9 +23,9 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public double HitWindowMiss = 95;
 
-        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
+        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(timing, difficulty);
+            base.ApplyDefaults(controlPointInfo, difficulty);
 
             HitWindowGreat = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 50, 35, 20);
             HitWindowGood = BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 120, 80, 50);
