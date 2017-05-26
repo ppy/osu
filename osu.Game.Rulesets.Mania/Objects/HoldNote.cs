@@ -13,20 +13,39 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// </summary>
     public class HoldNote : ManiaHitObject, IHasEndTime
     {
-        public double Duration { get; set; }
         public double EndTime => StartTime + Duration;
 
-        private Note head;
+        private double duration;
+        public double Duration
+        {
+            get { return duration; }
+            set
+            {
+                duration = value;
+                Tail.StartTime = EndTime;
+            }
+        }
+
+        public override double StartTime
+        {
+            get { return base.StartTime; }
+            set
+            {
+                base.StartTime = value;
+                Head.StartTime = value;
+                Tail.StartTime = EndTime;
+            }
+        }
+
         /// <summary>
         /// The head note of the hold.
         /// </summary>
-        public Note Head => head ?? (head = new Note { StartTime = StartTime });
+        public Note Head = new Note();
 
-        private Note tail;
         /// <summary>
         /// The tail note of the hold.
         /// </summary>
-        public Note Tail => tail ?? (tail = new TailNote { StartTime = EndTime });
+        public Note Tail = new TailNote();
 
         /// <summary>
         /// The time between ticks of this hold.
