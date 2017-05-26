@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract T DefaultTab { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
 
-        public SearchableListFilterControl()
+        protected SearchableListFilterControl()
         {
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("BrowseFilterControl only supports enums as the generic type argument");

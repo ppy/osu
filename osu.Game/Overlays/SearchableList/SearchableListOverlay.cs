@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract SearchableListHeader<T> CreateHeader();
         protected abstract SearchableListFilterControl<U> CreateFilterControl();
 
-        public SearchableListOverlay()
+        protected SearchableListOverlay()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.SearchableList
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
+                                    Padding = new MarginPadding { Horizontal = WIDTH_PADDING },
                                     Direction = FillDirection.Vertical,
                                 },
                             },

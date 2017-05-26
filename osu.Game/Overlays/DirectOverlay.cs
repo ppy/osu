@@ -137,7 +137,7 @@ namespace osu.Game.Overlays
 
         private void withDisplayStyleControl(Action<DisplayStyleControl<RankStatus>> action)
         {
-            var f = (Filter as FilterControl);
+            var f = Filter as FilterControl;
             if (f != null) action.Invoke(f.DisplayStyleControl);
         }
 

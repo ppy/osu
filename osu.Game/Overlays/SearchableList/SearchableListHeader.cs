@@ -14,8 +14,6 @@ namespace osu.Game.Overlays.SearchableList
 {
     public abstract class SearchableListHeader<T> : Container
     {
-        public static readonly float HEIGHT = 90;
-
         private readonly Box tabStrip;
 
         public readonly HeaderTabControl<T> Tabs;
@@ -25,13 +23,13 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract T DefaultTab { get; }
         protected abstract Drawable CreateHeaderText();
 
-        public SearchableListHeader()
+        protected SearchableListHeader()
         {
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("BrowseHeader only supports enums as the generic type argument");
 
             RelativeSizeAxes = Axes.X;
-            Height = HEIGHT;
+            Height = 90;
 
             Children = new Drawable[]
             {
@@ -54,7 +52,7 @@ namespace osu.Game.Overlays.SearchableList
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(10f, 0f),
-                            Children = new Drawable[]
+                            Children = new[]
                             {
                                 new TextAwesome
                                 {
