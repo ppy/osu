@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class TwoLayerButton : ClickableContainer
     {
-        private readonly IconBeatSyncedContainer iconBeatSyncedContainer;
+        private readonly BouncingIcon bouncingIcon;
 
         public Box IconLayer;
         public Box TextLayer;
@@ -98,7 +98,7 @@ namespace osu.Game.Graphics.UserInterface
                                 },
                             }
                         },
-                        iconBeatSyncedContainer = new IconBeatSyncedContainer
+                        bouncingIcon = new BouncingIcon
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -148,7 +148,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
-                iconBeatSyncedContainer.Icon = value;
+                bouncingIcon.Icon = value;
             }
         }
 
@@ -200,47 +200,33 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnClick(state);
         }
 
-        private class IconBeatSyncedContainer : BeatSyncedContainer
+        private class BouncingIcon : BeatSyncedContainer
         {
             private const double beat_in_time = 60;
 
             private readonly TextAwesome icon;
-            private readonly Container amplitudeContainer;
 
             public FontAwesome Icon { set { icon.Icon = value; } }
 
-            public IconBeatSyncedContainer()
+            public BouncingIcon()
             {
                 EarlyActivationMilliseconds = beat_in_time;
                 AutoSizeAxes = Axes.Both;
 
                 Children = new Drawable[]
                 {
-                    amplitudeContainer = new Container
+                    icon = new TextAwesome
                     {
-                        AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Children = new Drawable[]
-                        {
-                            icon = new TextAwesome
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                TextSize = 25
-                            }
-                        }
-                    },
+                        TextSize = 25
+                    }
                 };
             }
-
-            private int lastBeatIndex;
 
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
-
-                lastBeatIndex = beatIndex;
 
                 var beatLength = timingPoint.BeatLength;
 
@@ -251,16 +237,6 @@ namespace osu.Game.Graphics.UserInterface
                 icon.ScaleTo(1 - 0.1f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
                 using (icon.BeginDelayedSequence(beat_in_time))
                     icon.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                const float scale_adjust_cutoff = 0.4f;
-
-                var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value?.Track?.CurrentAmplitudes.Maximum ?? 0 : 0;
-                amplitudeContainer.ScaleTo(1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.1f, 75, EasingTypes.OutQuint);
             }
         }
     }
