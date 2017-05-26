@@ -29,6 +29,7 @@ namespace osu.Game.Overlays.Chat
         private readonly SearchContainer<ChannelSection> sectionsFlow;
 
         public Action<Channel> OnRequestJoin;
+        public Action<Channel> OnRequestLeave;
 
         public IEnumerable<ChannelSection> Sections
         {
@@ -41,6 +42,7 @@ namespace osu.Game.Overlays.Chat
                     foreach (ChannelListItem c in s.ChannelFlow.Children)
                     {
                         c.OnRequestJoin = channel => { OnRequestJoin?.Invoke(channel); };
+                        c.OnRequestLeave = channel => { OnRequestLeave?.Invoke(channel); };
                     }
                 }
             }
