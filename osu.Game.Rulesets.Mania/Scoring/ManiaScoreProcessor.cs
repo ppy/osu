@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -40,6 +41,71 @@ namespace osu.Game.Rulesets.Mania.Scoring
         private const int combo_relevance_cap = 400;
 
         /// <summary>
+        /// The hit HP multiplier at OD = 0.
+        /// </summary>
+        private const double hp_multiplier_min = 0.75;
+
+        /// <summary>
+        /// The hit HP multiplier at OD = 0.
+        /// </summary>
+        private const double hp_multiplier_mid = 0.85;
+
+        /// <summary>
+        /// The hit HP multiplier at OD = 0.
+        /// </summary>
+        private const double hp_multiplier_max = 1;
+
+        /// <summary>
+        /// The default BAD hit HP increase.
+        /// </summary>
+        private const double hp_increase_bad = 0.005;
+
+        /// <summary>
+        /// The default OK hit HP increase.
+        /// </summary>
+        private const double hp_increase_ok = 0.010;
+
+        /// <summary>
+        /// The default GOOD hit HP increase.
+        /// </summary>
+        private const double hp_increase_good = 0.035;
+
+        /// <summary>
+        /// The default tick hit HP increase.
+        /// </summary>
+        private const double hp_increase_tick = 0.040;
+
+        /// <summary>
+        /// The default GREAT hit HP increase.
+        /// </summary>
+        private const double hp_increase_great = 0.055;
+
+        /// <summary>
+        /// The default PERFECT hit HP increase.
+        /// </summary>
+        private const double hp_increase_perfect = 0.065;
+
+        /// <summary>
+        /// The MISS HP multiplier at OD = 0.
+        /// </summary>
+        private const double hp_multiplier_miss_min = 0.5;
+
+        /// <summary>
+        /// The MISS HP multiplier at OD = 5.
+        /// </summary>
+        private const double hp_multiplier_miss_mid = 0.75;
+
+        /// <summary>
+        /// The MISS HP multiplier at OD = 10.
+        /// </summary>
+        private const double hp_multiplier_miss_max = 1;
+
+        /// <summary>
+        /// The default MISS HP increase.
+        /// </summary>
+        private const double hp_increase_miss = -0.125;
+
+        /// <summary>
         /// The cumulative combo portion of the score.
         /// </summary>
         private double comboScore => combo_portion_max * comboPortion / maxComboPortion;
@@ -55,21 +121,35 @@ namespace osu.Game.Rulesets.Mania.Scoring
         /// </summary>
         private double bonusScore;
 
+        /// <summary>
+        /// The <see cref="comboPortion"/> achieved by a perfect playthrough.
+        /// </summary>
         private double maxComboPortion;
+
+        /// <summary>
+        /// The portion of the score dedicated to combo.
+        /// </summary>
         private double comboPortion;
+
+        /// <summary>
+        /// The <see cref="totalHits"/> achieved by a perfect playthrough.
+        /// </summary>
         private int maxTotalHits;
+
+        /// <summary>
+        /// The total hits.
+        /// </summary>
         private int totalHits;
 
-        private double hpMultiplier = 1;
-        private const double hp_increase_bad = 0.005;
-        private const double hp_increase_ok = 0.010;
-        private const double hp_increase_good = 0.035;
-        private const double hp_increase_tick = 0.040;
-        private const double hp_increase_great = 0.055;
-        private const double hp_increase_perfect = 0.065;
-
+        /// <summary>
+        /// The MISS HP multiplier.
+        /// </summary>
         private double hpMissMultiplier = 1;
-        private const double hp_increase_miss = -0.125;
+
+        /// <summary>
+        /// The HIT HP multiplier.
+        /// </summary>
+        private double hpMultiplier = 1;
 
         public ManiaScoreProcessor()
         {
@@ -82,6 +162,10 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
         protected override void ComputeTargets(Beatmap<ManiaHitObject> beatmap)
         {
+            BeatmapDifficulty difficulty = beatmap.BeatmapInfo.Difficulty;
+            hpMultiplier = BeatmapDifficulty.DifficultyRange(difficulty.DrainRate, hp_multiplier_min, hp_multiplier_mid, hp_multiplier_max);
+            hpMissMultiplier = BeatmapDifficulty.DifficultyRange(difficulty.DrainRate, hp_multiplier_miss_min, hp_multiplier_miss_mid, hp_multiplier_miss_max);
+
             while (true)
             {
                 foreach (var obj in beatmap.HitObjects)
