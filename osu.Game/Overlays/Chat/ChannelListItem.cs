@@ -17,7 +17,6 @@ namespace osu.Game.Overlays.Chat
     {
         private const float width_padding = 5;
         private const float channel_width = 150;
-        private const float topic_width = 380;
         private const float text_size = 15;
         private const float transition_duration = 100;
 
@@ -104,7 +103,8 @@ namespace osu.Game.Overlays.Chat
                         },
                         new Container
                         {
-                            Width = topic_width,
+                            RelativeSizeAxes = Axes.X,
+                            Width = 0.7f,
                             AutoSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Left = width_padding },
                             Children = new[]
