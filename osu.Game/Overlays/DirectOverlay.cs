@@ -11,13 +11,13 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Direct;
-using osu.Game.Overlays.Browse;
+using osu.Game.Overlays.SearchableList;
 using OpenTK.Graphics;
 using System;
 
 namespace osu.Game.Overlays
 {
-    public class DirectOverlay : BrowseOverlay<DirectTab,DirectSortCritera>
+    public class DirectOverlay : SearchableListOverlay<DirectTab,DirectSortCritera>
     {
         private const float panel_padding = 10f;
 
@@ -29,8 +29,8 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
 
-        protected override BrowseHeader<DirectTab> CreateHeader() => new Header();
-        protected override BrowseFilterControl<DirectSortCritera> CreateFilterControl() => new FilterControl();
+        protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
+        protected override SearchableListFilterControl<DirectSortCritera> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;
         public IEnumerable<BeatmapSetInfo> BeatmapSets

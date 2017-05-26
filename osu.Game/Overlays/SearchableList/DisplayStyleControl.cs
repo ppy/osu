@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.Browse
+namespace osu.Game.Overlays.SearchableList
 {
     public class DisplayStyleControl<T> : Container
     {

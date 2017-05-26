@@ -448,16 +448,16 @@
     <Compile Include="Database\BeatmapOnlineInfo.cs" />
     <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
     <Compile Include="Database\RankStatus.cs" />
-    <Compile Include="Overlays\Browse\BrowseHeader.cs" />
-    <Compile Include="Overlays\Browse\HeaderTabControl.cs" />
+    <Compile Include="Overlays\SearchableList\SearchableListHeader.cs" />
+    <Compile Include="Overlays\SearchableList\HeaderTabControl.cs" />
     <Compile Include="Overlays\Social\FilterControl.cs" />
     <Compile Include="Overlays\Social\Header.cs" />
-    <Compile Include="Overlays\Browse\BrowseFilterControl.cs" />
-    <Compile Include="Overlays\Browse\BrowseOverlay.cs" />
+    <Compile Include="Overlays\SearchableList\SearchableListFilterControl.cs" />
+    <Compile Include="Overlays\SearchableList\SearchableListOverlay.cs" />
     <Compile Include="Graphics\UserInterface\PageTabControl.cs" />
     <Compile Include="Overlays\SocialOverlay.cs" />
-    <Compile Include="Overlays\Browse\SlimEnumDropdown.cs" />
-    <Compile Include="Overlays\Browse\DisplayStyleControl.cs" />
+    <Compile Include="Overlays\SearchableList\SlimEnumDropdown.cs" />
+    <Compile Include="Overlays\SearchableList\DisplayStyleControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

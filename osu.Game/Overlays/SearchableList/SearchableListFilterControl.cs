@@ -11,9 +11,9 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Browse
+namespace osu.Game.Overlays.SearchableList
 {
-    public abstract class BrowseFilterControl<T> : Container
+    public abstract class SearchableListFilterControl<T> : Container
     {
         private const float padding = 10;
 
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Browse
         protected abstract T DefaultTab { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
 
-        public BrowseFilterControl()
+        public SearchableListFilterControl()
         {
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("BrowseFilterControl only supports enums as the generic type argument");
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Browse
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Top = padding, Horizontal = BrowseOverlay.WIDTH_PADDING },
+                    Padding = new MarginPadding { Top = padding, Horizontal = SearchableListOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
                         Search = new FilterSearchTextBox
