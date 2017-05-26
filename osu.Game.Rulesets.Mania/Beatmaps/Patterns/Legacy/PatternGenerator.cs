@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 HitObject firstObject = Beatmap.HitObjects.FirstOrDefault();
 
                 double drainTime = (lastObject?.StartTime ?? 0) - (firstObject?.StartTime ?? 0);
-                drainTime -= Beatmap.EventInfo.TotalBreakTime;
+                drainTime -= Beatmap.TotalBreakTime;
 
                 if (drainTime == 0)
                     drainTime = 10000;

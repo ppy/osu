@@ -15,51 +15,51 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <summary>
         /// Keep the same as last row.
         /// </summary>
-        ForceStack = 1,
+        ForceStack = 1 << 0,
         /// <summary>
         /// Keep different from last row.
         /// </summary>
-        ForceNotStack = 2,
+        ForceNotStack = 1 << 1,
         /// <summary>
         /// Keep as single note at its original position.
         /// </summary>
-        KeepSingle = 4,
+        KeepSingle = 1 << 2,
         /// <summary>
         /// Use a lower random value.
         /// </summary>
-        LowProbability = 8,
+        LowProbability = 1 << 3,
         /// <summary>
         /// Reserved.
         /// </summary>
-        Alternate = 16,
+        Alternate = 1 << 4,
         /// <summary>
         /// Ignore the repeat count.
         /// </summary>
-        ForceSigSlider = 32,
+        ForceSigSlider = 1 << 5,
         /// <summary>
         /// Convert slider to circle.
         /// </summary>
-        ForceNotSlider = 64,
+        ForceNotSlider = 1 << 6,
         /// <summary>
         /// Notes gathered together.
         /// </summary>
-        Gathered = 128,
-        Mirror = 256,
+        Gathered = 1 << 7,
+        Mirror = 1 << 8,
         /// <summary>
         /// Change 0 -> 6.
         /// </summary>
-        Reverse = 512,
+        Reverse = 1 << 9,
         /// <summary>
         /// 1 -> 5 -> 1 -> 5 like reverse.
         /// </summary>
-        Cycle = 1024,
+        Cycle = 1 << 10,
         /// <summary>
         /// Next note will be at column + 1.
         /// </summary>
-        Stair = 2048,
+        Stair = 1 << 11,
         /// <summary>
         /// Next note will be at column - 1.
         /// </summary>
-        ReverseStair = 4096
+        ReverseStair = 1 << 12
     }
 }

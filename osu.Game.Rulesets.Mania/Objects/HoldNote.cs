@@ -1,7 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps.Timing;
+using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -23,13 +24,18 @@ namespace osu.Game.Rulesets.Mania.Objects
         public double EndTime => StartTime + Duration;
 
         /// <summary>
+        /// The samples to be played when this hold note is released.
+        /// </summary>
+        public SampleInfoList EndSamples = new SampleInfoList();
+
+        /// <summary>
         /// The key-release hit windows for this hold note.
         /// </summary>
-        protected HitWindows ReleaseHitWindows = new HitWindows();
+        public HitWindows ReleaseHitWindows { get; protected set; } = new HitWindows();
 
-        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
+        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(timing, difficulty);
+            base.ApplyDefaults(controlPointInfo, difficulty);
 
             ReleaseHitWindows = HitWindows * release_window_lenience;
         }

@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Play
             decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             var firstObjectTime = HitRenderer.Objects.First().StartTime;
-            decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(Beatmap.Beatmap.TimingInfo.BeatLengthAt(firstObjectTime) * 4, Beatmap.BeatmapInfo.AudioLeadIn)));
+            decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(Beatmap.Beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, Beatmap.BeatmapInfo.AudioLeadIn)));
             decoupledClock.ProcessFrame();
 
             offsetClock = new FramedOffsetClock(decoupledClock);
@@ -150,7 +150,7 @@ namespace osu.Game.Screens.Play
                     FramedClock = offsetClock,
                     OnRetry = Restart,
                     OnQuit = Exit,
-                    CheckCanPause = () => ValidForResume && !HasFailed,
+                    CheckCanPause = () => ValidForResume && !HasFailed && !HitRenderer.HasReplayLoaded,
                     Retries = RestartCount,
                     OnPause = () => {
                         hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;

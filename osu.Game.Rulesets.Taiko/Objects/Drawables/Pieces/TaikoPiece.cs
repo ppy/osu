@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
-    public class TaikoPiece : Container, IHasAccentColour
+    public class TaikoPiece : BeatSyncedContainer, IHasAccentColour
     {
         private Color4 accentColour;
         /// <summary>
@@ -17,10 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         public virtual Color4 AccentColour
         {
             get { return accentColour; }
-            set
-            {
-                accentColour = value;
-            }
+            set { accentColour = value; }
         }
 
         private bool kiaiMode;

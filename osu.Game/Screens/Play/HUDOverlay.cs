@@ -30,7 +30,6 @@ namespace osu.Game.Screens.Play
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
 
-        private Bindable<bool> showKeyCounter;
         private Bindable<bool> showHud;
 
         private static bool hasShownNotificationOnce;
@@ -67,24 +66,8 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, NotificationManager notificationManager)
         {
-            showKeyCounter = config.GetBindable<bool>(OsuSetting.KeyOverlay);
-            showKeyCounter.ValueChanged += keyCounterVisibility =>
-            {
-                if (keyCounterVisibility)
-                    KeyCounter.FadeIn(duration);
-                else
-                    KeyCounter.FadeOut(duration);
-            };
-            showKeyCounter.TriggerChange();
-
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.ValueChanged += hudVisibility =>
-            {
-                if (hudVisibility)
-                    content.FadeIn(duration);
-                else
-                    content.FadeOut(duration);
-            };
+            showHud.ValueChanged += hudVisibility => content.FadeTo(hudVisibility ? 1 : 0, duration);
             showHud.TriggerChange();
 
             if (!showHud && !hasShownNotificationOnce)
