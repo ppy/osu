@@ -164,10 +164,20 @@ namespace osu.Game.Overlays.Chat
 
         private void updateColour(bool joined)
         {
-            joinedCheckmark.FadeTo(joined ? 1f : 0f, transition_duration);
-            topic.FadeTo(joined ? 0.8f : 1f, transition_duration);
-            topic.FadeColour(joined ? Color4.White : topicColour ?? Color4.White, transition_duration);
-            FadeColour(joined ? joinedColour ?? Color4.White : Color4.White, transition_duration);
+            if (joined)
+            {
+                joinedCheckmark.FadeTo(1f, transition_duration);
+                topic.FadeTo(0.8f, transition_duration);
+                topic.FadeColour(Color4.White, transition_duration);
+                FadeColour(joinedColour ?? Color4.White, transition_duration);
+            }
+            else
+            {
+                joinedCheckmark.FadeTo(0f, transition_duration);
+                topic.FadeTo(1f, transition_duration);
+                topic.FadeColour(topicColour ?? Color4.White, transition_duration);
+                FadeColour(Color4.White, transition_duration);
+            }
         }
     }
 }

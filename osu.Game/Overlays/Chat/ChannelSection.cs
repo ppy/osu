@@ -38,7 +38,6 @@ namespace osu.Game.Overlays.Chat
             set { ChannelFlow.Children = value.Select(c => new ChannelListItem { Channel = c }); }
         }
 
-
         public ChannelSection()
         {
             RelativeSizeAxes = Axes.X;
