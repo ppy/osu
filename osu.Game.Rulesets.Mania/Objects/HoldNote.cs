@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects.Types;
@@ -59,6 +60,11 @@ namespace osu.Game.Rulesets.Mania.Objects
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
         }
+
+        /// <summary>
+        /// Total number of hold note ticks.
+        /// </summary>
+        public int TotalTicks => Ticks.Count();
 
         /// <summary>
         /// The scoring scoring ticks of the hold note.
