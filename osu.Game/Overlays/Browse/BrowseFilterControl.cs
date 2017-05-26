@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Browse
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
-        protected virtual Drawable CreateControls() => new Container(); //todo: naming
+        protected virtual Drawable CreateControls() => null; //todo: naming
 
         public BrowseFilterControl()
         {
@@ -34,6 +34,8 @@ namespace osu.Game.Overlays.Browse
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            var controls = CreateControls();
+            Container controlsContainer;
             Children = new Drawable[]
             {
                 new Box
@@ -60,15 +62,11 @@ namespace osu.Game.Overlays.Browse
                         {
                             RelativeSizeAxes = Axes.X,
                         },
-                        new Container
+                        controlsContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Top = padding }, //todo: margin is still applied without any controls
-                            Children = new[]
-                            {
-                                CreateControls(),
-                            },
+                            Margin = new MarginPadding { Top = controls != null ? padding : 0 },
                         },
                         Tabs = new PageTabControl<T>
                         {
@@ -84,6 +82,7 @@ namespace osu.Game.Overlays.Browse
                 },
             };
 
+            if (controls != null) controlsContainer.Children = new[] { controls };
             Tabs.Current.Value = DefaultTab;
             Tabs.Current.TriggerChange();
         }

@@ -17,7 +17,6 @@ namespace osu.Game.Overlays.Browse
     }
 
     //todo: naming
-    //todo: crash when pressing tab
     public abstract class BrowseOverlay<T,U> : BrowseOverlay
     {
         private readonly Container scrollContainer;

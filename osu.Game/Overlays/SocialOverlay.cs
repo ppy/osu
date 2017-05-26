@@ -3,9 +3,12 @@
 
 using System.ComponentModel;
 using OpenTK.Graphics;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Browse;
 using osu.Game.Overlays.Social;
+
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays
 {
@@ -17,28 +20,32 @@ namespace osu.Game.Overlays
 
         protected override BrowseFilterControl<SocialSortCriteria> CreateFilterControl() => new FilterControl();
         protected override BrowseHeader<SocialTab> CreateHeader() => new Header();
+
+        public SocialOverlay()
+        {
+            ScrollFlow.Children = new[]
+            {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Vertical = 10 },
+                    Children = new[]
+                    {
+                        new DisplayStyleControl<SortDirection>
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                        },
+                    },
+                },
+            };
+        }
     }
 
-    public enum SocialTab
+    public enum SortDirection
     {
-        [Description("Online Players")]
-        OnlinePlayers,
-        [Description("Online Friends")]
-        OnlineFriends,
-        [Description("Online Team Members")]
-        OnlineTeamMembers,
-        [Description("Chat Channels")]
-        ChatChannels,
-    }
-
-    public enum SocialSortCriteria
-    {
-        Name,
-        Rank,
-        Location,
-        [Description("Time Zone")]
-        TimeZone,
-        [Description("World Map")]
-        WorldMap,
+        Ascending,
+        Descending,
     }
 }
