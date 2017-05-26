@@ -440,16 +440,24 @@
     <Compile Include="Overlays\DirectOverlay.cs" />
     <Compile Include="Overlays\Direct\FilterControl.cs" />
     <Compile Include="Overlays\Direct\Header.cs" />
-    <Compile Include="Overlays\Direct\SortTabControl.cs" />
     <Compile Include="Graphics\UserInterface\OsuEnumDropdown.cs" />
     <Compile Include="Overlays\Direct\DirectPanel.cs" />
     <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
     <Compile Include="Overlays\Direct\DirectListPanel.cs" />
     <Compile Include="Database\OnlineWorkingBeatmap.cs" />
     <Compile Include="Database\BeatmapOnlineInfo.cs" />
-    <Compile Include="Overlays\Direct\SlimEnumDropdown.cs" />
     <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
     <Compile Include="Database\RankStatus.cs" />
+    <Compile Include="Overlays\Browse\BrowseHeader.cs" />
+    <Compile Include="Overlays\Browse\HeaderTabControl.cs" />
+    <Compile Include="Overlays\Social\FilterControl.cs" />
+    <Compile Include="Overlays\Social\Header.cs" />
+    <Compile Include="Overlays\Browse\BrowseFilterControl.cs" />
+    <Compile Include="Overlays\Browse\BrowseOverlay.cs" />
+    <Compile Include="Graphics\UserInterface\PageTabControl.cs" />
+    <Compile Include="Overlays\SocialOverlay.cs" />
+    <Compile Include="Overlays\Browse\SlimEnumDropdown.cs" />
+    <Compile Include="Overlays\Browse\DisplayStyleControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
