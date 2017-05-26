@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -19,11 +19,14 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public override bool NewCombo => true;
 
-        public override void ApplyDefaults(TimingInfo timing, BeatmapDifficulty difficulty)
+        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(timing, difficulty);
+            base.ApplyDefaults(controlPointInfo, difficulty);
 
             SpinsRequired = (int)(Duration / 1000 * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5));
+
+            // spinning doesn't match 1:1 with stable, so let's fudge them easier for the time being.
+            SpinsRequired = (int)(SpinsRequired * 0.6);
         }
     }
 }

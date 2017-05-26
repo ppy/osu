@@ -89,10 +89,15 @@
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
+    <Compile Include="Beatmaps\ControlPoints\ControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\ControlPointInfo.cs" />
+    <Compile Include="Beatmaps\ControlPoints\DifficultyControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\EffectControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\SoundControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\TimingControlPoint.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
     <Compile Include="Beatmaps\Timing\BreakPeriod.cs" />
     <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
-    <Compile Include="Beatmaps\Timing\TimingInfo.cs" />
     <Compile Include="Database\BeatmapMetrics.cs" />
     <Compile Include="Database\Database.cs" />
     <Compile Include="Database\RulesetInfo.cs" />
@@ -186,6 +191,7 @@
     <Compile Include="Database\RulesetDatabase.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
+    <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
     <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />
     <Compile Include="Screens\Play\HUDOverlay.cs" />
     <Compile Include="Screens\Play\HUD\StandardHealthDisplay.cs" />
@@ -204,7 +210,6 @@
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Rulesets\Objects\Drawables\DrawableHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitObject.cs" />
-    <Compile Include="Beatmaps\Timing\ControlPoint.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
     <Compile Include="Overlays\Notifications\Notification.cs" />
@@ -434,6 +439,24 @@
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
+    <Compile Include="Screens\Multiplayer\DrawableRoom.cs" />
+    <Compile Include="Online\Multiplayer\Room.cs" />
+    <Compile Include="Online\Multiplayer\RoomStatus.cs" />
+    <Compile Include="Users\UserPanel.cs" />
+    <Compile Include="Users\UserStatus.cs" />
+    <Compile Include="Overlays\DirectOverlay.cs" />
+    <Compile Include="Overlays\Direct\FilterControl.cs" />
+    <Compile Include="Overlays\Direct\Header.cs" />
+    <Compile Include="Overlays\Direct\SortTabControl.cs" />
+    <Compile Include="Graphics\UserInterface\OsuEnumDropdown.cs" />
+    <Compile Include="Overlays\Direct\DirectPanel.cs" />
+    <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
+    <Compile Include="Overlays\Direct\DirectListPanel.cs" />
+    <Compile Include="Database\OnlineWorkingBeatmap.cs" />
+    <Compile Include="Database\BeatmapOnlineInfo.cs" />
+    <Compile Include="Overlays\Direct\SlimEnumDropdown.cs" />
+    <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
+    <Compile Include="Database\RankStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

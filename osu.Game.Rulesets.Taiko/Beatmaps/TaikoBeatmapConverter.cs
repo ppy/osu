@@ -12,6 +12,7 @@ using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
 {
@@ -77,8 +78,11 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
             {
                 int repeats = repeatsData?.RepeatCount ?? 1;
 
-                double speedAdjustment = beatmap.TimingInfo.SpeedMultiplierAt(obj.StartTime);
-                double speedAdjustedBeatLength = beatmap.TimingInfo.BeatLengthAt(obj.StartTime) * speedAdjustment;
+                TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(obj.StartTime);
+                DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(obj.StartTime);
+
+                double speedAdjustment = difficultyPoint.SpeedMultiplier;
+                double speedAdjustedBeatLength = timingPoint.BeatLength * speedAdjustment;
 
                 // The true distance, accounting for any repeats. This ends up being the drum roll distance later
                 double distance = distanceData.Distance * repeats * legacy_velocity_multiplier;
