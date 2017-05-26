@@ -47,14 +47,14 @@ namespace osu.Game.Graphics.UserInterface
             public BreadcrumbTabItem(T value) : base(value)
             {
                 Text.TextSize = 18;
-                Padding = new MarginPadding { Right = padding + 9 };
+                Padding = new MarginPadding { Right = padding + 9 }; //padding + chevron width
                 Add(Chevron = new TextAwesome
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
                     TextSize = 12,
                     Icon = FontAwesome.fa_chevron_right,
-                    Margin = new MarginPadding { Left = 10 },
+                    Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,
                 });
             }
