@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public BreadcrumbControl()
         {
-            Height = 28;
+            Height = 26;
             TabContainer.Spacing = new Vector2(padding, 0f);
             Current.ValueChanged += tab =>
             {
@@ -46,8 +46,8 @@ namespace osu.Game.Graphics.UserInterface
 
             public BreadcrumbTabItem(T value) : base(value)
             {
-                Text.TextSize = 18;
-                Padding = new MarginPadding { Right = padding + 9 }; //padding + chevron width
+                Text.TextSize = 16;
+                Padding = new MarginPadding { Right = padding + 8 }; //padding + chevron width
                 Add(Chevron = new TextAwesome
                 {
                     Anchor = Anchor.CentreRight,
