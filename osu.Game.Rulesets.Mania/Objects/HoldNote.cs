@@ -40,12 +40,12 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The head note of the hold.
         /// </summary>
-        public Note Head = new Note();
+        public readonly Note Head = new Note();
 
         /// <summary>
         /// The tail note of the hold.
         /// </summary>
-        public Note Tail = new TailNote();
+        public readonly Note Tail = new TailNote();
 
         /// <summary>
         /// The time between ticks of this hold.
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Objects
             if (tickSpacing == 0)
                 return ret;
 
-            for (double t = StartTime + Head.HitWindows.Great / 2; t <= EndTime - Tail.HitWindows.Great / 2; t+= tickSpacing)
+            for (double t = StartTime + tickSpacing; t <= EndTime - tickSpacing; t += tickSpacing)
             {
                 ret.Add(new HoldNoteTick
                 {
