@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Chat
         public string[] FilterTerms => new[] { Channel.Name };
         public bool MatchingCurrentFilter
         {
-        	set
+            set
             {
                 FadeTo(value ? 1f : 0f, 100);
             }
