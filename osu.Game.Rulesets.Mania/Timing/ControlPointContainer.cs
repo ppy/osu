@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Timing
 {
@@ -27,6 +28,8 @@ namespace osu.Game.Rulesets.Mania.Timing
         public double TimeSpan { get; set; }
 
         private readonly List<DrawableControlPoint> drawableControlPoints;
+
+        protected override IComparer<Drawable> DepthComparer => new HitObjectStartTimeComparer();
 
         public ControlPointContainer(IEnumerable<TimingChange> timingChanges)
         {
