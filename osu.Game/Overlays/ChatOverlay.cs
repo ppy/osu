@@ -69,7 +69,7 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                channelSelection = new ChannelSelectionOverlay
+                channelSelection = new ChannelSelectionOverlay //todo: temporary placement
                 {
                     Origin = Anchor.BottomLeft,
                     Height = 400,
