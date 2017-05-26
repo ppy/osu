@@ -167,6 +167,8 @@ namespace osu.Game.Graphics.UserInterface
             ResizeTo(SIZE_EXTENDED, transform_time, EasingTypes.OutElastic);
             IconLayer.FadeColour(HoverColour, transform_time, EasingTypes.OutElastic);
 
+            bouncingIcon.ScaleTo(1.1f, transform_time, EasingTypes.OutElastic);
+
             return true;
         }
 
@@ -174,6 +176,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             ResizeTo(SIZE_RETRACTED, transform_time, EasingTypes.OutElastic);
             IconLayer.FadeColour(TextLayer.Colour, transform_time, EasingTypes.OutElastic);
+
+            bouncingIcon.ScaleTo(1, transform_time, EasingTypes.OutElastic);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
