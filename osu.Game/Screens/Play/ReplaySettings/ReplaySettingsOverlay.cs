@@ -48,14 +48,11 @@ namespace osu.Game.Screens.Play.ReplaySettings
         {
             if (args.Repeat) return false;
 
-            if (state.Keyboard.ControlPressed)
+            switch (args.Key)
             {
-                switch (args.Key)
-                {
-                    case Key.H:
-                        toogleVisibility();
-                        return true;
-                }
+                case Key.H:
+                    toogleVisibility();
+                    return true;
             }
 
             return base.OnKeyDown(state, args);
