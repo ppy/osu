@@ -24,9 +24,9 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"channel_id")]
         public int Id;
 
-        public Bindable<bool> Joined = new Bindable<bool>();
-
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
+
+        public Bindable<bool> Joined = new Bindable<bool>();
 
         public bool ReadOnly => Name != "#lazer";
 
