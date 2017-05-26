@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Mods
     public class ModButton : ModButtonEmpty, IHasTooltip
     {
         private ModIcon foregroundIcon;
+        private ModIcon backgroundIcon;
         private readonly SpriteText text;
         private readonly Container<ModIcon> iconsContainer;
         private SampleChannel sampleOn, sampleOff;
@@ -34,6 +35,9 @@ namespace osu.Game.Overlays.Mods
         public Action<Mod> Action; // Passed the selected mod or null if none
 
         public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
+
+        private const EasingTypes modSwitchEasing = EasingTypes.InOutQuint;
+        private const double modSwitchDuration = 100;
 
         private int _selectedIndex = -1;
         private int selectedIndex
@@ -45,6 +49,9 @@ namespace osu.Game.Overlays.Mods
             set
             {
                 if (value == _selectedIndex) return;
+
+                bool beforeSelected = Selected;
+
                 _selectedIndex = value;
 
                 if (value >= Mods.Length)
@@ -55,13 +62,30 @@ namespace osu.Game.Overlays.Mods
                 {
                     _selectedIndex = Mods.Length - 1;
                 }
-
-                iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
-                iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
+                if (beforeSelected ^ Selected)
+                {
+                    iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
+                    iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
+                }
+                else
+                {
+                    foregroundIcon.RotateTo(15f, modSwitchDuration, modSwitchEasing);
+                    backgroundIcon.RotateTo(-15f, modSwitchDuration, modSwitchEasing);
+                    using (foregroundIcon.BeginDelayedSequence(modSwitchDuration))
+                    {
+                        foregroundIcon.RotateTo(-15f);
+                        foregroundIcon.RotateTo(0f, modSwitchDuration, modSwitchEasing);
+                    }
+                    using (backgroundIcon.BeginDelayedSequence(modSwitchDuration))
+                    {
+                        backgroundIcon.RotateTo(15f);
+                        backgroundIcon.RotateTo(0f, modSwitchDuration, modSwitchEasing);
+                    }
+                }
                 foregroundIcon.Highlighted = Selected;
 
                 if (mod != null)
-                    displayMod(SelectedMod ?? Mods[0]);
+                    Scheduler.AddDelayed(() => displayMod(SelectedMod ?? Mods[0]), beforeSelected ^ Selected ? 0 : modSwitchDuration);
             }
         }
 
@@ -159,6 +183,8 @@ namespace osu.Game.Overlays.Mods
 
         private void displayMod(Mod mod)
         {
+            if(backgroundIcon != null)
+                backgroundIcon.Icon = foregroundIcon.Icon;
             foregroundIcon.Icon = mod.Icon;
             text.Text = mod.Name;
         }
@@ -170,17 +196,17 @@ namespace osu.Game.Overlays.Mods
             {
                 iconsContainer.Add(new[]
                 {
-                    new ModIcon(Mods[0])
+                    backgroundIcon = new ModIcon(Mods[1])
                     {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
+                        Origin = Anchor.BottomRight,
+                        Anchor = Anchor.BottomRight,
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(1.5f),
                     },
                     foregroundIcon = new ModIcon(Mods[0])
                     {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
+                        Origin = Anchor.BottomRight,
+                        Anchor = Anchor.BottomRight,
                         AutoSizeAxes = Axes.Both,
                         Position = new Vector2(-1.5f),
                     },
