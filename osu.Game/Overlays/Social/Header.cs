@@ -1,7 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Overlays.Browse;
+using osu.Game.Overlays.SearchableList;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -12,7 +12,7 @@ using System.ComponentModel;
 
 namespace osu.Game.Overlays.Social
 {
-    public class Header : BrowseHeader<SocialTab>
+    public class Header : SearchableListHeader<SocialTab>
     {
         private OsuSpriteText browser;
 

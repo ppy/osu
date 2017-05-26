@@ -9,11 +9,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Overlays.Browse;
+using osu.Game.Overlays.SearchableList;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class FilterControl : BrowseFilterControl<DirectSortCritera>
+    public class FilterControl : SearchableListFilterControl<DirectSortCritera>
     {
         private FillFlowContainer<RulesetToggleButton> modeButtons;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Direct
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,
-                Margin = new MarginPadding { Bottom = 5, Right = BrowseOverlay.WIDTH_PADDING },
+                Margin = new MarginPadding { Bottom = 5, Right = SearchableListOverlay.WIDTH_PADDING },
             });
         }
 

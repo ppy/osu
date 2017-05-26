@@ -8,29 +8,29 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics.Backgrounds;
 
-namespace osu.Game.Overlays.Browse
+namespace osu.Game.Overlays.SearchableList
 {
-    public abstract class BrowseOverlay : WaveOverlayContainer
+    public abstract class SearchableListOverlay : WaveOverlayContainer
     {
         public static readonly float WIDTH_PADDING = 80;
     }
 
     //todo: naming
-    public abstract class BrowseOverlay<T,U> : BrowseOverlay
+    public abstract class SearchableListOverlay<T,U> : SearchableListOverlay
     {
         private readonly Container scrollContainer;
 
-        protected readonly BrowseHeader<T> Header;
-        protected readonly BrowseFilterControl<U> Filter;
+        protected readonly SearchableListHeader<T> Header;
+        protected readonly SearchableListFilterControl<U> Filter;
         protected readonly FillFlowContainer ScrollFlow;
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract Color4 TrianglesColourLight { get; }
         protected abstract Color4 TrianglesColourDark { get; }
-        protected abstract BrowseHeader<T> CreateHeader();
-        protected abstract BrowseFilterControl<U> CreateFilterControl();
+        protected abstract SearchableListHeader<T> CreateHeader();
+        protected abstract SearchableListFilterControl<U> CreateFilterControl();
 
-        public BrowseOverlay()
+        public SearchableListOverlay()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Browse
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Horizontal = BrowseOverlay.WIDTH_PADDING },
+                                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
                                     Direction = FillDirection.Vertical,
                                 },
                             },

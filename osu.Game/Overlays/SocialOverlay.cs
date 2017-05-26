@@ -8,13 +8,13 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Overlays.Browse;
+using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays
 {
-    public class SocialOverlay : BrowseOverlay<SocialTab, SocialSortCriteria>
+    public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria>
     {
         private readonly FillFlowContainer<UserPanel> panelFlow;
 
@@ -22,8 +22,8 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"672b51");
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"5c2648");
 
-        protected override BrowseFilterControl<SocialSortCriteria> CreateFilterControl() => new FilterControl();
-        protected override BrowseHeader<SocialTab> CreateHeader() => new Header();
+        protected override SearchableListHeader<SocialTab> CreateHeader() => new Header();
+        protected override SearchableListFilterControl<SocialSortCriteria> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<User> users;
         public IEnumerable<User> Users

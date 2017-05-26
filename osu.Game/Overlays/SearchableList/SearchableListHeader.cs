@@ -10,9 +10,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.Browse
+namespace osu.Game.Overlays.SearchableList
 {
-    public abstract class BrowseHeader<T> : Container
+    public abstract class SearchableListHeader<T> : Container
     {
         public static readonly float HEIGHT = 90;
 
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Browse
         protected abstract T DefaultTab { get; }
         protected abstract Drawable CreateHeaderText();
 
-        public BrowseHeader()
+        public SearchableListHeader()
         {
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("BrowseHeader only supports enums as the generic type argument");
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Browse
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = BrowseOverlay.WIDTH_PADDING, Right = BrowseOverlay.WIDTH_PADDING }, 
+                    Padding = new MarginPadding { Left = SearchableListOverlay.WIDTH_PADDING, Right = SearchableListOverlay.WIDTH_PADDING }, 
                     Children = new Drawable[]
                     {
                         new FillFlowContainer

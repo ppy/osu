@@ -6,11 +6,11 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Browse;
+using osu.Game.Overlays.SearchableList;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class Header : BrowseHeader<DirectTab>
+    public class Header : SearchableListHeader<DirectTab>
     {
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"252f3a");
         protected override float TabStripWidth => 298;

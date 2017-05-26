@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Browse
+namespace osu.Game.Overlays.SearchableList
 {
     public class SlimEnumDropdown<T> : OsuEnumDropdown<T>
     {

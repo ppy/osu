@@ -4,11 +4,11 @@
 using System.ComponentModel;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Overlays.Browse;
+using osu.Game.Overlays.SearchableList;
 
 namespace osu.Game.Overlays.Social
 {
-    public class FilterControl : BrowseFilterControl<SocialSortCriteria>
+    public class FilterControl : SearchableListFilterControl<SocialSortCriteria>
     {
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"47253a");
         protected override SocialSortCriteria DefaultTab => SocialSortCriteria.Name;
