@@ -69,7 +69,6 @@ namespace osu.Game.Rulesets.Mania.Scoring
         private const double hp_increase_perfect = 0.065;
 
         private double hpMissMultiplier = 1;
-        private const double hp_increase_tick_miss = -0.025;
         private const double hp_increase_miss = -0.125;
 
         public ManiaScoreProcessor()
@@ -145,9 +144,6 @@ namespace osu.Game.Rulesets.Mania.Scoring
             switch (judgement.Result)
             {
                 case HitResult.Miss:
-                    if (isTick)
-                        Health.Value += hpMissMultiplier * hp_increase_tick_miss;
-                    else
                         Health.Value += hpMissMultiplier * hp_increase_miss;
                     break;
                 case HitResult.Hit:
