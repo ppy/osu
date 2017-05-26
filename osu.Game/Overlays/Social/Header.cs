@@ -8,6 +8,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using System.ComponentModel;
 
 namespace osu.Game.Overlays.Social
 {
@@ -47,5 +48,17 @@ namespace osu.Game.Overlays.Social
         {
             browser.Colour = colours.Pink;
         }
+    }
+
+    public enum SocialTab
+    {
+        [Description("Online Players")]
+        OnlinePlayers,
+        [Description("Online Friends")]
+        OnlineFriends,
+        [Description("Online Team Members")]
+        OnlineTeamMembers,
+        [Description("Chat Channels")]
+        ChatChannels,
     }
 }
