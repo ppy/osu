@@ -42,6 +42,7 @@ namespace osu.Game.Overlays.Browse
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = BackgroundColour,
+                    Alpha = 0.9f,
                 },
                 tabStrip = new Box
                 {
@@ -49,7 +50,6 @@ namespace osu.Game.Overlays.Browse
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = 1,
-                    Alpha = 0.9f,
                 },
                 new FillFlowContainer
                 {
