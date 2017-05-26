@@ -75,12 +75,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     RelativeCoordinateSpace = new Vector2(1, (float)HitObject.Duration)
                 },
-                head = new HeadNote(this, key)
+                head = new DrawableHeadNote(this, key)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 },
-                tail = new TailNote(this, key)
+                tail = new DrawableTailNote(this, key)
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre
@@ -168,11 +168,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// <summary>
         /// The head note of a hold.
         /// </summary>
-        private class HeadNote : DrawableNote
+        private class DrawableHeadNote : DrawableNote
         {
             private readonly DrawableHoldNote holdNote;
 
-            public HeadNote(DrawableHoldNote holdNote, Bindable<Key> key = null)
+            public DrawableHeadNote(DrawableHoldNote holdNote, Bindable<Key> key = null)
                 : base(holdNote.HitObject.Head, key)
             {
                 this.holdNote = holdNote;
@@ -205,11 +205,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// <summary>
         /// The tail note of a hold.
         /// </summary>
-        private class TailNote : DrawableNote
+        private class DrawableTailNote : DrawableNote
         {
             private readonly DrawableHoldNote holdNote;
 
-            public TailNote(DrawableHoldNote holdNote, Bindable<Key> key = null)
+            public DrawableTailNote(DrawableHoldNote holdNote, Bindable<Key> key = null)
                 : base(holdNote.HitObject.Tail, key)
             {
                 this.holdNote = holdNote;
