@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Social
     {
         private OsuSpriteText browser;
 
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"672b51");
+        protected override Color4 BackgroundColour => OsuColour.FromHex(@"38202e");
         protected override float TabStripWidth => 438;
         protected override SocialTab DefaultTab => SocialTab.OnlinePlayers;
 
