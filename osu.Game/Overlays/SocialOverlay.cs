@@ -14,7 +14,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays
 {
-    public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria>
+    public class SocialOverlay : SearchableListOverlay<SocialTab,SocialSortCriteria,SortDirection>
     {
         private readonly FillFlowContainer<UserPanel> panelFlow;
 
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"5c2648");
 
         protected override SearchableListHeader<SocialTab> CreateHeader() => new Header();
-        protected override SearchableListFilterControl<SocialSortCriteria> CreateFilterControl() => new FilterControl();
+        protected override SearchableListFilterControl<SocialSortCriteria,SortDirection> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<User> users;
         public IEnumerable<User> Users
@@ -50,26 +50,13 @@ namespace osu.Game.Overlays
             ThirdWaveColour = OsuColour.FromHex(@"9B2B6E");
             FourthWaveColour = OsuColour.FromHex(@"6D214D");
 
-            ScrollFlow.Children = new Drawable[]
+            ScrollFlow.Children = new[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Vertical = 10 },
-                    Children = new[]
-                    {
-                        new DisplayStyleControl<SortDirection>
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                        },
-                    },
-                },
                 panelFlow = new FillFlowContainer<UserPanel>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Margin = new MarginPadding { Top = 20 },
                     Spacing = new Vector2(10f),
                 },
             };

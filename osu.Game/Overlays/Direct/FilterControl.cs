@@ -13,11 +13,9 @@ using osu.Game.Overlays.SearchableList;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class FilterControl : SearchableListFilterControl<DirectSortCritera>
+    public class FilterControl : SearchableListFilterControl<DirectSortCritera,RankStatus>
     {
         private FillFlowContainer<RulesetToggleButton> modeButtons;
-
-        public readonly DisplayStyleControl<RankStatus> DisplayStyleControl;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"384552");
         protected override DirectSortCritera DefaultTab => DirectSortCritera.Title;
@@ -30,16 +28,6 @@ namespace osu.Game.Overlays.Direct
             };
 
             return modeButtons;
-        }
-
-        public FilterControl()
-        {
-            Add(DisplayStyleControl = new DisplayStyleControl<RankStatus>
-            {
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
-                Margin = new MarginPadding { Bottom = 5, Right = SearchableListOverlay.WIDTH_PADDING },
-            });
         }
 
         [BackgroundDependencyLoader(true)]

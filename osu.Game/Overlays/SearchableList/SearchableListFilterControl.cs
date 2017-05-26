@@ -13,7 +13,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.SearchableList
 {
-    public abstract class SearchableListFilterControl<T> : Container
+    public abstract class SearchableListFilterControl<T,U> : Container
     {
         private const float padding = 10;
 
@@ -21,6 +21,7 @@ namespace osu.Game.Overlays.SearchableList
 
         public readonly SearchTextBox Search;
         public readonly PageTabControl<T> Tabs;
+        public readonly DisplayStyleControl<U> DisplayStyleControl;
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
@@ -79,6 +80,12 @@ namespace osu.Game.Overlays.SearchableList
                             Colour = Color4.White.Opacity(0),
                         },
                     },
+                },
+                DisplayStyleControl = new DisplayStyleControl<U>
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Margin = new MarginPadding { Bottom = 5, Right = SearchableListOverlay.WIDTH_PADDING },
                 },
             };
 

@@ -17,7 +17,7 @@ using System;
 
 namespace osu.Game.Overlays
 {
-    public class DirectOverlay : SearchableListOverlay<DirectTab,DirectSortCritera>
+    public class DirectOverlay : SearchableListOverlay<DirectTab,DirectSortCritera,RankStatus>
     {
         private const float panel_padding = 10f;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
-        protected override SearchableListFilterControl<DirectSortCritera> CreateFilterControl() => new FilterControl();
+        protected override SearchableListFilterControl<DirectSortCritera,RankStatus> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;
         public IEnumerable<BeatmapSetInfo> BeatmapSets
@@ -41,9 +41,7 @@ namespace osu.Game.Overlays
                 if (beatmapSets?.Equals(value) ?? false) return;
                 beatmapSets = value;
 
-                var s = PanelDisplayStyle.Grid;
-                withDisplayStyleControl(c => s = c.DisplayStyle.Value);
-                recreatePanels(s);
+                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             }
         }
 
@@ -103,7 +101,7 @@ namespace osu.Game.Overlays
 
             Header.Tabs.Current.ValueChanged += tab => { if (tab != DirectTab.Search) Filter.Search.Text = string.Empty; };
             Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
-            withDisplayStyleControl(c => c.DisplayStyle.ValueChanged += recreatePanels);
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
 
             updateResultCounts();
         }
@@ -133,12 +131,6 @@ namespace osu.Game.Overlays
         {
             if (BeatmapSets == null) return;
             panels.Children = BeatmapSets.Select(b => displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)new DirectGridPanel(b) { Width = 400 } : new DirectListPanel(b));
-        }
-
-        private void withDisplayStyleControl(Action<DisplayStyleControl<RankStatus>> action)
-        {
-            var f = Filter as FilterControl;
-            if (f != null) action.Invoke(f.DisplayStyleControl);
         }
 
         public class ResultCounts
