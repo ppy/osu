@@ -2,11 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using osu.Game.Beatmaps.Events;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Beatmaps
 {
@@ -17,8 +18,8 @@ namespace osu.Game.Beatmaps
         where T : HitObject
     {
         public BeatmapInfo BeatmapInfo;
-        public TimingInfo TimingInfo = new TimingInfo();
-        public EventInfo EventInfo = new EventInfo();
+        public ControlPointInfo ControlPointInfo = new ControlPointInfo();
+        public List<BreakPeriod> Breaks = new List<BreakPeriod>();
         public readonly List<Color4> ComboColors = new List<Color4>
         {
             new Color4(17, 136, 170, 255),
@@ -35,14 +36,19 @@ namespace osu.Game.Beatmaps
         public List<T> HitObjects;
 
         /// <summary>
+        /// Total amount of break time in the beatmap.
+        /// </summary>
+        public double TotalBreakTime => Breaks.Sum(b => b.Duration);
+
+        /// <summary>
         /// Constructs a new beatmap.
         /// </summary>
         /// <param name="original">The original beatmap to use the parameters of.</param>
         public Beatmap(Beatmap original = null)
         {
             BeatmapInfo = original?.BeatmapInfo ?? BeatmapInfo;
-            TimingInfo = original?.TimingInfo ?? TimingInfo;
-            EventInfo = original?.EventInfo ?? EventInfo;
+            ControlPointInfo = original?.ControlPointInfo ?? ControlPointInfo;
+            Breaks = original?.Breaks ?? Breaks;
             ComboColors = original?.ComboColors ?? ComboColors;
         }
     }

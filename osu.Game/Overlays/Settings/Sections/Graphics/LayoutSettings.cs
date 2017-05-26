@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -11,10 +12,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override string Header => "Layout";
 
-        private SettingsSlider<double> letterboxPositionX;
-        private SettingsSlider<double> letterboxPositionY;
+        private FillFlowContainer letterboxSettings;
 
         private Bindable<bool> letterboxing;
+
+        private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config)
@@ -33,34 +35,40 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Letterboxing",
                     Bindable = letterboxing,
                 },
-                letterboxPositionX = new SettingsSlider<double>
+                letterboxSettings = new FillFlowContainer
                 {
-                    LabelText = "Horizontal position",
-                    Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionX)
-                },
-                letterboxPositionY = new SettingsSlider<double>
-                {
-                    LabelText = "Vertical position",
-                    Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionY)
+                    Direction = FillDirection.Vertical,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    AutoSizeDuration = transition_duration,
+                    AutoSizeEasing = EasingTypes.OutQuint,
+                    Masking = true,
+
+                    Children = new Drawable[]
+                    {
+                        new SettingsSlider<double>
+                        {
+                            LabelText = "Horizontal position",
+                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionX)
+                        },
+                        new SettingsSlider<double>
+                        {
+                            LabelText = "Vertical position",
+                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionY)
+                        },
+                    }
                 },
             };
 
-            letterboxing.ValueChanged += visibilityChanged;
-            letterboxing.TriggerChange();
-        }
+            letterboxing.ValueChanged += isVisible =>
+            {
+                letterboxSettings.ClearTransforms();
+                letterboxSettings.AutoSizeAxes = isVisible ? Axes.Y : Axes.None;
 
-        private void visibilityChanged(bool newVisibility)
-        {
-            if (newVisibility)
-            {
-                letterboxPositionX.Show();
-                letterboxPositionY.Show();
-            }
-            else
-            {
-                letterboxPositionX.Hide();
-                letterboxPositionY.Hide();
-            }
+                if(!isVisible)
+                    letterboxSettings.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
+            };
+            letterboxing.TriggerChange();
         }
     }
 }

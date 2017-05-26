@@ -11,7 +11,7 @@ using OpenTK.Graphics;
 namespace osu.Game.Beatmaps.Drawables
 {
 
-    internal class DifficultyIcon : DifficultyColouredContainer
+    public class DifficultyIcon : DifficultyColouredContainer
     {
         private readonly BeatmapInfo beatmap;
 
