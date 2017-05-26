@@ -43,6 +43,8 @@ namespace osu.Game
 
         private DirectOverlay direct;
 
+        private SocialOverlay social;
+
         private Intro intro
         {
             get
@@ -165,6 +167,7 @@ namespace osu.Game
 
             //overlay elements
             LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
+            LoadComponentAsync(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
             LoadComponentAsync(musicController = new MusicController
@@ -233,6 +236,9 @@ namespace osu.Game
             {
                 case Key.F8:
                     chat.ToggleVisibility();
+                    return true;
+                case Key.F9:
+                    social.ToggleVisibility();
                     return true;
                 case Key.PageUp:
                 case Key.PageDown:
