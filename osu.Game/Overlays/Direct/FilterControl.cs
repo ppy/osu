@@ -17,11 +17,11 @@ namespace osu.Game.Overlays.Direct
     {
         private FillFlowContainer<RulesetToggleButton> modeButtons;
 
-        public readonly DisplayStyleControl<RankStatus> DisplayStyleControl; //todo: naming
+        public readonly DisplayStyleControl<RankStatus> DisplayStyleControl;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"384552");
         protected override DirectSortCritera DefaultTab => DirectSortCritera.Title;
-        protected override Drawable CreateControls()
+        protected override Drawable CreateSupplementaryControls()
         {
             modeButtons = new FillFlowContainer<RulesetToggleButton>
             {

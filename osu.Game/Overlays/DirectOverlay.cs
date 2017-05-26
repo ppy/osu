@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.Browse;
 using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -40,7 +41,9 @@ namespace osu.Game.Overlays
                 if (beatmapSets?.Equals(value) ?? false) return;
                 beatmapSets = value;
 
-                recreatePanels((Filter as FilterControl).DisplayStyleControl.DisplayStyle.Value); //todo: potential nullref
+                var s = PanelDisplayStyle.Grid;
+                withDisplayStyleControl(c => s = c.DisplayStyle.Value);
+                recreatePanels(s);
             }
         }
 
@@ -100,7 +103,7 @@ namespace osu.Game.Overlays
 
             Header.Tabs.Current.ValueChanged += tab => { if (tab != DirectTab.Search) Filter.Search.Text = string.Empty; };
             Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
-            (Filter as FilterControl).DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels; //todo: potential nullref
+            withDisplayStyleControl(c => c.DisplayStyle.ValueChanged += recreatePanels);
 
             updateResultCounts();
         }
@@ -130,6 +133,12 @@ namespace osu.Game.Overlays
         {
             if (BeatmapSets == null) return;
             panels.Children = BeatmapSets.Select(b => displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)new DirectGridPanel(b) { Width = 400 } : new DirectListPanel(b));
+        }
+
+        private void withDisplayStyleControl(Action<DisplayStyleControl<RankStatus>> action)
+        {
+            var f = (Filter as FilterControl);
+            if (f != null) action.Invoke(f.DisplayStyleControl);
         }
 
         public class ResultCounts

@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Browse
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
-        protected virtual Drawable CreateControls() => null; //todo: naming
+        protected virtual Drawable CreateSupplementaryControls() => null;
 
         public BrowseFilterControl()
         {
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Browse
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            var controls = CreateControls();
+            var controls = CreateSupplementaryControls();
             Container controlsContainer;
             Children = new Drawable[]
             {

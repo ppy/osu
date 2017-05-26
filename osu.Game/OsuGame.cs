@@ -295,6 +295,7 @@ namespace osu.Game
                 musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;
                 direct.State = Visibility.Hidden;
+                social.State = Visibility.Hidden;
             }
             else
             {
