@@ -475,11 +475,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     StartTime = startTime,
                     Column = column,
-                    Duration = endTime - startTime
+                    Duration = endTime - startTime,
+                    Head = { Samples = sampleInfoListAt(startTime) },
+                    Tail = { Samples = sampleInfoListAt(endTime) }
                 };
 
-                holdNote.Head.Samples = sampleInfoListAt(startTime);
-                holdNote.Tail.Samples = sampleInfoListAt(endTime);
 
                 newObject = holdNote;
             }
