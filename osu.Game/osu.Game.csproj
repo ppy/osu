@@ -85,9 +85,10 @@
     <Compile Include="Overlays\Settings\SettingsHeader.cs" />
     <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
-    <Compile Include="Overlays\UserPageOverlay.cs" />
-    <Compile Include="Overlays\UserPage\UserPageHeader.cs" />
-    <Compile Include="Overlays\UserPage\UserPageSection.cs" />
+    <Compile Include="Users\UserCoverBackground.cs" />
+    <Compile Include="Users\UserPageOverlay.cs" />
+    <Compile Include="Users\UserPage\UserPageHeader.cs" />
+    <Compile Include="Users\UserPage\UserPageSection.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
     <Compile Include="Beatmaps\ControlPoints\ControlPoint.cs" />
