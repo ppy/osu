@@ -71,13 +71,11 @@ namespace osu.Game.Overlays.Mods
                 {
                     foregroundIcon.RotateTo(15f, mod_switch_duration, mod_switch_easing);
                     backgroundIcon.RotateTo(-15f, mod_switch_duration, mod_switch_easing);
-                    using (foregroundIcon.BeginDelayedSequence(mod_switch_duration))
+                    using (iconsContainer.BeginDelayedSequence(mod_switch_duration, true))
                     {
                         foregroundIcon.RotateTo(-15f);
                         foregroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
-                    }
-                    using (backgroundIcon.BeginDelayedSequence(mod_switch_duration))
-                    {
+
                         backgroundIcon.RotateTo(15f);
                         backgroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
                     }
