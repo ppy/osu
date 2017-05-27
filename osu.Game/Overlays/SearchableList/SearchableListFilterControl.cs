@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.SearchableList
         protected SearchableListFilterControl()
         {
             if (!typeof(T).IsEnum)
-                throw new InvalidOperationException("BrowseFilterControl only supports enums as the generic type argument");
+                throw new InvalidOperationException("SearchableListFilterControl's sort tabs only support enums as the generic type argument");
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
