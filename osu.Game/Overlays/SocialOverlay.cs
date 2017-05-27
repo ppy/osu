@@ -45,10 +45,10 @@ namespace osu.Game.Overlays
 
         public SocialOverlay()
         {
-            FirstWaveColour = OsuColour.FromHex(@"CB5FA0");
-            SecondWaveColour = OsuColour.FromHex(@"B04384");
-            ThirdWaveColour = OsuColour.FromHex(@"9B2B6E");
-            FourthWaveColour = OsuColour.FromHex(@"6D214D");
+            FirstWaveColour = OsuColour.FromHex(@"cb5fa0");
+            SecondWaveColour = OsuColour.FromHex(@"b04384");
+            ThirdWaveColour = OsuColour.FromHex(@"9b2b6e");
+            FourthWaveColour = OsuColour.FromHex(@"6d214d");
 
             ScrollFlow.Children = new[]
             {
