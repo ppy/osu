@@ -14,9 +14,9 @@ namespace osu.Game.Graphics.UserInterface
     public abstract class SettingsDropdownContainer : Container
     {
         /// <summary>
-        /// The title of this container.
+        /// The title of this container, which will be written in header.
         /// </summary>
-        public abstract string Title { get; }
+        protected abstract string Title { get; }
 
         private const float transition_duration = 600;
         private const int container_width = 270;
@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.UserInterface
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Text = Title,
+                                    Text = Title.ToUpper(),
                                     TextSize = 17,
                                     Font = @"Exo2.0-Bold",
                                     Margin = new MarginPadding { Left = 10 },
