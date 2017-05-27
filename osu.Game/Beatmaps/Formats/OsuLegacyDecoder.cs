@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using OpenTK.Graphics;
@@ -31,6 +32,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private ConvertHitObjectParser parser;
 
+        private Dictionary<string, string> variables = new Dictionary<string, string>();
+
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
 
@@ -56,6 +59,7 @@ namespace osu.Game.Beatmaps.Formats
             TimingPoints,
             Colours,
             HitObjects,
+            Variables,
         }
 
         private void handleGeneral(Beatmap beatmap, string key, string val)
@@ -391,7 +395,7 @@ namespace osu.Game.Beatmaps.Formats
                 }
 
                 string val = line, key = null;
-                if (section != Section.Events && section != Section.TimingPoints && section != Section.HitObjects)
+                if (section != Section.Events && section != Section.TimingPoints && section != Section.HitObjects && section != Section.Variables)
                 {
                     key = val.Remove(val.IndexOf(':')).Trim();
                     val = val.Substring(val.IndexOf(':') + 1).Trim();
@@ -411,6 +415,13 @@ namespace osu.Game.Beatmaps.Formats
                         handleDifficulty(beatmap, key, val);
                         break;
                     case Section.Events:
+                        string[] valSplit = val.Split(',');
+                        for (int i = 0; i < valSplit.Length; i++)
+                        {
+                            if (valSplit[i][0] == '$' && variables.ContainsKey(valSplit[i]))
+                                valSplit[i] = variables[valSplit[i]];
+                        }
+                        val = string.Join(",", valSplit);
                         handleEvents(beatmap, val);
                         break;
                     case Section.TimingPoints:
@@ -425,6 +436,11 @@ namespace osu.Game.Beatmaps.Formats
                         if (obj != null)
                             beatmap.HitObjects.Add(obj);
 
+                        break;
+                    case Section.Variables:
+                        key = val.Remove(val.IndexOf('=')).Trim();
+                        val = val.Substring(val.IndexOf('=') + 1).Trim();
+                        variables[key] = val;
                         break;
                 }
             }
