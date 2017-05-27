@@ -32,7 +32,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private ConvertHitObjectParser parser;
 
-        private Dictionary<string, string> variables = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> variables = new Dictionary<string, string>();
 
         private LegacySampleBank defaultSampleBank;
         private int defaultSampleVolume = 100;
@@ -415,13 +415,16 @@ namespace osu.Game.Beatmaps.Formats
                         handleDifficulty(beatmap, key, val);
                         break;
                     case Section.Events:
-                        string[] valSplit = val.Split(',');
-                        for (int i = 0; i < valSplit.Length; i++)
+                        do
                         {
-                            if (valSplit[i][0] == '$' && variables.ContainsKey(valSplit[i]))
-                                valSplit[i] = variables[valSplit[i]];
-                        }
-                        val = string.Join(",", valSplit);
+                            string[] valSplit = val.Split(',');
+                            for (int i = 0; i < valSplit.Length; i++)
+                            {
+                                if (valSplit[i][0] == '$' && variables.ContainsKey(valSplit[i]))
+                                    valSplit[i] = variables[valSplit[i]];
+                            }
+                            val = string.Join(",", valSplit);
+                        } while (val.IndexOf('$') != -1);
                         handleEvents(beatmap, val);
                         break;
                     case Section.TimingPoints:
