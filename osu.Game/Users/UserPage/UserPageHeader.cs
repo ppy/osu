@@ -8,9 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Overlays.UserPage
+namespace osu.Game.Users.UserPage
 {
     public class UserPageHeader : Container
     {
+        private readonly User user;
+        public UserPageHeader(User user)
+        {
+            this.user = user;
+        }
     }
 }

@@ -9,10 +9,9 @@ using System.Threading.Tasks;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.UserPage;
-using osu.Game.Users;
+using osu.Game.Users.UserPage;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Users
 {
     public class UserPageOverlay : FocusedOverlayContainer
     {
@@ -25,7 +24,7 @@ namespace osu.Game.Overlays
             var sections = new UserPageSection[] { };
             var sectionsContainer = new SectionsContainer
             {
-                ExpandableHeader = new UserPageHeader(),
+                ExpandableHeader = new UserPageHeader(user),
                 FixedHeader = tab,
                 Sections = sections
             };

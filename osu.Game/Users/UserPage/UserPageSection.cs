@@ -2,9 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics.Containers;
-using osu.Game.Users;
 
-namespace osu.Game.Overlays.UserPage
+namespace osu.Game.Users.UserPage
 {
     public abstract class UserPageSection : Container
     {

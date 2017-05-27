@@ -9,7 +9,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -43,7 +42,7 @@ namespace osu.Game.Users
 
             Children = new Drawable[]
             {
-                new AsyncLoadWrapper(new CoverBackgroundSprite(user)
+                new AsyncLoadWrapper(new UserCoverBackground(user)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -191,23 +190,6 @@ namespace osu.Game.Users
 
                 statusBg.FadeColour(status.GetAppropriateColour(colours), 500, EasingTypes.OutQuint);
                 statusMessage.Text = status.Message;
-            }
-        }
-
-        private class CoverBackgroundSprite : Sprite
-        {
-            private readonly User user;
-
-            public CoverBackgroundSprite(User user)
-            {
-                this.user = user;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                if (!string.IsNullOrEmpty(user.CoverUrl))
-                    Texture = textures.Get(user.CoverUrl);
             }
         }
     }
