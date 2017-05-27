@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class CollectionSettings : SettingsDropdownContainer
     {
-        public override string Title => @"COLLECTIONS";
+        protected override string Title => @"collections";
 
         [BackgroundDependencyLoader]
         private void load()

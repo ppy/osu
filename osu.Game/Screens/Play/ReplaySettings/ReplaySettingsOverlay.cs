@@ -16,6 +16,9 @@ namespace osu.Game.Screens.Play.ReplaySettings
         private bool isVisible;
 
         private bool isAvaliable;
+        /// <summary>
+        /// Allow user to interact with this overlay.
+        /// </summary>
         public bool IsAvaliable
         {
             set

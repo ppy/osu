@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class PlaybackSettings : SettingsDropdownContainer
     {
-        public override string Title => @"PLAYBACK";
+        protected override string Title => @"playback";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

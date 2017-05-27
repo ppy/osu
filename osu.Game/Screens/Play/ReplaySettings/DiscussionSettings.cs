@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
 {
     public class DiscussionSettings : SettingsDropdownContainer
     {
-        public override string Title => @"DISCUSSIONS";
+        protected override string Title => @"discussions";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)

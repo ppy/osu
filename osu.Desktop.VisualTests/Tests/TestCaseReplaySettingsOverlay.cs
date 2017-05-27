@@ -50,7 +50,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class ExampleContainer : SettingsDropdownContainer
         {
-            public override string Title => @"EXAMPLE";
+            protected override string Title => @"example";
         }
     }
 }
