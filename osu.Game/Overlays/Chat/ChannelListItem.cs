@@ -20,6 +20,8 @@ namespace osu.Game.Overlays.Chat
         private const float text_size = 15;
         private const float transition_duration = 100;
 
+        private readonly Channel channel;
+
         private readonly OsuSpriteText topic;
         private readonly TextAwesome joinedCheckmark;
 
@@ -37,8 +39,6 @@ namespace osu.Game.Overlays.Chat
 
         public Action<Channel> OnRequestJoin;
         public Action<Channel> OnRequestLeave;
-
-        private Channel channel;
 
         public ChannelListItem(Channel channel)
         {
