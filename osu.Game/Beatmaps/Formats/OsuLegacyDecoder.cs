@@ -208,6 +208,17 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(Beatmap beatmap, string val)
         {
+            do
+            {
+                string[] valSplit = val.Split(',');
+                for (int i = 0; i < valSplit.Length; i++)
+                {
+                    if (valSplit[i][0] == '$' && variables.ContainsKey(valSplit[i]))
+                        valSplit[i] = variables[valSplit[i]];
+                }
+                val = string.Join(",", valSplit);
+            } while (val.IndexOf('$') != -1);
+
             string[] split = val.Split(',');
 
             EventType type;
@@ -415,16 +426,6 @@ namespace osu.Game.Beatmaps.Formats
                         handleDifficulty(beatmap, key, val);
                         break;
                     case Section.Events:
-                        do
-                        {
-                            string[] valSplit = val.Split(',');
-                            for (int i = 0; i < valSplit.Length; i++)
-                            {
-                                if (valSplit[i][0] == '$' && variables.ContainsKey(valSplit[i]))
-                                    valSplit[i] = variables[valSplit[i]];
-                            }
-                            val = string.Join(",", valSplit);
-                        } while (val.IndexOf('$') != -1);
                         handleEvents(beatmap, val);
                         break;
                     case Section.TimingPoints:
