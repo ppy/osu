@@ -2,7 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using osu.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
@@ -23,21 +25,44 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     var tIndex = TabContainer.IndexOf(t);
                     var tabIndex = TabContainer.IndexOf(TabMap[tab]);
-                    var hide = tIndex < tabIndex;
 
-                    t.FadeTo(hide ? 0f : 1f, 500, EasingTypes.OutQuint);
-                    t.ScaleTo(new Vector2(hide ? 0.8f : 1f, 1f), 500, EasingTypes.OutQuint);
+                    ((BreadcrumbTabItem)t).State = tIndex < tabIndex ? Visibility.Hidden : Visibility.Visible;
                     ((BreadcrumbTabItem)t).Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, EasingTypes.OutQuint);
                 }
             };
         }
 
-        private class BreadcrumbTabItem : OsuTabItem
+        private class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
             public readonly TextAwesome Chevron;
 
             //don't allow clicking between transitions and don't make the chevron clickable
             protected override bool InternalContains(Vector2 screenSpacePos) => Alpha == 1f && Text.Contains(screenSpacePos);
+            public override bool HandleInput => State == Visibility.Visible;
+
+            private Visibility state;
+            public Visibility State
+            {
+                get { return state; }
+                set
+                {
+                    if (value == state) return;
+                    state = value;
+
+                    const float transition_duration = 500;
+
+                    if (State == Visibility.Visible)
+                    {
+                        FadeIn(transition_duration, EasingTypes.OutQuint);
+                        ScaleTo(new Vector2(1f), transition_duration, EasingTypes.OutQuint);
+                    }
+                    else
+                    {
+                        FadeOut(transition_duration, EasingTypes.OutQuint);
+                        ScaleTo(new Vector2(0.8f, 1f), transition_duration, EasingTypes.OutQuint);
+                    }
+                }
+            }
 
             public BreadcrumbTabItem(T value) : base(value)
             {
