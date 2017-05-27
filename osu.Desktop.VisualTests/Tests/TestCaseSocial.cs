@@ -24,14 +24,14 @@ namespace osu.Desktop.VisualTests.Tests
                         Username = @"flyte",
                         Id = 3103765,
                         Country = new Country { FlagName = @"JP" },
-                        CoverUrl = @"https://assets.ppy.sh/user-profile-covers/3103765/5b012e13611d5761caa7e24fecb3d3a16e1cf48fc2a3032cfd43dd444af83d82.jpeg",
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
                     },
                     new User
                     {
                         Username = @"Cookiezi",
                         Id = 124493,
                         Country = new Country { FlagName = @"KR" },
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg",
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg",
                     },
                     new User
                     {
@@ -45,35 +45,35 @@ namespace osu.Desktop.VisualTests.Tests
                         Username = @"Rafis",
                         Id = 2558286,
                         Country = new Country { FlagName = @"PL" },
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c5.jpg",
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg",
                     },
                     new User
                     {
                         Username = @"hvick225",
                         Id = 50265,
                         Country = new Country { FlagName = @"TW" },
-                        CoverUrl = @"https://assets.ppy.sh/user-profile-covers/50265/cb79df0d6ddd04b57d057623417aa55c505810d8e73b1a96d6e665e0e18e5770.jpeg",
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c5.jpg",
                     },
                     new User
                     {
                         Username = @"peppy",
                         Id = 2,
                         Country = new Country { FlagName = @"AU" },
-                        CoverUrl = @"https://assets.ppy.sh/user-profile-covers/2/615362d26dc37cc4d46e61a08a2537e7cdf0e0e00f40574b18bf90156ad0280f.jpeg"
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
                     },
                     new User
                     {
                         Username = @"filsdelama",
                         Id = 2831793,
                         Country = new Country { FlagName = @"FR" },
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c2.jpg"
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c7.jpg"
                     },
                     new User
                     {
                         Username = @"_index",
                         Id = 652457,
                         Country = new Country { FlagName = @"RU" },
-                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c7.jpg"
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c8.jpg"
                     },
                 },
             };
