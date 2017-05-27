@@ -24,6 +24,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.ApplyDefaults(controlPointInfo, difficulty);
 
             SpinsRequired = (int)(Duration / 1000 * BeatmapDifficulty.DifficultyRange(difficulty.OverallDifficulty, 3, 5, 7.5));
+
+            // spinning doesn't match 1:1 with stable, so let's fudge them easier for the time being.
+            SpinsRequired = (int)(SpinsRequired * 0.6);
         }
     }
 }
