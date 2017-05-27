@@ -250,7 +250,7 @@ namespace osu.Game.Overlays
                     {
                         new ChannelSection
                         {
-                            Header = @"ALL CHANNELS",
+                            Header = "All Channels",
                             Channels = channels,
                         },
                     };
