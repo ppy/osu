@@ -21,13 +21,12 @@ namespace osu.Game.Overlays.Chat
         private const float transition_duration = 100;
 
         private readonly OsuSpriteText topic;
-        private readonly OsuSpriteText name;
         private readonly TextAwesome joinedCheckmark;
 
         private Color4? joinedColour;
         private Color4? topicColour;
 
-        public string[] FilterTerms => new[] { Channel.Name };
+        public string[] FilterTerms => new[] { channel.Name };
         public bool MatchingCurrentFilter
         {
             set
@@ -40,28 +39,15 @@ namespace osu.Game.Overlays.Chat
         public Action<Channel> OnRequestLeave;
 
         private Channel channel;
-        public Channel Channel
-        {
-            get { return channel; }
-            set
-            {
-                if (value == channel) return;
-                if (channel != null) channel.Joined.ValueChanged -= updateColour;
-                channel = value;
 
-                name.Text = Channel.ToString();
-                topic.Text = Channel.Topic;
-                channel.Joined.ValueChanged += updateColour;
-                updateColour(Channel.Joined);
-            }
-        }
-
-        public ChannelListItem()
+        public ChannelListItem(Channel channel)
         {
+            this.channel = channel;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Action = () => { (Channel.Joined ? OnRequestLeave : OnRequestJoin)?.Invoke(Channel); };
+            Action = () => { (channel.Joined ? OnRequestLeave : OnRequestJoin)?.Invoke(channel); };
 
             Children = new Drawable[]
             {
@@ -94,8 +80,9 @@ namespace osu.Game.Overlays.Chat
                             AutoSizeAxes = Axes.Y,
                             Children = new[]
                             {
-                                name = new OsuSpriteText
+                                new OsuSpriteText
                                 {
+                                    Text = channel.ToString(),
                                     TextSize = text_size,
                                     Font = @"Exo2.0-Bold",
                                     Shadow = false,
@@ -112,6 +99,7 @@ namespace osu.Game.Overlays.Chat
                             {
                                 topic = new OsuSpriteText
                                 {
+                                    Text = channel.Topic,
                                     TextSize = text_size,
                                     Font = @"Exo2.0-SemiBold",
                                     Shadow = false,
@@ -146,6 +134,8 @@ namespace osu.Game.Overlays.Chat
                     },
                 },
             };
+
+            channel.Joined.ValueChanged += updateColour;
         }
 
         [BackgroundDependencyLoader]
@@ -154,7 +144,7 @@ namespace osu.Game.Overlays.Chat
             topicColour = colours.Gray9;
             joinedColour = colours.Blue;
 
-            updateColour(Channel.Joined);
+            updateColour(channel.Joined);
         }
 
         protected override void Dispose(bool isDisposing)
