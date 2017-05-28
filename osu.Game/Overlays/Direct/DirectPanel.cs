@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -36,7 +37,7 @@ namespace osu.Game.Overlays.Direct
 
         protected Drawable GetBackground(TextureStore textures)
         {
-            return new AsyncLoadWrapper(new BeatmapBackgroundSprite(new OnlineWorkingBeatmap(SetInfo.Beatmaps.FirstOrDefault(), textures, null))
+            return new AsyncLoadWrapper(new BeatmapSetBackgroundSprite(SetInfo)
             {
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
@@ -82,6 +83,23 @@ namespace osu.Game.Overlays.Direct
                 };
 
                 Value = value;
+            }
+        }
+
+        private class BeatmapSetBackgroundSprite : Sprite
+        {
+            private readonly BeatmapSetInfo set;
+
+            public BeatmapSetBackgroundSprite(BeatmapSetInfo set)
+            {
+                this.set = set;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                if (set.OnlineInfo?.Covers.FirstOrDefault() != null)
+                    Texture = textures.Get(set.OnlineInfo.Covers.First());
             }
         }
     }

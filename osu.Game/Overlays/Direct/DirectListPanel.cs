@@ -104,11 +104,11 @@ namespace osu.Game.Overlays.Direct
                             Margin = new MarginPadding { Right = height - vertical_padding * 2 + vertical_padding },
                             Children = new Drawable[]
                             {
-                                new Statistic(FontAwesome.fa_play_circle, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.PlayCount ?? 0)
+                                new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
                                 {
                                     Margin = new MarginPadding { Right = 1 },
                                 },
-                                new Statistic(FontAwesome.fa_heart, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.FavouriteCount ?? 0),
+                                new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                                 new FillFlowContainer
                                 {
                                     Anchor = Anchor.TopRight,
