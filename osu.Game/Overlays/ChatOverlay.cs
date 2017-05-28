@@ -165,7 +165,7 @@ namespace osu.Game.Overlays
         protected override bool OnFocus(InputState state)
         {
             //this is necessary as inputTextBox is masked away and therefore can't get focus :(
-            inputTextBox.TriggerFocus();
+            InputManager.ChangeFocus(inputTextBox);
             return false;
         }
 
