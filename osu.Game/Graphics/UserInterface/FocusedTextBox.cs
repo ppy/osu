@@ -3,6 +3,7 @@
 
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework.Allocation;
 using osu.Framework.Input;
 using System;
 using System.Linq;
@@ -23,9 +24,17 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 focus = value;
-                if (!focus)
-                    TriggerFocusLost();
+                if (!focus && HasFocus)
+                    inputManager.ChangeFocus(null);
             }
+        }
+
+        private InputManager inputManager;
+
+        [BackgroundDependencyLoader]
+        private void load(UserInputManager inputManager)
+        {
+            this.inputManager = inputManager;
         }
 
         protected override bool OnFocus(InputState state)
