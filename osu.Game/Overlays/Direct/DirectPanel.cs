@@ -98,8 +98,8 @@ namespace osu.Game.Overlays.Direct
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                if (set.OnlineInfo?.Covers.FirstOrDefault() != null)
-                    Texture = textures.Get(set.OnlineInfo.Covers.First());
+                if (set.OnlineInfo?.Covers?.Card != null)
+                    Texture = textures.Get(set.OnlineInfo.Covers.Card);
             }
         }
     }

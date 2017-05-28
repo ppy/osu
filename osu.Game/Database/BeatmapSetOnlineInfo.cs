@@ -12,10 +12,10 @@ namespace osu.Game.Database
     public class BeatmapSetOnlineInfo
     {
         /// <summary>
-        /// The different sizes of cover art for this beatmap: cover, cover@2x, card, card@2x, list, list@2x.
+        /// The different sizes of cover art for this beatmap.
         /// </summary>
         [JsonProperty(@"covers")]
-        public IEnumerable<string> Covers { get; set; }
+        public BeatmapSetOnlineCovers Covers { get; set; }
 
         /// <summary>
         /// A small sample clip of this beatmap's song.
@@ -34,5 +34,23 @@ namespace osu.Game.Database
         /// </summary>
         [JsonProperty(@"favourite_count")]
         public int FavouriteCount { get; set; }
+    }
+
+    public class BeatmapSetOnlineCovers
+    {
+        public string Cover { get; set; }
+
+        [JsonProperty(@"cover@2x")]
+        public string Cover2x { get; set; }
+
+        public string Card { get; set; }
+
+        [JsonProperty(@"card@2x")]
+        public string Card2x { get; set; }
+
+        public string List { get; set; }
+
+        [JsonProperty(@"list@2x")]
+        public string List2x { get; set; }
     }
 }

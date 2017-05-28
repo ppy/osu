@@ -13,6 +13,8 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 
 using Container = osu.Framework.Graphics.Containers.Container;
@@ -23,6 +25,9 @@ namespace osu.Game.Overlays
     {
         public static readonly int WIDTH_PADDING = 80;
         private const float panel_padding = 10f;
+
+        private APIAccess api;
+        private RulesetDatabase rulesets;
 
         private readonly FilterControl filter;
         private readonly FillFlowContainer resultCountsContainer;
@@ -37,6 +42,17 @@ namespace osu.Game.Overlays
             {
                 if (beatmapSets?.Equals(value) ?? false) return;
                 beatmapSets = value;
+
+                if (BeatmapSets == null)
+                {
+                    foreach (var p in panels.Children)
+                    {
+                        p.FadeOut(200);
+                        p.Expire();
+                    }
+
+                    return;
+                }
 
                 recreatePanels(filter.DisplayStyle.Value);
             }
@@ -155,14 +171,17 @@ namespace osu.Game.Overlays
 
             filter.Search.Exit = Hide;
             filter.Search.Current.ValueChanged += text => { if (text != string.Empty) header.Tabs.Current.Value = DirectTab.Search; };
+            filter.Search.OnCommit = (sender, text) => updateSets();
             filter.DisplayStyle.ValueChanged += recreatePanels;
 
             updateResultCounts();
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, APIAccess api, RulesetDatabase rulesets)
         {
+            this.api = api;
+            this.rulesets = rulesets;
             resultCountsContainer.Colour = colours.Yellow;
         }
 
@@ -185,6 +204,21 @@ namespace osu.Game.Overlays
         {
             if (BeatmapSets == null) return;
             panels.Children = BeatmapSets.Select(b => displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)new DirectGridPanel(b) { Width = 400 } : new DirectListPanel(b));
+        }
+
+        private GetBeatmapSetsRequest getSetsRequest;
+        private void updateSets()
+        {
+            if (!IsLoaded) return;
+
+            BeatmapSets = null;
+            getSetsRequest?.Cancel();
+
+            if (api == null || filter.Search.Text == string.Empty) return;
+
+            getSetsRequest = new GetBeatmapSetsRequest(filter.Search.Text);
+            getSetsRequest.Success += r => BeatmapSets = r?.Select(response => response.ToSetInfo(rulesets));
+            api.Queue(getSetsRequest);
         }
 
         protected override bool OnFocus(InputState state)
