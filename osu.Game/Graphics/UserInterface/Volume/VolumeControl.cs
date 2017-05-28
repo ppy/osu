@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
                 return;
             }
 
-            volumeMeterMaster.TriggerWheel(state);
+            volumeMeterMaster.TriggerOnWheel(state);
         }
 
         [BackgroundDependencyLoader]
