@@ -172,6 +172,7 @@ namespace osu.Game.Overlays
             filter.Search.Exit = Hide;
             filter.Search.Current.ValueChanged += text => { if (text != string.Empty) header.Tabs.Current.Value = DirectTab.Search; };
             filter.Search.OnCommit = (sender, text) => updateSets();
+            filter.RankStatusDropdown.Current.ValueChanged += rankStatus => updateSets();
             filter.DisplayStyle.ValueChanged += recreatePanels;
 
             updateResultCounts();
@@ -216,7 +217,7 @@ namespace osu.Game.Overlays
 
             if (api == null || filter.Search.Text == string.Empty) return;
 
-            getSetsRequest = new GetBeatmapSetsRequest(filter.Search.Text);
+            getSetsRequest = new GetBeatmapSetsRequest(filter.Search.Text, filter.RankStatusDropdown.Current.Value);
             getSetsRequest.Success += r => BeatmapSets = r?.Select(response => response.ToSetInfo(rulesets));
             api.Queue(getSetsRequest);
         }
