@@ -48,6 +48,13 @@ namespace osu.Desktop.VisualTests.Tests
                         Author = @"RLC",
                         Source = @"",
                     },
+                    OnlineInfo = new BeatmapSetOnlineInfo
+                    {
+                        Covers = new[] { @"https://assets.ppy.sh//beatmaps/578332/covers/cover.jpg?1494591390" },
+                        Preview = @"https://b.ppy.sh/preview/578332.mp3",
+                        PlayCount = 97,
+                        FavouriteCount = 72,
+                    },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
@@ -55,13 +62,6 @@ namespace osu.Desktop.VisualTests.Tests
                             Ruleset = ruleset,
                             StarDifficulty = 5.35f,
                             Metadata = new BeatmapMetadata(),
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Covers = new[] { @"https://assets.ppy.sh//beatmaps/578332/covers/cover.jpg?1494591390" },
-                                Preview = @"https://b.ppy.sh/preview/578332.mp3",
-                                PlayCount = 97,
-                                FavouriteCount = 72,
-                            },
                         },
                     },
                 },
@@ -74,6 +74,13 @@ namespace osu.Desktop.VisualTests.Tests
                         Author = @"Sotarks",
                         Source = @"ぎんぎつね",
                     },
+                    OnlineInfo = new BeatmapSetOnlineInfo
+                    {
+                        Covers = new[] { @"https://assets.ppy.sh//beatmaps/599627/covers/cover.jpg?1494539318" },
+                        Preview = @"https//b.ppy.sh/preview/599627.mp3",
+                        PlayCount = 3082,
+                        FavouriteCount = 14,
+                    },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
@@ -81,13 +88,6 @@ namespace osu.Desktop.VisualTests.Tests
                             Ruleset = ruleset,
                             StarDifficulty = 5.81f,
                             Metadata = new BeatmapMetadata(),
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Covers = new[] { @"https://assets.ppy.sh//beatmaps/599627/covers/cover.jpg?1494539318" },
-                                Preview = @"https//b.ppy.sh/preview/599627.mp3",
-                                PlayCount = 3082,
-                                FavouriteCount = 14,
-                            },
                         },
                     },
                 },
@@ -100,6 +100,13 @@ namespace osu.Desktop.VisualTests.Tests
                         Author = @"Cerulean Veyron",
                         Source = @"",
                     },
+                    OnlineInfo = new BeatmapSetOnlineInfo
+                    {
+                        Covers = new[] { @"https://assets.ppy.sh//beatmaps/513268/covers/cover.jpg?1494502863" },
+                        Preview = @"https//b.ppy.sh/preview/513268.mp3",
+                        PlayCount = 2762,
+                        FavouriteCount = 15,
+                    },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
@@ -107,13 +114,6 @@ namespace osu.Desktop.VisualTests.Tests
                             Ruleset = ruleset,
                             StarDifficulty = 0.9f,
                             Metadata = new BeatmapMetadata(),
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Covers = new[] { @"https://assets.ppy.sh//beatmaps/513268/covers/cover.jpg?1494502863" },
-                                Preview = @"https//b.ppy.sh/preview/513268.mp3",
-                                PlayCount = 2762,
-                                FavouriteCount = 15,
-                            },
                         },
                         new BeatmapInfo
                         {
@@ -141,6 +141,13 @@ namespace osu.Desktop.VisualTests.Tests
                         Author = @"[Kamiya]",
                         Source = @"小林さんちのメイドラゴン",
                     },
+                    OnlineInfo = new BeatmapSetOnlineInfo
+                    {
+                        Covers = new[] { @"https://assets.ppy.sh//beatmaps/586841/covers/cover.jpg?1494052741" },
+                        Preview = @"https//b.ppy.sh/preview/586841.mp3",
+                        PlayCount = 62317,
+                        FavouriteCount = 161,
+                    },
                     Beatmaps = new List<BeatmapInfo>
                     {
                         new BeatmapInfo
@@ -148,13 +155,6 @@ namespace osu.Desktop.VisualTests.Tests
                             Ruleset = ruleset,
                             StarDifficulty = 1.26f,
                             Metadata = new BeatmapMetadata(),
-                            OnlineInfo = new BeatmapOnlineInfo
-                            {
-                                Covers = new[] { @"https://assets.ppy.sh//beatmaps/586841/covers/cover.jpg?1494052741" },
-                                Preview = @"https//b.ppy.sh/preview/586841.mp3",
-                                PlayCount = 62317,
-                                FavouriteCount = 161,
-                            },
                         },
                         new BeatmapInfo
                         {
