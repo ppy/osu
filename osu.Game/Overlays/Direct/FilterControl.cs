@@ -129,6 +129,8 @@ namespace osu.Game.Overlays.Direct
             protected override Color4 BackgroundUnfocused => backgroundColour;
             protected override Color4 BackgroundFocused => backgroundColour;
 
+            protected override bool AllowCommit => true;
+
             private Color4 backgroundColour;
 
             [BackgroundDependencyLoader]
