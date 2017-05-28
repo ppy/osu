@@ -261,6 +261,9 @@ namespace osu.Game
                         settings.ToggleVisibility();
                         return true;
                     case Key.D:
+                        if (state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
+                            return false;
+
                         direct.ToggleVisibility();
                         return true;
                 }
