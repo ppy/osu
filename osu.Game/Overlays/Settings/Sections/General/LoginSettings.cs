@@ -237,14 +237,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             protected override bool OnFocus(InputState state)
             {
-                Schedule(() =>
-                {
-                    if (string.IsNullOrEmpty(username.Text))
-                        inputManager.ChangeFocus(username);
-                    else
-                        inputManager.ChangeFocus(password);
-                });
-
+                Schedule(() => { inputManager.ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
                 return base.OnFocus(state);
             }
         }
