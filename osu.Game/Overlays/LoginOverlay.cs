@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
             settingsSection.Bounding = true;
             FadeIn(transition_time, EasingTypes.OutQuint);
 
-            settingsSection.TriggerFocus();
+            InputManager.ChangeFocus(settingsSection);
         }
 
         protected override void PopOut()
