@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Music
 {
@@ -35,10 +36,12 @@ namespace osu.Game.Overlays.Music
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets;
+        private InputManager inputManager;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, BeatmapDatabase beatmaps, OsuColour colours)
+        private void load(OsuGameBase game, BeatmapDatabase beatmaps, OsuColour colours, UserInputManager inputManager)
         {
+            this.inputManager = inputManager;
             this.beatmaps = beatmaps;
             trackManager = game.Audio.Track;
 
@@ -100,7 +103,7 @@ namespace osu.Game.Overlays.Music
         protected override void PopIn()
         {
             filter.Search.HoldFocus = true;
-            Schedule(() => filter.Search.TriggerFocus());
+            Schedule(() => inputManager.ChangeFocus(filter.Search));
 
             ResizeTo(new Vector2(1, playlist_height), transition_duration, EasingTypes.OutQuint);
             FadeIn(transition_duration, EasingTypes.OutQuint);
