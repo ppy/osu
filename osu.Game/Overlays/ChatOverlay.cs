@@ -341,6 +341,7 @@ namespace osu.Game.Overlays
         private void postMessage(TextBox textbox, bool newText)
         {
             var postText = textbox.Text;
+            bool postIsAction = false;
 
             if (string.IsNullOrEmpty(postText))
                 return;
@@ -356,10 +357,30 @@ namespace osu.Game.Overlays
 
             if (postText[0] == '/')
             {
-                // TODO: handle commands
-                currentChannel.AddNewMessages(new ErrorMessage("Chat commands are not supported yet!"));
-                textbox.Text = string.Empty;
-                return;
+                // TODO: Add more commands
+                if (postText.StartsWith("/me "))
+                {
+                    postText = postText.Remove(0,4);
+                    postIsAction = true;
+                }
+                else if (postText == "/me")
+                {
+                    currentChannel.AddNewMessages(new ErrorMessage("Usage: /me <action>"));
+                    textbox.Text = string.Empty;
+                    return;
+                }
+                else if (postText == "/help" || postText.StartsWith("/help "))
+                {
+                    currentChannel.AddNewMessages(new ErrorMessage("Implemented Commands: /me, /help"));
+                    textbox.Text = string.Empty;
+                    return;
+                }
+                else
+                {
+                    currentChannel.AddNewMessages(new ErrorMessage("Invalid command! See /help"));
+                    textbox.Text = string.Empty;
+                    return;
+                }
             }
 
             var message = new Message
@@ -368,7 +389,8 @@ namespace osu.Game.Overlays
                 Timestamp = DateTimeOffset.Now,
                 TargetType = TargetType.Channel, //TODO: read this from currentChannel
                 TargetId = currentChannel.Id,
-                Content = postText
+                Content = postText,
+                IsAction = postIsAction
             };
 
             textbox.ReadOnly = true;

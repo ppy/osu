@@ -29,6 +29,9 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"content")]
         public string Content;
 
+        [JsonProperty(@"is_action")]
+        public bool IsAction;
+
         [JsonProperty(@"sender")]
         public User Sender;
 
@@ -47,8 +50,6 @@ namespace osu.Game.Online.Chat
         public bool Equals(Message other) => Id == other?.Id;
 
         public override int GetHashCode() => Id.GetHashCode();
-
-        public bool IsAction() => (Content.StartsWith("\u0001ACTION") && Content.EndsWith("\u0001"));
     }
 
     public enum TargetType

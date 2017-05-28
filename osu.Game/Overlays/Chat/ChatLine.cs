@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Chat
                         new OsuSpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
-                            Text = Message.IsAction() ? $@"*{message.Sender.Username}" : $@"{message.Sender.Username}:",
+                            Text = Message.IsAction ? $@"*{message.Sender.Username}" : $@"{message.Sender.Username}:",
                             Colour = getUsernameColour(Message),
                             TextSize = text_size,
                             Origin = Anchor.TopRight,
@@ -109,13 +109,13 @@ namespace osu.Game.Overlays.Chat
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = message_padding + (Message.IsAction() ? 5 : 15) },
+                    Padding = new MarginPadding { Left = message_padding + (Message.IsAction ? 5 : 15) },
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
                         {
-                            Text = Message.IsAction() ? $@"{message.Content.Trim("\u0001"[0]).Substring(7)}" : message.Content,
-                            Colour = Message.IsAction() ? getUsernameColour(Message) : Color4.White,
+                            Text = message.Content,
+                            Colour = Message.IsAction ? getUsernameColour(Message) : Color4.White,
                             TextSize = text_size,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
