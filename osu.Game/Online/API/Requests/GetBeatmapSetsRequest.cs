@@ -11,13 +11,15 @@ namespace osu.Game.Online.API.Requests
     public class GetBeatmapSetsRequest : APIRequest<IEnumerable<GetBeatmapSetsResponse>>
     {
         private readonly string query;
+        private readonly RankStatus rankStatus;
 
-        public GetBeatmapSetsRequest(string query)
+        public GetBeatmapSetsRequest(string query, RankStatus rankStatus = RankStatus.Any)
         {
             this.query = System.Uri.EscapeDataString(query);
+            this.rankStatus = rankStatus;
         }
 
-        protected override string Target => $@"beatmapsets/search?q={query}";
+        protected override string Target => $@"beatmapsets/search?q={query}&s={(int)rankStatus}";
     }
 
     public class GetBeatmapSetsResponse : BeatmapMetadata
