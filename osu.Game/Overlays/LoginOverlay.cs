@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings.Sections.General;
 using OpenTK.Graphics;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays
 {
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays
             settingsSection.Bounding = true;
             FadeIn(transition_time, EasingTypes.OutQuint);
 
-            settingsSection.TriggerFocus();
+            InputManager.ChangeFocus(settingsSection);
         }
 
         protected override void PopOut()
