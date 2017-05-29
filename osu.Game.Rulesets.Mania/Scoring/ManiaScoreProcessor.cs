@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mania.Judgements;
@@ -170,6 +171,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
             {
                 foreach (var obj in beatmap.HitObjects)
                 {
+                    var holdNote = obj as HoldNote;
+
                     if (obj is Note)
                     {
                         AddJudgement(new ManiaJudgement
@@ -178,7 +181,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
                             ManiaResult = ManiaHitResult.Perfect
                         });
                     }
-                    else if (obj is HoldNote)
+                    else if (holdNote != null)
                     {
                         // Head
                         AddJudgement(new ManiaJudgement
@@ -188,7 +191,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
                         });
 
                         // Ticks
-                        for (int i = 0; i < ((HoldNote)obj).TotalTicks; i++)
+                        int tickCount = holdNote.Ticks.Count();
+                        for (int i = 0; i < tickCount; i++)
                         {
                             AddJudgement(new HoldNoteTickJudgement
                             {

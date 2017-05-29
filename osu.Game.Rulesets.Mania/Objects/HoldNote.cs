@@ -62,11 +62,6 @@ namespace osu.Game.Rulesets.Mania.Objects
         }
 
         /// <summary>
-        /// Total number of hold note ticks.
-        /// </summary>
-        public int TotalTicks => Ticks.Count();
-
-        /// <summary>
         /// The scoring scoring ticks of the hold note.
         /// </summary>
         public IEnumerable<HoldNoteTick> Ticks => ticks ?? (ticks = createTicks());
