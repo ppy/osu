@@ -57,10 +57,13 @@
     <Compile Include="Beatmaps\Patterns\Pattern.cs" />
     <Compile Include="MathUtils\FastRandom.cs" />
     <Compile Include="Judgements\HitWindows.cs" />
+    <Compile Include="Judgements\HoldNoteTailJudgement.cs" />
+    <Compile Include="Judgements\HoldNoteTickJudgement.cs" />
     <Compile Include="Judgements\ManiaHitResult.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
     <Compile Include="Objects\Drawables\DrawableHoldNote.cs" />
+    <Compile Include="Objects\Drawables\DrawableHoldNoteTick.cs" />
     <Compile Include="Objects\Drawables\DrawableManiaHitObject.cs" />
     <Compile Include="Objects\Drawables\DrawableNote.cs" />
     <Compile Include="Objects\Drawables\Pieces\BodyPiece.cs" />
@@ -68,6 +71,7 @@
     <Compile Include="Objects\Types\IHasColumn.cs" />
     <Compile Include="Scoring\ManiaScoreProcessor.cs" />
     <Compile Include="Objects\HoldNote.cs" />
+    <Compile Include="Objects\HoldNoteTick.cs" />
     <Compile Include="Objects\ManiaHitObject.cs" />
     <Compile Include="Objects\Note.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
