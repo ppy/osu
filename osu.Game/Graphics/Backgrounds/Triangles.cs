@@ -23,6 +23,7 @@ namespace osu.Game.Graphics.Backgrounds
     public class Triangles : Drawable
     {
         private const float triangle_size = 100;
+        private const float base_velocity = 50;
 
         /// <summary>
         /// How many screen-space pixels are smoothed over.
@@ -117,14 +118,18 @@ namespace osu.Game.Graphics.Backgrounds
                 (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3) :
                 1;
 
-            float movedDistance = ((float)Time.Elapsed / 950) * Velocity * (50 / DrawHeight) / triangleScale;
+            float elapsedSeconds = (float)Time.Elapsed / 1000;
+            // Since position is relative, the velocity needs to scale inversely with DrawHeight.
+            // Since we will later multiply by the scale of individual triangles we normalize by
+            // dividing by triangleScale.
+            float movedDistance = -elapsedSeconds * Velocity * base_velocity / (DrawHeight * triangleScale);
 
             for (int i = 0; i < parts.Count; i++)
             {
                 TriangleParticle newParticle = parts[i];
 
                 // Scale moved distance by the size of the triangle. Smaller triangles should move more slowly.
-                newParticle.Position.Y += -parts[i].Scale * movedDistance;
+                newParticle.Position.Y += parts[i].Scale * movedDistance;
                 newParticle.Colour.A = adjustedAlpha;
 
                 parts[i] = newParticle;
