@@ -16,18 +16,21 @@ namespace osu.Game.Screens.Play.ReplaySettings
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            Add(new SettingsCheckbox
+            Children = new Drawable[]
             {
-                LabelText = "Show floating coments",
-                Bindable = config.GetBindable<bool>(OsuSetting.FloatingComments)
-            });
-            Add(new FocusedTextBox
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = 30,
-                PlaceholderText = "Add Comment",
-                HoldFocus = false,
-            });
+                new SettingsCheckbox
+                {
+                    LabelText = "Show floating coments",
+                    Bindable = config.GetBindable<bool>(OsuSetting.FloatingComments)
+                },
+                new FocusedTextBox
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 30,
+                    PlaceholderText = "Add Comment",
+                    HoldFocus = false,
+                },
+            };
         }
     }
 }

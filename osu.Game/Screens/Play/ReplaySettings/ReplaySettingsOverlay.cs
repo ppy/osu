@@ -15,26 +15,6 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         private bool isVisible;
 
-        private bool isAvaliable;
-        /// <summary>
-        /// Allow user to interact with this overlay.
-        /// </summary>
-        public bool IsAvaliable
-        {
-            set
-            {
-                isAvaliable = value;
-                if (isAvaliable)
-                    Show();
-                else
-                    Hide();
-            }
-            get
-            {
-                return isAvaliable;
-            }
-        }
-
         public ReplaySettingsOverlay()
         {
             AlwaysPresent = true;
@@ -54,20 +34,12 @@ namespace osu.Game.Screens.Play.ReplaySettings
             switch (args.Key)
             {
                 case Key.H:
-                    toogleVisibility();
+                    FadeTo(isVisible ? 1 : 0, fade_duration);
+                    isVisible = !isVisible;
                     return true;
             }
 
             return base.OnKeyDown(state, args);
-        }
-
-        private void toogleVisibility()
-        {
-            if (isAvaliable)
-            {
-                FadeTo(isVisible ? 1 : 0, fade_duration);
-                isVisible = !isVisible;
-            }
         }
     }
 }

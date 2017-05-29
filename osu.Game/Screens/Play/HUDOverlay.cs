@@ -99,8 +99,13 @@ namespace osu.Game.Screens.Play
 
             // in the case a replay isn't loaded, we want some elements to only appear briefly.
             if (!hitRenderer.HasReplayLoaded)
+            {
+                ReplaySettingsOverlay.Hide();
+                ReplaySettingsOverlay.AlwaysPresent = false;
+
                 using (ModDisplay.BeginDelayedSequence(2000))
                     ModDisplay.FadeOut(200);
+            }
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

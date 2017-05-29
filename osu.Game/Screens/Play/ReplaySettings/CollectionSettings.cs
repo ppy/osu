@@ -17,15 +17,18 @@ namespace osu.Game.Screens.Play.ReplaySettings
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(new OsuSpriteText
+            Children = new Drawable[]
             {
-                Text = @"Add current song to",
-            });
-            Add(new CollectionsDropdown<PlaylistCollection>
-            {
-                RelativeSizeAxes = Axes.X,
-                Items = new[] { new KeyValuePair<string, PlaylistCollection>(@"All", PlaylistCollection.All) },
-            });
+                new OsuSpriteText
+                {
+                    Text = @"Add current song to",
+                },
+                new CollectionsDropdown<PlaylistCollection>
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Items = new[] { new KeyValuePair<string, PlaylistCollection>(@"All", PlaylistCollection.All) },
+                },
+            };
         }
     }
 }
