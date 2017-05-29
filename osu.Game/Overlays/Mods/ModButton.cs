@@ -36,59 +36,64 @@ namespace osu.Game.Overlays.Mods
 
         public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
 
-        private const EasingTypes mod_switch_easing = EasingTypes.InOutQuint;
-        private const double mod_switch_duration = 100;
+        private const EasingTypes mod_switch_easing = EasingTypes.InOutSine;
+        private const double mod_switch_duration = 140;
 
-        private int _selectedIndex = -1;
-        private int selectedIndex
+        // A selected index of -1 means not selected.
+        private int selectedIndex = -1;
+
+        protected int SelectedIndex
         {
             get
             {
-                return _selectedIndex;
+                return selectedIndex;
             }
             set
             {
-                if (value == _selectedIndex) return;
+                if (value == selectedIndex) return;
 
                 bool beforeSelected = Selected;
 
-                _selectedIndex = value;
+                int direction = value < selectedIndex ? -1 : 1;
+
+                selectedIndex = value;
 
                 if (value >= Mods.Length)
-                {
-                    _selectedIndex = -1;
-                }
+                    selectedIndex = -1;
                 else if (value <= -2)
-                {
-                    _selectedIndex = Mods.Length - 1;
-                }
+                    selectedIndex = Mods.Length - 1;
+
                 if (beforeSelected ^ Selected)
                 {
                     iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
                     iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
+                    displayMod(SelectedMod ?? Mods[0]);
                 }
                 else
                 {
-                    foregroundIcon.RotateTo(15f, mod_switch_duration, mod_switch_easing);
-                    backgroundIcon.RotateTo(-15f, mod_switch_duration, mod_switch_easing);
+                    const float rotate_angle = 16;
+
+                    foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
+                    backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
+
+                    backgroundIcon.Icon = SelectedMod.Icon;
                     using (iconsContainer.BeginDelayedSequence(mod_switch_duration, true))
                     {
-                        foregroundIcon.RotateTo(-15f);
+                        foregroundIcon.RotateTo(-rotate_angle * direction);
                         foregroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
 
-                        backgroundIcon.RotateTo(15f);
+                        backgroundIcon.RotateTo(rotate_angle * direction);
                         backgroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
+
+                        iconsContainer.Schedule(() => displayMod(SelectedMod ?? Mods[0]));
                     }
                 }
-                foregroundIcon.Highlighted = Selected;
 
-                if (mod != null)
-                    Scheduler.AddDelayed(() => displayMod(SelectedMod ?? Mods[0]), beforeSelected ^ Selected ? 0 : mod_switch_duration);
+                foregroundIcon.Highlighted = Selected;
             }
         }
 
-        public bool Selected => selectedIndex != -1;
-
+        public bool Selected => SelectedIndex != -1;
 
         private Color4 selectedColour;
         public Color4 SelectedColour
@@ -139,7 +144,7 @@ namespace osu.Game.Overlays.Mods
 
         // the mods from Mod, only multiple if Mod is a MultiMod
 
-        public override Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
+        public override Mod SelectedMod => Mods.ElementAtOrDefault(SelectedIndex);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -164,19 +169,19 @@ namespace osu.Game.Overlays.Mods
 
         public void SelectNext()
         {
-            (++selectedIndex == -1 ? sampleOff : sampleOn).Play();
+            (++SelectedIndex == -1 ? sampleOff : sampleOn).Play();
             Action?.Invoke(SelectedMod);
         }
 
         public void SelectPrevious()
         {
-            (--selectedIndex == -1 ? sampleOff : sampleOn).Play();
+            (--SelectedIndex == -1 ? sampleOff : sampleOn).Play();
             Action?.Invoke(SelectedMod);
         }
 
         public void Deselect()
         {
-            selectedIndex = -1;
+            SelectedIndex = -1;
         }
 
         private void displayMod(Mod mod)
