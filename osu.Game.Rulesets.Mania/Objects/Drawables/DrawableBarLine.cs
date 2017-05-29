@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableBarLine : DrawableManiaHitObject<BarLine>
     {
-        public DrawableBarLine(BarLine hitObject)
-            : base(hitObject, null)
+        public DrawableBarLine(BarLine barLine)
+            : base(barLine, null)
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
@@ -31,38 +31,35 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Height = 1
             });
 
-            int signatureRelativeIndex = hitObject.BeatIndex % (int)hitObject.ControlPoint.TimeSignature;
+            bool isMajor = barLine.BeatIndex % (int)barLine.ControlPoint.TimeSignature == 0;
 
-            switch (signatureRelativeIndex)
+            if (isMajor)
             {
-                case 0:
-                    Add(new EquilateralTriangle
-                    {
-                        Name = "Left triangle",
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.TopCentre,
-                        Size = new Vector2(12),
-                        X = -9,
-                        Rotation = 90,
-                        BypassAutoSizeAxes = Axes.Both
-                    });
+                Add(new EquilateralTriangle
+                {
+                    Name = "Left triangle",
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopCentre,
+                    Size = new Vector2(12),
+                    X = -9,
+                    Rotation = 90,
+                    BypassAutoSizeAxes = Axes.Both
+                });
 
-                    Add(new EquilateralTriangle
-                    {
-                        Name = "Right triangle",
-                        Anchor = Anchor.BottomRight,
-                        Origin = Anchor.TopCentre,
-                        Size = new Vector2(12),
-                        X = 9,
-                        Rotation = -90,
-                        BypassAutoSizeAxes = Axes.Both,
-                    });
-                    break;
-                case 1:
-                case 3:
-                    Alpha = 0.2f;
-                    break;
+                Add(new EquilateralTriangle
+                {
+                    Name = "Right triangle",
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.TopCentre,
+                    Size = new Vector2(12),
+                    X = 9,
+                    Rotation = -90,
+                    BypassAutoSizeAxes = Axes.Both,
+                });
             }
+
+            if (!isMajor && barLine.BeatIndex % 2 == 1)
+                Alpha = 0.2f;
         }
 
         protected override void UpdateState(ArmedState state)
