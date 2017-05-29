@@ -28,7 +28,8 @@ namespace osu.Game.Graphics.UserInterface
         private readonly OsuSpriteText textBold;
         private readonly Box background;
 
-        public SampleChannel SampleClick, SampleHover;
+        private SampleChannel sampleClick;
+        private SampleChannel sampleHover;
 
         public ContextMenuItem(string title)
         {
@@ -66,13 +67,13 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            SampleHover = audio.Sample.Get(@"Menu/menuclick");
-            SampleClick = audio.Sample.Get(@"Menu/menuback");
+            sampleHover = audio.Sample.Get(@"Menu/menuclick");
+            sampleClick = audio.Sample.Get(@"Menu/menuback");
         }
 
         protected override bool OnHover(InputState state)
         {
-            SampleHover.Play();
+            sampleHover.Play();
             background.Colour = backgroundHoveredColour;
             textBold.FadeIn(transition_length, EasingTypes.OutQuint);
             text.FadeOut(transition_length, EasingTypes.OutQuint);
@@ -89,7 +90,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(InputState state)
         {
-            SampleClick?.Play();
+            sampleClick?.Play();
             Action?.Invoke();
             return true;
         }

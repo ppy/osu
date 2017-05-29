@@ -51,7 +51,7 @@ namespace osu.Game.Graphics.Cursor
                     menu.Items = menuTarget.Items;
                     menu.Position = ToLocalSpace(cursor.ActiveCursor.ScreenSpaceDrawQuad.TopLeft);
                     menu.FadeIn(fade_duration, EasingTypes.OutQuint);
-                    return true;
+                    break;
             }
 
             return true;
@@ -61,23 +61,7 @@ namespace osu.Game.Graphics.Cursor
         {
             private readonly FillFlowContainer<ContextMenuItem> content;
 
-            private ContextMenuItem[] items;
-            public ContextMenuItem[] Items
-            {
-                set
-                {
-                    if(items != null)
-                    {
-                        foreach (var item in items)
-                            content.Remove(item);
-                    }
-
-                    items = value;
-
-                    foreach (var item in value)
-                        content.Add(item);
-                }
-            }
+            public ContextMenuItem[] Items { set { content.Children = value; } }
 
             public ContextMenu()
             {
