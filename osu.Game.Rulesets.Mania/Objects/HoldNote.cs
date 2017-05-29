@@ -58,6 +58,9 @@ namespace osu.Game.Rulesets.Mania.Objects
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
+
+            Head.ApplyDefaults(controlPointInfo, difficulty);
+            Tail.ApplyDefaults(controlPointInfo, difficulty);
         }
 
         /// <summary>
