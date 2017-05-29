@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.Chat
         protected override void PopIn()
         {
             search.HoldFocus = true;
-            Schedule(() => search.TriggerFocus());
+            Schedule(() => search.TriggerOnFocus());
 
             FadeIn(100, EasingTypes.OutQuint);
             MoveToY(0, 800, EasingTypes.OutQuint);
