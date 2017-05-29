@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play
         {
             if (!args.Repeat && args.Key == Key.Escape)
             {
-                Buttons.Children.Last().TriggerClick();
+                Buttons.Children.Last().TriggerOnClick();
                 return true;
             }
 
