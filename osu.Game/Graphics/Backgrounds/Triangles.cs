@@ -24,6 +24,12 @@ namespace osu.Game.Graphics.Backgrounds
     {
         private const float triangle_size = 100;
 
+        /// <summary>
+        /// How many screen-space pixels are smoothed over.
+        /// Same behavior as Sprite's EdgeSmoothness.
+        /// </summary>
+        private const float edge_smoothness = 1;
+
         public override bool HandleInput => false;
 
         public Color4 ColourLight = Color4.White;
@@ -211,20 +217,28 @@ namespace osu.Game.Graphics.Backgrounds
                 Shader.Bind();
                 Texture.TextureGL.Bind();
 
+                Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
+
                 foreach (TriangleParticle particle in Parts)
                 {
-                    var offset = new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
+                    var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
+                    var size = new Vector2(2 * offset.X, offset.Y);
 
                     var triangle = new Triangle(
                         particle.Position * Size * DrawInfo.Matrix,
-                        (particle.Position * Size + offset * triangle_size) * DrawInfo.Matrix,
-                        (particle.Position * Size + new Vector2(-offset.X, offset.Y) * triangle_size) * DrawInfo.Matrix
+                        (particle.Position * Size + offset) * DrawInfo.Matrix,
+                        (particle.Position * Size + new Vector2(-offset.X, offset.Y)) * DrawInfo.Matrix
                     );
 
                     ColourInfo colourInfo = DrawInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
-                    Texture.DrawTriangle(triangle, colourInfo, null, Shared.VertexBatch.Add);
+                    Texture.DrawTriangle(
+                        triangle,
+                        colourInfo,
+                        null,
+                        Shared.VertexBatch.Add,
+                        Vector2.Divide(localInflationAmount, size));
                 }
 
                 Shader.Unbind();
