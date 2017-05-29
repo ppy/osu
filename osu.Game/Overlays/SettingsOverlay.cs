@@ -134,12 +134,13 @@ namespace osu.Game.Overlays
             FadeTo(0, TRANSITION_LENGTH / 2);
 
             searchTextBox.HoldFocus = false;
-            searchTextBox.TriggerFocusLost();
+            if (searchTextBox.HasFocus)
+                InputManager.ChangeFocus(null);
         }
 
         protected override bool OnFocus(InputState state)
         {
-            searchTextBox.TriggerFocus(state);
+            InputManager.ChangeFocus(searchTextBox);
             return false;
         }
 
