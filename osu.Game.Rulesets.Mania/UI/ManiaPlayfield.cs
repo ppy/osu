@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Mania.Timing;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -77,27 +78,40 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new Box
+                        new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black
-                        },
-                        columns = new FillFlowContainer<Column>
-                        {
-                            Name = "Columns",
+                            Name = "Masked elements",
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
-                            Direction = FillDirection.Horizontal,
-                            Padding = new MarginPadding { Left = 1, Right = 1 },
-                            Spacing = new Vector2(1, 0)
+                            Masking = true,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black
+                                },
+                                columns = new FillFlowContainer<Column>
+                                {
+                                    Name = "Columns",
+                                    RelativeSizeAxes = Axes.Y,
+                                    AutoSizeAxes = Axes.X,
+                                    Direction = FillDirection.Horizontal,
+                                    Padding = new MarginPadding { Left = 1, Right = 1 },
+                                    Spacing = new Vector2(1, 0)
+                                }
+                            }
                         },
                         new Container
                         {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
@@ -105,7 +119,10 @@ namespace osu.Game.Rulesets.Mania.UI
                                 barlineContainer = new ControlPointContainer(timingChanges)
                                 {
                                     Name = "Bar lines",
-                                    RelativeSizeAxes = Axes.Both,
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    RelativeSizeAxes = Axes.Y
+                                    // Width is set in the Update method
                                 }
                             }
                         }
@@ -190,6 +207,7 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
+        public void Add(DrawableBarline barline) => barlineContainer.Add(barline);
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -232,6 +250,13 @@ namespace osu.Game.Rulesets.Mania.UI
         private void transformTimeSpanTo(double newTimeSpan, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
             TransformTo(() => TimeSpan, newTimeSpan, duration, easing, new TransformTimeSpan());
+        }
+
+        protected override void Update()
+        {
+            // Due to masking differences, it is not possible to get the width of the columns container automatically
+            // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
+            barlineContainer.Width = columns.Width;
         }
 
         private class TransformTimeSpan : Transform<double>
