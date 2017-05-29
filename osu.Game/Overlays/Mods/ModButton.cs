@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Mods
         public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
 
         private const EasingTypes mod_switch_easing = EasingTypes.InOutSine;
-        private const double mod_switch_duration = 140;
+        private const double mod_switch_duration = 120;
 
         // A selected index of -1 means not selected.
         private int selectedIndex = -1;
@@ -52,31 +52,34 @@ namespace osu.Game.Overlays.Mods
             {
                 if (value == selectedIndex) return;
 
+                int direction = value < selectedIndex ? -1 : 1;
                 bool beforeSelected = Selected;
 
-                int direction = value < selectedIndex ? -1 : 1;
-
-                selectedIndex = value;
+                Mod modBefore = SelectedMod ?? Mods[0];
 
                 if (value >= Mods.Length)
                     selectedIndex = -1;
-                else if (value <= -2)
+                else if (value < -1)
                     selectedIndex = Mods.Length - 1;
+                else
+                    selectedIndex = value;
 
-                if (beforeSelected ^ Selected)
+                Mod modAfter = SelectedMod ?? Mods[0];
+
+                if (beforeSelected != Selected)
                 {
                     iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
                     iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
-                    displayMod(SelectedMod ?? Mods[0]);
                 }
-                else
+
+                if (modBefore != modAfter)
                 {
                     const float rotate_angle = 16;
 
                     foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
                     backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
 
-                    backgroundIcon.Icon = SelectedMod.Icon;
+                    backgroundIcon.Icon = modAfter.Icon;
                     using (iconsContainer.BeginDelayedSequence(mod_switch_duration, true))
                     {
                         foregroundIcon.RotateTo(-rotate_angle * direction);
@@ -85,7 +88,7 @@ namespace osu.Game.Overlays.Mods
                         backgroundIcon.RotateTo(rotate_angle * direction);
                         backgroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
 
-                        iconsContainer.Schedule(() => displayMod(SelectedMod ?? Mods[0]));
+                        iconsContainer.Schedule(() => displayMod(modAfter));
                     }
                 }
 
