@@ -21,7 +21,6 @@ namespace osu.Desktop.VisualTests.Tests
 
             Add(new ReplaySettingsOverlay()
             {
-                IsAvaliable = true,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             });

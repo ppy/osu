@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
             BorderColour = Color4.Black;
             BorderThickness = border_thickness;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -59,10 +59,10 @@ namespace osu.Game.Graphics.UserInterface
                         new Container
                         {
                             Name = @"Header",
-                            RelativeSizeAxes = Axes.X,
-                            Height = header_height,
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.X,
+                            Height = header_height,
 
                             Children = new Drawable[]
                             {
@@ -90,13 +90,13 @@ namespace osu.Game.Graphics.UserInterface
                         content = new FillFlowContainer
                         {
                             Name = @"Content",
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeDuration = transition_duration,
                             AutoSizeEasing = EasingTypes.OutQuint,
                             AutoSizeAxes = Axes.Y,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
                             Padding = new MarginPadding(15),
                             Spacing = new Vector2(0, 15),
                         }
@@ -105,10 +105,7 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        public new void Add(Drawable drawable)
-        {
-            content.Add(drawable);
-        }
+        protected override Container<Drawable> Content => content;
 
         private void triggerContentVisibility()
         {

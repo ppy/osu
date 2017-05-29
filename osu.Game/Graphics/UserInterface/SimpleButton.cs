@@ -44,12 +44,12 @@ namespace osu.Game.Graphics.UserInterface
             {
                 content = new Container
                 {
-                    Size = new Vector2(button_size),
-                    CornerRadius = 5,
-                    Masking = true,
-
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
+                    Size = new Vector2 (button_size),
+
+                    CornerRadius = 5,
+                    Masking = true,
                     EdgeEffect = new EdgeEffect
                     {
                         Colour = Color4.Black.Opacity(0.04f),
@@ -65,9 +65,9 @@ namespace osu.Game.Graphics.UserInterface
                         },
                         icon = new TextAwesome
                         {
-                            TextSize = 18,
                             Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre
+                            Anchor = Anchor.Centre,
+                            TextSize = 18,
                         }
                     }
                 }
