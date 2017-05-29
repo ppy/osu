@@ -109,6 +109,8 @@ namespace osu.Game.Graphics.Backgrounds
 
             Invalidate(Invalidation.DrawNode, shallPropagate: false);
 
+            addTriangles(false);
+
             for (int i = 0; i < parts.Count; i++)
             {
                 TriangleParticle newParticle = parts[i];
@@ -117,7 +119,6 @@ namespace osu.Game.Graphics.Backgrounds
                     // Cubically scale alpha to make it drop off more sharply.
                     (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3) :
                     1;
-
 
                 newParticle.Position += new Vector2(0, -(parts[i].Scale * (50 / DrawHeight)) / triangleScale * Velocity) * ((float)Time.Elapsed / 950);
                 newParticle.Colour.A = adjustedAlpha;
@@ -132,8 +133,6 @@ namespace osu.Game.Graphics.Backgrounds
                 if (bottomPos < 0)
                     parts.RemoveAt(i);
             }
-
-            addTriangles(false);
         }
 
         private void addTriangles(bool randomY)
