@@ -6,20 +6,30 @@ using System;
 using System.Collections.Generic;
 using OpenTK;
 using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Database;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
     internal abstract class ConvertSlider : HitObject, IHasCurve
     {
+        /// <summary>
+        /// Scoring distance with a speed-adjusted beat length of 1 second.
+        /// </summary>
+        private const float base_scoring_distance = 100;
+
         public List<Vector2> ControlPoints { get; set; }
         public CurveType CurveType { get; set; }
+
         public double Distance { get; set; }
 
         public List<SampleInfoList> RepeatSamples { get; set; }
         public int RepeatCount { get; set; } = 1;
 
-        public double EndTime { get; set; }
-        public double Duration { get; set; }
+        public double EndTime => StartTime + RepeatCount * Distance / Velocity;
+        public double Duration => EndTime - StartTime;
+
+        public double Velocity = 1;
 
         public Vector2 PositionAt(double progress)
         {
@@ -34,6 +44,18 @@ namespace osu.Game.Rulesets.Objects.Legacy
         public int RepeatAt(double progress)
         {
             throw new NotImplementedException();
+        }
+
+        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        {
+            base.ApplyDefaults(controlPointInfo, difficulty);
+
+            TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
+            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
+
+            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier / difficultyPoint.SpeedMultiplier;
+
+            Velocity = scoringDistance / timingPoint.BeatLength;
         }
     }
 }

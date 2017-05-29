@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Timing
 {
@@ -128,6 +129,8 @@ namespace osu.Game.Rulesets.Mania.Timing
             /// </summary>
             private class AutoTimeRelativeContainer : Container
             {
+                protected override IComparer<Drawable> DepthComparer => new HitObjectReverseStartTimeComparer();
+
                 public override void InvalidateFromChild(Invalidation invalidation)
                 {
                     // We only want to re-compute our size when a child's size or position has changed

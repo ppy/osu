@@ -428,6 +428,9 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                 }
             }
+
+            foreach (var hitObject in beatmap.HitObjects)
+                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.Difficulty);
         }
 
         internal enum LegacySampleBank

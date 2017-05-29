@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Menu
             switch (args.Key)
             {
                 case Key.Space:
-                    osuLogo.TriggerClick(state);
+                    osuLogo.TriggerOnClick(state);
                     return true;
                 case Key.Escape:
                     switch (State)
@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Menu
                             State = MenuState.Initial;
                             return true;
                         case MenuState.Play:
-                            backButton.TriggerClick();
+                            backButton.TriggerOnClick();
                             return true;
                     }
 
@@ -178,10 +178,10 @@ namespace osu.Game.Screens.Menu
                     State = MenuState.TopLevel;
                     return;
                 case MenuState.TopLevel:
-                    buttonsTopLevel.First().TriggerClick();
+                    buttonsTopLevel.First().TriggerOnClick();
                     return;
                 case MenuState.Play:
-                    buttonsPlay.First().TriggerClick();
+                    buttonsPlay.First().TriggerOnClick();
                     return;
             }
         }
