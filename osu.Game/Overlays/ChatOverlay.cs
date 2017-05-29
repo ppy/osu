@@ -135,17 +135,22 @@ namespace osu.Game.Overlays
             channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
         }
 
+        private double startDragChatHeight;
+
         protected override bool OnDragStart(InputState state)
         {
-            if (channelTabs.Hovering)
-                return true;
+            if (!channelTabs.Hovering)
+                return base.OnDragStart(state);
 
-            return base.OnDragStart(state);
+            startDragChatHeight = chatHeight.Value;
+            return true;
         }
 
         protected override bool OnDrag(InputState state)
         {
-            chatHeight.Value = Height - state.Mouse.Delta.Y / Parent.DrawSize.Y;
+            Trace.Assert(state.Mouse.PositionMouseDown != null);
+
+            chatHeight.Value = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
             return base.OnDrag(state);
         }
 
@@ -165,7 +170,7 @@ namespace osu.Game.Overlays
         protected override bool OnFocus(InputState state)
         {
             //this is necessary as inputTextBox is masked away and therefore can't get focus :(
-            inputTextBox.TriggerFocus();
+            InputManager.ChangeFocus(inputTextBox);
             return false;
         }
 
