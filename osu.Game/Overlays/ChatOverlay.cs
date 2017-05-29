@@ -355,32 +355,34 @@ namespace osu.Game.Overlays
 
             if (currentChannel == null) return;
 
-            if (postText[0] == '/')
+            switch (postText.Split(' ')[0])
             {
                 // TODO: Add more commands
-                if (postText.StartsWith("/me "))
-                {
-                    postText = postText.Remove(0,4);
-                    postIsAction = true;
-                }
-                else if (postText == "/me")
-                {
-                    currentChannel.AddNewMessages(new ErrorMessage("Usage: /me <action>"));
-                    textbox.Text = string.Empty;
-                    return;
-                }
-                else if (postText == "/help" || postText.StartsWith("/help "))
-                {
+                case "/me":
+                    if (postText.StartsWith("/me "))
+                    {
+                        postText = postText.Remove(0,4);
+                        postIsAction = true;
+                        break;
+                    }
+                    else
+                    {
+                        currentChannel.AddNewMessages(new ErrorMessage("Usage: /me <action>"));
+                        textbox.Text = string.Empty;
+                        return;
+                    };
+                case "/help":
                     currentChannel.AddNewMessages(new ErrorMessage("Implemented Commands: /me, /help"));
                     textbox.Text = string.Empty;
                     return;
-                }
-                else
-                {
-                    currentChannel.AddNewMessages(new ErrorMessage("Invalid command! See /help"));
-                    textbox.Text = string.Empty;
-                    return;
-                }
+                default:
+                    if (postText.StartsWith("/"))
+                    {
+                        currentChannel.AddNewMessages(new ErrorMessage("Invalid command! See /help"));
+                        textbox.Text = string.Empty;
+                        return;
+                    }
+                    break;
             }
 
             var message = new Message
