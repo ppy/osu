@@ -77,6 +77,7 @@
     <Compile Include="Graphics\Cursor\ContextMenuContainer.cs" />
     <Compile Include="Graphics\IHasContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\ContextMenuItem.cs" />
+    <Compile Include="Graphics\UserInterface\DismissContextMenuItem.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
