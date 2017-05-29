@@ -451,6 +451,7 @@
     <Compile Include="Overlays\Direct\SlimEnumDropdown.cs" />
     <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
     <Compile Include="Database\RankStatus.cs" />
+    <Compile Include="Graphics\UserInterface\BreadcrumbControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
