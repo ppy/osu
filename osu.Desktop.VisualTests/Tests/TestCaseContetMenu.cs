@@ -58,8 +58,12 @@ namespace osu.Desktop.VisualTests.Tests
             public ContextMenuItem[] Items => new ContextMenuItem[]
             {
                 new ContextMenuItem(@"Some option"),
+                new LinkableContextMenuItem(@"Linkable option"),
                 new ContextMenuItem(@"Another option"),
                 new ContextMenuItem(@"Choose me please"),
+                new ContextMenuItem(@"And me too"),
+                new ContextMenuItem(@"Trying to fill"),
+                new DismissContextMenuItem(@"Dismiss option"),
             };
         }
 
@@ -68,8 +72,8 @@ namespace osu.Desktop.VisualTests.Tests
             public ContextMenuItem[] Items => new ContextMenuItem[]
             {
                 new ContextMenuItem(@"Invite to"),
-                new ContextMenuItem(@"Interesting option"),
-                new DismissContextMenuItem(@"Red option"),
+                new LinkableContextMenuItem(@"Linkable option"),
+                new DismissContextMenuItem(@"Dismiss option"),
             };
         }
     }

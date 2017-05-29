@@ -39,28 +39,27 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
+            menu.FadeOut(fade_duration, EasingTypes.OutQuint);
+
             switch (args.Button)
             {
                 case MouseButton.Right:
                     var menuTarget = inputManager.HoveredDrawables.OfType<IHasContextMenu>().FirstOrDefault();
                     if (menuTarget == null)
-                    {
-                        menu.FadeOut(fade_duration, EasingTypes.OutQuint);
                         return false;
-                    }
+
                     menu.Items = menuTarget.Items;
                     menu.Position = ToLocalSpace(cursor.ActiveCursor.ScreenSpaceDrawQuad.TopLeft);
                     menu.FadeIn(fade_duration, EasingTypes.OutQuint);
                     return true;
             }
 
-            menu.FadeOut(fade_duration, EasingTypes.OutQuint);
             return true;
         }
 
         public class ContextMenu : Container
         {
-            private readonly FillFlowContainer content;
+            private readonly FillFlowContainer<ContextMenuItem> content;
 
             private ContextMenuItem[] items;
             public ContextMenuItem[] Items
@@ -95,7 +94,7 @@ namespace osu.Game.Graphics.Cursor
 
                 Children = new Drawable[]
                 {
-                    content = new FillFlowContainer
+                    content = new FillFlowContainer<ContextMenuItem>
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,

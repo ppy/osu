@@ -2,6 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -12,16 +15,20 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class ContextMenuItem : ClickableContainer
     {
-        private const int height = 30;
-        private const int width = 200;
+        private const int height = 25;
+        private const int width = 170;
+        private const int transition_length = 200;
 
         private Color4 backgroundHoveredColour => OsuColour.FromHex(@"172023");
         private Color4 backgroundColour => OsuColour.FromHex(@"223034");
 
-        protected Color4 TextColour { set { text.Colour = value; } }
+        protected Color4 TextColour { set { text.Colour = textBold.Colour = value; } }
 
         private readonly OsuSpriteText text;
+        private readonly OsuSpriteText textBold;
         private readonly Box background;
+
+        public SampleChannel SampleClick, SampleHover;
 
         public ContextMenuItem(string title)
         {
@@ -39,26 +46,52 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    TextSize = 18,
+                    TextSize = 17,
                     Text = title,
-                    Font = @"Exo2.0",
+                    Margin = new MarginPadding{ Left = 20 },
+                },
+                textBold = new OsuSpriteText
+                {
+                    Alpha = 0,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    TextSize = 17,
+                    Text = title,
+                    Font = @"Exo2.0-Bold",
                     Margin = new MarginPadding{ Left = 20 },
                 }
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            SampleHover = audio.Sample.Get(@"Menu/menuclick");
+            SampleClick = audio.Sample.Get(@"Menu/menuback");
+        }
+
         protected override bool OnHover(InputState state)
         {
+            SampleHover.Play();
             background.Colour = backgroundHoveredColour;
-            text.Font = @"Exo2.0-Bold";
-            return base.OnHover(state);
+            textBold.FadeIn(transition_length, EasingTypes.OutQuint);
+            text.FadeOut(transition_length, EasingTypes.OutQuint);
+
+            return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             background.Colour = backgroundColour;
-            text.Font = @"Exo2.0";
-            base.OnHoverLost(state);
+            textBold.FadeOut(transition_length, EasingTypes.OutQuint);
+            text.FadeIn(transition_length, EasingTypes.OutQuint);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            SampleClick?.Play();
+            Action?.Invoke();
+            return true;
         }
     }
 }
