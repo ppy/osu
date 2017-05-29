@@ -12,12 +12,12 @@ using osu.Game.Rulesets.Objects.Drawables;
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
     /// <summary>
-    /// Visualises a <see cref="Barline"/>. Although this derives DrawableManiaHitObject,
+    /// Visualises a <see cref="BarLine"/>. Although this derives DrawableManiaHitObject,
     /// this does not handle input/sound like a normal hit object.
     /// </summary>
-    public class DrawableBarline : DrawableManiaHitObject<Barline>
+    public class DrawableBarLine : DrawableManiaHitObject<BarLine>
     {
-        public DrawableBarline(Barline hitObject)
+        public DrawableBarLine(BarLine hitObject)
             : base(hitObject, null)
         {
             AutoSizeAxes = Axes.Y;

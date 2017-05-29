@@ -3,7 +3,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
-    public class Barline : ManiaHitObject
+    public class BarLine : ManiaHitObject
     {
         /// <summary>
         /// The control point which this bar line is part of.
