@@ -189,7 +189,7 @@ namespace osu.Game.Overlays.Mods
 
         private void displayMod(Mod mod)
         {
-            if(backgroundIcon != null)
+            if (backgroundIcon != null)
                 backgroundIcon.Icon = foregroundIcon.Icon;
             foregroundIcon.Icon = mod.Icon;
             text.Text = mod.Name;
