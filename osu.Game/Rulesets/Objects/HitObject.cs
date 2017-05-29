@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The time at which the HitObject starts.
         /// </summary>
-        public double StartTime;
+        public virtual double StartTime { get; set; }
 
         /// <summary>
         /// The samples to be played when this hit object is hit.
