@@ -293,7 +293,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
-            if (HasFailed || !ValidForResume || pauseContainer.AllowExit || HitRenderer.HasReplayLoaded)
+            if (HasFailed || !ValidForResume || pauseContainer?.AllowExit != false || HitRenderer?.HasReplayLoaded != false)
             {
                 fadeOut();
                 return base.OnExiting(next);
@@ -310,7 +310,7 @@ namespace osu.Game.Screens.Play
             HitRenderer?.FadeOut(fade_out_duration);
             Content.FadeOut(fade_out_duration);
 
-            hudOverlay.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
+            hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
 
             Background?.FadeTo(1f, fade_out_duration);
         }

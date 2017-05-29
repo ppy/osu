@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Play
             {
                 if (!args.Repeat && args.Key == Key.Escape)
                 {
-                    Buttons.Children.First().TriggerClick();
+                    Buttons.Children.First().TriggerOnClick();
                     return true;
                 }
 
