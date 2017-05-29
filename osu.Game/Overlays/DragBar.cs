@@ -68,6 +68,9 @@ namespace osu.Game.Overlays
 
             float seekLocation = state.Mouse.Position.X / DrawWidth;
 
+            if (seekLocation >= 1)
+                IsSeeking = false;
+
             SeekRequested?.Invoke(seekLocation);
             updatePosition(seekLocation);
         }
@@ -80,12 +83,24 @@ namespace osu.Game.Overlays
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
+            IsSeeking = true;
+
             seek(state);
+            return true;
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        { 
+            IsSeeking = false;
+
             return true;
         }
 
         protected override bool OnDrag(InputState state)
         {
+            if (!IsSeeking)
+                return false;
+
             seek(state);
             return true;
         }

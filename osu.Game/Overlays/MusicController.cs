@@ -352,18 +352,13 @@ namespace osu.Game.Overlays
             var track = current?.Track;
             if (position < 1)
                 track?.Seek(track.Length * position);
-            else
+            else if (track?.Looping == true)
             {
-                progressBar.TriggerDragEnd();
-
-                if (track?.Looping == true)
-                {
-                    track.Seek(0);
-                    track.Start();
-                }
-                else
-                    next();
+                track.Seek(0);
+                track.Start();
             }
+            else
+                next();
         }
 
         protected override void PopIn()
