@@ -223,6 +223,7 @@
     <Compile Include="Tests\TestCaseDrawableRoom.cs" />
     <Compile Include="Tests\TestCaseUserPanel.cs" />
     <Compile Include="Tests\TestCaseDirect.cs" />
+    <Compile Include="Tests\TestCaseBreadcrumbs.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
