@@ -51,21 +51,15 @@ namespace osu.Desktop.VisualTests.Tests
                     }
                 }
             });
-
-            Add(new ContextMenuItem(@"test")
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            });
         }
 
         private class ContextMenuContainerOne : Container, IHasContextMenu
         {
             public ContextMenuItem[] Items => new ContextMenuItem[]
             {
-                new ContextMenuItem(@"test1"),
-                new ContextMenuItem(@"test2"),
-                new ContextMenuItem(@"test3"),
+                new ContextMenuItem(@"Some option"),
+                new ContextMenuItem(@"Another option"),
+                new ContextMenuItem(@"Choose me please"),
             };
         }
 
@@ -73,9 +67,9 @@ namespace osu.Desktop.VisualTests.Tests
         {
             public ContextMenuItem[] Items => new ContextMenuItem[]
             {
-                new ContextMenuItem(@"test4"),
-                new ContextMenuItem(@"test5"),
-                new ContextMenuItem(@"test6"),
+                new ContextMenuItem(@"Invite to"),
+                new ContextMenuItem(@"Interesting option"),
+                new DismissContextMenuItem(@"Red option"),
             };
         }
     }

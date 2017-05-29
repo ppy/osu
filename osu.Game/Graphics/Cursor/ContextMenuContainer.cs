@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -10,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
-using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
 
@@ -20,6 +18,8 @@ namespace osu.Game.Graphics.Cursor
     {
         private readonly CursorContainer cursor;
         private readonly ContextMenu menu;
+
+        private const float fade_duration = 250;
 
         private UserInputManager inputManager;
 
@@ -45,21 +45,23 @@ namespace osu.Game.Graphics.Cursor
                     var menuTarget = inputManager.HoveredDrawables.OfType<IHasContextMenu>().FirstOrDefault();
                     if (menuTarget == null)
                     {
-                        menu.Hide();
+                        menu.FadeOut(fade_duration, EasingTypes.OutQuint);
                         return false;
                     }
                     menu.Items = menuTarget.Items;
                     menu.Position = ToLocalSpace(cursor.ActiveCursor.ScreenSpaceDrawQuad.TopLeft);
-                    menu.Show();
+                    menu.FadeIn(fade_duration, EasingTypes.OutQuint);
                     return true;
             }
 
-            menu.Hide();
+            menu.FadeOut(fade_duration, EasingTypes.OutQuint);
             return true;
         }
 
-        public class ContextMenu : FillFlowContainer
+        public class ContextMenu : Container
         {
+            private readonly FillFlowContainer content;
+
             private ContextMenuItem[] items;
             public ContextMenuItem[] Items
             {
@@ -68,20 +70,19 @@ namespace osu.Game.Graphics.Cursor
                     if(items != null)
                     {
                         foreach (var item in items)
-                            Remove(item);
+                            content.Remove(item);
                     }
 
                     items = value;
 
                     foreach (var item in value)
-                        Add(item);
+                        content.Add(item);
                 }
             }
 
             public ContextMenu()
             {
                 AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Vertical;
 
                 CornerRadius = 5;
                 Masking = true;
@@ -90,6 +91,15 @@ namespace osu.Game.Graphics.Cursor
                     Type = EdgeEffectType.Shadow,
                     Colour = Color4.Black.Opacity(40),
                     Radius = 5,
+                };
+
+                Children = new Drawable[]
+                {
+                    content = new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                    }
                 };
             }
         }

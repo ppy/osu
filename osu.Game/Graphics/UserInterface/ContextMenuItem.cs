@@ -12,46 +12,51 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class ContextMenuItem : ClickableContainer
     {
-        private readonly Box background;
+        private const int height = 30;
+        private const int width = 200;
+
+        private Color4 backgroundHoveredColour => OsuColour.FromHex(@"172023");
+        private Color4 backgroundColour => OsuColour.FromHex(@"223034");
+
+        protected Color4 TextColour { set { text.Colour = value; } }
+
         private readonly OsuSpriteText text;
+        private readonly Box background;
 
         public ContextMenuItem(string title)
         {
-            Width = 150;
-            AutoSizeAxes = Axes.Y;
+            Width = width;
+            Height = height;
 
             Children = new Drawable[]
             {
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
+                    Colour = backgroundColour,
                 },
                 text = new OsuSpriteText
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Colour = Color4.White,
-                    TextSize = 20,
+                    TextSize = 18,
                     Text = title,
                     Font = @"Exo2.0",
-                    Margin = new MarginPadding{ Left = 10 },
+                    Margin = new MarginPadding{ Left = 20 },
                 }
             };
         }
 
         protected override bool OnHover(InputState state)
         {
-            background.Colour = Color4.Blue;
-            text.Colour = Color4.Yellow;
+            background.Colour = backgroundHoveredColour;
             text.Font = @"Exo2.0-Bold";
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            background.Colour = Color4.Black;
-            text.Colour = Color4.White;
+            background.Colour = backgroundColour;
             text.Font = @"Exo2.0";
             base.OnHoverLost(state);
         }
