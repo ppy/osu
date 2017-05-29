@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 int index = 0;
                 for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength, index++)
                 {
-                    maniaPlayfield.Add(new DrawableBarline(new Barline
+                    maniaPlayfield.Add(new DrawableBarLine(new BarLine
                     {
                         StartTime = t,
                         ControlPoint = point,
