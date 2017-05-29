@@ -99,6 +99,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 TimingControlPoint point = timingPoints[i];
 
+                // Stop on the beat before the next timing point, or if there is no next timing point stop slightly past the last object
                 double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time - point.BeatLength : lastObjectTime + point.BeatLength * (int)point.TimeSignature;
 
                 int index = 0;
