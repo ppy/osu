@@ -69,18 +69,21 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (holdNote)
             {
-                newObject = new HoldNote
+                var hold = new HoldNote
                 {
                     StartTime = HitObject.StartTime,
-                    EndSamples = HitObject.Samples,
                     Column = column,
                     Duration = endTime - HitObject.StartTime
                 };
 
-                newObject.Samples.Add(new SampleInfo
+                hold.Head.Samples.Add(new SampleInfo
                 {
                     Name = SampleInfo.HIT_NORMAL
                 });
+
+                hold.Tail.Samples = HitObject.Samples;
+
+                newObject = hold;
             }
             else
             {
