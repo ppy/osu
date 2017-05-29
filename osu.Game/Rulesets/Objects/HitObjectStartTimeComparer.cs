@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Objects
             var hitObjectY = y as DrawableHitObject;
 
             // If either of the two drawables are not hit objects, fall back to the base comparer
-            if ((hitObjectX ?? hitObjectY) == null)
+            if (hitObjectX?.HitObject == null || hitObjectY?.HitObject == null)
                 return base.Compare(x, y);
 
             // Compare by start time
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Objects
             var hitObjectY = y as DrawableHitObject;
 
             // If either of the two drawables are not hit objects, fall back to the base comparer
-            if ((hitObjectX ?? hitObjectY) == null)
+            if (hitObjectX?.HitObject == null || hitObjectY?.HitObject == null)
                 return base.Compare(x, y);
 
             // Compare by start time

@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Mania.Timing
 
         private readonly List<DrawableControlPoint> drawableControlPoints;
 
-        protected override IComparer<Drawable> DepthComparer => new HitObjectStartTimeComparer();
-
         public ControlPointContainer(IEnumerable<TimingChange> timingChanges)
         {
             drawableControlPoints = timingChanges.Select(t => new DrawableControlPoint(t)).ToList();
@@ -131,6 +129,8 @@ namespace osu.Game.Rulesets.Mania.Timing
             /// </summary>
             private class AutoTimeRelativeContainer : Container
             {
+                protected override IComparer<Drawable> DepthComparer => new HitObjectReverseStartTimeComparer();
+
                 public override void InvalidateFromChild(Invalidation invalidation)
                 {
                     // We only want to re-compute our size when a child's size or position has changed
