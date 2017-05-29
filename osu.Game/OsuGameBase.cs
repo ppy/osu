@@ -159,6 +159,7 @@ namespace osu.Game
                         {
                             Cursor = new MenuCursor(),
                             new TooltipContainer(Cursor) { Depth = -1 },
+                            new ContextMenuContainer(Cursor) { Depth = -2 },
                         }
                     },
                 }
