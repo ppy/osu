@@ -90,7 +90,7 @@ namespace osu.Game.Overlays
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-        { 
+        {
             IsSeeking = false;
 
             return true;
