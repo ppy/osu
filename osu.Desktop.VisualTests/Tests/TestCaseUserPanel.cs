@@ -32,14 +32,14 @@ namespace osu.Desktop.VisualTests.Tests
                         Username = @"flyte",
                         Id = 3103765,
                         Country = new Country { FlagName = @"JP" },
-                        CoverUrl = @"https://assets.ppy.sh/user-profile-covers/3103765/5b012e13611d5761caa7e24fecb3d3a16e1cf48fc2a3032cfd43dd444af83d82.jpeg"
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
                     }) { Width = 300 },
                     peppy = new UserPanel(new User
                     {
                         Username = @"peppy",
                         Id = 2,
                         Country = new Country { FlagName = @"AU" },
-                        CoverUrl = @"https://assets.ppy.sh/user-profile-covers/2/08cad88747c235a64fca5f1b770e100f120827ded1ffe3b66bfcd19c940afa65.jpeg"
+                        CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
                     }) { Width = 300 },
                 },
             });
