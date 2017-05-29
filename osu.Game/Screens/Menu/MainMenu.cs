@@ -48,7 +48,8 @@ namespace osu.Game.Screens.Menu
                             OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnExit = delegate { Exit(); },
-                        }
+                        },
+                        new MenuSideFlashes(),
                     }
                 }
             };
@@ -60,6 +61,7 @@ namespace osu.Game.Screens.Menu
             LoadComponentAsync(background);
 
             buttons.OnSettings = game.ToggleSettings;
+            buttons.OnDirect = game.ToggleDirect;
 
             preloadSongSelect();
         }

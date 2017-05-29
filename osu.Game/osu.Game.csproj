@@ -176,6 +176,7 @@
     <Compile Include="Rulesets\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
     <Compile Include="Rulesets\Objects\HitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\HitObjectStartTimeComparer.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasCombo.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasEndTime.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasDistance.cs" />
@@ -189,6 +190,7 @@
     <Compile Include="Database\RulesetDatabase.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
+    <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
     <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />
     <Compile Include="Screens\Play\HUDOverlay.cs" />
     <Compile Include="Screens\Play\HUD\StandardHealthDisplay.cs" />
@@ -431,6 +433,24 @@
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
+    <Compile Include="Screens\Multiplayer\DrawableRoom.cs" />
+    <Compile Include="Online\Multiplayer\Room.cs" />
+    <Compile Include="Online\Multiplayer\RoomStatus.cs" />
+    <Compile Include="Users\UserPanel.cs" />
+    <Compile Include="Users\UserStatus.cs" />
+    <Compile Include="Overlays\DirectOverlay.cs" />
+    <Compile Include="Overlays\Direct\FilterControl.cs" />
+    <Compile Include="Overlays\Direct\Header.cs" />
+    <Compile Include="Overlays\Direct\SortTabControl.cs" />
+    <Compile Include="Graphics\UserInterface\OsuEnumDropdown.cs" />
+    <Compile Include="Overlays\Direct\DirectPanel.cs" />
+    <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
+    <Compile Include="Overlays\Direct\DirectListPanel.cs" />
+    <Compile Include="Database\OnlineWorkingBeatmap.cs" />
+    <Compile Include="Database\BeatmapOnlineInfo.cs" />
+    <Compile Include="Overlays\Direct\SlimEnumDropdown.cs" />
+    <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
+    <Compile Include="Database\RankStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
