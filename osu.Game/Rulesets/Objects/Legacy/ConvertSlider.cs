@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         public double EndTime => StartTime + RepeatCount * Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
-        public double Velocity;
+        public double Velocity = 1;
 
         public Vector2 PositionAt(double progress)
         {
