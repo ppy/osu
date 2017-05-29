@@ -6,6 +6,7 @@ using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using System.Linq;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -21,13 +22,13 @@ namespace osu.Game.Graphics.UserInterface
             TabContainer.Spacing = new Vector2(padding, 0f);
             Current.ValueChanged += tab =>
             {
-                foreach (TabItem<T> t in TabContainer.Children)
+                foreach (var t in TabContainer.Children.OfType<BreadcrumbTabItem>())
                 {
                     var tIndex = TabContainer.IndexOf(t);
                     var tabIndex = TabContainer.IndexOf(TabMap[tab]);
 
-                    ((BreadcrumbTabItem)t).State = tIndex < tabIndex ? Visibility.Hidden : Visibility.Visible;
-                    ((BreadcrumbTabItem)t).Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, EasingTypes.OutQuint);
+                    t.State = tIndex < tabIndex ? Visibility.Hidden : Visibility.Visible;
+                    t.Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, EasingTypes.OutQuint);
                 }
             };
         }
