@@ -130,7 +130,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void triggerKeyDown(Column column)
         {
-            column.TriggerKeyDown(new InputState(), new KeyDownEventArgs
+            column.TriggerOnKeyDown(new InputState(), new KeyDownEventArgs
             {
                 Key = column.Key,
                 Repeat = false
@@ -139,7 +139,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void triggerKeyUp(Column column)
         {
-            column.TriggerKeyUp(new InputState(), new KeyUpEventArgs
+            column.TriggerOnKeyUp(new InputState(), new KeyUpEventArgs
             {
                 Key = column.Key
             });
