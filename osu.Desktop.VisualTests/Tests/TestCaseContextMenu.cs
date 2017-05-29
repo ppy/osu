@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -55,7 +55,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class ContextMenuContainerOne : Container, IHasContextMenu
         {
-            public ContextMenuItem[] Items => new ContextMenuItem[]
+            public ContextMenuItem[] Items => new []
             {
                 new ContextMenuItem(@"Some option"),
                 new LinkableContextMenuItem(@"Linkable option"),
@@ -69,7 +69,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class ContextMenuContainerTwo : Container, IHasContextMenu
         {
-            public ContextMenuItem[] Items => new ContextMenuItem[]
+            public ContextMenuItem[] Items => new []
             {
                 new ContextMenuItem(@"Invite to"),
                 new LinkableContextMenuItem(@"Linkable option"),
