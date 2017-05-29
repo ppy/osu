@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
             switch (judgement.Result)
             {
                 case HitResult.Miss:
-                        Health.Value += hpMissMultiplier * hp_increase_miss;
+                    Health.Value += hpMissMultiplier * hp_increase_miss;
                     break;
                 case HitResult.Hit:
                     if (isTick)
