@@ -1,10 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK;
-using OpenTK.Input;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -17,18 +14,28 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableBarLine : DrawableManiaHitObject<BarLine>
     {
+        /// <summary>
+        /// Height of major bar line triangles.
+        /// </summary>
+        private const float triangle_height = 12;
+
+        /// <summary>
+        /// Offset of the major bar line triangles from the sides of the bar line.
+        /// </summary>
+        private const float triangle_offset = 9;
+
         public DrawableBarLine(BarLine barLine)
-            : base(barLine, null)
+            : base(barLine)
         {
-            AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
+            Height = 1;
 
             Add(new Box
             {
+                Name = "Bar line",
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
-                RelativeSizeAxes = Axes.X,
-                Height = 1
+                RelativeSizeAxes = Axes.Both,
             });
 
             bool isMajor = barLine.BeatIndex % (int)barLine.ControlPoint.TimeSignature == 0;
@@ -40,10 +47,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Name = "Left triangle",
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopCentre,
-                    Size = new Vector2(12),
-                    X = -9,
-                    Rotation = 90,
-                    BypassAutoSizeAxes = Axes.Both
+                    Size = new Vector2(triangle_height),
+                    X = -triangle_offset,
+                    Rotation = 90
                 });
 
                 Add(new EquilateralTriangle
@@ -51,10 +57,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Name = "Right triangle",
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.TopCentre,
-                    Size = new Vector2(12),
-                    X = 9,
-                    Rotation = -90,
-                    BypassAutoSizeAxes = Axes.Both,
+                    Size = new Vector2(triangle_height),
+                    X = triangle_offset,
+                    Rotation = -90
                 });
             }
 

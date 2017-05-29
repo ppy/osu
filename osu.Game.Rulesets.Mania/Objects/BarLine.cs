@@ -1,5 +1,4 @@
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
@@ -12,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         /// <summary>
         /// The index of the beat which this bar line represents within the control point.
-        /// This is a "major" beat at <see cref="BeatIndex"/> % <see cref="TimingControlPoint.TimeSignature"/> == 0.
+        /// This is a "major" bar line if <see cref="BeatIndex"/> % <see cref="TimingControlPoint.TimeSignature"/> == 0.
         /// </summary>
         public int BeatIndex;
     }
