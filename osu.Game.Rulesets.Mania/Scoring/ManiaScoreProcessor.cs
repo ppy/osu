@@ -106,6 +106,16 @@ namespace osu.Game.Rulesets.Mania.Scoring
         private const double hp_increase_miss = -0.125;
 
         /// <summary>
+        /// The MISS HP multiplier. This is multiplied to the miss hp increase.
+        /// </summary>
+        private double hpMissMultiplier = 1;
+
+        /// <summary>
+        /// The HIT HP multiplier. This is multiplied to hit hp increases.
+        /// </summary>
+        private double hpMultiplier = 1;
+
+        /// <summary>
         /// The cumulative combo portion of the score.
         /// </summary>
         private double comboScore => combo_portion_max * comboPortion / maxComboPortion;
@@ -140,16 +150,6 @@ namespace osu.Game.Rulesets.Mania.Scoring
         /// The total hits.
         /// </summary>
         private int totalHits;
-
-        /// <summary>
-        /// The MISS HP multiplier.
-        /// </summary>
-        private double hpMissMultiplier = 1;
-
-        /// <summary>
-        /// The HIT HP multiplier.
-        /// </summary>
-        private double hpMultiplier = 1;
 
         public ManiaScoreProcessor()
         {
