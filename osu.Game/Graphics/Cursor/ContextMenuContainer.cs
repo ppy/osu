@@ -21,12 +21,7 @@ namespace osu.Game.Graphics.Cursor
         private readonly CursorContainer cursor;
         private readonly ContextMenu menu;
 
-        private ScheduledDelegate findMenuTask;
         private UserInputManager inputManager;
-
-        private const int default_appear_delay = 220;
-
-        private IHasContextMenu currentlyDisplayed;
 
         public ContextMenuContainer(CursorContainer cursor)
         {
@@ -42,68 +37,25 @@ namespace osu.Game.Graphics.Cursor
             inputManager = input;
         }
 
-        protected override bool OnHover(InputState state)
-        {
-            if (menu.IsPresent)
-            {
-                if (currentlyDisplayed != null)
-                {
-                    menu.Items = currentlyDisplayed.Items;
-                }
-            }
-            return base.OnHover(state);
-        }
-
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-        {
-            updateMenuState(state);
-            return base.OnMouseUp(state, args);
-        }
-
-        protected override bool OnMouseMove(InputState state)
-        {
-            updateMenuState(state);
-            return base.OnMouseMove(state);
-        }
-
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             switch (args.Button)
             {
                 case MouseButton.Right:
+                    var menuTarget = inputManager.HoveredDrawables.OfType<IHasContextMenu>().FirstOrDefault();
+                    if (menuTarget == null)
+                    {
+                        menu.Hide();
+                        return false;
+                    }
+                    menu.Items = menuTarget.Items;
                     menu.Position = ToLocalSpace(cursor.ActiveCursor.ScreenSpaceDrawQuad.TopLeft);
                     menu.Show();
                     return true;
             }
+
             menu.Hide();
-
-            return base.OnMouseDown(state, args);
-        }
-
-        private void updateMenuState(InputState state)
-        {
-            if (currentlyDisplayed?.Hovering != true)
-            {
-                if (currentlyDisplayed != null && !state.Mouse.HasMainButtonPressed)
-                {
-                    menu.Delay(150);
-                    menu.FadeOut(500, EasingTypes.OutQuint);
-                    currentlyDisplayed = null;
-                }
-
-                findMenuTask?.Cancel();
-                findMenuTask = Scheduler.AddDelayed(delegate
-                {
-                    var menuTarget = inputManager.HoveredDrawables.OfType<IHasContextMenu>().FirstOrDefault();
-
-                    if (menuTarget == null) return;
-
-                    menu.Items = menuTarget.Items;
-                    menu.FadeIn(500, EasingTypes.OutQuint);
-
-                    currentlyDisplayed = menuTarget;
-                }, (1 - menu.Alpha) * default_appear_delay);
-            }
+            return true;
         }
 
         public class ContextMenu : FillFlowContainer
