@@ -131,13 +131,13 @@ namespace osu.Game.Screens.Play
 
             public override bool HandleInput => true;
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => target.Children.Any(c => c.TriggerKeyDown(state, args));
+            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => target.Children.Any(c => c.TriggerOnKeyDown(state, args));
 
-            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => target.Children.Any(c => c.TriggerKeyUp(state, args));
+            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => target.Children.Any(c => c.TriggerOnKeyUp(state, args));
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => target.Children.Any(c => c.TriggerMouseDown(state, args));
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => target.Children.Any(c => c.TriggerOnMouseDown(state, args));
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => target.Children.Any(c => c.TriggerMouseUp(state, args));
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => target.Children.Any(c => c.TriggerOnMouseUp(state, args));
         }
     }
 }
