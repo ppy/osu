@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Play
             switch (args.Key)
             {
                 case Key.Space:
-                    button.TriggerClick();
+                    button.TriggerOnClick();
                     return true;
             }
 
