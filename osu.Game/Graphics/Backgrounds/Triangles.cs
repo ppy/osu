@@ -109,27 +109,27 @@ namespace osu.Game.Graphics.Backgrounds
 
             Invalidate(Invalidation.DrawNode, shallPropagate: false);
 
-            addTriangles(false);
+            if (CreateNewTriangles)
+                addTriangles(false);
+
+            float adjustedAlpha = HideAlphaDiscrepancies ?
+                // Cubically scale alpha to make it drop off more sharply.
+                (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3) :
+                1;
+
+            float movedDistance = ((float)Time.Elapsed / 950) * Velocity * (50 / DrawHeight) / triangleScale;
 
             for (int i = 0; i < parts.Count; i++)
             {
                 TriangleParticle newParticle = parts[i];
 
-                float adjustedAlpha = HideAlphaDiscrepancies ?
-                    // Cubically scale alpha to make it drop off more sharply.
-                    (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3) :
-                    1;
-
-                newParticle.Position += new Vector2(0, -(parts[i].Scale * (50 / DrawHeight)) / triangleScale * Velocity) * ((float)Time.Elapsed / 950);
+                // Scale moved distance by the size of the triangle. Smaller triangles should move more slowly.
+                newParticle.Position.Y += -parts[i].Scale * movedDistance;
                 newParticle.Colour.A = adjustedAlpha;
 
                 parts[i] = newParticle;
 
-                if (!CreateNewTriangles)
-                    continue;
-
                 float bottomPos = parts[i].Position.Y + triangle_size * parts[i].Scale * 0.866f / DrawHeight;
-
                 if (bottomPos < 0)
                     parts.RemoveAt(i);
             }
