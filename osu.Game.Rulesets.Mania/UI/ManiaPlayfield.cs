@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
-        private readonly ControlPointContainer barlineContainer;
+        private readonly ControlPointContainer barLineContainer;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
                             {
-                                barlineContainer = new ControlPointContainer(timingChanges)
+                                barLineContainer = new ControlPointContainer(timingChanges)
                                 {
                                     Name = "Bar lines",
                                     Anchor = Anchor.TopCentre,
@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
-        public void Add(DrawableBarLine barline) => barlineContainer.Add(barline);
+        public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -242,7 +242,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 timeSpan = MathHelper.Clamp(timeSpan, time_span_min, time_span_max);
 
-                barlineContainer.TimeSpan = value;
+                barLineContainer.TimeSpan = value;
                 Columns.ForEach(c => c.ControlPointContainer.TimeSpan = value);
             }
         }
@@ -256,7 +256,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             // Due to masking differences, it is not possible to get the width of the columns container automatically
             // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
-            barlineContainer.Width = columns.Width;
+            barLineContainer.Width = columns.Width;
         }
 
         private class TransformTimeSpan : Transform<double>
