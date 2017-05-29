@@ -18,21 +18,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public readonly SliderCurve Curve = new SliderCurve();
-
         public List<Vector2> ControlPoints { get; set; }
         public CurveType CurveType { get; set; }
 
-        public double Distance
-        {
-            get { return Curve.Distance; }
-            set { Curve.Distance = value; }
-        }
+        public double Distance { get; set; }
 
         public List<SampleInfoList> RepeatSamples { get; set; }
         public int RepeatCount { get; set; } = 1;
 
-        public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
+        public double EndTime => StartTime + RepeatCount * Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
         public double Velocity;
