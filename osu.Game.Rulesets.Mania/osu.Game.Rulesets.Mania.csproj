@@ -63,7 +63,6 @@
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
     <Compile Include="Objects\Drawables\DrawableBarline.cs" />
-    <Compile Include="Objects\Drawables\DrawableMajorBarline.cs" />
     <Compile Include="Objects\Drawables\DrawableHoldNote.cs" />
     <Compile Include="Objects\Drawables\DrawableHoldNoteTick.cs" />
     <Compile Include="Objects\Drawables\DrawableManiaHitObject.cs" />
