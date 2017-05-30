@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Multiplayer
     public class RoomInspector : Container
     {
         private readonly MarginPadding content_padding = new MarginPadding { Horizontal = 20, Vertical = 10 };
+        private const float transition_duration = 100;
 
         private readonly FillFlowContainer topFlow;
         private readonly Box statusStrip;
@@ -113,7 +114,7 @@ namespace osu.Game.Screens.Multiplayer
                                             Origin = Anchor.TopRight,
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
-                                            LayoutDuration = 100,
+                                            LayoutDuration = transition_duration,
                                             Children = new[]
                                             {
                                                 participants = new OsuSpriteText
@@ -178,7 +179,7 @@ namespace osu.Game.Screens.Multiplayer
                                         {
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
-                                            LayoutDuration = 100,
+                                            LayoutDuration = transition_duration,
                                             Spacing = new Vector2(5f, 0f),
                                             Children = new Drawable[]
                                             {
@@ -349,7 +350,7 @@ namespace osu.Game.Screens.Multiplayer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            LayoutDuration = 100,
+                            LayoutDuration = transition_duration,
                             Spacing = new Vector2(5f),
                         },
                     },
@@ -363,7 +364,7 @@ namespace osu.Game.Screens.Multiplayer
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation, TextureStore textures, RulesetDatabase rulesets)
+        private void load(OsuColour colours, LocalisationEngine localisation, TextureStore textures)
         {
             this.localisation = localisation;
             this.colours = colours;
@@ -372,12 +373,6 @@ namespace osu.Game.Screens.Multiplayer
             host.Colour = colours.Blue;
 
             cover.Texture = textures.Get(@"https://a.pomf.cat/mvduor.png");
-
-            rulesetContainer.Add(new DifficultyIcon(new BeatmapInfo
-            {
-                Ruleset = rulesets.GetRuleset(0),
-                StarDifficulty = 3.7,
-            }) { Size = new Vector2(30f) });
 
             //binded here instead of ctor because dependencies are needed
             statusBind.ValueChanged += displayStatus;
@@ -411,14 +406,14 @@ namespace osu.Game.Screens.Multiplayer
             status.Text = value.Message;
 
             foreach (Drawable d in new Drawable[] { statusStrip, status })
-                d.FadeColour(value.GetAppropriateColour(colours), 100);
+                d.FadeColour(value.GetAppropriateColour(colours), transition_duration);
         }
 
         private void displayBeatmap(BeatmapInfo value)
         {
             if (value != null)
             {
-                rulesetContainer.FadeIn(100);
+                rulesetContainer.FadeIn(transition_duration);
                 rulesetContainer.Children = new[]
                 {
                     new DifficultyIcon(value)
@@ -434,7 +429,7 @@ namespace osu.Game.Screens.Multiplayer
             }
             else
             {
-                rulesetContainer.FadeOut(100);
+                rulesetContainer.FadeOut(transition_duration);
 
                 beatmapTitle.Current = null;
                 beatmapArtist.Current = null;
@@ -448,13 +443,13 @@ namespace osu.Game.Screens.Multiplayer
         {
             if (value == null)
             {
-                participantsSlash.FadeOut(100);
-                maxParticipants.FadeOut(100);
+                participantsSlash.FadeOut(transition_duration);
+                maxParticipants.FadeOut(transition_duration);
             }
             else
             {
-                participantsSlash.FadeIn(100);
-                maxParticipants.FadeIn(100);
+                participantsSlash.FadeIn(transition_duration);
+                maxParticipants.FadeIn(transition_duration);
                 maxParticipants.Text = value.ToString();
             }
         }
