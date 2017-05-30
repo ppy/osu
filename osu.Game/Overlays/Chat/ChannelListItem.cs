@@ -7,6 +7,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
@@ -22,11 +23,13 @@ namespace osu.Game.Overlays.Chat
 
         private readonly Channel channel;
 
+        private readonly OsuSpriteText name;
         private readonly OsuSpriteText topic;
         private readonly TextAwesome joinedCheckmark;
 
         private Color4? joinedColour;
         private Color4? topicColour;
+        private Color4 hoverColour;
 
         public string[] FilterTerms => new[] { channel.Name };
         public bool MatchingCurrentFilter
@@ -80,7 +83,7 @@ namespace osu.Game.Overlays.Chat
                             AutoSizeAxes = Axes.Y,
                             Children = new[]
                             {
-                                new OsuSpriteText
+                                name = new OsuSpriteText
                                 {
                                     Text = channel.ToString(),
                                     TextSize = text_size,
@@ -143,8 +146,23 @@ namespace osu.Game.Overlays.Chat
         {
             topicColour = colours.Gray9;
             joinedColour = colours.Blue;
+            hoverColour = colours.Yellow;
 
             updateColour(channel.Joined);
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            if (!channel.Joined.Value)
+                name.FadeColour(hoverColour, transition_duration);
+
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            if (!channel.Joined.Value)
+                name.FadeColour(Color4.White, transition_duration);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -157,6 +175,7 @@ namespace osu.Game.Overlays.Chat
         {
             if (joined)
             {
+                name.FadeColour(Color4.White, transition_duration);
                 joinedCheckmark.FadeTo(1f, transition_duration);
                 topic.FadeTo(0.8f, transition_duration);
                 topic.FadeColour(Color4.White, transition_duration);
