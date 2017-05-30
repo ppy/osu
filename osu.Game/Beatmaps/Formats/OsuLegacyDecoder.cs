@@ -10,7 +10,6 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
-using System.Linq;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -220,7 +219,7 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     var item = split[i];
                     if (item.StartsWith("$") && variables.ContainsKey(item))
-                        item = variables[item];
+                        split[i] = variables[item];
                 }
 
                 line = string.Join(",", split);
