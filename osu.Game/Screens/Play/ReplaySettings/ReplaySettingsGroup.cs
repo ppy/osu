@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         private Color4 buttonActiveColour;
 
-        public ReplaySettingsGroup()
+        protected ReplaySettingsGroup()
         {
             AutoSizeAxes = Axes.Y;
             Width = container_width;
