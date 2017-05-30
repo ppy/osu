@@ -185,7 +185,8 @@ namespace osu.Game.Screens.Multiplayer
                                         },
                                         new FillFlowContainer
                                         {
-                                            AutoSizeAxes = Axes.Both,
+                                            AutoSizeAxes = Axes.X,
+                                            Height = ruleset_height,
                                             Direction = FillDirection.Horizontal,
                                             LayoutDuration = transition_duration,
                                             Spacing = new Vector2(5f, 0f),
@@ -212,7 +213,7 @@ namespace osu.Game.Screens.Multiplayer
                                                 new Container
                                                 {
                                                     AutoSizeAxes = Axes.X,
-                                                    Height = ruleset_height,
+                                                    RelativeSizeAxes = Axes.Y,
                                                     Margin = new MarginPadding { Left = 5 },
                                                     Children = new[]
                                                     {
@@ -389,9 +390,9 @@ namespace osu.Game.Screens.Multiplayer
             beatmapBind.TriggerChange();
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             participantsScroll.Height = DrawHeight - topFlow.DrawHeight;
         }
