@@ -74,7 +74,7 @@
     <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
-    <Compile Include="Graphics\UserInterface\SimpleButton.cs" />
+    <Compile Include="Graphics\UserInterface\IconButton.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
@@ -243,7 +243,7 @@
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
     <Compile Include="Screens\Play\ReplaySettings\CollectionSettings.cs" />
     <Compile Include="Screens\Play\ReplaySettings\DiscussionSettings.cs" />
-    <Compile Include="Graphics\UserInterface\SettingsDropdownContainer.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplaySettingsGroup.cs" />
     <Compile Include="Screens\Play\ReplaySettings\ReplaySettingsOverlay.cs" />
     <Compile Include="Screens\Play\ReplaySettings\ReplaySettingsSliderBar.cs" />
     <Compile Include="Screens\Play\ReplaySettings\PlaybackSettings.cs" />

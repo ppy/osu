@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {
-    public class CollectionSettings : SettingsDropdownContainer
+    public class CollectionSettings : ReplaySettingsGroup
     {
         protected override string Title => @"collections";
 

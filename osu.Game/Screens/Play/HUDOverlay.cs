@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Play
         public readonly ReplaySettingsOverlay ReplaySettingsOverlay;
 
         private Bindable<bool> showHud;
+        private bool replaySettingsIsVisible;
+        private bool replayLoaded;
 
         private static bool hasShownNotificationOnce;
 
@@ -97,8 +99,10 @@ namespace osu.Game.Screens.Play
         {
             hitRenderer.InputManager.Add(KeyCounter.GetReceptor());
 
+            replayLoaded = hitRenderer.HasReplayLoaded;
+
             // in the case a replay isn't loaded, we want some elements to only appear briefly.
-            if (!hitRenderer.HasReplayLoaded)
+            if (!replayLoaded)
             {
                 ReplaySettingsOverlay.Hide();
                 ReplaySettingsOverlay.AlwaysPresent = false;
@@ -120,6 +124,18 @@ namespace osu.Game.Screens.Play
                         showHud.Value = !showHud.Value;
                         return true;
                 }
+            }
+
+            switch (args.Key)
+            {
+                case Key.H:
+                    if (replayLoaded)
+                    {
+                        ReplaySettingsOverlay.FadeTo(replaySettingsIsVisible ? 1 : 0, duration);
+                        replaySettingsIsVisible = !replaySettingsIsVisible;
+                        return true;
+                    }
+                    else return false;
             }
 
             return base.OnKeyDown(state, args);

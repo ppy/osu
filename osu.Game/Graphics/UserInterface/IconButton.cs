@@ -12,7 +12,7 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class SimpleButton : ClickableContainer
+    public class IconButton : ClickableContainer
     {
         private readonly TextAwesome icon;
         private readonly Box hover;
@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
             set { icon.Scale = value; }
         }
 
-        public SimpleButton()
+        public IconButton()
         {
             AutoSizeAxes = Axes.Both;
 
