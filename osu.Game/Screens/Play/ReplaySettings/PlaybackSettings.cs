@@ -6,6 +6,7 @@ using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {
@@ -18,10 +19,10 @@ namespace osu.Game.Screens.Play.ReplaySettings
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<double>
+                new ReplaySettingsSliderBar<double>()
                 {
                     LabelText = "Playback speed",
-                    Bindable = config.GetBindable<double>(OsuSetting.PlaybackSpeed),
+                    Bindable = config.GetBindable<double>(OsuSetting.PlaybackSpeed)
                 }
             };
         }

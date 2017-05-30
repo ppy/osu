@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
         {
             Children = new Drawable[]
             {
-                new SettingsCheckbox
+                new ReplaySettingsCheckbox
                 {
                     LabelText = "Show floating coments",
                     Bindable = config.GetBindable<bool>(OsuSetting.FloatingComments)

@@ -33,7 +33,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Text = @"Button",
             }));
 
-            AddStep(@"Add checkbox", () => container.Add(new SettingsCheckbox
+            AddStep(@"Add checkbox", () => container.Add(new ReplaySettingsCheckbox
             {
                 LabelText = "Checkbox",
             }));
