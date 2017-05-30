@@ -62,6 +62,7 @@
     <Compile Include="Judgements\ManiaHitResult.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
+    <Compile Include="Objects\Drawables\DrawableBarLine.cs" />
     <Compile Include="Objects\Drawables\DrawableHoldNote.cs" />
     <Compile Include="Objects\Drawables\DrawableHoldNoteTick.cs" />
     <Compile Include="Objects\Drawables\DrawableManiaHitObject.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Objects\Drawables\Pieces\NotePiece.cs" />
     <Compile Include="Objects\Types\IHasColumn.cs" />
     <Compile Include="Scoring\ManiaScoreProcessor.cs" />
+    <Compile Include="Objects\BarLine.cs" />
     <Compile Include="Objects\HoldNote.cs" />
     <Compile Include="Objects\HoldNoteTick.cs" />
     <Compile Include="Objects\ManiaHitObject.cs" />
