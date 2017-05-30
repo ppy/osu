@@ -223,8 +223,7 @@ namespace osu.Game.Overlays.Chat
                     Depth = float.MaxValue;
                     Width = 45;
 
-                    icon.Icon = 0;
-                    icon.X = 0;
+                    icon.Alpha = 0;
 
                     text.TextSize = 45;
                     textBold.TextSize = 45;
