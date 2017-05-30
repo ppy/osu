@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
+using System.Linq;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -206,18 +207,29 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
+        /// <summary>
+        /// Decodes any beatmap variables present in a string value.
+        /// </summary>
+        /// <param name="val">The value which contains variables.</param>
+        private void decodeVariables(ref string val)
+        {
+            while (val.IndexOf('$') >= 0)
+            {
+                string[] split = val.Split(',');
+                for (int i = 0; i < split.Length; i++)
+                {
+                    var item = split[i];
+                    if (item.StartsWith("$") && variables.ContainsKey(item))
+                        item = variables[item];
+                }
+
+                val = string.Join(",", split);
+            }
+        }
+
         private void handleEvents(Beatmap beatmap, string val)
         {
-            do
-            {
-                string[] valSplit = val.Split(',');
-                for (int i = 0; i < valSplit.Length; i++)
-                {
-                    if (valSplit[i][0] == '$' && variables.ContainsKey(valSplit[i]))
-                        valSplit[i] = variables[valSplit[i]];
-                }
-                val = string.Join(",", valSplit);
-            } while (val.IndexOf('$') != -1);
+            decodeVariables(ref val);
 
             string[] split = val.Split(',');
 
@@ -405,46 +417,56 @@ namespace osu.Game.Beatmaps.Formats
                     continue;
                 }
 
-                string val = line, key = null;
-                if (section != Section.Events && section != Section.TimingPoints && section != Section.HitObjects && section != Section.Variables)
-                {
-                    key = val.Remove(val.IndexOf(':')).Trim();
-                    val = val.Substring(val.IndexOf(':') + 1).Trim();
-                }
+                string key = null, value = null;
+
                 switch (section)
                 {
                     case Section.General:
-                        handleGeneral(beatmap, key, val);
+                    case Section.Editor:
+                    case Section.Metadata:
+                    case Section.Difficulty:
+                    case Section.Colours:
+                        key = line.Remove(line.IndexOf(':')).Trim();
+                        value = line.Substring(line.IndexOf(':') + 1).Trim();
+                        break;
+                    case Section.Variables:
+                        key = line.Remove(line.IndexOf('=')).Trim();
+                        value = line.Substring(line.IndexOf('=') + 1).Trim();
+                        break;
+                }
+
+                switch (section)
+                {
+                    case Section.General:
+                        handleGeneral(beatmap, key, value);
                         break;
                     case Section.Editor:
-                        handleEditor(beatmap, key, val);
+                        handleEditor(beatmap, key, value);
                         break;
                     case Section.Metadata:
-                        handleMetadata(beatmap, key, val);
+                        handleMetadata(beatmap, key, value);
                         break;
                     case Section.Difficulty:
-                        handleDifficulty(beatmap, key, val);
+                        handleDifficulty(beatmap, key, value);
                         break;
                     case Section.Events:
-                        handleEvents(beatmap, val);
+                        handleEvents(beatmap, line);
                         break;
                     case Section.TimingPoints:
-                        handleTimingPoints(beatmap, val);
+                        handleTimingPoints(beatmap, line);
                         break;
                     case Section.Colours:
-                        handleColours(beatmap, key, val, ref hasCustomColours);
+                        handleColours(beatmap, key, value, ref hasCustomColours);
                         break;
                     case Section.HitObjects:
-                        var obj = parser.Parse(val);
+                        var obj = parser.Parse(line);
 
                         if (obj != null)
                             beatmap.HitObjects.Add(obj);
 
                         break;
                     case Section.Variables:
-                        key = val.Remove(val.IndexOf('=')).Trim();
-                        val = val.Substring(val.IndexOf('=') + 1).Trim();
-                        variables[key] = val;
+                        variables[key] = value;
                         break;
                 }
             }
