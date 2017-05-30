@@ -3,9 +3,11 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -16,16 +18,17 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Menu visible on right click";
 
+        private ContextMenuContainer contextMenuContainer;
+
         public override void Reset()
         {
             base.Reset();
 
-            Add(new ContextMenuContainerOne
+            Add(contextMenuContainer = new ContextMenuContainer
             {
                 Size = new Vector2(200),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-
                 Children = new Drawable[]
                 {
                     new Box
@@ -36,12 +39,11 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            Add(new ContextMenuContainerTwo
+            Add(new AnotherContextMenuContainer
             {
                 Size = new Vector2(200),
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-
                 Children = new Drawable[]
                 {
                     new Box
@@ -53,27 +55,27 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
 
-        private class ContextMenuContainerOne : Container, IHasContextMenu
+        private class ContextMenuContainer : Container, IHasContextMenu
         {
-            public ContextMenuItem[] Items => new []
+            public ContextMenuItem[] ContextMenuItems => new []
             {
                 new ContextMenuItem(@"Some option"),
-                new LinkableContextMenuItem(@"Linkable option"),
+                new ContextMenuItem(@"Linkable option", ContextMenuType.Linkable),
                 new ContextMenuItem(@"Another option"),
                 new ContextMenuItem(@"Choose me please"),
                 new ContextMenuItem(@"And me too"),
                 new ContextMenuItem(@"Trying to fill"),
-                new DismissContextMenuItem(@"Dismiss option"),
+                new ContextMenuItem(@"Dismiss option", ContextMenuType.Dismiss),
             };
         }
 
-        private class ContextMenuContainerTwo : Container, IHasContextMenu
+        private class AnotherContextMenuContainer : Container, IHasContextMenu
         {
-            public ContextMenuItem[] Items => new []
+            public ContextMenuItem[] ContextMenuItems => new []
             {
                 new ContextMenuItem(@"Invite to"),
-                new LinkableContextMenuItem(@"Linkable option"),
-                new DismissContextMenuItem(@"Dismiss option"),
+                new ContextMenuItem(@"Linkable option", ContextMenuType.Linkable),
+                new ContextMenuItem(@"Dismiss option", ContextMenuType.Dismiss),
             };
         }
     }

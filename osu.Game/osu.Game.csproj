@@ -74,11 +74,10 @@
     <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
+    <Compile Include="Graphics\ContextMenuType.cs" />
     <Compile Include="Graphics\Cursor\ContextMenuContainer.cs" />
     <Compile Include="Graphics\IHasContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\ContextMenuItem.cs" />
-    <Compile Include="Graphics\UserInterface\DismissContextMenuItem.cs" />
-    <Compile Include="Graphics\UserInterface\LinkableContextMenuItem.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />

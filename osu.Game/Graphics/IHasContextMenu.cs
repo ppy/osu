@@ -9,8 +9,8 @@ namespace osu.Game.Graphics
     public interface IHasContextMenu : IDrawable
     {
         /// <summary>
-        /// Menu that opens when clicked on the drawable
+        /// Menu items that appear when the drawable is right-clicked.
         /// </summary>
-        ContextMenuItem[] Items { get; }
+        ContextMenuItem[] ContextMenuItems { get; }
     }
 }

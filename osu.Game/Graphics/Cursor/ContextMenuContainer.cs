@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.Cursor
                     if (menuTarget == null)
                         return false;
 
-                    menu.Items = menuTarget.Items;
+                    menu.Items = menuTarget.ContextMenuItems;
                     menu.Position = ToLocalSpace(cursor.ActiveCursor.ScreenSpaceDrawQuad.TopLeft);
                     menu.FadeIn(fade_duration, EasingTypes.OutQuint);
                     break;

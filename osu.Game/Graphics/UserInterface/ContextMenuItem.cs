@@ -22,8 +22,6 @@ namespace osu.Game.Graphics.UserInterface
         private Color4 backgroundHoveredColour => OsuColour.FromHex(@"172023");
         private Color4 backgroundColour => OsuColour.FromHex(@"223034");
 
-        protected Color4 TextColour { set { text.Colour = textBold.Colour = value; } }
-
         private readonly OsuSpriteText text;
         private readonly OsuSpriteText textBold;
         private readonly Box background;
@@ -31,11 +29,14 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
-        public ContextMenuItem(string title)
+        private ContextMenuType type;
+
+        public ContextMenuItem(string title, ContextMenuType type = ContextMenuType.Standard)
         {
+            this.type = type;
+
             Width = width;
             Height = height;
-
             Children = new Drawable[]
             {
                 background = new Box
@@ -65,10 +66,20 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, OsuColour colours)
         {
             sampleHover = audio.Sample.Get(@"Menu/menuclick");
             sampleClick = audio.Sample.Get(@"Menu/menuback");
+
+            switch (type)
+            {
+                case ContextMenuType.Linkable:
+                    text.Colour = textBold.Colour = colours.Yellow;
+                    break;
+                case ContextMenuType.Dismiss:
+                    text.Colour = textBold.Colour = colours.Red;
+                    break;
+            }
         }
 
         protected override bool OnHover(InputState state)
