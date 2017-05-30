@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Chat
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 85 },
+                    Padding = new MarginPadding { Top = 85, Right = WIDTH_PADDING },
                     Children = new[]
                     {
                         new ScrollContainer
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Chat
                                     LayoutDuration = 200,
                                     LayoutEasing = EasingTypes.OutQuint,
                                     Spacing = new Vector2(0f, 20f),
-                                    Padding = new MarginPadding { Top = 20, Bottom = 20, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
+                                    Padding = new MarginPadding { Vertical = 20, Left = WIDTH_PADDING },
                                 },
                             },
                         },
