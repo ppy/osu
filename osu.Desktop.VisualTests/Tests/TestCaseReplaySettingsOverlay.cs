@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Play.ReplaySettings;
 
 namespace osu.Desktop.VisualTests.Tests
