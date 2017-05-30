@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Input;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Beatmaps;
@@ -83,6 +85,34 @@ namespace osu.Game.Rulesets.Mania.UI
                 // Invert by default for now (should be moved to config/skin later)
                 Scale = new Vector2(1, -1)
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var maniaPlayfield = (ManiaPlayfield)Playfield;
+
+            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
+
+            SortedList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
+            for (int i = 0; i < timingPoints.Count; i++)
+            {
+                TimingControlPoint point = timingPoints[i];
+
+                // Stop on the beat before the next timing point, or if there is no next timing point stop slightly past the last object
+                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time - point.BeatLength : lastObjectTime + point.BeatLength * (int)point.TimeSignature;
+
+                int index = 0;
+                for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength, index++)
+                {
+                    maniaPlayfield.Add(new DrawableBarLine(new BarLine
+                    {
+                        StartTime = t,
+                        ControlPoint = point,
+                        BeatIndex = index
+                    }));
+                }
+            }
         }
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
