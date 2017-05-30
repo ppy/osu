@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {
-    public class PlaybackSettings : SettingsDropdownContainer
+    public class PlaybackSettings : ReplaySettingsGroup
     {
         protected override string Title => @"playback";
 

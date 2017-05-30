@@ -39,8 +39,8 @@ namespace osu.Game.Overlays
         private Drawable currentBackground;
         private DragBar progressBar;
 
-        private SimpleButton playButton;
-        private SimpleButton playlistButton;
+        private IconButton playButton;
+        private IconButton playlistButton;
 
         private SpriteText title, artist;
 
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Children = new Drawable[]
                                     {
-                                        new FillFlowContainer<SimpleButton>
+                                        new FillFlowContainer<IconButton>
                                         {
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
@@ -153,26 +153,26 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.Centre,
                                             Children = new[]
                                             {
-                                                new SimpleButton
+                                                new IconButton
                                                 {
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
                                                 },
-                                                playButton = new SimpleButton
+                                                playButton = new IconButton
                                                 {
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
                                                     Action = play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
-                                                new SimpleButton
+                                                new IconButton
                                                 {
                                                     Action = next,
                                                     Icon = FontAwesome.fa_step_forward,
                                                 },
                                             }
                                         },
-                                        playlistButton = new SimpleButton
+                                        playlistButton = new IconButton
                                         {
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.CentreRight,

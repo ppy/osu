@@ -46,7 +46,7 @@ namespace osu.Desktop.VisualTests.Tests
             }));
         }
 
-        private class ExampleContainer : SettingsDropdownContainer
+        private class ExampleContainer : ReplaySettingsGroup
         {
             protected override string Title => @"example";
         }

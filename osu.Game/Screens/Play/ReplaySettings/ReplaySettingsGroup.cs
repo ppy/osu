@@ -7,14 +7,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Screens.Play.ReplaySettings
 {
-    public abstract class SettingsDropdownContainer : Container
+    public abstract class ReplaySettingsGroup : Container
     {
         /// <summary>
-        /// The title of this container, which will be written in header.
+        /// The title to be displayed in the header of this group.
         /// </summary>
         protected abstract string Title { get; }
 
@@ -24,14 +26,13 @@ namespace osu.Game.Graphics.UserInterface
         private const int header_height = 30;
         private const int corner_radius = 5;
 
-        private FillFlowContainer content;
-        private SimpleButton button;
-        private bool buttonIsActive;
+        private readonly FillFlowContainer content;
+        private readonly IconButton button;
+        private bool expanded;
 
         private Color4 buttonActiveColour;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public ReplaySettingsGroup()
         {
             AutoSizeAxes = Axes.Y;
             Width = container_width;
@@ -53,7 +54,6 @@ namespace osu.Game.Graphics.UserInterface
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-
                     Children = new Drawable[]
                     {
                         new Container
@@ -63,7 +63,6 @@ namespace osu.Game.Graphics.UserInterface
                             Anchor = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             Height = header_height,
-
                             Children = new Drawable[]
                             {
                                 new OsuSpriteText
@@ -75,14 +74,13 @@ namespace osu.Game.Graphics.UserInterface
                                     Font = @"Exo2.0-Bold",
                                     Margin = new MarginPadding { Left = 10 },
                                 },
-                                button = new SimpleButton
+                                button = new IconButton
                                 {
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.CentreRight,
                                     Position = new Vector2(-15,0),
                                     Icon = FontAwesome.fa_bars,
                                     Scale = new Vector2(0.75f),
-                                    Colour = buttonActiveColour = colours.Yellow,
                                     Action = triggerContentVisibility,
                                 },
                             }
@@ -105,19 +103,25 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            button.Colour = buttonActiveColour = colours.Yellow;
+        }
+
         protected override Container<Drawable> Content => content;
 
         private void triggerContentVisibility()
         {
             content.ClearTransforms();
-            content.AutoSizeAxes = buttonIsActive ? Axes.Y : Axes.None;
+            content.AutoSizeAxes = expanded ? Axes.Y : Axes.None;
 
-            if (!buttonIsActive)
+            if (!expanded)
                 content.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
 
-            button.FadeColour(buttonIsActive ? buttonActiveColour : Color4.White, 200, EasingTypes.OutQuint);
+            button.FadeColour(expanded ? buttonActiveColour : Color4.White, 200, EasingTypes.OutQuint);
 
-            buttonIsActive = !buttonIsActive;
+            expanded = !expanded;
         }
     }
 }
