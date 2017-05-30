@@ -14,6 +14,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -22,6 +23,8 @@ namespace osu.Game.Overlays.Chat
         protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value);
 
         private const float shear_width = 10;
+
+        public readonly Bindable<bool> ChannelSelectorActive = new Bindable<bool>();
 
         public ChatTabControl()
         {
@@ -37,6 +40,8 @@ namespace osu.Game.Overlays.Chat
                 TextSize = 20,
                 Padding = new MarginPadding(10),
             });
+
+            AddTabItem(new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }, ChannelSelectorActive));
         }
 
         private class ChannelTabItem : TabItem<Channel>
@@ -49,6 +54,7 @@ namespace osu.Game.Overlays.Chat
             private readonly SpriteText textBold;
             private readonly Box box;
             private readonly Box highlightBox;
+            private readonly TextAwesome icon;
 
             public override bool Active
             {
@@ -114,6 +120,11 @@ namespace osu.Game.Overlays.Chat
                 backgroundHover = colours.Gray7;
 
                 highlightBox.Colour = colours.Yellow;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
 
                 updateState();
             }
@@ -159,7 +170,7 @@ namespace osu.Game.Overlays.Chat
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            new TextAwesome
+                            icon = new TextAwesome
                             {
                                 Icon = FontAwesome.fa_hashtag,
                                 Anchor = Anchor.CentreLeft,
@@ -190,6 +201,40 @@ namespace osu.Game.Overlays.Chat
                         }
                     }
                 };
+            }
+
+            public class ChannelSelectorTabItem : ChannelTabItem
+            {
+                public override bool Active
+                {
+                    get { return base.Active; }
+                    set
+                    {
+                        activeBindable.Value = value;
+                        base.Active = value;
+                    }
+                }
+
+                private readonly Bindable<bool> activeBindable;
+
+                public ChannelSelectorTabItem(Channel value, Bindable<bool> active) : base(value)
+                {
+                    activeBindable = active;
+                    Depth = float.MaxValue;
+                    Width = 45;
+
+                    icon.Alpha = 0;
+
+                    text.TextSize = 45;
+                    textBold.TextSize = 45;
+                }
+
+                [BackgroundDependencyLoader]
+                private new void load(OsuColour colour)
+                {
+                    backgroundInactive = colour.Gray2;
+                    backgroundActive = colour.Gray3;
+                }
             }
         }
     }

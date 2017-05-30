@@ -260,6 +260,8 @@ namespace osu.Game.Overlays
             {
                 if (currentChannel == value) return;
 
+                if (channelTabs.ChannelSelectorActive) return;
+
                 if (currentChannel != null)
                     currentChannelContainer.Clear(false);
 
