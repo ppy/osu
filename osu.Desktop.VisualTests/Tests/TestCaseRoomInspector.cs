@@ -35,6 +35,10 @@ namespace osu.Desktop.VisualTests.Tests
                     Artist = @"Maaya Sakamoto",
                     Author = @"uwutm8",
                 },
+                OnlineInfo = new BeatmapOnlineInfo
+                {
+                    Covers = new[] { @"https://assets.ppy.sh//beatmaps/560573/covers/cover.jpg?1492722343" },
+                },
             };
             room.MaxParticipants.Value = 200;
             room.Participants.Value = new[] { new User { Username = @"flyte", Id = 3103765, GlobalRank = 1425 },
@@ -78,6 +82,10 @@ namespace osu.Desktop.VisualTests.Tests
                         Title = @"xi",
                         Artist = @"FREEDOM DIVE",
                         Author = @"Nakagawa-Kanon",
+                    },
+                    OnlineInfo = new BeatmapOnlineInfo
+                    {
+                        Covers = new[] { @"https://assets.ppy.sh//beatmaps/39804/covers/cover.jpg?1456506845" },
                     },
                 };
                 newRoom.MaxParticipants.Value = 10;

@@ -27,15 +27,11 @@ namespace osu.Game.Screens.Multiplayer
         private readonly MarginPadding content_padding = new MarginPadding { Horizontal = 20, Vertical = 10 };
         private const float transition_duration = 100;
 
-        private readonly FillFlowContainer topFlow;
         private readonly Box statusStrip;
+        private readonly Container coverContainer, rulesetContainer, flagContainer;
+        private readonly FillFlowContainer topFlow, levelRangeContainer, participantsFlow;
         private readonly OsuSpriteText participants, participantsSlash, maxParticipants, name, status, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor, host, levelRangeLower, levelRangeHigher;
-        private readonly Sprite cover;
-        private readonly FillFlowContainer levelRangeContainer;
         private readonly ScrollContainer participantsScroll;
-        private readonly FillFlowContainer participantsFlow;
-        private readonly Container rulesetContainer;
-        private readonly Container flagContainer;
 
         private Bindable<string> nameBind = new Bindable<string>();
         private Bindable<User> hostBind = new Bindable<User>();
@@ -46,6 +42,7 @@ namespace osu.Game.Screens.Multiplayer
 
         private OsuColour colours;
         private LocalisationEngine localisation;
+        private TextureStore textures;
 
         private Room room;
         public Room Room
@@ -91,11 +88,21 @@ namespace osu.Game.Screens.Multiplayer
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                cover = new Sprite
+                                new Container
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    FillMode = FillMode.Fill,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Colour = Color4.Black,
+                                        },
+                                        coverContainer = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                    },
                                 },
                                 new Box
                                 {
@@ -368,11 +375,10 @@ namespace osu.Game.Screens.Multiplayer
         {
             this.localisation = localisation;
             this.colours = colours;
+            this.textures = textures;
 
             beatmapAuthor.Colour = levelRangeContainer.Colour = colours.Gray9;
             host.Colour = colours.Blue;
-
-            cover.Texture = textures.Get(@"https://a.pomf.cat/mvduor.png");
 
             //binded here instead of ctor because dependencies are needed
             statusBind.ValueChanged += displayStatus;
@@ -413,6 +419,18 @@ namespace osu.Game.Screens.Multiplayer
         {
             if (value != null)
             {
+                coverContainer.FadeIn(transition_duration);
+                coverContainer.Children = new[]
+                {
+                    new AsyncLoadWrapper(new BeatmapBackgroundSprite(new OnlineWorkingBeatmap(value, textures, null))
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        FillMode = FillMode.Fill,
+                        OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
+                    }) { RelativeSizeAxes = Axes.Both }
+                };
+
                 rulesetContainer.FadeIn(transition_duration);
                 rulesetContainer.Children = new[]
                 {
@@ -429,6 +447,7 @@ namespace osu.Game.Screens.Multiplayer
             }
             else
             {
+                coverContainer.FadeOut(transition_duration);
                 rulesetContainer.FadeOut(transition_duration);
 
                 beatmapTitle.Current = null;
