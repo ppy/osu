@@ -80,7 +80,6 @@ namespace osu.Game.Overlays.Chat
                         new ScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ScrollDraggerVisible = false,
                             Children = new[]
                             {
                                 sectionsFlow = new SearchContainer<ChannelSection>
