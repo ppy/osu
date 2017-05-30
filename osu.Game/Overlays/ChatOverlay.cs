@@ -156,7 +156,7 @@ namespace osu.Game.Overlays
             };
 
             channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
-            channelTabs.ChannelSelectorActive.ValueChanged += (value) => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
+            channelTabs.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
             channelSelection.StateChanged += (overlay, state) =>
             {
                 if (state == Visibility.Visible && 1f - chatHeight.Value < channel_selection_min_height)
