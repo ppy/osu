@@ -11,6 +11,9 @@ using OpenTK;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Timing;
+using osu.Framework.Configuration;
+using OpenTK.Input;
+using osu.Framework.Timing;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -59,6 +62,51 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             };
 
+            Action createPlayfieldWithNotesAcceptingInput = () =>
+            {
+                Clear();
+
+                var rateAdjustClock = new StopwatchClock(true) { Rate = 0.5 };
+
+                ManiaPlayfield playField;
+                Add(playField = new ManiaPlayfield(4, new List<TimingChange> { new TimingChange { BeatLength = 200 } })
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Scale = new Vector2(1, -1),
+                    Clock = new FramedClock(rateAdjustClock)
+                });
+
+                for (int t = 1000; t <= 2000; t += 100)
+                {
+                    playField.Add(new DrawableNote(new Note
+                    {
+                        StartTime = t,
+                        Column = 0
+                    }, new Bindable<Key>(Key.D)));
+
+                    playField.Add(new DrawableNote(new Note
+                    {
+                        StartTime = t,
+                        Column = 3
+                    }, new Bindable<Key>(Key.K)));
+                }
+
+                playField.Add(new DrawableHoldNote(new HoldNote
+                {
+                    StartTime = 1000,
+                    Duration = 1000,
+                    Column = 1
+                }, new Bindable<Key>(Key.F)));
+
+                playField.Add(new DrawableHoldNote(new HoldNote
+                {
+                    StartTime = 1000,
+                    Duration = 1000,
+                    Column = 2
+                }, new Bindable<Key>(Key.J)));
+            };
+
             AddStep("1 column", () => createPlayfield(1, SpecialColumnPosition.Normal));
             AddStep("4 columns", () => createPlayfield(4, SpecialColumnPosition.Normal));
             AddStep("Left special style", () => createPlayfield(4, SpecialColumnPosition.Left));
@@ -76,11 +124,13 @@ namespace osu.Desktop.VisualTests.Tests
             AddWaitStep(10);
             AddStep("Right special style", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Right));
             AddWaitStep(10);
+
+            AddStep("Notes with input", () => createPlayfieldWithNotesAcceptingInput());
         }
 
         private void triggerKeyDown(Column column)
         {
-            column.TriggerKeyDown(new InputState(), new KeyDownEventArgs
+            column.TriggerOnKeyDown(new InputState(), new KeyDownEventArgs
             {
                 Key = column.Key,
                 Repeat = false
@@ -89,7 +139,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void triggerKeyUp(Column column)
         {
-            column.TriggerKeyUp(new InputState(), new KeyUpEventArgs
+            column.TriggerOnKeyUp(new InputState(), new KeyUpEventArgs
             {
                 Key = column.Key
             });

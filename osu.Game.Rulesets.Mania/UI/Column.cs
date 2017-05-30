@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -188,7 +187,11 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject) => ControlPointContainer.Add(hitObject);
+        public void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject)
+        {
+            hitObject.AccentColour = AccentColour;
+            ControlPointContainer.Add(hitObject);
+        }
 
         private bool onKeyDown(InputState state, KeyDownEventArgs args)
         {
