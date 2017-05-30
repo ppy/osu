@@ -3,11 +3,9 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -18,13 +16,11 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Menu visible on right click";
 
-        private ContextMenuContainer contextMenuContainer;
-
         public override void Reset()
         {
             base.Reset();
 
-            Add(contextMenuContainer = new ContextMenuContainer
+            Add(new ContextMenuContainer
             {
                 Size = new Vector2(200),
                 Anchor = Anchor.Centre,
