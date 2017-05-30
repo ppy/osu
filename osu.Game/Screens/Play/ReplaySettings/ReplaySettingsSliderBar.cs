@@ -6,7 +6,6 @@ using osu.Game.Graphics.UserInterface;
 using System;
 using osu.Game.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Play.ReplaySettings
