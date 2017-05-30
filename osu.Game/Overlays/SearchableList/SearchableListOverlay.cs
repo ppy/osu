@@ -55,17 +55,6 @@ namespace osu.Game.Overlays.SearchableList
                         },
                     },
                 },
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
-                    {
-                        Header = CreateHeader(),
-                        Filter = CreateFilterControl(),
-                    },
-                },
                 scrollContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -86,6 +75,18 @@ namespace osu.Game.Overlays.SearchableList
                                 },
                             },
                         },
+                    },
+                },
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    AlwaysReceiveInput = true,
+                    Children = new Drawable[]
+                    {
+                        Header = CreateHeader(),
+                        Filter = CreateFilterControl(),
                     },
                 },
             };

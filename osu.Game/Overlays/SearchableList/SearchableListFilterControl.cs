@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -17,6 +18,7 @@ namespace osu.Game.Overlays.SearchableList
     {
         private const float padding = 10;
 
+        private readonly Container filterContainer;
         private readonly Box tabStrip;
 
         public readonly SearchTextBox Search;
@@ -27,65 +29,73 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract T DefaultTab { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
 
+        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || DisplayStyleControl.Dropdown.Contains(screenSpacePos);
+
         protected SearchableListFilterControl()
         {
             if (!typeof(T).IsEnum)
                 throw new InvalidOperationException("SearchableListFilterControl's sort tabs only support enums as the generic type argument");
 
             RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
 
             var controls = CreateSupplementaryControls();
             Container controlsContainer;
             Children = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = BackgroundColour,
-                    Alpha = 0.9f,
-                },
-                tabStrip = new Box
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                },
-                new FillFlowContainer
+                filterContainer = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Top = padding, Horizontal = SearchableListOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
-                        Search = new FilterSearchTextBox
+                        new Box
                         {
-                            RelativeSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = BackgroundColour,
+                            Alpha = 0.9f,
                         },
-                        controlsContainer = new Container
+                        tabStrip = new Box
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 1,
+                        },
+                        new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Margin = new MarginPadding { Top = controls != null ? padding : 0 },
-                        },
-                        Tabs = new PageTabControl<T>
-                        {
-                            RelativeSizeAxes = Axes.X,
-                        },
-                        new Box //keep the tab strip part of autosize, but don't put it in the flow container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 1,
-                            Colour = Color4.White.Opacity(0),
+                            Padding = new MarginPadding { Top = padding, Horizontal = SearchableListOverlay.WIDTH_PADDING },
+                            Children = new Drawable[]
+                            {
+                                Search = new FilterSearchTextBox
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                },
+                                controlsContainer = new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Margin = new MarginPadding { Top = controls != null ? padding : 0 },
+                                },
+                                Tabs = new PageTabControl<T>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                },
+                                new Box //keep the tab strip part of autosize, but don't put it in the flow container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 1,
+                                    Colour = Color4.White.Opacity(0),
+                                },
+                            },
                         },
                     },
                 },
                 DisplayStyleControl = new DisplayStyleControl<U>
                 {
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
-                    Margin = new MarginPadding { Bottom = 5, Right = SearchableListOverlay.WIDTH_PADDING },
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
                 },
             };
 
@@ -99,6 +109,14 @@ namespace osu.Game.Overlays.SearchableList
         private void load(OsuColour colours)
         {
             tabStrip.Colour = colours.Yellow;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Height = filterContainer.Height;
+            DisplayStyleControl.Margin = new MarginPadding { Top = filterContainer.Height - 35, Right = SearchableListOverlay.WIDTH_PADDING };
         }
 
         private class FilterSearchTextBox : SearchTextBox
