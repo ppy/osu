@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.SearchableList
 
         protected override bool OnFocus(InputState state)
         {
-            Filter.Search.TriggerOnFocus();
+            InputManager.ChangeFocus(Filter.Search);
             return false;
         }
 
