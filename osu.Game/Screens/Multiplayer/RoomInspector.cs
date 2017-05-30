@@ -26,6 +26,7 @@ namespace osu.Game.Screens.Multiplayer
     {
         private readonly MarginPadding content_padding = new MarginPadding { Horizontal = 20, Vertical = 10 };
         private const float transition_duration = 100;
+        private const float ruleset_height = 30;
 
         private readonly Box statusStrip;
         private readonly Container coverContainer, rulesetContainer, flagContainer;
@@ -192,11 +193,11 @@ namespace osu.Game.Screens.Multiplayer
                                             {
                                                 rulesetContainer = new Container
                                                 {
-                                                    Size = new Vector2(30f),
+                                                    Size = new Vector2(ruleset_height),
                                                 },
                                                 new Container //todo: game type icon
                                                 {
-                                                    Size = new Vector2(30f),
+                                                    Size = new Vector2(ruleset_height),
                                                     CornerRadius = 15f,
                                                     Masking = true,
                                                     Children = new[]
@@ -211,7 +212,7 @@ namespace osu.Game.Screens.Multiplayer
                                                 new Container
                                                 {
                                                     AutoSizeAxes = Axes.X,
-                                                    Height = 30f,
+                                                    Height = ruleset_height,
                                                     Margin = new MarginPadding { Left = 5 },
                                                     Children = new[]
                                                     {
@@ -436,7 +437,7 @@ namespace osu.Game.Screens.Multiplayer
                 {
                     new DifficultyIcon(value)
                     {
-                        Size = new Vector2(rulesetContainer.DrawHeight),
+                        Size = new Vector2(ruleset_height),
                     }
                 };
 
