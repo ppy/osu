@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -22,6 +23,8 @@ namespace osu.Game.Graphics.Cursor
         private const float fade_duration = 250;
 
         private UserInputManager inputManager;
+        private IHasContextMenu menuTarget;
+        private Vector2 relativeCursorPosition;
 
         public ContextMenuContainer(CursorContainer cursor)
         {
@@ -44,17 +47,26 @@ namespace osu.Game.Graphics.Cursor
             switch (args.Button)
             {
                 case MouseButton.Right:
-                    var menuTarget = inputManager.HoveredDrawables.OfType<IHasContextMenu>().FirstOrDefault();
+                    menuTarget = inputManager.HoveredDrawables.OfType<IHasContextMenu>().FirstOrDefault();
+
                     if (menuTarget == null)
                         return false;
 
                     menu.Items = menuTarget.ContextMenuItems;
                     menu.Position = ToLocalSpace(cursor.ActiveCursor.ScreenSpaceDrawQuad.TopLeft);
+                    relativeCursorPosition = ToSpaceOfOtherDrawable(menu.Position, menuTarget);
                     menu.FadeIn(fade_duration, EasingTypes.OutQuint);
                     break;
             }
 
             return true;
+        }
+
+        protected override void Update()
+        {
+            if (menu.IsPresent && menuTarget != null)
+                menu.Position = new Vector2(-ToSpaceOfOtherDrawable(-relativeCursorPosition, menuTarget).X, -ToSpaceOfOtherDrawable(-relativeCursorPosition, menuTarget).Y);
+            base.Update();
         }
 
         public class ContextMenu : Container

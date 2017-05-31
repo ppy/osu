@@ -6,6 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Testing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -16,11 +17,16 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Menu visible on right click";
 
+        private const int start_time = 0;
+        private const int duration = 1000;
+
+        private ContextMenuContainer container;
+
         public override void Reset()
         {
             base.Reset();
 
-            Add(new ContextMenuContainer
+            Add(container = new ContextMenuContainer
             {
                 Size = new Vector2(200),
                 Anchor = Anchor.Centre,
@@ -48,6 +54,28 @@ namespace osu.Desktop.VisualTests.Tests
                         Colour = Color4.Red,
                     }
                 }
+            });
+
+            container.Transforms.Add(new TransformPosition
+            {
+                StartValue = Vector2.Zero,
+                EndValue = new Vector2(0, -100),
+                StartTime = start_time,
+                EndTime = start_time + duration,
+                Easing = EasingTypes.Out,
+                LoopCount = -1,
+                LoopDelay = duration
+            });
+
+            container.Transforms.Add(new TransformPosition
+            {
+                StartValue = new Vector2(0, -100),
+                EndValue = Vector2.Zero,
+                StartTime = start_time + duration,
+                EndTime = start_time + duration * 2,
+                Easing = EasingTypes.In,
+                LoopCount = -1,
+                LoopDelay = duration
             });
         }
 
