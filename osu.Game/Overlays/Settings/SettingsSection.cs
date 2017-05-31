@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
         public string[] FilterTerms => new[] { Header };
-        public bool MatchingCurrentFilter
+        public bool MatchingFilter
         {
             set
             {
