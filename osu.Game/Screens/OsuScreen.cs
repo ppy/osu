@@ -136,6 +136,7 @@ namespace osu.Game.Screens
 
             // while this is not necessary as we are constructing our own bindable, there are cases where
             // the GC doesn't run as fast as expected and this is triggered post-exit.
+            // added to resolve https://github.com/ppy/osu/issues/829
             beatmap.ValueChanged -= OnBeatmapChanged;
 
             return false;
