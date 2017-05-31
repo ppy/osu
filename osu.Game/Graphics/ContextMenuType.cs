@@ -6,7 +6,7 @@ namespace osu.Game.Graphics
     public enum ContextMenuType
     {
         Standard,
-        Linkable,
-        Dismiss,
+        Highlighted,
+        Destructive,
     }
 }

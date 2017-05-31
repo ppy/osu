@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
@@ -19,8 +20,6 @@ namespace osu.Game.Graphics.Cursor
     {
         private readonly CursorContainer cursor;
         private readonly ContextMenu menu;
-
-        private const float fade_duration = 250;
 
         private UserInputManager inputManager;
         private IHasContextMenu menuTarget;
@@ -42,7 +41,7 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            menu.FadeOut(fade_duration, EasingTypes.OutQuint);
+            menu.State = MenuState.Closed;
 
             switch (args.Button)
             {
@@ -52,10 +51,13 @@ namespace osu.Game.Graphics.Cursor
                     if (menuTarget == null)
                         return false;
 
-                    menu.Items = menuTarget.ContextMenuItems;
+                    menu.ItemsContainer.InternalChildren = menuTarget.ContextMenuItems;
+                    foreach (var item in menu.ItemsContainer.InternalChildren)
+                        item.Action += () => menu.State = MenuState.Closed;
+
                     menu.Position = ToLocalSpace(cursor.ActiveCursor.ScreenSpaceDrawQuad.TopLeft);
                     relativeCursorPosition = ToSpaceOfOtherDrawable(menu.Position, menuTarget);
-                    menu.FadeIn(fade_duration, EasingTypes.OutQuint);
+                    menu.Toggle();
                     break;
             }
 
@@ -69,33 +71,34 @@ namespace osu.Game.Graphics.Cursor
             base.Update();
         }
 
-        public class ContextMenu : Container
+        private class ContextMenu : Menu
         {
-            private readonly FillFlowContainer<ContextMenuItem> content;
-
-            public ContextMenuItem[] Items { set { content.Children = value; } }
+            private const int margin_vertical = ContextMenuItem.MARGIN_VERTICAL;
+            private const int fade_duration = 250;
 
             public ContextMenu()
             {
-                AutoSizeAxes = Axes.Both;
-
                 CornerRadius = 5;
+                ItemsContainer.Padding = new MarginPadding { Vertical = margin_vertical };
                 Masking = true;
                 EdgeEffect = new EdgeEffect
                 {
                     Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(40),
-                    Radius = 5,
+                    Colour = Color4.Black.Opacity(0.25f),
+                    Radius = 4,
                 };
 
-                Children = new Drawable[]
-                {
-                    content = new FillFlowContainer<ContextMenuItem>
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                    }
-                };
+                Background.Colour = OsuColour.FromHex(@"223034");
+            }
+
+            protected override void AnimateOpen() => FadeIn(fade_duration, EasingTypes.OutQuint);
+
+            protected override void AnimateClose() => FadeOut(fade_duration, EasingTypes.OutQuint);
+
+            protected override void UpdateContentHeight()
+            {
+                var actualHeight = (RelativeSizeAxes & Axes.Y) > 0 ? 1 : ContentHeight;
+                ResizeTo(new Vector2(1, State == MenuState.Opened ? actualHeight : 0), fade_duration, EasingTypes.OutQuint);
             }
         }
     }

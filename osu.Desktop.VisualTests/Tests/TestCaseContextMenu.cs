@@ -59,23 +59,41 @@ namespace osu.Desktop.VisualTests.Tests
             container.Transforms.Add(new TransformPosition
             {
                 StartValue = Vector2.Zero,
-                EndValue = new Vector2(0, -100),
+                EndValue = new Vector2(0, 100),
                 StartTime = start_time,
                 EndTime = start_time + duration,
-                Easing = EasingTypes.Out,
                 LoopCount = -1,
-                LoopDelay = duration
+                LoopDelay = duration * 3
             });
 
             container.Transforms.Add(new TransformPosition
             {
-                StartValue = new Vector2(0, -100),
-                EndValue = Vector2.Zero,
+                StartValue = new Vector2(0, 100),
+                EndValue = new Vector2(100, 100),
                 StartTime = start_time + duration,
                 EndTime = start_time + duration * 2,
-                Easing = EasingTypes.In,
                 LoopCount = -1,
-                LoopDelay = duration
+                LoopDelay = duration * 3
+            });
+
+            container.Transforms.Add(new TransformPosition
+            {
+                StartValue = new Vector2(100, 100),
+                EndValue = new Vector2(100, 0),
+                StartTime = start_time + duration * 2,
+                EndTime = start_time + duration * 3,
+                LoopCount = -1,
+                LoopDelay = duration * 3
+            });
+
+            container.Transforms.Add(new TransformPosition
+            {
+                StartValue = new Vector2(100, 0),
+                EndValue = Vector2.Zero,
+                StartTime = start_time + duration * 3,
+                EndTime = start_time + duration * 4,
+                LoopCount = -1,
+                LoopDelay = duration * 3
             });
         }
 
@@ -84,12 +102,12 @@ namespace osu.Desktop.VisualTests.Tests
             public ContextMenuItem[] ContextMenuItems => new []
             {
                 new ContextMenuItem(@"Some option"),
-                new ContextMenuItem(@"Linkable option", ContextMenuType.Linkable),
+                new ContextMenuItem(@"Highlighted option", ContextMenuType.Highlighted),
                 new ContextMenuItem(@"Another option"),
                 new ContextMenuItem(@"Choose me please"),
                 new ContextMenuItem(@"And me too"),
                 new ContextMenuItem(@"Trying to fill"),
-                new ContextMenuItem(@"Dismiss option", ContextMenuType.Dismiss),
+                new ContextMenuItem(@"Destructive option", ContextMenuType.Destructive),
             };
         }
 
@@ -97,9 +115,11 @@ namespace osu.Desktop.VisualTests.Tests
         {
             public ContextMenuItem[] ContextMenuItems => new []
             {
-                new ContextMenuItem(@"Invite to"),
-                new ContextMenuItem(@"Linkable option", ContextMenuType.Linkable),
-                new ContextMenuItem(@"Dismiss option", ContextMenuType.Dismiss),
+                new ContextMenuItem(@"Simple option"),
+                new ContextMenuItem(@"Change width", ContextMenuType.Highlighted) { Action = () => ResizeWidthTo(Width * 2, 100, EasingTypes.OutQuint) },
+                new ContextMenuItem(@"Change height", ContextMenuType.Highlighted) { Action = () => ResizeHeightTo(Height * 2, 100, EasingTypes.OutQuint) },
+                new ContextMenuItem(@"Change width back", ContextMenuType.Destructive) { Action = () => ResizeWidthTo(Width / 2, 100, EasingTypes.OutQuint) },
+                new ContextMenuItem(@"Change height back", ContextMenuType.Destructive) { Action = () => ResizeHeightTo(Height / 2, 100, EasingTypes.OutQuint) },
             };
         }
     }
