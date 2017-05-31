@@ -35,6 +35,8 @@ namespace osu.Game
 
         private ChatOverlay chat;
 
+        private OnScreenDisplay onScreenDisplay;
+
         private MusicController musicController;
 
         private NotificationManager notificationManager;
@@ -225,6 +227,7 @@ namespace osu.Game
             Cursor.State = Visibility.Hidden;
         }
 
+
         private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat || intro == null) return false;
@@ -233,6 +236,9 @@ namespace osu.Game
             {
                 case Key.F8:
                     chat.ToggleVisibility();
+                    return true;
+                case Key.F10:
+                    LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;
                 case Key.PageUp:
                 case Key.PageDown:
