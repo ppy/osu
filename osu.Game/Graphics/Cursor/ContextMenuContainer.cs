@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.Cursor
 
         protected override void Update()
         {
-            if (menu.IsPresent && menuTarget != null)
+            if (menu.State == MenuState.Opened && menuTarget != null)
                 menu.Position = new Vector2(-ToSpaceOfOtherDrawable(-relativeCursorPosition, menuTarget).X, -ToSpaceOfOtherDrawable(-relativeCursorPosition, menuTarget).Y);
             base.Update();
         }
