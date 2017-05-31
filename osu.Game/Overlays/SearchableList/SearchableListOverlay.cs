@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.SearchableList
                         new ScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ScrollDraggerVisible = false,
+                            ScrollbarVisible = false,
                             Children = new[]
                             {
                                 ScrollFlow = new FillFlowContainer
@@ -101,10 +101,9 @@ namespace osu.Game.Overlays.SearchableList
             scrollContainer.Padding = new MarginPadding { Top = Header.Height + Filter.Height };
         }
 
-        protected override bool OnFocus(InputState state)
+        protected override void OnFocus(InputState state)
         {
             InputManager.ChangeFocus(Filter.Search);
-            return false;
         }
 
         protected override void PopIn()
