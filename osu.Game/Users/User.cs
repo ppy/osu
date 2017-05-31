@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using Newtonsoft.Json;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Users
 {
@@ -18,6 +19,8 @@ namespace osu.Game.Users
 
         [JsonProperty(@"country")]
         public Country Country;
+
+        public Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
         //public Team Team;
 
