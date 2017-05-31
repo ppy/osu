@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 scrollContainer = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollDraggerVisible = false,
+                    ScrollbarVisible = false,
                     Children = new Drawable[]
                     {
                         scrollFlow = new FillFlowContainer<LeaderboardScore>
