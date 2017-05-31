@@ -120,16 +120,7 @@ namespace osu.Game.Overlays
             trackSetting(frameworkConfig.GetBindable<FrameSync>(FrameworkSetting.FrameSync), v => display(v, "Frame Limiter", v.GetDescription(), "Ctrl+F7"));
             trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.AudioDevice), v => display(v, "Audio Device", string.IsNullOrEmpty(v) ? "Default" : v, v));
             trackSetting(frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay), v => display(v, "Debug Logs", v ? "visible" : "hidden", "Ctrl+F10"));
-            trackSetting(osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons), v => 
-            {
-                string currentMouseState = "";
-                if (osuConfig.Get<bool>(OsuSetting.MouseDisableButtons))
-                    currentMouseState = "Disabled";
-                else
-                    currentMouseState = "Enabled";
-                display(0, "Mouse Buttons", currentMouseState, "F10");
-            });
-
+            trackSetting(osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons), v => display(0, "Mouse Buttons", osuConfig.Get<bool>(OsuSetting.MouseDisableButtons) ? "Disabled" : "Enabled", "F10"));
 
             Action displayResolution = delegate { display(null, "Screen Resolution", frameworkConfig.Get<int>(FrameworkSetting.Width) + "x" + frameworkConfig.Get<int>(FrameworkSetting.Height)); };
 
