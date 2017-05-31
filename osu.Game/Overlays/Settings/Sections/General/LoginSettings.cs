@@ -339,7 +339,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 public UserDropdownMenuItem(string text, UserAction current) : base(text, current)
                 {
                     Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 5 };
-                    Text.Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 };
+                    Label.Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 };
                     CornerRadius = 5;
                 }
             }
