@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Select
             {
                 List<BeatmapGroup> notSeenGroups = visibleGroups.Except(seenGroups).ToList();
                 if (!notSeenGroups.Any())
-                { 
+                {
                     seenGroups.Clear();
                     notSeenGroups = visibleGroups;
                 }
