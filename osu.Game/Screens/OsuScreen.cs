@@ -134,6 +134,8 @@ namespace osu.Game.Screens
             if (base.OnExiting(next))
                 return true;
 
+            // while this is not necessary as we are constructing our own bindable, there are cases where
+            // the GC doesn't run as fast as expected and this is triggered post-exit.
             beatmap.ValueChanged -= OnBeatmapChanged;
 
             return false;
