@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Multiplayer
 {
     public class RoomInspector : Container
     {
-        private readonly MarginPadding content_padding = new MarginPadding { Horizontal = 20, Vertical = 10 };
+        private readonly MarginPadding contentPadding = new MarginPadding { Horizontal = 20, Vertical = 10 };
         private const float transition_duration = 100;
         private const float ruleset_height = 30;
 
@@ -34,13 +34,13 @@ namespace osu.Game.Screens.Multiplayer
         private readonly OsuSpriteText participants, participantsSlash, maxParticipants, name, status, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor, host, levelRangeLower, levelRangeHigher;
         private readonly ScrollContainer participantsScroll;
 
-        private Bindable<string> nameBind = new Bindable<string>();
-        private Bindable<User> hostBind = new Bindable<User>();
-        private Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
-        private Bindable<GameType> typeBind = new Bindable<GameType>();
-        private Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
-        private Bindable<int?> maxParticipantsBind = new Bindable<int?>();
-        private Bindable<User[]> participantsBind = new Bindable<User[]>();
+        private readonly Bindable<string> nameBind = new Bindable<string>();
+        private readonly Bindable<User> hostBind = new Bindable<User>();
+        private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
+        private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
+        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
+        private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
+        private readonly Bindable<User[]> participantsBind = new Bindable<User[]>();
 
         private OsuColour colours;
         private LocalisationEngine localisation;
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Multiplayer
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
-                                    Padding = content_padding,
+                                    Padding = contentPadding,
                                     Spacing = new Vector2(0f, 5f),
                                     Children = new Drawable[]
                                     {
@@ -247,7 +247,7 @@ namespace osu.Game.Screens.Multiplayer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Padding = content_padding,
+                            Padding = contentPadding,
                             Children = new Drawable[]
                             {
                                 new FillFlowContainer
@@ -344,7 +344,7 @@ namespace osu.Game.Screens.Multiplayer
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    Padding = new MarginPadding { Top = content_padding.Top, Left = 38, Right = 37 },
+                    Padding = new MarginPadding { Top = contentPadding.Top, Left = 38, Right = 37 },
                     Children = new[]
                     {
                         participantsFlow = new FillFlowContainer

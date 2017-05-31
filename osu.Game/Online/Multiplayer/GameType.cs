@@ -85,7 +85,7 @@ namespace osu.Game.Online.Multiplayer
     {
         public VersusRow(Color4 first, Color4 second, float size)
         {
-            var triangle_size = new Vector2(size);
+            var triangleSize = new Vector2(size);
             AutoSizeAxes = Axes.Both;
             Spacing = new Vector2(2f, 0f);
 
@@ -93,7 +93,7 @@ namespace osu.Game.Online.Multiplayer
             {
                 new Container
                 {
-                    Size = triangle_size,
+                    Size = triangleSize,
                     Colour = first,
                     Children = new[]
                     {
@@ -108,7 +108,7 @@ namespace osu.Game.Online.Multiplayer
                 },
                 new Container
                 {
-                    Size = triangle_size,
+                    Size = triangleSize,
                     Colour = second,
                     Children = new[]
                     {
