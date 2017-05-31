@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Settings
 
         public string[] FilterTerms => new[] { LabelText };
 
-        public bool MatchingCurrentFilter
+        public bool MatchingFilter
         {
             set
             {
