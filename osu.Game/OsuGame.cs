@@ -35,8 +35,6 @@ namespace osu.Game
 
         private ChatOverlay chat;
 
-        private OnScreenDisplay onScreenDisplay;
-
         private MusicController musicController;
 
         private NotificationManager notificationManager;
@@ -226,7 +224,6 @@ namespace osu.Game
 
             Cursor.State = Visibility.Hidden;
         }
-
 
         private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
         {
