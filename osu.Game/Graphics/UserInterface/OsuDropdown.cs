@@ -72,7 +72,7 @@ namespace osu.Game.Graphics.UserInterface
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                         },
-                        Text = new OsuSpriteText {
+                        Label = new OsuSpriteText {
                             Text = text,
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
@@ -85,7 +85,7 @@ namespace osu.Game.Graphics.UserInterface
             private Color4? accentColour;
 
             protected readonly TextAwesome Chevron;
-            protected readonly OsuSpriteText Text;
+            protected readonly OsuSpriteText Label;
 
             protected override void FormatForeground(bool hover = false)
             {
