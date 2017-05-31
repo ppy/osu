@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select
         private readonly List<BeatmapGroup> groups = new List<BeatmapGroup>();
 
         private Bindable<SelectionRandomType> randomType;
-        private HashSet<BeatmapGroup> seenGroups = new HashSet<BeatmapGroup>();
+        private readonly HashSet<BeatmapGroup> seenGroups = new HashSet<BeatmapGroup>();
 
         private readonly List<Panel> panels = new List<Panel>();
 
@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Select
                     notSeenGroups = visibleGroups;
                 }
 
-                group = notSeenGroups[RNG.Next(notSeenGroups.Count())];
+                group = notSeenGroups[RNG.Next(notSeenGroups.Count)];
                 seenGroups.Add(group);
             }
             else
