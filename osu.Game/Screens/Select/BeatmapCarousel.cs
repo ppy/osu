@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Configuration;
 using osu.Framework.Input;
 using OpenTK.Input;
 using System.Collections;
@@ -17,6 +18,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Screens.Select
 {
@@ -69,6 +71,9 @@ namespace osu.Game.Screens.Select
         private readonly Container<Panel> scrollableContent;
 
         private readonly List<BeatmapGroup> groups = new List<BeatmapGroup>();
+
+        private Bindable<SelectionRandomType> randomType;
+        private HashSet<BeatmapGroup> seenGroups = new HashSet<BeatmapGroup>();
 
         private readonly List<Panel> panels = new List<Panel>();
 
@@ -171,7 +176,22 @@ namespace osu.Game.Screens.Select
             if (visibleGroups.Count < 1)
                 return;
 
-            BeatmapGroup group = visibleGroups[RNG.Next(visibleGroups.Count)];
+            BeatmapGroup group;
+            if (randomType == SelectionRandomType.RandomPermutation)
+            {
+                List<BeatmapGroup> notSeenGroups = visibleGroups.Except(seenGroups).ToList();
+                if (!notSeenGroups.Any())
+                { 
+                    seenGroups.Clear();
+                    notSeenGroups = visibleGroups;
+                }
+
+                group = notSeenGroups[RNG.Next(notSeenGroups.Count())];
+                seenGroups.Add(group);
+            }
+            else
+                group = visibleGroups[RNG.Next(visibleGroups.Count)];
+
             BeatmapPanel panel = group.BeatmapPanels[RNG.Next(group.BeatmapPanels.Count)];
 
             selectGroup(group, panel);
@@ -239,9 +259,10 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase database)
+        private void load(BeatmapDatabase database, OsuConfigManager config)
         {
             this.database = database;
+            randomType = config.GetBindable<SelectionRandomType>(OsuSetting.SelectionRandomType);
         }
 
         private void addGroup(BeatmapGroup group)
