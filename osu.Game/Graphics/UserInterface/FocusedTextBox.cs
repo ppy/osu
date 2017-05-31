@@ -37,11 +37,10 @@ namespace osu.Game.Graphics.UserInterface
             this.inputManager = inputManager;
         }
 
-        protected override bool OnFocus(InputState state)
+        protected override void OnFocus(InputState state)
         {
-            var result = base.OnFocus(state);
+            base.OnFocus(state);
             BorderThickness = 0;
-            return result;
         }
 
         protected override void OnFocusLost(InputState state)
@@ -56,6 +55,6 @@ namespace osu.Game.Graphics.UserInterface
             base.OnFocusLost(state);
         }
 
-        public override bool RequestingFocus => HoldFocus;
+        public override bool RequestsFocus => HoldFocus;
     }
 }
