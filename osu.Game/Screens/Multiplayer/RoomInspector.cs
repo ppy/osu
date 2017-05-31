@@ -196,11 +196,11 @@ namespace osu.Game.Screens.Multiplayer
                                             {
                                                 rulesetContainer = new Container
                                                 {
-                                                    Size = new Vector2(ruleset_height),
+                                                    AutoSizeAxes = Axes.Both,
                                                 },
                                                 gameTypeContainer = new Container
                                                 {
-                                                    Size = new Vector2(ruleset_height),
+                                                    AutoSizeAxes = Axes.Both,
                                                 },
                                                 new Container
                                                 {
@@ -263,7 +263,7 @@ namespace osu.Game.Screens.Multiplayer
                                             Width = 22f,
                                             RelativeSizeAxes = Axes.Y,
                                         },
-                                        new Container
+                                        new Container //todo: team banners
                                         {
                                             Width = 38f,
                                             RelativeSizeAxes = Axes.Y,
@@ -399,12 +399,17 @@ namespace osu.Game.Screens.Multiplayer
         private void displayUser(User value)
         {
             host.Text = value.Username;
-            flagContainer.Children = new[] { new DrawableFlag(value.Country?.FlagName ?? @"__") { RelativeSizeAxes = Axes.Both } };
+            flagContainer.Children = new[]
+            {
+                new DrawableFlag(value.Country?.FlagName ?? @"__")
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+            };
         }
 
         private void displayStatus(RoomStatus value)
         {
-            if (value == null) return;
             status.Text = value.Message;
 
             foreach (Drawable d in new Drawable[] { statusStrip, status })
