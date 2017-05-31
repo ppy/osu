@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Multiplayer
         private const float ruleset_height = 30;
 
         private readonly Box statusStrip;
-        private readonly Container coverContainer, rulesetContainer, flagContainer;
+        private readonly Container coverContainer, rulesetContainer, gameTypeContainer, flagContainer;
         private readonly FillFlowContainer topFlow, levelRangeContainer, participantsFlow;
         private readonly OsuSpriteText participants, participantsSlash, maxParticipants, name, status, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor, host, levelRangeLower, levelRangeHigher;
         private readonly ScrollContainer participantsScroll;
@@ -37,6 +37,7 @@ namespace osu.Game.Screens.Multiplayer
         private Bindable<string> nameBind = new Bindable<string>();
         private Bindable<User> hostBind = new Bindable<User>();
         private Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
+        private Bindable<GameType> typeBind = new Bindable<GameType>();
         private Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private Bindable<int?> maxParticipantsBind = new Bindable<int?>();
         private Bindable<User[]> participantsBind = new Bindable<User[]>();
@@ -57,6 +58,7 @@ namespace osu.Game.Screens.Multiplayer
                 nameBind.BindTo(Room.Name);
                 hostBind.BindTo(Room.Host);
                 statusBind.BindTo(Room.Status);
+                typeBind.BindTo(Room.Type);
                 beatmapBind.BindTo(Room.Beatmap);
                 maxParticipantsBind.BindTo(Room.MaxParticipants);
                 participantsBind.BindTo(Room.Participants);
@@ -196,19 +198,9 @@ namespace osu.Game.Screens.Multiplayer
                                                 {
                                                     Size = new Vector2(ruleset_height),
                                                 },
-                                                new Container //todo: game type icon
+                                                gameTypeContainer = new Container
                                                 {
                                                     Size = new Vector2(ruleset_height),
-                                                    CornerRadius = 15f,
-                                                    Masking = true,
-                                                    Children = new[]
-                                                    {
-                                                        new Box
-                                                        {
-                                                            RelativeSizeAxes = Axes.Both,
-                                                            Colour = OsuColour.FromHex(@"545454"),
-                                                        },
-                                                    },
                                                 },
                                                 new Container
                                                 {
@@ -384,9 +376,11 @@ namespace osu.Game.Screens.Multiplayer
 
             //binded here instead of ctor because dependencies are needed
             statusBind.ValueChanged += displayStatus;
+            typeBind.ValueChanged += displayGameType;
             beatmapBind.ValueChanged += displayBeatmap;
 
             statusBind.TriggerChange();
+            typeBind.TriggerChange();
             beatmapBind.TriggerChange();
         }
 
@@ -415,6 +409,17 @@ namespace osu.Game.Screens.Multiplayer
 
             foreach (Drawable d in new Drawable[] { statusStrip, status })
                 d.FadeColour(value.GetAppropriateColour(colours), transition_duration);
+        }
+
+        private void displayGameType(GameType value)
+        {
+            gameTypeContainer.Children = new[]
+            {
+                new DrawableGameType(value)
+                {
+                    Size = new Vector2(ruleset_height),
+                },
+            };
         }
 
         private void displayBeatmap(BeatmapInfo value)

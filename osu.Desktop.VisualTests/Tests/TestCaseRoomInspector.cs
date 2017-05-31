@@ -25,6 +25,7 @@ namespace osu.Desktop.VisualTests.Tests
             room.Name.Value = @"My Awesome Room";
             room.Host.Value = new User { Username = @"flyte", Id = 3103765, Country = new Country { FlagName = @"JP" }};
             room.Status.Value = new RoomStatusOpen();
+            room.Type.Value = new GameTypeTeamVersus();
             room.Beatmap.Value = new BeatmapInfo
             {
                 StarDifficulty = 3.7,
@@ -59,6 +60,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep(@"change title", () => room.Name.Value = @"A Better Room Than The Above");
             AddStep(@"change host", () => room.Host.Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" }});
             AddStep(@"change status", () => room.Status.Value = new RoomStatusPlaying());
+            AddStep(@"change type", () => room.Type.Value = new GameTypeTag());
             AddStep(@"change beatmap", () => room.Beatmap.Value = null);
             AddStep(@"change max participants", () => room.MaxParticipants.Value = null);
             AddStep(@"change participants", () => room.Participants.Value = new[]
@@ -73,6 +75,7 @@ namespace osu.Desktop.VisualTests.Tests
                 newRoom.Name.Value = @"My New, Better Than Ever Room";
                 newRoom.Host.Value = new User { Username = @"Angelsim", Id = 1777162, Country = new Country { FlagName = @"KR" }};
                 newRoom.Status.Value = new RoomStatusOpen();
+                newRoom.Type.Value = new GameTypeTagTeam();
                 newRoom.Beatmap.Value = new BeatmapInfo
                 {
                     StarDifficulty = 7.07,
