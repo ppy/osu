@@ -21,7 +21,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            var room = new Room { };
+            var room = new Room();
             room.Name.Value = @"My Awesome Room";
             room.Host.Value = new User { Username = @"flyte", Id = 3103765, Country = new Country { FlagName = @"JP" }};
             room.Status.Value = new RoomStatusOpen();
@@ -71,7 +71,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddStep(@"change room", () =>
             {
-                var newRoom = new Room { };
+                var newRoom = new Room();
                 newRoom.Name.Value = @"My New, Better Than Ever Room";
                 newRoom.Host.Value = new User { Username = @"Angelsim", Id = 1777162, Country = new Country { FlagName = @"KR" }};
                 newRoom.Status.Value = new RoomStatusOpen();

@@ -304,7 +304,7 @@ namespace osu.Game.Screens.Multiplayer
                                     {
                                         new OsuSpriteText
                                         {
-                                            Text = "Level Range ",
+                                            Text = "Rank Range ",
                                             TextSize = 14,
                                         },
                                         new OsuSpriteText
