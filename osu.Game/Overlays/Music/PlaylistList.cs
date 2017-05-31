@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Music
             }
         }
 
-        public BeatmapSetInfo FirstVisibleSet => items.Children.FirstOrDefault(i => i.MatchingCurrentFilter)?.BeatmapSetInfo;
+        public BeatmapSetInfo FirstVisibleSet => items.Children.FirstOrDefault(i => i.MatchingFilter)?.BeatmapSetInfo;
 
         private void itemSelected(BeatmapSetInfo b)
         {
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Music
         private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
         {
             public string[] FilterTerms => new string[] { };
-            public bool MatchingCurrentFilter
+            public bool MatchingFilter
             {
                 set
                 {
