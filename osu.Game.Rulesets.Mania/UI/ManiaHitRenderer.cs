@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mania.Timing;
+using osu.Game.Rulesets.Mania.Timing.Drawable;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -88,6 +89,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             timingChanges.ForEach(t => playfield.Columns.ForEach(c => c.Add(new DrawableScrollingTimingChange(t))));
+            timingChanges.ForEach(t => playfield.Add(new DrawableScrollingTimingChange(t)));
 
             return playfield;
         }

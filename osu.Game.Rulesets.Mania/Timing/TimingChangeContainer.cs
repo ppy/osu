@@ -39,6 +39,6 @@ namespace osu.Game.Rulesets.Mania.Timing
         /// </summary>
         /// <param name="hitObject">The hit object to contain.</param>
         /// <returns>The last timing change which can contain <paramref name="hitObject"/>.</returns>
-        private DrawableTimingChange timingChangeFor(DrawableHitObject hitObject) => Children.LastOrDefault(c => c.CanContain(hitObject));
+        private DrawableTimingChange timingChangeFor(DrawableHitObject hitObject) => Children.LastOrDefault(c => c.CanContain(hitObject)) ?? Children.FirstOrDefault();
     }
 }
