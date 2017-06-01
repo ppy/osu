@@ -155,6 +155,8 @@ namespace osu.Game.Overlays.Chat
 
         protected override void PopIn()
         {
+            MoveToY(DrawHeight);
+
             FadeIn(100, EasingTypes.OutQuint);
             MoveToY(0, 800, EasingTypes.OutQuint);
 
