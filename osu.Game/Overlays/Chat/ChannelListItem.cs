@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.Chat
         protected override bool OnHover(InputState state)
         {
             if (!channel.Joined.Value)
-                name.FadeColour(hoverColour, transition_duration);
+                name.FadeColour(hoverColour, 50, EasingTypes.OutQuint);
 
             return base.OnHover(state);
         }
