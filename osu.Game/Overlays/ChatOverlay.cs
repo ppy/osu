@@ -173,7 +173,6 @@ namespace osu.Game.Overlays
                 else
                 {
                     inputTextBox.HoldFocus = true;
-                    channelTabs.Current.Value = channelTabs.LastTab;
                 }
             };
         }
