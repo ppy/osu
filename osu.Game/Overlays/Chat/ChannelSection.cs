@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Chat
 
         public IEnumerable<IFilterable> FilterableChildren => ChannelFlow.Children;
         public string[] FilterTerms => new[] { Header };
-        public bool MatchingCurrentFilter
+        public bool MatchingFilter
         {
             set
             {
