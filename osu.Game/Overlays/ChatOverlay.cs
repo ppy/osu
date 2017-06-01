@@ -232,7 +232,11 @@ namespace osu.Game.Overlays
             {
                 chatContainer.Height = (float)h;
                 channelSelection.Height = 1f - (float)h;
-                if (channelSelection.Height < channel_selection_min_height) channelSelection.Hide();
+                if (channelSelection.Height < channel_selection_min_height)
+                    channelSelection.Hide();
+                else if (channelSelection.State == Visibility.Hidden && channelTabs.ChannelSelectorActive.Value)
+                    channelSelection.Show();
+
                 tabBackground.FadeTo(Height == 1 ? 1 : 0.8f, 200);
             };
             chatHeight.TriggerChange();
