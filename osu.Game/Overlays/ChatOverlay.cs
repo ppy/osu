@@ -159,12 +159,20 @@ namespace osu.Game.Overlays
             channelTabs.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
             channelSelection.StateChanged += (overlay, state) =>
             {
-                if (state == Visibility.Visible && 1f - chatHeight.Value < channel_selection_min_height)
+                if (state == Visibility.Visible)
                 {
-                    chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, EasingTypes.OutQuint);
-                    channelSelection.ResizeHeightTo(channel_selection_min_height, 800, EasingTypes.OutQuint);
-                    channelSelection.Show();
-                    chatHeight.Value = 1f - channel_selection_min_height;
+                    inputTextBox.HoldFocus = false;
+                    if (1f - chatHeight.Value < channel_selection_min_height)
+                    {
+                        chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, EasingTypes.OutQuint);
+                        channelSelection.ResizeHeightTo(channel_selection_min_height, 800, EasingTypes.OutQuint);
+                        channelSelection.Show();
+                        chatHeight.Value = 1f - channel_selection_min_height;
+                    }
+                }
+                else
+                {
+                    inputTextBox.HoldFocus = true;
                 }
             };
         }
