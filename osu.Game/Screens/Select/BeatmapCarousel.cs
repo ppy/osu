@@ -77,8 +77,9 @@ namespace osu.Game.Screens.Select
 
         private readonly List<Panel> panels = new List<Panel>();
 
-        private BeatmapGroup selectedGroup;
+        private readonly Stack<BeatmapGroup> randomSelectedBeatmaps = new Stack<BeatmapGroup>();
 
+        private BeatmapGroup selectedGroup;
         private BeatmapPanel selectedPanel;
 
         public BeatmapCarousel()
@@ -172,14 +173,17 @@ namespace osu.Game.Screens.Select
 
         public void SelectRandom()
         {
-            IEnumerable<BeatmapGroup> visibleGroups = groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden);
+            randomSelectedBeatmaps.Push(selectedGroup);
+
+            var visibleGroups = getVisibleGroups();
             if (!visibleGroups.Any())
                 return;
 
             BeatmapGroup group;
+
             if (randomType == SelectionRandomType.RandomPermutation)
             {
-                IEnumerable<BeatmapGroup> notSeenGroups = visibleGroups.Except(seenGroups);
+                var notSeenGroups = visibleGroups.Except(seenGroups);
                 if (!notSeenGroups.Any())
                 {
                     seenGroups.Clear();
@@ -195,6 +199,38 @@ namespace osu.Game.Screens.Select
             BeatmapPanel panel = group.BeatmapPanels[RNG.Next(group.BeatmapPanels.Count)];
 
             selectGroup(group, panel);
+        }
+
+        public void CancelRandom()
+        {
+            if (!randomSelectedBeatmaps.Any())
+                return;
+
+            var visibleGroups = getVisibleGroups();
+            if (!visibleGroups.Any())
+                return;
+
+            // we can avoid selecting deleted beatmaps or beatmaps selected in another gamemode
+            while (true)
+            {
+                if (!randomSelectedBeatmaps.Any()) break;
+
+                if (!visibleGroups.Contains(randomSelectedBeatmaps.FirstOrDefault()))
+                {
+                    randomSelectedBeatmaps.Pop();
+                }
+                else
+                {
+                    BeatmapGroup beatmapGroup = randomSelectedBeatmaps.Pop();
+                    selectGroup(beatmapGroup, beatmapGroup.SelectedPanel);
+                    break;
+                }
+            }
+        }
+
+        private IEnumerable<BeatmapGroup> getVisibleGroups()
+        {
+            return groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden);
         }
 
         private FilterCriteria criteria = new FilterCriteria();
