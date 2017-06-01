@@ -58,14 +58,14 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
-        private readonly ControlPointContainer barLineContainer;
+        private readonly TimingChangeContainer barLineContainer;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
         private readonly int columnCount;
 
-        public ManiaPlayfield(int columnCount, IEnumerable<TimingChange> timingChanges)
+        public ManiaPlayfield(int columnCount)
         {
             this.columnCount = columnCount;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
                             {
-                                barLineContainer = new ControlPointContainer(timingChanges)
+                                barLineContainer = new TimingChangeContainer
                                 {
                                     Name = "Bar lines",
                                     Anchor = Anchor.TopCentre,
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < columnCount; i++)
-                columns.Add(new Column(timingChanges));
+                columns.Add(new Column());
 
             TimeSpan = time_span_default;
         }
@@ -207,6 +207,8 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
+
+        public void Add(DrawableTimingChange timingChange) => barLineContainer.Add(timingChange);
         public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -243,7 +245,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 timeSpan = MathHelper.Clamp(timeSpan, time_span_min, time_span_max);
 
                 barLineContainer.TimeSpan = value;
-                Columns.ForEach(c => c.ControlPointContainer.TimeSpan = value);
+                Columns.ForEach(c => c.TimeSpan = value);
             }
         }
 
