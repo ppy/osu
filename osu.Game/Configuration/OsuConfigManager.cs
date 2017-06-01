@@ -20,6 +20,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10);
             Set(OsuSetting.DisplayStarsMaximum, 10.0, 0, 10);
 
+            Set(OsuSetting.SelectionRandomType, SelectionRandomType.RandomPermutation);
+
             Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
 
             // Online settings
@@ -102,6 +104,7 @@ namespace osu.Game.Configuration
         SaveUsername,
         DisplayStarsMinimum,
         DisplayStarsMaximum,
+        SelectionRandomType,
         SnakingInSliders,
         SnakingOutSliders,
         ShowFpsDisplay,
