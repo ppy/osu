@@ -13,7 +13,7 @@ using osu.Game.Overlays.SearchableList;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class FilterControl : SearchableListFilterControl<DirectSortCritera,RankStatus>
+    public class FilterControl : SearchableListFilterControl<DirectSortCritera, RankStatus>
     {
         private FillFlowContainer<RulesetToggleButton> modeButtons;
 

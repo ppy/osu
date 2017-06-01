@@ -14,7 +14,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays
 {
-    public class SocialOverlay : SearchableListOverlay<SocialTab,SocialSortCriteria,SortDirection>
+    public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>
     {
         private readonly FillFlowContainer<UserPanel> panelFlow;
 
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"5c2648");
 
         protected override SearchableListHeader<SocialTab> CreateHeader() => new Header();
-        protected override SearchableListFilterControl<SocialSortCriteria,SortDirection> CreateFilterControl() => new FilterControl();
+        protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<User> users;
         public IEnumerable<User> Users
