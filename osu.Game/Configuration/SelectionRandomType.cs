@@ -7,9 +7,9 @@ namespace osu.Game.Configuration
 {
    public enum SelectionRandomType
     {
-        [Description("Random")]
-        Random,
         [Description("Never repeat")]
-        RandomPermutation
+        RandomPermutation,
+        [Description("Random")]
+        Random
     }
 }

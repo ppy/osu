@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select
         private readonly List<BeatmapGroup> groups = new List<BeatmapGroup>();
 
         private Bindable<SelectionRandomType> randomType;
-        private readonly HashSet<BeatmapGroup> seenGroups = new HashSet<BeatmapGroup>();
+        private readonly List<BeatmapGroup> seenGroups = new List<BeatmapGroup>();
 
         private readonly List<Panel> panels = new List<Panel>();
 
@@ -172,25 +172,25 @@ namespace osu.Game.Screens.Select
 
         public void SelectRandom()
         {
-            List<BeatmapGroup> visibleGroups = groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden).ToList();
-            if (visibleGroups.Count < 1)
+            IEnumerable<BeatmapGroup> visibleGroups = groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden);
+            if (!visibleGroups.Any())
                 return;
 
             BeatmapGroup group;
             if (randomType == SelectionRandomType.RandomPermutation)
             {
-                List<BeatmapGroup> notSeenGroups = visibleGroups.Except(seenGroups).ToList();
+                IEnumerable<BeatmapGroup> notSeenGroups = visibleGroups.Except(seenGroups);
                 if (!notSeenGroups.Any())
                 {
                     seenGroups.Clear();
                     notSeenGroups = visibleGroups;
                 }
 
-                group = notSeenGroups[RNG.Next(notSeenGroups.Count)];
+                group = notSeenGroups.ElementAt(RNG.Next(notSeenGroups.Count()));
                 seenGroups.Add(group);
             }
             else
-                group = visibleGroups[RNG.Next(visibleGroups.Count)];
+                group = visibleGroups.ElementAt(RNG.Next(visibleGroups.Count()));
 
             BeatmapPanel panel = group.BeatmapPanels[RNG.Next(group.BeatmapPanels.Count)];
 
