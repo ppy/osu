@@ -23,8 +23,12 @@ namespace osu.Game.Overlays.Chat
         protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value);
 
         private const float shear_width = 10;
+        private readonly Channel addChannel = new Channel { Name = "+" };
 
         public readonly Bindable<bool> ChannelSelectorActive = new Bindable<bool>();
+
+        private Channel lastTab;
+        public Channel LastTab => lastTab;
 
         public ChatTabControl()
         {
@@ -41,7 +45,12 @@ namespace osu.Game.Overlays.Chat
                 Padding = new MarginPadding(10),
             });
 
-            AddTabItem(new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }, ChannelSelectorActive));
+            AddTabItem(new ChannelTabItem.ChannelSelectorTabItem(addChannel, ChannelSelectorActive));
+
+            Current.ValueChanged += tab =>
+            {
+                if (tab != addChannel) lastTab = tab;
+            };
         }
 
         private class ChannelTabItem : TabItem<Channel>
