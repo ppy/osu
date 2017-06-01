@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Select
         {
             if (Footer != null)
             {
-                Footer.AddButton(@"random", colours.Green, SelectRandom, Key.F2);
+                Footer.AddButton(@"random", colours.Green, SelectRandom, Key.F2, true);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
 
                 BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
@@ -378,6 +378,13 @@ namespace osu.Game.Screens.Select
                     if (state.Keyboard.ShiftPressed)
                     {
                         promptDelete();
+                        return true;
+                    }
+                    break;
+                case Key.F2:
+                    if (state.Keyboard.ShiftPressed)
+                    {
+                        carousel.CancelRandom();
                         return true;
                     }
                     break;
