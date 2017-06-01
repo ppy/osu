@@ -70,7 +70,7 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                channelSelection = new ChannelSelectionOverlay //todo: temporary placement
+                channelSelection = new ChannelSelectionOverlay
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
@@ -160,7 +160,12 @@ namespace osu.Game.Overlays
             channelSelection.StateChanged += (overlay, state) =>
             {
                 if (state == Visibility.Visible && 1f - chatHeight.Value < channel_selection_min_height)
+                {
+                    chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, EasingTypes.OutQuint);
+                    channelSelection.ResizeHeightTo(channel_selection_min_height, 800, EasingTypes.OutQuint);
+                    channelSelection.Show();
                     chatHeight.Value = 1f - channel_selection_min_height;
+                }
             };
         }
 
