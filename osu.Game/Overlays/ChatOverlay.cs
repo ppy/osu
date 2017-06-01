@@ -167,11 +167,15 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected override bool OnFocus(InputState state)
+        public override bool AcceptsFocus => true;
+
+        protected override bool OnClick(InputState state) => true;
+
+        protected override void OnFocus(InputState state)
         {
             //this is necessary as inputTextBox is masked away and therefore can't get focus :(
             InputManager.ChangeFocus(inputTextBox);
-            return false;
+            base.OnFocus(state);
         }
 
         protected override void PopIn()
@@ -259,6 +263,8 @@ namespace osu.Game.Overlays
             set
             {
                 if (currentChannel == value) return;
+
+                if (channelTabs.ChannelSelectorActive) return;
 
                 if (currentChannel != null)
                     currentChannelContainer.Clear(false);

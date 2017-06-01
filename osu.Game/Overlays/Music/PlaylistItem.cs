@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Music
 
         private bool matching = true;
 
-        public bool MatchingCurrentFilter
+        public bool MatchingFilter
         {
             set
             {
