@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Mania.Timing
+namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
     public abstract class DrawableTimingChange : Container<DrawableHitObject>
     {
@@ -77,36 +77,6 @@ namespace osu.Game.Rulesets.Mania.Timing
 
                 base.InvalidateFromChild(invalidation);
             }
-        }
-    }
-
-    public class DrawableScrollingTimingChange : DrawableTimingChange
-    {
-        public DrawableScrollingTimingChange(TimingChange timingChange)
-            : base(timingChange)
-        {
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            Content.Y = (float)(TimingChange.Time - Time.Current);
-        }
-    }
-
-    public class DrawableGravityTimingChange : DrawableTimingChange
-    {
-        public DrawableGravityTimingChange(TimingChange timingChange)
-            : base(timingChange)
-        {
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // Todo: Gravity calculations here
         }
     }
 }

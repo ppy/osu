@@ -15,6 +15,7 @@ using osu.Framework.Configuration;
 using OpenTK.Input;
 using osu.Framework.Timing;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Rulesets.Mania.Timing.Drawables;
 
 namespace osu.Desktop.VisualTests.Tests
 {
