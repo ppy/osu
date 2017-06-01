@@ -249,7 +249,7 @@ namespace osu.Game.Overlays
             {
                 chatContainer.Height = (float)h;
                 channelSelection.Height = 1f - (float)h;
-                tabBackground.FadeTo(Height == 1 ? 1 : 0.8f, 200);
+                tabBackground.FadeTo(h == 1 ? 1 : 0.8f, 200);
             };
             chatHeight.TriggerChange();
 
