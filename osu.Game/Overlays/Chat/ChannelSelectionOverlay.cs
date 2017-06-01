@@ -10,6 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -18,7 +19,7 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelSelectionOverlay : OverlayContainer
+    public class ChannelSelectionOverlay : FocusedOverlayContainer
     {
         public static readonly float WIDTH_PADDING = 170;
 
@@ -146,21 +147,28 @@ namespace osu.Game.Overlays.Chat
             headerBg.Colour = colours.Gray2.Opacity(0.75f);
         }
 
+        protected override void OnFocus(InputState state)
+        {
+            InputManager.ChangeFocus(search);
+            base.OnFocus(state);
+        }
+
         protected override void PopIn()
         {
-            search.HoldFocus = true;
-            Schedule(() => search.TriggerOnFocus());
-
             FadeIn(100, EasingTypes.OutQuint);
             MoveToY(0, 800, EasingTypes.OutQuint);
+
+            search.HoldFocus = true;
+            base.PopIn();
         }
 
         protected override void PopOut()
         {
-            search.HoldFocus = false;
-
             FadeOut(500, EasingTypes.InQuint);
             MoveToY(DrawHeight, 500, EasingTypes.In);
+
+            search.HoldFocus = false;
+            base.PopOut();
         }
 
         private class HeaderSearchTextBox : SearchTextBox

@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Chat
         private Color4 hoverColour;
 
         public string[] FilterTerms => new[] { channel.Name };
-        public bool MatchingCurrentFilter
+        public bool MatchingFilter
         {
             set
             {
