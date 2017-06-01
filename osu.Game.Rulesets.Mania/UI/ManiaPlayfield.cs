@@ -22,6 +22,7 @@ using osu.Framework.Input;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {

@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Judgements;
 using System;
 using osu.Framework.Configuration;
+using osu.Game.Rulesets.Mania.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
