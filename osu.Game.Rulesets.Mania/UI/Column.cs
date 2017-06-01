@@ -42,9 +42,9 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
-        public readonly ControlPointContainer ControlPointContainer;
+        private readonly TimingChangeContainer timingChanges;
 
-        public Column(IEnumerable<TimingChange> timingChanges)
+        public Column()
         {
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 }
                             }
                         },
-                        ControlPointContainer = new ControlPointContainer(timingChanges)
+                        timingChanges = new TimingChangeContainer
                         {
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,
@@ -187,10 +187,17 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject)
+        public double TimeSpan
+        {
+            get { return timingChanges.TimeSpan; }
+            set { timingChanges.TimeSpan = value; }
+        }
+
+        public void Add(DrawableTimingChange timingChange) => timingChanges.Add(timingChange);
+        public void Add(DrawableHitObject hitObject)
         {
             hitObject.AccentColour = AccentColour;
-            ControlPointContainer.Add(hitObject);
+            timingChanges.Add(hitObject);
         }
 
         private bool onKeyDown(InputState state, KeyDownEventArgs args)

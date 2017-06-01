@@ -8,6 +8,7 @@ using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
 using osu.Framework.MathUtils;
@@ -78,13 +79,17 @@ namespace osu.Game.Rulesets.Mania.UI
                 .GroupBy(s => s.BeatLength * s.SpeedMultiplier).Select(g => g.First())
                 .ToList();
 
-            return new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize), timingChanges)
+            var playfield = new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize))
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 // Invert by default for now (should be moved to config/skin later)
                 Scale = new Vector2(1, -1)
             };
+
+            timingChanges.ForEach(t => playfield.Columns.ForEach(c => c.Add(new DrawableScrollingTimingChange(t))));
+
+            return playfield;
         }
 
         [BackgroundDependencyLoader]

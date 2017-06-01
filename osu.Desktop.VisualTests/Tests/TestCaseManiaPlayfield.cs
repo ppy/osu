@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mania.Timing;
 using osu.Framework.Configuration;
 using OpenTK.Input;
 using osu.Framework.Timing;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -30,7 +31,7 @@ namespace osu.Desktop.VisualTests.Tests
             Action<int, SpecialColumnPosition> createPlayfield = (cols, pos) =>
             {
                 Clear();
-                Add(new ManiaPlayfield(cols, new List<TimingChange>())
+                Add(new ManiaPlayfield(cols)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -44,13 +45,15 @@ namespace osu.Desktop.VisualTests.Tests
                 Clear();
 
                 ManiaPlayfield playField;
-                Add(playField = new ManiaPlayfield(cols, new List<TimingChange> { new TimingChange { BeatLength = 200 } })
+                Add(playField = new ManiaPlayfield(cols)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     SpecialColumnPosition = pos,
                     Scale = new Vector2(1, -1)
                 });
+
+                playField.Columns.ForEach(c => c.Add(new DrawableScrollingTimingChange(new TimingChange { BeatLength = 200 })));
 
                 for (int i = 0; i < cols; i++)
                 {
@@ -69,13 +72,15 @@ namespace osu.Desktop.VisualTests.Tests
                 var rateAdjustClock = new StopwatchClock(true) { Rate = 0.5 };
 
                 ManiaPlayfield playField;
-                Add(playField = new ManiaPlayfield(4, new List<TimingChange> { new TimingChange { BeatLength = 200 } })
+                Add(playField = new ManiaPlayfield(4)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Scale = new Vector2(1, -1),
                     Clock = new FramedClock(rateAdjustClock)
                 });
+
+                playField.Columns.ForEach(c => c.Add(new DrawableScrollingTimingChange(new TimingChange { BeatLength = 200 })));
 
                 for (int t = 1000; t <= 2000; t += 100)
                 {
