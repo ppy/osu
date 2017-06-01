@@ -452,6 +452,9 @@
     <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
     <Compile Include="Database\RankStatus.cs" />
     <Compile Include="Graphics\UserInterface\BreadcrumbControl.cs" />
+    <Compile Include="Overlays\MedalOverlay.cs" />
+    <Compile Include="Users\Medal.cs" />
+    <Compile Include="Overlays\MedalSplash\DrawableMedal.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
