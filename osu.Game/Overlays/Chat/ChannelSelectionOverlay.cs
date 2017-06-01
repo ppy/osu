@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.Chat
     {
         public static readonly float WIDTH_PADDING = 170;
 
+        private const float transition_duration = 500;
+
         private readonly Box bg;
         private readonly Triangles triangles;
         private readonly Box headerBg;
@@ -157,8 +159,8 @@ namespace osu.Game.Overlays.Chat
         {
             if (Alpha == 0) MoveToY(DrawHeight);
 
-            FadeIn(100, EasingTypes.OutQuint);
-            MoveToY(0, 800, EasingTypes.OutQuint);
+            FadeIn(transition_duration, EasingTypes.OutQuint);
+            MoveToY(0, transition_duration, EasingTypes.OutQuint);
 
             search.HoldFocus = true;
             base.PopIn();
@@ -166,8 +168,8 @@ namespace osu.Game.Overlays.Chat
 
         protected override void PopOut()
         {
-            FadeOut(500, EasingTypes.InQuint);
-            MoveToY(DrawHeight, 500, EasingTypes.In);
+            FadeOut(transition_duration, EasingTypes.InSine);
+            MoveToY(DrawHeight, transition_duration, EasingTypes.InSine);
 
             search.HoldFocus = false;
             base.PopOut();
