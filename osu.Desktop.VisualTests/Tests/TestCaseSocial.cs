@@ -35,7 +35,7 @@ namespace osu.Desktop.VisualTests.Tests
                     },
                     new User
                     {
-                        Username = @"Angelism",
+                        Username = @"Angelsim",
                         Id = 1777162,
                         Country = new Country { FlagName = @"KR" },
                         CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg",
