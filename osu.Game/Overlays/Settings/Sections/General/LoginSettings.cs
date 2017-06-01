@@ -166,10 +166,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
             if (form != null) inputManager.ChangeFocus(form);
         }
 
-        protected override bool OnFocus(InputState state)
+        public override bool AcceptsFocus => true;
+
+        protected override bool OnClick(InputState state) => true;
+
+        protected override void OnFocus(InputState state)
         {
             if (form != null) inputManager.ChangeFocus(form);
-            return base.OnFocus(state);
+            base.OnFocus(state);
         }
 
         private class LoginForm : FillFlowContainer
@@ -235,10 +239,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 };
             }
 
-            protected override bool OnFocus(InputState state)
+            public override bool AcceptsFocus => true;
+
+            protected override bool OnClick(InputState state) => true;
+
+            protected override void OnFocus(InputState state)
             {
                 Schedule(() => { inputManager.ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
-                return base.OnFocus(state);
             }
         }
 
@@ -338,8 +345,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 public UserDropdownMenuItem(string text, UserAction current) : base(text, current)
                 {
-                    Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = UserDropdownHeader.LABEL_LEFT_MARGIN, Right = 5 };
-                    Chevron.Margin = new MarginPadding { Left = 2, Right = 3 };
+                    Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 5 };
+                    Label.Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 };
                     CornerRadius = 5;
                 }
             }

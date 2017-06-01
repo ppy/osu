@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
                         new ScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ScrollDraggerVisible = false,
+                            ScrollbarVisible = false,
                             Children = new Drawable[]
                             {
                                 new FillFlowContainer
@@ -187,10 +187,14 @@ namespace osu.Game.Overlays
             panels.Children = BeatmapSets.Select(b => displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)new DirectGridPanel(b) { Width = 400 } : new DirectListPanel(b));
         }
 
-        protected override bool OnFocus(InputState state)
+        public override bool AcceptsFocus => true;
+
+        protected override bool OnClick(InputState state) => true;
+
+        protected override void OnFocus(InputState state)
         {
             InputManager.ChangeFocus(filter.Search);
-            return false;
+            base.OnFocus(state);
         }
 
         protected override void PopIn()
