@@ -13,13 +13,14 @@ using osu.Framework.Caching;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ContextMenuContainer : Container
+    public class ContextMenuContainer<TItem> : Container
+        where TItem : ContextMenuItem
     {
         private readonly ContextMenu contextMenu;
 
         public MenuState State => contextMenu?.State ?? MenuState.Closed;
 
-        public IEnumerable<ContextMenuItem> Items
+        public IEnumerable<TItem> Items
         {
             set
             {
@@ -27,9 +28,13 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     contextMenu.ItemsContainer.InternalChildren = value;
 
-                    foreach (var item in contextMenu.ItemsContainer?.InternalChildren)
-                        ((ContextMenuItem)item).Action += Close;
+                    foreach (var item in Items)
+                        item.Action += Close;
                 }
+            }
+            get
+            {
+                return contextMenu.ItemsContainer.InternalChildren;
             }
         }
 
@@ -49,8 +54,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     float width = 0;
 
-                    foreach (var item in contextMenu.ItemsContainer.InternalChildren)
-                        width = Math.Max(width, ((ContextMenuItem)item).DrawWidth);
+                    foreach (var item in Items)
+                        width = Math.Max(width, item.DrawWidth);
                     return width;
                 });
 
@@ -80,7 +85,7 @@ namespace osu.Game.Graphics.UserInterface
             contextMenu.State = MenuState.Closed;
         }
 
-        private class ContextMenu : Menu
+        private class ContextMenu : Menu<TItem>
         {
             private const int margin_vertical = ContextMenuItem.MARGIN_VERTICAL;
             private const int fade_duration = 250;

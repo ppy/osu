@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.Cursor
     public class CursorContextMenu : Container
     {
         private readonly CursorContainer cursor;
-        private readonly ContextMenuContainer menu;
+        private readonly ContextMenuContainer<ContextMenuItem> menu;
 
         private UserInputManager inputManager;
         private IHasContextMenu menuTarget;
@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.Cursor
             this.cursor = cursor;
             RelativeSizeAxes = Axes.Both;
 
-            Add(menu = new ContextMenuContainer());
+            Add(menu = new ContextMenuContainer<ContextMenuItem>());
         }
 
         [BackgroundDependencyLoader]
