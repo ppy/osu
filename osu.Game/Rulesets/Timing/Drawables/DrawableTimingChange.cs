@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Mania.Timing.Drawables
+namespace osu.Game.Rulesets.Timing.Drawables
 {
     /// <summary>
     /// Represents a container in which contains hit objects and moves relative to the current time.

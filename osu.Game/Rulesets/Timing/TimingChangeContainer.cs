@@ -7,10 +7,10 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Timing.Drawables;
+using osu.Game.Rulesets.Timing.Drawables;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Mania.Timing
+namespace osu.Game.Rulesets.Timing
 {
     public class TimingChangeContainer : Container<DrawableTimingChange>, IHasTimeSpan
     {

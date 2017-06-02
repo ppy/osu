@@ -17,12 +17,12 @@ using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Timing;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Timing.Drawables;
+using osu.Game.Rulesets.Timing;
+using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {

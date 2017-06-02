@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Timing;
+using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {

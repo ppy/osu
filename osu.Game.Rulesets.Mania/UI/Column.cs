@@ -11,11 +11,11 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using osu.Framework.Configuration;
-using osu.Game.Rulesets.Mania.Timing.Drawables;
+using osu.Game.Rulesets.Timing;
+using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {

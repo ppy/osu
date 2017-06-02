@@ -9,13 +9,14 @@ using System;
 using OpenTK;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Timing;
 using osu.Framework.Configuration;
 using OpenTK.Input;
 using osu.Framework.Timing;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mania.Timing.Drawables;
 using System.Linq;
+using osu.Game.Rulesets.Timing;
+using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Desktop.VisualTests.Tests
 {
