@@ -75,8 +75,8 @@
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Graphics\ContextMenuType.cs" />
-    <Compile Include="Graphics\Cursor\ContextMenu.cs" />
     <Compile Include="Graphics\Cursor\ContextMenuContainer.cs" />
+    <Compile Include="Graphics\Cursor\CursorContextMenu.cs" />
     <Compile Include="Graphics\IHasContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\ContextMenuItem.cs" />
     <Compile Include="Configuration\SelectionRandomType.cs" />
