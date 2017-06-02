@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
             if (parent == null)
                 return;
 
+            // This is very naive and can be improved, but is adequate for now
             LifetimeStart = TimingChange.Time - parent.TimeSpan.Y;
             LifetimeEnd = TimingChange.Time + Content.RelativeCoordinateSpace.Y * 2;
         }
