@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Game.Graphics.UserInterface;
 using System.Linq;
 
 namespace osu.Game.Graphics.Cursor

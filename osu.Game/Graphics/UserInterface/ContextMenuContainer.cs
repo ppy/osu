@@ -8,11 +8,10 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterface;
 using System.Collections.Generic;
 using osu.Framework.Caching;
 
-namespace osu.Game.Graphics.Cursor
+namespace osu.Game.Graphics.UserInterface
 {
     public class ContextMenuContainer : Container
     {
