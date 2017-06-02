@@ -82,6 +82,7 @@
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />
     <Compile Include="Mods\ManiaMod.cs" />
+    <Compile Include="Mods\ManiaModGravity.cs" />
     <Compile Include="UI\SpecialColumnPosition.cs" />
     <Compile Include="Timing\Drawables\DrawableGravityTimingChange.cs" />
     <Compile Include="Timing\Drawables\DrawableScrollingTimingChange.cs" />
