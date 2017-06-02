@@ -8,14 +8,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Graphics.Cursor
 {
     public class ContextMenuContainer : Container
     {
-        private ContextMenu contextMenu;
+        private readonly ContextMenu contextMenu;
 
         public IEnumerable<ContextMenuItem> Items
         {
@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.Cursor
                 contextMenu.ItemsContainer.InternalChildren = value;
 
                 foreach (var item in contextMenu.ItemsContainer.InternalChildren)
-                    item.Action += () => Hide();
+                    (item as ContextMenuItem).Action += Hide;
             }
         }
 
@@ -35,7 +35,6 @@ namespace osu.Game.Graphics.Cursor
             AlwaysPresent = true;
             AlwaysReceiveInput = true;
             AutoSizeAxes = Axes.Y;
-            Width = 300;
             Children = new Drawable[]
             {
                 contextMenu = new ContextMenu
@@ -43,6 +42,23 @@ namespace osu.Game.Graphics.Cursor
                     Alpha = 0
                 }
             };
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            updateWidth();
+
+            base.UpdateAfterChildren();
+        }
+
+        private void updateWidth()
+        {
+            float width = 0;
+
+            foreach (var item in contextMenu.ItemsContainer.InternalChildren)
+                width = Math.Max(width, (item as ContextMenuItem).DrawWidth);
+
+            Width = width;
         }
 
         public new void Show() => contextMenu.State = MenuState.Opened;
