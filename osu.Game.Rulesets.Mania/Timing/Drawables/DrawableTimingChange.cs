@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
         protected override Container<DrawableHitObject> Content => content;
         private readonly Container<DrawableHitObject> content;
 
-        public DrawableTimingChange(TimingChange timingChange)
+        protected DrawableTimingChange(TimingChange timingChange)
         {
             TimingChange = timingChange;
 

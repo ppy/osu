@@ -32,7 +32,12 @@ namespace osu.Game.Rulesets.Mania.UI
     public class ManiaHitRenderer : HitRenderer<ManiaHitObject, ManiaJudgement>
     {
         private int? columns;
-        public int Columns => columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize);
+
+        public int Columns
+        {
+            get { return columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize); }
+            set { columns = value; }
+        } 
 
         public Dictionary<int, List<DrawableTimingChange>> HitObjectTimingChanges;
         public List<DrawableTimingChange> BarlineTimingChanges;
