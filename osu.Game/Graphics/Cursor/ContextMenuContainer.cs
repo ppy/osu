@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -8,8 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
-using System;
 using System.Collections.Generic;
+using osu.Framework.Caching;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -40,15 +41,29 @@ namespace osu.Game.Graphics.Cursor
             Add(contextMenu = new ContextMenu());
         }
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+            if (!menuWidth.IsValid)
+            {
+                menuWidth.Refresh(() =>
+                {
+                    float width = 0;
+
+                    foreach (var item in contextMenu.ItemsContainer.InternalChildren)
+                        width = Math.Max(width, ((ContextMenuItem)item).DrawWidth);
+                    return width;
+                });
+
+                Width = menuWidth.Value;
+            }
+        }
+
+        private Cached<float> menuWidth = new Cached<float>();
+
         public override void InvalidateFromChild(Invalidation invalidation)
         {
-            float width = 0;
-
-            foreach (var item in contextMenu.ItemsContainer.InternalChildren)
-                width = Math.Max(width, ((ContextMenuItem)item).DrawWidth);
-
-            Width = width;
-
+            menuWidth.Invalidate();
             base.InvalidateFromChild(invalidation);
         }
 
