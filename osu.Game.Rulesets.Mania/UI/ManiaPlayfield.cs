@@ -230,11 +230,11 @@ namespace osu.Game.Rulesets.Mania.UI
             return false;
         }
 
-        private double timeSpan;
+        private float timeSpan;
         /// <summary>
         /// The amount of time which the length of the playfield spans.
         /// </summary>
-        public double TimeSpan
+        public float TimeSpan
         {
             get { return timeSpan; }
             set
@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 timeSpan = MathHelper.Clamp(timeSpan, time_span_min, time_span_max);
 
-                barLineContainer.TimeSpan = value;
+                barLineContainer.TimeSpan = new Vector2(1, value);
                 Columns.ForEach(c => c.TimeSpan = value);
             }
         }
@@ -281,7 +281,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 base.Apply(d);
 
                 var p = (ManiaPlayfield)d;
-                p.TimeSpan = CurrentValue;
+                p.TimeSpan = (float)CurrentValue;
             }
         }
     }
