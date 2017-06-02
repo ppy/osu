@@ -211,6 +211,7 @@ namespace osu.Game.Overlays.Chat
                     set
                     {
                         activeBindable.Value = !activeBindable.Value;
+                        selectorUpdateState();
                         base.Active = false;
                     }
                 }
@@ -234,6 +235,26 @@ namespace osu.Game.Overlays.Chat
                 {
                     backgroundInactive = colour.Gray2;
                     backgroundActive = colour.Gray3;
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    selectorUpdateState();
+                }
+
+                protected override void OnHoverLost(InputState state)
+                {
+                    selectorUpdateState();
+                }
+
+                private void selectorUpdateState()
+                {
+                    if (activeBindable.Value)
+                        fadeActive();
+                    else
+                        fadeInactive();
                 }
             }
         }
