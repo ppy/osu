@@ -16,6 +16,7 @@ namespace osu.Game.Overlays
         protected readonly Container Fill;
 
         public Action<float> SeekRequested;
+        public Action SeekStartRequested;
 
         public bool IsSeeking { get; private set; }
 
@@ -68,9 +69,6 @@ namespace osu.Game.Overlays
 
             float seekLocation = state.Mouse.Position.X / DrawWidth;
 
-            if (seekLocation >= 1)
-                IsSeeking = false;
-
             SeekRequested?.Invoke(seekLocation);
             updatePosition(seekLocation);
         }
@@ -84,6 +82,7 @@ namespace osu.Game.Overlays
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             IsSeeking = true;
+            SeekStartRequested?.Invoke();
 
             seek(state);
             return true;
@@ -105,13 +104,9 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDragStart(InputState state) => IsSeeking = true;
+        protected override bool OnDragStart(InputState state) => true;
 
-        protected override bool OnDragEnd(InputState state)
-        {
-            IsSeeking = false;
-            return true;
-        }
+        protected override bool OnDragEnd(InputState state) => true;
 
         private class TransformSeek : TransformFloat
         {

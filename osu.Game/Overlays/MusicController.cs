@@ -52,6 +52,8 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
+        private bool trackWasRunning;
+
         public MusicController()
         {
             Width = 400;
@@ -187,7 +189,8 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Height = progress_height,
                                     Colour = colours.Yellow,
-                                    SeekRequested = seek
+                                    SeekRequested = seek,
+                                    SeekStartRequested = seekStart
                                 }
                             },
                         },
@@ -223,9 +226,10 @@ namespace osu.Game.Overlays
                 var track = current.Track;
 
                 progressBar.UpdatePosition(track.Length == 0 ? 0 : (float)(track.CurrentTime / track.Length));
-                playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
+                playButton.Icon = (progressBar.IsSeeking ? trackWasRunning : track.IsRunning) ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping) next();
+                if (!progressBar.IsSeeking && track.HasCompleted && !track.Looping)
+                    next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
@@ -350,18 +354,27 @@ namespace osu.Game.Overlays
             });
         }
 
+        private void seekStart()
+        {
+            var track = current.Track;
+
+            trackWasRunning = track?.IsRunning ?? false;
+        }
+
         private void seek(float position)
         {
             var track = current?.Track;
-            if (position < 1)
-                track?.Seek(track.Length * position);
-            else if (track?.Looping == true)
+
+            if (track != null)
             {
-                track.Seek(0);
-                track.Start();
+                track.Seek(track.Length * position);
+
+                //Make sure the track is still running if it was running before
+                if (trackWasRunning && !track.IsRunning)
+                    track.Start();
+
             }
-            else
-                next();
+
         }
 
         protected override void PopIn()
