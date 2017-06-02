@@ -11,6 +11,7 @@ using System.Linq;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -19,6 +20,8 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Name => "Gravity";
 
         public override double ScoreMultiplier => 0;
+
+        public override FontAwesome Icon => FontAwesome.fa_sort_desc;
 
         public void ApplyToHitRenderer(HitRenderer<ManiaHitObject> hitRenderer)
         {
