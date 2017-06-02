@@ -8,12 +8,6 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
     public class DrawableGravityTimingChange : DrawableTimingChange
     {
-        // Amount of time to travel this container such that
-        // at time = 0, gravityTime = timeSpan and
-        // at time = travel_time, gravityTime = 0
-        // Where gravityTime is used as the position of the content
-        private const double travel_time = 1000;
-
         public DrawableGravityTimingChange(TimingChange timingChange)
             : base(timingChange)
         {
@@ -44,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
             // The sign of the relative time, this is used to apply backwards acceleration leading into startTime
             double sign = relativeTime < 0 ? -1 : 1;
 
-            return timeSpan - acceleration / 2 * relativeTime * relativeTime * sign;
+            return timeSpan - acceleration * relativeTime * relativeTime * sign;
         }
 
         /// <summary>
@@ -55,20 +49,18 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
         /// <summary>
         /// The acceleration due to "gravity" of the content of this container.
         /// </summary>
-        private double acceleration => 2 * timeSpan / travel_time / travel_time;
+        private double acceleration => timeSpan / travelTime / travelTime;
 
         /// <summary>
-        /// Computes the current time relative to <paramref name="time"/>, accounting for <see cref="travel_time"/>.
+        /// The travel time, after beat length adjustments.
         /// </summary>
-        /// <param name="time">The non-offset time.</param>
-        /// <returns>The current time relative to <paramref name="time"/> - <see cref="travel_time"/>. </returns>
-        private double relativeTimeAt(double time) => Time.Current - time + travel_time;
+        private double travelTime => timeSpan / TimingChange.SpeedMultiplier;
 
         /// <summary>
-        /// The velocity of the content of this container at a time.
+        /// Computes the current time relative to <paramref name="time"/>, accounting for <see cref="travelTime"/>.
         /// </summary>
         /// <param name="time">The non-offset time.</param>
-        /// <returns>The velocity at <paramref name="time"/>.</returns>
-        private double velocityAt(double time) => acceleration * relativeTimeAt(time);
+        /// <returns>The current time relative to <paramref name="time"/> - <see cref="travelTime"/>. </returns>
+        private double relativeTimeAt(double time) => Time.Current - time + travelTime;
     }
 }
