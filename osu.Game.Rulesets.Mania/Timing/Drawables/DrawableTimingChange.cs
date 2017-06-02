@@ -36,6 +36,9 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
             // Adjust our height to account for the speed changes
             Height = (float)(1000 / TimingChange.BeatLength / TimingChange.SpeedMultiplier);
             RelativeCoordinateSpace = new Vector2(1, (float)parent.TimeSpan);
+
+            LifetimeStart = TimingChange.Time - parent.TimeSpan;
+            LifetimeEnd = TimingChange.Time + Content.RelativeCoordinateSpace.Y * 2;
         }
 
         public override void Add(DrawableHitObject drawable)
