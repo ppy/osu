@@ -42,32 +42,28 @@ namespace osu.Desktop.VisualTests.Tests
                 });
             };
 
-            Action<int, SpecialColumnPosition> createPlayfieldWithNotes = (cols, pos) =>
+            const double start_time = 500;
+            const double duration = 1000;
+
+            Func<double, bool, DrawableTimingChange> createTimingChange = (time, gravity) =>
             {
-                Clear();
-
-                ManiaPlayfield playField;
-                Add(playField = new ManiaPlayfield(cols)
+                if (gravity)
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    SpecialColumnPosition = pos,
-                    Scale = new Vector2(1, -1)
-                });
-
-                playField.Columns.ForEach(c => c.Add(new DrawableGravityTimingChange(new TimingChange { BeatLength = 200 })));
-
-                for (int i = 0; i < cols; i++)
-                {
-                    playField.Add(new DrawableNote(new Note
+                    return new DrawableGravityTimingChange(new TimingChange
                     {
-                        StartTime = Time.Current + 1000,
-                        Column = i
-                    }));
+                        BeatLength = 1000,
+                        Time = time
+                    });
                 }
+
+                return new DrawableScrollingTimingChange(new TimingChange
+                {
+                    BeatLength = 1000,
+                    Time = time
+                });
             };
 
-            Action createPlayfieldWithNotesAcceptingInput = () =>
+            Action<bool> createPlayfieldWithNotes = g =>
             {
                 Clear();
 
@@ -82,13 +78,13 @@ namespace osu.Desktop.VisualTests.Tests
                     Clock = new FramedClock(rateAdjustClock)
                 });
 
-                for (int t = 1000; t <= 2000; t += 100)
+                if (!g)
+                    playField.Columns.ForEach(c => c.Add(createTimingChange(0, false)));
+
+                for (double t = start_time; t <= start_time + duration; t += 100)
                 {
-                    playField.Columns.ElementAt(0).Add(new DrawableGravityTimingChange(new TimingChange
-                    {
-                        BeatLength = 200,
-                        Time = t
-                    }));
+                    if (g)
+                        playField.Columns.ElementAt(0).Add(createTimingChange(t, true));
 
                     playField.Add(new DrawableNote(new Note
                     {
@@ -96,11 +92,8 @@ namespace osu.Desktop.VisualTests.Tests
                         Column = 0
                     }, new Bindable<Key>(Key.D)));
 
-                    playField.Columns.ElementAt(3).Add(new DrawableGravityTimingChange(new TimingChange
-                    {
-                        BeatLength = 200,
-                        Time = t
-                    }));
+                    if (g)
+                        playField.Columns.ElementAt(3).Add(createTimingChange(t, true));
 
                     playField.Add(new DrawableNote(new Note
                     {
@@ -109,52 +102,41 @@ namespace osu.Desktop.VisualTests.Tests
                     }, new Bindable<Key>(Key.K)));
                 }
 
-                playField.Columns.ElementAt(1).Add(new DrawableGravityTimingChange(new TimingChange
-                {
-                    BeatLength = 200,
-                    Time = 1000
-                }));
+                if (g)
+                    playField.Columns.ElementAt(1).Add(createTimingChange(start_time, true));
 
                 playField.Add(new DrawableHoldNote(new HoldNote
                 {
-                    StartTime = 1000,
-                    Duration = 1000,
+                    StartTime = start_time,
+                    Duration = duration,
                     Column = 1
                 }, new Bindable<Key>(Key.F)));
 
-                playField.Columns.ElementAt(2).Add(new DrawableGravityTimingChange(new TimingChange
-                {
-                    BeatLength = 200,
-                    Time = 1000
-                }));
+                if (g)
+                    playField.Columns.ElementAt(2).Add(createTimingChange(start_time, true));
 
                 playField.Add(new DrawableHoldNote(new HoldNote
                 {
-                    StartTime = 1000,
-                    Duration = 1000,
+                    StartTime = start_time,
+                    Duration = duration,
                     Column = 2
                 }, new Bindable<Key>(Key.J)));
             };
 
-            // AddStep("1 column", () => createPlayfield(1, SpecialColumnPosition.Normal));
-            // AddStep("4 columns", () => createPlayfield(4, SpecialColumnPosition.Normal));
-            // AddStep("Left special style", () => createPlayfield(4, SpecialColumnPosition.Left));
-            // AddStep("Right special style", () => createPlayfield(4, SpecialColumnPosition.Right));
-            // AddStep("5 columns", () => createPlayfield(5, SpecialColumnPosition.Normal));
-            // AddStep("8 columns", () => createPlayfield(8, SpecialColumnPosition.Normal));
-            // AddStep("Left special style", () => createPlayfield(8, SpecialColumnPosition.Left));
-            // AddStep("Right special style", () => createPlayfield(8, SpecialColumnPosition.Right));
+            AddStep("1 column", () => createPlayfield(1, SpecialColumnPosition.Normal));
+            AddStep("4 columns", () => createPlayfield(4, SpecialColumnPosition.Normal));
+            AddStep("Left special style", () => createPlayfield(4, SpecialColumnPosition.Left));
+            AddStep("Right special style", () => createPlayfield(4, SpecialColumnPosition.Right));
+            AddStep("5 columns", () => createPlayfield(5, SpecialColumnPosition.Normal));
+            AddStep("8 columns", () => createPlayfield(8, SpecialColumnPosition.Normal));
+            AddStep("Left special style", () => createPlayfield(8, SpecialColumnPosition.Left));
+            AddStep("Right special style", () => createPlayfield(8, SpecialColumnPosition.Right));
 
-            // AddStep("Normal special style", () => createPlayfield(4, SpecialColumnPosition.Normal));
+            AddStep("Notes with input", () => createPlayfieldWithNotes(false));
+            AddWaitStep(15);
 
-            // AddStep("Notes", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Normal));
-            // AddWaitStep(10);
-            // AddStep("Left special style", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Left));
-            // AddWaitStep(10);
-            // AddStep("Right special style", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Right));
-            // AddWaitStep(10);
-
-            AddStep("Notes with input", () => createPlayfieldWithNotesAcceptingInput());
+            AddStep("Notes with gravity", () => createPlayfieldWithNotes(true));
+            AddWaitStep(15);
         }
 
         private void triggerKeyDown(Column column)
