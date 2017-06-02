@@ -4,11 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
@@ -63,8 +63,8 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
             Size = new Vector2((scrollingAxes & Axes.X) > 0 ? speedAdjustedSize : 1,
                                (scrollingAxes & Axes.Y) > 0 ? speedAdjustedSize : 1);
 
-            RelativeCoordinateSpace = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)parent.TimeSpan.X : 1,
-                                                  (scrollingAxes & Axes.Y) > 0 ? (float)parent.TimeSpan.Y : 1);
+            RelativeCoordinateSpace = new Vector2((scrollingAxes & Axes.X) > 0 ? parent.TimeSpan.X : 1,
+                                                  (scrollingAxes & Axes.Y) > 0 ? parent.TimeSpan.Y : 1);
         }
 
         public override void Add(DrawableHitObject hitObject)
@@ -96,8 +96,8 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
 
             /// <summary>
             /// The axes which this container should calculate its size from its children on.
-            /// Note that this is not the same as <see cref="AutoSizeAxes"/>, because that would not allow this container
-            /// to be relatively sized - desired in the case where the playfield re-defines <see cref="RelativeCoordinateSpace"/>.
+            /// Note that this is not the same as <see cref="Container{T}.AutoSizeAxes"/>, because that would not allow this container
+            /// to be relatively sized - desired in the case where the playfield re-defines <see cref="Container{T}.RelativeCoordinateSpace"/>.
             /// </summary>
             /// <param name="autoSizingAxes"></param>
             public RelativeCoordinateAutoSizingContainer(Axes autoSizingAxes)
@@ -120,8 +120,8 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
                 float height = Children.Select(child => child.Y + child.Height).Max();
                 float width = Children.Select(child => child.X + child.Width).Max();
 
-                Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : base.Size.X,
-                                   (autoSizingAxes & Axes.Y) > 0 ? height : base.Size.Y);
+                Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X,
+                                   (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
 
                 RelativeCoordinateSpace = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : 1,
                                                       (autoSizingAxes & Axes.Y) > 0 ? height : 1);
