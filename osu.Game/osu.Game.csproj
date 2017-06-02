@@ -190,6 +190,10 @@
     <Compile Include="Database\RulesetDatabase.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
+    <Compile Include="Rulesets\Timing\Drawables\DrawableTimingChange.cs" />
+    <Compile Include="Rulesets\Timing\IHasTimeSpan.cs" />
+    <Compile Include="Rulesets\Timing\TimingChange.cs" />
+    <Compile Include="Rulesets\Timing\TimingChangeContainer.cs" />
     <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
     <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />
     <Compile Include="Screens\Play\HUDOverlay.cs" />

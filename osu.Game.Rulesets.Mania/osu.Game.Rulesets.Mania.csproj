@@ -87,10 +87,6 @@
     <Compile Include="Timing\Drawables\DrawableGravityTimingChange.cs" />
     <Compile Include="Timing\Drawables\DrawableManiaTimingChange.cs" />
     <Compile Include="Timing\Drawables\DrawableScrollingTimingChange.cs" />
-    <Compile Include="Timing\Drawables\DrawableTimingChange.cs" />
-    <Compile Include="Timing\IHasTimeSpan.cs" />
-    <Compile Include="Timing\TimingChange.cs" />
-    <Compile Include="Timing\TimingChangeContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
