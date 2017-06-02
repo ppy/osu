@@ -38,8 +38,6 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            menu.Close();
-
             switch (args.Button)
             {
                 case MouseButton.Right:
@@ -54,8 +52,10 @@ namespace osu.Game.Graphics.Cursor
                     relativeCursorPosition = ToSpaceOfOtherDrawable(menu.Position, menuTarget);
                     menu.Open();
                     break;
+                default:
+                    menu.Close();
+                    break;
             }
-
             return true;
         }
 
