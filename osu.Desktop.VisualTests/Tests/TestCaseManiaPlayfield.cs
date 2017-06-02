@@ -16,6 +16,7 @@ using OpenTK.Input;
 using osu.Framework.Timing;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mania.Timing.Drawables;
+using System.Linq;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -54,7 +55,7 @@ namespace osu.Desktop.VisualTests.Tests
                     Scale = new Vector2(1, -1)
                 });
 
-                playField.Columns.ForEach(c => c.Add(new DrawableScrollingTimingChange(new TimingChange { BeatLength = 200 })));
+                playField.Columns.ForEach(c => c.Add(new DrawableGravityTimingChange(new TimingChange { BeatLength = 200 })));
 
                 for (int i = 0; i < cols; i++)
                 {
@@ -81,15 +82,25 @@ namespace osu.Desktop.VisualTests.Tests
                     Clock = new FramedClock(rateAdjustClock)
                 });
 
-                playField.Columns.ForEach(c => c.Add(new DrawableScrollingTimingChange(new TimingChange { BeatLength = 200 })));
-
                 for (int t = 1000; t <= 2000; t += 100)
                 {
+                    playField.Columns.ElementAt(0).Add(new DrawableGravityTimingChange(new TimingChange
+                    {
+                        BeatLength = 200,
+                        Time = t
+                    }));
+
                     playField.Add(new DrawableNote(new Note
                     {
                         StartTime = t,
                         Column = 0
                     }, new Bindable<Key>(Key.D)));
+
+                    playField.Columns.ElementAt(3).Add(new DrawableGravityTimingChange(new TimingChange
+                    {
+                        BeatLength = 200,
+                        Time = t
+                    }));
 
                     playField.Add(new DrawableNote(new Note
                     {
@@ -98,12 +109,24 @@ namespace osu.Desktop.VisualTests.Tests
                     }, new Bindable<Key>(Key.K)));
                 }
 
+                playField.Columns.ElementAt(1).Add(new DrawableGravityTimingChange(new TimingChange
+                {
+                    BeatLength = 200,
+                    Time = 1000
+                }));
+
                 playField.Add(new DrawableHoldNote(new HoldNote
                 {
                     StartTime = 1000,
                     Duration = 1000,
                     Column = 1
                 }, new Bindable<Key>(Key.F)));
+
+                playField.Columns.ElementAt(2).Add(new DrawableGravityTimingChange(new TimingChange
+                {
+                    BeatLength = 200,
+                    Time = 1000
+                }));
 
                 playField.Add(new DrawableHoldNote(new HoldNote
                 {
@@ -113,23 +136,23 @@ namespace osu.Desktop.VisualTests.Tests
                 }, new Bindable<Key>(Key.J)));
             };
 
-            AddStep("1 column", () => createPlayfield(1, SpecialColumnPosition.Normal));
-            AddStep("4 columns", () => createPlayfield(4, SpecialColumnPosition.Normal));
-            AddStep("Left special style", () => createPlayfield(4, SpecialColumnPosition.Left));
-            AddStep("Right special style", () => createPlayfield(4, SpecialColumnPosition.Right));
-            AddStep("5 columns", () => createPlayfield(5, SpecialColumnPosition.Normal));
-            AddStep("8 columns", () => createPlayfield(8, SpecialColumnPosition.Normal));
-            AddStep("Left special style", () => createPlayfield(8, SpecialColumnPosition.Left));
-            AddStep("Right special style", () => createPlayfield(8, SpecialColumnPosition.Right));
+            // AddStep("1 column", () => createPlayfield(1, SpecialColumnPosition.Normal));
+            // AddStep("4 columns", () => createPlayfield(4, SpecialColumnPosition.Normal));
+            // AddStep("Left special style", () => createPlayfield(4, SpecialColumnPosition.Left));
+            // AddStep("Right special style", () => createPlayfield(4, SpecialColumnPosition.Right));
+            // AddStep("5 columns", () => createPlayfield(5, SpecialColumnPosition.Normal));
+            // AddStep("8 columns", () => createPlayfield(8, SpecialColumnPosition.Normal));
+            // AddStep("Left special style", () => createPlayfield(8, SpecialColumnPosition.Left));
+            // AddStep("Right special style", () => createPlayfield(8, SpecialColumnPosition.Right));
 
-            AddStep("Normal special style", () => createPlayfield(4, SpecialColumnPosition.Normal));
+            // AddStep("Normal special style", () => createPlayfield(4, SpecialColumnPosition.Normal));
 
-            AddStep("Notes", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Normal));
-            AddWaitStep(10);
-            AddStep("Left special style", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Left));
-            AddWaitStep(10);
-            AddStep("Right special style", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Right));
-            AddWaitStep(10);
+            // AddStep("Notes", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Normal));
+            // AddWaitStep(10);
+            // AddStep("Left special style", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Left));
+            // AddWaitStep(10);
+            // AddStep("Right special style", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Right));
+            // AddWaitStep(10);
 
             AddStep("Notes with input", () => createPlayfieldWithNotesAcceptingInput());
         }
