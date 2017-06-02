@@ -43,7 +43,7 @@ namespace osu.Desktop.VisualTests.Tests
             };
 
             const double start_time = 500;
-            const double duration = 1000;
+            const double duration = 500;
 
             Func<double, bool, DrawableTimingChange> createTimingChange = (time, gravity) =>
             {
@@ -67,7 +67,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 Clear();
 
-                var rateAdjustClock = new StopwatchClock(true) { Rate = 0.5 };
+                var rateAdjustClock = new StopwatchClock(true) { Rate = 1 };
 
                 ManiaPlayfield playField;
                 Add(playField = new ManiaPlayfield(4)
@@ -133,10 +133,10 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Right special style", () => createPlayfield(8, SpecialColumnPosition.Right));
 
             AddStep("Notes with input", () => createPlayfieldWithNotes(false));
-            AddWaitStep(15);
+            AddWaitStep((int)Math.Ceiling((start_time + duration) / TimePerAction));
 
             AddStep("Notes with gravity", () => createPlayfieldWithNotes(true));
-            AddWaitStep(15);
+            AddWaitStep((int)Math.Ceiling((start_time + duration) / TimePerAction));
         }
 
         private void triggerKeyDown(Column column)
