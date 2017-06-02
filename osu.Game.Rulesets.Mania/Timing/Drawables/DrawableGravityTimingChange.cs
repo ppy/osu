@@ -49,10 +49,10 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
         private double acceleration => 1 / timeSpan;
 
         /// <summary>
-        /// Computes the current time relative to <paramref name="time"/>, accounting for <see cref="travelTime"/>.
+        /// Computes the current time relative to <paramref name="time"/>, accounting for <see cref="timeSpan"/>.
         /// </summary>
         /// <param name="time">The non-offset time.</param>
-        /// <returns>The current time relative to <paramref name="time"/> - <see cref="travelTime"/>. </returns>
+        /// <returns>The current time relative to <paramref name="time"/> - <see cref="timeSpan"/>. </returns>
         private double relativeTimeAt(double time) => Time.Current - time + timeSpan;
     }
 }
