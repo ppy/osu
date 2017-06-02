@@ -1,9 +1,3 @@
-using System;
-using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
-using osu.Framework.Physics;
-using osu.Game.Rulesets.Objects.Drawables;
-
 namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
     public class DrawableGravityTimingChange : DrawableTimingChange

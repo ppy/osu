@@ -6,7 +6,6 @@ using osu.Framework.Testing;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.UI;
 using System;
-using System.Collections.Generic;
 using OpenTK;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
