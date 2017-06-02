@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            menu.Hide();
+            menu.Close();
 
             switch (args.Button)
             {
@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.Cursor
 
                     menu.Position = ToLocalSpace(cursor.ActiveCursor.ScreenSpaceDrawQuad.TopLeft);
                     relativeCursorPosition = ToSpaceOfOtherDrawable(menu.Position, menuTarget);
-                    menu.Show();
+                    menu.Open();
                     break;
             }
 

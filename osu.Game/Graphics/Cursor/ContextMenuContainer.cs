@@ -17,41 +17,30 @@ namespace osu.Game.Graphics.Cursor
     {
         private readonly ContextMenu contextMenu;
 
+        public MenuState State => contextMenu?.State ?? MenuState.Closed;
+
         public IEnumerable<ContextMenuItem> Items
         {
             set
             {
-                contextMenu.ItemsContainer.InternalChildren = value;
+                if(contextMenu != null)
+                {
+                    contextMenu.ItemsContainer.InternalChildren = value;
 
-                foreach (var item in contextMenu.ItemsContainer.InternalChildren)
-                    (item as ContextMenuItem).Action += Hide;
+                    foreach (var item in contextMenu.ItemsContainer.InternalChildren)
+                        (item as ContextMenuItem).Action += Close;
+                }
             }
         }
 
         public ContextMenuContainer()
         {
-            Anchor = Anchor.TopLeft;
-            Origin = Anchor.TopLeft;
-            AlwaysPresent = true;
             AlwaysReceiveInput = true;
             AutoSizeAxes = Axes.Y;
-            Children = new Drawable[]
-            {
-                contextMenu = new ContextMenu
-                {
-                    Alpha = 0
-                }
-            };
+            Add(contextMenu = new ContextMenu());
         }
 
-        protected override void UpdateAfterChildren()
-        {
-            updateWidth();
-
-            base.UpdateAfterChildren();
-        }
-
-        private void updateWidth()
+        public override void InvalidateFromChild(Invalidation invalidation)
         {
             float width = 0;
 
@@ -59,11 +48,23 @@ namespace osu.Game.Graphics.Cursor
                 width = Math.Max(width, (item as ContextMenuItem).DrawWidth);
 
             Width = width;
+
+            base.InvalidateFromChild(invalidation);
         }
 
-        public new void Show() => contextMenu.State = MenuState.Opened;
-        public new void Hide() => contextMenu.State = MenuState.Closed;
-        public MenuState State => contextMenu.State;
+        public void Open()
+        {
+            if (contextMenu == null)
+                return;
+            contextMenu.State = MenuState.Opened;
+        }
+
+        public void Close()
+        {
+            if (contextMenu == null)
+                return;
+            contextMenu.State = MenuState.Closed;
+        }
 
         private class ContextMenu : Menu
         {
