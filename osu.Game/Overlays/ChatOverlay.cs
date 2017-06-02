@@ -55,6 +55,7 @@ namespace osu.Game.Overlays
 
         private Bindable<double> chatHeight;
 
+        private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
         protected override bool InternalContains(Vector2 screenSpacePos) => chatContainer.Contains(screenSpacePos) || channelSelection.Contains(screenSpacePos);
@@ -70,12 +71,18 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                channelSelection = new ChannelSelectionOverlay
+                channelSelectionContainer = new Container
                 {
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.Both,
                     Height = 1f - DEFAULT_HEIGHT,
+                    Masking = true,
+                    Children = new[]
+                    {
+                        channelSelection = new ChannelSelectionOverlay
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    },
                 },
                 chatContainer = new Container
                 {
@@ -165,7 +172,7 @@ namespace osu.Game.Overlays
                     if (1f - chatHeight.Value < channel_selection_min_height)
                     {
                         chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, EasingTypes.OutQuint);
-                        channelSelection.ResizeHeightTo(channel_selection_min_height, 800, EasingTypes.OutQuint);
+                        channelSelectionContainer.ResizeHeightTo(channel_selection_min_height, 800, EasingTypes.OutQuint);
                         channelSelection.Show();
                         chatHeight.Value = 1f - channel_selection_min_height;
                     }
@@ -248,7 +255,7 @@ namespace osu.Game.Overlays
             chatHeight.ValueChanged += h =>
             {
                 chatContainer.Height = (float)h;
-                channelSelection.Height = 1f - (float)h;
+                channelSelectionContainer.Height = 1f - (float)h;
                 tabBackground.FadeTo(h == 1 ? 1 : 0.8f, 200);
             };
             chatHeight.TriggerChange();
