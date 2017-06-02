@@ -8,15 +8,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Timing.Drawables;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Timing
 {
-    public class TimingChangeContainer : Container<DrawableTimingChange>
+    public class TimingChangeContainer : Container<DrawableTimingChange>, IHasTimeSpan
     {
-        /// <summary>
-        /// The amount of time which this container spans.
-        /// </summary>
-        public double TimeSpan { get; set; }
+        public Vector2 TimeSpan { get; set; }
 
         /// <summary>
         /// Adds a hit object to the most applicable timing change in this container.
@@ -35,10 +33,11 @@ namespace osu.Game.Rulesets.Mania.Timing
         protected override IComparer<Drawable> DepthComparer => new TimingChangeReverseStartTimeComparer();
 
         /// <summary>
-        /// Finds the most applicable timing change that can contain a hit object.
+        /// Finds the most applicable timing change that can contain a hit object. If the hit object occurs before the first (time-wise)
+        /// timing change, then the timing change returned is the first (time-wise) timing change.
         /// </summary>
         /// <param name="hitObject">The hit object to contain.</param>
-        /// <returns>The last timing change which can contain <paramref name="hitObject"/>. Null if no timing change can contain the hit object.</returns>
+        /// <returns>The last (time-wise) timing change which can contain <paramref name="hitObject"/>. Null if no timing change exists.</returns>
         private DrawableTimingChange timingChangeFor(DrawableHitObject hitObject) => Children.FirstOrDefault(c => c.CanContain(hitObject)) ?? Children.LastOrDefault();
     }
 

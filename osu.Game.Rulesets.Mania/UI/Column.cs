@@ -185,10 +185,10 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public double TimeSpan
+        public float TimeSpan
         {
-            get { return timingChanges.TimeSpan; }
-            set { timingChanges.TimeSpan = value; }
+            get { return timingChanges.TimeSpan.Y; }
+            set { timingChanges.TimeSpan = new Vector2(1, value); }
         }
 
         public void Add(DrawableTimingChange timingChange) => timingChanges.Add(timingChange);
