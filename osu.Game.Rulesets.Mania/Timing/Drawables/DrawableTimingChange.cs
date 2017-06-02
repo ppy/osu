@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
     public abstract class DrawableTimingChange : Container<DrawableHitObject>
     {
-        protected readonly TimingChange TimingChange;
+        public readonly TimingChange TimingChange;
 
         protected override Container<DrawableHitObject> Content => content;
         private readonly Container<DrawableHitObject> content;
