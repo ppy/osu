@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
-using System;
 
 namespace osu.Game.Graphics.UserInterface
 {

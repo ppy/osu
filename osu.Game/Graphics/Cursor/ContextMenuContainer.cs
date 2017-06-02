@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Cursor
                 {
                     contextMenu.ItemsContainer.InternalChildren = value;
 
-                    foreach (var item in contextMenu.ItemsContainer.InternalChildren)
+                    foreach (var item in contextMenu.ItemsContainer?.InternalChildren)
                         (item as ContextMenuItem).Action += Close;
                 }
             }
@@ -44,7 +44,7 @@ namespace osu.Game.Graphics.Cursor
         {
             float width = 0;
 
-            foreach (var item in contextMenu.ItemsContainer.InternalChildren)
+            foreach (var item in contextMenu?.ItemsContainer?.InternalChildren)
                 width = Math.Max(width, (item as ContextMenuItem).DrawWidth);
 
             Width = width;
