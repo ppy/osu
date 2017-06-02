@@ -89,6 +89,7 @@ namespace osu.Game.Rulesets.Mania
                                 new ModCinema(),
                             },
                         },
+                        new ManiaModGravity()
                     };
 
                 default:

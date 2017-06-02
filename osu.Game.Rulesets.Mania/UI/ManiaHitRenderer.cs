@@ -31,15 +31,26 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaHitRenderer : HitRenderer<ManiaHitObject, ManiaJudgement>
     {
-        public int? Columns;
+        private int? columns;
+        public int Columns => columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize);
+
+        public Dictionary<int, List<DrawableTimingChange>> HitObjectTimingChanges;
+        public List<DrawableTimingChange> BarlineTimingChanges;
 
         public ManiaHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(beatmap, isForCurrentRuleset)
         {
+            generateTimingChanges();
         }
 
-        protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
+        private void generateTimingChanges()
         {
+            if (HitObjectTimingChanges != null || BarlineTimingChanges != null)
+                return;
+
+            HitObjectTimingChanges = new Dictionary<int, List<DrawableTimingChange>>();
+            BarlineTimingChanges = new List<DrawableTimingChange>();
+
             double lastSpeedMultiplier = 1;
             double lastBeatLength = 500;
 
@@ -80,7 +91,24 @@ namespace osu.Game.Rulesets.Mania.UI
                 .GroupBy(s => s.BeatLength * s.SpeedMultiplier).Select(g => g.First())
                 .ToList();
 
-            var playfield = new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize))
+            timingChanges.ForEach(t =>
+            {
+                for (int i = 0; i < Columns; i++)
+                {
+                    List<DrawableTimingChange> columnTimingChanges;
+                    if (!HitObjectTimingChanges.TryGetValue(i, out columnTimingChanges))
+                        HitObjectTimingChanges[i] = columnTimingChanges = new List<DrawableTimingChange>();
+
+                    columnTimingChanges.Add(new DrawableScrollingTimingChange(t));
+                }
+
+                BarlineTimingChanges.Add(new DrawableScrollingTimingChange(t));
+            });
+        }
+
+        protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
+        {
+            var playfield = new ManiaPlayfield(Columns)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -88,8 +116,17 @@ namespace osu.Game.Rulesets.Mania.UI
                 Scale = new Vector2(1, -1)
             };
 
-            timingChanges.ForEach(t => playfield.Columns.ForEach(c => c.Add(new DrawableScrollingTimingChange(t))));
-            timingChanges.ForEach(t => playfield.Add(new DrawableScrollingTimingChange(t)));
+            foreach (var kvp in HitObjectTimingChanges)
+            {
+                int column = kvp.Key;
+                List<DrawableTimingChange> timingChanges = kvp.Value;
+
+                foreach (var change in timingChanges)
+                    playfield.Columns.ElementAt(column).Add(change);
+            }
+
+            foreach (var change in BarlineTimingChanges)
+                playfield.Add(change);
 
             return playfield;
         }
