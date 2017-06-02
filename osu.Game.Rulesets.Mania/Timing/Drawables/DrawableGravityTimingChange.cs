@@ -46,18 +46,13 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
         /// <summary>
         /// The acceleration due to "gravity" of the content of this container.
         /// </summary>
-        private double acceleration => timeSpan / travelTime / travelTime;
-
-        /// <summary>
-        /// The travel time, after beat length adjustments.
-        /// </summary>
-        private double travelTime => timeSpan / TimingChange.SpeedMultiplier;
+        private double acceleration => 1 / timeSpan;
 
         /// <summary>
         /// Computes the current time relative to <paramref name="time"/>, accounting for <see cref="travelTime"/>.
         /// </summary>
         /// <param name="time">The non-offset time.</param>
         /// <returns>The current time relative to <paramref name="time"/> - <see cref="travelTime"/>. </returns>
-        private double relativeTimeAt(double time) => Time.Current - time + travelTime;
+        private double relativeTimeAt(double time) => Time.Current - time + timeSpan;
     }
 }
