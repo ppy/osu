@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using System.Collections.Generic;
 using osu.Framework.Caching;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -101,8 +102,12 @@ namespace osu.Game.Graphics.UserInterface
                     Colour = Color4.Black.Opacity(0.25f),
                     Radius = 4,
                 };
+            }
 
-                Background.Colour = OsuColour.FromHex(@"223034");
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Background.Colour = colours.ContextGray;
             }
 
             protected override void AnimateOpen() => FadeIn(fade_duration, EasingTypes.OutQuint);
