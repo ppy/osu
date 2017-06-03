@@ -9,6 +9,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Configuration;
 using OpenTK;
 using osu.Game.Graphics;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Desktop.VisualTests.Tests
 {
