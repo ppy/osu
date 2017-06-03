@@ -27,7 +27,21 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
-        private readonly ContextMenuType type;
+        private ContextMenuType type;
+
+        private bool enabled = true;
+        public new bool Enabled
+        {
+            set
+            {
+                enabled = value;
+
+                if(IsLoaded)
+                    updateTextColour();
+            }
+            get { return enabled; }
+        }
+
 
         public new float DrawWidth
         {
@@ -75,7 +89,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(AudioManager audio)
         {
             sampleHover = audio.Sample.Get(@"Menu/menuclick");
             sampleClick = audio.Sample.Get(@"Menu/menuback");
@@ -83,14 +97,29 @@ namespace osu.Game.Graphics.UserInterface
             BackgroundColour = Color4.Transparent;
             BackgroundColourHover = OsuColour.FromHex(@"172023");
 
-            switch (type)
+            updateTextColour();
+        }
+
+        private void updateTextColour()
+        {
+            if (Enabled)
             {
-                case ContextMenuType.Highlighted:
-                    text.Colour = textBold.Colour = colours.Yellow;
-                    break;
-                case ContextMenuType.Destructive:
-                    text.Colour = textBold.Colour = Color4.Red;
-                    break;
+                switch (type)
+                {
+                    case ContextMenuType.Standard:
+                        text.Colour = textBold.Colour = Color4.White;
+                        break;
+                    case ContextMenuType.Destructive:
+                        text.Colour = textBold.Colour = Color4.Red;
+                        break;
+                    case ContextMenuType.Highlighted:
+                        text.Colour = textBold.Colour = OsuColour.FromHex(@"ffcc22");
+                        break;
+                }
+            }
+            else
+            {
+                text.Colour = textBold.Colour = Color4.Gray;
             }
         }
 
@@ -112,7 +141,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(InputState state)
         {
             sampleClick?.Play();
-            return base.OnClick(state);
+            return enabled ? base.OnClick(state) : false;
         }
     }
 }

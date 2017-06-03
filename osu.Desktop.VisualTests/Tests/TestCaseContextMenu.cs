@@ -115,7 +115,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             public ContextMenuItem[] ContextMenuItems => new []
             {
-                new ContextMenuItem(@"Simple option"),
+                new ContextMenuItem(@"Simple option") { Enabled = false },
                 new ContextMenuItem(@"Change width", ContextMenuType.Highlighted) { Action = () => ResizeWidthTo(Width * 2, 100, EasingTypes.OutQuint) },
                 new ContextMenuItem(@"Change height", ContextMenuType.Highlighted) { Action = () => ResizeHeightTo(Height * 2, 100, EasingTypes.OutQuint) },
                 new ContextMenuItem(@"Change width back", ContextMenuType.Destructive) { Action = () => ResizeWidthTo(Width / 2, 100, EasingTypes.OutQuint) },

@@ -88,13 +88,12 @@ namespace osu.Game.Graphics.UserInterface
 
         private class ContextMenu : Menu<TItem>
         {
-            private const int margin_vertical = ContextMenuItem.MARGIN_VERTICAL;
             private const int fade_duration = 250;
 
             public ContextMenu()
             {
                 CornerRadius = 5;
-                ItemsContainer.Padding = new MarginPadding { Vertical = margin_vertical };
+                ItemsContainer.Padding = new MarginPadding { Vertical = ContextMenuItem.MARGIN_VERTICAL };
                 Masking = true;
                 EdgeEffect = new EdgeEffect
                 {
