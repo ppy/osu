@@ -14,7 +14,6 @@ namespace osu.Desktop.VisualTests.Tests
         public override void Reset()
         {
             base.Reset();
-            
             Add(new SkipButton(Clock.CurrentTime + 5000));
         }
     }
