@@ -1,11 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
+using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -14,6 +17,14 @@ namespace osu.Game.Graphics.UserInterface
         protected override Drawable GetDrawableCharacter(char c) => new PasswordMaskChar(CalculatedTextSize);
 
         public override bool AllowClipboardExport => false;
+
+        public OsuPasswordTextBox()
+        {
+            Add(new CapsWarning
+            {
+                TextSize = 20,
+            });
+        }
 
         public class PasswordMaskChar : Container
         {
@@ -50,6 +61,37 @@ namespace osu.Game.Graphics.UserInterface
                 circle.FadeIn(500, EasingTypes.OutQuint);
                 circle.ResizeTo(new Vector2(0.8f), 500, EasingTypes.OutQuint);
             }
+        }
+
+        private class CapsWarning : TextAwesome, IHasTooltip
+        {
+            public string TooltipText => Console.CapsLock ? @"Caps lock is active" : string.Empty;
+
+            public override bool HandleInput => true;
+
+            public CapsWarning()
+            {
+                Icon = FontAwesome.fa_warning;
+                Origin = Anchor.CentreRight;
+                Anchor = Anchor.CentreRight;
+                Margin = new MarginPadding { Right = 10 };
+                AlwaysPresent = true;
+                Alpha = 0;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colour)
+            {
+                Colour = colour.YellowLight;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                updateVisibility();
+            }
+
+            private void updateVisibility() => FadeTo(Console.CapsLock ? 1 : 0, 250, EasingTypes.OutQuint);
         }
     }
 }
