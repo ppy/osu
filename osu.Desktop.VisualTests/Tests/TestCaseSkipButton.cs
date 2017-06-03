@@ -3,18 +3,19 @@
 
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    internal class TestCaseTwoLayerButton : TestCase
+    internal class TestCaseSkipButton : TestCase
     {
-        public override string Description => @"Mostly back button";
+        public override string Description => @"Skip skip skippediskip";
 
         public override void Reset()
         {
             base.Reset();
-
-            Add(new BackButton());
+            
+            Add(new SkipButton(Clock.CurrentTime + 5000));
         }
     }
 }
