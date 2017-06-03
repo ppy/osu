@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Testing;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
 
 namespace osu.Desktop.VisualTests.Tests
