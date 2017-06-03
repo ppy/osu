@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
+using osu.Framework.Caching;
 
 namespace osu.Game.Rulesets.Timing.Drawables
 {
@@ -94,6 +95,8 @@ namespace osu.Game.Rulesets.Timing.Drawables
 
             private readonly Axes autoSizingAxes;
 
+            private Cached layout = new Cached();
+
             /// <summary>
             /// The axes which this container should calculate its size from its children on.
             /// Note that this is not the same as <see cref="Container{T}.AutoSizeAxes"/>, because that would not allow this container
@@ -114,19 +117,32 @@ namespace osu.Game.Rulesets.Timing.Drawables
                     return;
                 }
 
-                if (!Children.Any())
-                    return;
-
-                float height = Children.Select(child => child.Y + child.Height).Max();
-                float width = Children.Select(child => child.X + child.Width).Max();
-
-                Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X,
-                                   (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
-
-                RelativeCoordinateSpace = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : 1,
-                                                      (autoSizingAxes & Axes.Y) > 0 ? height : 1);
+                layout.Invalidate();
 
                 base.InvalidateFromChild(invalidation);
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                if (!layout.EnsureValid())
+                {
+                    layout.Refresh(() =>
+                    {
+                        if (!Children.Any())
+                            return;
+
+                        float height = Children.Select(child => child.Y + child.Height).Max();
+                        float width = Children.Select(child => child.X + child.Width).Max();
+
+                        Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X,
+                                           (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
+
+                        RelativeCoordinateSpace = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : 1,
+                                                              (autoSizingAxes & Axes.Y) > 0 ? height : 1);
+                    });
+                }
             }
         }
     }
