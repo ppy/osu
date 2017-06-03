@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets.Mania.UI
         public const float HIT_TARGET_POSITION = 50;
 
         private const float time_span_default = 1500;
-        private const float time_span_min = 10;
-        private const float time_span_max = 50000;
-        private const float time_span_step = 200;
+        public const float TIME_SPAN_MIN = 50;
+        public const float TIME_SPAN_MAX = 10000;
+        private const float time_span_step = 50;
 
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.
@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Mania.UI
                     return;
                 timeSpan = value;
 
-                timeSpan = MathHelper.Clamp(timeSpan, time_span_min, time_span_max);
+                timeSpan = MathHelper.Clamp(timeSpan, TIME_SPAN_MIN, TIME_SPAN_MAX);
 
                 barLineContainer.TimeSpan = new Vector2(1, value);
                 Columns.ForEach(c => c.TimeSpan = value);
