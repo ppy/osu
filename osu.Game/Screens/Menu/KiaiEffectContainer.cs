@@ -44,8 +44,7 @@ namespace osu.Game.Screens.Menu
         private void load(OsuGameBase game, OsuColour colours)
         {
             beatmap.BindTo(game.Beatmap);
-
-            // linear colour looks better in this case, so let's use it for now.
+            
             triangleColour = colours.Blue.Opacity(triangle_max_alpha);
         }
 
