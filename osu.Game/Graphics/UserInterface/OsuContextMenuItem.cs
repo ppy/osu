@@ -16,8 +16,9 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuContextMenuItem : ContextMenuItem
     {
         private const int transition_length = 200;
-        private const int margin_horizontal = 15;
-        public const int MARGIN_VERTICAL = 5;
+        private const int margin_horizontal = 17;
+        public const int MARGIN_VERTICAL = 4;
+        private const int text_size = 17;
 
         private OsuSpriteText text;
         private OsuSpriteText textBold;
@@ -38,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    TextSize = 17,
+                    TextSize = text_size,
                     Text = title,
                     Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
                 },
@@ -48,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
                     Alpha = 0,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    TextSize = 17,
+                    TextSize = text_size,
                     Text = title,
                     Font = @"Exo2.0-Bold",
                     Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
