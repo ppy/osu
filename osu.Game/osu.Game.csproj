@@ -74,6 +74,7 @@
     <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
+    <Compile Include="Configuration\SelectionRandomType.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
@@ -104,7 +105,6 @@
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
-    <Compile Include="Graphics\IHasTooltip.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\Transforms\TransformAccent.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
@@ -117,7 +117,7 @@
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
     <Compile Include="Graphics\UserInterface\SimpleComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
-    <Compile Include="Graphics\Cursor\TooltipContainer.cs" />
+    <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
     <Compile Include="Input\Handlers\ReplayInputHandler.cs" />
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />
     <Compile Include="IO\Legacy\SerializationReader.cs" />

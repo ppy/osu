@@ -11,6 +11,6 @@ namespace osu.Game.Graphics.Containers
     public class ReverseDepthFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable
     {
         protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
-        protected override IEnumerable<T> FlowingChildren => base.FlowingChildren.Reverse();
+        protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
     }
 }
