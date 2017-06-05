@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.Cursor
         {
             private readonly Box background;
             private readonly OsuSpriteText text;
-            private bool firstMovement = true;
+            private bool instantMovement = true;
 
             public override string TooltipText
             {
@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.Cursor
                     if (value == text.Text) return;
 
                     text.Text = value;
-                    if (Alpha > 0)
+                    if (IsPresent)
                     {
                         AutoSizeDuration = 250;
                         background.FlashColour(OsuColour.Gray(0.4f), 1000, EasingTypes.OutQuint);
@@ -82,8 +82,8 @@ namespace osu.Game.Graphics.Cursor
 
             protected override void PopIn()
             {
+                instantMovement |= !IsPresent;
                 FadeIn(500, EasingTypes.OutQuint);
-                firstMovement = true;
             }
 
             protected override void PopOut()
@@ -94,10 +94,10 @@ namespace osu.Game.Graphics.Cursor
 
             public override void Move(Vector2 pos)
             {
-                if (firstMovement)
+                if (instantMovement)
                 {
                     Position = pos;
-                    firstMovement = false;
+                    instantMovement = false;
                 }
                 else
                 {
