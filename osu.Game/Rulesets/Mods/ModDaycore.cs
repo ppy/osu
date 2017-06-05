@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModDaycore : ModHalfTime
     {
         public override string Name => "Daycore";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_nightcore;
+        public override FontAwesome Icon => FontAwesome.fa_question;
         public override string Description => "whoaaaaa";
 
         public override void ApplyToClock(IAdjustableClock clock)
