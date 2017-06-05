@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         protected abstract HealthDisplay CreateHealthDisplay();
         protected abstract SongProgress CreateProgress();
         protected abstract ModDisplay CreateModsContainer();
-        protected abstract ReplaySettingsOverlay CreateReplaySettingsOverlay();
+        //protected abstract ReplaySettingsOverlay CreateReplaySettingsOverlay();
 
         protected HUDOverlay()
         {
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
-                    ReplaySettingsOverlay = CreateReplaySettingsOverlay(),
+                    //ReplaySettingsOverlay = CreateReplaySettingsOverlay(),
                 }
             });
         }
