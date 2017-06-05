@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -24,6 +25,7 @@ namespace osu.Game.Users
             var sections = new UserPageSection[] { };
             var sectionsContainer = new SectionsContainer
             {
+                RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = new UserPageHeader(user),
                 FixedHeader = tab,
                 Sections = sections

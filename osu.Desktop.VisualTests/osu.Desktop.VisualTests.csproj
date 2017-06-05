@@ -210,6 +210,7 @@
     <Compile Include="Tests\TestCasePlaySongSelect.cs" />
     <Compile Include="Tests\TestCaseTooltip.cs" />
     <Compile Include="Tests\TestCaseTwoLayerButton.cs" />
+    <Compile Include="Tests\TestCaseUserPage.cs" />
     <Compile Include="VisualTestGame.cs" />
     <Compile Include="Platform\TestStorage.cs" />
     <Compile Include="Tests\TestCaseSettings.cs" />
