@@ -7,12 +7,12 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 {
-    public class OsuDifficulyBeatmap : IEnumerable<OsuDifficultyHitObject>
+    public class OsuDifficultyBeatmap : IEnumerable<OsuDifficultyHitObject>
     {
         IEnumerator<OsuDifficultyHitObject> difficultyObjects;
         private Queue<OsuDifficultyHitObject> onScreen = new Queue<OsuDifficultyHitObject>();
 
-        public OsuDifficulyBeatmap(List<OsuHitObject> objects)
+        public OsuDifficultyBeatmap(List<OsuHitObject> objects)
         {
             // Sort HitObjects by StartTime - they are not correctly ordered in some cases.
             // This should probably happen before the objects reach the difficulty calculator.
