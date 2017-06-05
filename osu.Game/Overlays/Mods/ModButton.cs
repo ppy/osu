@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System;
 using System.Linq;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Mods
 {

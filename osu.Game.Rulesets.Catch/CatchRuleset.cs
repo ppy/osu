@@ -28,7 +28,14 @@ namespace osu.Game.Rulesets.Catch
                     {
                         new CatchModEasy(),
                         new CatchModNoFail(),
-                        new CatchModHalfTime(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new CatchModHalfTime(),
+                                new CatchModDaycore(),
+                            },
+                        },
                     };
 
                 case ModType.DifficultyIncrease:

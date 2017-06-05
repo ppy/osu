@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.Chat;
@@ -43,11 +44,15 @@ namespace osu.Game.Overlays.Chat
             channel.NewMessagesArrived += newMessagesArrived;
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            newMessagesArrived(Channel.Messages);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            newMessagesArrived(Channel.Messages);
             scrollToEnd();
         }
 
@@ -59,12 +64,12 @@ namespace osu.Game.Overlays.Chat
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
-            if (!IsLoaded) return;
-
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
             //up to last Channel.MAX_HISTORY messages
             flow.Add(displayMessages.Select(m => new ChatLine(m)));
+
+            if (!IsLoaded) return;
 
             if (scroll.IsScrolledToEnd(10) || !flow.Children.Any())
                 scrollToEnd();
