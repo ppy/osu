@@ -102,6 +102,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             public SensitivitySlider()
             {
+                KeyboardStep = 0.01f;
+
                 Current.ValueChanged += newValue =>
                 {
                     if (!isDragging && Sensitivity != null)
