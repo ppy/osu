@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
                 currentStrain += strainValue() * skillMultiplier;
 
             currentSectionPeak = Math.Max(currentStrain, currentSectionPeak);
-            
+
             previous.Push(current);
         }
 
