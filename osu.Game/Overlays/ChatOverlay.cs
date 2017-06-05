@@ -166,6 +166,8 @@ namespace osu.Game.Overlays
             channelTabs.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
             channelSelection.StateChanged += (overlay, state) =>
             {
+                channelTabs.ChannelSelectorActive.Value = state == Visibility.Visible;
+
                 if (state == Visibility.Visible)
                 {
                     inputTextBox.HoldFocus = false;
