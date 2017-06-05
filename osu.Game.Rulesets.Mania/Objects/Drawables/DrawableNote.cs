@@ -13,6 +13,9 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
+    /// <summary>
+    /// Visualises a <see cref="Note"/> hit object.
+    /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>
     {
         private readonly NotePiece headPiece;

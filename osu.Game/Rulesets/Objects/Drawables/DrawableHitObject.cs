@@ -15,18 +15,38 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
-    public abstract class DrawableHitObject<TObject, TJudgement> : Container
-        where TObject : HitObject
-        where TJudgement : Judgement
+    public abstract class DrawableHitObject : Container
     {
-        public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
-
-        public TObject HitObject;
+        public readonly HitObject HitObject;
 
         /// <summary>
         /// The colour used for various elements of this DrawableHitObject.
         /// </summary>
         public virtual Color4 AccentColour { get; set; }
+
+        protected DrawableHitObject(HitObject hitObject)
+        {
+            HitObject = hitObject;
+        }
+    }
+
+    public abstract class DrawableHitObject<TObject> : DrawableHitObject
+        where TObject : HitObject
+    {
+        public new readonly TObject HitObject;
+
+        protected DrawableHitObject(TObject hitObject)
+            : base(hitObject)
+        {
+            HitObject = hitObject;
+        }
+    }
+
+    public abstract class DrawableHitObject<TObject, TJudgement> : DrawableHitObject<TObject>
+        where TObject : HitObject
+        where TJudgement : Judgement
+    {
+        public event Action<DrawableHitObject<TObject, TJudgement>> OnJudgement;
 
         public override bool HandleInput => Interactive;
 
@@ -34,9 +54,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public TJudgement Judgement;
 
-        protected abstract TJudgement CreateJudgement();
+        protected List<SampleChannel> Samples = new List<SampleChannel>();
 
-        protected abstract void UpdateState(ArmedState state);
+        protected DrawableHitObject(TObject hitObject)
+            : base(hitObject)
+        {
+        }
 
         private ArmedState state;
         public ArmedState State
@@ -59,8 +82,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        protected List<SampleChannel> Samples = new List<SampleChannel>();
-
         protected void PlaySamples()
         {
             Samples.ForEach(s => s?.Play());
@@ -78,11 +99,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Whether this hit object and all of its nested hit objects have been judged.
         /// </summary>
         public bool Judged => (Judgement?.Result ?? HitResult.None) != HitResult.None && (NestedHitObjects?.All(h => h.Judged) ?? true);
-
-        protected DrawableHitObject(TObject hitObject)
-        {
-            HitObject = hitObject;
-        }
 
         /// <summary>
         /// Process a hit of this hitobject. Carries out judgement.
@@ -176,5 +192,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             h.OnJudgement += d => OnJudgement?.Invoke(d);
             nestedHitObjects.Add(h);
         }
+
+        protected abstract TJudgement CreateJudgement();
+        protected abstract void UpdateState(ArmedState state);
     }
 }
