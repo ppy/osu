@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
         /// </summary>
         protected abstract string Title { get; }
 
-        private const float transition_duration = 600;
+        private const float transition_duration = 250;
         private const int container_width = 270;
         private const int border_thickness = 2;
         private const int header_height = 30;
@@ -28,7 +28,8 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         private readonly FillFlowContainer content;
         private readonly IconButton button;
-        private bool expanded;
+
+        private bool expanded = true;
 
         private Color4 buttonActiveColour;
 
@@ -81,7 +82,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
                                     Position = new Vector2(-15,0),
                                     Icon = FontAwesome.fa_bars,
                                     Scale = new Vector2(0.75f),
-                                    Action = triggerContentVisibility,
+                                    Action = toggleContentVisibility,
                                 },
                             }
                         },
@@ -111,17 +112,21 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         protected override Container<Drawable> Content => content;
 
-        private void triggerContentVisibility()
+        private void toggleContentVisibility()
         {
             content.ClearTransforms();
-            content.AutoSizeAxes = expanded ? Axes.Y : Axes.None;
-
-            if (!expanded)
-                content.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
-
-            button.FadeColour(expanded ? buttonActiveColour : Color4.White, 200, EasingTypes.OutQuint);
 
             expanded = !expanded;
+
+            if (expanded)
+                content.AutoSizeAxes = Axes.Y;
+            else
+            {
+                content.AutoSizeAxes = Axes.None;
+                content.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
+            }
+
+            button.FadeColour(expanded ? buttonActiveColour : Color4.White, 200, EasingTypes.OutQuint);
         }
     }
 }
