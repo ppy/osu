@@ -93,6 +93,7 @@ namespace osu.Game.Graphics.Cursor
         {
             private Container cursorContainer;
             private Bindable<double> cursorScale;
+            private const float base_scale = 0.15f;
 
             public Sprite AdditiveLayer;
 
@@ -108,17 +109,15 @@ namespace osu.Game.Graphics.Cursor
                 {
                     cursorContainer = new Container
                     {
-                        Size = new Vector2(32),
+                        AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
                             new Sprite
                             {
-                                FillMode = FillMode.Fit,
                                 Texture = textures.Get(@"Cursor/menu-cursor"),
                             },
                             AdditiveLayer = new Sprite
                             {
-                                FillMode = FillMode.Fit,
                                 BlendingMode = BlendingMode.Additive,
                                 Colour = colour.Pink,
                                 Alpha = 0,
@@ -129,7 +128,7 @@ namespace osu.Game.Graphics.Cursor
                 };
 
                 cursorScale = config.GetBindable<double>(OsuSetting.MenuCursorSize);
-                cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale);
+                cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale * base_scale);
                 cursorScale.TriggerChange();
             }
         }
