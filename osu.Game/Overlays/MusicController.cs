@@ -22,6 +22,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Threading;
 using osu.Game.Overlays.Music;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
@@ -38,8 +39,8 @@ namespace osu.Game.Overlays
         private Drawable currentBackground;
         private DragBar progressBar;
 
-        private Button playButton;
-        private Button playlistButton;
+        private IconButton playButton;
+        private IconButton playlistButton;
 
         private SpriteText title, artist;
 
@@ -143,7 +144,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Children = new Drawable[]
                                     {
-                                        new FillFlowContainer<Button>
+                                        new FillFlowContainer<IconButton>
                                         {
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
@@ -152,26 +153,26 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.Centre,
                                             Children = new[]
                                             {
-                                                new Button
+                                                new IconButton
                                                 {
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
                                                 },
-                                                playButton = new Button
+                                                playButton = new IconButton
                                                 {
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
                                                     Action = play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
-                                                new Button
+                                                new IconButton
                                                 {
                                                     Action = next,
                                                     Icon = FontAwesome.fa_step_forward,
                                                 },
                                             }
                                         },
-                                        playlistButton = new Button
+                                        playlistButton = new IconButton
                                         {
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.CentreRight,
@@ -413,106 +414,6 @@ namespace osu.Game.Overlays
             private void load(TextureStore textures)
             {
                 sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
-            }
-        }
-
-        private class Button : ClickableContainer
-        {
-            private readonly TextAwesome icon;
-            private readonly Box hover;
-            private readonly Container content;
-
-            public FontAwesome Icon
-            {
-                get { return icon.Icon; }
-                set { icon.Icon = value; }
-            }
-
-            private const float button_size = 30;
-            private Color4 flashColour;
-
-            public Vector2 IconScale
-            {
-                get { return icon.Scale; }
-                set { icon.Scale = value; }
-            }
-
-            public Button()
-            {
-                AutoSizeAxes = Axes.Both;
-
-                Origin = Anchor.Centre;
-                Anchor = Anchor.Centre;
-
-                Children = new Drawable[]
-                {
-                    content = new Container
-                    {
-                        Size = new Vector2(button_size),
-                        CornerRadius = 5,
-                        Masking = true,
-
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        EdgeEffect = new EdgeEffect
-                        {
-                            Colour = Color4.Black.Opacity(0.04f),
-                            Type = EdgeEffectType.Shadow,
-                            Radius = 5,
-                        },
-                        Children = new Drawable[]
-                        {
-                            hover = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0,
-                            },
-                            icon = new TextAwesome
-                            {
-                                TextSize = 18,
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre
-                            }
-                        }
-                    }
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                hover.Colour = colours.Yellow.Opacity(0.6f);
-                flashColour = colours.Yellow;
-            }
-
-            protected override bool OnHover(InputState state)
-            {
-                hover.FadeIn(500, EasingTypes.OutQuint);
-                return base.OnHover(state);
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                hover.FadeOut(500, EasingTypes.OutQuint);
-                base.OnHoverLost(state);
-            }
-
-            protected override bool OnClick(InputState state)
-            {
-                hover.FlashColour(flashColour, 800, EasingTypes.OutQuint);
-                return base.OnClick(state);
-            }
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                content.ScaleTo(0.75f, 2000, EasingTypes.OutQuint);
-                return base.OnMouseDown(state, args);
-            }
-
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-            {
-                content.ScaleTo(1, 1000, EasingTypes.OutElastic);
-                return base.OnMouseUp(state, args);
             }
         }
     }
