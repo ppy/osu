@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {
-    public class CollectionSettings : ReplaySettingsGroup
+    public class CollectionSettings : ReplayGroup
     {
         protected override string Title => @"collections";
 

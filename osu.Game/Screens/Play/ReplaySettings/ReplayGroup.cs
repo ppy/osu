@@ -13,7 +13,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {
-    public abstract class ReplaySettingsGroup : Container
+    public abstract class ReplayGroup : Container
     {
         /// <summary>
         /// The title to be displayed in the header of this group.
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         private Color4 buttonActiveColour;
 
-        protected ReplaySettingsGroup()
+        protected ReplayGroup()
         {
             AutoSizeAxes = Axes.Y;
             Width = container_width;

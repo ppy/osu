@@ -8,7 +8,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD;
 using OpenTK;
-using osu.Game.Screens.Play.ReplaySettings;
 
 namespace osu.Game.Screens.Play
 {
@@ -46,7 +45,7 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
-            Y = - TwoLayerButton.SIZE_RETRACTED.Y,
+            Y = -TwoLayerButton.SIZE_RETRACTED.Y,
         };
 
         protected override ScoreCounter CreateScoreCounter() => new ScoreCounter(6)

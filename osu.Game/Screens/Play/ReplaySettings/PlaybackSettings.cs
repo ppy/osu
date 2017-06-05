@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {
-    public class PlaybackSettings : ReplaySettingsGroup
+    public class PlaybackSettings : ReplayGroup
     {
         protected override string Title => @"playback";
 
@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
         {
             Children = new Drawable[]
             {
-                new ReplaySettingsSliderBar<double>()
+                new ReplaySliderBar<double>()
                 {
                     LabelText = "Playback speed",
                     Bindable = config.GetBindable<double>(OsuSetting.PlaybackSpeed)
