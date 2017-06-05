@@ -20,6 +20,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10);
             Set(OsuSetting.DisplayStarsMaximum, 10.0, 0, 10);
 
+            Set(OsuSetting.SelectionRandomType, SelectionRandomType.RandomPermutation);
+
             Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
 
             // Online settings
@@ -69,6 +71,9 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.KeyOverlay, false);
 
+            Set(OsuSetting.FloatingComments, false);
+            Set(OsuSetting.PlaybackSpeed, 1.0, 0.5f, 2);
+
             // Update
 
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -88,6 +93,8 @@ namespace osu.Game.Configuration
         AutoCursorSize,
         DimLevel,
         KeyOverlay,
+        FloatingComments,
+        PlaybackSpeed,
         ShowInterface,
         MouseDisableButtons,
         MouseDisableWheel,
@@ -102,6 +109,7 @@ namespace osu.Game.Configuration
         SaveUsername,
         DisplayStarsMinimum,
         DisplayStarsMaximum,
+        SelectionRandomType,
         SnakingInSliders,
         SnakingOutSliders,
         ShowFpsDisplay,
