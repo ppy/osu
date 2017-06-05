@@ -84,7 +84,6 @@ namespace osu.Game.Screens.Select
         public Action Hovered;
         public Action HoverLost;
         public Key? Hotkey;
-        public bool ExcludePressWithShift;
 
         protected override bool OnHover(InputState state)
         {
@@ -125,19 +124,8 @@ namespace osu.Game.Screens.Select
         {
             if (!args.Repeat && args.Key == Hotkey)
             {
-                if (ExcludePressWithShift)
-                {
-                    if (!state.Keyboard.ShiftPressed)
-                    {
-                        OnClick(state);
-                        return true;
-                    }
-                }
-                else
-                {
-                    OnClick(state);
-                    return true;
-                }
+                OnClick(state);
+                return true;
             }
 
             return base.OnKeyDown(state, args);
