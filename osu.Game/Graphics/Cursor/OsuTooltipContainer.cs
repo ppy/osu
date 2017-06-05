@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -24,6 +25,7 @@ namespace osu.Game.Graphics.Cursor
         {
             private readonly Box background;
             private readonly OsuSpriteText text;
+            private bool instantMovement = true;
 
             public override string TooltipText
             {
@@ -32,7 +34,7 @@ namespace osu.Game.Graphics.Cursor
                     if (value == text.Text) return;
 
                     text.Text = value;
-                    if (Alpha > 0)
+                    if (IsPresent)
                     {
                         AutoSizeDuration = 250;
                         background.FlashColour(OsuColour.Gray(0.4f), 1000, EasingTypes.OutQuint);
@@ -80,6 +82,7 @@ namespace osu.Game.Graphics.Cursor
 
             protected override void PopIn()
             {
+                instantMovement |= !IsPresent;
                 FadeIn(500, EasingTypes.OutQuint);
             }
 
@@ -87,6 +90,19 @@ namespace osu.Game.Graphics.Cursor
             {
                 using (BeginDelayedSequence(150))
                     FadeOut(500, EasingTypes.OutQuint);
+            }
+
+            public override void Move(Vector2 pos)
+            {
+                if (instantMovement)
+                {
+                    Position = pos;
+                    instantMovement = false;
+                }
+                else
+                {
+                    MoveTo(pos, 200, EasingTypes.OutQuint);
+                }
             }
         }
     }
