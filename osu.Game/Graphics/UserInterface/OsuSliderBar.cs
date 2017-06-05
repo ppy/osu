@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Graphics.UserInterface
 {

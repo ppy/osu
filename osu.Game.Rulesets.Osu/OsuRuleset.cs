@@ -46,7 +46,14 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModEasy(),
                         new OsuModNoFail(),
-                        new OsuModHalfTime(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModHalfTime(),
+                                new OsuModDaycore(),
+                            },
+                        },
                     };
 
                 case ModType.DifficultyIncrease:
