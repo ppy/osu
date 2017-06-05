@@ -266,20 +266,30 @@ namespace osu.Game.Overlays
 
                 if (channelTabs.ChannelSelectorActive) return;
 
-                if (currentChannel != null)
-                    currentChannelContainer.Clear(false);
-
                 currentChannel = value;
+
+                inputTextBox.Current.Disabled = currentChannel.ReadOnly;
+                channelTabs.Current.Value = value;
 
                 var loaded = loadedChannels.Find(d => d.Channel == value);
                 if (loaded == null)
-                    loadedChannels.Add(loaded = new DrawableChannel(currentChannel));
+                {
+                    currentChannelContainer.FadeOut(500, EasingTypes.OutQuint);
 
-                inputTextBox.Current.Disabled = currentChannel.ReadOnly;
-
-                currentChannelContainer.Add(loaded);
-
-                channelTabs.Current.Value = value;
+                    loaded = new DrawableChannel(currentChannel);
+                    loadedChannels.Add(loaded);
+                    LoadComponentAsync(loaded, l =>
+                    {
+                        currentChannelContainer.Clear(false);
+                        currentChannelContainer.Add(l);
+                        currentChannelContainer.FadeIn(500, EasingTypes.OutQuint);
+                    });
+                }
+                else
+                {
+                    currentChannelContainer.Clear(false);
+                    currentChannelContainer.Add(loaded);
+                }
             }
         }
 
