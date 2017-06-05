@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Dialog
         private void pressButtonAtIndex(int index)
         {
             if (index < Buttons.Count())
-                Buttons.Skip(index).First().TriggerClick();
+                Buttons.Skip(index).First().TriggerOnClick();
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Dialog
 
             if (args.Key == Key.Enter)
             {
-                Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerClick();
+                Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
                 return true;
             }
 

@@ -74,9 +74,12 @@
     <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
+    <Compile Include="Graphics\UserInterface\IconButton.cs" />
+    <Compile Include="Configuration\SelectionRandomType.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
+    <Compile Include="Overlays\Music\CollectionsDropdown.cs" />
     <Compile Include="Overlays\Music\FilterControl.cs" />
     <Compile Include="Overlays\Music\PlaylistItem.cs" />
     <Compile Include="Overlays\Music\PlaylistList.cs" />
@@ -108,7 +111,6 @@
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
-    <Compile Include="Graphics\IHasTooltip.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\Transforms\TransformAccent.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
@@ -121,7 +123,7 @@
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
     <Compile Include="Graphics\UserInterface\SimpleComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
-    <Compile Include="Graphics\Cursor\TooltipContainer.cs" />
+    <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
     <Compile Include="Input\Handlers\ReplayInputHandler.cs" />
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />
     <Compile Include="IO\Legacy\SerializationReader.cs" />
@@ -129,6 +131,7 @@
     <Compile Include="IO\Serialization\IJsonSerializable.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
     <Compile Include="Rulesets\BeatmapStatistic.cs" />
+    <Compile Include="Rulesets\Mods\ModDaycore.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertHit.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertHitObjectParser.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertSlider.cs" />
@@ -180,6 +183,7 @@
     <Compile Include="Rulesets\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
     <Compile Include="Rulesets\Objects\HitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\HitObjectStartTimeComparer.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasCombo.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasEndTime.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasDistance.cs" />
@@ -242,6 +246,13 @@
     <Compile Include="Screens\Charts\ChartInfo.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\CollectionSettings.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\DiscussionSettings.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplayGroup.cs" />
+    <Compile Include="Screens\Play\ReplaySettingsOverlay.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplaySliderBar.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\PlaybackSettings.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplayCheckbox.cs" />
     <Compile Include="Screens\Play\PauseContainer.cs" />
     <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
@@ -454,6 +465,7 @@
     <Compile Include="Overlays\Direct\SlimEnumDropdown.cs" />
     <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
     <Compile Include="Database\RankStatus.cs" />
+    <Compile Include="Graphics\UserInterface\BreadcrumbControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

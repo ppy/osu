@@ -135,17 +135,22 @@ namespace osu.Game.Overlays
             channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
         }
 
+        private double startDragChatHeight;
+
         protected override bool OnDragStart(InputState state)
         {
-            if (channelTabs.Hovering)
-                return true;
+            if (!channelTabs.Hovering)
+                return base.OnDragStart(state);
 
-            return base.OnDragStart(state);
+            startDragChatHeight = chatHeight.Value;
+            return true;
         }
 
         protected override bool OnDrag(InputState state)
         {
-            chatHeight.Value = Height - state.Mouse.Delta.Y / Parent.DrawSize.Y;
+            Trace.Assert(state.Mouse.PositionMouseDown != null);
+
+            chatHeight.Value = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
             return base.OnDrag(state);
         }
 
@@ -162,11 +167,15 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected override bool OnFocus(InputState state)
+        public override bool AcceptsFocus => true;
+
+        protected override bool OnClick(InputState state) => true;
+
+        protected override void OnFocus(InputState state)
         {
             //this is necessary as inputTextBox is masked away and therefore can't get focus :(
-            inputTextBox.TriggerFocus();
-            return false;
+            InputManager.ChangeFocus(inputTextBox);
+            base.OnFocus(state);
         }
 
         protected override void PopIn()
@@ -255,20 +264,32 @@ namespace osu.Game.Overlays
             {
                 if (currentChannel == value) return;
 
-                if (currentChannel != null)
-                    currentChannelContainer.Clear(false);
+                if (channelTabs.ChannelSelectorActive) return;
 
                 currentChannel = value;
 
+                inputTextBox.Current.Disabled = currentChannel.ReadOnly;
+                channelTabs.Current.Value = value;
+
                 var loaded = loadedChannels.Find(d => d.Channel == value);
                 if (loaded == null)
-                    loadedChannels.Add(loaded = new DrawableChannel(currentChannel));
+                {
+                    currentChannelContainer.FadeOut(500, EasingTypes.OutQuint);
 
-                inputTextBox.Current.Disabled = currentChannel.ReadOnly;
-
-                currentChannelContainer.Add(loaded);
-
-                channelTabs.Current.Value = value;
+                    loaded = new DrawableChannel(currentChannel);
+                    loadedChannels.Add(loaded);
+                    LoadComponentAsync(loaded, l =>
+                    {
+                        currentChannelContainer.Clear(false);
+                        currentChannelContainer.Add(l);
+                        currentChannelContainer.FadeIn(500, EasingTypes.OutQuint);
+                    });
+                }
+                else
+                {
+                    currentChannelContainer.Clear(false);
+                    currentChannelContainer.Add(loaded);
+                }
             }
         }
 

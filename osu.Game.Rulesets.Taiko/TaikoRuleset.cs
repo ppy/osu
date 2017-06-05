@@ -28,7 +28,14 @@ namespace osu.Game.Rulesets.Taiko
                     {
                         new TaikoModEasy(),
                         new TaikoModNoFail(),
-                        new TaikoModHalfTime(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new TaikoModHalfTime(),
+                                new TaikoModDaycore(),
+                            },
+                        },
                     };
 
                 case ModType.DifficultyIncrease:

@@ -134,13 +134,18 @@ namespace osu.Game.Overlays
             FadeTo(0, TRANSITION_LENGTH / 2);
 
             searchTextBox.HoldFocus = false;
-            searchTextBox.TriggerFocusLost();
+            if (searchTextBox.HasFocus)
+                InputManager.ChangeFocus(null);
         }
 
-        protected override bool OnFocus(InputState state)
+        public override bool AcceptsFocus => true;
+
+        protected override bool OnClick(InputState state) => true;
+
+        protected override void OnFocus(InputState state)
         {
-            searchTextBox.TriggerFocus(state);
-            return false;
+            InputManager.ChangeFocus(searchTextBox);
+            base.OnFocus(state);
         }
 
         private class SettingsSectionsContainer : SectionsContainer
@@ -158,7 +163,7 @@ namespace osu.Game.Overlays
 
             public SettingsSectionsContainer()
             {
-                ScrollContainer.ScrollDraggerVisible = false;
+                ScrollContainer.ScrollbarVisible = false;
                 Add(headerBackground = new Box
                 {
                     Colour = Color4.Black,
