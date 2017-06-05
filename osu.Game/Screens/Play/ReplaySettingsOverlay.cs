@@ -12,7 +12,6 @@ namespace osu.Game.Screens.Play
     {
         public ReplaySettingsOverlay()
         {
-            AlwaysPresent = true;
             Direction = FillDirection.Vertical;
             AutoSizeAxes = Axes.Both;
             Spacing = new Vector2(0, 20);
