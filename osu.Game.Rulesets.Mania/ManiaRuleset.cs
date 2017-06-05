@@ -27,7 +27,14 @@ namespace osu.Game.Rulesets.Mania
                     {
                         new ManiaModEasy(),
                         new ManiaModNoFail(),
-                        new ManiaModHalfTime(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ManiaModHalfTime(),
+                                new ManiaModDaycore(),
+                            },
+                        },
                     };
 
                 case ModType.DifficultyIncrease:

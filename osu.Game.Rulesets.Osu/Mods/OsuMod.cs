@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModAutopilot) }).ToArray();
     }
 
+    public class OsuModDaycore : ModDaycore
+    {
+        public override double ScoreMultiplier => 0.5;
+    }
+
     public class OsuModDoubleTime : ModDoubleTime
     {
         public override double ScoreMultiplier => 1.12;

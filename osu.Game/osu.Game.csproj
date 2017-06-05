@@ -105,7 +105,6 @@
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
-    <Compile Include="Graphics\IHasTooltip.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\Transforms\TransformAccent.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
@@ -118,7 +117,7 @@
     <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
     <Compile Include="Graphics\UserInterface\SimpleComboCounter.cs" />
     <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
-    <Compile Include="Graphics\Cursor\TooltipContainer.cs" />
+    <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
     <Compile Include="Input\Handlers\ReplayInputHandler.cs" />
     <Compile Include="IO\Legacy\ILegacySerializable.cs" />
     <Compile Include="IO\Legacy\SerializationReader.cs" />
@@ -126,6 +125,7 @@
     <Compile Include="IO\Serialization\IJsonSerializable.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
     <Compile Include="Rulesets\BeatmapStatistic.cs" />
+    <Compile Include="Rulesets\Mods\ModDaycore.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertHit.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertHitObjectParser.cs" />
     <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertSlider.cs" />
