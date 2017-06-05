@@ -15,6 +15,8 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseUserProfile : TestCase
     {
+        public override string Description => "Tests user's profile page.";
+
         public override void Reset()
         {
             base.Reset();
