@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override double ScoreMultiplier => 1.12;
 
-        public void ApplyToClock(IAdjustableClock clock)
+        public virtual void ApplyToClock(IAdjustableClock clock)
         {
             clock.Rate = 0.75;
         }
