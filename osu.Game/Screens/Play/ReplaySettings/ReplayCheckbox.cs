@@ -7,7 +7,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {
-    public class ReplaySettingsCheckbox : OsuCheckbox
+    public class ReplayCheckbox : OsuCheckbox
     {
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

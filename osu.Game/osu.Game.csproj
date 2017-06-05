@@ -244,11 +244,11 @@
     <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
     <Compile Include="Screens\Play\ReplaySettings\CollectionSettings.cs" />
     <Compile Include="Screens\Play\ReplaySettings\DiscussionSettings.cs" />
-    <Compile Include="Screens\Play\ReplaySettings\ReplaySettingsGroup.cs" />
-    <Compile Include="Screens\Play\ReplaySettings\ReplaySettingsOverlay.cs" />
-    <Compile Include="Screens\Play\ReplaySettings\ReplaySettingsSliderBar.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplayGroup.cs" />
+    <Compile Include="Screens\Play\ReplaySettingsOverlay.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplaySliderBar.cs" />
     <Compile Include="Screens\Play\ReplaySettings\PlaybackSettings.cs" />
-    <Compile Include="Screens\Play\ReplaySettings\ReplaySettingsCheckbox.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplayCheckbox.cs" />
     <Compile Include="Screens\Play\PauseContainer.cs" />
     <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
