@@ -71,6 +71,9 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.KeyOverlay, false);
 
+            Set(OsuSetting.FloatingComments, false);
+            Set(OsuSetting.PlaybackSpeed, 1.0, 0.5f, 2);
+
             // Update
 
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -90,6 +93,8 @@ namespace osu.Game.Configuration
         AutoCursorSize,
         DimLevel,
         KeyOverlay,
+        FloatingComments,
+        PlaybackSpeed,
         ShowInterface,
         MouseDisableButtons,
         MouseDisableWheel,

@@ -31,6 +31,7 @@ namespace osu.Game.Screens.Play
         public readonly ModDisplay ModDisplay;
 
         private Bindable<bool> showHud;
+        private bool replayLoaded;
 
         private static bool hasShownNotificationOnce;
 
@@ -41,6 +42,7 @@ namespace osu.Game.Screens.Play
         protected abstract HealthDisplay CreateHealthDisplay();
         protected abstract SongProgress CreateProgress();
         protected abstract ModDisplay CreateModsContainer();
+        //protected abstract ReplaySettingsOverlay CreateReplaySettingsOverlay();
 
         protected HUDOverlay()
         {
@@ -59,6 +61,7 @@ namespace osu.Game.Screens.Play
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
+                    //ReplaySettingsOverlay = CreateReplaySettingsOverlay(),
                 }
             });
         }
@@ -93,10 +96,14 @@ namespace osu.Game.Screens.Play
         {
             hitRenderer.InputManager.Add(KeyCounter.GetReceptor());
 
+            replayLoaded = hitRenderer.HasReplayLoaded;
+
             // in the case a replay isn't loaded, we want some elements to only appear briefly.
-            if (!hitRenderer.HasReplayLoaded)
+            if (!replayLoaded)
+            {
                 using (ModDisplay.BeginDelayedSequence(2000))
                     ModDisplay.FadeOut(200);
+            }
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
