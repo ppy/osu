@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using OpenTK.Graphics;
 using OpenTK;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -40,7 +41,7 @@ namespace osu.Desktop.VisualTests.Tests
                             {
                                 Name = "Timing section",
                                 RelativeSizeAxes = Axes.Both,
-                                RelativeCoordinateSpace = new Vector2(1, 10000),
+                                RelativeCoordinateSpace = new RectangleF(0, 0, 1, 10000),
                                 Children = new[]
                                 {
                                     new DrawableNote(new Note { StartTime = 5000 }) { AccentColour = Color4.Red },
@@ -62,7 +63,7 @@ namespace osu.Desktop.VisualTests.Tests
                             {
                                 Name = "Timing section",
                                 RelativeSizeAxes = Axes.Both,
-                                RelativeCoordinateSpace = new Vector2(1, 10000),
+                                RelativeCoordinateSpace = new RectangleF(0, 0, 1, 10000),
                                 Children = new[]
                                 {
                                     new DrawableHoldNote(new HoldNote
