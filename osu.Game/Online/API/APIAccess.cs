@@ -52,7 +52,7 @@ namespace osu.Game.Online.API
         public APIAccess()
         {
             authentication = new OAuth(client_id, client_secret, Endpoint);
-            log = Logger.GetLogger(LoggingTarget.Network);
+            log = Logger.GetLogger(LoggingTarget.Network, true);
 
             thread = new Thread(run) { IsBackground = true };
             thread.Start();
