@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Framework.Caching;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.Timing.Drawables
 {
@@ -41,7 +42,8 @@ namespace osu.Game.Rulesets.Timing.Drawables
             AddInternal(content = new RelativeCoordinateAutoSizingContainer(scrollingAxes)
             {
                 RelativeSizeAxes = Axes.Both,
-                RelativePositionAxes = Axes.Both
+                RelativePositionAxes = Axes.Both,
+                RelativeCoordinateSpace = new RectangleF((scrollingAxes & Axes.X) > 0 ? (float)TimingChange.Time : 0, (scrollingAxes & Axes.Y) > 0 ? (float)TimingChange.Time : 0, 1, 1)
             });
         }
 
@@ -61,23 +63,8 @@ namespace osu.Game.Rulesets.Timing.Drawables
             // Adjust our size to account for the speed changes
             float speedAdjustedSize = (float)(1000 / TimingChange.BeatLength / TimingChange.SpeedMultiplier);
 
-            Size = new Vector2((scrollingAxes & Axes.X) > 0 ? speedAdjustedSize : 1,
-                               (scrollingAxes & Axes.Y) > 0 ? speedAdjustedSize : 1);
-
-            RelativeCoordinateSpace = new Vector2((scrollingAxes & Axes.X) > 0 ? parent.TimeSpan.X : 1,
-                                                  (scrollingAxes & Axes.Y) > 0 ? parent.TimeSpan.Y : 1);
-        }
-
-        public override void Add(DrawableHitObject hitObject)
-        {
-            // The previously relatively-positioned hit object will now become relative to content, but since the hit object has no knowledge of content,
-            // we need to offset it back by content's position (timing change time) so that it becomes correctly relatively-positioned to content
-            // This can be removed if hit objects were stored such that either their StartTime or their "beat offset" was relative to the timing change
-            // they belonged to, but this requires a radical change to the beatmap format which we're not ready to do just yet
-            hitObject.Position = new Vector2((scrollingAxes & Axes.X) > 0 ? hitObject.X - (float)TimingChange.Time : hitObject.X,
-                                             (scrollingAxes & Axes.Y) > 0 ? hitObject.Y - (float)TimingChange.Time : hitObject.Y);
-
-            base.Add(hitObject);
+            Size = new Vector2((scrollingAxes & Axes.X) > 0 ? speedAdjustedSize : 1, (scrollingAxes & Axes.Y) > 0 ? speedAdjustedSize : 1);
+            RelativeCoordinateSpace = new RectangleF(0, 0, (scrollingAxes & Axes.X) > 0 ? parent.TimeSpan.X : 1, (scrollingAxes & Axes.Y) > 0 ? parent.TimeSpan.Y : 1);
         }
 
         /// <summary>
@@ -133,14 +120,20 @@ namespace osu.Game.Rulesets.Timing.Drawables
                         if (!Children.Any())
                             return;
 
-                        float height = Children.Select(child => child.Y + child.Height).Max();
-                        float width = Children.Select(child => child.X + child.Width).Max();
+                        float width = Children.Select(child => child.X + child.Width).Max() - RelativeChildOffset.X;
+                        float height = Children.Select(child => child.Y + child.Height).Max() - RelativeChildOffset.Y;
 
-                        Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X,
-                                           (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
+                        Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X, (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
 
-                        RelativeCoordinateSpace = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : 1,
-                                                              (autoSizingAxes & Axes.Y) > 0 ? height : 1);
+                        var space = RelativeCoordinateSpace;
+
+                        if ((autoSizingAxes & Axes.X) > 0)
+                            space.Width = width;
+
+                        if ((autoSizingAxes & Axes.Y) > 0)
+                            space.Height = height;
+
+                        RelativeCoordinateSpace = space;
                     });
                 }
             }

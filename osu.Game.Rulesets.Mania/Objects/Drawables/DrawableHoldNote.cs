@@ -12,6 +12,7 @@ using OpenTK;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -55,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tickContainer = new Container<DrawableHoldNoteTick>
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RelativeCoordinateSpace = new Vector2(1, (float)HitObject.Duration)
+                    RelativeCoordinateSpace = new RectangleF(0, 0, 1, (float)HitObject.Duration)
                 },
                 head = new DrawableHeadNote(this, key)
                 {
