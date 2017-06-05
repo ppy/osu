@@ -5,16 +5,16 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
 {
     public class Speed : Skill
     {
-        protected override double skillMultiplier => 1400;
-        protected override double strainDecayBase => 0.3;
+        protected override double SkillMultiplier => 1400;
+        protected override double StrainDecayBase => 0.3;
 
         private const double single_spacing_threshold = 125;
         private const double stream_spacing_threshold = 110;
         private const double almost_diameter = 90;
 
-        protected override double strainValue()
+        protected override double StrainValue()
         {
-            double distance = current.Distance;
+            double distance = Current.Distance;
 
             double speedValue;
             if (distance > single_spacing_threshold)
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
             else
                 speedValue = 0.95;
 
-            return speedValue / current.MS;
+            return speedValue / Current.Ms;
         }
     }
 }

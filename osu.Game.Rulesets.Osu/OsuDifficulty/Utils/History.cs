@@ -13,10 +13,10 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Utils
     /// </summary>
     public class History<T> : IEnumerable<T>
     {
-        public int Count { get; private set; } = 0;
+        public int Count { get; private set; }
 
-        private T[] array;
-        private int size;
+        private readonly T[] array;
+        private readonly int size;
         private int marker; // Marks the position of the most recently added item.
 
         public History(int size)

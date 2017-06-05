@@ -11,30 +11,30 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
 {
     public abstract class Skill
     {
-        protected abstract double skillMultiplier { get; }
-        protected abstract double strainDecayBase { get; }
+        protected abstract double SkillMultiplier { get; }
+        protected abstract double StrainDecayBase { get; }
 
-        protected OsuDifficultyHitObject current;
-        protected History<OsuDifficultyHitObject> previous = new History<OsuDifficultyHitObject>(2); // Contained objects not used yet
+        protected OsuDifficultyHitObject Current;
+        protected History<OsuDifficultyHitObject> Previous = new History<OsuDifficultyHitObject>(2); // Contained objects not used yet
 
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
-        private List<double> strainPeaks = new List<double>();
+        private readonly List<double> strainPeaks = new List<double>();
 
         /// <summary>
         /// Process a HitObject and update current strain values accordingly.
         /// </summary>
         public void Process(OsuDifficultyHitObject h)
         {
-            current = h;
+            Current = h;
 
-            currentStrain *= strainDecay(current.MS);
-            if (!(current.BaseObject is Spinner))
-                currentStrain += strainValue() * skillMultiplier;
+            currentStrain *= strainDecay(Current.Ms);
+            if (!(Current.BaseObject is Spinner))
+                currentStrain += StrainValue() * SkillMultiplier;
 
             currentSectionPeak = Math.Max(currentStrain, currentSectionPeak);
 
-            previous.Push(current);
+            Previous.Push(Current);
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
         /// </summary>
         public void SaveCurrentPeak()
         {
-            if (previous.Count > 0)
+            if (Previous.Count > 0)
                 strainPeaks.Add(currentSectionPeak);
         }
 
@@ -54,8 +54,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
         {
             // The maximum strain of the new section is not zero by default, strain decays as usual regardless of section boundaries.
             // This means we need to capture the strain level at the beginning of the new section, and use that as the initial peak level.
-            if (previous.Count > 0)
-                currentSectionPeak = currentStrain * strainDecay(offset - previous[0].BaseObject.StartTime);
+            if (Previous.Count > 0)
+                currentSectionPeak = currentStrain * strainDecay(offset - Previous[0].BaseObject.StartTime);
         }
 
         /// <summary>
@@ -78,8 +78,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
             return difficulty;
         }
 
-        protected abstract double strainValue();
+        protected abstract double StrainValue();
 
-        private double strainDecay(double ms) => Math.Pow(strainDecayBase, ms / 1000);
+        private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
     }
 }

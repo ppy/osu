@@ -7,9 +7,9 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
 {
     public class Aim : Skill
     {
-        protected override double skillMultiplier => 26.25;
-        protected override double strainDecayBase => 0.15;
+        protected override double SkillMultiplier => 26.25;
+        protected override double StrainDecayBase => 0.15;
 
-        protected override double strainValue() => Math.Pow(current.Distance, 0.99) / current.MS;
+        protected override double StrainValue() => Math.Pow(Current.Distance, 0.99) / Current.Ms;
     }
 }

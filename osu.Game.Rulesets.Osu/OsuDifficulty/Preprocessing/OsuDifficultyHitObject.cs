@@ -18,13 +18,13 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         /// <summary>
         /// Milliseconds elapsed since the StartTime of the previous note.
         /// </summary>
-        public double MS { get; private set; }
+        public double Ms { get; private set; }
 
-        public double MSUntilHit { get; set; }
+        public double MsUntilHit { get; set; }
 
         private const int normalized_radius = 52;
 
-        private OsuHitObject[] t;
+        private readonly OsuHitObject[] t;
 
         public OsuDifficultyHitObject(OsuHitObject[] triangle)
         {
@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         private void setTimingValues()
         {
             // Every timing inverval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure.
-            MS = Math.Max(40, t[0].StartTime - t[1].StartTime);
-            MSUntilHit = 450; // BaseObject.PreEmpt;
+            Ms = Math.Max(40, t[0].StartTime - t[1].StartTime);
+            MsUntilHit = 450; // BaseObject.PreEmpt;
         }
     }
 }
