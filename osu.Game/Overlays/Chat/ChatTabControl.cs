@@ -210,8 +210,10 @@ namespace osu.Game.Overlays.Chat
                     get { return false; }
                     set
                     {
+                        // we basically never want this tab to become active.
+                        // this allows us to become a "toggle" tab.
+                        // is a bit hacky, to say the least.
                         activeBindable.Value = !activeBindable.Value;
-                        selectorUpdateState();
                         base.Active = false;
                     }
                 }
@@ -221,6 +223,9 @@ namespace osu.Game.Overlays.Chat
                 public ChannelSelectorTabItem(Channel value, Bindable<bool> active) : base(value)
                 {
                     activeBindable = active;
+                    activeBindable.ValueChanged += v => selectorUpdateState();
+
+
                     Depth = float.MaxValue;
                     Width = 45;
 
