@@ -83,6 +83,7 @@ namespace osu.Game.Graphics.Cursor
             protected override void PopIn()
             {
                 FadeIn(500, EasingTypes.OutQuint);
+                firstMovement = true;
             }
 
             protected override void PopOut()
