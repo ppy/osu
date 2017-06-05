@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Select
             } while (index != startIndex);
         }
 
-        public void SelectRandom()
+        public void SelectNextRandom()
         {
             randomSelectedBeatmaps.Push(selectedGroup);
 
@@ -201,7 +201,7 @@ namespace osu.Game.Screens.Select
             selectGroup(group, panel);
         }
 
-        public void CancelRandom()
+        public void SelectPreviousRandom()
         {
             if (!randomSelectedBeatmaps.Any())
                 return;
@@ -210,19 +210,12 @@ namespace osu.Game.Screens.Select
             if (!visibleGroups.Any())
                 return;
 
-            // we can avoid selecting deleted beatmaps or beatmaps selected in another gamemode
-            while (true)
+            while (randomSelectedBeatmaps.Any())
             {
-                if (!randomSelectedBeatmaps.Any()) break;
-
-                if (!visibleGroups.Contains(randomSelectedBeatmaps.FirstOrDefault()))
+                var group = randomSelectedBeatmaps.Pop();
+                if (visibleGroups.Contains(group))
                 {
-                    randomSelectedBeatmaps.Pop();
-                }
-                else
-                {
-                    BeatmapGroup beatmapGroup = randomSelectedBeatmaps.Pop();
-                    selectGroup(beatmapGroup, beatmapGroup.SelectedPanel);
+                    selectGroup(group, group.SelectedPanel);
                     break;
                 }
             }
