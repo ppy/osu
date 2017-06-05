@@ -324,9 +324,7 @@ namespace osu.Game.Overlays
 
             set
             {
-                if (currentChannel == value) return;
-
-                if (channelTabs.ChannelSelectorActive) return;
+                if (currentChannel == value || value == null) return;
 
                 currentChannel = value;
 
