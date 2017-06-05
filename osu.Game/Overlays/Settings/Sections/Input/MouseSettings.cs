@@ -16,27 +16,29 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private readonly BindableBool rawInputToggle = new BindableBool();
         private Bindable<string> activeInputHandlers;
+        private SettingsSlider<double, SensitivitySlider> sensitivity;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
         {
             activeInputHandlers = config.GetBindable<string>(FrameworkSetting.ActiveInputHandlers);
             rawInputToggle.Value = activeInputHandlers.Value.Contains("Raw");
-            rawInputToggle.ValueChanged += enabled =>
-            {
-                const string raw_mouse_handler = @"OpenTKRawMouseHandler";
-                const string standard_mouse_handler = @"OpenTKMouseHandler";
-
-                activeInputHandlers.Value = enabled ?
-                    activeInputHandlers.Value.Replace(standard_mouse_handler, raw_mouse_handler) :
-                    activeInputHandlers.Value.Replace(raw_mouse_handler, standard_mouse_handler);
-            };
 
             Children = new Drawable[]
             {
+                new SettingsCheckbox
+                {
+                    LabelText = "Raw Input",
+                    Bindable = rawInputToggle
+                },
+                sensitivity = new SettingsSlider<double, SensitivitySlider>
+                {
+                    LabelText = "Cursor Sensitivity",
+                    Bindable = config.GetBindable<double>(FrameworkSetting.CursorSensitivity)
+                },
                 new SettingsEnumDropdown<ConfineMouseMode>
                 {
-                    LabelText = "Confine mouse cursor",
+                    LabelText = "Confine mouse cursor to window",
                     Bindable = config.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode),
                 },
                 new SettingsCheckbox
@@ -49,22 +51,27 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = "Disable mouse buttons during gameplay",
                     Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = "Raw Input",
-                    Bindable = rawInputToggle
-                },
-                new SettingsSlider<double, SensitivitySlider>
-                {
-                    LabelText = "Cursor Sensitivity",
-                    Bindable = config.GetBindable<double>(FrameworkSetting.CursorSensitivity)
-                }
             };
+
+            rawInputToggle.ValueChanged += enabled =>
+            {
+                // this is temporary until we support per-handler settings.
+                const string raw_mouse_handler = @"OpenTKRawMouseHandler";
+                const string standard_mouse_handler = @"OpenTKMouseHandler";
+
+                activeInputHandlers.Value = enabled ?
+                    activeInputHandlers.Value.Replace(standard_mouse_handler, raw_mouse_handler) :
+                    activeInputHandlers.Value.Replace(raw_mouse_handler, standard_mouse_handler);
+
+                sensitivity.Bindable.Disabled = !enabled;
+            };
+
+            rawInputToggle.TriggerChange();
         }
 
         private class SensitivitySlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Value.ToString(@"0.##x");
+            public override string TooltipText => Current.Disabled ? "Enable raw input to adjust sensitivity" : Current.Value.ToString(@"0.##x");
         }
     }
 }
