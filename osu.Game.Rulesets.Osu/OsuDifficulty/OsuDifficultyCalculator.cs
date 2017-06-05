@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty
         protected override double CalculateInternal(Dictionary<string, string> categoryDifficulty)
         {
             OsuDifficultyBeatmap beatmap = new OsuDifficultyBeatmap(Objects);
-            Skill[] skills = new Skill[2]
+            Skill[] skills = new Skill[]
             {
                 new Aim(),
                 new Speed()

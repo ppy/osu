@@ -9,8 +9,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 {
     public class OsuDifficultyBeatmap : IEnumerable<OsuDifficultyHitObject>
     {
-        IEnumerator<OsuDifficultyHitObject> difficultyObjects;
-        private Queue<OsuDifficultyHitObject> onScreen = new Queue<OsuDifficultyHitObject>();
+        private readonly IEnumerator<OsuDifficultyHitObject> difficultyObjects;
+        private readonly Queue<OsuDifficultyHitObject> onScreen = new Queue<OsuDifficultyHitObject>();
 
         public OsuDifficultyBeatmap(List<OsuHitObject> objects)
         {
@@ -40,14 +40,14 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 
                         foreach (OsuDifficultyHitObject h in onScreen)
                         {
-                            h.MSUntilHit -= latest.MS;
+                            h.MsUntilHit -= latest.Ms;
                             // Calculate reading strain here
                         }
 
                         onScreen.Enqueue(latest);
                     }
                 }
-                while (onScreen.Peek().MSUntilHit > 0 && hasNext); // Keep adding new notes on screen while there is still time before we have to hit the next one.
+                while (onScreen.Peek().MsUntilHit > 0 && hasNext); // Keep adding new notes on screen while there is still time before we have to hit the next one.
 
                 yield return onScreen.Dequeue(); // Remove and return notes one by one that had to be hit before the latest note appeared.
             }
@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        IEnumerator<OsuDifficultyHitObject> createDifficultyObjectEnumerator(List<OsuHitObject> objects)
+        private IEnumerator<OsuDifficultyHitObject> createDifficultyObjectEnumerator(List<OsuHitObject> objects)
         {
             // We will process HitObjects in groups of three to form a triangle, so we can calculate an angle for each note.
             OsuHitObject[] triangle = new OsuHitObject[3];
