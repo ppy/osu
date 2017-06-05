@@ -120,8 +120,8 @@ namespace osu.Game.Rulesets.Timing.Drawables
                         if (!Children.Any())
                             return;
 
-                        float width = Children.Select(child => child.X + child.Width).Max() - RelativeChildOffset.X;
-                        float height = Children.Select(child => child.Y + child.Height).Max() - RelativeChildOffset.Y;
+                        float width = Children.Select(child => child.X + child.Width).Max() - RelativePositionOffset.X;
+                        float height = Children.Select(child => child.Y + child.Height).Max() - RelativePositionOffset.Y;
 
                         Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X, (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
 
