@@ -51,7 +51,8 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private readonly Nub nub;
+        protected readonly Nub Nub;
+
         private readonly SpriteText labelSpriteText;
         private SampleChannel sampleChecked;
         private SampleChannel sampleUnchecked;
@@ -64,7 +65,7 @@ namespace osu.Game.Graphics.UserInterface
             Children = new Drawable[]
             {
                 labelSpriteText = new OsuSpriteText(),
-                nub = new Nub
+                Nub = new Nub
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
@@ -72,7 +73,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             };
 
-            nub.Current.BindTo(Current);
+            Nub.Current.BindTo(Current);
 
             Current.ValueChanged += newValue =>
             {
@@ -90,15 +91,15 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            nub.Glowing = true;
-            nub.Expanded = true;
+            Nub.Glowing = true;
+            Nub.Expanded = true;
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            nub.Glowing = false;
-            nub.Expanded = false;
+            Nub.Glowing = false;
+            Nub.Expanded = false;
             base.OnHoverLost(state);
         }
 
