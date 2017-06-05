@@ -3,6 +3,7 @@
 
 using System;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -15,14 +16,14 @@ using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip
+    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
         where T : struct, IEquatable<T>
     {
         private SampleChannel sample;
         private double lastSampleTime;
         private T lastSampleValue;
 
-        private readonly Nub nub;
+        protected readonly Nub Nub;
         private readonly Box leftBox;
         private readonly Box rightBox;
 
@@ -43,6 +44,18 @@ namespace osu.Game.Graphics.UserInterface
                     return bindableInt.Value.ToString(@"n0");
 
                 return Current.Value.ToString();
+            }
+        }
+
+        private Color4 accentColour;
+        public Color4 AccentColour
+        {
+            get { return accentColour; }
+            set
+            {
+                accentColour = value;
+                leftBox.Colour = value;
+                rightBox.Colour = value;
             }
         }
 
@@ -71,7 +84,7 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.CentreRight,
                     Alpha = 0.5f,
                 },
-                nub = new Nub
+                Nub = new Nub
                 {
                     Origin = Anchor.TopCentre,
                     Expanded = true,
@@ -88,19 +101,18 @@ namespace osu.Game.Graphics.UserInterface
         private void load(AudioManager audio, OsuColour colours)
         {
             sample = audio.Sample.Get(@"Sliderbar/sliderbar");
-            leftBox.Colour = colours.Pink;
-            rightBox.Colour = colours.Pink;
+            AccentColour = colours.Pink;
         }
 
         protected override bool OnHover(InputState state)
         {
-            nub.Glowing = true;
+            Nub.Glowing = true;
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            nub.Glowing = false;
+            Nub.Glowing = false;
             base.OnHoverLost(state);
         }
 
@@ -133,13 +145,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            nub.Current.Value = true;
+            Nub.Current.Value = true;
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            nub.Current.Value = false;
+            Nub.Current.Value = false;
             return base.OnMouseUp(state, args);
         }
 
@@ -147,14 +159,14 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.UpdateAfterChildren();
             leftBox.Scale = new Vector2(MathHelper.Clamp(
-                nub.DrawPosition.X - nub.DrawWidth / 2, 0, DrawWidth), 1);
+                Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
             rightBox.Scale = new Vector2(MathHelper.Clamp(
-                DrawWidth - nub.DrawPosition.X - nub.DrawWidth / 2, 0, DrawWidth), 1);
+                DrawWidth - Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
         }
 
         protected override void UpdateValue(float value)
         {
-            nub.MoveToX(RangePadding + UsableWidth * value, 250, EasingTypes.OutQuint);
+            Nub.MoveToX(RangePadding + UsableWidth * value, 250, EasingTypes.OutQuint);
         }
     }
 }
