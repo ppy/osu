@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -24,6 +25,7 @@ namespace osu.Game.Graphics.Cursor
         {
             private readonly Box background;
             private readonly OsuSpriteText text;
+            private bool firstMovement = true;
 
             public override string TooltipText
             {
@@ -87,6 +89,19 @@ namespace osu.Game.Graphics.Cursor
             {
                 using (BeginDelayedSequence(150))
                     FadeOut(500, EasingTypes.OutQuint);
+            }
+
+            public override void Move(Vector2 pos)
+            {
+                if (firstMovement)
+                {
+                    Position = pos;
+                    firstMovement = false;
+                }
+                else
+                {
+                    MoveTo(pos, 200, EasingTypes.OutQuint);
+                }
             }
         }
     }
