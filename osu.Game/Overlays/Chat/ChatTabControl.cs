@@ -208,6 +208,7 @@ namespace osu.Game.Overlays.Chat
                 public override bool Active
                 {
                     get { return false; }
+                    // ReSharper disable once ValueParameterNotUsed
                     set
                     {
                         // we basically never want this tab to become active.
