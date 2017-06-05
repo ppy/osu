@@ -10,19 +10,19 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Users.UserPage;
+using osu.Game.Users.Profile;
 
 namespace osu.Game.Users
 {
-    public class UserPageOverlay : FocusedOverlayContainer
+    public class UserProfile : FocusedOverlayContainer
     {
         private readonly User user;
-        private UserPageSection lastSection;
-        public UserPageOverlay(User user)
+        private ProfileSection lastSection;
+        public UserProfile(User user)
         {
             this.user = user;
-            var tab = new OsuTabControl<UserPageSection>();
-            var sections = new UserPageSection[] { };
+            var tab = new OsuTabControl<ProfileSection>();
+            var sections = new ProfileSection[] { };
             var sectionsContainer = new SectionsContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -37,7 +37,7 @@ namespace osu.Game.Users
             {
                 if (lastSection != s)
                 {
-                    lastSection = s as UserPageSection;
+                    lastSection = s as ProfileSection;
                     tab.Current.Value = lastSection;
                 }
             };

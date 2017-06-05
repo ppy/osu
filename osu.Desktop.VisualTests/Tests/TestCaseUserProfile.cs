@@ -13,12 +13,12 @@ using osu.Game.Users;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    internal class TestCaseUserPage : TestCase
+    internal class TestCaseUserProfile : TestCase
     {
         public override void Reset()
         {
             base.Reset();
-            var userpage = new UserPageOverlay(new User
+            var userpage = new UserProfile(new User
             {
                 Username = @"peppy",
                 Id = 2,

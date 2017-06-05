@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Users.UserPage
+namespace osu.Game.Users.Profile
 {
     public class UserPageHeader : Container
     {
