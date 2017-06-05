@@ -3,14 +3,14 @@
 
 using osu.Framework.Graphics.Containers;
 
-namespace osu.Game.Users.UserPage
+namespace osu.Game.Users.Profile
 {
-    public abstract class UserPageSection : Container
+    public abstract class ProfileSection : Container
     {
         protected readonly User User;
         public abstract string Title { get; }
 
-        protected UserPageSection(User user)
+        protected ProfileSection(User user)
         {
             User = user;
         }
