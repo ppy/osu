@@ -9,5 +9,29 @@ namespace osu.Game.Rulesets.Mania.Judgements
         /// Whether the hold note has been released too early and shouldn't give full score for the release.
         /// </summary>
         public bool HasBroken;
+
+        public override int NumericResultForScore(ManiaHitResult result)
+        {
+            switch (result)
+            {
+                default:
+                    return base.NumericResultForScore(result);
+                case ManiaHitResult.Great:
+                case ManiaHitResult.Perfect:
+                    return base.NumericResultForScore(HasBroken ? ManiaHitResult.Good : result);
+            }
+        }
+
+        public override int NumericResultForAccuracy(ManiaHitResult result)
+        {
+            switch (result)
+            {
+                default:
+                    return base.NumericResultForAccuracy(result);
+                case ManiaHitResult.Great:
+                case ManiaHitResult.Perfect:
+                    return base.NumericResultForAccuracy(HasBroken ? ManiaHitResult.Good : result);
+            }
+        }
     }
 }
