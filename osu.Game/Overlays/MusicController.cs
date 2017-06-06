@@ -372,9 +372,7 @@ namespace osu.Game.Overlays
                 //Make sure the track is still running if it was running before
                 if (trackWasRunning && !track.IsRunning)
                     track.Start();
-
             }
-
         }
 
         protected override void PopIn()
