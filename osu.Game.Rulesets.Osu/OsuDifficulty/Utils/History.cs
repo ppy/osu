@@ -19,7 +19,6 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Utils
         private readonly int capacity;
         private int marker; // Marks the position of the most recently added item.
 
-        //  
         /// <summary>
         /// Initializes a new instance of the History class that is empty and has the specified capacity.
         /// </summary>
