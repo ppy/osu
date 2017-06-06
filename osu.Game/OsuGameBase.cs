@@ -158,6 +158,7 @@ namespace osu.Game
                         Children = new Drawable[]
                         {
                             Cursor = new MenuCursor(),
+                            new OsuContextMenuContainer(Cursor) { Depth = -2 },
                             new OsuTooltipContainer(Cursor) { Depth = -1 },
                         }
                     },
