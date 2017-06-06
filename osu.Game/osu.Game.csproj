@@ -257,7 +257,6 @@
     <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
     <Compile Include="Screens\Play\SquareGraph.cs" />
-    <Compile Include="Screens\Play\StandardHUDOverlay.cs" />
     <Compile Include="Screens\Ranking\ResultsPage.cs" />
     <Compile Include="Screens\Ranking\ResultsPageRanking.cs" />
     <Compile Include="Screens\Ranking\ResultsPageScore.cs" />
@@ -447,6 +446,9 @@
     <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
     <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
     <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
+    <Compile Include="Overlays\Chat\ChannelSelectionOverlay.cs" />
+    <Compile Include="Overlays\Chat\ChannelListItem.cs" />
+    <Compile Include="Overlays\Chat\ChannelSection.cs" />
     <Compile Include="Screens\Multiplayer\DrawableRoom.cs" />
     <Compile Include="Online\Multiplayer\Room.cs" />
     <Compile Include="Online\Multiplayer\RoomStatus.cs" />
