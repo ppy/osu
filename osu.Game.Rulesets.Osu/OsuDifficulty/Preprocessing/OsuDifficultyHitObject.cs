@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         public double DeltaTime { get; private set; }
 
         /// <summary>
-        /// Number of milliseconds until the <see cref="OsuDifficultyHitObject"/> has to be hit. <see cref="OsuHitObject."/>
+        /// Number of milliseconds until the <see cref="OsuDifficultyHitObject"/> has to be hit.
         /// </summary>
         public double TimeUntilHit { get; set; }
 
