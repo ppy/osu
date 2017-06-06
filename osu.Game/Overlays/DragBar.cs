@@ -97,9 +97,6 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
-            if (!IsSeeking)
-                return false;
-
             seek(state);
             return true;
         }
