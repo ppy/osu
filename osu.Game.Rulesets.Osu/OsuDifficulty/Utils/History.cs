@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace osu.Game.Rulesets.Osu.OsuDifficulty.Utils
 {
     /// <summary>
-    /// An indexed stack with Push() only, which disposes items at the bottom once the size limit has been reached.
+    /// An indexed stack with Push() only, which disposes items at the bottom after the capacity is full.
     /// Indexing starts at the top of the stack.
     /// </summary>
     public class History<T> : IEnumerable<T>
@@ -16,17 +16,28 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Utils
         public int Count { get; private set; }
 
         private readonly T[] array;
-        private readonly int size;
+        private readonly int capacity;
         private int marker; // Marks the position of the most recently added item.
 
-        public History(int size)
+        //  
+        /// <summary>
+        /// Initializes a new instance of the History class that is empty and has the specified capacity.
+        /// </summary>
+        /// <param name="capacity">The number of items the History can hold.</param>
+        public History(int capacity)
         {
-            this.size = size;
-            array = new T[size];
-            marker = size; // Set marker to the end of the array, outside of the indexed range by one.
+            if (capacity < 0)
+                throw new ArgumentOutOfRangeException();
+
+            this.capacity = capacity;
+            array = new T[capacity];
+            marker = capacity; // Set marker to the end of the array, outside of the indexed range by one.
         }
 
-        public T this[int i] // Index 0 returns the most recently added item.
+        /// <summary>
+        /// The most recently added item is returned at index 0.
+        /// </summary>
+        public T this[int i]
         {
             get
             {
@@ -34,8 +45,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Utils
                     throw new IndexOutOfRangeException();
 
                 i += marker;
-                if (i > size - 1)
-                    i -= size;
+                if (i > capacity - 1)
+                    i -= capacity;
 
                 return array[i];
             }
@@ -48,22 +59,25 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Utils
         public void Push(T item) // Overwrite the oldest item instead of shifting every item by one with every addition.
         {
             if (marker == 0)
-                marker = size - 1;
+                marker = capacity - 1;
             else
                 --marker;
 
             array[marker] = item;
 
-            if (Count < size)
+            if (Count < capacity)
                 ++Count;
         }
 
+        /// <summary>
+        /// Returns an enumerator which enumerates items in the history starting from the most recently added item.
+        /// </summary>
         public IEnumerator<T> GetEnumerator()
         {
-            for (int i = marker; i < size; ++i)
+            for (int i = marker; i < capacity; ++i)
                 yield return array[i];
 
-            if (Count == size)
+            if (Count == capacity)
                 for (int i = 0; i < marker; ++i)
                     yield return array[i];
         }

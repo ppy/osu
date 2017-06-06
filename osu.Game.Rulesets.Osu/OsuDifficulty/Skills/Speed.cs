@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
             else
                 speedValue = 0.95;
 
-            return speedValue / Current.Ms;
+            return speedValue / Current.DeltaTime;
         }
     }
 }
