@@ -6,25 +6,28 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 {
+    /// <summary>
+    /// A wrapper around <see cref="OsuHitObject"/> extending it with additional data required for difficulty calculation.
+    /// </summary>
     public class OsuDifficultyHitObject
     {
         /// <summary>
-        /// The current note. Attributes are calculated relative to previous ones.
+        /// The <see cref="OsuHitObject"/> this <see cref="OsuDifficultyHitObject"/> refers to.
         /// </summary>
         public OsuHitObject BaseObject { get; }
 
         /// <summary>
-        /// Normalized distance from the StartPosition of the previous note.
+        /// Normalized distance from the <see cref="OsuHitObject.StackedPosition"/> of the previous <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double Distance { get; private set; }
 
         /// <summary>
-        /// Milliseconds elapsed since the StartTime of the previous note.
+        /// Milliseconds elapsed since the StartTime of the previous <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double DeltaTime { get; private set; }
 
         /// <summary>
-        /// Number of milliseconds until the note has to be hit.
+        /// Number of milliseconds until the <see cref="OsuDifficultyHitObject"/> has to be hit. <see cref="OsuHitObject."/>
         /// </summary>
         public double TimeUntilHit { get; set; }
 
@@ -33,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         private readonly OsuHitObject[] t;
 
         /// <summary>
-        /// Constructs a wrapper around a HitObject calculating additional data required for difficulty calculation.
+        /// Initializes the object calculating extra data required for difficulty calculation.
         /// </summary>
         public OsuDifficultyHitObject(OsuHitObject[] triangle)
         {
