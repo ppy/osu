@@ -8,6 +8,9 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 {
     public class OsuDifficultyHitObject
     {
+        /// <summary>
+        /// The current note. Attributes are calculated relative to previous ones.
+        /// </summary>
         public OsuHitObject BaseObject { get; }
 
         /// <summary>
@@ -18,14 +21,20 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         /// <summary>
         /// Milliseconds elapsed since the StartTime of the previous note.
         /// </summary>
-        public double Ms { get; private set; }
+        public double DeltaTime { get; private set; }
 
-        public double MsUntilHit { get; set; }
+        /// <summary>
+        /// Number of milliseconds until the note has to be hit.
+        /// </summary>
+        public double TimeUntilHit { get; set; }
 
         private const int normalized_radius = 52;
 
         private readonly OsuHitObject[] t;
 
+        /// <summary>
+        /// Constructs a wrapper around a HitObject calculating additional data required for difficulty calculation.
+        /// </summary>
         public OsuDifficultyHitObject(OsuHitObject[] triangle)
         {
             t = triangle;
@@ -51,8 +60,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         private void setTimingValues()
         {
             // Every timing inverval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure.
-            Ms = Math.Max(40, t[0].StartTime - t[1].StartTime);
-            MsUntilHit = 450; // BaseObject.PreEmpt;
+            DeltaTime = Math.Max(40, t[0].StartTime - t[1].StartTime);
+            TimeUntilHit = 450; // BaseObject.PreEmpt;
         }
     }
 }

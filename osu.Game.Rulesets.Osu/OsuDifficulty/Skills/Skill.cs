@@ -11,10 +11,25 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
 {
     public abstract class Skill
     {
+        /// <summary>
+        /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
+        /// </summary>
         protected abstract double SkillMultiplier { get; }
+
+        /// <summary>
+        /// Determines how quickly strain decays for the given skill.
+        /// For example a value of 0.15 indicates that strain decays to 15% of it's original value in one second.
+        /// </summary>
         protected abstract double StrainDecayBase { get; }
 
+        /// <summary>
+        /// The note that will be processed.
+        /// </summary>
         protected OsuDifficultyHitObject Current;
+
+        /// <summary>
+        /// Notes that were processed previously. They can affect the strain value of the current note.
+        /// </summary>
         protected History<OsuDifficultyHitObject> Previous = new History<OsuDifficultyHitObject>(2); // Contained objects not used yet
 
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
@@ -28,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
         {
             Current = h;
 
-            currentStrain *= strainDecay(Current.Ms);
+            currentStrain *= strainDecay(Current.DeltaTime);
             if (!(Current.BaseObject is Spinner))
                 currentStrain += StrainValue() * SkillMultiplier;
 
@@ -78,6 +93,9 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
             return difficulty;
         }
 
+        /// <summary>
+        /// Calculates the strain value of the current note. This value is affected by previous notes.
+        /// </summary>
         protected abstract double StrainValue();
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);

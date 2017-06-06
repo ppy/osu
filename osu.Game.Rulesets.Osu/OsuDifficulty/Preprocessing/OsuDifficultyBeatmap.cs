@@ -12,6 +12,9 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
         private readonly IEnumerator<OsuDifficultyHitObject> difficultyObjects;
         private readonly Queue<OsuDifficultyHitObject> onScreen = new Queue<OsuDifficultyHitObject>();
 
+        /// <summary>
+        /// Creates an enumerable, which handles the preprocessing of HitObjects, getting them ready to be used in difficulty calculation.
+        /// </summary>
         public OsuDifficultyBeatmap(List<OsuHitObject> objects)
         {
             // Sort HitObjects by StartTime - they are not correctly ordered in some cases.
@@ -20,38 +23,40 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
             difficultyObjects = createDifficultyObjectEnumerator(objects);
         }
 
+        /// <summary>
+        /// Returns an enumerator that enumerates all difficulty objects in the beatmap.
+        /// The inner loop adds notes that appear on screen into a queue until we need to hit the next note,
+        /// the outer loop returns notes from this queue one at a time, only after they had to be hit, and should no longer be on screen.
+        /// This means that we can loop through every object that is on screen at the time when a new one appears,
+        /// allowing us to determine a reading strain for the note that just appeared.
+        /// </summary>
         public IEnumerator<OsuDifficultyHitObject> GetEnumerator()
         {
-            do
+            while (true)
             {
                 // Add upcoming notes to the queue until we have at least one note that had been hit and can be dequeued.
                 // This means there is always at least one note in the queue unless we reached the end of the map.
-                bool hasNext;
                 do
                 {
-                    hasNext = difficultyObjects.MoveNext();
-                    if (onScreen.Count == 0 && !hasNext)
-                        yield break; // Stop if we have an empty enumerator.
+                    if (!difficultyObjects.MoveNext())
+                        break; // New notes can't be added anymore, but we still need to dequeue and return the ones already on screen.
 
-                    if (hasNext)
+                    OsuDifficultyHitObject latest = difficultyObjects.Current;
+                    // Calculate flow values here
+
+                    foreach (OsuDifficultyHitObject h in onScreen)
                     {
-                        OsuDifficultyHitObject latest = difficultyObjects.Current;
-                        // Calculate flow values here
-
-                        foreach (OsuDifficultyHitObject h in onScreen)
-                        {
-                            h.MsUntilHit -= latest.Ms;
-                            // Calculate reading strain here
-                        }
-
-                        onScreen.Enqueue(latest);
+                        h.TimeUntilHit -= latest.DeltaTime;
+                        // Calculate reading strain here
                     }
-                }
-                while (onScreen.Peek().MsUntilHit > 0 && hasNext); // Keep adding new notes on screen while there is still time before we have to hit the next one.
 
+                    onScreen.Enqueue(latest);
+                }
+                while (onScreen.Peek().TimeUntilHit > 0); // Keep adding new notes on screen while there is still time before we have to hit the next one.
+
+                if (onScreen.Count == 0) break; // We have reached the end of the map and enumerated all the notes.
                 yield return onScreen.Dequeue(); // Remove and return notes one by one that had to be hit before the latest note appeared.
             }
-            while (onScreen.Count > 0);
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
