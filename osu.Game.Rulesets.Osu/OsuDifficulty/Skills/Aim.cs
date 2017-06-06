@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
 {
@@ -10,6 +11,6 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
 
-        protected override double StrainValue() => Math.Pow(Current.Distance, 0.99) / Current.DeltaTime;
+        protected override double StrainValueOf(OsuDifficultyHitObject current) => Math.Pow(current.Distance, 0.99) / current.DeltaTime;
     }
 }

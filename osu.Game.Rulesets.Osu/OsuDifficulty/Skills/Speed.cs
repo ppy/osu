@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing;
+
 namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
 {
     public class Speed : Skill
@@ -12,9 +14,9 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
         private const double stream_spacing_threshold = 110;
         private const double almost_diameter = 90;
 
-        protected override double StrainValue()
+        protected override double StrainValueOf(OsuDifficultyHitObject current)
         {
-            double distance = Current.Distance;
+            double distance = current.Distance;
 
             double speedValue;
             if (distance > single_spacing_threshold)
@@ -28,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
             else
                 speedValue = 0.95;
 
-            return speedValue / Current.DeltaTime;
+            return speedValue / current.DeltaTime;
         }
     }
 }

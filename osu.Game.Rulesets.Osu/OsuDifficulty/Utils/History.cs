@@ -52,8 +52,8 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Utils
         }
 
         /// <summary>
-        /// Adds the element as the most recent one in the history.
-        /// The oldest element is disposed if the history is full.
+        /// Adds the item as the most recent one in the history.
+        /// The oldest item is disposed if the history is full.
         /// </summary>
         public void Push(T item) // Overwrite the oldest item instead of shifting every item by one with every addition.
         {
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Utils
         }
 
         /// <summary>
-        /// Returns an enumerator which enumerates items in the history starting from the most recently added item.
+        /// Returns an enumerator which enumerates items in the history starting from the most recently added one.
         /// </summary>
         public IEnumerator<T> GetEnumerator()
         {

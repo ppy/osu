@@ -7,39 +7,44 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 {
+    /// <summary>
+    /// An enumerable container wrapping <see cref="OsuHitObject"/> input as <see cref="OsuDifficultyHitObject"/>
+    /// which contains extra data required for difficulty calculation.
+    /// </summary>
     public class OsuDifficultyBeatmap : IEnumerable<OsuDifficultyHitObject>
     {
         private readonly IEnumerator<OsuDifficultyHitObject> difficultyObjects;
         private readonly Queue<OsuDifficultyHitObject> onScreen = new Queue<OsuDifficultyHitObject>();
 
         /// <summary>
-        /// Creates an enumerable, which handles the preprocessing of HitObjects, getting them ready to be used in difficulty calculation.
+        /// Creates an enumerator, which preprocesses a list of <see cref="OsuHitObject"/>s recieved as input, wrapping them as
+        /// <see cref="OsuDifficultyHitObject"/> which contains extra data required for difficulty calculation.
         /// </summary>
         public OsuDifficultyBeatmap(List<OsuHitObject> objects)
         {
-            // Sort HitObjects by StartTime - they are not correctly ordered in some cases.
+            // Sort OsuHitObjects by StartTime - they are not correctly ordered in some cases.
             // This should probably happen before the objects reach the difficulty calculator.
             objects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
             difficultyObjects = createDifficultyObjectEnumerator(objects);
         }
 
         /// <summary>
-        /// Returns an enumerator that enumerates all difficulty objects in the beatmap.
-        /// The inner loop adds notes that appear on screen into a queue until we need to hit the next note,
-        /// the outer loop returns notes from this queue one at a time, only after they had to be hit, and should no longer be on screen.
+        /// Returns an enumerator that enumerates all <see cref="OsuDifficultyHitObject"/>s in the <see cref="OsuDifficultyBeatmap"/>.
+        /// The inner loop adds objects that appear on screen into a queue until we need to hit the next object.
+        /// The outer loop returns objects from this queue one at a time, only after they had to be hit, and should no longer be on screen.
         /// This means that we can loop through every object that is on screen at the time when a new one appears,
-        /// allowing us to determine a reading strain for the note that just appeared.
+        /// allowing us to determine a reading strain for the object that just appeared.
         /// </summary>
         public IEnumerator<OsuDifficultyHitObject> GetEnumerator()
         {
             while (true)
             {
-                // Add upcoming notes to the queue until we have at least one note that had been hit and can be dequeued.
-                // This means there is always at least one note in the queue unless we reached the end of the map.
+                // Add upcoming objects to the queue until we have at least one object that had been hit and can be dequeued.
+                // This means there is always at least one object in the queue unless we reached the end of the map.
                 do
                 {
                     if (!difficultyObjects.MoveNext())
-                        break; // New notes can't be added anymore, but we still need to dequeue and return the ones already on screen.
+                        break; // New objects can't be added anymore, but we still need to dequeue and return the ones already on screen.
 
                     OsuDifficultyHitObject latest = difficultyObjects.Current;
                     // Calculate flow values here
@@ -52,10 +57,10 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 
                     onScreen.Enqueue(latest);
                 }
-                while (onScreen.Peek().TimeUntilHit > 0); // Keep adding new notes on screen while there is still time before we have to hit the next one.
+                while (onScreen.Peek().TimeUntilHit > 0); // Keep adding new objects on screen while there is still time before we have to hit the next one.
 
-                if (onScreen.Count == 0) break; // We have reached the end of the map and enumerated all the notes.
-                yield return onScreen.Dequeue(); // Remove and return notes one by one that had to be hit before the latest note appeared.
+                if (onScreen.Count == 0) break; // We have reached the end of the map and enumerated all the objects.
+                yield return onScreen.Dequeue(); // Remove and return objects one by one that had to be hit before the latest one appeared.
             }
         }
 
@@ -63,18 +68,18 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 
         private IEnumerator<OsuDifficultyHitObject> createDifficultyObjectEnumerator(List<OsuHitObject> objects)
         {
-            // We will process HitObjects in groups of three to form a triangle, so we can calculate an angle for each note.
+            // We will process OsuHitObjects in groups of three to form a triangle, so we can calculate an angle for each object.
             OsuHitObject[] triangle = new OsuHitObject[3];
 
-            // Difficulty object construction requires three components, an extra copy of the first object is used at the beginning.
+            // OsuDifficultyHitObject construction requires three components, an extra copy of the first OsuHitObject is used at the beginning.
             if (objects.Count > 1)
             {
                 triangle[1] = objects[0]; // This copy will get shifted to the last spot in the triangle.
-                triangle[0] = objects[0]; // This is the real first note.
+                triangle[0] = objects[0]; // This component corresponds to the real first OsuHitOject.
             }
 
-            // The final component of the first triangle will be the second note, which forms the first jump.
-            // If the beatmap has less than two HitObjects, the enumerator will not return anything.
+            // The final component of the first triangle will be the second OsuHitOject of the map, which forms the first jump.
+            // If the map has less than two OsuHitObjects, the enumerator will not return anything.
             for (int i = 1; i < objects.Count; ++i)
             {
                 triangle[2] = triangle[1];
