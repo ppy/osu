@@ -7,11 +7,11 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class OsuCursorContextMenu : CursorContextMenu
+    public class OsuContextMenuContainer : ContextMenuContainer
     {
-        protected override ContextMenuContainer CreateContextMenuContainer() => new OsuContextMenuContainer();
+        protected override ContextMenu CreateContextMenu() => new OsuContextMenu();
 
-        public OsuCursorContextMenu(CursorContainer cursor) : base(cursor)
+        public OsuContextMenuContainer(CursorContainer cursor) : base(cursor)
         {
         }
     }

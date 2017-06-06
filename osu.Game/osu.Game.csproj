@@ -76,9 +76,9 @@
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Graphics\UserInterface\IconButton.cs" />
     <Compile Include="Configuration\SelectionRandomType.cs" />
-    <Compile Include="Graphics\Cursor\OsuCursorContextMenu.cs" />
+    <Compile Include="Graphics\Cursor\OsuContextMenuContainer.cs" />
     <Compile Include="Graphics\UserInterface\ContextMenuType.cs" />
-    <Compile Include="Graphics\UserInterface\OsuContextMenuContainer.cs" />
+    <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
