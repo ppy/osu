@@ -253,7 +253,6 @@
     <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
     <Compile Include="Screens\Play\SquareGraph.cs" />
-    <Compile Include="Screens\Play\StandardHUDOverlay.cs" />
     <Compile Include="Screens\Ranking\ResultsPage.cs" />
     <Compile Include="Screens\Ranking\ResultsPageRanking.cs" />
     <Compile Include="Screens\Ranking\ResultsPageScore.cs" />
