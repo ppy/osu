@@ -134,6 +134,7 @@ namespace osu.Game.Overlays
                                             PlaceholderText = "type your message",
                                             Exit = () => State = Visibility.Hidden,
                                             OnCommit = postMessage,
+                                            ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
                                         }
                                     }
