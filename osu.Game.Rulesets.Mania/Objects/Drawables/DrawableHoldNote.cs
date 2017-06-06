@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tickContainer = new Container<DrawableHoldNoteTick>
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RelativeCoordinateSpace = new RectangleF(0, 0, 1, (float)HitObject.Duration)
+                    RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
                 },
                 head = new DrawableHeadNote(this, key)
                 {

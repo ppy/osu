@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
             // The gravity-adjusted start position
             float startY = (float)computeGravityTime(TimingChange.Time);
             // The gravity-adjusted end position
-            float endY = (float)computeGravityTime(TimingChange.Time + Content.RelativeCoordinateSpace.Height);
+            float endY = (float)computeGravityTime(TimingChange.Time + Content.RelativeChildSize.Y);
 
             Content.Y = startY;
             Content.Height = endY - startY;
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
         /// <summary>
         /// The time spanned by this container.
         /// </summary>
-        private double timeSpan => RelativeCoordinateSpace.Height;
+        private double timeSpan => RelativeChildSize.Y;
 
         /// <summary>
         /// The acceleration due to "gravity" of the content of this container.
