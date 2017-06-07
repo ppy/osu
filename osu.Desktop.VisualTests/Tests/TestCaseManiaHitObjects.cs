@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using OpenTK.Graphics;
 using OpenTK;
-using osu.Framework.Graphics.Primitives;
 
 namespace osu.Desktop.VisualTests.Tests
 {
