@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Timing.Drawables
             float speedAdjustedSize = (float)(1000 / TimingChange.BeatLength / TimingChange.SpeedMultiplier);
 
             Size = new Vector2((scrollingAxes & Axes.X) > 0 ? speedAdjustedSize : 1, (scrollingAxes & Axes.Y) > 0 ? speedAdjustedSize : 1);
-            RelativeChildSize = new Vector2((scrollingAxes & Axes.X) > 0 ? parent.TimeSpan.X : 1, (scrollingAxes & Axes.Y) > 0 ? parent.TimeSpan.Y : 1);
+            RelativeChildSize = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)parent.TimeSpan : 1, (scrollingAxes & Axes.Y) > 0 ? (float)parent.TimeSpan : 1);
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Timing
 {
     public class TimingChangeContainer : Container<DrawableTimingChange>, IHasTimeSpan
     {
-        public Vector2 TimeSpan { get; set; }
+        public double TimeSpan { get; set; }
 
         /// <summary>
         /// Adds a hit object to the most applicable timing change in this container.
