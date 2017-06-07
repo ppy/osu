@@ -3,18 +3,21 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays
 {
-    public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>
+    public class SocialOverlay : SearchableListOverlay<SocialTab, SocialSortCriteria, SortDirection>, IOnlineComponent
     {
         private readonly FillFlowContainer<UserPanel> panelFlow;
 
@@ -34,12 +37,17 @@ namespace osu.Game.Overlays
                 if (users?.Equals(value) ?? false) return;
                 users = value;
 
-                panelFlow.Children = users.Select(u =>
+                if (users == null)
+                    panelFlow.Clear();
+                else
                 {
-                    var p = new UserPanel(u) { Width = 300 };
-                    p.Status.BindTo(u.Status);
-                    return p;
-                });
+                    panelFlow.Children = users.Select(u =>
+                    {
+                        var p = new UserPanel(u) { Width = 300 };
+                        p.Status.BindTo(u.Status);
+                        return p;
+                    });
+                }
             }
         }
 
@@ -61,11 +69,40 @@ namespace osu.Game.Overlays
                 },
             };
         }
+
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api)
+        {
+            reloadUsers(api);
+        }
+
+        private void reloadUsers(APIAccess api)
+        {
+            Users = null;
+
+            // no this is not the correct data source, but it's something.
+            var request = new GetUsersRequest();
+            request.Success += res => Users = res.Select(e => e.User);
+            api.Queue(request);
+        }
+
+        public void APIStateChanged(APIAccess api, APIState state)
+        {
+            switch (state)
+            {
+                case APIState.Online:
+                    reloadUsers(api);
+                    break;
+                default:
+                    Users = null;
+                    break;
+            }
+        }
     }
 
     public enum SortDirection
     {
-        Ascending,
         Descending,
+        Ascending,
     }
 }
