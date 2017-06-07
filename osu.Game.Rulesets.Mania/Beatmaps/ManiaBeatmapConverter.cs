@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Database;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 using OpenTK;
+using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -161,9 +162,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     pattern.Add(new HoldNote
                     {
                         StartTime = HitObject.StartTime,
-                        Samples = HitObject.Samples,
                         Duration = endTimeData.Duration,
                         Column = column,
+                        Head = { Samples = sampleInfoListAt(HitObject.StartTime) },
+                        Tail = { Samples = sampleInfoListAt(endTimeData.EndTime) },
                     });
                 }
                 else if (positionData != null)
@@ -177,6 +179,24 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 }
 
                 return pattern;
+            }
+
+            /// <summary>
+            /// Retrieves the sample info list at a point in time.
+            /// </summary>
+            /// <param name="time">The time to retrieve the sample info list from.</param>
+            /// <returns></returns>
+            private SampleInfoList sampleInfoListAt(double time)
+            {
+                var curveData = HitObject as IHasCurve;
+
+                if (curveData == null)
+                    return HitObject.Samples;
+
+                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.RepeatCount;
+
+                int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
+                return curveData.RepeatSamples[index];
             }
         }
     }

@@ -7,32 +7,34 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
-
-using Container = osu.Framework.Graphics.Containers.Container;
+using osu.Game.Overlays.SearchableList;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class DirectOverlay : WaveOverlayContainer
+    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCritera, RankStatus>
     {
-        public static readonly int WIDTH_PADDING = 80;
         private const float panel_padding = 10f;
 
         private APIAccess api;
         private RulesetDatabase rulesets;
 
-        private readonly FilterControl filter;
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
         private readonly FillFlowContainer<DirectPanel> panels;
+
+        protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
+        protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
+        protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
+
+        protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
+        protected override SearchableListFilterControl<DirectSortCritera, RankStatus> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;
         public IEnumerable<BeatmapSetInfo> BeatmapSets
@@ -54,7 +56,7 @@ namespace osu.Game.Overlays
                     return;
                 }
 
-                recreatePanels(filter.DisplayStyle.Value);
+                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             }
         }
 
@@ -82,98 +84,41 @@ namespace osu.Game.Overlays
             ThirdWaveColour = OsuColour.FromHex(@"005774");
             FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
-            Header header;
-            Children = new Drawable[]
+            ScrollFlow.Children = new Drawable[]
             {
-                new Box
+                resultCountsContainer = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex(@"485e74"),
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Children = new[]
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding { Top = 5 },
+                    Children = new Drawable[]
                     {
-                        new Triangles
+                        new OsuSpriteText
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            TriangleScale = 5,
-                            ColourLight = OsuColour.FromHex(@"465b71"),
-                            ColourDark = OsuColour.FromHex(@"3f5265"),
+                            Text = "Found ",
+                            TextSize = 15,
                         },
-                    },
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = Header.HEIGHT + FilterControl.HEIGHT },
-                    Children = new[]
-                    {
-                        new ScrollContainer
+                        resultCountsText = new OsuSpriteText
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            ScrollDraggerVisible = false,
-                            Children = new Drawable[]
-                            {
-                                new FillFlowContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
-                                    Children = new Drawable[]
-                                    {
-                                        resultCountsContainer = new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Margin = new MarginPadding { Left = WIDTH_PADDING, Top = 6 },
-                                            Children = new Drawable[]
-                                            {
-                                                new OsuSpriteText
-                                                {
-                                                    Text = "Found ",
-                                                    TextSize = 15,
-                                                },
-                                                resultCountsText = new OsuSpriteText
-                                                {
-                                                    TextSize = 15,
-                                                    Font = @"Exo2.0-Bold",
-                                                },
-                                            }
-                                        },
-                                        panels = new FillFlowContainer<DirectPanel>
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Padding = new MarginPadding { Top = panel_padding, Bottom = panel_padding, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
-                                            Spacing = new Vector2(panel_padding),
-                                        },
-                                    },
-                                },
-                            },
+                            TextSize = 15,
+                            Font = @"Exo2.0-Bold",
                         },
-                    },
+                    }
                 },
-                filter = new FilterControl
+                panels = new FillFlowContainer<DirectPanel>
                 {
                     RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding { Top = Header.HEIGHT },
-                },
-                header = new Header
-                {
-                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Spacing = new Vector2(panel_padding),
+                    Margin = new MarginPadding { Top = 10 },
                 },
             };
 
-            header.Tabs.Current.ValueChanged += tab => { if (tab != DirectTab.Search) filter.Search.Current.Value = string.Empty; };
-
-            filter.Search.Exit = Hide;
-            filter.Search.Current.ValueChanged += text => { if (text != string.Empty) header.Tabs.Current.Value = DirectTab.Search; };
-            filter.Search.OnCommit = (sender, text) => updateSets();
-            filter.RankStatusDropdown.Current.ValueChanged += rankStatus => updateSets();
-            filter.DisplayStyle.ValueChanged += recreatePanels;
+            Header.Tabs.Current.ValueChanged += tab => { if (tab != DirectTab.Search) Filter.Search.Text = string.Empty; };
+            Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
+            Filter.Search.OnCommit = (sender, text) => updateSets();
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => updateSets();
 
             updateResultCounts();
         }
@@ -215,31 +160,11 @@ namespace osu.Game.Overlays
             BeatmapSets = null;
             getSetsRequest?.Cancel();
 
-            if (api == null || filter.Search.Text == string.Empty) return;
+            if (api == null || Filter.Search.Text == string.Empty) return;
 
-            getSetsRequest = new GetBeatmapSetsRequest(filter.Search.Text, filter.RankStatusDropdown.Current.Value);
+            getSetsRequest = new GetBeatmapSetsRequest(Filter.Search.Text, Filter.DisplayStyleControl.Dropdown.Current.Value);
             getSetsRequest.Success += r => BeatmapSets = r?.Select(response => response.ToSetInfo(rulesets));
             api.Queue(getSetsRequest);
-        }
-
-        protected override bool OnFocus(InputState state)
-        {
-            filter.Search.TriggerFocus();
-            return false;
-        }
-
-        protected override void PopIn()
-        {
-            base.PopIn();
-
-            filter.Search.HoldFocus = true;
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-
-            filter.Search.HoldFocus = false;
         }
 
         public class ResultCounts
@@ -254,12 +179,6 @@ namespace osu.Game.Overlays
                 Songs = songs;
                 Tags = tags;
             }
-        }
-
-        public enum PanelDisplayStyle
-        {
-            Grid,
-            List,
         }
     }
 }

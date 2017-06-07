@@ -51,9 +51,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
             Spacing = new Vector2(0f, 5f);
         }
 
+        private InputManager inputManager;
+
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(OsuColour colours, APIAccess api, UserInputManager inputManager)
         {
+            this.inputManager = inputManager;
             this.colours = colours;
             api?.Register(this);
         }
@@ -160,13 +163,17 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     break;
             }
 
-            form?.TriggerFocus();
+            if (form != null) inputManager.ChangeFocus(form);
         }
 
-        protected override bool OnFocus(InputState state)
+        public override bool AcceptsFocus => true;
+
+        protected override bool OnClick(InputState state) => true;
+
+        protected override void OnFocus(InputState state)
         {
-            form?.TriggerFocus();
-            return base.OnFocus(state);
+            if (form != null) inputManager.ChangeFocus(form);
+            base.OnFocus(state);
         }
 
         private class LoginForm : FillFlowContainer
@@ -174,6 +181,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             private TextBox username;
             private TextBox password;
             private APIAccess api;
+            private InputManager inputManager;
 
             private void performLogin()
             {
@@ -182,8 +190,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
-            private void load(APIAccess api, OsuConfigManager config)
+            private void load(APIAccess api, OsuConfigManager config, UserInputManager inputManager)
             {
+                this.inputManager = inputManager;
                 this.api = api;
                 Direction = FillDirection.Vertical;
                 Spacing = new Vector2(0, 5);
@@ -230,17 +239,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 };
             }
 
-            protected override bool OnFocus(InputState state)
-            {
-                Schedule(() =>
-                {
-                    if (string.IsNullOrEmpty(username.Text))
-                        username.TriggerFocus();
-                    else
-                        password.TriggerFocus();
-                });
+            public override bool AcceptsFocus => true;
 
-                return base.OnFocus(state);
+            protected override bool OnClick(InputState state) => true;
+
+            protected override void OnFocus(InputState state)
+            {
+                Schedule(() => { inputManager.ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
             }
         }
 
@@ -340,8 +345,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 public UserDropdownMenuItem(string text, UserAction current) : base(text, current)
                 {
-                    Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = UserDropdownHeader.LABEL_LEFT_MARGIN, Right = 5 };
-                    Chevron.Margin = new MarginPadding { Left = 2, Right = 3 };
+                    Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 5 };
+                    Label.Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 };
                     CornerRadius = 5;
                 }
             }
