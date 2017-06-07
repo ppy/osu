@@ -3,6 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Users.Profile;
@@ -21,6 +23,13 @@ namespace osu.Game.Users
             this.user = user;
             var tab = new OsuTabControl<ProfileSection>();
             var sections = new ProfileSection[] { };
+
+            Add(new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = OsuColour.Gray(0.2f)
+            });
+
             var sectionsContainer = new SectionsContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -28,7 +37,6 @@ namespace osu.Game.Users
                 FixedHeader = tab,
                 Sections = sections
             };
-
             Add(sectionsContainer);
 
             sectionsContainer.SelectedSection.ValueChanged += s =>
