@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Database;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Direct;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -12,14 +14,21 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly string query;
         private readonly RankStatus rankStatus;
+        private readonly DirectSortCriteria sortCriteria;
+        private readonly SortDirection direction;
+        private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
 
-        public GetBeatmapSetsRequest(string query, RankStatus rankStatus = RankStatus.Any)
+        public GetBeatmapSetsRequest(string query, RankStatus rankStatus = RankStatus.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
         {
             this.query = System.Uri.EscapeDataString(query);
             this.rankStatus = rankStatus;
+            this.sortCriteria = sortCriteria;
+            this.direction = direction;
+
+            System.Console.WriteLine(Target);
         }
 
-        protected override string Target => $@"beatmapsets/search?q={query}&s={(int)rankStatus}";
+        protected override string Target => $@"beatmapsets/search?q={query}&s={(int)rankStatus}&sort={sortCriteria.ToString().ToLower()}_{directionString}";
     }
 
     public class GetBeatmapSetsResponse : BeatmapMetadata
