@@ -3,11 +3,11 @@
 
 using osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing;
 
-/// <summary>
-/// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
-/// </summary>
 namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
 {
+    /// <summary>
+    /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
+    /// </summary>
     public class Speed : Skill
     {
         protected override double SkillMultiplier => 1400;
