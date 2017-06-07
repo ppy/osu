@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract float TabStripWidth { get; } //can be removed once (if?) TabControl support auto sizing
         protected abstract T DefaultTab { get; }
         protected abstract Drawable CreateHeaderText();
+        protected abstract FontAwesome Icon { get; }
 
         protected SearchableListHeader()
         {
@@ -41,7 +42,7 @@ namespace osu.Game.Overlays.SearchableList
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = SearchableListOverlay.WIDTH_PADDING, Right = SearchableListOverlay.WIDTH_PADDING }, 
+                    Padding = new MarginPadding { Left = SearchableListOverlay.WIDTH_PADDING, Right = SearchableListOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -57,7 +58,7 @@ namespace osu.Game.Overlays.SearchableList
                                 new TextAwesome
                                 {
                                     TextSize = 25,
-                                    Icon = FontAwesome.fa_osu_chevron_down_o,
+                                    Icon = Icon,
                                 },
                                 CreateHeaderText(),
                             },
