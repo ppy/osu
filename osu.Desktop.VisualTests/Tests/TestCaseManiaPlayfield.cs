@@ -63,7 +63,7 @@ namespace osu.Desktop.VisualTests.Tests
                 });
             };
 
-            Action<bool> createPlayfieldWithNotes = g =>
+            Action<bool> createPlayfieldWithNotes = gravity =>
             {
                 Clear();
 
@@ -78,12 +78,12 @@ namespace osu.Desktop.VisualTests.Tests
                     Clock = new FramedClock(rateAdjustClock)
                 });
 
-                if (!g)
+                if (!gravity)
                     playField.Columns.ForEach(c => c.Add(createTimingChange(0, false)));
 
                 for (double t = start_time; t <= start_time + duration; t += 100)
                 {
-                    if (g)
+                    if (gravity)
                         playField.Columns.ElementAt(0).Add(createTimingChange(t, true));
 
                     playField.Add(new DrawableNote(new Note
@@ -92,7 +92,7 @@ namespace osu.Desktop.VisualTests.Tests
                         Column = 0
                     }, new Bindable<Key>(Key.D)));
 
-                    if (g)
+                    if (gravity)
                         playField.Columns.ElementAt(3).Add(createTimingChange(t, true));
 
                     playField.Add(new DrawableNote(new Note
@@ -102,7 +102,7 @@ namespace osu.Desktop.VisualTests.Tests
                     }, new Bindable<Key>(Key.K)));
                 }
 
-                if (g)
+                if (gravity)
                     playField.Columns.ElementAt(1).Add(createTimingChange(start_time, true));
 
                 playField.Add(new DrawableHoldNote(new HoldNote
@@ -112,7 +112,7 @@ namespace osu.Desktop.VisualTests.Tests
                     Column = 1
                 }, new Bindable<Key>(Key.F)));
 
-                if (g)
+                if (gravity)
                     playField.Columns.ElementAt(2).Add(createTimingChange(start_time, true));
 
                 playField.Add(new DrawableHoldNote(new HoldNote

@@ -5,6 +5,9 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
+    /// <summary>
+    /// A timing change which scrolls with an increasing velocity, following a form of "gravity".
+    /// </summary>
     public class DrawableManiaGravityTimingChange : DrawableManiaTimingChange
     {
         public DrawableManiaGravityTimingChange(TimingChange timingChange)
