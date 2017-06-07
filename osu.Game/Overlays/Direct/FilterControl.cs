@@ -10,11 +10,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Direct
 {
     public class FilterControl : SearchableListFilterControl<DirectSortCriteria, RankStatus>
     {
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
         private FillFlowContainer<RulesetToggleButton> modeButtons;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"384552");
@@ -35,10 +37,10 @@ namespace osu.Game.Overlays.Direct
         {
             DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 
-            var b = new Bindable<RulesetInfo>(); //backup bindable incase the game is null
+            Ruleset.BindTo(game?.Ruleset ?? new Bindable<RulesetInfo>());
             foreach (var r in rulesets.AllRulesets)
             {
-                modeButtons.Add(new RulesetToggleButton(game?.Ruleset ?? b, r));
+                modeButtons.Add(new RulesetToggleButton(Ruleset, r));
             }
         }
 
