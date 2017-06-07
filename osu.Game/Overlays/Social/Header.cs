@@ -19,6 +19,7 @@ namespace osu.Game.Overlays.Social
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"38202e");
         protected override float TabStripWidth => 438;
         protected override SocialTab DefaultTab => SocialTab.OnlinePlayers;
+        protected override FontAwesome Icon => FontAwesome.fa_users;
 
         protected override Drawable CreateHeaderText()
         {
@@ -54,11 +55,11 @@ namespace osu.Game.Overlays.Social
     {
         [Description("Online Players")]
         OnlinePlayers,
-        [Description("Online Friends")]
-        OnlineFriends,
-        [Description("Online Team Members")]
-        OnlineTeamMembers,
-        [Description("Chat Channels")]
-        ChatChannels,
+        //[Description("Online Friends")]
+        //OnlineFriends,
+        //[Description("Online Team Members")]
+        //OnlineTeamMembers,
+        //[Description("Chat Channels")]
+        //ChatChannels,
     }
 }
