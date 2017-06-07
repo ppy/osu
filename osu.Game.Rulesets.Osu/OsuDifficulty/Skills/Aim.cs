@@ -6,6 +6,9 @@ using osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing;
 
 namespace osu.Game.Rulesets.Osu.OsuDifficulty.Skills
 {
+    /// <summary>
+    /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
+    /// </summary>
     public class Aim : Skill
     {
         protected override double SkillMultiplier => 26.25;

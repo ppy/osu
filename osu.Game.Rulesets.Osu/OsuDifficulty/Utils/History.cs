@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Utils
         {
             get
             {
-                if (i > Count - 1)
+                if (i < 0 || i > Count - 1)
                     throw new IndexOutOfRangeException();
 
                 i += marker;
