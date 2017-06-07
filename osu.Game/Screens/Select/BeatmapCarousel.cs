@@ -311,7 +311,7 @@ namespace osu.Game.Screens.Select
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
                         if (panel == selectedPanel)
-                            selectedY = ((currentY + (panel.DrawHeight / 2)) - (DrawHeight / 2));
+                            selectedY = currentY + (panel.DrawHeight / 2) - (DrawHeight / 2);
 
                         panel.MoveToX(-50, 500, EasingTypes.OutExpo);
 
