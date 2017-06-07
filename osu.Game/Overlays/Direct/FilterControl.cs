@@ -13,12 +13,12 @@ using osu.Game.Overlays.SearchableList;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class FilterControl : SearchableListFilterControl<DirectSortCritera, RankStatus>
+    public class FilterControl : SearchableListFilterControl<DirectSortCriteria, RankStatus>
     {
         private FillFlowContainer<RulesetToggleButton> modeButtons;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"384552");
-        protected override DirectSortCritera DefaultTab => DirectSortCritera.Title;
+        protected override DirectSortCriteria DefaultTab => DirectSortCriteria.Title;
         protected override Drawable CreateSupplementaryControls()
         {
             modeButtons = new FillFlowContainer<RulesetToggleButton>
@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.Direct
         }
     }
 
-    public enum DirectSortCritera
+    public enum DirectSortCriteria
     {
         Title,
         Artist,
