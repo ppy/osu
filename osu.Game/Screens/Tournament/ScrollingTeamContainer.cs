@@ -82,7 +82,11 @@ namespace osu.Game.Screens.Tournament
         private ScrollState _scrollState;
         private ScrollState scrollState
         {
-            get { return _scrollState; }
+            get
+            {
+                return _scrollState;
+            }
+
             set
             {
                 if (_scrollState == value)
@@ -261,7 +265,7 @@ namespace osu.Game.Screens.Tournament
                 else
                 {
                     c.MoveToX(pos, 100);
-                    c.FadeTo(1.0f - Math.Abs(pos - DrawWidth / 2f) / (DrawWidth / 2.5f), 100);
+                    c.FadeTo(1.0f - (Math.Abs(pos - (DrawWidth / 2f)) / (DrawWidth / 2.5f)), 100);
                 }
 
                 pos += ScrollingTeam.WIDTH;
@@ -328,7 +332,11 @@ namespace osu.Game.Screens.Tournament
             private bool selected;
             public bool Selected
             {
-                get { return selected; }
+                get
+                {
+                    return selected;
+                }
+
                 set
                 {
                     selected = value;

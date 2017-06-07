@@ -244,7 +244,7 @@ namespace osu.Game.Screens.Select
 
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
         {
-            foreach(var b in beatmapSet.Beatmaps)
+            foreach (var b in beatmapSet.Beatmaps)
             {
                 if (b.Metadata == null)
                     b.Metadata = beatmapSet.Metadata;
