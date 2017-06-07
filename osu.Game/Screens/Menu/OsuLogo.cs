@@ -51,10 +51,7 @@ namespace osu.Game.Screens.Menu
 
         public bool Triangles
         {
-            set
-            {
-                colourAndTriangles.Alpha = value ? 1 : 0;
-            }
+            set { colourAndTriangles.Alpha = value ? 1 : 0; }
         }
 
         protected override bool InternalContains(Vector2 screenSpacePos) => logoContainer.Contains(screenSpacePos);
@@ -62,10 +59,7 @@ namespace osu.Game.Screens.Menu
         public bool Ripple
         {
             get { return rippleContainer.Alpha > 0; }
-            set
-            {
-                rippleContainer.Alpha = value ? 1 : 0;
-            }
+            set { rippleContainer.Alpha = value ? 1 : 0; }
         }
 
         public bool Interactive = true;
@@ -237,7 +231,7 @@ namespace osu.Game.Screens.Menu
 
             if (beatIndex < 0) return;
 
-            logoBeatContainer.ScaleTo(1 - 0.02f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
+            logoBeatContainer.ScaleTo(1 - (0.02f * amplitudeAdjust), beat_in_time, EasingTypes.Out);
             using (logoBeatContainer.BeginDelayedSequence(beat_in_time))
                 logoBeatContainer.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
 
@@ -246,7 +240,7 @@ namespace osu.Game.Screens.Menu
             ripple.ScaleTo(logoAmplitudeContainer.Scale);
             ripple.Alpha = 0.15f * amplitudeAdjust;
 
-            ripple.ScaleTo(logoAmplitudeContainer.Scale * (1 + 0.04f * amplitudeAdjust), beatLength, EasingTypes.OutQuint);
+            ripple.ScaleTo(logoAmplitudeContainer.Scale * (1 + (0.04f * amplitudeAdjust)), beatLength, EasingTypes.OutQuint);
             ripple.FadeOut(beatLength, EasingTypes.OutQuint);
 
             if (effectPoint.KiaiMode && flashLayer.Alpha < 0.4f)
