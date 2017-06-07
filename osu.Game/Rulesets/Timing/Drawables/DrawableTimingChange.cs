@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Framework.Caching;
-using osu.Framework.Graphics.Primitives;
 
 namespace osu.Game.Rulesets.Timing.Drawables
 {
@@ -87,7 +86,7 @@ namespace osu.Game.Rulesets.Timing.Drawables
             /// <summary>
             /// The axes which this container should calculate its size from its children on.
             /// Note that this is not the same as <see cref="Container{T}.AutoSizeAxes"/>, because that would not allow this container
-            /// to be relatively sized - desired in the case where the playfield re-defines <see cref="Container{T}.RelativeCoordinateSpace"/>.
+            /// to be relatively sized - desired in the case where the playfield re-defines <see cref="Container{T}.RelativeChildSize"/>.
             /// </summary>
             /// <param name="autoSizingAxes"></param>
             public RelativeCoordinateAutoSizingContainer(Axes autoSizingAxes)
