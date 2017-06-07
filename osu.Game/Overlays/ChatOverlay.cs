@@ -122,7 +122,7 @@ namespace osu.Game.Overlays
                                     {
                                         Top = padding * 2,
                                         Bottom = padding * 2,
-                                        Left = ChatLine.LEFT_PADDING + (padding * 2),
+                                        Left = ChatLine.LEFT_PADDING + padding * 2,
                                         Right = padding * 2,
                                     },
                                     Children = new Drawable[]
@@ -202,7 +202,7 @@ namespace osu.Game.Overlays
         {
             Trace.Assert(state.Mouse.PositionMouseDown != null);
 
-            chatHeight.Value = startDragChatHeight - ((state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y);
+            chatHeight.Value = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
             return base.OnDrag(state);
         }
 

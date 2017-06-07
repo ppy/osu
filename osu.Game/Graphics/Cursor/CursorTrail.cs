@@ -136,7 +136,7 @@ namespace osu.Game.Graphics.Cursor
 
                 for (float d = interval; d < distance; d += interval)
                 {
-                    lastPosition = pos1 + (direction * d);
+                    lastPosition = pos1 + direction * d;
                     addPosition(lastPosition.Value);
                 }
             }
@@ -213,7 +213,7 @@ namespace osu.Game.Graphics.Cursor
                         colour.BottomRight.Linear.A = Parts[i].Time + colour.BottomRight.Linear.A;
 
                         Texture.DrawQuad(
-                            new Quad(pos.X - (Size.X / 2), pos.Y - (Size.Y / 2), Size.X, Size.Y),
+                            new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
                             colour,
                             null,
                             v => Shared.VertexBuffer.Vertices[end++] = v);
