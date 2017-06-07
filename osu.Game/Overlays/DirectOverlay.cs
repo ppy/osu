@@ -16,9 +16,9 @@ using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using OpenTK.Graphics;
 
-namespace osu.Game.Overlaysi
+namespace osu.Game.Overlays
 {
-    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCritera, RankStatus>
+    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCriteria, RankStatus>
     {
         private const float panel_padding = 10f;
 
@@ -29,12 +29,12 @@ namespace osu.Game.Overlaysi
         private readonly OsuSpriteText resultCountsText;
         private readonly FillFlowContainer<DirectPanel> panels;
 
-        protected override Color4 BackgroundColour => OsuColour.FromHexi(@"485e74");
+        protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
-        protected override SearchableListFilterControl<DirectSortCritera, RankStatus> CreateFilterControl() => new FilterControl();
+        protected override SearchableListFilterControl<DirectSortCriteria, RankStatus> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;
         public IEnumerable<BeatmapSetInfo> BeatmapSets
@@ -117,6 +117,7 @@ namespace osu.Game.Overlaysi
             Header.Tabs.Current.ValueChanged += tab => { if (tab != DirectTab.Search) Filter.Search.Text = string.Empty; };
             Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
             Filter.Search.OnCommit = (sender, text) => updateSets();
+            Filter.Tabs.Current.ValueChanged += sortCriteria => updateSets();
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
             Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => updateSets();
 
@@ -162,7 +163,7 @@ namespace osu.Game.Overlaysi
 
             if (api == null || Filter.Search.Text == string.Empty) return;
 
-            getSetsRequest = new GetBeatmapSetsRequest(Filter.Search.Text, Filter.DisplayStyleControl.Dropdown.Current.Value);
+            getSetsRequest = new GetBeatmapSetsRequest(Filter.Search.Text, Filter.DisplayStyleControl.Dropdown.Current.Value, Filter.Tabs.Current.Value); //todo: sort direction
             getSetsRequest.Success += r => BeatmapSets = r?.Select(response => response.ToSetInfo(rulesets));
             api.Queue(getSetsRequest);
         }
