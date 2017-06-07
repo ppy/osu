@@ -35,6 +35,11 @@ namespace osu.Game.Users
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = new UserPageHeader(user),
                 FixedHeader = tab,
+                HeaderBackground = new Box
+                {
+                    Colour = OsuColour.Gray(34),
+                    RelativeSizeAxes = Axes.Both
+                },
                 Sections = sections
             };
             Add(sectionsContainer);

@@ -15,9 +15,9 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class SectionsContainer : Container
     {
-        private Drawable expandableHeader, fixedHeader, footer;
+        private Drawable expandableHeader, fixedHeader, footer, headerBackground;
         public readonly ScrollContainer ScrollContainer;
-        private readonly Container<Drawable> sectionsContainer;
+        private readonly Container<Drawable> sectionsContainer, headerBackgroundContainer;
 
         public Drawable ExpandableHeader
         {
@@ -72,6 +72,22 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
+        public Drawable HeaderBackground
+        {
+            get { return headerBackground; }
+            set
+            {
+                if (value == headerBackground) return;
+
+                headerBackgroundContainer.Clear();
+                headerBackground = value;
+                if (value == null) return;
+
+                headerBackgroundContainer.Add(headerBackground);
+                lastKnownScroll = float.NaN;
+            }
+        }
+
         public Bindable<Drawable> SelectedSection { get; } = new Bindable<Drawable>();
 
         protected virtual Container<Drawable> CreateScrollContentContainer()
@@ -120,6 +136,7 @@ namespace osu.Game.Graphics.Containers
                 Masking = false,
                 Children = new Drawable[] { sectionsContainer = CreateScrollContentContainer() }
             });
+            Add(headerBackgroundContainer = new Container<Drawable> { RelativeSizeAxes = Axes.X });
             originalSectionsMargin = sectionsContainer.Margin;
         }
 
@@ -149,6 +166,9 @@ namespace osu.Game.Graphics.Containers
                     expandableHeader.Y = -offset;
                     fixedHeader.Y = -offset + expandableHeader.LayoutSize.Y;
                 }
+
+                headerBackgroundContainer.Height = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
+                headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
                 Drawable bestMatch = null;
                 float minDiff = float.MaxValue;
