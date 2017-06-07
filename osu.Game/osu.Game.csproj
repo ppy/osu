@@ -89,6 +89,7 @@
     <Compile Include="Overlays\Settings\SettingsHeader.cs" />
     <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarSocialButton.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
     <Compile Include="Beatmaps\ControlPoints\ControlPoint.cs" />
