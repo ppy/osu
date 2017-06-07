@@ -73,7 +73,8 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(APIAccess api)
         {
-            reloadUsers(api);
+            if (Users == null)
+                reloadUsers(api);
         }
 
         private void reloadUsers(APIAccess api)
