@@ -30,10 +30,10 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         public const float HIT_TARGET_POSITION = 50;
 
-        private const float time_span_default = 1500;
-        public const float TIME_SPAN_MIN = 50;
-        public const float TIME_SPAN_MAX = 10000;
-        private const float time_span_step = 50;
+        private const double time_span_default = 1500;
+        public const double TIME_SPAN_MIN = 50;
+        public const double TIME_SPAN_MAX = 10000;
+        private const double time_span_step = 50;
 
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.
@@ -230,11 +230,11 @@ namespace osu.Game.Rulesets.Mania.UI
             return false;
         }
 
-        private float timeSpan;
+        private double timeSpan;
         /// <summary>
         /// The amount of time which the length of the playfield spans.
         /// </summary>
-        public float TimeSpan
+        public double TimeSpan
         {
             get { return timeSpan; }
             set
@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 timeSpan = MathHelper.Clamp(timeSpan, TIME_SPAN_MIN, TIME_SPAN_MAX);
 
-                barLineContainer.TimeSpan = new Vector2(1, value);
+                barLineContainer.TimeSpan = value;
                 Columns.ForEach(c => c.TimeSpan = value);
             }
         }

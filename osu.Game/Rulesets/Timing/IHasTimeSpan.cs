@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// The amount of time which this container spans.
         /// </summary>
-        Vector2 TimeSpan { get; }
+        double TimeSpan { get; }
     }
 }
