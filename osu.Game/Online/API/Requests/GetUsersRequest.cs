@@ -9,11 +9,7 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetUsersRequest : APIRequest<List<RankingEntry>>
     {
-        public GetUsersRequest()
-        {
-        }
-
-        protected override string Target => $@"rankings/osu/performance";
+        protected override string Target => @"rankings/osu/performance";
     }
 
     public class RankingEntry
