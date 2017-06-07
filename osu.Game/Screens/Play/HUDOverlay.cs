@@ -7,21 +7,24 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
+using OpenTK;
 using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class HUDOverlay : Container
+    public class HUDOverlay : Container
     {
         private const int duration = 100;
 
         private readonly Container content;
+
         public readonly KeyCounterCollection KeyCounter;
         public readonly RollingCounter<int> ComboCounter;
         public readonly ScoreCounter ScoreCounter;
@@ -35,16 +38,7 @@ namespace osu.Game.Screens.Play
 
         private static bool hasShownNotificationOnce;
 
-        protected abstract KeyCounterCollection CreateKeyCounter();
-        protected abstract RollingCounter<int> CreateComboCounter();
-        protected abstract RollingCounter<double> CreateAccuracyCounter();
-        protected abstract ScoreCounter CreateScoreCounter();
-        protected abstract HealthDisplay CreateHealthDisplay();
-        protected abstract SongProgress CreateProgress();
-        protected abstract ModDisplay CreateModsContainer();
-        //protected abstract ReplaySettingsOverlay CreateReplaySettingsOverlay();
-
-        protected HUDOverlay()
+        public HUDOverlay()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -67,7 +61,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, NotificationManager notificationManager)
+        private void load(OsuConfigManager config, NotificationManager notificationManager, OsuColour colours)
         {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
             showHud.ValueChanged += hudVisibility => content.FadeTo(hudVisibility ? 1 : 0, duration);
@@ -82,14 +76,18 @@ namespace osu.Game.Screens.Play
                     Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
                 });
             }
-        }
 
-        public virtual void BindProcessor(ScoreProcessor processor)
-        {
-            ScoreCounter?.Current.BindTo(processor.TotalScore);
-            AccuracyCounter?.Current.BindTo(processor.Accuracy);
-            ComboCounter?.Current.BindTo(processor.Combo);
-            HealthDisplay?.Current.BindTo(processor.Health);
+            // todo: the stuff below should probably not be in this base implementation, but in each individual class.
+            ComboCounter.AccentColour = colours.BlueLighter;
+            AccuracyCounter.AccentColour = colours.BlueLighter;
+            ScoreCounter.AccentColour = colours.BlueLighter;
+
+            var shd = HealthDisplay as StandardHealthDisplay;
+            if (shd != null)
+            {
+                shd.AccentColour = colours.BlueLighter;
+                shd.GlowColour = colours.BlueDarker;
+            }
         }
 
         public virtual void BindHitRenderer(HitRenderer hitRenderer)
@@ -121,6 +119,83 @@ namespace osu.Game.Screens.Play
             }
 
             return base.OnKeyDown(state, args);
+        }
+
+        protected virtual RollingCounter<double> CreateAccuracyCounter() => new PercentageCounter
+        {
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopRight,
+            Position = new Vector2(0, 35),
+            TextSize = 20,
+            Margin = new MarginPadding { Right = 140 },
+        };
+
+        protected virtual RollingCounter<int> CreateComboCounter() => new SimpleComboCounter
+        {
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopLeft,
+            Position = new Vector2(0, 35),
+            Margin = new MarginPadding { Left = 140 },
+            TextSize = 20,
+        };
+
+        protected virtual HealthDisplay CreateHealthDisplay() => new StandardHealthDisplay
+        {
+            Size = new Vector2(1, 5),
+            RelativeSizeAxes = Axes.X,
+            Margin = new MarginPadding { Top = 20 }
+        };
+
+        protected virtual KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
+        {
+            IsCounting = true,
+            FadeTime = 50,
+            Anchor = Anchor.BottomRight,
+            Origin = Anchor.BottomRight,
+            Margin = new MarginPadding(10),
+            Y = -TwoLayerButton.SIZE_RETRACTED.Y,
+        };
+
+        protected virtual ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
+        {
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
+            TextSize = 40,
+            Position = new Vector2(0, 30),
+        };
+
+        protected virtual SongProgress CreateProgress() => new SongProgress
+        {
+            Anchor = Anchor.BottomLeft,
+            Origin = Anchor.BottomLeft,
+            RelativeSizeAxes = Axes.X,
+        };
+
+        protected virtual ModDisplay CreateModsContainer() => new ModDisplay
+        {
+            Anchor = Anchor.TopRight,
+            Origin = Anchor.TopRight,
+            AutoSizeAxes = Axes.Both,
+            Margin = new MarginPadding { Top = 20, Right = 10 },
+        };
+
+        //protected virtual ReplaySettingsOverlay CreateReplaySettingsOverlay() => new ReplaySettingsOverlay
+        //{
+        //    Anchor = Anchor.TopRight,
+        //    Origin = Anchor.TopRight,
+        //    Margin = new MarginPadding { Top = 100, Right = 10 },
+        //};
+
+        public virtual void BindProcessor(ScoreProcessor processor)
+        {
+            ScoreCounter?.Current.BindTo(processor.TotalScore);
+            AccuracyCounter?.Current.BindTo(processor.Accuracy);
+            ComboCounter?.Current.BindTo(processor.Combo);
+            HealthDisplay?.Current.BindTo(processor.Health);
+
+            var shd = HealthDisplay as StandardHealthDisplay;
+            if (shd != null)
+                processor.NewJudgement += shd.Flash;
         }
     }
 }
