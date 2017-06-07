@@ -65,10 +65,10 @@ namespace osu.Game.Rulesets.Mania.UI
             if (HitObjectTimingChanges != null || BarlineTimingChanges != null)
                 return;
 
-            HitObjectTimingChanges = new List<DrawableTimingChange>[Columns.Value];
+            HitObjectTimingChanges = new List<DrawableTimingChange>[PreferredColumns];
             BarlineTimingChanges = new List<DrawableTimingChange>();
 
-            for (int i = 0; i < Columns.Value; i++)
+            for (int i = 0; i < PreferredColumns; i++)
                 HitObjectTimingChanges[i] = new List<DrawableTimingChange>();
 
             double lastSpeedMultiplier = 1;
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             timingChanges.ForEach(t =>
             {
-                for (int i = 0; i < Columns.Value; i++)
+                for (int i = 0; i < PreferredColumns; i++)
                     HitObjectTimingChanges[i].Add(new DrawableManiaScrollingTimingChange(t));
 
                 BarlineTimingChanges.Add(new DrawableManiaScrollingTimingChange(t));
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
         {
-            var playfield = new ManiaPlayfield(Columns.Value)
+            var playfield = new ManiaPlayfield(PreferredColumns)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 Scale = new Vector2(1, -1)
             };
 
-            for (int i = 0; i < Columns; i++)
+            for (int i = 0; i < PreferredColumns; i++)
             {
                 foreach (var change in HitObjectTimingChanges[i])
                     playfield.Columns.ElementAt(i).Add(change);
