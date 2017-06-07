@@ -16,7 +16,7 @@ using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using OpenTK.Graphics;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlaysi
 {
     public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCritera, RankStatus>
     {
@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
         private readonly OsuSpriteText resultCountsText;
         private readonly FillFlowContainer<DirectPanel> panels;
 
-        protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
+        protected override Color4 BackgroundColour => OsuColour.FromHexi(@"485e74");
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
 
