@@ -14,5 +14,7 @@ namespace osu.Game.Users.Profile
         {
             User = user;
         }
+
+        public override string ToString() => Title; //for tab control
     }
 }
