@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Menu
                 StartValue = -10,
                 EndValue = 10,
                 StartTime = startTime,
-                EndTime = startTime + (duration * 2),
+                EndTime = startTime + duration * 2,
                 Easing = EasingTypes.InOutSine,
                 LoopCount = -1,
                 LoopDelay = duration * 2
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Menu
                 StartValue = new Vector2(0, -10),
                 EndValue = Vector2.Zero,
                 StartTime = startTime + duration,
-                EndTime = startTime + (duration * 2),
+                EndTime = startTime + duration * 2,
                 Easing = EasingTypes.In,
                 LoopCount = -1,
                 LoopDelay = duration
@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Menu
                 StartValue = Vector2.One,
                 EndValue = new Vector2(1, 0.9f),
                 StartTime = startTime + duration,
-                EndTime = startTime + (duration * 2),
+                EndTime = startTime + duration * 2,
                 Easing = EasingTypes.In,
                 LoopCount = -1,
                 LoopDelay = duration
@@ -197,8 +197,8 @@ namespace osu.Game.Screens.Menu
             {
                 StartValue = 10,
                 EndValue = -10,
-                StartTime = startTime + (duration * 2),
-                EndTime = startTime + (duration * 4),
+                StartTime = startTime + duration * 2,
+                EndTime = startTime + duration * 4,
                 Easing = EasingTypes.InOutSine,
                 LoopCount = -1,
                 LoopDelay = duration * 2
@@ -282,10 +282,7 @@ namespace osu.Game.Screens.Menu
 
         public ButtonState State
         {
-            get
-            {
-                return state;
-            }
+            get{ return state; }
 
             set
             {
