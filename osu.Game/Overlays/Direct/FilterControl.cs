@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Direct
 {
