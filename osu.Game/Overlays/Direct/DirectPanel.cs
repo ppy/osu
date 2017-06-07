@@ -39,6 +39,8 @@ namespace osu.Game.Overlays.Direct
         {
             return new AsyncLoadWrapper(new BeatmapSetBackgroundSprite(SetInfo)
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
             }) { RelativeSizeAxes = Axes.Both };
