@@ -43,6 +43,8 @@ namespace osu.Game
 
         private DirectOverlay direct;
 
+        private SocialOverlay social;
+
         private Intro intro
         {
             get
@@ -165,6 +167,7 @@ namespace osu.Game
 
             //overlay elements
             LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
+            LoadComponentAsync(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
             LoadComponentAsync(musicController = new MusicController
@@ -198,10 +201,15 @@ namespace osu.Game
             };
 
             Dependencies.Cache(settings);
+            Dependencies.Cache(social);
             Dependencies.Cache(chat);
             Dependencies.Cache(musicController);
             Dependencies.Cache(notificationManager);
             Dependencies.Cache(dialogOverlay);
+
+            // ensure both overlays aren't presented at the same time
+            chat.StateChanged += (container, state) => social.State = state == Visibility.Visible ? Visibility.Hidden : social.State;
+            social.StateChanged += (container, state) => chat.State = state == Visibility.Visible ? Visibility.Hidden : chat.State;
 
             LoadComponentAsync(Toolbar = new Toolbar
             {
@@ -233,6 +241,9 @@ namespace osu.Game
             {
                 case Key.F8:
                     chat.ToggleVisibility();
+                    return true;
+                case Key.F9:
+                    social.ToggleVisibility();
                     return true;
                 case Key.PageUp:
                 case Key.PageDown:
@@ -292,6 +303,7 @@ namespace osu.Game
                 musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;
                 direct.State = Visibility.Hidden;
+                social.State = Visibility.Hidden;
             }
             else
             {
