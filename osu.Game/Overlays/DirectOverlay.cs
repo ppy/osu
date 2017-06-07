@@ -165,6 +165,7 @@ namespace osu.Game.Overlays
             if (!IsLoaded) return;
 
             BeatmapSets = null;
+            ResultAmounts = null;
             getSetsRequest?.Cancel();
 
             if (api == null || Filter.Search.Text == string.Empty) return;
@@ -174,9 +175,28 @@ namespace osu.Game.Overlays
                                                        Filter.DisplayStyleControl.Dropdown.Current.Value,
                                                        Filter.Tabs.Current.Value); //todo: sort direction
 
-            getSetsRequest.Success += r => BeatmapSets = r?.Select(response => response.ToSetInfo(rulesets));
+            getSetsRequest.Success += r =>
+            {
+                BeatmapSets = r?.Select(response => response.ToSetInfo(rulesets));
+
+                var artists = new List<string>();
+                var songs = new List<string>();
+                var tags = new List<string>();
+                foreach (var s in BeatmapSets)
+                {
+                    artists.Add(s.Metadata.Artist);
+                    songs.Add(s.Metadata.Title);
+                    tags.AddRange(s.Metadata.Tags.Split(' '));
+                }
+
+                ResultAmounts = new ResultCounts(distinctCount(artists),
+                                                 distinctCount(songs),
+                                                 distinctCount(tags));
+            };
             api.Queue(getSetsRequest);
         }
+
+        private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
 
         public class ResultCounts
         {

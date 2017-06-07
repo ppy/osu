@@ -23,6 +23,8 @@ namespace osu.Game.Database
         public string Author { get; set; }
 
         public string Source { get; set; }
+
+        [JsonProperty(@"tags")]
         public string Tags { get; set; }
         public int PreviewTime { get; set; }
         public string AudioFile { get; set; }
