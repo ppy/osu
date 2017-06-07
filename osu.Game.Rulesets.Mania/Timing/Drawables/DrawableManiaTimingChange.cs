@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
     public abstract class DrawableManiaTimingChange : DrawableTimingChange
     {
-        public DrawableManiaTimingChange(TimingChange timingChange)
+        protected DrawableManiaTimingChange(TimingChange timingChange)
             : base(timingChange, Axes.Y)
         {
         }
