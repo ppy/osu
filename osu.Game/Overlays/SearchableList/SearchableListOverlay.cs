@@ -15,19 +15,19 @@ namespace osu.Game.Overlays.SearchableList
         public static readonly float WIDTH_PADDING = 80;
     }
 
-    public abstract class SearchableListOverlay<T,U,S> : SearchableListOverlay
+    public abstract class SearchableListOverlay<T, U, S> : SearchableListOverlay
     {
         private readonly Container scrollContainer;
 
         protected readonly SearchableListHeader<T> Header;
-        protected readonly SearchableListFilterControl<U,S> Filter;
+        protected readonly SearchableListFilterControl<U, S> Filter;
         protected readonly FillFlowContainer ScrollFlow;
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract Color4 TrianglesColourLight { get; }
         protected abstract Color4 TrianglesColourDark { get; }
         protected abstract SearchableListHeader<T> CreateHeader();
-        protected abstract SearchableListFilterControl<U,S> CreateFilterControl();
+        protected abstract SearchableListFilterControl<U, S> CreateFilterControl();
 
         protected SearchableListOverlay()
         {

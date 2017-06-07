@@ -14,7 +14,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.SearchableList
 {
-    public abstract class SearchableListFilterControl<T,U> : Container
+    public abstract class SearchableListFilterControl<T, U> : Container
     {
         private const float padding = 10;
 
