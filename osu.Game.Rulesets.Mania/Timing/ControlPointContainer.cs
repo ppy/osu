@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Timing
 {
@@ -96,7 +97,7 @@ namespace osu.Game.Rulesets.Mania.Timing
 
                 // Adjust our height to account for the speed changes
                 Height = (float)(1000 / timingChange.BeatLength / timingChange.SpeedMultiplier);
-                RelativeCoordinateSpace = new Vector2(1, (float)parent.TimeSpan);
+                RelativeChildSize = new Vector2(1, (float)parent.TimeSpan);
 
                 // Scroll the content
                 content.Y = (float)(timingChange.Time - Time.Current);
@@ -128,6 +129,8 @@ namespace osu.Game.Rulesets.Mania.Timing
             /// </summary>
             private class AutoTimeRelativeContainer : Container
             {
+                protected override IComparer<Drawable> DepthComparer => new HitObjectReverseStartTimeComparer();
+
                 public override void InvalidateFromChild(Invalidation invalidation)
                 {
                     // We only want to re-compute our size when a child's size or position has changed
@@ -143,7 +146,7 @@ namespace osu.Game.Rulesets.Mania.Timing
                     float height = Children.Select(child => child.Y + child.Height).Max();
 
                     Height = height;
-                    RelativeCoordinateSpace = new Vector2(1, height);
+                    RelativeChildSize = new Vector2(1, height);
 
                     base.InvalidateFromChild(invalidation);
                 }

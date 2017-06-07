@@ -7,12 +7,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Direct
+namespace osu.Game.Overlays.SearchableList
 {
     public class SlimEnumDropdown<T> : OsuEnumDropdown<T>
     {
-        public const float HEIGHT = 25;
-
         protected override DropdownHeader CreateHeader() => new SlimDropdownHeader { AccentColour = AccentColour };
         protected override Menu CreateMenu() => new SlimMenu();
 
@@ -20,7 +18,7 @@ namespace osu.Game.Overlays.Direct
         {
             public SlimDropdownHeader()
             {
-                Height = HEIGHT;
+                Height = 25;
                 Icon.TextSize = 16;
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
             }
