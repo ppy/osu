@@ -76,6 +76,7 @@
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Graphics\UserInterface\IconButton.cs" />
     <Compile Include="Configuration\SelectionRandomType.cs" />
+    <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Overlays\Settings\SettingsHeader.cs" />
     <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarSocialButton.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
     <Compile Include="Beatmaps\ControlPoints\ControlPoint.cs" />
@@ -453,16 +455,24 @@
     <Compile Include="Overlays\DirectOverlay.cs" />
     <Compile Include="Overlays\Direct\FilterControl.cs" />
     <Compile Include="Overlays\Direct\Header.cs" />
-    <Compile Include="Overlays\Direct\SortTabControl.cs" />
     <Compile Include="Graphics\UserInterface\OsuEnumDropdown.cs" />
     <Compile Include="Overlays\Direct\DirectPanel.cs" />
     <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
     <Compile Include="Overlays\Direct\DirectListPanel.cs" />
     <Compile Include="Database\OnlineWorkingBeatmap.cs" />
     <Compile Include="Database\BeatmapOnlineInfo.cs" />
-    <Compile Include="Overlays\Direct\SlimEnumDropdown.cs" />
     <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
     <Compile Include="Database\RankStatus.cs" />
+    <Compile Include="Overlays\SearchableList\SearchableListHeader.cs" />
+    <Compile Include="Overlays\SearchableList\HeaderTabControl.cs" />
+    <Compile Include="Overlays\Social\FilterControl.cs" />
+    <Compile Include="Overlays\Social\Header.cs" />
+    <Compile Include="Overlays\SearchableList\SearchableListFilterControl.cs" />
+    <Compile Include="Overlays\SearchableList\SearchableListOverlay.cs" />
+    <Compile Include="Graphics\UserInterface\PageTabControl.cs" />
+    <Compile Include="Overlays\SocialOverlay.cs" />
+    <Compile Include="Overlays\SearchableList\SlimEnumDropdown.cs" />
+    <Compile Include="Overlays\SearchableList\DisplayStyleControl.cs" />
     <Compile Include="Graphics\UserInterface\BreadcrumbControl.cs" />
   </ItemGroup>
   <ItemGroup>
