@@ -5,9 +5,12 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
-    public class DrawableScrollingTimingChange : DrawableManiaTimingChange
+    /// <summary>
+    /// A basic timing change which scrolls along with a timing change.
+    /// </summary>
+    public class DrawableManiaScrollingTimingChange : DrawableManiaTimingChange
     {
-        public DrawableScrollingTimingChange(TimingChange timingChange)
+        public DrawableManiaScrollingTimingChange(TimingChange timingChange)
             : base(timingChange)
         {
         }
