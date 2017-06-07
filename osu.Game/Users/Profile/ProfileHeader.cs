@@ -35,7 +35,11 @@ namespace osu.Game.Users.Profile
                             Origin = Anchor.Centre,
                             FillMode = FillMode.Fill,
                             OnLoadComplete = d => d.FadeInFromZero(200)
-                        }) { RelativeSizeAxes = Axes.Both },
+                        })
+                        {
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both
+                        },
                         new UpdateableAvatar
                         {
                             User = user,

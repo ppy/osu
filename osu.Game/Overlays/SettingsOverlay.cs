@@ -151,7 +151,6 @@ namespace osu.Game.Overlays
         private class SettingsSectionsContainer : SectionsContainer
         {
             public SearchContainer SearchContainer;
-            private readonly Box headerBackground;
 
             protected override Container<Drawable> CreateScrollContentContainer()
                 => SearchContainer = new SearchContainer
@@ -164,11 +163,11 @@ namespace osu.Game.Overlays
             public SettingsSectionsContainer()
             {
                 ScrollContainer.ScrollbarVisible = false;
-                Add(headerBackground = new Box
+                HeaderBackground = new Box
                 {
                     Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.X
-                });
+                    RelativeSizeAxes = Axes.Both
+                };
             }
 
             protected override void UpdateAfterChildren()
@@ -176,9 +175,7 @@ namespace osu.Game.Overlays
                 base.UpdateAfterChildren();
 
                 // no null check because the usage of this class is strict
-                headerBackground.Height = ExpandableHeader.LayoutSize.Y + FixedHeader.LayoutSize.Y;
-                headerBackground.Y = ExpandableHeader.Y;
-                headerBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
+                HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
             }
         }
     }
