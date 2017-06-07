@@ -34,9 +34,9 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable GetBackground(TextureStore textures)
+        protected Drawable GetBackground(TextureStore textures, bool doubleSize)
         {
-            return new AsyncLoadWrapper(new BeatmapSetBackgroundSprite(SetInfo)
+            return new AsyncLoadWrapper(new BeatmapSetBackgroundSprite(SetInfo, doubleSize)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -90,17 +90,19 @@ namespace osu.Game.Overlays.Direct
         private class BeatmapSetBackgroundSprite : Sprite
         {
             private readonly BeatmapSetInfo set;
+            private readonly bool doubleSize;
 
-            public BeatmapSetBackgroundSprite(BeatmapSetInfo set)
+            public BeatmapSetBackgroundSprite(BeatmapSetInfo set, bool doubleSize)
             {
                 this.set = set;
+                this.doubleSize = doubleSize;
             }
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
                 if (set.OnlineInfo?.Covers?.Card != null)
-                    Texture = textures.Get(set.OnlineInfo.Covers.Card);
+                    Texture = textures.Get(doubleSize ? set.OnlineInfo.Covers.Card2x : set.OnlineInfo.Covers.Card);
             }
         }
     }
