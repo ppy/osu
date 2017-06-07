@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Configuration;
 
 namespace osu.Game.Overlays
 {
@@ -114,11 +115,12 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig)
+        private void load(FrameworkConfigManager frameworkConfig, OsuConfigManager osuConfig)
         {
             trackSetting(frameworkConfig.GetBindable<FrameSync>(FrameworkSetting.FrameSync), v => display(v, "Frame Limiter", v.GetDescription(), "Ctrl+F7"));
             trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.AudioDevice), v => display(v, "Audio Device", string.IsNullOrEmpty(v) ? "Default" : v, v));
             trackSetting(frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay), v => display(v, "Debug Logs", v ? "visible" : "hidden", "Ctrl+F10"));
+            trackSetting(osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons), v => display(!v, "Mouse Buttons", v ? "Disabled" : "Enabled", "F10"));
 
             Action displayResolution = delegate { display(null, "Screen Resolution", frameworkConfig.Get<int>(FrameworkSetting.Width) + "x" + frameworkConfig.Get<int>(FrameworkSetting.Height)); };
 

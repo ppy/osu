@@ -234,6 +234,9 @@ namespace osu.Game
                 case Key.F8:
                     chat.ToggleVisibility();
                     return true;
+                case Key.F10:
+                    LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
+                    return true;
                 case Key.PageUp:
                 case Key.PageDown:
                     var swClock = (Clock as ThrottledFrameClock)?.Source as StopwatchClock;
