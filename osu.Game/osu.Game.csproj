@@ -88,6 +88,13 @@
     <Compile Include="Overlays\Settings\SettingsHeader.cs" />
     <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
+    <Compile Include="Users\Profile\AboutSection.cs" />
+    <Compile Include="Users\Profile\BeatmapsSection.cs" />
+    <Compile Include="Users\Profile\HistoricalSection.cs" />
+    <Compile Include="Users\Profile\KudosuSection.cs" />
+    <Compile Include="Users\Profile\MedalsSection.cs" />
+    <Compile Include="Users\Profile\RanksSection.cs" />
+    <Compile Include="Users\Profile\RecentSection.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Users\UserProfile.cs" />
     <Compile Include="Users\Profile\ProfileHeader.cs" />

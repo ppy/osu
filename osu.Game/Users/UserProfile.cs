@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -21,8 +22,22 @@ namespace osu.Game.Users
         public UserProfile(User user)
         {
             this.user = user;
-            var tab = new OsuTabControl<ProfileSection>();
-            var sections = new ProfileSection[] { };
+            var sections = new ProfileSection[]
+            {
+                new AboutSection(user),
+                new RecentSection(user),
+                new RanksSection(user),
+                new MedalsSection(user),
+                new HistoricalSection(user),
+                new BeatmapsSection(user),
+                new KudosuSection(user)
+            };
+            var tab = new OsuTabControl<ProfileSection>
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 24
+            };
+            sections.ForEach(tab.AddItem);
 
             Add(new Box
             {
