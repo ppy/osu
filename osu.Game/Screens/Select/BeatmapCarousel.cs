@@ -311,7 +311,7 @@ namespace osu.Game.Screens.Select
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
                         if (panel == selectedPanel)
-                            selectedY = currentY + panel.DrawHeight / 2 - DrawHeight / 2;
+                            selectedY = ((currentY + (panel.DrawHeight / 2)) - (DrawHeight / 2));
 
                         panel.MoveToX(-50, 500, EasingTypes.OutExpo);
 
@@ -477,7 +477,7 @@ namespace osu.Game.Screens.Select
         {
             // The radius of the circle the carousel moves on.
             const float circle_radius = 3;
-            double discriminant = Math.Max(0, circle_radius * circle_radius - dist * dist);
+            double discriminant = Math.Max(0, (circle_radius * circle_radius) - (dist * dist));
             float x = (circle_radius - (float)Math.Sqrt(discriminant)) * halfHeight;
 
             return 125 + x;
@@ -493,8 +493,8 @@ namespace osu.Game.Screens.Select
         {
             var height = p.IsPresent ? p.DrawHeight : 0;
 
-            float panelDrawY = p.Position.Y - Current + height / 2;
-            float dist = Math.Abs(1f - panelDrawY / halfHeight);
+            float panelDrawY = (p.Position.Y - Current) + (height / 2);
+            float dist = Math.Abs(1f - (panelDrawY / halfHeight));
 
             // Setting the origin position serves as an additive position on top of potential
             // local transformation we may want to apply (e.g. when a panel gets selected, we
@@ -504,7 +504,7 @@ namespace osu.Game.Screens.Select
             // We are applying a multiplicative alpha (which is internally done by nesting an
             // additional container and setting that container's alpha) such that we can
             // layer transformations on top, with a similar reasoning to the previous comment.
-            p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
+            p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - (1.5f * dist), 0, 1));
         }
     }
 }
