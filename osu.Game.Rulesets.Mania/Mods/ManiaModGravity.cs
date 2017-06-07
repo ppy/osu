@@ -31,8 +31,11 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             var maniaHitRenderer = (ManiaHitRenderer)hitRenderer;
 
-            maniaHitRenderer.HitObjectTimingChanges = new Dictionary<int, List<DrawableTimingChange>>();
+            maniaHitRenderer.HitObjectTimingChanges = new List<DrawableTimingChange>[maniaHitRenderer.PreferredColumns];
             maniaHitRenderer.BarlineTimingChanges = new List<DrawableTimingChange>();
+
+            for (int i = 0; i < maniaHitRenderer.PreferredColumns; i++)
+                maniaHitRenderer.HitObjectTimingChanges[i] = new List<DrawableTimingChange>();
 
             foreach (HitObject obj in maniaHitRenderer.Objects)
             {
@@ -40,11 +43,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 if (maniaObject == null)
                     continue;
 
-                List<DrawableTimingChange> timingChanges;
-                if (!maniaHitRenderer.HitObjectTimingChanges.TryGetValue(maniaObject.Column, out timingChanges))
-                    maniaHitRenderer.HitObjectTimingChanges[maniaObject.Column] = timingChanges = new List<DrawableTimingChange>();
-
-                timingChanges.Add(new DrawableGravityTimingChange(new TimingChange
+                maniaHitRenderer.HitObjectTimingChanges[maniaObject.Column].Add(new DrawableManiaGravityTimingChange(new TimingChange
                 {
                     Time = obj.StartTime,
                     BeatLength = 1000
@@ -63,7 +62,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 
                 for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength)
                 {
-                    maniaHitRenderer.BarlineTimingChanges.Add(new DrawableGravityTimingChange(new TimingChange
+                    maniaHitRenderer.BarlineTimingChanges.Add(new DrawableManiaGravityTimingChange(new TimingChange
                     {
                         Time = t,
                         BeatLength = 1000

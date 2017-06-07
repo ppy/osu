@@ -5,9 +5,9 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
-    public class DrawableGravityTimingChange : DrawableManiaTimingChange
+    public class DrawableManiaGravityTimingChange : DrawableManiaTimingChange
     {
-        public DrawableGravityTimingChange(TimingChange timingChange)
+        public DrawableManiaGravityTimingChange(TimingChange timingChange)
             : base(timingChange)
         {
         }

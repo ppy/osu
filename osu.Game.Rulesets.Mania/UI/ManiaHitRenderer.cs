@@ -32,19 +32,31 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaHitRenderer : HitRenderer<ManiaHitObject, ManiaJudgement>
     {
-        private int? columns;
-        public int Columns
-        {
-            get { return columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize); }
-            set { columns = value; }
-        }
+        /// <summary>
+        /// Preferred column count. This will only have an effect during the initialization of the play field.
+        /// </summary>
+        public int PreferredColumns;
 
-        public Dictionary<int, List<DrawableTimingChange>> HitObjectTimingChanges;
+        /// <summary>
+        /// Per-column timing changes.
+        /// </summary>
+        public List<DrawableTimingChange>[] HitObjectTimingChanges;
+
+        /// <summary>
+        /// Bar line timing changes.
+        /// </summary>
         public List<DrawableTimingChange> BarlineTimingChanges;
+
+        /// <summary>
+        /// Number of columns in the playfield of this hit renderer. Null if the play field hasn't been generated yet.
+        /// </summary>
+        public int? Columns { get; private set; }
 
         public ManiaHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(beatmap, isForCurrentRuleset)
         {
+            Columns = PreferredColumns;
+
             generateDefaultTimingChanges();
         }
 
@@ -53,8 +65,11 @@ namespace osu.Game.Rulesets.Mania.UI
             if (HitObjectTimingChanges != null || BarlineTimingChanges != null)
                 return;
 
-            HitObjectTimingChanges = new Dictionary<int, List<DrawableTimingChange>>();
+            HitObjectTimingChanges = new List<DrawableTimingChange>[Columns.Value];
             BarlineTimingChanges = new List<DrawableTimingChange>();
+
+            for (int i = 0; i < Columns.Value; i++)
+                HitObjectTimingChanges[i] = new List<DrawableTimingChange>();
 
             double lastSpeedMultiplier = 1;
             double lastBeatLength = 500;
@@ -98,22 +113,22 @@ namespace osu.Game.Rulesets.Mania.UI
 
             timingChanges.ForEach(t =>
             {
-                for (int i = 0; i < Columns; i++)
-                {
-                    List<DrawableTimingChange> columnTimingChanges;
-                    if (!HitObjectTimingChanges.TryGetValue(i, out columnTimingChanges))
-                        HitObjectTimingChanges[i] = columnTimingChanges = new List<DrawableTimingChange>();
+                for (int i = 0; i < Columns.Value; i++)
+                    HitObjectTimingChanges[i].Add(new DrawableManiaScrollingTimingChange(t));
 
-                    columnTimingChanges.Add(new DrawableScrollingTimingChange(t));
-                }
-
-                BarlineTimingChanges.Add(new DrawableScrollingTimingChange(t));
+                BarlineTimingChanges.Add(new DrawableManiaScrollingTimingChange(t));
             });
+        }
+
+        protected override void ApplyBeatmap()
+        {
+            base.ApplyBeatmap();
+            PreferredColumns = (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize);
         }
 
         protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
         {
-            var playfield = new ManiaPlayfield(Columns)
+            var playfield = new ManiaPlayfield(Columns.Value)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -121,13 +136,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 Scale = new Vector2(1, -1)
             };
 
-            foreach (var kvp in HitObjectTimingChanges)
+            for (int i = 0; i < Columns; i++)
             {
-                int column = kvp.Key;
-                List<DrawableTimingChange> timingChanges = kvp.Value;
-
-                foreach (var change in timingChanges)
-                    playfield.Columns.ElementAt(column).Add(change);
+                foreach (var change in HitObjectTimingChanges[i])
+                    playfield.Columns.ElementAt(i).Add(change);
             }
 
             foreach (var change in BarlineTimingChanges)

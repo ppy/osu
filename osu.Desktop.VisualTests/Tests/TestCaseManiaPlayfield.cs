@@ -49,14 +49,14 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 if (gravity)
                 {
-                    return new DrawableGravityTimingChange(new TimingChange
+                    return new DrawableManiaGravityTimingChange(new TimingChange
                     {
                         BeatLength = 1000,
                         Time = time
                     });
                 }
 
-                return new DrawableScrollingTimingChange(new TimingChange
+                return new DrawableManiaScrollingTimingChange(new TimingChange
                 {
                     BeatLength = 1000,
                     Time = time

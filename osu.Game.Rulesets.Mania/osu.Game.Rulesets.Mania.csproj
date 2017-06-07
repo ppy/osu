@@ -84,9 +84,9 @@
     <Compile Include="Mods\ManiaMod.cs" />
     <Compile Include="Mods\ManiaModGravity.cs" />
     <Compile Include="UI\SpecialColumnPosition.cs" />
-    <Compile Include="Timing\Drawables\DrawableGravityTimingChange.cs" />
+    <Compile Include="Timing\Drawables\DrawableManiaGravityTimingChange.cs" />
     <Compile Include="Timing\Drawables\DrawableManiaTimingChange.cs" />
-    <Compile Include="Timing\Drawables\DrawableScrollingTimingChange.cs" />
+    <Compile Include="Timing\Drawables\DrawableManiaScrollingTimingChange.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
