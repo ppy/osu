@@ -14,7 +14,6 @@ using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics.Textures;
-using System.Linq;
 using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Direct
