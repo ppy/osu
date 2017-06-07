@@ -29,6 +29,7 @@ namespace osu.Game.Overlays
     public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
     {
         private const float textbox_height = 60;
+        private const float channel_selection_min_height = 0.3f;
 
         private ScheduledDelegate messageRequest;
 
@@ -48,16 +49,21 @@ namespace osu.Game.Overlays
 
         private readonly ChatTabControl channelTabs;
 
+        private readonly Container chatContainer;
         private readonly Box chatBackground;
         private readonly Box tabBackground;
 
         private Bindable<double> chatHeight;
 
+        private readonly Container channelSelectionContainer;
+        private readonly ChannelSelectionOverlay channelSelection;
+
+        protected override bool InternalContains(Vector2 screenSpacePos) => chatContainer.Contains(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.Contains(screenSpacePos);
+
         public ChatOverlay()
         {
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
-            Size = new Vector2(1, DEFAULT_HEIGHT);
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
@@ -65,74 +71,120 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                new Container
+                channelSelectionContainer = new Container
                 {
-                    Name = @"chat area",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = TAB_AREA_HEIGHT },
-                    Children = new Drawable[]
+                    Height = 1f - DEFAULT_HEIGHT,
+                    Masking = true,
+                    Children = new[]
                     {
-                        chatBackground = new Box
+                        channelSelection = new ChannelSelectionOverlay
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
-                        currentChannelContainer = new Container
+                    },
+                },
+                chatContainer = new Container
+                {
+                    Name = @"chat container",
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = DEFAULT_HEIGHT,
+                    Children = new[]
+                    {
+                        new Container
                         {
+                            Name = @"chat area",
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding
+                            Padding = new MarginPadding { Top = TAB_AREA_HEIGHT },
+                            Children = new Drawable[]
                             {
-                                Bottom = textbox_height + padding
-                            },
+                                chatBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                currentChannelContainer = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding
+                                    {
+                                        Bottom = textbox_height + padding
+                                    },
+                                },
+                                new Container
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = textbox_height,
+                                    Padding = new MarginPadding
+                                    {
+                                        Top = padding * 2,
+                                        Bottom = padding * 2,
+                                        Left = ChatLine.LEFT_PADDING + padding * 2,
+                                        Right = padding * 2,
+                                    },
+                                    Children = new Drawable[]
+                                    {
+                                        inputTextBox = new FocusedTextBox
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Height = 1,
+                                            PlaceholderText = "type your message",
+                                            Exit = () => State = Visibility.Hidden,
+                                            OnCommit = postMessage,
+                                            ReleaseFocusOnCommit = false,
+                                            HoldFocus = true,
+                                        }
+                                    }
+                                }
+                            }
                         },
                         new Container
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Name = @"tabs area",
                             RelativeSizeAxes = Axes.X,
-                            Height = textbox_height,
-                            Padding = new MarginPadding
-                            {
-                                Top = padding * 2,
-                                Bottom = padding * 2,
-                                Left = ChatLine.LEFT_PADDING + padding * 2,
-                                Right = padding * 2,
-                            },
+                            Height = TAB_AREA_HEIGHT,
                             Children = new Drawable[]
                             {
-                                inputTextBox = new FocusedTextBox
+                                tabBackground = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Height = 1,
-                                    PlaceholderText = "type your message",
-                                    Exit = () => State = Visibility.Hidden,
-                                    OnCommit = postMessage,
-                                    HoldFocus = true,
-                                }
+                                    Colour = Color4.Black,
+                                },
+                                channelTabs = new ChatTabControl
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
                             }
-                        }
-                    }
-                },
-                new Container
-                {
-                    Name = @"tabs area",
-                    RelativeSizeAxes = Axes.X,
-                    Height = TAB_AREA_HEIGHT,
-                    Children = new Drawable[]
-                    {
-                        tabBackground = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
                         },
-                        channelTabs = new ChatTabControl
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                    }
+                    },
                 },
             };
 
             channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
+            channelTabs.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
+            channelSelection.StateChanged += (overlay, state) =>
+            {
+                channelTabs.ChannelSelectorActive.Value = state == Visibility.Visible;
+
+                if (state == Visibility.Visible)
+                {
+                    inputTextBox.HoldFocus = false;
+                    if (1f - chatHeight.Value < channel_selection_min_height)
+                    {
+                        chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, EasingTypes.OutQuint);
+                        channelSelectionContainer.ResizeHeightTo(channel_selection_min_height, 800, EasingTypes.OutQuint);
+                        channelSelection.Show();
+                        chatHeight.Value = 1f - channel_selection_min_height;
+                    }
+                }
+                else
+                {
+                    inputTextBox.HoldFocus = true;
+                }
+            };
         }
 
         private double startDragChatHeight;
@@ -205,8 +257,9 @@ namespace osu.Game.Overlays
             chatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
             chatHeight.ValueChanged += h =>
             {
-                Height = (float)h;
-                tabBackground.FadeTo(Height == 1 ? 1 : 0.8f, 200);
+                chatContainer.Height = (float)h;
+                channelSelectionContainer.Height = 1f - (float)h;
+                tabBackground.FadeTo(h == 1 ? 1 : 0.8f, 200);
             };
             chatHeight.TriggerChange();
 
@@ -243,6 +296,16 @@ namespace osu.Game.Overlays
                     addChannel(channels.Find(c => c.Name == @"#lazer"));
                     addChannel(channels.Find(c => c.Name == @"#osu"));
                     addChannel(channels.Find(c => c.Name == @"#lobby"));
+
+                    channelSelection.OnRequestJoin = addChannel;
+                    channelSelection.Sections = new[]
+                    {
+                        new ChannelSection
+                        {
+                            Header = "All Channels",
+                            Channels = channels,
+                        },
+                    };
                 });
 
                 messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
@@ -262,9 +325,7 @@ namespace osu.Game.Overlays
 
             set
             {
-                if (currentChannel == value) return;
-
-                if (channelTabs.ChannelSelectorActive) return;
+                if (currentChannel == value || value == null) return;
 
                 currentChannel = value;
 
@@ -316,6 +377,8 @@ namespace osu.Game.Overlays
 
             if (CurrentChannel == null)
                 CurrentChannel = channel;
+
+            channel.Joined.Value = true;
         }
 
         private void fetchInitialMessages(Channel channel)

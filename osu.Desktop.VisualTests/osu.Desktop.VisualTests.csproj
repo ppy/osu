@@ -196,6 +196,7 @@
     <Compile Include="Tests\TestCaseMusicController.cs" />
     <Compile Include="Tests\TestCaseNotificationManager.cs" />
     <Compile Include="Tests\TestCaseOnScreenDisplay.cs" />
+    <Compile Include="Tests\TestCaseReplaySettingsOverlay.cs" />
     <Compile Include="Tests\TestCasePlayer.cs" />
     <Compile Include="Tests\TestCaseHitObjects.cs" />
     <Compile Include="Tests\TestCaseKeyCounter.cs" />
@@ -203,6 +204,7 @@
     <Compile Include="Tests\TestCaseReplay.cs" />
     <Compile Include="Tests\TestCaseResults.cs" />
     <Compile Include="Tests\TestCaseScoreCounter.cs" />
+    <Compile Include="Tests\TestCaseSkipButton.cs" />
     <Compile Include="Tests\TestCaseTabControl.cs" />
     <Compile Include="Tests\TestCaseTaikoHitObjects.cs" />
     <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
