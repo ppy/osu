@@ -90,7 +90,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Offset = new Vector2(2, 0),
                                 Radius = 2,
                             },
-                            Children = new [] {
+                            Children = new[] {
                                 IconLayer = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -124,7 +124,7 @@ namespace osu.Game.Graphics.UserInterface
                                 Offset = new Vector2(2, 0),
                                 Radius = 2,
                             },
-                            Children = new [] {
+                            Children = new[] {
                                 TextLayer = new Box
                                 {
                                     Origin = Anchor.TopLeft,
