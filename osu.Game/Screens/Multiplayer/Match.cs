@@ -24,12 +24,12 @@ namespace osu.Game.Screens.Multiplayer
         {
             base.OnEntering(last);
 
-            Background.Schedule(() => Background.FadeColour(Color4.DarkGray, 500));
+            Background.FadeColour(Color4.DarkGray, 500);
         }
 
         protected override bool OnExiting(Screen next)
         {
-            Background.Schedule(() => Background.FadeColour(Color4.White, 500));
+            Background.FadeColour(Color4.White, 500);
             return base.OnExiting(next);
         }
     }
