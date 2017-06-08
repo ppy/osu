@@ -45,18 +45,18 @@ namespace osu.Desktop.VisualTests.Tests
             const double start_time = 500;
             const double duration = 500;
 
-            Func<double, bool, DrawableTimingChange> createTimingChange = (time, gravity) =>
+            Func<double, bool, DrawableTimingSection> createTimingChange = (time, gravity) =>
             {
                 if (gravity)
                 {
-                    return new DrawableManiaGravityTimingChange(new TimingChange
+                    return new DrawableManiaGravityTimingChange(new TimingSection
                     {
                         BeatLength = 1000,
                         Time = time
                     });
                 }
 
-                return new DrawableManiaScrollingTimingChange(new TimingChange
+                return new DrawableManiaScrollingTimingChange(new TimingSection
                 {
                     BeatLength = 1000,
                     Time = time

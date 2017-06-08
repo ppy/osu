@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
-        private readonly TimingChangeContainer barLineContainer;
+        private readonly TimingSectionCollection barLineContainer;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
                             {
-                                barLineContainer = new TimingChangeContainer
+                                barLineContainer = new TimingSectionCollection
                                 {
                                     Name = "Bar lines",
                                     Anchor = Anchor.TopCentre,
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
 
-        public void Add(DrawableTimingChange timingChange) => barLineContainer.Add(timingChange);
+        public void Add(DrawableTimingSection timingChange) => barLineContainer.Add(timingChange);
         public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)

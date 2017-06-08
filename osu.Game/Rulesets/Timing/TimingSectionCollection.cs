@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Timing
 {
-    public class TimingChangeContainer : Container<DrawableTimingChange>, IHasTimeSpan
+    public class TimingSectionCollection : Container<DrawableTimingSection>
     {
         public double TimeSpan { get; set; }
 
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Timing
         /// </summary>
         /// <param name="hitObject">The hit object to contain.</param>
         /// <returns>The last (time-wise) timing change which can contain <paramref name="hitObject"/>. Null if no timing change exists.</returns>
-        private DrawableTimingChange timingChangeFor(DrawableHitObject hitObject) => Children.FirstOrDefault(c => c.CanContain(hitObject)) ?? Children.LastOrDefault();
+        private DrawableTimingSection timingChangeFor(DrawableHitObject hitObject) => Children.FirstOrDefault(c => c.CanContain(hitObject)) ?? Children.LastOrDefault();
     }
 
     /// <summary>
@@ -48,8 +48,8 @@ namespace osu.Game.Rulesets.Timing
     {
         public override int Compare(Drawable x, Drawable y)
         {
-            var timingChangeX = x as DrawableTimingChange;
-            var timingChangeY = y as DrawableTimingChange;
+            var timingChangeX = x as DrawableTimingSection;
+            var timingChangeY = y as DrawableTimingSection;
 
             // If either of the two drawables are not hit objects, fall back to the base comparer
             if (timingChangeX?.TimingChange == null || timingChangeY?.TimingChange == null)

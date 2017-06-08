@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
-        private readonly TimingChangeContainer timingChanges;
+        private readonly TimingSectionCollection timingChanges;
 
         public Column()
         {
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 }
                             }
                         },
-                        timingChanges = new TimingChangeContainer
+                        timingChanges = new TimingSectionCollection
                         {
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,
@@ -191,7 +191,7 @@ namespace osu.Game.Rulesets.Mania.UI
             set { timingChanges.TimeSpan = value; }
         }
 
-        public void Add(DrawableTimingChange timingChange) => timingChanges.Add(timingChange);
+        public void Add(DrawableTimingSection timingChange) => timingChanges.Add(timingChange);
         public void Add(DrawableHitObject hitObject)
         {
             hitObject.AccentColour = AccentColour;

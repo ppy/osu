@@ -16,9 +16,9 @@ namespace osu.Game.Rulesets.Timing.Drawables
     /// <summary>
     /// Represents a container in which contains hit objects and moves relative to the current time.
     /// </summary>
-    public abstract class DrawableTimingChange : Container<DrawableHitObject>
+    public abstract class DrawableTimingSection : Container<DrawableHitObject>
     {
-        public readonly TimingChange TimingChange;
+        public readonly TimingSection TimingChange;
 
         protected override Container<DrawableHitObject> Content => content;
         private readonly Container<DrawableHitObject> content;
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Timing.Drawables
         /// </summary>
         /// <param name="timingChange">The encapsulated timing change that provides the speed changes.</param>
         /// <param name="scrollingAxes">The axes through which this timing change scrolls.</param>
-        protected DrawableTimingChange(TimingChange timingChange, Axes scrollingAxes)
+        protected DrawableTimingSection(TimingSection timingChange, Axes scrollingAxes)
         {
             this.scrollingAxes = scrollingAxes;
 
@@ -49,12 +49,12 @@ namespace osu.Game.Rulesets.Timing.Drawables
         public override Axes RelativeSizeAxes
         {
             get { return Axes.Both; }
-            set { throw new InvalidOperationException($"{nameof(DrawableTimingChange)} must always be relatively-sized."); }
+            set { throw new InvalidOperationException($"{nameof(DrawableTimingSection)} must always be relatively-sized."); }
         }
 
         protected override void Update()
         {
-            var parent = Parent as IHasTimeSpan;
+            var parent = Parent as Container;
 
             if (parent == null)
                 return;
@@ -63,8 +63,10 @@ namespace osu.Game.Rulesets.Timing.Drawables
             float speedAdjustedSize = (float)(1000 / TimingChange.BeatLength / TimingChange.SpeedMultiplier);
 
             Size = new Vector2((scrollingAxes & Axes.X) > 0 ? speedAdjustedSize : 1, (scrollingAxes & Axes.Y) > 0 ? speedAdjustedSize : 1);
-            RelativeChildSize = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)parent.TimeSpan : 1, (scrollingAxes & Axes.Y) > 0 ? (float)parent.TimeSpan : 1);
+            RelativeChildSize = new Vector2((scrollingAxes & Axes.X) > 0 ? parent.RelativeChildSize.X : 1, (scrollingAxes & Axes.Y) > 0 ? parent.RelativeChildSize.Y : 1);
         }
+
+        protected double TimeSpan => (Parent as TimingSectionCollection)?.TimeSpan ?? 0;
 
         /// <summary>
         /// Whether this timing change can contain a hit object. This is true if the hit object occurs "after" after this timing change.
