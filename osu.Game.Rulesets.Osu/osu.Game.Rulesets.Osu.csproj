@@ -68,9 +68,14 @@
     <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
-    <Compile Include="Objects\OsuHitObjectDifficulty.cs" />
     <Compile Include="Objects\SliderTick.cs" />
-    <Compile Include="OsuDifficultyCalculator.cs" />
+    <Compile Include="OsuDifficulty\OsuDifficultyCalculator.cs" />
+    <Compile Include="OsuDifficulty\Preprocessing\OsuDifficultyBeatmap.cs" />
+    <Compile Include="OsuDifficulty\Preprocessing\OsuDifficultyHitObject.cs" />
+    <Compile Include="OsuDifficulty\Skills\Aim.cs" />
+    <Compile Include="OsuDifficulty\Skills\Skill.cs" />
+    <Compile Include="OsuDifficulty\Skills\Speed.cs" />
+    <Compile Include="OsuDifficulty\Utils\History.cs" />
     <Compile Include="OsuKeyConversionInputManager.cs" />
     <Compile Include="Scoring\OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuHitRenderer.cs" />
