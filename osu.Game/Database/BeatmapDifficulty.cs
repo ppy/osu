@@ -39,4 +39,3 @@ namespace osu.Game.Database
         }
     }
 }
-
