@@ -10,7 +10,8 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuContextMenu : ContextMenu
+    public class OsuContextMenu<TItem> : ContextMenu<TItem>
+        where TItem : ContextMenuItem
     {
         protected override CustomMenu CreateCustomMenu() => new OsuCustomMenu();
 
