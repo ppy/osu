@@ -25,13 +25,13 @@ namespace osu.Game.Screens.Edit
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
-            Background.Schedule(() => Background.FadeColour(Color4.DarkGray, 500));
+            Background.FadeColour(Color4.DarkGray, 500);
             Beatmap?.Track?.Stop();
         }
 
         protected override bool OnExiting(Screen next)
         {
-            Background.Schedule(() => Background.FadeColour(Color4.White, 500));
+            Background.FadeColour(Color4.White, 500);
             Beatmap?.Track?.Start();
             return base.OnExiting(next);
         }

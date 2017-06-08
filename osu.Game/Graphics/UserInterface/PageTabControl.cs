@@ -10,22 +10,20 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Direct
+namespace osu.Game.Graphics.UserInterface
 {
-    public class SortTabControl : OsuTabControl<SortCriteria>
+    public class PageTabControl<T> : OsuTabControl<T>
     {
-        protected override TabItem<SortCriteria> CreateTabItem(SortCriteria value) => new SortTabItem(value);
+        protected override TabItem<T> CreateTabItem(T value) => new PageTabItem(value);
 
-        public SortTabControl()
+        public PageTabControl()
         {
             Height = 30;
         }
 
-        private class SortTabItem : TabItem<SortCriteria>
+        private class PageTabItem : TabItem<T>
         {
             private const float transition_duration = 100;
 
@@ -46,7 +44,7 @@ namespace osu.Game.Overlays.Direct
                 }
             }
 
-            public SortTabItem(SortCriteria value) : base(value)
+            public PageTabItem(T value) : base(value)
             {
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
@@ -103,15 +101,5 @@ namespace osu.Game.Overlays.Direct
                 box.ScaleTo(new Vector2(1f, 0f), transition_duration);
             }
         }
-    }
-
-    public enum SortCriteria
-    {
-        Title,
-        Artist,
-        Creator,
-        Difficulty,
-        Ranked,
-        Rating,
     }
 }
