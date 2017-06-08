@@ -186,7 +186,7 @@ namespace osu.Game.Rulesets.Osu
         public enum DifficultyType
         {
             Speed = 0,
-            Aim,
+            Aim
         };
     }
 }
