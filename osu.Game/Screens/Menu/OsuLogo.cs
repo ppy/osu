@@ -51,10 +51,7 @@ namespace osu.Game.Screens.Menu
 
         public bool Triangles
         {
-            set
-            {
-                colourAndTriangles.Alpha = value ? 1 : 0;
-            }
+            set { colourAndTriangles.Alpha = value ? 1 : 0; }
         }
 
         protected override bool InternalContains(Vector2 screenSpacePos) => logoContainer.Contains(screenSpacePos);
@@ -62,10 +59,7 @@ namespace osu.Game.Screens.Menu
         public bool Ripple
         {
             get { return rippleContainer.Alpha > 0; }
-            set
-            {
-                rippleContainer.Alpha = value ? 1 : 0;
-            }
+            set { rippleContainer.Alpha = value ? 1 : 0; }
         }
 
         public bool Interactive = true;
