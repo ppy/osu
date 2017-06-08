@@ -114,6 +114,11 @@ namespace osu.Game.Overlays
                 },
             };
 
+            Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
+            ((FilterControl)Filter).Ruleset.ValueChanged += ruleset => updateSets();
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => updateSets();
+
             Header.Tabs.Current.ValueChanged += tab =>
             {
                 if (tab != DirectTab.Search)
@@ -123,13 +128,13 @@ namespace osu.Game.Overlays
                     updateSets();
                 }
             };
-            Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
+
             Filter.Search.OnCommit = (sender, text) =>
             {
                 lastQuery = Filter.Search.Text;
                 updateSets();
             };
-            ((FilterControl)Filter).Ruleset.ValueChanged += ruleset => updateSets();
+
             Filter.Tabs.Current.ValueChanged += sortCriteria =>
             {
                 if (Header.Tabs.Current.Value != DirectTab.Search && sortCriteria != (DirectSortCriteria)Header.Tabs.Current.Value)
@@ -137,8 +142,6 @@ namespace osu.Game.Overlays
 
                 updateSets();
             };
-            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => updateSets();
 
             updateResultCounts();
         }
@@ -176,7 +179,7 @@ namespace osu.Game.Overlays
         private string lastQuery = string.Empty;
         private void updateSets()
         {
-            if (!IsLoaded || Header.Tabs.Current.Value == DirectTab.Search && Filter.Search.Text == string.Empty) return;
+            if (!IsLoaded || Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || lastQuery == string.Empty)) return;
 
             BeatmapSets = null;
             ResultAmounts = null;
