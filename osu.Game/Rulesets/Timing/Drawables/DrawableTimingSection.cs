@@ -2,23 +2,20 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
-using osu.Framework.Caching;
 
 namespace osu.Game.Rulesets.Timing.Drawables
 {
     /// <summary>
-    /// Represents a container in which contains hit objects and moves relative to the current time.
+    /// A container for hit objects which applies applies the speed changes defined by the <see cref="Timing.TimingSection.BeatLength"/> and <see cref="Timing.TimingSection.SpeedMultiplier"/>
+    /// properties to its <see cref="Container{T}.Content"/> to affect the <see cref="HitObjectCollection"/> scroll speed.
     /// </summary>
     public abstract class DrawableTimingSection : Container<DrawableHitObject>
     {
-        public readonly TimingSection TimingChange;
+        public readonly TimingSection TimingSection;
 
         protected override Container<DrawableHitObject> Content => content;
         private readonly Container<DrawableHitObject> content;
@@ -26,24 +23,18 @@ namespace osu.Game.Rulesets.Timing.Drawables
         private readonly Axes scrollingAxes;
 
         /// <summary>
-        /// Creates a new drawable timing change which contains hit objects and scrolls relative to the current time.
+        /// Creates a new <see cref="DrawableTimingSection"/>.
         /// </summary>
-        /// <param name="timingChange">The encapsulated timing change that provides the speed changes.</param>
-        /// <param name="scrollingAxes">The axes through which this timing change scrolls.</param>
-        protected DrawableTimingSection(TimingSection timingChange, Axes scrollingAxes)
+        /// <param name="timingSection">The encapsulated timing section that provides the speed changes.</param>
+        /// <param name="scrollingAxes">The axes through which this drawable timing section scrolls through.</param>
+        protected DrawableTimingSection(TimingSection timingSection, Axes scrollingAxes)
         {
             this.scrollingAxes = scrollingAxes;
 
-            TimingChange = timingChange;
+            TimingSection = timingSection;
 
-            // We have to proxy the hit objects to an internal container since we're
-            // going to be modifying our height to apply speed changes
-            AddInternal(content = new RelativeCoordinateAutoSizingContainer(scrollingAxes)
-            {
-                RelativeSizeAxes = Axes.Both,
-                RelativePositionAxes = Axes.Both,
-                RelativeChildOffset = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)TimingChange.Time : 0, (scrollingAxes & Axes.Y) > 0 ? (float)TimingChange.Time : 0)
-            });
+            AddInternal(content = CreateHitObjectCollection(scrollingAxes));
+            content.RelativeChildOffset = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)TimingSection.Time : 0, (scrollingAxes & Axes.Y) > 0 ? (float)TimingSection.Time : 0);
         }
 
         public override Axes RelativeSizeAxes
@@ -59,76 +50,24 @@ namespace osu.Game.Rulesets.Timing.Drawables
             if (parent == null)
                 return;
 
-            // Adjust our size to account for the speed changes
-            float speedAdjustedSize = (float)(1000 / TimingChange.BeatLength / TimingChange.SpeedMultiplier);
+            float speedAdjustedSize = (float)(1000 / TimingSection.BeatLength / TimingSection.SpeedMultiplier);
 
+            // The application of speed changes happens by modifying our size while maintaining the parent's relative child size as our own
+            // By doing this the scroll speed of the hit objects is changed by a factor of Size / RelativeChildSize
             Size = new Vector2((scrollingAxes & Axes.X) > 0 ? speedAdjustedSize : 1, (scrollingAxes & Axes.Y) > 0 ? speedAdjustedSize : 1);
-            RelativeChildSize = new Vector2((scrollingAxes & Axes.X) > 0 ? parent.RelativeChildSize.X : 1, (scrollingAxes & Axes.Y) > 0 ? parent.RelativeChildSize.Y : 1);
+            RelativeChildSize = parent.RelativeChildSize;
         }
 
-        protected double TimeSpan => (Parent as TimingSectionCollection)?.TimeSpan ?? 0;
+        /// <summary>
+        /// Whether this timing change can contain a hit object. This is true if the hit object occurs after this timing change with respect to time.
+        /// </summary>
+        public bool CanContain(DrawableHitObject hitObject) => TimingSection.Time <= hitObject.HitObject.StartTime;
 
         /// <summary>
-        /// Whether this timing change can contain a hit object. This is true if the hit object occurs "after" after this timing change.
+        /// Creates the container which handles the movement of a collection of hit objects.
         /// </summary>
-        public bool CanContain(DrawableHitObject hitObject) => TimingChange.Time <= hitObject.HitObject.StartTime;
-
-        /// <summary>
-        /// A container which cann be relatively-sized while auto-sizing to its children on desired axes. The relative coordinate space of
-        /// this container follows its auto-sized height.
-        /// </summary>
-        private class RelativeCoordinateAutoSizingContainer : Container<DrawableHitObject>
-        {
-            protected override IComparer<Drawable> DepthComparer => new HitObjectReverseStartTimeComparer();
-
-            private readonly Axes autoSizingAxes;
-
-            private Cached layout = new Cached();
-
-            /// <summary>
-            /// The axes which this container should calculate its size from its children on.
-            /// Note that this is not the same as <see cref="Container{T}.AutoSizeAxes"/>, because that would not allow this container
-            /// to be relatively sized - desired in the case where the playfield re-defines <see cref="Container{T}.RelativeChildSize"/>.
-            /// </summary>
-            /// <param name="autoSizingAxes"></param>
-            public RelativeCoordinateAutoSizingContainer(Axes autoSizingAxes)
-            {
-                this.autoSizingAxes = autoSizingAxes;
-            }
-
-            public override void InvalidateFromChild(Invalidation invalidation)
-            {
-                // We only want to re-compute our size when a child's size or position has changed
-                if ((invalidation & Invalidation.Geometry) == 0)
-                {
-                    base.InvalidateFromChild(invalidation);
-                    return;
-                }
-
-                layout.Invalidate();
-
-                base.InvalidateFromChild(invalidation);
-            }
-
-            protected override void UpdateAfterChildren()
-            {
-                base.UpdateAfterChildren();
-
-                if (!layout.EnsureValid())
-                {
-                    layout.Refresh(() =>
-                    {
-                        if (!Children.Any())
-                            return;
-
-                        float width = Children.Select(child => child.X + child.Width).Max() - RelativeChildOffset.X;
-                        float height = Children.Select(child => child.Y + child.Height).Max() - RelativeChildOffset.Y;
-
-                        Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X, (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
-                        RelativeChildSize = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : 1, (autoSizingAxes & Axes.Y) > 0 ? height : 1);
-                    });
-                }
-            }
-        }
+        /// <param name="autoSizingAxes"></param>
+        /// <returns></returns>
+        protected abstract HitObjectCollection CreateHitObjectCollection(Axes autoSizingAxes);
     }
 }
