@@ -11,8 +11,11 @@ using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Timing
 {
-    public class TimingSectionCollection : Container<DrawableTimingSection>
+    public abstract class TimingSectionCollection : Container<DrawableTimingSection>
     {
+        /// <summary>
+        /// The length of time which is visualized 
+        /// </summary>
         public double TimeSpan { get; set; }
 
         /// <summary>
