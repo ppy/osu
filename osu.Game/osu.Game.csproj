@@ -194,6 +194,7 @@
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
     <Compile Include="Rulesets\Timing\Drawables\DrawableTimingSection.cs" />
+    <Compile Include="Rulesets\Timing\Drawables\HitObjectCollection.cs" />
     <Compile Include="Rulesets\Timing\TimingSection.cs" />
     <Compile Include="Rulesets\Timing\TimingSectionCollection.cs" />
     <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
