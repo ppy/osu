@@ -50,6 +50,7 @@ namespace osu.Game.Screens.Menu
                             OnExit = delegate { Exit(); },
                         },
                         new MenuSideFlashes(),
+                        new KiaiEffectContainer()
                     }
                 }
             };
