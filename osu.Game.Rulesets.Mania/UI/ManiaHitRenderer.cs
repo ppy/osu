@@ -20,6 +20,7 @@ using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Mania.Timing.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
@@ -114,9 +115,9 @@ namespace osu.Game.Rulesets.Mania.UI
             timingChanges.ForEach(t =>
             {
                 for (int i = 0; i < PreferredColumns; i++)
-                    HitObjectTimingChanges[i].Add(new DrawableManiaScrollingTimingChange(t));
+                    HitObjectTimingChanges[i].Add(new DrawableManiaTimingSection(t, ScrollingAlgorithm.Basic));
 
-                BarlineTimingChanges.Add(new DrawableManiaScrollingTimingChange(t));
+                BarlineTimingChanges.Add(new DrawableManiaTimingSection(t, ScrollingAlgorithm.Basic));
             });
         }
 

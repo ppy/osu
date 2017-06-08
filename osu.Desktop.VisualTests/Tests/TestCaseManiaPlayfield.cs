@@ -13,8 +13,9 @@ using osu.Framework.Configuration;
 using OpenTK.Input;
 using osu.Framework.Timing;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Game.Rulesets.Mania.Timing.Drawables;
 using System.Linq;
+using osu.Game.Rulesets.Mania.Timing;
+using osu.Game.Rulesets.Mania.Timing.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.Timing.Drawables;
 
@@ -45,23 +46,11 @@ namespace osu.Desktop.VisualTests.Tests
             const double start_time = 500;
             const double duration = 500;
 
-            Func<double, bool, DrawableTimingSection> createTimingChange = (time, gravity) =>
+            Func<double, bool, DrawableTimingSection> createTimingChange = (time, gravity) => new DrawableManiaTimingSection(new TimingSection
             {
-                if (gravity)
-                {
-                    return new DrawableManiaGravityTimingChange(new TimingSection
-                    {
-                        BeatLength = 1000,
-                        Time = time
-                    });
-                }
-
-                return new DrawableManiaScrollingTimingChange(new TimingSection
-                {
-                    BeatLength = 1000,
-                    Time = time
-                });
-            };
+                BeatLength = 1000,
+                Time = time
+            }, gravity ? ScrollingAlgorithm.Gravity : ScrollingAlgorithm.Basic);
 
             Action<bool> createPlayfieldWithNotes = gravity =>
             {
