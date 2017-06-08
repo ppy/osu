@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Timing.Drawables
@@ -71,7 +70,7 @@ namespace osu.Game.Rulesets.Timing.Drawables
         public override void InvalidateFromChild(Invalidation invalidation)
         {
             // We only want to re-compute our size when a child's size or position has changed
-            if ((invalidation & Invalidation.Geometry) == 0)
+            if ((invalidation & Invalidation.RequiredParentSizeToFit) == 0)
             {
                 base.InvalidateFromChild(invalidation);
                 return;
