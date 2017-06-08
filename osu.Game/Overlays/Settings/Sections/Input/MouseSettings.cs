@@ -59,12 +59,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 activeInputHandlers.Value = enabled ?
                     activeInputHandlers.Value.Replace(standard_mouse_handler, raw_mouse_handler) :
                     activeInputHandlers.Value.Replace(raw_mouse_handler, standard_mouse_handler);
-
-                sensitivity.Bindable.Disabled = !enabled;
             };
 
             activeInputHandlers = config.GetBindable<string>(FrameworkSetting.ActiveInputHandlers);
-            activeInputHandlers.ValueChanged += handlers => rawInputToggle.Value = handlers.Contains("Raw");
+            activeInputHandlers.ValueChanged += handlers =>
+            {
+                bool raw = handlers.Contains("Raw");
+                rawInputToggle.Value = raw;
+                sensitivity.Bindable.Disabled = !raw;
+            };
+
             activeInputHandlers.TriggerChange();
         }
 

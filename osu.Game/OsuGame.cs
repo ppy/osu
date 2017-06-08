@@ -264,8 +264,13 @@ namespace osu.Game
                     case Key.R:
                         if (state.Keyboard.AltPressed)
                         {
+                            var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
+
+                            sensitivity.Disabled = false;
+                            sensitivity.Value = 1;
+                            sensitivity.Disabled = true;
+
                             frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
-                            frameworkConfig.Set(FrameworkSetting.CursorSensitivity, 1.0);
                             return true;
                         }
                         break;
