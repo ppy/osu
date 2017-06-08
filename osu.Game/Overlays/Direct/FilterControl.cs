@@ -103,5 +103,6 @@ namespace osu.Game.Overlays.Direct
         Difficulty,
         Ranked,
         Rating,
+        Plays,
     }
 }

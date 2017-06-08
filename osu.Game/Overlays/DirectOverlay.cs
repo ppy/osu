@@ -114,7 +114,15 @@ namespace osu.Game.Overlays
                 },
             };
 
-            Header.Tabs.Current.ValueChanged += tab => { if (tab != DirectTab.Search) Filter.Search.Text = string.Empty; };
+            Header.Tabs.Current.ValueChanged += tab =>
+            {
+                if (tab != DirectTab.Search)
+                {
+                    Filter.Search.Text = lastQuery = string.Empty;
+                    Filter.Tabs.Current.Value = (DirectSortCriteria)Header.Tabs.Current.Value;
+                    updateSets();
+                }
+            };
             Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
             Filter.Search.OnCommit = (sender, text) =>
             {
@@ -122,7 +130,13 @@ namespace osu.Game.Overlays
                 updateSets();
             };
             ((FilterControl)Filter).Ruleset.ValueChanged += ruleset => updateSets();
-            Filter.Tabs.Current.ValueChanged += sortCriteria => updateSets();
+            Filter.Tabs.Current.ValueChanged += sortCriteria =>
+            {
+                if (Header.Tabs.Current.Value != DirectTab.Search && sortCriteria != (DirectSortCriteria)Header.Tabs.Current.Value)
+                    Header.Tabs.Current.Value = DirectTab.Search;
+
+                updateSets();
+            };
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
             Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => updateSets();
 
@@ -159,7 +173,7 @@ namespace osu.Game.Overlays
         }
 
         private GetBeatmapSetsRequest getSetsRequest;
-        private string lastQuery;
+        private string lastQuery = string.Empty;
         private void updateSets()
         {
             if (!IsLoaded) return;
@@ -168,7 +182,7 @@ namespace osu.Game.Overlays
             ResultAmounts = null;
             getSetsRequest?.Cancel();
 
-            if (api == null || Filter.Search.Text == string.Empty) return;
+            if (api == null || Filter.Search.Text == string.Empty && Header.Tabs.Current.Value == DirectTab.Search) return;
 
             getSetsRequest = new GetBeatmapSetsRequest(lastQuery,
                                                        ((FilterControl)Filter).Ruleset.Value,
