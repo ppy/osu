@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 letterboxSettings.ClearTransforms();
                 letterboxSettings.AutoSizeAxes = isVisible ? Axes.Y : Axes.None;
 
-                if(!isVisible)
+                if (!isVisible)
                     letterboxSettings.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
             };
             letterboxing.TriggerChange();

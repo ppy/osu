@@ -71,7 +71,6 @@ namespace osu.Game.Screens.Ranking
 
             using (BeginDelayedSequence(transition_time * 0.25f, true))
             {
-
                 circleOuter.ScaleTo(1, transition_time, EasingTypes.OutQuint);
                 circleOuter.FadeTo(1, transition_time, EasingTypes.OutQuint);
 

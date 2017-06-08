@@ -86,6 +86,6 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        private void scrollToEnd() => Scheduler.AddDelayed(() => scroll.ScrollToEnd(), 50);
+        private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
     }
 }
