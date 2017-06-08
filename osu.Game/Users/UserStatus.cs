@@ -14,7 +14,7 @@ namespace osu.Game.Users
 
     public abstract class UserStatusAvailable : UserStatus
     {
-        public override Color4 GetAppropriateColour(OsuColour colours) => colours.BlueDarker;
+        public override Color4 GetAppropriateColour(OsuColour colours) => colours.Green;
     }
 
     public abstract class UserStatusBusy : UserStatus
