@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Mods
                     backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
 
                     backgroundIcon.Icon = modAfter.Icon;
-                    using (iconsContainer.BeginDelayedSequence(mod_switch_duration, true))
+                    using (BeginDelayedSequence(mod_switch_duration, true))
                     {
                         foregroundIcon.RotateTo(-rotate_angle * direction);
                         foregroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Mods
                         backgroundIcon.RotateTo(rotate_angle * direction);
                         backgroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
 
-                        iconsContainer.Schedule(() => displayMod(modAfter));
+                        Schedule(() => displayMod(modAfter));
                     }
                 }
 
