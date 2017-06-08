@@ -278,7 +278,6 @@ namespace osu.Game.Screens.Play
                 {
                     if (!pauseContainer.IsPaused)
                         decoupledClock.Start();
-
                 });
 
             pauseContainer.Alpha = 0;
