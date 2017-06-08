@@ -176,18 +176,18 @@ namespace osu.Game.Overlays
         private string lastQuery = string.Empty;
         private void updateSets()
         {
-            if (!IsLoaded) return;
+            if (!IsLoaded || Header.Tabs.Current.Value == DirectTab.Search && Filter.Search.Text == string.Empty) return;
 
             BeatmapSets = null;
             ResultAmounts = null;
             getSetsRequest?.Cancel();
 
-            if (api == null || Filter.Search.Text == string.Empty && Header.Tabs.Current.Value == DirectTab.Search) return;
+            if (api == null) return;
 
             getSetsRequest = new GetBeatmapSetsRequest(lastQuery,
                                                        ((FilterControl)Filter).Ruleset.Value,
                                                        Filter.DisplayStyleControl.Dropdown.Current.Value,
-                                                       Filter.Tabs.Current.Value); //todo: sort direction
+                                                       Filter.Tabs.Current.Value); //todo: sort direction (?)
 
             getSetsRequest.Success += r =>
             {
