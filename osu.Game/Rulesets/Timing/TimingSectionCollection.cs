@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Timing
 {
-    public abstract class TimingSectionCollection : Container<DrawableTimingSection>
+    public class TimingSectionCollection : Container<DrawableTimingSection>
     {
         /// <summary>
         /// The length of time which is visualized 
@@ -55,11 +55,11 @@ namespace osu.Game.Rulesets.Timing
             var timingChangeY = y as DrawableTimingSection;
 
             // If either of the two drawables are not hit objects, fall back to the base comparer
-            if (timingChangeX?.TimingChange == null || timingChangeY?.TimingChange == null)
+            if (timingChangeX?.TimingSection == null || timingChangeY?.TimingSection == null)
                 return base.Compare(x, y);
 
             // Compare by start time
-            int i = timingChangeY.TimingChange.Time.CompareTo(timingChangeX.TimingChange.Time);
+            int i = timingChangeY.TimingSection.Time.CompareTo(timingChangeX.TimingSection.Time);
             if (i != 0)
                 return i;
 

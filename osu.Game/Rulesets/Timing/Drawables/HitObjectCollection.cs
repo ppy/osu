@@ -28,9 +28,9 @@ namespace osu.Game.Rulesets.Timing.Drawables
     /// </para>
     /// 
     /// <para>
-    /// This container will always be relatively-sized to its parent through the use of <see cref="Drawable.RelativeSizeAxes"/> such that the
-    /// parent can utilise <see cref="Container{T}.RelativeChildSize"/> and <see cref="Container{T}.RelativeChildOffset"/> to apply further
-    /// time offsets to this collection of hit objects.
+    /// This container will always be relatively-sized and positioned to its parent through the use of <see cref="Drawable.RelativeSizeAxes"/>
+    /// and <see cref="Drawable.RelativePositionAxes"/> such that the parent can utilise <see cref="Container{T}.RelativeChildSize"/> and
+    /// <see cref="Container{T}.RelativeChildOffset"/> to apply further time offsets to this collection of hit objects.
     /// </para>
     /// </summary>
     public abstract class HitObjectCollection : Container<DrawableHitObject>
@@ -48,6 +48,9 @@ namespace osu.Game.Rulesets.Timing.Drawables
         protected HitObjectCollection(Axes autoSizingAxes)
         {
             this.autoSizingAxes = autoSizingAxes;
+
+            // We need a default size since RelativeSizeAxes is overridden
+            Size = Vector2.One;
         }
 
         public override Axes AutoSizeAxes { set { throw new InvalidOperationException($"{nameof(HitObjectCollection)} must always be relatively-sized."); } }
@@ -56,6 +59,12 @@ namespace osu.Game.Rulesets.Timing.Drawables
         {
             get { return Axes.Both; }
             set { throw new InvalidOperationException($"{nameof(HitObjectCollection)} must always be relatively-sized."); }
+        }
+
+        public override Axes RelativePositionAxes
+        {
+            get { return Axes.Both; }
+            set { throw new InvalidOperationException($"{nameof(HitObjectCollection)} must always be relatively-positioned."); }
         }
 
         public override void InvalidateFromChild(Invalidation invalidation)
@@ -88,7 +97,7 @@ namespace osu.Game.Rulesets.Timing.Drawables
                     float height = Children.Select(child => child.Y + child.Height).Max() - RelativeChildOffset.Y;
 
                     // Consider that width/height are time values. To have ourselves span these time values 1:1, we first need to set our size
-                    base.Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X, (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
+                    Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X, (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
                     // Then to make our position-space be time values again, we need our relative child size to follow our size
                     RelativeChildSize = Size;
                 });

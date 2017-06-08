@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -18,7 +19,7 @@ namespace osu.Game.Rulesets.Timing.Drawables
         public readonly TimingSection TimingSection;
 
         protected override Container<DrawableHitObject> Content => content;
-        private readonly Container<DrawableHitObject> content;
+        private Container<DrawableHitObject> content;
 
         private readonly Axes scrollingAxes;
 
@@ -32,8 +33,12 @@ namespace osu.Game.Rulesets.Timing.Drawables
             this.scrollingAxes = scrollingAxes;
 
             TimingSection = timingSection;
+        }
 
-            AddInternal(content = CreateHitObjectCollection(scrollingAxes));
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddInternal(content = CreateHitObjectCollection());
             content.RelativeChildOffset = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)TimingSection.Time : 0, (scrollingAxes & Axes.Y) > 0 ? (float)TimingSection.Time : 0);
         }
 
@@ -45,7 +50,7 @@ namespace osu.Game.Rulesets.Timing.Drawables
 
         protected override void Update()
         {
-            var parent = Parent as Container;
+            var parent = Parent as TimingSectionCollection;
 
             if (parent == null)
                 return;
@@ -55,7 +60,7 @@ namespace osu.Game.Rulesets.Timing.Drawables
             // The application of speed changes happens by modifying our size while maintaining the parent's relative child size as our own
             // By doing this the scroll speed of the hit objects is changed by a factor of Size / RelativeChildSize
             Size = new Vector2((scrollingAxes & Axes.X) > 0 ? speedAdjustedSize : 1, (scrollingAxes & Axes.Y) > 0 ? speedAdjustedSize : 1);
-            RelativeChildSize = parent.RelativeChildSize;
+            RelativeChildSize = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)parent.TimeSpan : 1, (scrollingAxes & Axes.Y) > 0 ? (float)parent.TimeSpan : 1);
         }
 
         /// <summary>
@@ -66,8 +71,7 @@ namespace osu.Game.Rulesets.Timing.Drawables
         /// <summary>
         /// Creates the container which handles the movement of a collection of hit objects.
         /// </summary>
-        /// <param name="autoSizingAxes"></param>
-        /// <returns></returns>
-        protected abstract HitObjectCollection CreateHitObjectCollection(Axes autoSizingAxes);
+        /// <returns>The hit object collection.</returns>
+        protected abstract HitObjectCollection CreateHitObjectCollection();
     }
 }
