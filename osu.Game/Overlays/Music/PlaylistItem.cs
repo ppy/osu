@@ -137,6 +137,7 @@ namespace osu.Game.Overlays.Music
 
         public bool MatchingFilter
         {
+            get { return matching; }
             set
             {
                 if (matching == value) return;
@@ -144,10 +145,6 @@ namespace osu.Game.Overlays.Music
                 matching = value;
 
                 FadeTo(matching ? 1 : 0, 200);
-            }
-            get
-            {
-                return matching;
             }
         }
     }

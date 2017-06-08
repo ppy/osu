@@ -20,7 +20,6 @@ using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Mods
 {
-
     /// <summary>
     /// Represents a clickable button which can cycle through one of more mods.
     /// </summary>
