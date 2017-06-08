@@ -6,13 +6,14 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Mania.Timing.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using System.Linq;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Timing;
+using osu.Game.Rulesets.Mania.Timing.Drawables;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.Timing.Drawables;
@@ -43,11 +44,11 @@ namespace osu.Game.Rulesets.Mania.Mods
                 if (maniaObject == null)
                     continue;
 
-                maniaHitRenderer.HitObjectTimingChanges[maniaObject.Column].Add(new DrawableManiaGravityTimingChange(new TimingSection
+                maniaHitRenderer.HitObjectTimingChanges[maniaObject.Column].Add(new DrawableManiaTimingSection(new TimingSection
                 {
                     Time = obj.StartTime,
                     BeatLength = 1000
-                }));
+                }, ScrollingAlgorithm.Gravity));
             }
 
             double lastObjectTime = (maniaHitRenderer.Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? maniaHitRenderer.Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
@@ -62,11 +63,11 @@ namespace osu.Game.Rulesets.Mania.Mods
 
                 for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength)
                 {
-                    maniaHitRenderer.BarlineTimingChanges.Add(new DrawableManiaGravityTimingChange(new TimingSection
+                    maniaHitRenderer.BarlineTimingChanges.Add(new DrawableManiaTimingSection(new TimingSection
                     {
                         Time = t,
                         BeatLength = 1000
-                    }));
+                    }, ScrollingAlgorithm.Gravity));
                 }
             }
         }
