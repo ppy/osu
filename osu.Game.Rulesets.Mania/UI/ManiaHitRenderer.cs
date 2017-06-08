@@ -40,12 +40,12 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// Per-column timing changes.
         /// </summary>
-        public List<DrawableTimingChange>[] HitObjectTimingChanges;
+        public List<DrawableTimingSection>[] HitObjectTimingChanges;
 
         /// <summary>
         /// Bar line timing changes.
         /// </summary>
-        public List<DrawableTimingChange> BarlineTimingChanges;
+        public List<DrawableTimingSection> BarlineTimingChanges;
 
         /// <summary>
         /// Number of columns in the playfield of this hit renderer. Null if the play field hasn't been generated yet.
@@ -65,11 +65,11 @@ namespace osu.Game.Rulesets.Mania.UI
             if (HitObjectTimingChanges != null || BarlineTimingChanges != null)
                 return;
 
-            HitObjectTimingChanges = new List<DrawableTimingChange>[PreferredColumns];
-            BarlineTimingChanges = new List<DrawableTimingChange>();
+            HitObjectTimingChanges = new List<DrawableTimingSection>[PreferredColumns];
+            BarlineTimingChanges = new List<DrawableTimingSection>();
 
             for (int i = 0; i < PreferredColumns; i++)
-                HitObjectTimingChanges[i] = new List<DrawableTimingChange>();
+                HitObjectTimingChanges[i] = new List<DrawableTimingSection>();
 
             double lastSpeedMultiplier = 1;
             double lastBeatLength = 500;
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 if (difficultyPoint != null)
                     lastSpeedMultiplier = difficultyPoint.SpeedMultiplier;
 
-                return new TimingChange
+                return new TimingSection
                 {
                     Time = c.Time,
                     BeatLength = lastBeatLength,

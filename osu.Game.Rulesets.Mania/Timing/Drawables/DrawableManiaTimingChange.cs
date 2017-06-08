@@ -7,9 +7,9 @@ using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
-    public abstract class DrawableManiaTimingChange : DrawableTimingChange
+    public abstract class DrawableManiaTimingChange : DrawableTimingSection
     {
-        protected DrawableManiaTimingChange(TimingChange timingChange)
+        protected DrawableManiaTimingChange(TimingSection timingChange)
             : base(timingChange, Axes.Y)
         {
         }
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
         {
             base.UpdateAfterChildren();
 
-            var parent = Parent as IHasTimeSpan;
+            var parent = Parent as TimingSectionCollection;
 
             if (parent == null)
                 return;

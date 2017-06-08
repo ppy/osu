@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Timing
 {
-    public class TimingChange
+    public class TimingSection
     {
         /// <summary>
         /// The time at which this timing change happened.

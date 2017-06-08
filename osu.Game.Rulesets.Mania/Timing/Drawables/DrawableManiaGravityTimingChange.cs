@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
     /// </summary>
     public class DrawableManiaGravityTimingChange : DrawableManiaTimingChange
     {
-        public DrawableManiaGravityTimingChange(TimingChange timingChange)
+        public DrawableManiaGravityTimingChange(TimingSection timingChange)
             : base(timingChange)
         {
         }
