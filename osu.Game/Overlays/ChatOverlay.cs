@@ -367,7 +367,6 @@ namespace osu.Game.Overlays
             }
             else
             {
-
                 careChannels.Add(channel);
                 channelTabs.AddItem(channel);
             }

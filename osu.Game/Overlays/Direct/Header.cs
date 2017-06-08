@@ -2,112 +2,27 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.ComponentModel;
-using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-
-using Container = osu.Framework.Graphics.Containers.Container;
+using osu.Game.Overlays.SearchableList;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class Header : Container
+    public class Header : SearchableListHeader<DirectTab>
     {
-        public static readonly float HEIGHT = 90;
+        protected override Color4 BackgroundColour => OsuColour.FromHex(@"252f3a");
+        protected override float TabStripWidth => 298;
 
-        private readonly Box tabStrip;
-
-        public readonly OsuTabControl<DirectTab> Tabs;
+        protected override DirectTab DefaultTab => DirectTab.Search;
+        protected override Drawable CreateHeaderText() => new OsuSpriteText { Text = @"osu!direct", TextSize = 25 };
+        protected override FontAwesome Icon => FontAwesome.fa_osu_chevron_down_o;
 
         public Header()
         {
-            Height = HEIGHT;
-
-            Children = new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex(@"252f3a"),
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Left = DirectOverlay.WIDTH_PADDING, Right = DirectOverlay.WIDTH_PADDING },
-                    Children = new Drawable[]
-                    {
-                        new FillFlowContainer
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.BottomLeft,
-                            Position = new Vector2(-35f, 5f),
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(10f, 0f),
-                            Children = new Drawable[]
-                            {
-                                new TextAwesome
-                                {
-                                    TextSize = 25,
-                                    Icon = FontAwesome.fa_osu_chevron_down_o,
-                                },
-                                new OsuSpriteText
-                                {
-                                    TextSize = 25,
-                                    Text = @"osu!direct",
-                                },
-                            },
-                        },
-                        tabStrip = new Box
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Width = 282, //todo: make this actually match the tab control's width instead of hardcoding
-                            Height = 1,
-                        },
-                        Tabs = new DirectTabControl
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                        },
-                    },
-                },
-            };
-
             Tabs.Current.Value = DirectTab.Search;
             Tabs.Current.TriggerChange();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            tabStrip.Colour = colours.Green;
-        }
-
-        private class DirectTabControl : OsuTabControl<DirectTab>
-        {
-            protected override TabItem<DirectTab> CreateTabItem(DirectTab value) => new DirectTabItem(value);
-
-            public DirectTabControl()
-            {
-                Height = 25;
-                AccentColour = Color4.White;
-            }
-
-            private class DirectTabItem : OsuTabItem
-            {
-                public DirectTabItem(DirectTab value) : base(value)
-                {
-                    Text.TextSize = 15;
-                }
-            }
         }
     }
 
