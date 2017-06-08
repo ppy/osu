@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Multiplayer
                 },
                 avatar = new UpdateableAvatar
                 {
-                    Size = new Vector2(Height - content_padding* 2),
+                    Size = new Vector2(Height - content_padding * 2),
                     Masking = true,
                     CornerRadius = 5f,
                     Margin = new MarginPadding { Left = content_padding * 2, Top = content_padding },
