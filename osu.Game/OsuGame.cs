@@ -150,7 +150,7 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                 },
                 volume = new VolumeControl(),
-                overlayContent = new Container{ RelativeSizeAxes = Axes.Both },
+                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 new OnScreenDisplay(),
                 new GlobalHotkeys //exists because UserInputManager is at a level below us.
                 {
