@@ -6,7 +6,7 @@ namespace osu.Game.Rulesets.Timing
     public class TimingSection
     {
         /// <summary>
-        /// The time at which this timing change happened.
+        /// The time at which this timing section starts.
         /// </summary>
         public double Time;
 
