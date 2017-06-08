@@ -36,13 +36,13 @@ namespace osu.Game.Overlays.Direct
 
         protected Drawable GetBackground(TextureStore textures, bool doubleSize)
         {
-            return new AsyncLoadWrapper(new BeatmapSetBackgroundSprite(SetInfo, doubleSize)
+            return new DelayedLoadWrapper(new BeatmapSetBackgroundSprite(SetInfo, doubleSize)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
-            }) { RelativeSizeAxes = Axes.Both };
+            }) { RelativeSizeAxes = Axes.Both, TimeBeforeLoad = 300 };
         }
 
         public class Statistic : FillFlowContainer
