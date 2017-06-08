@@ -232,7 +232,7 @@ namespace osu.Game.Screens.Play
                                 AutoSizeAxes = Axes.Both,
                                 Origin = Anchor.Centre,
                                 Direction = FillDirection.Horizontal,
-                                Children = new []
+                                Children = new[]
                                 {
                                     new TextAwesome { Icon = FontAwesome.fa_chevron_right },
                                     new TextAwesome { Icon = FontAwesome.fa_chevron_right },
