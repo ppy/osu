@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Timing.Drawables
@@ -23,8 +24,8 @@ namespace osu.Game.Rulesets.Timing.Drawables
     /// </para>
     /// 
     /// <para>
-    /// This container will auto-size to the total size of its children along the desired auto-sizing axes such that the size of this container
-    /// will also be a time value if hit objects added to this container have time values as their positions/sizes.
+    /// This container will auto-size to the total size of its children along the desired auto-sizing axes such that the reasulting size
+    /// of this container will also be a time value.
     /// </para>
     /// 
     /// <para>
@@ -92,7 +93,15 @@ namespace osu.Game.Rulesets.Timing.Drawables
                     if (!Children.Any())
                         return;
 
+                    //double maxDuration = Children.Select(c => (c.HitObject as IHasEndTime)?.EndTime ?? c.HitObject.StartTime).Max();
+                    //float width = (float)maxDuration - RelativeChildOffset.X;
+                    //float height = (float)maxDuration - RelativeChildOffset.Y;
+
+
                     // Auto-size to the total size of our children
+                    // This ends up being the total duration of our children, however for now this is a more sure-fire way to calculate this
+                    // than the above due to some undesired masking optimisations causing some hit objects to be culled...
+                    // Todo: When this is investigated more we should use the above method as it is a little more exact
                     float width = Children.Select(child => child.X + child.Width).Max() - RelativeChildOffset.X;
                     float height = Children.Select(child => child.Y + child.Height).Max() - RelativeChildOffset.Y;
 

@@ -57,14 +57,13 @@ namespace osu.Game.Rulesets.Timing.Drawables
 
             float speedAdjustedSize = (float)(1000 / TimingSection.BeatLength / TimingSection.SpeedMultiplier);
 
-            // The application of speed changes happens by modifying our size while maintaining the parent's relative child size as our own
-            // By doing this the scroll speed of the hit objects is changed by a factor of Size / RelativeChildSize
+            // The application of speed changes happens by modifying our size while maintaining the parent's time span as our relative child size
             Size = new Vector2((scrollingAxes & Axes.X) > 0 ? speedAdjustedSize : 1, (scrollingAxes & Axes.Y) > 0 ? speedAdjustedSize : 1);
             RelativeChildSize = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)parent.TimeSpan : 1, (scrollingAxes & Axes.Y) > 0 ? (float)parent.TimeSpan : 1);
         }
 
         /// <summary>
-        /// Whether this timing change can contain a hit object. This is true if the hit object occurs after this timing change with respect to time.
+        /// Whether this timing section can contain a hit object. This is true if the hit object occurs after this timing section with respect to time.
         /// </summary>
         public bool CanContain(DrawableHitObject hitObject) => TimingSection.Time <= hitObject.HitObject.StartTime;
 
