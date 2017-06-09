@@ -40,7 +40,7 @@ namespace osu.Desktop.VisualTests.Tests
                             {
                                 Name = "Timing section",
                                 RelativeSizeAxes = Axes.Both,
-                                RelativeCoordinateSpace = new Vector2(1, 10000),
+                                RelativeChildSize = new Vector2(1, 10000),
                                 Children = new[]
                                 {
                                     new DrawableNote(new Note { StartTime = 5000 }) { AccentColour = Color4.Red },
@@ -62,7 +62,7 @@ namespace osu.Desktop.VisualTests.Tests
                             {
                                 Name = "Timing section",
                                 RelativeSizeAxes = Axes.Both,
-                                RelativeCoordinateSpace = new Vector2(1, 10000),
+                                RelativeChildSize = new Vector2(1, 10000),
                                 Children = new[]
                                 {
                                     new DrawableHoldNote(new HoldNote
