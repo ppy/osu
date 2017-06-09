@@ -5,14 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Caching;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
-using osu.Framework.Configuration;
 
-namespace osu.Game.Rulesets.Timing.Drawables
+namespace osu.Game.Rulesets.Timing
 {
     /// <summary>
     /// A collection of hit objects which scrolls within a <see cref="SpeedAdjustmentContainer"/>.

@@ -121,6 +121,11 @@ namespace osu.Game.Rulesets.UI
         public Beatmap<TObject> Beatmap;
 
         /// <summary>
+        /// The mods which are to be applied.
+        /// </summary>
+        protected IEnumerable<Mod> Mods;
+
+        /// <summary>
         /// Creates a hit renderer for a beatmap.
         /// </summary>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
@@ -128,6 +133,8 @@ namespace osu.Game.Rulesets.UI
         internal HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
         {
             Debug.Assert(beatmap != null, "HitRenderer initialized with a null beatmap.");
+
+            Mods = beatmap.Mods.Value;
 
             RelativeSizeAxes = Axes.Both;
 
