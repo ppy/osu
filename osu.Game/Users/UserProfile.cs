@@ -76,6 +76,11 @@ namespace osu.Game.Users
 
             tabs.Current.ValueChanged += s =>
             {
+                if (lastSection == null)
+                {
+                    lastSection = tabs.Current.Value = sections[0];
+                    return;
+                }
                 if (lastSection != s)
                 {
                     lastSection = s;
