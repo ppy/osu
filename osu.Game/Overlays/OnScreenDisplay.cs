@@ -125,6 +125,14 @@ namespace osu.Game.Overlays
             trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Width), v => displayResolution());
             trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Height), v => displayResolution());
 
+            trackSetting(frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity), v => display(v, "Cursor Sensitivity", v.ToString(@"0.##x"), "Ctrl+Alt+R to reset"));
+            trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.ActiveInputHandlers),
+                delegate (string v)
+                {
+                    bool raw = v.Contains("Raw");
+                    display(raw, "Raw Input", raw ? "enabled" : "disabled", "Ctrl+Alt+R to reset");
+                });
+
             trackSetting(frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode), v => display(v, "Screen Mode", v.ToString(), "Alt+Enter"));
         }
 
