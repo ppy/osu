@@ -7,7 +7,7 @@ namespace osu.Game.Users.Profile
     {
         public override string Title => "Historical";
 
-        public HistoricalSection(User user) : base(user)
+        public HistoricalSection(User user)
         {
         }
     }

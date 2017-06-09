@@ -7,7 +7,7 @@ namespace osu.Game.Users.Profile
     {
         public override string Title => "me!";
 
-        public AboutSection(User user) : base(user)
+        public AboutSection(User user)
         {
         }
     }

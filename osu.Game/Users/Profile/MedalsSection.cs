@@ -7,7 +7,7 @@ namespace osu.Game.Users.Profile
     {
         public override string Title => "Medals";
 
-        public MedalsSection(User user) : base(user)
+        public MedalsSection(User user)
         {
         }
     }
