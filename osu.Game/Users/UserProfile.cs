@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -83,30 +84,40 @@ namespace osu.Game.Users
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private class ProfileTabControl : PageTabControl<ProfileSection>
         {
-            tabs.AccentColour = colours.Yellow;
-        }
+            private readonly Box bottom;
 
-        private class ProfileTabControl : OsuTabControl<ProfileSection>
-        {
             public ProfileTabControl()
             {
                 TabContainer.RelativeSizeAxes &= ~Axes.X;
                 TabContainer.AutoSizeAxes |= Axes.X;
                 TabContainer.Anchor |= Anchor.x1;
                 TabContainer.Origin |= Anchor.x1;
+                Add(bottom = new Box
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 1,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    EdgeSmoothness = new Vector2(1)
+                });
             }
 
             protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value);
 
-            private class ProfileTabItem : OsuTabItem
+            private class ProfileTabItem : PageTabItem
             {
                 public ProfileTabItem(ProfileSection value) : base(value)
                 {
                     Text.Text = value.Title;
                 }
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                bottom.Colour = colours.Yellow;
             }
         }
     }
