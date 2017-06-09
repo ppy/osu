@@ -7,7 +7,7 @@ namespace osu.Game.Users.Profile
     {
         public override string Title => "Ranks";
 
-        public RanksSection(User user) : base(user)
+        public RanksSection(User user)
         {
         }
     }

@@ -7,7 +7,7 @@ namespace osu.Game.Users.Profile
     {
         public override string Title => "Beatmaps";
 
-        public BeatmapsSection(User user) : base(user)
+        public BeatmapsSection(User user)
         {
         }
     }

@@ -7,7 +7,7 @@ namespace osu.Game.Users.Profile
     {
         public override string Title => "Recent";
 
-        public RecentSection(User user) : base(user)
+        public RecentSection(User user)
         {
         }
     }

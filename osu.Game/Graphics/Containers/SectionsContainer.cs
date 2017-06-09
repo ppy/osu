@@ -94,7 +94,8 @@ namespace osu.Game.Graphics.Containers
             => new FillFlowContainer
             {
                 Direction = FillDirection.Vertical,
-                AutoSizeAxes = Axes.Both
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
             };
 
         private List<Drawable> sections = new List<Drawable>();
@@ -133,7 +134,7 @@ namespace osu.Game.Graphics.Containers
             Add(ScrollContainer = new ScrollContainer()
             {
                 RelativeSizeAxes = Axes.Both,
-                Masking = false,
+                Masking = true,
                 Children = new Drawable[] { sectionsContainer = CreateScrollContentContainer() },
                 Depth = float.MaxValue
             });
