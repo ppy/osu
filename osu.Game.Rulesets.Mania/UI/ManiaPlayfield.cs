@@ -23,6 +23,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.Timing.Drawables;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -59,7 +60,13 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
-        private readonly TimingSectionCollection barLineContainer;
+        private readonly BindableDouble visibleTimeRange = new BindableDouble(time_span_default)
+        {
+            MinValue = TIME_SPAN_MIN,
+            MaxValue = TIME_SPAN_MAX
+        };
+
+        private readonly SpeedAdjustmentCollection barLineContainer;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
@@ -117,7 +124,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
                             {
-                                barLineContainer = new TimingSectionCollection
+                                barLineContainer = new SpeedAdjustmentCollection
                                 {
                                     Name = "Bar lines",
                                     Anchor = Anchor.TopCentre,
@@ -132,9 +139,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < columnCount; i++)
-                columns.Add(new Column());
-
-            TimeSpan = time_span_default;
+                columns.Add(new Column { VisibleTimeRange = visibleTimeRange });
         }
 
         [BackgroundDependencyLoader]
@@ -209,7 +214,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
 
-        public void Add(DrawableTimingSection timingChange) => barLineContainer.Add(timingChange);
+        public void Add(SpeedAdjustmentContainer timingChange) => barLineContainer.Add(timingChange);
         public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -219,10 +224,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 switch (args.Key)
                 {
                     case Key.Minus:
-                        transformTimeSpanTo(TimeSpan + time_span_step, 200, EasingTypes.OutQuint);
+                        transformVisibleTimeRangeTo(visibleTimeRange + time_span_step, 200, EasingTypes.OutQuint);
                         break;
                     case Key.Plus:
-                        transformTimeSpanTo(TimeSpan - time_span_step, 200, EasingTypes.OutQuint);
+                        transformVisibleTimeRangeTo(visibleTimeRange - time_span_step, 200, EasingTypes.OutQuint);
                         break;
                 }
             }
@@ -230,29 +235,9 @@ namespace osu.Game.Rulesets.Mania.UI
             return false;
         }
 
-        private double timeSpan;
-        /// <summary>
-        /// The amount of time which the length of the playfield spans.
-        /// </summary>
-        public double TimeSpan
+        private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
-            get { return timeSpan; }
-            set
-            {
-                if (timeSpan == value)
-                    return;
-                timeSpan = value;
-
-                timeSpan = MathHelper.Clamp(timeSpan, TIME_SPAN_MIN, TIME_SPAN_MAX);
-
-                barLineContainer.TimeSpan = value;
-                Columns.ForEach(c => c.TimeSpan = value);
-            }
-        }
-
-        private void transformTimeSpanTo(double newTimeSpan, double duration = 0, EasingTypes easing = EasingTypes.None)
-        {
-            TransformTo(() => TimeSpan, newTimeSpan, duration, easing, new TransformTimeSpan());
+            TransformTo(() => visibleTimeRange.Value, newTimeRange, duration, easing, new TransformTimeSpan());
         }
 
         protected override void Update()
@@ -281,7 +266,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 base.Apply(d);
 
                 var p = (ManiaPlayfield)d;
-                p.TimeSpan = (float)CurrentValue;
+                p.visibleTimeRange.Value = (float)CurrentValue;
             }
         }
     }

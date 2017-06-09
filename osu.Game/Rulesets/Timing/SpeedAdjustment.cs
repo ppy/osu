@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Timing
 {
-    public class TimingSection
+    public class SpeedAdjustment
     {
         /// <summary>
         /// The time in milliseconds at which this timing section starts.

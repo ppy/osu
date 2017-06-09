@@ -7,11 +7,11 @@ using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
-    internal class BasicScrollingHitObjectCollection : HitObjectCollection
+    internal class BasicScrollingDrawableTimingSection : DrawableTimingSection
     {
-        private readonly TimingSection timingSection;
+        private readonly SpeedAdjustment timingSection;
 
-        public BasicScrollingHitObjectCollection(TimingSection timingSection)
+        public BasicScrollingDrawableTimingSection(SpeedAdjustment timingSection)
             : base(Axes.Y)
         {
             this.timingSection = timingSection;

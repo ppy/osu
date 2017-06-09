@@ -8,16 +8,14 @@ using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Timing.Drawables
 {
-    internal class GravityScrollingHitObjectCollection : HitObjectCollection
+    internal class GravityScrollingDrawableTimingSection : DrawableTimingSection
     {
-        private readonly TimingSection timingSection;
-        private readonly Func<double> timeSpan;
+        private readonly SpeedAdjustment timingSection;
 
-        public GravityScrollingHitObjectCollection(TimingSection timingSection, Func<double> timeSpan)
+        public GravityScrollingDrawableTimingSection(SpeedAdjustment timingSection)
             : base(Axes.Y)
         {
             this.timingSection = timingSection;
-            this.timeSpan = timeSpan;
         }
 
         protected override void UpdateAfterChildren()
@@ -45,19 +43,19 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
             // The sign of the relative time, this is used to apply backwards acceleration leading into startTime
             double sign = relativeTime < 0 ? -1 : 1;
 
-            return timeSpan() - acceleration * relativeTime * relativeTime * sign;
+            return VisibleTimeRange - acceleration * relativeTime * relativeTime * sign;
         }
 
         /// <summary>
         /// The acceleration due to "gravity" of the content of this container.
         /// </summary>
-        private double acceleration => 1 / timeSpan();
+        private double acceleration => 1 / VisibleTimeRange;
 
         /// <summary>
         /// Computes the current time relative to <paramref name="time"/>, accounting for <see cref="timeSpan"/>.
         /// </summary>
         /// <param name="time">The non-offset time.</param>
         /// <returns>The current time relative to <paramref name="time"/> - <see cref="timeSpan"/>. </returns>
-        private double relativeTimeAt(double time) => Time.Current - time + timeSpan();
+        private double relativeTimeAt(double time) => Time.Current - time + VisibleTimeRange;
     }
 }

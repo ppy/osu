@@ -31,6 +31,13 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
+        private readonly BindableDouble visibleTimeRange = new BindableDouble();
+        public BindableDouble VisibleTimeRange
+        {
+            get { return visibleTimeRange; }
+            set { visibleTimeRange.BindTo(value); }
+        }
+
         /// <summary>
         /// The key that will trigger input actions for this column and hit objects contained inside it.
         /// </summary>
@@ -40,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
-        private readonly TimingSectionCollection timingChanges;
+        private readonly SpeedAdjustmentCollection speedAdjustments;
 
         public Column()
         {
@@ -91,10 +98,11 @@ namespace osu.Game.Rulesets.Mania.UI
                                 }
                             }
                         },
-                        timingChanges = new TimingSectionCollection
+                        speedAdjustments = new SpeedAdjustmentCollection
                         {
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,
+                            VisibleTimeRange = VisibleTimeRange
                         },
                         // For column lighting, we need to capture input events before the notes
                         new InputTarget
@@ -185,17 +193,11 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public double TimeSpan
-        {
-            get { return timingChanges.TimeSpan; }
-            set { timingChanges.TimeSpan = value; }
-        }
-
-        public void Add(DrawableTimingSection timingChange) => timingChanges.Add(timingChange);
+        public void Add(SpeedAdjustmentContainer speedAdjustment) => speedAdjustments.Add(speedAdjustment);
         public void Add(DrawableHitObject hitObject)
         {
             hitObject.AccentColour = AccentColour;
-            timingChanges.Add(hitObject);
+            speedAdjustments.Add(hitObject);
         }
 
         private bool onKeyDown(InputState state, KeyDownEventArgs args)
