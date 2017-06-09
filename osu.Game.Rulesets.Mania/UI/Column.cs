@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using osu.Framework.Configuration;
 using osu.Game.Rulesets.Timing;
-using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {

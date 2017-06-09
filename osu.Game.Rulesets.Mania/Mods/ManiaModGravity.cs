@@ -13,10 +13,8 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Timing;
-using osu.Game.Rulesets.Mania.Timing.Drawables;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Timing;
-using osu.Game.Rulesets.Timing.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
