@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.Timing.Drawables;
 
-namespace osu.Game.Rulesets.Mania.Timing.Drawables
+namespace osu.Game.Rulesets.Mania.Timing
 {
     public class ManiaSpeedAdjustmentContainer : SpeedAdjustmentContainer
     {

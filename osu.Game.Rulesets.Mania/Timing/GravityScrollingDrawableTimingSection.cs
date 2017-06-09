@@ -1,12 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.Timing.Drawables;
 
-namespace osu.Game.Rulesets.Mania.Timing.Drawables
+namespace osu.Game.Rulesets.Mania.Timing
 {
     internal class GravityScrollingDrawableTimingSection : DrawableTimingSection
     {
@@ -52,10 +51,10 @@ namespace osu.Game.Rulesets.Mania.Timing.Drawables
         private double acceleration => 1 / VisibleTimeRange;
 
         /// <summary>
-        /// Computes the current time relative to <paramref name="time"/>, accounting for <see cref="timeSpan"/>.
+        /// Computes the current time relative to <paramref name="time"/>, accounting for <see cref="DrawableTimingSection.VisibleTimeRange"/>.
         /// </summary>
         /// <param name="time">The non-offset time.</param>
-        /// <returns>The current time relative to <paramref name="time"/> - <see cref="timeSpan"/>. </returns>
+        /// <returns>The current time relative to <paramref name="time"/> - <see cref="DrawableTimingSection.VisibleTimeRange"/>. </returns>
         private double relativeTimeAt(double time) => Time.Current - time + VisibleTimeRange;
     }
 }
