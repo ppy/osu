@@ -41,12 +41,12 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// Per-column timing changes.
         /// </summary>
-        public List<DrawableTimingSection>[] HitObjectTimingChanges;
+        public List<SpeedAdjustmentContainer>[] HitObjectTimingChanges;
 
         /// <summary>
         /// Bar line timing changes.
         /// </summary>
-        public List<DrawableTimingSection> BarlineTimingChanges;
+        public List<SpeedAdjustmentContainer> BarlineTimingChanges;
 
         /// <summary>
         /// Number of columns in the playfield of this hit renderer. Null if the play field hasn't been generated yet.
@@ -66,11 +66,11 @@ namespace osu.Game.Rulesets.Mania.UI
             if (HitObjectTimingChanges != null || BarlineTimingChanges != null)
                 return;
 
-            HitObjectTimingChanges = new List<DrawableTimingSection>[PreferredColumns];
-            BarlineTimingChanges = new List<DrawableTimingSection>();
+            HitObjectTimingChanges = new List<SpeedAdjustmentContainer>[PreferredColumns];
+            BarlineTimingChanges = new List<SpeedAdjustmentContainer>();
 
             for (int i = 0; i < PreferredColumns; i++)
-                HitObjectTimingChanges[i] = new List<DrawableTimingSection>();
+                HitObjectTimingChanges[i] = new List<SpeedAdjustmentContainer>();
 
             double lastSpeedMultiplier = 1;
             double lastBeatLength = 500;
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 if (difficultyPoint != null)
                     lastSpeedMultiplier = difficultyPoint.SpeedMultiplier;
 
-                return new TimingSection
+                return new SpeedAdjustment
                 {
                     Time = c.Time,
                     BeatLength = lastBeatLength,
@@ -115,9 +115,9 @@ namespace osu.Game.Rulesets.Mania.UI
             timingChanges.ForEach(t =>
             {
                 for (int i = 0; i < PreferredColumns; i++)
-                    HitObjectTimingChanges[i].Add(new DrawableManiaTimingSection(t, ScrollingAlgorithm.Basic));
+                    HitObjectTimingChanges[i].Add(new ManiaSpeedAdjustmentContainer(t, ScrollingAlgorithm.Basic));
 
-                BarlineTimingChanges.Add(new DrawableManiaTimingSection(t, ScrollingAlgorithm.Basic));
+                BarlineTimingChanges.Add(new ManiaSpeedAdjustmentContainer(t, ScrollingAlgorithm.Basic));
             });
         }
 

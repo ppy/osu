@@ -46,7 +46,7 @@ namespace osu.Desktop.VisualTests.Tests
             const double start_time = 500;
             const double duration = 500;
 
-            Func<double, bool, DrawableTimingSection> createTimingChange = (time, gravity) => new DrawableManiaTimingSection(new TimingSection
+            Func<double, bool, SpeedAdjustmentContainer> createTimingChange = (time, gravity) => new ManiaSpeedAdjustmentContainer(new SpeedAdjustment
             {
                 BeatLength = 1000,
                 Time = time

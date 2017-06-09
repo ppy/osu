@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -12,20 +13,24 @@ using osu.Game.Rulesets.Timing.Drawables;
 namespace osu.Game.Rulesets.Timing
 {
     /// <summary>
-    /// A collection of timing sections which contain hit objects.
-    /// 
+    /// A collection of <see cref="SpeedAdjustmentContainer"/>s.
+    ///
     /// <para>
-    /// This container provides <see cref="TimeSpan"/> for the timing sections. This is a value that indicates the amount of time
-    /// that is visible throughout the span of this container.
-    /// For example, only hit objects with start time less than or equal to 1000 will be visible with <see cref="TimeSpan"/> = 1000.
+    /// This container provides <see cref="VisibleTimeRange"/> for the <see cref="SpeedAdjustmentContainer"/>s.
     /// </para>
     /// </summary>
-    public class TimingSectionCollection : Container<DrawableTimingSection>
+    public class SpeedAdjustmentCollection : Container<SpeedAdjustmentContainer>
     {
+        private readonly BindableDouble visibleTimeRange = new BindableDouble();
         /// <summary>
-        /// The length of time visible throughout the span of this container.
+        /// The amount of time visible by span of this container.
+        /// For example, only hit objects with start time less than or equal to 1000 will be visible with <see cref="VisibleTimeRange"/> = 1000.
         /// </summary>
-        public double TimeSpan;
+        public Bindable<double> VisibleTimeRange
+        {
+            get { return visibleTimeRange; }
+            set { visibleTimeRange.BindTo(value); }
+        }
 
         /// <summary>
         /// Adds a hit object to the most applicable timing section in this container.
@@ -41,6 +46,12 @@ namespace osu.Game.Rulesets.Timing
             target.Add(hitObject);
         }
 
+        public override void Add(SpeedAdjustmentContainer speedAdjustment)
+        {
+            speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
+            base.Add(speedAdjustment);
+        }
+
         protected override IComparer<Drawable> DepthComparer => new TimingSectionReverseStartTimeComparer();
 
         /// <summary>
@@ -49,7 +60,7 @@ namespace osu.Game.Rulesets.Timing
         /// </summary>
         /// <param name="hitObject">The hit object to contain.</param>
         /// <returns>The last (time-wise) timing section which can contain <paramref name="hitObject"/>. Null if no timing section exists.</returns>
-        private DrawableTimingSection timingSectionFor(DrawableHitObject hitObject) => Children.FirstOrDefault(c => c.CanContain(hitObject)) ?? Children.LastOrDefault();
+        private SpeedAdjustmentContainer timingSectionFor(DrawableHitObject hitObject) => Children.FirstOrDefault(c => c.CanContain(hitObject)) ?? Children.LastOrDefault();
 
         /// <summary>
         /// Compares two timing sections by their start time, falling back to creation order if their start time is equal.
@@ -59,8 +70,8 @@ namespace osu.Game.Rulesets.Timing
         {
             public override int Compare(Drawable x, Drawable y)
             {
-                var timingChangeX = x as DrawableTimingSection;
-                var timingChangeY = y as DrawableTimingSection;
+                var timingChangeX = x as SpeedAdjustmentContainer;
+                var timingChangeY = y as SpeedAdjustmentContainer;
 
                 // If either of the two drawables are not hit objects, fall back to the base comparer
                 if (timingChangeX?.TimingSection == null || timingChangeY?.TimingSection == null)

@@ -1,46 +1,67 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Timing.Drawables
 {
     /// <summary>
-    /// A container for hit objects which applies applies the speed changes defined by the <see cref="Timing.TimingSection.BeatLength"/> and <see cref="Timing.TimingSection.SpeedMultiplier"/>
-    /// properties to its <see cref="Container{T}.Content"/> to affect the <see cref="HitObjectCollection"/> scroll speed.
+    /// A collection of hit objects which scrolls within a <see cref="SpeedAdjustmentContainer"/>.
+    ///
+    /// <para>
+    /// This container handles the conversion between time and position through <see cref="Container{T}.RelativeChildSize"/> and
+    /// <see cref="Container{T}.RelativeChildOffset"/> such that hit objects added to this container should have time values set as their
+    /// positions/sizes to make proper use of this container.
+    /// </para>
+    ///
+    /// <para>
+    /// This container will auto-size to the total size of its children along the desired auto-sizing axes such that the reasulting size
+    /// of this container will also be a time value.
+    /// </para>
+    ///
+    /// <para>
+    /// This container will always be relatively-sized and positioned to its parent through the use of <see cref="Drawable.RelativeSizeAxes"/>
+    /// and <see cref="Drawable.RelativePositionAxes"/> such that the parent can utilise <see cref="Container{T}.RelativeChildSize"/> and
+    /// <see cref="Container{T}.RelativeChildOffset"/> to apply further time offsets to this collection of hit objects.
+    /// </para>
     /// </summary>
     public abstract class DrawableTimingSection : Container<DrawableHitObject>
     {
-        public readonly TimingSection TimingSection;
+        private readonly BindableDouble visibleTimeRange = new BindableDouble();
+        public BindableDouble VisibleTimeRange
+        {
+            get { return visibleTimeRange; }
+            set { visibleTimeRange.BindTo(value); }
+        }
 
-        protected override Container<DrawableHitObject> Content => content;
-        private Container<DrawableHitObject> content;
+        protected override IComparer<Drawable> DepthComparer => new HitObjectReverseStartTimeComparer();
 
-        private readonly Axes scrollingAxes;
+        private readonly Axes autoSizingAxes;
+
+        private Cached layout = new Cached();
 
         /// <summary>
         /// Creates a new <see cref="DrawableTimingSection"/>.
         /// </summary>
-        /// <param name="timingSection">The encapsulated timing section that provides the speed changes.</param>
-        /// <param name="scrollingAxes">The axes through which this drawable timing section scrolls through.</param>
-        protected DrawableTimingSection(TimingSection timingSection, Axes scrollingAxes)
+        /// <param name="autoSizingAxes">The axes on which to auto-size to the total size of items in the container.</param>
+        protected DrawableTimingSection(Axes autoSizingAxes)
         {
-            this.scrollingAxes = scrollingAxes;
+            this.autoSizingAxes = autoSizingAxes;
 
-            TimingSection = timingSection;
+            // We need a default size since RelativeSizeAxes is overridden
+            Size = Vector2.One;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            AddInternal(content = CreateHitObjectCollection());
-            content.RelativeChildOffset = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)TimingSection.Time : 0, (scrollingAxes & Axes.Y) > 0 ? (float)TimingSection.Time : 0);
-        }
+        public override Axes AutoSizeAxes { set { throw new InvalidOperationException($"{nameof(DrawableTimingSection)} must always be relatively-sized."); } }
 
         public override Axes RelativeSizeAxes
         {
@@ -48,29 +69,55 @@ namespace osu.Game.Rulesets.Timing.Drawables
             set { throw new InvalidOperationException($"{nameof(DrawableTimingSection)} must always be relatively-sized."); }
         }
 
-        protected override void Update()
+        public override Axes RelativePositionAxes
         {
-            var parent = Parent as TimingSectionCollection;
-
-            if (parent == null)
-                return;
-
-            float speedAdjustedSize = (float)(1000 / TimingSection.BeatLength / TimingSection.SpeedMultiplier);
-
-            // The application of speed changes happens by modifying our size while maintaining the parent's time span as our relative child size
-            Size = new Vector2((scrollingAxes & Axes.X) > 0 ? speedAdjustedSize : 1, (scrollingAxes & Axes.Y) > 0 ? speedAdjustedSize : 1);
-            RelativeChildSize = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)parent.TimeSpan : 1, (scrollingAxes & Axes.Y) > 0 ? (float)parent.TimeSpan : 1);
+            get { return Axes.Both; }
+            set { throw new InvalidOperationException($"{nameof(DrawableTimingSection)} must always be relatively-positioned."); }
         }
 
-        /// <summary>
-        /// Whether this timing section can contain a hit object. This is true if the hit object occurs after this timing section with respect to time.
-        /// </summary>
-        public bool CanContain(DrawableHitObject hitObject) => TimingSection.Time <= hitObject.HitObject.StartTime;
+        public override void InvalidateFromChild(Invalidation invalidation)
+        {
+            // We only want to re-compute our size when a child's size or position has changed
+            if ((invalidation & Invalidation.RequiredParentSizeToFit) == 0)
+            {
+                base.InvalidateFromChild(invalidation);
+                return;
+            }
 
-        /// <summary>
-        /// Creates the container which handles the movement of a collection of hit objects.
-        /// </summary>
-        /// <returns>The hit object collection.</returns>
-        protected abstract HitObjectCollection CreateHitObjectCollection();
+            layout.Invalidate();
+
+            base.InvalidateFromChild(invalidation);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (!layout.EnsureValid())
+            {
+                layout.Refresh(() =>
+                {
+                    if (!Children.Any())
+                        return;
+
+                    //double maxDuration = Children.Select(c => (c.HitObject as IHasEndTime)?.EndTime ?? c.HitObject.StartTime).Max();
+                    //float width = (float)maxDuration - RelativeChildOffset.X;
+                    //float height = (float)maxDuration - RelativeChildOffset.Y;
+
+
+                    // Auto-size to the total size of our children
+                    // This ends up being the total duration of our children, however for now this is a more sure-fire way to calculate this
+                    // than the above due to some undesired masking optimisations causing some hit objects to be culled...
+                    // Todo: When this is investigated more we should use the above method as it is a little more exact
+                    float width = Children.Select(child => child.X + child.Width).Max() - RelativeChildOffset.X;
+                    float height = Children.Select(child => child.Y + child.Height).Max() - RelativeChildOffset.Y;
+
+                    // Consider that width/height are time values. To have ourselves span these time values 1:1, we first need to set our size
+                    Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X, (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
+                    // Then to make our position-space be time values again, we need our relative child size to follow our size
+                    RelativeChildSize = Size;
+                });
+            }
+        }
     }
 }
