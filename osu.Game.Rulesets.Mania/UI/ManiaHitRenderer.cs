@@ -90,11 +90,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 if (difficultyPoint != null)
                     lastSpeedMultiplier = difficultyPoint.SpeedMultiplier;
 
-                return new SpeedAdjustment
+                return new MultiplierControlPoint(c.Time)
                 {
-                    Time = c.Time,
-                    BeatLength = lastBeatLength,
-                    SpeedMultiplier = lastSpeedMultiplier
+                    TimingPoint = { BeatLength = lastBeatLength },
+                    DifficultyPoint = { SpeedMultiplier = lastSpeedMultiplier }
                 };
             });
 
@@ -103,11 +102,11 @@ namespace osu.Game.Rulesets.Mania.UI
             // Perform some post processing of the timing changes
             timingChanges = timingChanges
                 // Collapse sections after the last hit object
-                .Where(s => s.Time <= lastObjectTime)
+                .Where(s => s.StartTime <= lastObjectTime)
                 // Collapse sections with the same start time
-                .GroupBy(s => s.Time).Select(g => g.Last()).OrderBy(s => s.Time)
+                .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime)
                 // Collapse sections with the same beat length
-                .GroupBy(s => s.BeatLength * s.SpeedMultiplier).Select(g => g.First())
+                .GroupBy(s => s.TimingPoint.BeatLength * s.DifficultyPoint.SpeedMultiplier).Select(g => g.First())
                 .ToList();
 
             timingChanges.ForEach(t =>

@@ -197,7 +197,7 @@
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
     <Compile Include="Rulesets\Timing\SpeedAdjustmentContainer.cs" />
     <Compile Include="Rulesets\Timing\DrawableTimingSection.cs" />
-    <Compile Include="Rulesets\Timing\SpeedAdjustment.cs" />
+    <Compile Include="Rulesets\Timing\MultiplierControlPoint.cs" />
     <Compile Include="Rulesets\Timing\SpeedAdjustmentCollection.cs" />
     <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
     <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />

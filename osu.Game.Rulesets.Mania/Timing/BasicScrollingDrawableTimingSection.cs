@@ -9,9 +9,9 @@ namespace osu.Game.Rulesets.Mania.Timing
 {
     internal class BasicScrollingDrawableTimingSection : DrawableTimingSection
     {
-        private readonly SpeedAdjustment timingSection;
+        private readonly MultiplierControlPoint timingSection;
 
-        public BasicScrollingDrawableTimingSection(SpeedAdjustment timingSection)
+        public BasicScrollingDrawableTimingSection(MultiplierControlPoint timingSection)
             : base(Axes.Y)
         {
             this.timingSection = timingSection;
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Timing
         {
             base.Update();
 
-            Y = (float)(timingSection.Time - Time.Current);
+            Y = (float)(timingSection.StartTime - Time.Current);
         }
     }
 }

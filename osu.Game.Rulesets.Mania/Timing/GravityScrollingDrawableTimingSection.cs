@@ -9,9 +9,9 @@ namespace osu.Game.Rulesets.Mania.Timing
 {
     internal class GravityScrollingDrawableTimingSection : DrawableTimingSection
     {
-        private readonly SpeedAdjustment timingSection;
+        private readonly MultiplierControlPoint timingSection;
 
-        public GravityScrollingDrawableTimingSection(SpeedAdjustment timingSection)
+        public GravityScrollingDrawableTimingSection(MultiplierControlPoint timingSection)
             : base(Axes.Y)
         {
             this.timingSection = timingSection;
@@ -22,9 +22,9 @@ namespace osu.Game.Rulesets.Mania.Timing
             base.UpdateAfterChildren();
 
             // The gravity-adjusted start position
-            float startPos = (float)computeGravityTime(timingSection.Time);
+            float startPos = (float)computeGravityTime(timingSection.StartTime);
             // The gravity-adjusted end position
-            float endPos = (float)computeGravityTime(timingSection.Time + RelativeChildSize.Y);
+            float endPos = (float)computeGravityTime(timingSection.StartTime + RelativeChildSize.Y);
 
             Y = startPos;
             Height = endPos - startPos;
