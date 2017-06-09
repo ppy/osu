@@ -6,17 +6,17 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Input;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Scoring;
@@ -36,42 +36,103 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public int PreferredColumns;
 
+        public readonly List<BarLine> BarLines = new List<BarLine>();
+
         /// <summary>
         /// Per-column timing changes.
         /// </summary>
-        public List<SpeedAdjustmentContainer>[] HitObjectTimingChanges;
+        private readonly List<SpeedAdjustmentContainer>[] hitObjectTimingChanges;
 
         /// <summary>
         /// Bar line timing changes.
         /// </summary>
-        public List<SpeedAdjustmentContainer> BarlineTimingChanges;
+        private readonly List<SpeedAdjustmentContainer> barlineTimingChanges = new List<SpeedAdjustmentContainer>();
 
-        /// <summary>
-        /// Number of columns in the playfield of this hit renderer. Null if the play field hasn't been generated yet.
-        /// </summary>
-        public int? Columns { get; private set; }
+        private readonly SortedList<MultiplierControlPoint> defaultControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
         public ManiaHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(beatmap, isForCurrentRuleset)
         {
-            Columns = PreferredColumns;
+            // Generate the speed adjustment container lists
+            hitObjectTimingChanges = new List<SpeedAdjustmentContainer>[PreferredColumns];
+            for (int i = 0; i < PreferredColumns; i++)
+                hitObjectTimingChanges[i] = new List<SpeedAdjustmentContainer>();
 
-            generateDefaultTimingChanges();
+            // Generate the bar line list
+            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
+            SortedList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
+            for (int i = 0; i < timingPoints.Count; i++)
+            {
+                TimingControlPoint point = timingPoints[i];
+
+                // Stop on the beat before the next timing point, or if there is no next timing point stop slightly past the last object
+                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time - point.BeatLength : lastObjectTime + point.BeatLength * (int)point.TimeSignature;
+
+                int index = 0;
+                for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength, index++)
+                {
+                    BarLines.Add(new BarLine
+                    {
+                        StartTime = t,
+                        ControlPoint = point,
+                        BeatIndex = index
+                    });
+                }
+            }
+
+            // Generate speed adjustments from mods first
+            bool useDefaultSpeedAdjustments = true;
+
+            if (Mods != null)
+            {
+                foreach (var speedAdjustmentMod in Mods.OfType<IGenerateSpeedAdjustments>())
+                {
+                    useDefaultSpeedAdjustments = false;
+                    speedAdjustmentMod.ApplyToHitRenderer(this, ref hitObjectTimingChanges, ref barlineTimingChanges);
+                }
+            }
+
+            // Generate the default speed adjustments
+            if (useDefaultSpeedAdjustments)
+                generateDefaultSpeedAdjustments();
         }
 
-        private void generateDefaultTimingChanges()
+        private void generateDefaultSpeedAdjustments()
         {
-            if (HitObjectTimingChanges != null || BarlineTimingChanges != null)
-                return;
+            defaultControlPoints.ForEach(c =>
+            {
+                foreach (List<SpeedAdjustmentContainer> t in hitObjectTimingChanges)
+                    t.Add(new ManiaSpeedAdjustmentContainer(c, ScrollingAlgorithm.Basic));
+                barlineTimingChanges.Add(new ManiaSpeedAdjustmentContainer(c, ScrollingAlgorithm.Basic));
+            });
+        }
 
-            HitObjectTimingChanges = new List<SpeedAdjustmentContainer>[PreferredColumns];
-            BarlineTimingChanges = new List<SpeedAdjustmentContainer>();
+        /// <summary>
+        /// Generates a control point at a point in time with the relevant timing change/difficulty change from the beatmap.
+        /// </summary>
+        /// <param name="time">The time to create the control point at.</param>
+        /// <returns>The <see cref="MultiplierControlPoint"/> at <paramref name="time"/>.</returns>
+        public MultiplierControlPoint CreateControlPointAt(double time)
+        {
+            if (defaultControlPoints.Count == 0)
+                return new MultiplierControlPoint(time);
 
-            for (int i = 0; i < PreferredColumns; i++)
-                HitObjectTimingChanges[i] = new List<SpeedAdjustmentContainer>();
+            int index = defaultControlPoints.BinarySearch(new MultiplierControlPoint(time));
+            if (index < 0)
+                return new MultiplierControlPoint(time);
 
-            double lastSpeedMultiplier = 1;
-            double lastBeatLength = 500;
+            return new MultiplierControlPoint(time, defaultControlPoints[index].DeepClone());
+        }
+
+        protected override void ApplyBeatmap()
+        {
+            base.ApplyBeatmap();
+
+            PreferredColumns = (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize);
+
+            // Calculate default multiplier control points
+            var lastTimingPoint = new TimingControlPoint();
+            var lastDifficultyPoint = new DifficultyControlPoint();
 
             // Merge timing + difficulty points
             var allPoints = new SortedList<ControlPoint>(Comparer<ControlPoint>.Default);
@@ -85,15 +146,15 @@ namespace osu.Game.Rulesets.Mania.UI
                 var difficultyPoint = c as DifficultyControlPoint;
 
                 if (timingPoint != null)
-                    lastBeatLength = timingPoint.BeatLength;
+                    lastTimingPoint = timingPoint;
 
                 if (difficultyPoint != null)
-                    lastSpeedMultiplier = difficultyPoint.SpeedMultiplier;
+                    lastDifficultyPoint = difficultyPoint;
 
                 return new MultiplierControlPoint(c.Time)
                 {
-                    TimingPoint = { BeatLength = lastBeatLength },
-                    DifficultyPoint = { SpeedMultiplier = lastSpeedMultiplier }
+                    TimingPoint = lastTimingPoint,
+                    DifficultyPoint = lastDifficultyPoint
                 };
             });
 
@@ -109,19 +170,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 .GroupBy(s => s.TimingPoint.BeatLength * s.DifficultyPoint.SpeedMultiplier).Select(g => g.First())
                 .ToList();
 
-            timingChanges.ForEach(t =>
-            {
-                for (int i = 0; i < PreferredColumns; i++)
-                    HitObjectTimingChanges[i].Add(new ManiaSpeedAdjustmentContainer(t, ScrollingAlgorithm.Basic));
-
-                BarlineTimingChanges.Add(new ManiaSpeedAdjustmentContainer(t, ScrollingAlgorithm.Basic));
-            });
-        }
-
-        protected override void ApplyBeatmap()
-        {
-            base.ApplyBeatmap();
-            PreferredColumns = (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize);
+            defaultControlPoints.AddRange(timingChanges);
         }
 
         protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
@@ -136,42 +185,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < PreferredColumns; i++)
             {
-                foreach (var change in HitObjectTimingChanges[i])
+                foreach (var change in hitObjectTimingChanges[i])
                     playfield.Columns.ElementAt(i).Add(change);
             }
 
-            foreach (var change in BarlineTimingChanges)
+            foreach (var change in barlineTimingChanges)
                 playfield.Add(change);
 
             return playfield;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            var maniaPlayfield = (ManiaPlayfield)Playfield;
-
-            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
-
-            SortedList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
-            for (int i = 0; i < timingPoints.Count; i++)
-            {
-                TimingControlPoint point = timingPoints[i];
-
-                // Stop on the beat before the next timing point, or if there is no next timing point stop slightly past the last object
-                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time - point.BeatLength : lastObjectTime + point.BeatLength * (int)point.TimeSignature;
-
-                int index = 0;
-                for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength, index++)
-                {
-                    maniaPlayfield.Add(new DrawableBarLine(new BarLine
-                    {
-                        StartTime = t,
-                        ControlPoint = point,
-                        BeatIndex = index
-                    }));
-                }
-            }
         }
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);

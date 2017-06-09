@@ -5,12 +5,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Objects.Types;
-using System.Linq;
-using osu.Framework.Lists;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Objects;
@@ -18,7 +12,7 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModGravity : Mod, IApplicableMod<ManiaHitObject>
+    public class ManiaModGravity : Mod, IGenerateSpeedAdjustments
     {
         public override string Name => "Gravity";
 
@@ -26,45 +20,26 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public override FontAwesome Icon => FontAwesome.fa_sort_desc;
 
-        public void ApplyToHitRenderer(HitRenderer<ManiaHitObject> hitRenderer)
+        public void ApplyToHitRenderer(ManiaHitRenderer hitRenderer, ref List<SpeedAdjustmentContainer>[] hitObjectTimingChanges, ref List<SpeedAdjustmentContainer> barlineTimingChanges)
         {
-            var maniaHitRenderer = (ManiaHitRenderer)hitRenderer;
-
-            maniaHitRenderer.HitObjectTimingChanges = new List<SpeedAdjustmentContainer>[maniaHitRenderer.PreferredColumns];
-            maniaHitRenderer.BarlineTimingChanges = new List<SpeedAdjustmentContainer>();
-
-            for (int i = 0; i < maniaHitRenderer.PreferredColumns; i++)
-                maniaHitRenderer.HitObjectTimingChanges[i] = new List<SpeedAdjustmentContainer>();
-
-            foreach (HitObject obj in maniaHitRenderer.Objects)
+            foreach (HitObject obj in hitRenderer.Objects)
             {
                 var maniaObject = obj as ManiaHitObject;
                 if (maniaObject == null)
                     continue;
 
-                maniaHitRenderer.HitObjectTimingChanges[maniaObject.Column].Add(new ManiaSpeedAdjustmentContainer(new MultiplierControlPoint(obj.StartTime)
-                {
-                    TimingPoint = { BeatLength = 1000 }
-                }, ScrollingAlgorithm.Gravity));
+                MultiplierControlPoint controlPoint = hitRenderer.CreateControlPointAt(obj.StartTime);
+                controlPoint.TimingPoint.BeatLength = 1000;
+
+                hitObjectTimingChanges[maniaObject.Column].Add(new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Gravity));
             }
 
-            double lastObjectTime = (maniaHitRenderer.Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? maniaHitRenderer.Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
-
-            SortedList<TimingControlPoint> timingPoints = maniaHitRenderer.Beatmap.ControlPointInfo.TimingPoints;
-            for (int i = 0; i < timingPoints.Count; i++)
+            foreach (BarLine barLine in hitRenderer.BarLines)
             {
-                TimingControlPoint point = timingPoints[i];
+                var controlPoint = hitRenderer.CreateControlPointAt(barLine.StartTime);
+                controlPoint.TimingPoint.BeatLength = 1000;
 
-                // Stop on the beat before the next timing point, or if there is no next timing point stop slightly past the last object
-                double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time - point.BeatLength : lastObjectTime + point.BeatLength * (int)point.TimeSignature;
-
-                for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength)
-                {
-                    maniaHitRenderer.BarlineTimingChanges.Add(new ManiaSpeedAdjustmentContainer(new MultiplierControlPoint(t)
-                    {
-                        TimingPoint = { BeatLength = 1000 }
-                    }, ScrollingAlgorithm.Gravity));
-                }
+                barlineTimingChanges.Add(new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Gravity));
             }
         }
     }
