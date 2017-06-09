@@ -53,7 +53,7 @@ namespace osu.Game.Users
             var sectionsContainer = new SectionsContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                ExpandableHeader = new UserPageHeader(user),
+                ExpandableHeader = new ProfileHeader(user),
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {

@@ -10,12 +10,12 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Users.Profile
 {
-    public class UserPageHeader : Container
+    public class ProfileHeader : Container
     {
         private readonly User user;
 
         private const float cover_height = 200, avatar_size = 110, avatar_bottom_position = -20;
-        public UserPageHeader(User user)
+        public ProfileHeader(User user)
         {
             this.user = user;
             RelativeSizeAxes = Axes.X;
