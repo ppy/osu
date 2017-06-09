@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Timing;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -34,9 +35,9 @@ namespace osu.Game.Rulesets.Mania.Mods
                 hitObjectTimingChanges[maniaObject.Column].Add(new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Gravity));
             }
 
-            foreach (BarLine barLine in hitRenderer.BarLines)
+            foreach (DrawableBarLine barLine in hitRenderer.BarLines)
             {
-                var controlPoint = hitRenderer.CreateControlPointAt(barLine.StartTime);
+                var controlPoint = hitRenderer.CreateControlPointAt(barLine.HitObject.StartTime);
                 controlPoint.TimingPoint.BeatLength = 1000;
 
                 barlineTimingChanges.Add(new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Gravity));

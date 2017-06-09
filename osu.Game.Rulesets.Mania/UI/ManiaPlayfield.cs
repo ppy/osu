@@ -127,7 +127,8 @@ namespace osu.Game.Rulesets.Mania.UI
                                     Name = "Bar lines",
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    RelativeSizeAxes = Axes.Y
+                                    RelativeSizeAxes = Axes.Y,
+                                    VisibleTimeRange = visibleTimeRange
                                     // Width is set in the Update method
                                 }
                             }

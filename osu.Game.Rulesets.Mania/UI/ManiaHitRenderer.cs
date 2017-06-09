@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Input;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
 using osu.Framework.MathUtils;
@@ -36,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         public int PreferredColumns;
 
-        public readonly List<BarLine> BarLines = new List<BarLine>();
+        public IEnumerable<DrawableBarLine> BarLines;
 
         /// <summary>
         /// Per-column timing changes.
@@ -58,9 +60,12 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < PreferredColumns; i++)
                 hitObjectTimingChanges[i] = new List<SpeedAdjustmentContainer>();
 
-            // Generate the bar line list
+            // Generate the bar lines
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
+
             SortedList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
+            var barLines = new List<DrawableBarLine>();
+
             for (int i = 0; i < timingPoints.Count; i++)
             {
                 TimingControlPoint point = timingPoints[i];
@@ -71,14 +76,16 @@ namespace osu.Game.Rulesets.Mania.UI
                 int index = 0;
                 for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength, index++)
                 {
-                    BarLines.Add(new BarLine
+                    barLines.Add(new DrawableBarLine(new BarLine
                     {
                         StartTime = t,
                         ControlPoint = point,
                         BeatIndex = index
-                    });
+                    }));
                 }
             }
+
+            BarLines = barLines;
 
             // Generate speed adjustments from mods first
             bool useDefaultSpeedAdjustments = true;
@@ -95,6 +102,16 @@ namespace osu.Game.Rulesets.Mania.UI
             // Generate the default speed adjustments
             if (useDefaultSpeedAdjustments)
                 generateDefaultSpeedAdjustments();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var maniaPlayfield = Playfield as ManiaPlayfield;
+            if (maniaPlayfield == null)
+                return;
+
+            BarLines.ForEach(maniaPlayfield.Add);
         }
 
         private void generateDefaultSpeedAdjustments()
