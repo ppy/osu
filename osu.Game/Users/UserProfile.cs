@@ -1,10 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -16,6 +18,7 @@ namespace osu.Game.Users
     {
         private readonly User user;
         private ProfileSection lastSection;
+        private readonly ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 50;
 
@@ -32,12 +35,14 @@ namespace osu.Game.Users
                 new BeatmapsSection(user),
                 new KudosuSection(user)
             };
-            var tab = new OsuTabControl<ProfileSection>
+            tabs = new ProfileTabControl
             {
                 RelativeSizeAxes = Axes.X,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
                 Height = 24
             };
-            sections.ForEach(tab.AddItem);
+            sections.ForEach(tabs.AddItem);
 
             Add(new Box
             {
@@ -49,7 +54,7 @@ namespace osu.Game.Users
             {
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = new UserPageHeader(user),
-                FixedHeader = tab,
+                FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
                     Colour = OsuColour.Gray(34),
@@ -64,11 +69,11 @@ namespace osu.Game.Users
                 if (lastSection != s)
                 {
                     lastSection = s as ProfileSection;
-                    tab.Current.Value = lastSection;
+                    tabs.Current.Value = lastSection;
                 }
             };
 
-            tab.Current.ValueChanged += s =>
+            tabs.Current.ValueChanged += s =>
             {
                 if (lastSection != s)
                 {
@@ -76,6 +81,33 @@ namespace osu.Game.Users
                     sectionsContainer.ScrollContainer.ScrollIntoView(lastSection);
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            tabs.AccentColour = colours.Yellow;
+        }
+
+        private class ProfileTabControl : OsuTabControl<ProfileSection>
+        {
+            public ProfileTabControl()
+            {
+                TabContainer.RelativeSizeAxes &= ~Axes.X;
+                TabContainer.AutoSizeAxes |= Axes.X;
+                TabContainer.Anchor |= Anchor.x1;
+                TabContainer.Origin |= Anchor.x1;
+            }
+
+            protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value);
+
+            private class ProfileTabItem : OsuTabItem
+            {
+                public ProfileTabItem(ProfileSection value) : base(value)
+                {
+                    Text.Text = value.Title;
+                }
+            }
         }
     }
 }
