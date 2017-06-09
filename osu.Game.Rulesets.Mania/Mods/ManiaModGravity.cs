@@ -42,10 +42,9 @@ namespace osu.Game.Rulesets.Mania.Mods
                 if (maniaObject == null)
                     continue;
 
-                maniaHitRenderer.HitObjectTimingChanges[maniaObject.Column].Add(new ManiaSpeedAdjustmentContainer(new SpeedAdjustment
+                maniaHitRenderer.HitObjectTimingChanges[maniaObject.Column].Add(new ManiaSpeedAdjustmentContainer(new MultiplierControlPoint(obj.StartTime)
                 {
-                    Time = obj.StartTime,
-                    BeatLength = 1000
+                    TimingPoint = { BeatLength = 1000 }
                 }, ScrollingAlgorithm.Gravity));
             }
 
@@ -61,10 +60,9 @@ namespace osu.Game.Rulesets.Mania.Mods
 
                 for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength)
                 {
-                    maniaHitRenderer.BarlineTimingChanges.Add(new ManiaSpeedAdjustmentContainer(new SpeedAdjustment
+                    maniaHitRenderer.BarlineTimingChanges.Add(new ManiaSpeedAdjustmentContainer(new MultiplierControlPoint(t)
                     {
-                        Time = t,
-                        BeatLength = 1000
+                        TimingPoint = { BeatLength = 1000 }
                     }, ScrollingAlgorithm.Gravity));
                 }
             }

@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Timing
     {
         private readonly ScrollingAlgorithm scrollingAlgorithm;
 
-        public ManiaSpeedAdjustmentContainer(SpeedAdjustment timingSection, ScrollingAlgorithm scrollingAlgorithm)
+        public ManiaSpeedAdjustmentContainer(MultiplierControlPoint timingSection, ScrollingAlgorithm scrollingAlgorithm)
             : base(timingSection, Axes.Y)
         {
             this.scrollingAlgorithm = scrollingAlgorithm;
@@ -27,8 +27,8 @@ namespace osu.Game.Rulesets.Mania.Timing
                 return;
 
             // This is very naive and can be improved, but is adequate for now
-            LifetimeStart = TimingSection.Time - VisibleTimeRange;
-            LifetimeEnd = TimingSection.Time + Content.Height * 2;
+            LifetimeStart = MultiplierControlPoint.StartTime - VisibleTimeRange;
+            LifetimeEnd = MultiplierControlPoint.StartTime + Content.Height * 2;
         }
 
         protected override DrawableTimingSection CreateTimingSection()
@@ -37,9 +37,9 @@ namespace osu.Game.Rulesets.Mania.Timing
             {
                 default:
                 case ScrollingAlgorithm.Basic:
-                    return new BasicScrollingDrawableTimingSection(TimingSection);
+                    return new BasicScrollingDrawableTimingSection(MultiplierControlPoint);
                 case ScrollingAlgorithm.Gravity:
-                    return new GravityScrollingDrawableTimingSection(TimingSection);
+                    return new GravityScrollingDrawableTimingSection(MultiplierControlPoint);
             }
         }
     }

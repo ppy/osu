@@ -44,10 +44,9 @@ namespace osu.Desktop.VisualTests.Tests
             const double start_time = 500;
             const double duration = 500;
 
-            Func<double, bool, SpeedAdjustmentContainer> createTimingChange = (time, gravity) => new ManiaSpeedAdjustmentContainer(new SpeedAdjustment
+            Func<double, bool, SpeedAdjustmentContainer> createTimingChange = (time, gravity) => new ManiaSpeedAdjustmentContainer(new MultiplierControlPoint(time)
             {
-                BeatLength = 1000,
-                Time = time
+                TimingPoint = { BeatLength = 1000 }
             }, gravity ? ScrollingAlgorithm.Gravity : ScrollingAlgorithm.Basic);
 
             Action<bool> createPlayfieldWithNotes = gravity =>
