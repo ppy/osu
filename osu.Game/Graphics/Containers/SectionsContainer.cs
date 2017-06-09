@@ -134,9 +134,14 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = false,
-                Children = new Drawable[] { sectionsContainer = CreateScrollContentContainer() }
+                Children = new Drawable[] { sectionsContainer = CreateScrollContentContainer() },
+                Depth = float.MaxValue
             });
-            Add(headerBackgroundContainer = new Container<Drawable> { RelativeSizeAxes = Axes.X });
+            Add(headerBackgroundContainer = new Container<Drawable>
+            {
+                RelativeSizeAxes = Axes.X,
+                Depth = float.MaxValue / 2
+            });
             originalSectionsMargin = sectionsContainer.Margin;
         }
 
