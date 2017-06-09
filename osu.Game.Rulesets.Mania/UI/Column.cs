@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Name = "Hit target + hit objects",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = ManiaPlayfield.HIT_TARGET_POSITION},
+                    Padding = new MarginPadding { Top = ManiaPlayfield.HIT_TARGET_POSITION },
                     Children = new Drawable[]
                     {
                         new Container
