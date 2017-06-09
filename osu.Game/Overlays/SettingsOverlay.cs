@@ -83,7 +83,7 @@ namespace osu.Game.Overlays
                         },
                         Exit = Hide,
                     },
-                    Sections = sections,
+                    Children = sections,
                     Footer = new SettingsFooter()
                 },
                 sidebar = new Sidebar
@@ -148,12 +148,12 @@ namespace osu.Game.Overlays
             base.OnFocus(state);
         }
 
-        private class SettingsSectionsContainer : SectionsContainer
+        private class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
-            public SearchContainer SearchContainer;
+            public SearchContainer<SettingsSection> SearchContainer;
 
-            protected override Container<Drawable> CreateScrollContentContainer()
-                => SearchContainer = new SearchContainer
+            protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
+                => SearchContainer = new SearchContainer<SettingsSection>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,

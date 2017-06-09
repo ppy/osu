@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -13,11 +12,15 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// A container that can scroll to each section inside it.
     /// </summary>
-    public class SectionsContainer : Container
+    public class SectionsContainer<T> : Container<T>
+        where T : Drawable
     {
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
         public readonly ScrollContainer ScrollContainer;
-        private readonly Container<Drawable> sectionsContainer, headerBackgroundContainer;
+        private readonly Container headerBackgroundContainer;
+        private readonly FlowContainer<T> sectionsContainer;
+
+        protected override Container<T> Content => sectionsContainer;
 
         public Drawable ExpandableHeader
         {
@@ -26,12 +29,11 @@ namespace osu.Game.Graphics.Containers
             {
                 if (value == expandableHeader) return;
 
-                if (expandableHeader != null)
-                    Remove(expandableHeader);
+                expandableHeader?.Expire();
                 expandableHeader = value;
                 if (value == null) return;
 
-                Add(expandableHeader);
+                AddInternal(expandableHeader);
                 lastKnownScroll = float.NaN;
             }
         }
@@ -43,12 +45,11 @@ namespace osu.Game.Graphics.Containers
             {
                 if (value == fixedHeader) return;
 
-                if (fixedHeader != null)
-                    Remove(fixedHeader);
+                fixedHeader?.Expire();
                 fixedHeader = value;
                 if (value == null) return;
 
-                Add(fixedHeader);
+                AddInternal(fixedHeader);
                 lastKnownScroll = float.NaN;
             }
         }
@@ -88,39 +89,27 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
-        public Bindable<Drawable> SelectedSection { get; } = new Bindable<Drawable>();
+        public Bindable<T> SelectedSection { get; } = new Bindable<T>();
 
-        protected virtual Container<Drawable> CreateScrollContentContainer()
-            => new FillFlowContainer
+        protected virtual FlowContainer<T> CreateScrollContentContainer()
+            => new FillFlowContainer<T>
             {
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
             };
 
-        private List<Drawable> sections = new List<Drawable>();
-        public IEnumerable<Drawable> Sections
+        public override void Add(T drawable)
         {
-            get { return sections; }
-            set
-            {
-                foreach (var section in sections)
-                    sectionsContainer.Remove(section);
-
-                sections = value.ToList();
-                if (sections.Count == 0) return;
-
-                sectionsContainer.Add(sections);
-                SelectedSection.Value = sections[0];
-                lastKnownScroll = float.NaN;
-            }
+            base.Add(drawable);
+            lastKnownScroll = float.NaN;
         }
 
         private float headerHeight, footerHeight;
         private readonly MarginPadding originalSectionsMargin;
         private void updateSectionsMargin()
         {
-            if (sections.Count == 0) return;
+            if (!Children.Any()) return;
 
             var newMargin = originalSectionsMargin;
             newMargin.Top += headerHeight;
@@ -131,14 +120,14 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            Add(ScrollContainer = new ScrollContainer()
+            AddInternal(ScrollContainer = new ScrollContainer()
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 Children = new Drawable[] { sectionsContainer = CreateScrollContentContainer() },
                 Depth = float.MaxValue
             });
-            Add(headerBackgroundContainer = new Container<Drawable>
+            AddInternal(headerBackgroundContainer = new Container
             {
                 RelativeSizeAxes = Axes.X,
                 Depth = float.MaxValue / 2
@@ -176,10 +165,10 @@ namespace osu.Game.Graphics.Containers
                 headerBackgroundContainer.Height = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
                 headerBackgroundContainer.Y = ExpandableHeader?.Y ?? 0;
 
-                Drawable bestMatch = null;
+                T bestMatch = null;
                 float minDiff = float.MaxValue;
 
-                foreach (var section in sections)
+                foreach (var section in Children)
                 {
                     float diff = Math.Abs(ScrollContainer.GetChildPosInContent(section) - currentScroll);
                     if (diff < minDiff)

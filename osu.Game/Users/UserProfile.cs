@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -51,7 +52,7 @@ namespace osu.Game.Users
                 Colour = OsuColour.Gray(0.2f)
             });
 
-            var sectionsContainer = new SectionsContainer
+            var sectionsContainer = new SectionsContainer<ProfileSection>
             {
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = new ProfileHeader(user),
@@ -61,7 +62,7 @@ namespace osu.Game.Users
                     Colour = OsuColour.Gray(34),
                     RelativeSizeAxes = Axes.Both
                 },
-                Sections = sections
+                Children = sections
             };
             Add(sectionsContainer);
 
@@ -69,7 +70,7 @@ namespace osu.Game.Users
             {
                 if (lastSection != s)
                 {
-                    lastSection = s as ProfileSection;
+                    lastSection = s;
                     tabs.Current.Value = lastSection;
                 }
             };
@@ -78,7 +79,9 @@ namespace osu.Game.Users
             {
                 if (lastSection == null)
                 {
-                    lastSection = tabs.Current.Value = sections[0];
+                    lastSection = sectionsContainer.Children.FirstOrDefault();
+                    if (lastSection != null)
+                        tabs.Current.Value = lastSection;
                     return;
                 }
                 if (lastSection != s)
