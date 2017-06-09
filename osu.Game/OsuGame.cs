@@ -77,8 +77,10 @@ namespace osu.Game
         public void ToggleDirect() => direct.ToggleVisibility();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(FrameworkConfigManager frameworkConfig)
         {
+            this.frameworkConfig = frameworkConfig;
+
             if (!Host.IsPrimaryInstance)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
@@ -259,6 +261,19 @@ namespace osu.Game
             {
                 switch (args.Key)
                 {
+                    case Key.R:
+                        if (state.Keyboard.AltPressed)
+                        {
+                            var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
+
+                            sensitivity.Disabled = false;
+                            sensitivity.Value = 1;
+                            sensitivity.Disabled = true;
+
+                            frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
+                            return true;
+                        }
+                        break;
                     case Key.T:
                         Toolbar.ToggleVisibility();
                         return true;
@@ -284,6 +299,7 @@ namespace osu.Game
         private Container overlayContent;
 
         private OsuScreen currentScreen;
+        private FrameworkConfigManager frameworkConfig;
 
         private void screenChanged(Screen newScreen)
         {
