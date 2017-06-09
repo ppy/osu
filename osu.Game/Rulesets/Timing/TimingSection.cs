@@ -6,17 +6,18 @@ namespace osu.Game.Rulesets.Timing
     public class TimingSection
     {
         /// <summary>
-        /// The time at which this timing section starts.
+        /// The time in milliseconds at which this timing section starts.
         /// </summary>
         public double Time;
 
         /// <summary>
-        /// The beat length.
+        /// The length of one beat in milliseconds.
         /// </summary>
         public double BeatLength = 500;
 
         /// <summary>
-        /// The speed multiplier.
+        /// An arbitrary speed multiplier which should be used to when adjusting the visual representation of entities represented by this section.
+        /// This is usually applied in adition to a multiplier based on the <see cref="BeatLength"/> relative to a constant.
         /// </summary>
         public double SpeedMultiplier = 1;
     }
