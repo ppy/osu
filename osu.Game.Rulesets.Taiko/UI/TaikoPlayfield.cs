@@ -229,7 +229,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                 if (judgedObject.HitObject.Kiai)
                     kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject.Judgement, isRim));
-
             }
             else
                 hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
