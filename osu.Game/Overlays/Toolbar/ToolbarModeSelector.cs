@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Toolbar
                         Radius = 15,
                         Roundness = 15,
                     },
-                    Children = new []
+                    Children = new[]
                     {
                         new Box
                         {
