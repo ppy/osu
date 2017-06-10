@@ -7,7 +7,6 @@ using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
-using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using OpenTK.Graphics.ES30;
@@ -16,6 +15,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Batches;
+using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Lists;
 
 namespace osu.Game.Graphics.Backgrounds
