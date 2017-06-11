@@ -171,6 +171,8 @@ namespace osu.Game.Screens.Select
             } while (index != startIndex);
         }
 
+        private IEnumerable<BeatmapGroup> getVisibleGroups() => groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden);
+
         public void SelectNextRandom()
         {
             randomSelectedBeatmaps.Push(selectedGroup);
@@ -219,11 +221,6 @@ namespace osu.Game.Screens.Select
                     break;
                 }
             }
-        }
-
-        private IEnumerable<BeatmapGroup> getVisibleGroups()
-        {
-            return groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden);
         }
 
         private FilterCriteria criteria = new FilterCriteria();
