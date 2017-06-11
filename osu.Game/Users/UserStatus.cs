@@ -48,7 +48,7 @@ namespace osu.Game.Users
         public override string Message => @"Solo Game";
     }
 
-    public class UserStatusMultiplayerGame: UserStatusBusy
+    public class UserStatusMultiplayerGame : UserStatusBusy
     {
         public override string Message => @"Multiplaying";
     }

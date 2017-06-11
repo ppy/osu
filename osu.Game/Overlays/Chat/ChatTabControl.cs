@@ -207,11 +207,15 @@ namespace osu.Game.Overlays.Chat
             {
                 public override bool Active
                 {
-                    get { return base.Active; }
+                    get { return false; }
+                    // ReSharper disable once ValueParameterNotUsed
                     set
                     {
-                        activeBindable.Value = value;
-                        base.Active = value;
+                        // we basically never want this tab to become active.
+                        // this allows us to become a "toggle" tab.
+                        // is a bit hacky, to say the least.
+                        activeBindable.Value = !activeBindable.Value;
+                        base.Active = false;
                     }
                 }
 
@@ -220,6 +224,9 @@ namespace osu.Game.Overlays.Chat
                 public ChannelSelectorTabItem(Channel value, Bindable<bool> active) : base(value)
                 {
                     activeBindable = active;
+                    activeBindable.ValueChanged += v => selectorUpdateState();
+
+
                     Depth = float.MaxValue;
                     Width = 45;
 
@@ -234,6 +241,26 @@ namespace osu.Game.Overlays.Chat
                 {
                     backgroundInactive = colour.Gray2;
                     backgroundActive = colour.Gray3;
+                }
+
+                protected override void LoadComplete()
+                {
+                    base.LoadComplete();
+
+                    selectorUpdateState();
+                }
+
+                protected override void OnHoverLost(InputState state)
+                {
+                    selectorUpdateState();
+                }
+
+                private void selectorUpdateState()
+                {
+                    if (activeBindable.Value)
+                        fadeActive();
+                    else
+                        fadeInactive();
                 }
             }
         }

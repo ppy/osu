@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             set
             {
                 bounding = value;
-                Invalidate(Invalidation.Geometry);
+                Invalidate(Invalidation.MiscGeometry);
             }
         }
 
