@@ -46,19 +46,19 @@ namespace osu.Game.Overlays
                             Direction = FillDirection.Vertical,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Children = new []
+                            Children = new[]
                             {
                                 new NotificationSection
                                 {
                                     Title = @"Notifications",
                                     ClearText = @"Clear All",
-                                    AcceptTypes = new [] { typeof(SimpleNotification) },
+                                    AcceptTypes = new[] { typeof(SimpleNotification) },
                                 },
                                 new NotificationSection
                                 {
                                     Title = @"Running Tasks",
                                     ClearText = @"Cancel All",
-                                    AcceptTypes = new [] { typeof(ProgressNotification) },
+                                    AcceptTypes = new[] { typeof(ProgressNotification) },
                                 },
                             }
                         }

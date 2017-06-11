@@ -335,7 +335,6 @@ namespace osu.Game.Screens.Tournament
                 {
                     Logger.Error(ex, "Failed to read last drawings results.");
                 }
-
             }
             else
             {

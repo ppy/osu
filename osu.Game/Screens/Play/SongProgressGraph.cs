@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play
                 {
                     IHasEndTime end = h as IHasEndTime;
 
-                    int startRange = (int)((h.StartTime - firstHit)/ interval);
+                    int startRange = (int)((h.StartTime - firstHit) / interval);
                     int endRange = (int)(((end?.EndTime > 0 ? end.EndTime : h.StartTime) - firstHit) / interval);
                     for (int i = startRange; i <= endRange; i++)
                         values[i]++;

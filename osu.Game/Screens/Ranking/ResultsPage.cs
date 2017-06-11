@@ -64,7 +64,8 @@ namespace osu.Game.Screens.Ranking
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        new Box{
+                        new Box
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
                             AlwaysPresent = true
@@ -87,6 +88,5 @@ namespace osu.Game.Screens.Ranking
                 }
             });
         }
-
     }
 }

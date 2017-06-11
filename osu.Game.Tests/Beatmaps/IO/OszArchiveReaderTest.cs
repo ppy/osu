@@ -86,4 +86,3 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
     }
 }
-

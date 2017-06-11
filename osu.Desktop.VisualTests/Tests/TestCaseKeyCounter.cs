@@ -54,7 +54,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Children = new Drawable[]
                 {
                     new SpriteText { Text = "FadeTime" },
-                    sliderBar =new TestSliderBar<int>
+                    sliderBar = new TestSliderBar<int>
                     {
                         Width = 150,
                         Height = 10,
