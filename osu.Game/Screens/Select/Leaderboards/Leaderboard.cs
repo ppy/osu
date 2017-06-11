@@ -15,11 +15,13 @@ using osu.Game.Database;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public class Leaderboard : Container
     {
+		private readonly LoadingAnimation loadingText;
         private readonly ScrollContainer scrollContainer;
         private readonly FillFlowContainer<LeaderboardScore> scrollFlow;
 
@@ -86,6 +88,12 @@ namespace osu.Game.Screens.Select.Leaderboards
                         },
                     },
                 },
+				loadingText = new LoadingAnimation
+				{
+					AutoSizeAxes = Axes.Both,
+					Anchor = Anchor.Centre,
+					Alpha = 0f,
+				},
             };
         }
 
@@ -123,11 +131,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             Scores = null;
             getScoresRequest?.Cancel();
+			loadingText.Show();
 
             if (api == null || Beatmap == null) return;
 
             getScoresRequest = new GetScoresRequest(Beatmap);
             getScoresRequest.Success += r => Scores = r.Scores;
+			getScoresRequest.Success += delegate { loadingText.Hide(); };
             api.Queue(getScoresRequest);
         }
 
