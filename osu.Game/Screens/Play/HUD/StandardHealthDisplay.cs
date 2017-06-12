@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD
                     return;
                 glowColour = value;
 
-                fill.EdgeEffect = new EdgeEffect
+                fill.EdgeEffect = new EdgeEffectParameters
                 {
                     Colour = glowColour.Opacity(base_glow_opacity),
                     Radius = 8,

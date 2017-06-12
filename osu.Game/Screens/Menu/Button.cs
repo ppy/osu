@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Masking = true,
                     MaskingSmoothness = 2,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = Color4.Black.Opacity(0.2f),

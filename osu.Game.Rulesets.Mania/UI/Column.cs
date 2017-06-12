@@ -171,14 +171,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 background.Colour = accentColour;
 
-                hitTargetBar.EdgeEffect = new EdgeEffect
+                hitTargetBar.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
                     Radius = 5,
                     Colour = accentColour.Opacity(0.5f),
                 };
 
-                keyIcon.EdgeEffect = new EdgeEffect
+                keyIcon.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
                     Radius = 5,

@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Chat
                 Shear = new Vector2(shear_width / ChatOverlay.TAB_AREA_HEIGHT, 0);
 
                 Masking = true;
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Radius = 10,

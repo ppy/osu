@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             Masking = true;
             AutoSizeAxes = Axes.Both;
             CornerRadius = width / 2;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = Color4.White.Opacity(0.2f),

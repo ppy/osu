@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Multiplayer
             Height = height;
             CornerRadius = 5;
             Masking = true;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = Color4.Black.Opacity(40),
