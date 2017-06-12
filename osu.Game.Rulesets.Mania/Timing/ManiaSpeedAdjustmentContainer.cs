@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Mania.Timing
                 return;
 
             // This is very naive and can be improved, but is adequate for now
-            LifetimeStart = MultiplierControlPoint.StartTime - VisibleTimeRange;
-            LifetimeEnd = MultiplierControlPoint.StartTime + Content.Height * 2;
+            LifetimeStart = ControlPoint.StartTime - VisibleTimeRange;
+            LifetimeEnd = ControlPoint.StartTime + Content.Height * 2;
         }
 
         protected override DrawableTimingSection CreateTimingSection()
@@ -36,9 +36,9 @@ namespace osu.Game.Rulesets.Mania.Timing
             {
                 default:
                 case ScrollingAlgorithm.Basic:
-                    return new BasicScrollingDrawableTimingSection(MultiplierControlPoint);
+                    return new BasicScrollingDrawableTimingSection(ControlPoint);
                 case ScrollingAlgorithm.Gravity:
-                    return new GravityScrollingDrawableTimingSection(MultiplierControlPoint);
+                    return new GravityScrollingDrawableTimingSection(ControlPoint);
             }
         }
     }
