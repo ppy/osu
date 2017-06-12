@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
-        private ContextMenuType type;
+        private readonly ContextMenuType type;
 
         protected override Container CreateTextContainer(string title) => new Container
         {
