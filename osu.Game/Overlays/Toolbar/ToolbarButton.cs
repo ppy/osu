@@ -172,7 +172,7 @@ namespace osu.Game.Overlays.Toolbar
             RelativeSizeAxes = Axes.Both;
             Masking = true;
             MaskingSmoothness = 0;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = Color4.Black.Opacity(40),

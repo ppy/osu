@@ -290,7 +290,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Margin = new MarginPadding { Bottom = 5 };
                     Masking = true;
                     CornerRadius = 5;
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = Color4.Black.Opacity(0.25f),
@@ -326,7 +326,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     CornerRadius = 5;
                     ItemsContainer.Padding = new MarginPadding(0);
                     Masking = true;
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = Color4.Black.Opacity(0.25f),
