@@ -87,6 +87,5 @@ namespace osu.Game.Rulesets.Mania.MathUtils
             bitIndex++;
             return ((bitBuffer >>= 1) & 1) == 1;
         }
-
     }
 }

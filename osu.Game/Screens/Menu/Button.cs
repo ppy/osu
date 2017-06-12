@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Masking = true,
                     MaskingSmoothness = 2,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = Color4.Black.Opacity(0.2f),
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Menu
                     Scale = new Vector2(0, 1),
                     Size = boxSize,
                     Shear = new Vector2(ButtonSystem.WEDGE_WIDTH / boxSize.Y, 0),
-                    Children = new []
+                    Children = new[]
                     {
                         new Box
                         {
@@ -283,9 +283,9 @@ namespace osu.Game.Screens.Menu
         public ButtonState State
         {
             get { return state; }
+
             set
             {
-
                 if (state == value)
                     return;
 

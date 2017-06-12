@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Settings
         // hold a reference to the provided bindable so we don't have to in every settings section.
         private Bindable<T> bindable;
 
-        public Bindable<T> Bindable
+        public virtual Bindable<T> Bindable
         {
             get
             {

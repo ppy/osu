@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings
                 },
                 new SidebarScrollContainer
                 {
-                    Children = new []
+                    Children = new[]
                     {
                         content = new FillFlowContainer
                         {
