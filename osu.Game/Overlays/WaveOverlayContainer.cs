@@ -173,7 +173,7 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.X;
                 Width = 1.5f;
                 Masking = true;
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Colour = Color4.Black.Opacity(50),
