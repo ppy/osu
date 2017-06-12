@@ -9,8 +9,12 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuTextFlowContainer: TextFlowContainer
+    public class OsuTextFlowContainer : TextFlowContainer
     {
+        public OsuTextFlowContainer(Action<SpriteText> defaultCreationParameters = null) : base(defaultCreationParameters)
+        {
+        }
+
         protected override SpriteText CreateSpriteText() => new OsuSpriteText();
 
         public IEnumerable<SpriteText> AddTextAwesome(FontAwesome icon, Action<SpriteText> creationParameters = null) => AddText(((char)icon).ToString(), creationParameters);
