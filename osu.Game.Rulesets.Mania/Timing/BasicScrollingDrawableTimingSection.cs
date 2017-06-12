@@ -6,21 +6,24 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.Mania.Timing
 {
+    /// <summary>
+    /// A <see cref="DrawableTimingSection"/> which scrolls relative to the control point start time.
+    /// </summary>
     internal class BasicScrollingDrawableTimingSection : DrawableTimingSection
     {
-        private readonly MultiplierControlPoint timingSection;
+        private readonly MultiplierControlPoint controlPoint;
 
-        public BasicScrollingDrawableTimingSection(MultiplierControlPoint timingSection)
+        public BasicScrollingDrawableTimingSection(MultiplierControlPoint controlPoint)
             : base(Axes.Y)
         {
-            this.timingSection = timingSection;
+            this.controlPoint = controlPoint;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            Y = (float)(timingSection.StartTime - Time.Current);
+            Y = (float)(controlPoint.StartTime - Time.Current);
         }
     }
 }

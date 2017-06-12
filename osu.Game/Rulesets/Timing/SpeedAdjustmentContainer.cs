@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -12,18 +11,29 @@ using OpenTK;
 namespace osu.Game.Rulesets.Timing
 {
     /// <summary>
-    /// A container for hit objects which applies applies the speed adjustments defined by the <see cref="Timing.MultiplierControlPoint"/> properties
-    /// to its <see cref="Container{T}.Content"/> to affect the <see cref="DrawableTimingSection"/> scroll speed.
+    /// A container for hit objects which applies applies the speed adjustments defined by the properties of a <see cref="Timing.MultiplierControlPoint"/>
+    /// to affect the scroll speed of the contained <see cref="DrawableTimingSection"/>.
+    ///
+    /// <para>
+    /// This container must always be relatively-sized to its parent to provide the speed adjustments. This container will provide the speed adjustments
+    /// by modifying its size while maintaining a constant <see cref="Container{T}.RelativeChildSize"/> for its children
+    /// </para>
     /// </summary>
     public abstract class SpeedAdjustmentContainer : Container<DrawableHitObject>
     {
         private readonly Bindable<double> visibleTimeRange = new Bindable<double>();
+        /// <summary>
+        /// Gets or sets the range of time that is visible by the length of this container.
+        /// </summary>
         public Bindable<double> VisibleTimeRange
         {
             get { return visibleTimeRange; }
             set { visibleTimeRange.BindTo(value); }
         }
 
+        /// <summary>
+        /// The <see cref="MultiplierControlPoint"/> which provides the speed adjustments for this container.
+        /// </summary>
         public readonly MultiplierControlPoint MultiplierControlPoint;
 
         protected override Container<DrawableHitObject> Content => content;
@@ -34,11 +44,13 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// Creates a new <see cref="SpeedAdjustmentContainer"/>.
         /// </summary>
-        /// <param name="multiplierControlPoint">The multiplier control point that provides the speed adjustments for this container.</param>
-        /// <param name="scrollingAxes">The axes through which this drawable timing section scrolls through.</param>
+        /// <param name="multiplierControlPoint">The <see cref="MultiplierControlPoint"/> which provides the speed adjustments for this container.</param>
+        /// <param name="scrollingAxes">The axes through which the content of this container should scroll through.</param>
         protected SpeedAdjustmentContainer(MultiplierControlPoint multiplierControlPoint, Axes scrollingAxes)
         {
             this.scrollingAxes = scrollingAxes;
+
+            RelativeSizeAxes = Axes.Both;
 
             MultiplierControlPoint = multiplierControlPoint;
         }
@@ -52,12 +64,6 @@ namespace osu.Game.Rulesets.Timing
             timingSection.RelativeChildOffset = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)MultiplierControlPoint.StartTime : 0, (scrollingAxes & Axes.Y) > 0 ? (float)MultiplierControlPoint.StartTime : 0);
 
             AddInternal(content = timingSection);
-        }
-
-        public override Axes RelativeSizeAxes
-        {
-            get { return Axes.Both; }
-            set { throw new InvalidOperationException($"{nameof(SpeedAdjustmentContainer)} must always be relatively-sized."); }
         }
 
         protected override void Update()
@@ -77,7 +83,7 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// Creates the container which handles the movement of a collection of hit objects.
         /// </summary>
-        /// <returns>The drawable timing section.</returns>
+        /// <returns>The <see cref="DrawableTimingSection"/>.</returns>
         protected abstract DrawableTimingSection CreateTimingSection();
     }
 }

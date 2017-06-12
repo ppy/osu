@@ -10,27 +10,46 @@ namespace osu.Game.Rulesets.Timing
     public class MultiplierControlPoint : IJsonSerializable, IComparable<MultiplierControlPoint>
     {
         /// <summary>
-        /// The time in milliseconds at which this control point starts.
+        /// The time in milliseconds at which this <see cref="MultiplierControlPoint"/> starts.
         /// </summary>
         public readonly double StartTime;
 
         /// <summary>
-        /// The multiplier which this control point provides.
+        /// The multiplier which this <see cref="MultiplierControlPoint"/> provides.
         /// </summary>
         public double Multiplier => 1000 / TimingPoint.BeatLength / DifficultyPoint.SpeedMultiplier;
 
+        /// <summary>
+        /// The <see cref="TimingControlPoint"/> that provides the timing information for this <see cref="MultiplierControlPoint"/>.
+        /// </summary>
         public TimingControlPoint TimingPoint = new TimingControlPoint();
+
+        /// <summary>
+        /// The <see cref="DifficultyControlPoint"/> that provides additional difficulty information for this <see cref="MultiplierControlPoint"/>.
+        /// </summary>
         public DifficultyControlPoint DifficultyPoint = new DifficultyControlPoint();
 
+        /// <summary>
+        /// Creates a <see cref="MultiplierControlPoint"/>. This is required for JSON serialization
+        /// </summary>
         public MultiplierControlPoint()
         {
         }
 
+        /// <summary>
+        /// Creates a <see cref="MultiplierControlPoint"/>.
+        /// </summary>
+        /// <param name="startTime">The start time of this <see cref="MultiplierControlPoint"/>.</param>
         public MultiplierControlPoint(double startTime)
         {
             StartTime = startTime;
         }
 
+        /// <summary>
+        /// Creates a <see cref="MultiplierControlPoint"/> by copying another <see cref="MultiplierControlPoint"/>.
+        /// </summary>
+        /// <param name="startTime">The start time of this <see cref="MultiplierControlPoint"/>.</param>
+        /// <param name="other">The <see cref="MultiplierControlPoint"/> to copy.</param>
         public MultiplierControlPoint(double startTime, MultiplierControlPoint other)
             : this(startTime)
         {

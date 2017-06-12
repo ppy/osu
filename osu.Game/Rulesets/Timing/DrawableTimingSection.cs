@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Caching;
@@ -24,19 +23,21 @@ namespace osu.Game.Rulesets.Timing
     /// </para>
     ///
     /// <para>
-    /// This container will auto-size to the total size of its children along the desired auto-sizing axes such that the reasulting size
-    /// of this container will also be a time value.
+    /// This container will auto-size to the total duration of the contained hit objects along the desired auto-sizing axes such that the resulting size
+    /// of this container will be a value representing the total duration of all contained hit objects.
     /// </para>
     ///
     /// <para>
-    /// This container is and must always be relatively-sized and positioned to its such that the parent can utilise
-    /// <see cref="Container{T}.RelativeChildSize"/> and <see cref="Container{T}.RelativeChildOffset"/> to apply further time offsets
-    /// to this collection of hit objects.
+    /// This container is and must always be relatively-sized and positioned to its such that the parent can utilise <see cref="Container{T}.RelativeChildSize"/>
+    /// and <see cref="Container{T}.RelativeChildOffset"/> to apply further time offsets to this collection of hit objects.
     /// </para>
     /// </summary>
     public abstract class DrawableTimingSection : Container<DrawableHitObject>
     {
         private readonly BindableDouble visibleTimeRange = new BindableDouble();
+        /// <summary>
+        /// Gets or sets the range of time that is visible by the length of this container.
+        /// </summary>
         public BindableDouble VisibleTimeRange
         {
             get { return visibleTimeRange; }
@@ -57,18 +58,8 @@ namespace osu.Game.Rulesets.Timing
         {
             this.autoSizingAxes = autoSizingAxes;
 
+            RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
-
-            // We need a default size since RelativeSizeAxes is overridden
-            Size = Vector2.One;
-        }
-
-        public override Axes AutoSizeAxes { set { throw new InvalidOperationException($"{nameof(DrawableTimingSection)} must always be relatively-sized."); } }
-
-        public override Axes RelativeSizeAxes
-        {
-            get { return Axes.Both; }
-            set { throw new InvalidOperationException($"{nameof(DrawableTimingSection)} must always be relatively-sized."); }
         }
 
         public override void InvalidateFromChild(Invalidation invalidation)

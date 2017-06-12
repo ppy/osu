@@ -6,14 +6,17 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.Mania.Timing
 {
+    /// <summary>
+    /// A <see cref="DrawableTimingSection"/> that emulates a form of gravity where hit objects speed up over time.
+    /// </summary>
     internal class GravityScrollingDrawableTimingSection : DrawableTimingSection
     {
-        private readonly MultiplierControlPoint timingSection;
+        private readonly MultiplierControlPoint controlPoint;
 
-        public GravityScrollingDrawableTimingSection(MultiplierControlPoint timingSection)
+        public GravityScrollingDrawableTimingSection(MultiplierControlPoint controlPoint)
             : base(Axes.Y)
         {
-            this.timingSection = timingSection;
+            this.controlPoint = controlPoint;
         }
 
         protected override void UpdateAfterChildren()
@@ -21,9 +24,9 @@ namespace osu.Game.Rulesets.Mania.Timing
             base.UpdateAfterChildren();
 
             // The gravity-adjusted start position
-            float startPos = (float)computeGravityTime(timingSection.StartTime);
+            float startPos = (float)computeGravityTime(controlPoint.StartTime);
             // The gravity-adjusted end position
-            float endPos = (float)computeGravityTime(timingSection.StartTime + RelativeChildSize.Y);
+            float endPos = (float)computeGravityTime(controlPoint.StartTime + RelativeChildSize.Y);
 
             Y = startPos;
             Height = endPos - startPos;

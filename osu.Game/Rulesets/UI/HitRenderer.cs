@@ -121,6 +121,11 @@ namespace osu.Game.Rulesets.UI
         public Beatmap<TObject> Beatmap;
 
         /// <summary>
+        /// All the converted hit objects contained by this hit renderer.
+        /// </summary>
+        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
+
+        /// <summary>
         /// The mods which are to be applied.
         /// </summary>
         protected IEnumerable<Mod> Mods;
@@ -206,7 +211,10 @@ namespace osu.Game.Rulesets.UI
 
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
-        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
+        /// <summary>
+        /// All the converted hit objects contained by this hit renderer.
+        /// </summary>
+        public new IEnumerable<TObject> Objects => Beatmap.HitObjects;
 
         protected override bool AllObjectsJudged => drawableObjects.All(h => h.Judged);
 
