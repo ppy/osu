@@ -17,6 +17,9 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Graphics.Containers;
+using osu.Framework.Audio.Track;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Menu
 {
@@ -24,7 +27,7 @@ namespace osu.Game.Screens.Menu
     /// Button designed specifically for the osu!next main menu.
     /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
     /// </summary>
-    public class Button : Container, IStateful<ButtonState>
+    public class Button : BeatSyncedContainer, IStateful<ButtonState>
     {
         private readonly Container iconText;
         private readonly Container box;
@@ -116,100 +119,108 @@ namespace osu.Game.Screens.Menu
             };
         }
 
-        protected override bool OnHover(InputState state)
+        private double previousBeatLength;
+
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
-            if (State != ButtonState.Expanded) return true;
+            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-            //if (OsuGame.Instance.IsActive)
-            //    Game.Audio.PlaySamplePositional($@"menu-{internalName}-hover", @"menuclick");
+            if (Hovering)
+            {
+                double currentBeatLength = timingPoint.BeatLength;
+                double startTime = Time.Current;
 
-            box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
+                if (currentBeatLength != previousBeatLength)
+                    restartAnimation(startTime, currentBeatLength / 2);
 
-            int duration = 0; //(int)(Game.Audio.BeatLength / 2);
-            if (duration == 0) duration = 250;
+                previousBeatLength = currentBeatLength;
+            }
+        }
 
+        private void restartAnimation(double startTime, double beatLength)
+        {
             icon.ClearTransforms();
-
-            icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
-
-            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
-            double startTime = Time.Current + offset;
-
-            icon.RotateTo(10, offset, EasingTypes.InOutSine);
-            icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);
 
             icon.Transforms.Add(new TransformRotation
             {
                 StartValue = -10,
                 EndValue = 10,
                 StartTime = startTime,
-                EndTime = startTime + duration * 2,
+                EndTime = startTime + beatLength * 2,
                 Easing = EasingTypes.InOutSine,
                 LoopCount = -1,
-                LoopDelay = duration * 2
+                LoopDelay = beatLength * 2
             });
-
             icon.Transforms.Add(new TransformPosition
             {
                 StartValue = Vector2.Zero,
                 EndValue = new Vector2(0, -10),
                 StartTime = startTime,
-                EndTime = startTime + duration,
+                EndTime = startTime + beatLength,
                 Easing = EasingTypes.Out,
                 LoopCount = -1,
-                LoopDelay = duration
+                LoopDelay = beatLength
             });
-
             icon.Transforms.Add(new TransformScale
             {
                 StartValue = new Vector2(1, 0.9f),
                 EndValue = Vector2.One,
                 StartTime = startTime,
-                EndTime = startTime + duration,
+                EndTime = startTime + beatLength,
                 Easing = EasingTypes.Out,
                 LoopCount = -1,
-                LoopDelay = duration
+                LoopDelay = beatLength,
             });
-
             icon.Transforms.Add(new TransformPosition
             {
                 StartValue = new Vector2(0, -10),
                 EndValue = Vector2.Zero,
-                StartTime = startTime + duration,
-                EndTime = startTime + duration * 2,
+                StartTime = startTime + beatLength,
+                EndTime = startTime + beatLength * 2,
                 Easing = EasingTypes.In,
                 LoopCount = -1,
-                LoopDelay = duration
+                LoopDelay = beatLength,
             });
-
             icon.Transforms.Add(new TransformScale
             {
                 StartValue = Vector2.One,
                 EndValue = new Vector2(1, 0.9f),
-                StartTime = startTime + duration,
-                EndTime = startTime + duration * 2,
+                StartTime = startTime + beatLength,
+                EndTime = startTime + beatLength * 2,
                 Easing = EasingTypes.In,
                 LoopCount = -1,
-                LoopDelay = duration
+                LoopDelay = beatLength,
             });
-
             icon.Transforms.Add(new TransformRotation
             {
                 StartValue = 10,
                 EndValue = -10,
-                StartTime = startTime + duration * 2,
-                EndTime = startTime + duration * 4,
+                StartTime = startTime + beatLength * 2,
+                EndTime = startTime + beatLength * 4,
                 Easing = EasingTypes.InOutSine,
                 LoopCount = -1,
-                LoopDelay = duration * 2
+                LoopDelay = beatLength * 2
             });
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            if (State != ButtonState.Expanded) return true;
+
+            box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
+
+            icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
+
+            icon.RotateTo(-10, 0, EasingTypes.InOutSine);
+            icon.ScaleTo(new Vector2(1, 0.9f), 0, EasingTypes.Out);
+
+            restartAnimation(Time.Current, 250);
 
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            icon.ClearTransforms();
             icon.RotateTo(0, 500, EasingTypes.Out);
             icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
             icon.ScaleTo(0.7f, 500, EasingTypes.OutElasticHalf);
