@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
 
                     CornerRadius = 5,
                     Masking = true,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = Color4.Black.Opacity(0.04f),
                         Type = EdgeEffectType.Shadow,
