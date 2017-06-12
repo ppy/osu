@@ -56,7 +56,7 @@ namespace osu.Game.Graphics.UserInterface
             GlowingAccentColour = colours.PinkLighter;
             GlowColour = colours.PinkDarker;
 
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Colour = GlowColour,
                 Type = EdgeEffectType.Glow,
