@@ -18,9 +18,9 @@ namespace osu.Game.Graphics.Containers
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
         public readonly ScrollContainer ScrollContainer;
         private readonly Container headerBackgroundContainer;
-        private readonly FlowContainer<T> sectionsContainer;
+        private readonly FlowContainer<T> scrollContentContainer;
 
-        protected override Container<T> Content => sectionsContainer;
+        protected override Container<T> Content => scrollContentContainer;
 
         public Drawable ExpandableHeader
         {
@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.Containers
             newMargin.Top += headerHeight;
             newMargin.Bottom += footerHeight;
 
-            sectionsContainer.Margin = newMargin;
+            scrollContentContainer.Margin = newMargin;
         }
 
         public SectionsContainer()
@@ -124,7 +124,7 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
-                Children = new Drawable[] { sectionsContainer = CreateScrollContentContainer() },
+                Children = new Drawable[] { scrollContentContainer = CreateScrollContentContainer() },
                 Depth = float.MaxValue
             });
             AddInternal(headerBackgroundContainer = new Container
@@ -132,7 +132,7 @@ namespace osu.Game.Graphics.Containers
                 RelativeSizeAxes = Axes.X,
                 Depth = float.MaxValue / 2
             });
-            originalSectionsMargin = sectionsContainer.Margin;
+            originalSectionsMargin = scrollContentContainer.Margin;
         }
 
         private float lastKnownScroll;
