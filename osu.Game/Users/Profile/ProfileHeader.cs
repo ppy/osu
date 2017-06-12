@@ -1,11 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Users.Profile
@@ -14,12 +18,14 @@ namespace osu.Game.Users.Profile
     {
         private readonly User user;
 
+        private readonly OsuTextFlowContainer infoText;
+
         private const float cover_height = 200, avatar_size = 110, avatar_bottom_position = -20;
         public ProfileHeader(User user)
         {
             this.user = user;
             RelativeSizeAxes = Axes.X;
-            Height = cover_height;
+            Height = cover_height + cover_height - UserProfile.TAB_HEIGHT;
 
             Children = new Drawable[]
             {
@@ -84,8 +90,48 @@ namespace osu.Game.Users.Profile
                             }
                         }
                     }
+                },
+                infoText = new OsuTextFlowContainer(t =>
+                {
+                    t.TextSize = 12;
+                    t.Alpha = 0.8f;
+                })
+                {
+                    Y = cover_height + 20,
+                    Margin = new MarginPadding { Horizontal = UserProfile.CONTENT_X_MARGIN },
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    ParagraphSpacing = 1,
+                    //LineSpacing = 0.5f
                 }
             };
+
+            Action<SpriteText> bold = t =>
+            {
+                t.Font = @"Exo2.0-Bold";
+                t.Alpha = 1;
+            };
+            // placeholder text
+            infoText.AddTextAwesome(FontAwesome.fa_map_marker);
+            infoText.AddText(" position     ");
+            infoText.AddTextAwesome(FontAwesome.fa_twitter);
+            infoText.AddText(" tweet     ");
+            infoText.AddTextAwesome(FontAwesome.fa_heart_o);
+            infoText.AddText(" favorite     ");
+            infoText.NewParagraph();
+            infoText.AddText("0 years old");
+            infoText.NewLine();
+            infoText.AddText("Commander of ");
+            infoText.AddText("The Color Scribbles", bold);
+            infoText.NewParagraph();
+            infoText.AddText("Joined since ");
+            infoText.AddText("June 2017", bold);
+            infoText.NewLine();
+            infoText.AddText("Last seen ");
+            infoText.AddText("0 minutes ago", bold);
+            infoText.NewParagraph();
+            infoText.AddText("Play with ");
+            infoText.AddText("Mouse, Keyboard, Tablet", bold);
         }
     }
 }
