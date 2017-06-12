@@ -35,7 +35,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Origin = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    new Framework.Graphics.Sprites.Box
+                    new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Green,
@@ -98,7 +98,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class MyContextMenuContainer : Container, IHasContextMenu
         {
-            public ContextMenuItem[] ContextMenuItems => new[]
+            public ContextMenuItem[] ContextMenuItems => new ContextMenuItem[]
             {
                 new OsuContextMenuItem(@"Some option"),
                 new OsuContextMenuItem(@"Highlighted option", ContextMenuType.Highlighted),
@@ -112,7 +112,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class AnotherContextMenuContainer : Container, IHasContextMenu
         {
-            public ContextMenuItem[] ContextMenuItems => new[]
+            public ContextMenuItem[] ContextMenuItems => new ContextMenuItem[]
             {
                 new OsuContextMenuItem(@"Simple option"),
                 new OsuContextMenuItem(@"Simple very very long option"),
