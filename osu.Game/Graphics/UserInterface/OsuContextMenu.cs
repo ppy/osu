@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -40,6 +41,12 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override void AnimateOpen() => FadeIn(fade_duration, EasingTypes.OutQuint);
             protected override void AnimateClose() => FadeOut(fade_duration, EasingTypes.OutQuint);
+
+            protected override void UpdateContentHeight()
+            {
+                var actualHeight = (RelativeSizeAxes & Axes.Y) > 0 ? 1 : ContentHeight;
+                ResizeTo(new Vector2(1, State == MenuState.Opened ? actualHeight : 0), 300, EasingTypes.OutQuint);
+            }
         }
     }
 }
