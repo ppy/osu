@@ -77,11 +77,11 @@ namespace osu.Game.Rulesets.Timing
                 var speedAdjustmentY = y as SpeedAdjustmentContainer;
 
                 // If either of the two drawables are not hit objects, fall back to the base comparer
-                if (speedAdjustmentX?.MultiplierControlPoint == null || speedAdjustmentY?.MultiplierControlPoint == null)
+                if (speedAdjustmentX?.ControlPoint == null || speedAdjustmentY?.ControlPoint == null)
                     return base.Compare(x, y);
 
                 // Compare by start time
-                int i = speedAdjustmentY.MultiplierControlPoint.StartTime.CompareTo(speedAdjustmentX.MultiplierControlPoint.StartTime);
+                int i = speedAdjustmentY.ControlPoint.StartTime.CompareTo(speedAdjustmentX.ControlPoint.StartTime);
 
                 return i != 0 ? i : base.Compare(x, y);
             }
