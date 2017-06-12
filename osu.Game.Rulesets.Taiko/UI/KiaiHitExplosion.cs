@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = isRim ? colours.BlueDarker : colours.PinkDarker,

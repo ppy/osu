@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     Masking = true,
                     Origin = Anchor.Centre,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Radius = 60,

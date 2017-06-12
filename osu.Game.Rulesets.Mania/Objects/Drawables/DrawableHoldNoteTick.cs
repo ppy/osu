@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 base.AccentColour = value;
 
-                glowContainer.EdgeEffect = new EdgeEffect
+                glowContainer.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
                     Radius = 2f,

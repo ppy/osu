@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Direct
             Height = height;
             CornerRadius = 5;
             Masking = true;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(0f, 1f),

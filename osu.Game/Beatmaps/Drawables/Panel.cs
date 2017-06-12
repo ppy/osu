@@ -88,7 +88,7 @@ namespace osu.Game.Beatmaps.Drawables
         protected virtual void Selected()
         {
             nestedContainer.BorderThickness = 2.5f;
-            nestedContainer.EdgeEffect = new EdgeEffect
+            nestedContainer.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = new Color4(130, 204, 255, 150),
@@ -100,7 +100,7 @@ namespace osu.Game.Beatmaps.Drawables
         protected virtual void Deselected()
         {
             nestedContainer.BorderThickness = 0;
-            nestedContainer.EdgeEffect = new EdgeEffect
+            nestedContainer.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(1),

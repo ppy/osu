@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Ranking
             activeColour = colours.PinkDarker;
             inactiveColour = OsuColour.Gray(0.8f);
 
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Colour = Color4.Black.Opacity(0.4f),
                 Type = EdgeEffectType.Shadow,
