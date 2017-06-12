@@ -253,7 +253,7 @@ namespace osu.Game.Overlays
                 Masking = true;
                 CornerRadius = 3;
 
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Colour = colours.BlueDark.Opacity(glow_strength),
                     Type = EdgeEffectType.Glow,

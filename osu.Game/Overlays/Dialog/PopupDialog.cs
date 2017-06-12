@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Dialog
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.5f),
