@@ -50,7 +50,7 @@ namespace osu.Game.Users.Profile
                             Y = avatar_bottom_position,
                             Masking = true,
                             CornerRadius = 5,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.25f),
