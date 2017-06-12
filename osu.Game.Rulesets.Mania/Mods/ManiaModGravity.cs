@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Timing;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 
@@ -23,21 +22,21 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         public void ApplyToHitRenderer(ManiaHitRenderer hitRenderer, ref List<SpeedAdjustmentContainer>[] hitObjectTimingChanges, ref List<SpeedAdjustmentContainer> barlineTimingChanges)
         {
-            foreach (HitObject obj in hitRenderer.Objects)
+            // We have to generate one speed adjustment per hit object for gravity
+            foreach (ManiaHitObject obj in hitRenderer.Objects)
             {
-                var maniaObject = obj as ManiaHitObject;
-                if (maniaObject == null)
-                    continue;
-
                 MultiplierControlPoint controlPoint = hitRenderer.CreateControlPointAt(obj.StartTime);
+                // Beat length has too large of an effect for gravity, so we'll force it to a constant value for now
                 controlPoint.TimingPoint.BeatLength = 1000;
 
-                hitObjectTimingChanges[maniaObject.Column].Add(new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Gravity));
+                hitObjectTimingChanges[obj.Column].Add(new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Gravity));
             }
 
+            // Like with hit objects, we need to generate one speed adjustment per bar line
             foreach (DrawableBarLine barLine in hitRenderer.BarLines)
             {
                 var controlPoint = hitRenderer.CreateControlPointAt(barLine.HitObject.StartTime);
+                // Beat length has too large of an effect for gravity, so we'll force it to a constant value for now
                 controlPoint.TimingPoint.BeatLength = 1000;
 
                 barlineTimingChanges.Add(new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Gravity));

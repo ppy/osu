@@ -7,8 +7,17 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
+    /// <summary>
+    /// A type of mod which generates speed adjustments that scroll the hit objects and bar lines.
+    /// </summary>
     internal interface IGenerateSpeedAdjustments
     {
+        /// <summary>
+        /// Applies this mod to a hit renderer.
+        /// </summary>
+        /// <param name="hitRenderer">The hit renderer to apply to.</param>
+        /// <param name="hitObjectTimingChanges">The per-column list of speed adjustments for hit objects.</param>
+        /// <param name="barlineTimingChanges">The list of speed adjustments for bar lines.</param>
         void ApplyToHitRenderer(ManiaHitRenderer hitRenderer, ref List<SpeedAdjustmentContainer>[] hitObjectTimingChanges, ref List<SpeedAdjustmentContainer> barlineTimingChanges);
     }
 }
