@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Music
                 Icon.TextSize = 14;
                 Icon.Margin = new MarginPadding(0);
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 10, Right = 10 };
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Colour = Color4.Black.Opacity(0.3f),
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Music
             public CollectionsMenu()
             {
                 CornerRadius = 5;
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Colour = Color4.Black.Opacity(0.3f),
