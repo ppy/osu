@@ -29,9 +29,9 @@ namespace osu.Game.Rulesets.Timing
     /// </para>
     ///
     /// <para>
-    /// This container will always be relatively-sized and positioned to its parent through the use of <see cref="Drawable.RelativeSizeAxes"/>
-    /// and <see cref="Drawable.RelativePositionAxes"/> such that the parent can utilise <see cref="Container{T}.RelativeChildSize"/> and
-    /// <see cref="Container{T}.RelativeChildOffset"/> to apply further time offsets to this collection of hit objects.
+    /// This container is and must always be relatively-sized and positioned to its such that the parent can utilise
+    /// <see cref="Container{T}.RelativeChildSize"/> and <see cref="Container{T}.RelativeChildOffset"/> to apply further time offsets
+    /// to this collection of hit objects.
     /// </para>
     /// </summary>
     public abstract class DrawableTimingSection : Container<DrawableHitObject>
@@ -57,6 +57,8 @@ namespace osu.Game.Rulesets.Timing
         {
             this.autoSizingAxes = autoSizingAxes;
 
+            RelativePositionAxes = Axes.Both;
+
             // We need a default size since RelativeSizeAxes is overridden
             Size = Vector2.One;
         }
@@ -67,12 +69,6 @@ namespace osu.Game.Rulesets.Timing
         {
             get { return Axes.Both; }
             set { throw new InvalidOperationException($"{nameof(DrawableTimingSection)} must always be relatively-sized."); }
-        }
-
-        public override Axes RelativePositionAxes
-        {
-            get { return Axes.Both; }
-            set { throw new InvalidOperationException($"{nameof(DrawableTimingSection)} must always be relatively-positioned."); }
         }
 
         public override void InvalidateFromChild(Invalidation invalidation)

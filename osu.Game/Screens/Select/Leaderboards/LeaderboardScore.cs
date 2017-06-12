@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                         CornerRadius = corner_radius,
                                         Masking = true,
                                         OnLoadComplete = d => d.FadeInFromZero(200),
-                                        EdgeEffect = new EdgeEffect
+                                        EdgeEffect = new EdgeEffectParameters
                                         {
                                             Type = EdgeEffectType.Shadow,
                                             Radius = 1,
