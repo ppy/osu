@@ -80,8 +80,8 @@ namespace osu.Game.Screens.Select
                 lookup.Success += res =>
                 {
                     if (beatmap != requestedBeatmap)
-                            //the beatmap has been changed since we started the lookup.
-                            return;
+                        //the beatmap has been changed since we started the lookup.
+                        return;
 
                     requestedBeatmap.Metrics = res;
                     Schedule(() => updateMetrics(res));
@@ -89,6 +89,7 @@ namespace osu.Game.Screens.Select
                 lookup.Failure += e => updateMetrics(null);
 
                 api.Queue(lookup);
+                loading.Show();
             }
 
             updateMetrics(requestedBeatmap.Metrics, false);
@@ -103,6 +104,9 @@ namespace osu.Game.Screens.Select
         {
             var hasRatings = metrics?.Ratings.Any() ?? false;
             var hasRetriesFails = (metrics?.Retries.Any() ?? false) && metrics.Fails.Any();
+
+            if (failOnMissing)
+                loading.Hide();
 
             if (hasRatings)
             {
@@ -320,11 +324,13 @@ namespace osu.Game.Screens.Select
                             }
                         },
                     },
-                }
+                },
+                loading = new LoadingAnimation()
             };
         }
 
         private APIAccess api;
+        private readonly LoadingAnimation loading;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, APIAccess api)
