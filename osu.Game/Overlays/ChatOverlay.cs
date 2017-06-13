@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Threading;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
@@ -33,7 +32,9 @@ namespace osu.Game.Overlays
 
         private ScheduledDelegate messageRequest;
 
-        private readonly Container currentChannelContainer;
+        private readonly Container<DrawableChannel> currentChannelContainer;
+
+        private readonly LoadingAnimation loading;
 
         private readonly FocusedTextBox inputTextBox;
 
@@ -104,7 +105,7 @@ namespace osu.Game.Overlays
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                currentChannelContainer = new Container
+                                currentChannelContainer = new Container<DrawableChannel>
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding
@@ -138,7 +139,8 @@ namespace osu.Game.Overlays
                                             HoldFocus = true,
                                         }
                                     }
-                                }
+                                },
+                                loading = new LoadingAnimation(),
                             }
                         },
                         new Container
@@ -274,14 +276,7 @@ namespace osu.Game.Overlays
 
         private void initializeChannels()
         {
-            SpriteText loading;
-            Add(loading = new OsuSpriteText
-            {
-                Text = @"initialising chat...",
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                TextSize = 40,
-            });
+            loading.Show();
 
             messageRequest?.Cancel();
 
@@ -290,9 +285,6 @@ namespace osu.Game.Overlays
             {
                 Scheduler.Add(delegate
                 {
-                    loading.FadeOut(100);
-                    loading.Expire();
-
                     addChannel(channels.Find(c => c.Name == @"#lazer"));
                     addChannel(channels.Find(c => c.Name == @"#osu"));
                     addChannel(channels.Find(c => c.Name == @"#lobby"));
@@ -336,13 +328,17 @@ namespace osu.Game.Overlays
                 if (loaded == null)
                 {
                     currentChannelContainer.FadeOut(500, EasingTypes.OutQuint);
+                    loading.Show();
 
                     loaded = new DrawableChannel(currentChannel);
                     loadedChannels.Add(loaded);
                     LoadComponentAsync(loaded, l =>
                     {
+                        if (currentChannel.Messages.Any())
+                            loading.Hide();
+
                         currentChannelContainer.Clear(false);
-                        currentChannelContainer.Add(l);
+                        currentChannelContainer.Add(loaded);
                         currentChannelContainer.FadeIn(500, EasingTypes.OutQuint);
                     });
                 }
@@ -386,6 +382,7 @@ namespace osu.Game.Overlays
 
             req.Success += delegate (List<Message> messages)
             {
+                loading.Hide();
                 channel.AddNewMessages(messages.ToArray());
                 Debug.Write("success!");
             };
