@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -101,12 +100,12 @@ namespace osu.Desktop.VisualTests.Tests
             public ContextMenuItem[] ContextMenuItems => new ContextMenuItem[]
             {
                 new OsuContextMenuItem(@"Some option"),
-                new OsuContextMenuItem(@"Highlighted option", ContextMenuType.Highlighted),
+                new OsuContextMenuItem(@"Highlighted option", MenuItemType.Highlighted),
                 new OsuContextMenuItem(@"Another option"),
                 new OsuContextMenuItem(@"Choose me please"),
                 new OsuContextMenuItem(@"And me too"),
                 new OsuContextMenuItem(@"Trying to fill"),
-                new OsuContextMenuItem(@"Destructive option", ContextMenuType.Destructive),
+                new OsuContextMenuItem(@"Destructive option", MenuItemType.Destructive),
             };
         }
 
@@ -116,10 +115,10 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 new OsuContextMenuItem(@"Simple option"),
                 new OsuContextMenuItem(@"Simple very very long option"),
-                new OsuContextMenuItem(@"Change width", ContextMenuType.Highlighted) { Action = () => ResizeWidthTo(Width * 2, 100, EasingTypes.OutQuint) },
-                new OsuContextMenuItem(@"Change height", ContextMenuType.Highlighted) { Action = () => ResizeHeightTo(Height * 2, 100, EasingTypes.OutQuint) },
-                new OsuContextMenuItem(@"Change width back", ContextMenuType.Destructive) { Action = () => ResizeWidthTo(Width / 2, 100, EasingTypes.OutQuint) },
-                new OsuContextMenuItem(@"Change height back", ContextMenuType.Destructive) { Action = () => ResizeHeightTo(Height / 2, 100, EasingTypes.OutQuint) },
+                new OsuContextMenuItem(@"Change width", MenuItemType.Highlighted) { Action = () => ResizeWidthTo(Width * 2, 100, EasingTypes.OutQuint) },
+                new OsuContextMenuItem(@"Change height", MenuItemType.Highlighted) { Action = () => ResizeHeightTo(Height * 2, 100, EasingTypes.OutQuint) },
+                new OsuContextMenuItem(@"Change width back", MenuItemType.Destructive) { Action = () => ResizeWidthTo(Width / 2, 100, EasingTypes.OutQuint) },
+                new OsuContextMenuItem(@"Change height back", MenuItemType.Destructive) { Action = () => ResizeHeightTo(Height / 2, 100, EasingTypes.OutQuint) },
             };
         }
     }
