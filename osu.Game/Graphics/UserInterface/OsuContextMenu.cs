@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(0.25f),
+                    Colour = Color4.Black.Opacity(0.1f),
                     Radius = 4,
                 };
             }
