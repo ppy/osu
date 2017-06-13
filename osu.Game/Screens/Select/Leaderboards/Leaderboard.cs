@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         public Action<Score> ScoreSelected;
 
-        private LoadingAnimation loading;
+        private readonly LoadingAnimation loading;
 
         private IEnumerable<Score> scores;
         public IEnumerable<Score> Scores
