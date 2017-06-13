@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
-        private readonly ContextMenuType type;
+        private readonly MenuItemType type;
 
         protected override Container CreateTextContainer(string title) => new Container
         {
@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         };
 
-        public OsuContextMenuItem(string title, ContextMenuType type = ContextMenuType.Standard) : base(title)
+        public OsuContextMenuItem(string title, MenuItemType type = MenuItemType.Standard) : base(title)
         {
             this.type = type;
         }
@@ -78,13 +78,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             switch (type)
             {
-                case ContextMenuType.Standard:
+                case MenuItemType.Standard:
                     textBold.Colour = text.Colour = Color4.White;
                     break;
-                case ContextMenuType.Destructive:
+                case MenuItemType.Destructive:
                     textBold.Colour = text.Colour = Color4.Red;
                     break;
-                case ContextMenuType.Highlighted:
+                case MenuItemType.Highlighted:
                     textBold.Colour = text.Colour = OsuColour.FromHex(@"ffcc22");
                     break;
             }
