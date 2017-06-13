@@ -9,6 +9,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
@@ -29,6 +30,8 @@ namespace osu.Game.Overlays
         protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<User> users;
+        private readonly LoadingAnimation loading;
+
         public IEnumerable<User> Users
         {
             get { return users; }
@@ -68,6 +71,8 @@ namespace osu.Game.Overlays
                     Spacing = new Vector2(10f),
                 },
             };
+
+            Add(loading = new LoadingAnimation());
         }
 
         [BackgroundDependencyLoader]
@@ -83,8 +88,14 @@ namespace osu.Game.Overlays
 
             // no this is not the correct data source, but it's something.
             var request = new GetUsersRequest();
-            request.Success += res => Users = res.Select(e => e.User);
+            request.Success += res =>
+            {
+                Users = res.Select(e => e.User);
+                loading.Hide();
+            };
+
             api.Queue(request);
+            loading.Show();
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
