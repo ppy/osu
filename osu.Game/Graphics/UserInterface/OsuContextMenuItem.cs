@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuContextMenuItem : ContextMenuItem
     {
-        private const int transition_length = 200;
+        private const int transition_length = 80;
         private const int margin_horizontal = 17;
         public const int MARGIN_VERTICAL = 4;
         private const int text_size = 17;
