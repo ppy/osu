@@ -74,21 +74,6 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public override bool Active
-            {
-                get { return base.Active; }
-                set
-                {
-                    if (Active == value) return;
-
-                    if (value)
-                        fadeActive();
-                    else
-                        fadeInactive();
-                    base.Active = value;
-                }
-            }
-
             private const float transition_length = 500;
 
             private void fadeActive()
@@ -150,6 +135,10 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 };
             }
+
+            protected override void OnActivated() => fadeActive();
+
+            protected override void OnDeactivated() => fadeInactive();
         }
 
         private class OsuTabDropdown : OsuDropdown<T>
