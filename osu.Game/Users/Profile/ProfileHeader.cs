@@ -4,11 +4,13 @@
 using System;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -20,6 +22,10 @@ namespace osu.Game.Users.Profile
         private readonly User user;
 
         private readonly OsuTextFlowContainer infoText;
+        private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
+
+        private readonly Sprite levelBadge;
+        private readonly SpriteText levelText;
 
         private const float cover_height = 350, info_height = 150, avatar_size = 110, avatar_bottom_position = -20, level_position = 30, level_height = 60;
         public ProfileHeader(User user)
@@ -129,6 +135,20 @@ namespace osu.Game.Users.Profile
                                 {
                                     Colour = Color4.Black.Opacity(0.5f),
                                     RelativeSizeAxes = Axes.Both
+                                },
+                                levelBadge = new Sprite
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Height = 50,
+                                    Width = 50
+                                },
+                                levelText = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Y = 11,
+                                    TextSize = 18
                                 }
                             }
                         },
@@ -145,6 +165,22 @@ namespace osu.Game.Users.Profile
                                 {
                                     Colour = Color4.Black.Opacity(0.5f),
                                     RelativeSizeAxes = Axes.Both
+                                },
+                                scoreText = new FillFlowContainer<SpriteText>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Padding = new MarginPadding { Horizontal = 20, Vertical = 18 },
+                                    Spacing = new Vector2(0, 2)
+                                },
+                                scoreNumberText = new FillFlowContainer<SpriteText>
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Padding = new MarginPadding { Horizontal = 20, Vertical = 18 },
+                                    Spacing = new Vector2(0, 2)
                                 }
                             }
                         },
@@ -193,6 +229,44 @@ namespace osu.Game.Users.Profile
             infoText.NewParagraph();
             infoText.AddText("Play with ");
             infoText.AddText("Mouse, Keyboard, Tablet", bold);
+
+            levelText.Text = "98";
+
+            scoreText.Add(createScoreText("Ranked Score"));
+            scoreNumberText.Add(createScoreNumberText("1,870,716,897"));
+            scoreText.Add(createScoreText("Accuracy"));
+            scoreNumberText.Add(createScoreNumberText("98.51%"));
+            scoreText.Add(createScoreText("Play Count"));
+            scoreNumberText.Add(createScoreNumberText("25,287"));
+            scoreText.Add(createScoreText("Total Score"));
+            scoreNumberText.Add(createScoreNumberText("28,444,797,570"));
+            scoreText.Add(createScoreText("Total Hits"));
+            scoreNumberText.Add(createScoreNumberText("4,612,765"));
+            scoreText.Add(createScoreText("Max Combo"));
+            scoreNumberText.Add(createScoreNumberText("2,056"));
+            scoreText.Add(createScoreText("Replay Watched"));
+            scoreNumberText.Add(createScoreNumberText("23"));
         }
+
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
+        {
+            levelBadge.Texture = textures.Get(@"Profile/levelbadge");
+        }
+
+        private OsuSpriteText createScoreText(string text) => new OsuSpriteText
+        {
+            TextSize = 14,
+            Text = text
+        };
+
+        private OsuSpriteText createScoreNumberText(string text) => new OsuSpriteText
+        {
+            TextSize = 14,
+            Font = @"Exo2.0-Bold",
+            Anchor = Anchor.TopRight,
+            Origin = Anchor.TopRight,
+            Text = text
+        };
     }
 }
