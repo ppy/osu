@@ -33,7 +33,7 @@ namespace osu.Game.Users.Profile
         {
             this.user = user;
             RelativeSizeAxes = Axes.X;
-            Height = cover_height + info_height - UserProfile.TAB_HEIGHT;
+            Height = cover_height + info_height;
 
             Children = new Drawable[]
             {
@@ -106,7 +106,7 @@ namespace osu.Game.Users.Profile
                 },
                 infoText = new OsuTextFlowContainer(t =>
                 {
-                    t.TextSize = 12;
+                    t.TextSize = 14;
                     t.Alpha = 0.8f;
                 })
                 {
@@ -219,7 +219,7 @@ namespace osu.Game.Users.Profile
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
-                            Height = info_height - UserProfile.TAB_HEIGHT - 15,
+                            Height = info_height - 15,
                             Children = new Drawable[]
                             {
                                 new Box

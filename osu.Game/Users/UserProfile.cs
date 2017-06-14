@@ -22,7 +22,7 @@ namespace osu.Game.Users
         private ProfileSection lastSection;
         private readonly ProfileTabControl tabs;
 
-        public const float CONTENT_X_MARGIN = 50, TAB_HEIGHT = 24;
+        public const float CONTENT_X_MARGIN = 50;
 
         public UserProfile(User user)
         {
@@ -42,7 +42,7 @@ namespace osu.Game.Users
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                Height = TAB_HEIGHT
+                Height = 24
             };
             sections.ForEach(tabs.AddItem);
 
