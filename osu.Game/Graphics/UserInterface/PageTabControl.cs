@@ -31,21 +31,6 @@ namespace osu.Game.Graphics.UserInterface
 
             protected readonly SpriteText Text;
 
-            public override bool Active
-            {
-                get { return base.Active; }
-                set
-                {
-                    if (Active == value) return;
-
-                    if (value)
-                        slideActive();
-                    else
-                        slideInactive();
-                    base.Active = value;
-                }
-            }
-
             public PageTabItem(T value) : base(value)
             {
                 AutoSizeAxes = Axes.X;
@@ -102,6 +87,10 @@ namespace osu.Game.Graphics.UserInterface
             {
                 box.ScaleTo(new Vector2(1f, 0f), transition_duration);
             }
+
+            protected override void OnActivated() => slideActive();
+
+            protected override void OnDeactivated() => slideInactive();
         }
     }
 }
