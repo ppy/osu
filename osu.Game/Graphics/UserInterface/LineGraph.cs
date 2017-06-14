@@ -23,14 +23,15 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public float? MinValue { get; set; }
 
-        private const float transform_duration = 250;
+        private const double transform_duration = 500;
 
         /// <summary>
         /// Hold an empty area if values are less.
         /// </summary>
         public int DefaultValueCount;
 
-        private Path path;
+        private readonly Container<Path> maskingContainer;
+        private readonly Path path;
 
         private float[] values;
 
@@ -43,7 +44,19 @@ namespace osu.Game.Graphics.UserInterface
             {
                 values = value.ToArray();
                 applyPath();
+                maskingContainer.Width = 0;
+                maskingContainer.ResizeWidthTo(1, transform_duration, EasingTypes.OutQuint);
             }
+        }
+
+        public LineGraph()
+        {
+            Add(maskingContainer = new Container<Path>
+            {
+                Masking = true,
+                RelativeSizeAxes = Axes.Both
+            });
+            maskingContainer.Add(path = new Path { RelativeSizeAxes = Axes.Both, PathWidth = 1 });
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
@@ -57,10 +70,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (values == null) return;
 
-            path?.Expire();
-            Path localPath = new Path { RelativeSizeAxes = Axes.Both, PathWidth = 1 }; //capture a copy to avoid potential change
-            Add(path = localPath);
-
+            path.ClearVertices();
             int count = Math.Max(values.Length, DefaultValueCount);
 
             float max = values.Max(), min = values.Min();
@@ -72,7 +82,7 @@ namespace osu.Game.Graphics.UserInterface
                 float x = (i + count - values.Length) / (float)(count - 1) * DrawWidth - 1;
                 float y = (max - values[i]) / (max - min) * DrawHeight - 1;
                 // the -1 is for inner offset in path (actually -PathWidth)
-                localPath.AddVertex(new Vector2(x, y));
+                path.AddVertex(new Vector2(x, y));
             }
         }
     }
