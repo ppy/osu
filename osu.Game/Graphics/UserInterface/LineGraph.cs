@@ -23,6 +23,9 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public float? MinValue { get; set; }
 
+        public float? ActualMaxValue { get; private set; }
+        public float? ActualMinValue { get; private set; }
+
         private const double transform_duration = 500;
 
         /// <summary>
@@ -40,6 +43,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public IEnumerable<float> Values
         {
+            get { return values; }
             set
             {
                 values = value.ToArray();
@@ -76,6 +80,9 @@ namespace osu.Game.Graphics.UserInterface
             float max = values.Max(), min = values.Min();
             if (MaxValue > max) max = MaxValue.Value;
             if (MinValue < min) min = MinValue.Value;
+
+            ActualMaxValue = max;
+            ActualMinValue = min;
 
             for (int i = 0; i < values.Length; i++)
             {
