@@ -80,6 +80,7 @@
     <Compile Include="Graphics\Containers\OsuTextFlowContainer.cs" />
     <Compile Include="Graphics\UserInterface\IconButton.cs" />
     <Compile Include="Configuration\SelectionRandomType.cs" />
+    <Compile Include="Graphics\UserInterface\LineGraph.cs" />
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
