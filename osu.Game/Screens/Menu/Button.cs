@@ -21,7 +21,6 @@ using osu.Game.Graphics.Containers;
 using osu.Framework.Audio.Track;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Lists;
-using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Menu
 {
@@ -141,7 +140,6 @@ namespace osu.Game.Screens.Menu
         private double previousBeatTime;
         private JumpSide jumpSide;
         private bool animationIsGoing;
-        private ScheduledDelegate defaultAnimationDelegate;
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
@@ -162,7 +160,7 @@ namespace osu.Game.Screens.Menu
 
                 // If animation will be restarted - we should know, on which side we've stopped
                 // to start animation from the correct side
-                jumpSide = switchJumpSide(); 
+                jumpSide = switchJumpSide();
             }
         }
 
@@ -278,7 +276,7 @@ namespace osu.Game.Screens.Menu
         }
 
         /// <summary>
-        /// Time left before the new beat
+        /// Time before the new beat starts
         /// </summary>
         private double timeLeft(double currentTime)
         {
@@ -293,7 +291,7 @@ namespace osu.Game.Screens.Menu
             if (Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTime + current.BeatLength) == next && current != next)
                 return next.Time - currentTime;
 
-            return current.BeatLength - ((currentTime - current.Time) % current.BeatLength);
+            return current.BeatLength - (currentTime - current.Time) % current.BeatLength;
         }
 
         protected override void OnHoverLost(InputState state)
