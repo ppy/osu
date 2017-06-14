@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
             State = Visibility.Visible;
         }
 
-        private void onDialogOnStateChanged(OverlayContainer dialog, Visibility v)
+        private void onDialogOnStateChanged(VisibilityContainer dialog, Visibility v)
         {
             if (v != Visibility.Hidden) return;
 
