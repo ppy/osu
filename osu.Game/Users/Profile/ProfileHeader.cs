@@ -19,7 +19,7 @@ namespace osu.Game.Users.Profile
 {
     public class ProfileHeader : Container
     {
-        private readonly User user;
+        //private readonly User user;
 
         private readonly OsuTextFlowContainer infoText;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
@@ -31,7 +31,7 @@ namespace osu.Game.Users.Profile
         private const float cover_height = 350, info_height = 150, avatar_size = 110, avatar_bottom_position = -20, level_position = 30, level_height = 60;
         public ProfileHeader(User user)
         {
-            this.user = user;
+            //this.user = user;
             RelativeSizeAxes = Axes.X;
             Height = cover_height + info_height;
 
@@ -191,7 +191,7 @@ namespace osu.Game.Users.Profile
                                     Origin = Anchor.BottomCentre,
                                     Y = -64,
                                     Spacing = new Vector2(20, 0),
-                                    Children = new GradeBadge[]
+                                    Children = new[]
                                     {
                                         gradeSSPlus = new GradeBadge("SSPlus") { Count = 12 },
                                         gradeSS = new GradeBadge("SS") { Count = 34 },
@@ -205,7 +205,7 @@ namespace osu.Game.Users.Profile
                                     Origin = Anchor.BottomCentre,
                                     Y = -18,
                                     Spacing = new Vector2(20, 0),
-                                    Children = new GradeBadge[]
+                                    Children = new[]
                                     {
                                         gradeSPlus = new GradeBadge("SPlus") { Count = 567 },
                                         gradeS = new GradeBadge("S") { Count = 890 },
@@ -236,13 +236,19 @@ namespace osu.Game.Users.Profile
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
+        {
+            levelBadge.Texture = textures.Get(@"Profile/levelbadge");
 
             Action<SpriteText> bold = t =>
             {
                 t.Font = @"Exo2.0-Bold";
                 t.Alpha = 1;
             };
-            // placeholder text
+            // fill placeholder texts
             infoText.AddTextAwesome(FontAwesome.fa_map_marker);
             infoText.AddText(" position     ");
             infoText.AddTextAwesome(FontAwesome.fa_twitter);
@@ -280,12 +286,6 @@ namespace osu.Game.Users.Profile
             scoreNumberText.Add(createScoreNumberText("2,056"));
             scoreText.Add(createScoreText("Replay Watched"));
             scoreNumberText.Add(createScoreNumberText("23"));
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            levelBadge.Texture = textures.Get(@"Profile/levelbadge");
         }
 
         private OsuSpriteText createScoreText(string text) => new OsuSpriteText

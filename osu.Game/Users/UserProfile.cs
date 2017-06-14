@@ -20,7 +20,6 @@ namespace osu.Game.Users
     {
         private readonly User user;
         private ProfileSection lastSection;
-        private readonly ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 50;
 
@@ -37,7 +36,7 @@ namespace osu.Game.Users
                 new BeatmapsSection(user),
                 new KudosuSection(user)
             };
-            tabs = new ProfileTabControl
+            var tabs = new ProfileTabControl
             {
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,

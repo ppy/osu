@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using OpenTK;
@@ -62,21 +63,25 @@ namespace osu.Game.Users.Profile
                     RelativeSizeAxes = Axes.X,
                     Y = -13,
                     DefaultValueCount = 90,
-                    BallRelease = () =>
-                    {
-                        rankText.Text = $"#{rank:#,#}";
-                        performanceText.Text = $"{performance:#,#}pp";
-                        relativeText.Text = $"{this.user.Country?.FullName} #{countryRank:#,#}";
-                    },
-                    BallMove = index =>
-                    {
-                        rankText.Text = $"#{ranks[index]:#,#}";
-                        performanceText.Text = $"{performances[index]:#,#}pp";
-                        relativeText.Text = index == ranks.Length ? "Now" : $"{ranks.Length - index} days ago";
-                        //plural should be handled in a general way
-                    }
+                    BallRelease = updateRankTexts,
+                    BallMove = showHistoryRankTexts
                 }
             };
+        }
+
+        private void updateRankTexts()
+        {
+            rankText.Text = $"#{rank:#,#}";
+            performanceText.Text = $"{performance:#,#}pp";
+            relativeText.Text = $"{this.user.Country?.FullName} #{countryRank:#,#}";
+        }
+
+        private void showHistoryRankTexts(int dayIndex)
+        {
+            rankText.Text = $"#{ranks[dayIndex]:#,#}";
+            performanceText.Text = $"{performances[dayIndex]:#,#}pp";
+            relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
+            //plural should be handled in a general way
         }
 
         [BackgroundDependencyLoader]
@@ -137,6 +142,8 @@ namespace osu.Game.Users.Profile
 
             public void ResetBall()
             {
+                Trace.Assert(ActualMaxValue.HasValue);
+                Trace.Assert(ActualMinValue.HasValue);
                 ball.MoveTo(new Vector2(1, ((ActualMaxValue - Values.Last()) / (ActualMaxValue - ActualMinValue)).Value), ballShown ? transform_duration : 0, EasingTypes.OutQuint);
                 ball.Show();
                 BallRelease();
@@ -147,7 +154,7 @@ namespace osu.Game.Users.Profile
             {
                 if (ballShown)
                 {
-                    var values = Values as IList<float>;
+                    var values = (IList<float>)Values;
                     var position = ToLocalSpace(state.Mouse.NativeState.Position);
                     int count = Math.Max(values.Count, DefaultValueCount);
                     int index = (int)Math.Round(position.X / DrawWidth * (count - 1));
@@ -155,6 +162,8 @@ namespace osu.Game.Users.Profile
                     {
                         int i = index + values.Count - count;
                         float value = values[i];
+                        Trace.Assert(ActualMaxValue.HasValue);
+                        Trace.Assert(ActualMinValue.HasValue);
                         float y = ((ActualMaxValue - value) / (ActualMaxValue - ActualMinValue)).Value;
                         if (Math.Abs(y * DrawHeight - position.Y) <= 8f)
                         {
