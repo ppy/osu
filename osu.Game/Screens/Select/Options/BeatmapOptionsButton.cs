@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Select.Options
                     RelativeSizeAxes = Axes.Both,
                     Shear = new Vector2(0.2f, 0f),
                     Masking = true,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = Color4.Black.Opacity(0.2f),

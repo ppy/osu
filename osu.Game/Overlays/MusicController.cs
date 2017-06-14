@@ -106,7 +106,7 @@ namespace osu.Game.Overlays
                             Height = player_height,
                             Masking = true,
                             CornerRadius = 5,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(40),

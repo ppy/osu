@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Toolbar
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                     Masking = true,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Colour = new Color4(255, 194, 224, 100),

@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Music
                     RelativeSizeAxes = Axes.Both,
                     CornerRadius = 5,
                     Masking = true,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = Color4.Black.Opacity(40),
