@@ -27,7 +27,7 @@ namespace osu.Game.Users.Profile
                 new OsuSpriteText
                 {
                     Text = Title,
-                    TextSize = 16,
+                    TextSize = 20,
                     Font = @"Exo2.0-RegularItalic",
                     Margin = new MarginPadding
                     {

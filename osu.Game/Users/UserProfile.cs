@@ -42,7 +42,7 @@ namespace osu.Game.Users
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                Height = 24
+                Height = 30
             };
             sections.ForEach(tabs.AddItem);
 
