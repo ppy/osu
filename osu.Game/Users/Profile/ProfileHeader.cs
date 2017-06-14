@@ -26,6 +26,7 @@ namespace osu.Game.Users.Profile
 
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
+        private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
 
         private const float cover_height = 350, info_height = 150, avatar_size = 110, avatar_bottom_position = -20, level_position = 30, level_height = 60;
         public ProfileHeader(User user)
@@ -181,6 +182,35 @@ namespace osu.Game.Users.Profile
                                     Direction = FillDirection.Vertical,
                                     Padding = new MarginPadding { Horizontal = 20, Vertical = 18 },
                                     Spacing = new Vector2(0, 2)
+                                },
+                                new FillFlowContainer<GradeBadge>
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomCentre,
+                                    Y = -64,
+                                    Spacing = new Vector2(20, 0),
+                                    Children = new GradeBadge[]
+                                    {
+                                        gradeSSPlus = new GradeBadge("SSPlus") { Count = 12 },
+                                        gradeSS = new GradeBadge("SS") { Count = 34 },
+                                    }
+                                },
+                                new FillFlowContainer<GradeBadge>
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.BottomCentre,
+                                    Y = -18,
+                                    Spacing = new Vector2(20, 0),
+                                    Children = new GradeBadge[]
+                                    {
+                                        gradeSPlus = new GradeBadge("SPlus") { Count = 567 },
+                                        gradeS = new GradeBadge("S") { Count = 890 },
+                                        gradeA = new GradeBadge("A") { Count = 1234 },
+                                    }
                                 }
                             }
                         },
@@ -268,5 +298,46 @@ namespace osu.Game.Users.Profile
             Origin = Anchor.TopRight,
             Text = text
         };
+
+        private class GradeBadge : Container
+        {
+            private const float width = 50;
+            private readonly string grade;
+            private readonly Sprite badge;
+            private readonly SpriteText numberText;
+
+            public int Count
+            {
+                set
+                {
+                    numberText.Text = value.ToString(@"#,#");
+                }
+            }
+
+            public GradeBadge(string grade)
+            {
+                this.grade = grade;
+                Width = width;
+                Height = 41;
+                Add(badge = new Sprite
+                {
+                    Width = width,
+                    Height = 26
+                });
+                Add(numberText = new SpriteText
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    TextSize = 14,
+                    Font = @"Exo2.0-Bold"
+                });
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                badge.Texture = textures.Get($"Grades/{grade}");
+            }
+        }
     }
 }
