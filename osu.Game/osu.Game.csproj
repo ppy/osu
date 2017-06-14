@@ -102,6 +102,7 @@
     <Compile Include="Users\Profile\HistoricalSection.cs" />
     <Compile Include="Users\Profile\KudosuSection.cs" />
     <Compile Include="Users\Profile\MedalsSection.cs" />
+    <Compile Include="Users\Profile\RankChart.cs" />
     <Compile Include="Users\Profile\RanksSection.cs" />
     <Compile Include="Users\Profile\RecentSection.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
