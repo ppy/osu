@@ -32,6 +32,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private Path path;
 
+        private float[] values;
+
         /// <summary>
         /// A list of floats decides position of each line node.
         /// </summary>
@@ -39,23 +41,38 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
-                path?.Expire();
-                Path localPath = new Path { RelativeSizeAxes = Axes.Both }; //capture a copy to avoid potential change
-                Add(path = localPath);
+                values = value.ToArray();
+                applyPath();
+            }
+        }
 
-                var values = value.ToArray();
-                int count = Math.Max(values.Length, DefaultValueCount);
+        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+        {
+            if ((invalidation & Invalidation.DrawSize) != 0)
+                applyPath();
+            return base.Invalidate(invalidation, source, shallPropagate);
+        }
 
-                float max = values.Max(), min = values.Min();
-                if (MaxValue > max) max = MaxValue.Value;
-                if (MinValue < min) min = MinValue.Value;
+        private void applyPath()
+        {
+            if (values == null) return;
 
-                for (int i = 0; i < values.Length; i++)
-                {
-                    float x = (i + count - values.Length) / (float)(count - 1);
-                    float y = (max - values[i]) / (max - min);
-                    Scheduler.AddDelayed(() => localPath.AddVertex(new Vector2(x, y)), x * transform_duration);
-                }
+            path?.Expire();
+            Path localPath = new Path { RelativeSizeAxes = Axes.Both, PathWidth = 1 }; //capture a copy to avoid potential change
+            Add(path = localPath);
+
+            int count = Math.Max(values.Length, DefaultValueCount);
+
+            float max = values.Max(), min = values.Min();
+            if (MaxValue > max) max = MaxValue.Value;
+            if (MinValue < min) min = MinValue.Value;
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                float x = (i + count - values.Length) / (float)(count - 1) * DrawWidth - 1;
+                float y = (max - values[i]) / (max - min) * DrawHeight - 1;
+                // the -1 is for inner offset in path (actually -PathWidth)
+                localPath.AddVertex(new Vector2(x, y));
             }
         }
     }
