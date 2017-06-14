@@ -87,7 +87,7 @@ namespace osu.Game.Users.Profile
                                 new OsuSpriteText
                                 {
                                     Text = user.Username,
-                                    TextSize = 25,
+                                    TextSize = 30,
                                     Font = @"Exo2.0-RegularItalic",
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
@@ -149,7 +149,7 @@ namespace osu.Game.Users.Profile
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     Y = 11,
-                                    TextSize = 18
+                                    TextSize = 20
                                 }
                             }
                         },
