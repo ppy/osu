@@ -226,6 +226,10 @@ namespace osu.Game.Users.Profile
                                 {
                                     Colour = Color4.Black.Opacity(0.25f),
                                     RelativeSizeAxes = Axes.Both
+                                },
+                                new RankChart(user)
+                                {
+                                    RelativeSizeAxes = Axes.Both
                                 }
                             }
                         }
