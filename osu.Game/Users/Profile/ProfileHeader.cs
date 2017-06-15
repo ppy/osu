@@ -26,7 +26,7 @@ namespace osu.Game.Users.Profile
 
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
-        private readonly GradeBadge gradeDoubleSPlus, gradeDoubleS, gradeSPlus, gradeS, gradeA;
+        private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
 
         private const float cover_height = 350, info_height = 150, avatar_size = 110, avatar_bottom_position = -20, level_position = 30, level_height = 60;
         public ProfileHeader(User user)
@@ -193,8 +193,8 @@ namespace osu.Game.Users.Profile
                                     Spacing = new Vector2(20, 0),
                                     Children = new[]
                                     {
-                                        gradeDoubleSPlus = new GradeBadge("SSPlus"),
-                                        gradeDoubleS = new GradeBadge("SS"),
+                                        gradeSSPlus = new GradeBadge("SSPlus"),
+                                        gradeSS = new GradeBadge("SS"),
                                     }
                                 },
                                 new FillFlowContainer<GradeBadge>
@@ -287,8 +287,8 @@ namespace osu.Game.Users.Profile
             scoreText.Add(createScoreText("Replay Watched"));
             scoreNumberText.Add(createScoreNumberText("23"));
 
-            gradeDoubleSPlus.Count = 12;
-            gradeDoubleS.Count = 34;
+            gradeSSPlus.Count = 12;
+            gradeSS.Count = 34;
             gradeSPlus.Count = 567;
             gradeS.Count = 890;
             gradeA.Count = 1234;
