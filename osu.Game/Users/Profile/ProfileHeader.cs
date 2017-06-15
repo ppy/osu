@@ -20,11 +20,10 @@ namespace osu.Game.Users.Profile
 {
     public class ProfileHeader : Container
     {
-        //private readonly User user;
-
         private readonly OsuTextFlowContainer infoText;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
 
+        private readonly Container coverContainer;
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
@@ -32,29 +31,17 @@ namespace osu.Game.Users.Profile
         private const float cover_height = 350, info_height = 150, avatar_size = 110, avatar_bottom_position = -20, level_position = 30, level_height = 60;
         public ProfileHeader(User user)
         {
-            //this.user = user;
             RelativeSizeAxes = Axes.X;
             Height = cover_height + info_height;
 
             Children = new Drawable[]
             {
-                new Container
+                coverContainer = new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = cover_height,
                     Children = new Drawable[]
                     {
-                        new AsyncLoadWrapper(new UserCoverBackground(user)
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            FillMode = FillMode.Fill,
-                            OnLoadComplete = d => d.FadeInFromZero(200)
-                        })
-                        {
-                            Masking = true,
-                            RelativeSizeAxes = Axes.Both
-                        },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -143,7 +130,8 @@ namespace osu.Game.Users.Profile
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Height = 50,
-                                    Width = 50
+                                    Width = 50,
+                                    Alpha = 0
                                 },
                                 levelText = new OsuSpriteText
                                 {
@@ -194,8 +182,8 @@ namespace osu.Game.Users.Profile
                                     Spacing = new Vector2(20, 0),
                                     Children = new[]
                                     {
-                                        gradeSSPlus = new GradeBadge("SSPlus"),
-                                        gradeSS = new GradeBadge("SS"),
+                                        gradeSSPlus = new GradeBadge("SSPlus") { Alpha = 0 },
+                                        gradeSS = new GradeBadge("SS") { Alpha = 0 },
                                     }
                                 },
                                 new FillFlowContainer<GradeBadge>
@@ -208,9 +196,9 @@ namespace osu.Game.Users.Profile
                                     Spacing = new Vector2(20, 0),
                                     Children = new[]
                                     {
-                                        gradeSPlus = new GradeBadge("SPlus"),
-                                        gradeS = new GradeBadge("S"),
-                                        gradeA = new GradeBadge("A"),
+                                        gradeSPlus = new GradeBadge("SPlus") { Alpha = 0 },
+                                        gradeS = new GradeBadge("S") { Alpha = 0 },
+                                        gradeA = new GradeBadge("A") { Alpha = 0 },
                                     }
                                 }
                             }
@@ -270,34 +258,47 @@ namespace osu.Game.Users.Profile
             infoText.NewParagraph();
             infoText.AddText("Play with ");
             infoText.AddText("Mouse, Keyboard, Tablet", bold);
-
-            levelText.Text = "98";
-
-            scoreText.Add(createScoreText("Ranked Score"));
-            scoreNumberText.Add(createScoreNumberText("1,870,716,897"));
-            scoreText.Add(createScoreText("Accuracy"));
-            scoreNumberText.Add(createScoreNumberText("98.51%"));
-            scoreText.Add(createScoreText("Play Count"));
-            scoreNumberText.Add(createScoreNumberText("25,287"));
-            scoreText.Add(createScoreText("Total Score"));
-            scoreNumberText.Add(createScoreNumberText("28,444,797,570"));
-            scoreText.Add(createScoreText("Total Hits"));
-            scoreNumberText.Add(createScoreNumberText("4,612,765"));
-            scoreText.Add(createScoreText("Max Combo"));
-            scoreNumberText.Add(createScoreNumberText("2,056"));
-            scoreText.Add(createScoreText("Replay Watched"));
-            scoreNumberText.Add(createScoreNumberText("23"));
-
-            gradeSSPlus.Count = 12;
-            gradeSS.Count = 34;
-            gradeSPlus.Count = 567;
-            gradeS.Count = 890;
-            gradeA.Count = 1234;
         }
 
         public void FillFullData(User user)
         {
+            coverContainer.Add(new AsyncLoadWrapper(new UserCoverBackground(user)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                FillMode = FillMode.Fill,
+                OnLoadComplete = d => d.FadeInFromZero(200)
+            })
+            {
+                Masking = true,
+                RelativeSizeAxes = Axes.Both,
+                Depth = float.MaxValue
+            });
 
+            levelBadge.Show();
+            levelText.Text = user.Statistics.Level.Current.ToString();
+
+            scoreText.Add(createScoreText("Ranked Score"));
+            scoreNumberText.Add(createScoreNumberText(user.Statistics.RankedScore.ToString(@"#,0")));
+            scoreText.Add(createScoreText("Accuracy"));
+            scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy}%"));
+            scoreText.Add(createScoreText("Play Count"));
+            scoreNumberText.Add(createScoreNumberText(user.Statistics.PlayCount.ToString(@"#,0")));
+            scoreText.Add(createScoreText("Total Score"));
+            scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalScore.ToString(@"#,0")));
+            scoreText.Add(createScoreText("Total Hits"));
+            scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalHits.ToString(@"#,0")));
+            scoreText.Add(createScoreText("Max Combo"));
+            scoreNumberText.Add(createScoreNumberText(user.Statistics.MaxCombo.ToString(@"#,0")));
+            scoreText.Add(createScoreText("Replay Watched by Others"));
+            scoreNumberText.Add(createScoreNumberText(user.Statistics.ReplayWatched.ToString(@"#,0")));
+
+            gradeSS.Count = user.Statistics.GradesCount.SS;
+            gradeSS.Show();
+            gradeS.Count = user.Statistics.GradesCount.S;
+            gradeS.Show();
+            gradeA.Count = user.Statistics.GradesCount.A;
+            gradeA.Show();
         }
 
         private OsuSpriteText createScoreText(string text) => new OsuSpriteText
@@ -326,7 +327,7 @@ namespace osu.Game.Users.Profile
             {
                 set
                 {
-                    numberText.Text = value.ToString(@"#,#");
+                    numberText.Text = value.ToString(@"#,0");
                 }
             }
 
