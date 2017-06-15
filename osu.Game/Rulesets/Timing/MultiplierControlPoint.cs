@@ -7,6 +7,9 @@ using osu.Game.IO.Serialization;
 
 namespace osu.Game.Rulesets.Timing
 {
+    /// <summary>
+    /// A control point which adds an aggregated multiplier based on the provided <see cref="TimingPoint"/>'s BeatLength and <see cref="DifficultyPoint"/>'s SpeedMultiplier.
+    /// </summary>
     public class MultiplierControlPoint : IJsonSerializable, IComparable<MultiplierControlPoint>
     {
         /// <summary>
