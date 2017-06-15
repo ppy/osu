@@ -120,8 +120,6 @@ namespace osu.Game.Screens.Menu
             };
         }
 
-        private double previousBeatTime;
-
         // true if icon going to jump from left to right
         private bool jumpSide;
 
@@ -135,8 +133,6 @@ namespace osu.Game.Screens.Menu
                 double beatTime = calculateBeatTime(timingPoint, getNextControlPoint(timingPoint));
 
                 restartAnimation(Time.Current, beatTime);
-
-                previousBeatTime = beatTime;
 
                 // If animation will be restarted - we should know, on which side we've stopped
                 // to start animation from the correct side
