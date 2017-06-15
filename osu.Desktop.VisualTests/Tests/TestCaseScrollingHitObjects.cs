@@ -23,6 +23,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private BindableDouble timeRangeBindable;
         private SpriteText timeRangeText;
+        private SpriteText bottomLabel;
 
         public override void Reset()
         {
@@ -49,8 +50,8 @@ namespace osu.Desktop.VisualTests.Tests
             });
 
             timeRange.Current.BindTo(timeRangeBindable);
-            timeRangeBindable.ValueChanged += v => timeRangeText.Text = $"Visible Range: {v:0.#}";
-            timeRangeBindable.TriggerChange();
+            timeRangeBindable.ValueChanged += v => timeRangeText.Text = $"Visible Range: {v:#,#.#}";
+            timeRangeBindable.ValueChanged += v => bottomLabel.Text = $"t minus {v:#,#}";
 
             Add(new Drawable[]
             {
@@ -70,10 +71,25 @@ namespace osu.Desktop.VisualTests.Tests
                         {
                             RelativeSizeAxes = Axes.Both,
                             VisibleTimeRange = timeRangeBindable
-                        }
+                        },
+                        new SpriteText
+                        {
+                            Text = "t minus 0",
+                            TextSize = 14,
+                            Anchor = Anchor.TopRight,
+                        },
+                        bottomLabel = new SpriteText
+                        {
+                            Text = "t minus x",
+                            TextSize = 14,
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomLeft,
+                        },
                     }
                 }
             });
+
+            timeRangeBindable.TriggerChange();
 
             adjustmentCollection.Add(new TestSpeedAdjustmentContainer(new MultiplierControlPoint()));
 
