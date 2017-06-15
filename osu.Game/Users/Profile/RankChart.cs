@@ -26,12 +26,14 @@ namespace osu.Game.Users.Profile
         private int[] ranks, performances;
         private int rank, performance, countryRank;
 
+        private const float primary_textsize = 25, secondary_textsize = 13, padding = 10;
+
         private readonly User user;
 
         public RankChart(User user)
         {
             this.user = user;
-            Padding = new MarginPadding { Vertical = 10 };
+            Padding = new MarginPadding { Vertical = padding };
             Children = new Drawable[]
             {
                 rankText = new OsuSpriteText
@@ -39,7 +41,7 @@ namespace osu.Game.Users.Profile
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Font = @"Exo2.0-RegularItalic",
-                    TextSize = 25
+                    TextSize = primary_textsize
                 },
                 relativeText = new OsuSpriteText
                 {
@@ -47,21 +49,21 @@ namespace osu.Game.Users.Profile
                     Origin = Anchor.TopCentre,
                     Font = @"Exo2.0-RegularItalic",
                     Y = 25,
-                    TextSize = 13
+                    TextSize = secondary_textsize
                 },
                 performanceText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Font = @"Exo2.0-RegularItalic",
-                    TextSize = 13
+                    TextSize = secondary_textsize
                 },
                 graph = new RankChartLineGraph
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
-                    Y = -13,
+                    Y = -secondary_textsize,
                     DefaultValueCount = 90,
                     BallRelease = updateRankTexts,
                     BallMove = showHistoryRankTexts
@@ -108,7 +110,7 @@ namespace osu.Game.Users.Profile
         {
             if ((invalidation & Invalidation.DrawSize) != 0)
             {
-                graph.Height = DrawHeight - 71;
+                graph.Height = DrawHeight - padding * 2 - primary_textsize - secondary_textsize * 2;
             }
 
             return base.Invalidate(invalidation, source, shallPropagate);
