@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Dialog
         {
             if (args.Repeat) return false;
 
-            if (args.Key == Key.Enter)
+            if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
             {
                 Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
                 return true;
