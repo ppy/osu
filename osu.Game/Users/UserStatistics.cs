@@ -20,7 +20,7 @@ namespace osu.Game.Users
         }
 
         [JsonProperty(@"pp")]
-        public decimal PP;
+        public decimal? PP;
 
         [JsonProperty(@"pp_rank")]
         public int Rank;
