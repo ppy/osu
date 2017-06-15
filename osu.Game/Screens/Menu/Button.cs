@@ -155,6 +155,11 @@ namespace osu.Game.Screens.Menu
             if (next.Time - current.Time < current.BeatLength)
                 return next.Time - current.Time;
 
+            double difference = Math.Abs(next.Time - Time.Current);
+
+            if (difference < current.BeatLength)
+                return difference;
+
             return current.BeatLength;
         }
 
