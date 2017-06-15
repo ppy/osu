@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Select
 
         private readonly List<Panel> panels = new List<Panel>();
 
-        private readonly Stack<BeatmapGroup> randomSelectedBeatmaps = new Stack<BeatmapGroup>();
+        private readonly Stack<KeyValuePair<BeatmapGroup, BeatmapPanel>> randomSelectedBeatmaps = new Stack<KeyValuePair<BeatmapGroup, BeatmapPanel>>();
 
         private BeatmapGroup selectedGroup;
         private BeatmapPanel selectedPanel;
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Select
 
         public void SelectNextRandom()
         {
-            randomSelectedBeatmaps.Push(selectedGroup);
+            randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
 
             var visibleGroups = getVisibleGroups();
             if (!visibleGroups.Any())
@@ -214,10 +214,11 @@ namespace osu.Game.Screens.Select
 
             while (randomSelectedBeatmaps.Any())
             {
-                var group = randomSelectedBeatmaps.Pop();
+                var beatmapCoordinates = randomSelectedBeatmaps.Pop();
+                var group = beatmapCoordinates.Key;
                 if (visibleGroups.Contains(group))
                 {
-                    selectGroup(group, group.SelectedPanel);
+                    selectGroup(group, beatmapCoordinates.Value);
                     break;
                 }
             }
