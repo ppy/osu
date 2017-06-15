@@ -96,6 +96,7 @@ namespace osu.Game.Rulesets.Timing
                     // This ends up being the total duration of our children, however for now this is a more sure-fire way to calculate this
                     // than the above due to some undesired masking optimisations causing some hit objects to be culled...
                     // Todo: When this is investigated more we should use the above method as it is a little more exact
+                    // Todo: This is not working correctly in the case that hit objects are absolutely-sized - needs a proper looking into in osu!framework
                     float width = Children.Select(child => child.X + child.Width).Max() - RelativeChildOffset.X;
                     float height = Children.Select(child => child.Y + child.Height).Max() - RelativeChildOffset.Y;
 
