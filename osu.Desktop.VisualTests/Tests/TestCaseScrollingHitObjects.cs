@@ -113,13 +113,16 @@ namespace osu.Desktop.VisualTests.Tests
             public TestDrawableHitObject(HitObject hitObject)
                 : base(hitObject)
             {
-                AutoSizeAxes = Axes.Both;
+                AutoSizeAxes = Axes.Y;
+                RelativeSizeAxes = Axes.X;
                 RelativePositionAxes = Axes.Y;
+
                 Y = (float)hitObject.StartTime;
 
                 Add(new Box
                 {
-                    Size = new Vector2(100, 10)
+                    RelativeSizeAxes = Axes.X,
+                    Height = 10,
                 });
             }
         }
