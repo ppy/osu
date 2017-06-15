@@ -6,9 +6,5 @@ namespace osu.Game.Users.Profile
     public class KudosuSection : ProfileSection
     {
         public override string Title => "Kudosu!";
-
-        public KudosuSection(User user)
-        {
-        }
     }
 }

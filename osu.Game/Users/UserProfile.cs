@@ -18,23 +18,21 @@ namespace osu.Game.Users
 {
     public class UserProfile : FocusedOverlayContainer
     {
-        private readonly User user;
         private ProfileSection lastSection;
 
         public const float CONTENT_X_MARGIN = 50;
 
         public UserProfile(User user)
         {
-            this.user = user;
             var sections = new ProfileSection[]
             {
-                new AboutSection(user),
-                new RecentSection(user),
-                new RanksSection(user),
-                new MedalsSection(user),
-                new HistoricalSection(user),
-                new BeatmapsSection(user),
-                new KudosuSection(user)
+                new AboutSection(),
+                new RecentSection(),
+                new RanksSection(),
+                new MedalsSection(),
+                new HistoricalSection(),
+                new BeatmapsSection(),
+                new KudosuSection()
             };
             var tabs = new ProfileTabControl
             {
