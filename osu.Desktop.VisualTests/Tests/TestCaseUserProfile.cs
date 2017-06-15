@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
+using osu.Game.Overlays;
 using osu.Game.Users;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -15,7 +16,7 @@ namespace osu.Desktop.VisualTests.Tests
         public override void Reset()
         {
             base.Reset();
-            var userpage = new UserProfile(new User
+            var userpage = new UserProfileOverlay(new User
             {
                 Username = @"peppy",
                 Id = 2,

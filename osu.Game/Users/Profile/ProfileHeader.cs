@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 
 namespace osu.Game.Users.Profile
 {
@@ -65,7 +66,7 @@ namespace osu.Game.Users.Profile
                             Size = new Vector2(avatar_size),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            X = UserProfile.CONTENT_X_MARGIN,
+                            X = UserProfileOverlay.CONTENT_X_MARGIN,
                             Y = avatar_bottom_position,
                             Masking = true,
                             CornerRadius = 5,
@@ -80,7 +81,7 @@ namespace osu.Game.Users.Profile
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            X = UserProfile.CONTENT_X_MARGIN + avatar_size + 10,
+                            X = UserProfileOverlay.CONTENT_X_MARGIN + avatar_size + 10,
                             Y = avatar_bottom_position,
                             Children = new Drawable[]
                             {
@@ -111,14 +112,14 @@ namespace osu.Game.Users.Profile
                 })
                 {
                     Y = cover_height + 20,
-                    Margin = new MarginPadding { Horizontal = UserProfile.CONTENT_X_MARGIN },
+                    Margin = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     ParagraphSpacing = 1
                 },
                 new Container
                 {
-                    X = -UserProfile.CONTENT_X_MARGIN,
+                    X = -UserProfileOverlay.CONTENT_X_MARGIN,
                     RelativeSizeAxes = Axes.Y,
                     Width = 280,
                     Anchor = Anchor.TopRight,

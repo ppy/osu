@@ -106,7 +106,7 @@
     <Compile Include="Users\Profile\RanksSection.cs" />
     <Compile Include="Users\Profile\RecentSection.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
-    <Compile Include="Users\UserProfile.cs" />
+    <Compile Include="Overlays\UserProfileOverlay.cs" />
     <Compile Include="Users\Profile\ProfileHeader.cs" />
     <Compile Include="Users\Profile\ProfileSection.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarSocialButton.cs" />

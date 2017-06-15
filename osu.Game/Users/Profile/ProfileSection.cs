@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 
 namespace osu.Game.Users.Profile
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Users.Profile
                     Font = @"Exo2.0-RegularItalic",
                     Margin = new MarginPadding
                     {
-                        Horizontal = UserProfile.CONTENT_X_MARGIN,
+                        Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
                         Vertical = 20
                     }
                 },
@@ -42,7 +43,7 @@ namespace osu.Game.Users.Profile
                     RelativeSizeAxes = Axes.X,
                     Margin = new MarginPadding
                     {
-                        Horizontal = UserProfile.CONTENT_X_MARGIN,
+                        Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
                         Bottom = 20
                     }
                 },

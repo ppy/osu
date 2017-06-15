@@ -6,23 +6,23 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Users;
 using osu.Game.Users.Profile;
 
-namespace osu.Game.Users
+namespace osu.Game.Overlays
 {
-    public class UserProfile : FocusedOverlayContainer
+    public class UserProfileOverlay : WaveOverlayContainer
     {
         private ProfileSection lastSection;
 
         public const float CONTENT_X_MARGIN = 50;
 
-        public UserProfile(User user)
+        public UserProfileOverlay(User user)
         {
             var sections = new ProfileSection[]
             {
