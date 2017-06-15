@@ -40,10 +40,10 @@ namespace osu.Game.Rulesets.Timing
         /// <param name="hitObject">The hit object to add.</param>
         public void Add(DrawableHitObject hitObject)
         {
-            if (hitObject.RelativePositionAxes == Axes.None)
-                throw new InvalidOperationException($"Make sure to set all {nameof(DrawableHitObject)}'s {nameof(RelativePositionAxes)} to some axis of relativity");
-
             var target = adjustmentContainerFor(hitObject);
+
+            if (hitObject.RelativePositionAxes != target.ScrollingAxes)
+                throw new InvalidOperationException($"Make sure to set all {nameof(DrawableHitObject)}'s {nameof(RelativePositionAxes)} are equal to the correct axes of scrolling ({target.ScrollingAxes}).");
 
             if (target == null)
                 throw new ArgumentException("No speed adjustment could be found that can contain the hit object.", nameof(hitObject));

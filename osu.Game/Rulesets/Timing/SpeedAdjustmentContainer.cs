@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Timing
         protected override Container<DrawableHitObject> Content => content;
         private Container<DrawableHitObject> content;
 
-        private readonly Axes scrollingAxes;
+        public readonly Axes ScrollingAxes;
 
         /// <summary>
         /// Creates a new <see cref="SpeedAdjustmentContainer"/>.
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Timing
         /// <param name="scrollingAxes">The axes through which the content of this container should scroll through.</param>
         protected SpeedAdjustmentContainer(MultiplierControlPoint controlPoint, Axes scrollingAxes)
         {
-            this.scrollingAxes = scrollingAxes;
+            ScrollingAxes = scrollingAxes;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Timing
             DrawableTimingSection timingSection = CreateTimingSection();
 
             timingSection.VisibleTimeRange.BindTo(VisibleTimeRange);
-            timingSection.RelativeChildOffset = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (scrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
+            timingSection.RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
 
             AddInternal(content = timingSection);
         }
@@ -71,8 +71,8 @@ namespace osu.Game.Rulesets.Timing
             float multiplier = (float)ControlPoint.Multiplier;
 
             // The speed adjustment happens by modifying our size by the multiplier while maintaining the visible time range as the relatve size for our children
-            Size = new Vector2((scrollingAxes & Axes.X) > 0 ? multiplier : 1, (scrollingAxes & Axes.Y) > 0 ? multiplier : 1);
-            RelativeChildSize = new Vector2((scrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 1, (scrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 1);
+            Size = new Vector2((ScrollingAxes & Axes.X) > 0 ? multiplier : 1, (ScrollingAxes & Axes.Y) > 0 ? multiplier : 1);
+            RelativeChildSize = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 1, (ScrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 1);
         }
 
         /// <summary>
