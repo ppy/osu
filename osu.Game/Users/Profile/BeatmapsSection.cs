@@ -6,5 +6,7 @@ namespace osu.Game.Users.Profile
     public class BeatmapsSection : ProfileSection
     {
         public override string Title => "Beatmaps";
+
+        public override string Identifier => "beatmaps";
     }
 }

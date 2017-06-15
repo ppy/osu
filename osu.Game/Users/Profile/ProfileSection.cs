@@ -15,6 +15,8 @@ namespace osu.Game.Users.Profile
     {
         public abstract string Title { get; }
 
+        public abstract string Identifier { get; }
+
         private readonly FillFlowContainer content;
         protected override Container<Drawable> Content => content;
 

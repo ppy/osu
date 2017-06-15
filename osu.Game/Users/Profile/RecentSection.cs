@@ -6,5 +6,7 @@ namespace osu.Game.Users.Profile
     public class RecentSection : ProfileSection
     {
         public override string Title => "Recent";
+
+        public override string Identifier => "recent_activities";
     }
 }
