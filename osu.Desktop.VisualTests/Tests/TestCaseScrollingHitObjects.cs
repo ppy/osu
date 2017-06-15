@@ -118,6 +118,7 @@ namespace osu.Desktop.VisualTests.Tests
         protected override void Update()
         {
             base.Update();
+
             topTime.Text = Time.Current.ToString("#,#");
             bottomTime.Text = (Time.Current + timeRangeBindable.Value).ToString("#,#");
         }
@@ -152,6 +153,7 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class TestDrawableHitObject : DrawableHitObject
         {
+            private readonly Box background;
             private const float height = 14;
 
             public TestDrawableHitObject(HitObject hitObject)
@@ -165,7 +167,7 @@ namespace osu.Desktop.VisualTests.Tests
 
                 Children = new Drawable[]
                 {
-                    new Box
+                    background = new Box
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = height,
@@ -186,6 +188,19 @@ namespace osu.Desktop.VisualTests.Tests
                         Text = $"{hitObject.StartTime:#,#}"
                     }
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                FadeInFromZero(250, EasingTypes.OutQuint);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                if (Time.Current >= HitObject.StartTime)
+                    background.Colour = Color4.Red;
             }
         }
     }
