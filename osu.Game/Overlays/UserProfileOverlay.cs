@@ -11,6 +11,8 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 using osu.Game.Users.Profile;
 
@@ -19,13 +21,23 @@ namespace osu.Game.Overlays
     public class UserProfileOverlay : WaveOverlayContainer
     {
         private ProfileSection lastSection;
+        private GetUserRequest userReq;
+        private APIAccess api;
 
         public const float CONTENT_X_MARGIN = 50;
 
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api)
+        {
+            this.api = api;
+        }
+
         public void ShowUser(User user)
         {
+            userReq?.Cancel();
             Clear();
             lastSection = null;
+
             var sections = new ProfileSection[]
             {
                 new AboutSection(),
@@ -43,7 +55,6 @@ namespace osu.Game.Overlays
                 Origin = Anchor.TopCentre,
                 Height = 30
             };
-            sections.ForEach(tabs.AddItem);
 
             Add(new Box
             {
@@ -51,20 +62,20 @@ namespace osu.Game.Overlays
                 Colour = OsuColour.Gray(0.2f)
             });
 
+            var header = new ProfileHeader(user);
+
             var sectionsContainer = new SectionsContainer<ProfileSection>
             {
                 RelativeSizeAxes = Axes.Both,
-                ExpandableHeader = new ProfileHeader(user),
+                ExpandableHeader = header,
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
                     Colour = OsuColour.Gray(34),
                     RelativeSizeAxes = Axes.Both
-                },
-                Children = sections
+                }
             };
             Add(sectionsContainer);
-
             sectionsContainer.SelectedSection.ValueChanged += s =>
             {
                 if (lastSection != s)
@@ -89,6 +100,16 @@ namespace osu.Game.Overlays
                     sectionsContainer.ScrollContainer.ScrollIntoView(lastSection);
                 }
             };
+
+            userReq = new GetUserRequest(user.Id); //fetch latest full data
+            userReq.Success += u =>
+            {
+                header.FillFullData(u);
+                sectionsContainer.Children = sections;
+                sections.ForEach(tabs.AddItem);
+            };
+            api.Queue(userReq);
+
             Show();
         }
 

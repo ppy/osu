@@ -295,6 +295,11 @@ namespace osu.Game.Users.Profile
             gradeA.Count = 1234;
         }
 
+        public void FillFullData(User user)
+        {
+
+        }
+
         private OsuSpriteText createScoreText(string text) => new OsuSpriteText
         {
             TextSize = 14,
