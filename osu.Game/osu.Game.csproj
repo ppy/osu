@@ -471,6 +471,7 @@
     <Compile Include="Online\Multiplayer\Room.cs" />
     <Compile Include="Online\Multiplayer\RoomStatus.cs" />
     <Compile Include="Users\UserPanel.cs" />
+    <Compile Include="Users\UserStatistics.cs" />
     <Compile Include="Users\UserStatus.cs" />
     <Compile Include="Overlays\DirectOverlay.cs" />
     <Compile Include="Overlays\Direct\FilterControl.cs" />
