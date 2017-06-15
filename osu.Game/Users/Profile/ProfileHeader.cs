@@ -26,7 +26,7 @@ namespace osu.Game.Users.Profile
 
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
-        private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
+        private readonly GradeBadge gradeDoubleSPlus, gradeDoubleS, gradeSPlus, gradeS, gradeA;
 
         private const float cover_height = 350, info_height = 150, avatar_size = 110, avatar_bottom_position = -20, level_position = 30, level_height = 60;
         public ProfileHeader(User user)
@@ -193,8 +193,8 @@ namespace osu.Game.Users.Profile
                                     Spacing = new Vector2(20, 0),
                                     Children = new[]
                                     {
-                                        gradeSSPlus = new GradeBadge("SSPlus") { Count = 12 },
-                                        gradeSS = new GradeBadge("SS") { Count = 34 },
+                                        gradeDoubleSPlus = new GradeBadge("SSPlus"),
+                                        gradeDoubleS = new GradeBadge("SS"),
                                     }
                                 },
                                 new FillFlowContainer<GradeBadge>
@@ -207,9 +207,9 @@ namespace osu.Game.Users.Profile
                                     Spacing = new Vector2(20, 0),
                                     Children = new[]
                                     {
-                                        gradeSPlus = new GradeBadge("SPlus") { Count = 567 },
-                                        gradeS = new GradeBadge("S") { Count = 890 },
-                                        gradeA = new GradeBadge("A") { Count = 1234 },
+                                        gradeSPlus = new GradeBadge("SPlus"),
+                                        gradeS = new GradeBadge("S"),
+                                        gradeA = new GradeBadge("A"),
                                     }
                                 }
                             }
@@ -286,6 +286,12 @@ namespace osu.Game.Users.Profile
             scoreNumberText.Add(createScoreNumberText("2,056"));
             scoreText.Add(createScoreText("Replay Watched"));
             scoreNumberText.Add(createScoreNumberText("23"));
+
+            gradeDoubleSPlus.Count = 12;
+            gradeDoubleS.Count = 34;
+            gradeSPlus.Count = 567;
+            gradeS.Count = 890;
+            gradeA.Count = 1234;
         }
 
         private OsuSpriteText createScoreText(string text) => new OsuSpriteText

@@ -73,7 +73,7 @@ namespace osu.Game.Users.Profile
         {
             rankText.Text = $"#{rank:#,#}";
             performanceText.Text = $"{performance:#,#}pp";
-            relativeText.Text = $"{this.user.Country?.FullName} #{countryRank:#,#}";
+            relativeText.Text = $"{user.Country?.FullName} #{countryRank:#,#}";
         }
 
         private void showHistoryRankTexts(int dayIndex)
