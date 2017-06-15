@@ -135,6 +135,8 @@ namespace osu.Game.Overlays
 
             protected override TabItem<ProfileSection> CreateTabItem(ProfileSection value) => new ProfileTabItem(value);
 
+            protected override Dropdown<ProfileSection> CreateDropdown() => null;
+
             private class ProfileTabItem : PageTabItem
             {
                 public ProfileTabItem(ProfileSection value) : base(value)
