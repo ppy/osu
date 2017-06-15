@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Menu
             if (next.Time - current.Time < current.BeatLength)
                 return next.Time - current.Time;
 
-            double difference = Math.Abs(next.Time - Time.Current);
+            double difference = next.Time - Beatmap.Value.Track.CurrentTime;
 
             if (difference < current.BeatLength)
                 return difference;
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Menu
 
             box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
 
-            double offset = getNextBeatLeftTime(Time.Current);
+            double offset = getNextBeatTimeLeft();
 
             icon.ClearTransforms();
             icon.MoveTo(Vector2.Zero, offset, EasingTypes.Out);
@@ -202,10 +202,12 @@ namespace osu.Game.Screens.Menu
                 box.ScaleTo(new Vector2(1, 1), 500, EasingTypes.OutElastic);
         }
 
-        private double getNextBeatLeftTime(double currentTime)
+        private double getNextBeatTimeLeft()
         {
             if (Beatmap.Value?.Track == null)
                 return 200;
+
+            double currentTime = Beatmap.Value.Track.CurrentTime;
 
             TimingControlPoint current = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTime);
             TimingControlPoint next = getNextControlPoint(current);
