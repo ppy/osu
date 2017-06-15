@@ -269,13 +269,9 @@ namespace osu.Game.Overlays
 
             TransformDirection direction = TransformDirection.None;
 
-            if (current != null)
+            if (current != null && beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) != true)
             {
-                bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
-
-                if (audioEquals)
-                    direction = TransformDirection.None;
-                else if (queuedDirection.HasValue)
+                if (queuedDirection.HasValue)
                 {
                     direction = queuedDirection.Value;
                     queuedDirection = null;
