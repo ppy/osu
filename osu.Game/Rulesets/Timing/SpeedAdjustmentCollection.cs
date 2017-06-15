@@ -40,6 +40,9 @@ namespace osu.Game.Rulesets.Timing
         /// <param name="hitObject">The hit object to add.</param>
         public void Add(DrawableHitObject hitObject)
         {
+            if (hitObject.RelativePositionAxes == Axes.None)
+                throw new InvalidOperationException($"Make sure to set all {nameof(DrawableHitObject)}'s {nameof(RelativePositionAxes)} to some axis of relativity");
+
             var target = adjustmentContainerFor(hitObject);
 
             if (target == null)
