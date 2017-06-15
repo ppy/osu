@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Globalization;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
@@ -31,8 +30,8 @@ namespace osu.Desktop.VisualTests.Tests
 
             timeRangeBindable = new BindableDouble(2000)
             {
-                MinValue = 50,
-                MaxValue = 20000,
+                MinValue = 200,
+                MaxValue = 4000,
             };
 
             SliderBar<double> timeRange;
@@ -50,7 +49,8 @@ namespace osu.Desktop.VisualTests.Tests
             });
 
             timeRange.Current.BindTo(timeRangeBindable);
-            timeRangeBindable.ValueChanged += v => timeRangeText.Text = v.ToString(CultureInfo.InvariantCulture);
+            timeRangeBindable.ValueChanged += v => timeRangeText.Text = $"Visible Range: {v:0.#}";
+            timeRangeBindable.TriggerChange();
 
             Add(new Drawable[]
             {
@@ -77,7 +77,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             adjustmentCollection.Add(new TestSpeedAdjustmentContainer(new MultiplierControlPoint()));
 
-            AddStep("Add hit object", () => adjustmentCollection.Add(new TestDrawableHitObject(new HitObject { StartTime = Time.Current + 5000 })));
+            AddStep("Add hit object", () => adjustmentCollection.Add(new TestDrawableHitObject(new HitObject { StartTime = Time.Current + 2000 })));
         }
 
         private class TestSpeedAdjustmentContainer : SpeedAdjustmentContainer
@@ -119,7 +119,7 @@ namespace osu.Desktop.VisualTests.Tests
 
                 Add(new Box
                 {
-                    Size = new Vector2(100)
+                    Size = new Vector2(100, 10)
                 });
             }
         }
