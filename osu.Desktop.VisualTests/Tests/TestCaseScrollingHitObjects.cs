@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
@@ -22,8 +23,9 @@ namespace osu.Desktop.VisualTests.Tests
         private SpeedAdjustmentCollection adjustmentCollection;
 
         private BindableDouble timeRangeBindable;
-        private SpriteText timeRangeText;
-        private SpriteText bottomLabel;
+        private OsuSpriteText timeRangeText;
+        private OsuSpriteText bottomLabel;
+        private SpriteText topTime, bottomTime;
 
         public override void Reset()
         {
@@ -43,7 +45,7 @@ namespace osu.Desktop.VisualTests.Tests
                 KeyboardStep = 100
             });
 
-            Add(timeRangeText = new SpriteText
+            Add(timeRangeText = new OsuSpriteText
             {
                 X = 210,
                 TextSize = 16,
@@ -70,20 +72,37 @@ namespace osu.Desktop.VisualTests.Tests
                         adjustmentCollection = new SpeedAdjustmentCollection
                         {
                             RelativeSizeAxes = Axes.Both,
-                            VisibleTimeRange = timeRangeBindable
+                            VisibleTimeRange = timeRangeBindable,
+                            Masking = true,
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "t minus 0",
+                            Margin = new MarginPadding(2),
                             TextSize = 14,
                             Anchor = Anchor.TopRight,
                         },
-                        bottomLabel = new SpriteText
+                        bottomLabel = new OsuSpriteText
                         {
                             Text = "t minus x",
+                            Margin = new MarginPadding(2),
                             TextSize = 14,
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomLeft,
+                        },
+                        topTime = new OsuSpriteText
+                        {
+                            Margin = new MarginPadding(2),
+                            TextSize = 14,
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopRight,
+                        },
+                        bottomTime = new OsuSpriteText
+                        {
+                            Margin = new MarginPadding(2),
+                            TextSize = 14,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomRight,
                         },
                     }
                 }
@@ -94,6 +113,13 @@ namespace osu.Desktop.VisualTests.Tests
             adjustmentCollection.Add(new TestSpeedAdjustmentContainer(new MultiplierControlPoint()));
 
             AddStep("Add hit object", () => adjustmentCollection.Add(new TestDrawableHitObject(new HitObject { StartTime = Time.Current + 2000 })));
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            topTime.Text = Time.Current.ToString("#,#");
+            bottomTime.Text = (Time.Current + timeRangeBindable.Value).ToString("#,#");
         }
 
         private class TestSpeedAdjustmentContainer : SpeedAdjustmentContainer
@@ -126,6 +152,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class TestDrawableHitObject : DrawableHitObject
         {
+            private const float height = 14;
+
             public TestDrawableHitObject(HitObject hitObject)
                 : base(hitObject)
             {
@@ -135,11 +163,29 @@ namespace osu.Desktop.VisualTests.Tests
 
                 Y = (float)hitObject.StartTime;
 
-                Add(new Box
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 10,
-                });
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = height,
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Colour = Color4.Cyan,
+                        Height = 1,
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Colour = Color4.Black,
+                        TextSize = height,
+                        Font = @"Exo2.0-BoldItalic",
+                        Text = $"{hitObject.StartTime:#,#}"
+                    }
+                };
             }
         }
     }
