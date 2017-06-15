@@ -22,8 +22,10 @@ namespace osu.Game.Overlays
 
         public const float CONTENT_X_MARGIN = 50;
 
-        public UserProfileOverlay(User user)
+        public void ShowUser(User user)
         {
+            Clear();
+            lastSection = null;
             var sections = new ProfileSection[]
             {
                 new AboutSection(),
@@ -87,6 +89,7 @@ namespace osu.Game.Overlays
                     sectionsContainer.ScrollContainer.ScrollIntoView(lastSection);
                 }
             };
+            Show();
         }
 
         private class ProfileTabControl : PageTabControl<ProfileSection>
