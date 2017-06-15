@@ -103,6 +103,8 @@ namespace osu.Game.Graphics.Containers
         {
             base.Add(drawable);
             lastKnownScroll = float.NaN;
+            headerHeight = float.NaN;
+            footerHeight = float.NaN;
         }
 
         private float headerHeight, footerHeight;
