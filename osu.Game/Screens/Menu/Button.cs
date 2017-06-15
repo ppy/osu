@@ -149,14 +149,19 @@ namespace osu.Game.Screens.Menu
 
         private double calculateBeatTime(TimingControlPoint current, TimingControlPoint next)
         {
+            double currentTime = Beatmap.Value.Track.CurrentTime;
+
+            double difference = current.Time - currentTime;
+            if (difference < current.BeatLength && difference > 0)
+                return difference;
+
             if (current == next)
                 return current.BeatLength;
 
             if (next.Time - current.Time < current.BeatLength)
                 return next.Time - current.Time;
 
-            double difference = next.Time - Beatmap.Value.Track.CurrentTime;
-
+            difference = next.Time - currentTime;
             if (difference < current.BeatLength)
                 return difference;
 
