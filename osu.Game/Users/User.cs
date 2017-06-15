@@ -24,7 +24,7 @@ namespace osu.Game.Users
         public Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
         [JsonProperty(@"age")]
-        public int Age;
+        public int? Age;
 
         //public Team Team;
 
