@@ -120,26 +120,10 @@ namespace osu.Game.Screens.Menu
             };
         }
 
-        /// <summary>
-        /// The side icon going jump to.
-        /// </summary>
-        private enum JumpSide
-        {
-            Left,
-            Right,
-        }
-
-        private JumpSide switchJumpSide()
-        {
-            if (jumpSide == JumpSide.Left)
-                return JumpSide.Right;
-            else
-                return JumpSide.Left;
-        }
-
         private double previousBeatTime;
-        private JumpSide jumpSide;
-        private bool animationIsGoing;
+
+        // true if icon going to jump from left to right
+        private bool jumpSide;
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
@@ -147,20 +131,16 @@ namespace osu.Game.Screens.Menu
 
             if (Hovering)
             {
-                double startTime = Time.Current;
-
-                // Beat length can be "cutted off" by the next timing point
+                // Beat length can be trimmed by the next timing point
                 double beatTime = calculateBeatTime(timingPoint, getNextControlPoint(timingPoint));
 
-                // After the lost hovering beat time can be the same so we need another trigger to start animation
-                if (beatTime != previousBeatTime || !animationIsGoing)
-                    restartAnimation(startTime, beatTime, jumpSide);
+                restartAnimation(Time.Current, beatTime);
 
                 previousBeatTime = beatTime;
 
                 // If animation will be restarted - we should know, on which side we've stopped
                 // to start animation from the correct side
-                jumpSide = switchJumpSide();
+                jumpSide = !jumpSide;
             }
         }
 
@@ -175,16 +155,14 @@ namespace osu.Game.Screens.Menu
             return current.BeatLength;
         }
 
-        private void restartAnimation(double startTime, double beatLength, JumpSide firstJumpSide)
+        private void restartAnimation(double startTime, double beatLength)
         {
-            animationIsGoing = true;
-
             icon.ClearTransforms();
 
             icon.Transforms.Add(new TransformRotation
             {
-                StartValue = firstJumpSide == JumpSide.Right ? -10 : 10,
-                EndValue = firstJumpSide == JumpSide.Right ? 10 : -10,
+                StartValue = jumpSide ? -10 : 10,
+                EndValue = jumpSide ? 10 : -10,
                 StartTime = startTime,
                 EndTime = startTime + beatLength,
                 Easing = EasingTypes.InOutSine,
@@ -233,8 +211,8 @@ namespace osu.Game.Screens.Menu
             });
             icon.Transforms.Add(new TransformRotation
             {
-                StartValue = firstJumpSide == JumpSide.Right ? 10 : -10,
-                EndValue = firstJumpSide == JumpSide.Right ? -10 : 10,
+                StartValue = jumpSide ? 10 : -10,
+                EndValue = jumpSide ? -10 : 10,
                 StartTime = startTime + beatLength,
                 EndTime = startTime + beatLength * 2,
                 Easing = EasingTypes.InOutSine,
@@ -249,18 +227,17 @@ namespace osu.Game.Screens.Menu
 
             box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
 
+            icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
+
             double offset = timeLeft(Time.Current);
 
             icon.RotateTo(-10, offset, EasingTypes.InOutSine);
             icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);
 
-            jumpSide = JumpSide.Right;
+            jumpSide = true;
 
             if (Beatmap.Value?.Track == null)
-            {
-                Delay(offset);
-                Schedule(() => restartAnimation(Time.Current, 500, jumpSide));
-            }
+                restartAnimation(Time.Current, 500);
 
             return true;
         }
@@ -296,8 +273,6 @@ namespace osu.Game.Screens.Menu
 
         protected override void OnHoverLost(InputState state)
         {
-            animationIsGoing = false;
-
             icon.ClearTransforms();
             icon.RotateTo(0, 500, EasingTypes.Out);
             icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
