@@ -4,7 +4,6 @@
 using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -105,8 +104,11 @@ namespace osu.Game.Overlays
             userReq.Success += u =>
             {
                 header.FillFullData(u);
-                sectionsContainer.Children = sections;
-                sections.ForEach(tabs.AddItem);
+
+                var reorderedSections = u.ProfileOrder.Select(x => sections.FirstOrDefault(s => s.Identifier == x)).Where(s => s != null).ToList();
+
+                sectionsContainer.Children = reorderedSections;
+                reorderedSections.ForEach(tabs.AddItem);
             };
             api.Queue(userReq);
 
