@@ -21,6 +21,7 @@ using osu.Game.Graphics.Containers;
 using osu.Framework.Audio.Track;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Lists;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Menu
 {
@@ -122,6 +123,7 @@ namespace osu.Game.Screens.Menu
 
         // true if icon going to jump from left to right
         private bool jumpSide;
+        private ScheduledDelegate defaultAnimationDelegate;
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
@@ -132,7 +134,7 @@ namespace osu.Game.Screens.Menu
                 // Beat length can be trimmed by the next timing point
                 double beatTime = calculateBeatTime(timingPoint, getNextControlPoint(timingPoint));
 
-                restartAnimation(Time.Current, beatTime);
+                restartAnimation(beatTime);
 
                 // If animation will be restarted - we should know, on which side we've stopped
                 // to start animation from the correct side
@@ -151,9 +153,75 @@ namespace osu.Game.Screens.Menu
             return current.BeatLength;
         }
 
-        private void restartAnimation(double startTime, double beatLength)
+        protected override bool OnHover(InputState state)
+        {
+            if (State != ButtonState.Expanded) return true;
+
+            box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
+
+            double offset = getNextBeatLeftTime(Time.Current);
+
+            icon.ClearTransforms();
+            icon.MoveTo(Vector2.Zero, offset, EasingTypes.Out);
+            icon.RotateTo(-10, offset, EasingTypes.InOutSine);
+            icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);
+
+            jumpSide = true;
+
+            if (Beatmap.Value?.Track == null)
+            {
+                Delay(offset);
+                defaultAnimationDelegate = Schedule(() => restartAnimation(500));
+            }
+
+            return true;
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            defaultAnimationDelegate?.Cancel();
+
+            icon.ClearTransforms();
+            icon.RotateTo(0, 500, EasingTypes.Out);
+            icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
+            icon.ScaleTo(0.7f, 500, EasingTypes.OutElasticHalf);
+            icon.ScaleTo(Vector2.One, 200, EasingTypes.Out);
+
+            if (State == ButtonState.Expanded)
+                box.ScaleTo(new Vector2(1, 1), 500, EasingTypes.OutElastic);
+        }
+
+        private double getNextBeatLeftTime(double currentTime)
+        {
+            if (Beatmap.Value?.Track == null)
+                return 200;
+
+            TimingControlPoint current = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTime);
+            TimingControlPoint next = getNextControlPoint(current);
+
+            // If the difference between the current time and the start time of the next timing point
+            // less than beat time of the current timing point
+            if (Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTime + current.BeatLength) == next && current != next)
+                return next.Time - currentTime;
+
+            return current.BeatLength - (currentTime - current.Time) % current.BeatLength;
+        }
+
+        private TimingControlPoint getNextControlPoint(TimingControlPoint current)
+        {
+            SortedList<TimingControlPoint> timingPoints = Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints;
+
+            if (timingPoints[timingPoints.Count - 1] == current)
+                return current;
+
+            return timingPoints[timingPoints.IndexOf(current) + 1];
+        }
+
+        private void restartAnimation(double beatLength)
         {
             icon.ClearTransforms();
+
+            double startTime = Time.Current;
 
             icon.Transforms.Add(new TransformRotation
             {
@@ -215,68 +283,6 @@ namespace osu.Game.Screens.Menu
                 LoopCount = -1,
                 LoopDelay = beatLength
             });
-        }
-
-        protected override bool OnHover(InputState state)
-        {
-            if (State != ButtonState.Expanded) return true;
-
-            box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
-
-            icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
-
-            double offset = timeLeft(Time.Current);
-
-            icon.RotateTo(-10, offset, EasingTypes.InOutSine);
-            icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);
-
-            jumpSide = true;
-
-            if (Beatmap.Value?.Track == null)
-                restartAnimation(Time.Current, 500);
-
-            return true;
-        }
-
-        private TimingControlPoint getNextControlPoint(TimingControlPoint current)
-        {
-            SortedList<TimingControlPoint> timingPoints = Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints;
-
-            if (timingPoints[timingPoints.Count - 1] == current)
-                return current;
-
-            return timingPoints[timingPoints.IndexOf(current) + 1];
-        }
-
-        /// <summary>
-        /// Time before the new beat starts
-        /// </summary>
-        private double timeLeft(double currentTime)
-        {
-            if (Beatmap.Value?.Track == null)
-                return 100;
-
-            TimingControlPoint current = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTime);
-            TimingControlPoint next = getNextControlPoint(current);
-
-            // If the difference between the current time and the start time of the next timing point
-            // less than beat time of the current timing point
-            if (Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTime + current.BeatLength) == next && current != next)
-                return next.Time - currentTime;
-
-            return current.BeatLength - (currentTime - current.Time) % current.BeatLength;
-        }
-
-        protected override void OnHoverLost(InputState state)
-        {
-            icon.ClearTransforms();
-            icon.RotateTo(0, 500, EasingTypes.Out);
-            icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
-            icon.ScaleTo(0.7f, 500, EasingTypes.OutElasticHalf);
-            icon.ScaleTo(Vector2.One, 200, EasingTypes.Out);
-
-            if (State == ButtonState.Expanded)
-                box.ScaleTo(new Vector2(1, 1), 500, EasingTypes.OutElastic);
         }
 
         [BackgroundDependencyLoader]
