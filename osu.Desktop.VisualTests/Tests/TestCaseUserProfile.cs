@@ -16,21 +16,31 @@ namespace osu.Desktop.VisualTests.Tests
         public override void Reset()
         {
             base.Reset();
-            var userpage = new UserProfileOverlay(new User
-            {
-                Username = @"peppy",
-                Id = 2,
-                Country = new Country { FullName = @"Australia", FlagName = @"AU" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
-            })
+            var profile = new UserProfileOverlay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding { Horizontal = 50 },
-                State = Visibility.Visible
             };
-            Add(userpage);
+            Add(profile);
+
+            AddStep("Show ppy", () => profile.ShowUser(new User
+            {
+                Username = @"peppy",
+                Id = 2,
+                Country = new Country { FullName = @"Australia", FlagName = @"AU" },
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c3.jpg"
+            }));
+            AddStep("Show flyte", () => profile.ShowUser(new User
+            {
+                Username = @"flyte",
+                Id = 3103765,
+                Country = new Country { FullName = @"Japan", FlagName = @"JP" },
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+            }));
+            AddStep("Hide", profile.Hide);
+            AddStep("Show without reload", profile.Show);
         }
     }
 }
