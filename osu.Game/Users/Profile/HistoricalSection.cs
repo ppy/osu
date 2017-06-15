@@ -6,9 +6,5 @@ namespace osu.Game.Users.Profile
     public class HistoricalSection : ProfileSection
     {
         public override string Title => "Historical";
-
-        public HistoricalSection(User user)
-        {
-        }
     }
 }

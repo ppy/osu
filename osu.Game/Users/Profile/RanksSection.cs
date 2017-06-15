@@ -6,9 +6,5 @@ namespace osu.Game.Users.Profile
     public class RanksSection : ProfileSection
     {
         public override string Title => "Ranks";
-
-        public RanksSection(User user)
-        {
-        }
     }
 }

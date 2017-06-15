@@ -6,9 +6,5 @@ namespace osu.Game.Users.Profile
     public class AboutSection : ProfileSection
     {
         public override string Title => "me!";
-
-        public AboutSection(User user)
-        {
-        }
     }
 }
