@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Timing
         [BackgroundDependencyLoader]
         private void load()
         {
-            DrawableTimingSection timingSection = CreateTimingSection(ControlPoint);
+            DrawableTimingSection timingSection = CreateTimingSection();
 
             timingSection.ScrollingAxes = ScrollingAxes;
             timingSection.VisibleTimeRange.BindTo(VisibleTimeRange);
@@ -88,6 +88,6 @@ namespace osu.Game.Rulesets.Timing
         /// Creates the container which handles the movement of a collection of hit objects.
         /// </summary>
         /// <returns>The <see cref="DrawableTimingSection"/>.</returns>
-        protected abstract DrawableTimingSection CreateTimingSection(MultiplierControlPoint controlPoint);
+        protected abstract DrawableTimingSection CreateTimingSection();
     }
 }

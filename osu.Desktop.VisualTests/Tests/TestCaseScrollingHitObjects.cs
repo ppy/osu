@@ -130,7 +130,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
             }
 
-            protected override DrawableTimingSection CreateTimingSection(MultiplierControlPoint controlPoint) => new TestDrawableTimingSection(controlPoint);
+            protected override DrawableTimingSection CreateTimingSection() => new TestDrawableTimingSection(ControlPoint);
 
             private class TestDrawableTimingSection : DrawableTimingSection
             {
