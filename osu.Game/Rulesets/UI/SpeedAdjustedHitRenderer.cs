@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -23,6 +24,12 @@ namespace osu.Game.Rulesets.UI
         public SpeedAdjustedHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(beatmap, isForCurrentRuleset)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            ApplySpeedAdjustments();
         }
 
         protected override void ApplyBeatmap()
@@ -86,14 +93,9 @@ namespace osu.Game.Rulesets.UI
             return new MultiplierControlPoint(time, DefaultControlPoints[index].DeepClone());
         }
 
-        protected override void LoadObjects()
-        {
-            // We need to add speed adjustments before hit objects are loaded
-            ApplySpeedAdjustments();
-
-            base.LoadObjects();
-        }
-
+        /// <summary>
+        /// Applies speed changes to the playfield.
+        /// </summary>
         protected abstract void ApplySpeedAdjustments();
     }
 }
