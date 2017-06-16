@@ -22,8 +22,8 @@ namespace osu.Game.Overlays.Profile
         private readonly SpriteText rankText, performanceText, relativeText;
         private readonly RankChartLineGraph graph;
 
-        private int[] ranks;
-        private decimal?[] performances;
+        private readonly int[] ranks;
+        private readonly decimal?[] performances;
 
         private const float primary_textsize = 25, secondary_textsize = 13, padding = 10;
 
@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Profile
                 }
             };
             ranks = new[] { user.Statistics.Rank };
-            performances = new decimal?[] { user.Statistics.PP };
+            performances = new [] { user.Statistics.PP };
         }
 
         private void updateRankTexts()
@@ -78,13 +78,14 @@ namespace osu.Game.Overlays.Profile
             rankText.Text = user.Statistics.Rank > 0 ? $"#{user.Statistics.Rank:#,0}" : "no rank";
             performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
             //relativeText.Text = $"{user.Country?.FullName} #{countryRank:#,0}";
+            relativeText.Text = string.Empty;
         }
 
         private void showHistoryRankTexts(int dayIndex)
         {
             rankText.Text = ranks[dayIndex] > 0 ? $"#{ranks[dayIndex]:#,0}" : "no rank";
             performanceText.Text = performances[dayIndex] != null ? $"{performances[dayIndex]:#,0}pp" : string.Empty;
-            //relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
+            relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
             //plural should be handled in a general way
         }
 

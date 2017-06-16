@@ -378,6 +378,9 @@ namespace osu.Game.Overlays.Profile
                 gradeA.Count = user.Statistics.GradesCount.A;
                 gradeA.Show();
 
+                gradeSPlus.Count = 0;
+                gradeSSPlus.Count = 0;
+
                 chartContainer.Add(new RankChart(user) { RelativeSizeAxes = Axes.Both });
             }
         }
