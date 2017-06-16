@@ -94,15 +94,19 @@ namespace osu.Game.Rulesets.Timing
 
             double baseDuration = Children.Max(c => (c.HitObject as IHasEndTime)?.EndTime ?? c.HitObject.StartTime) - ControlPoint.StartTime;
 
+            // If we have a singular hit object at the timing section's start time, let's set a sane default duration
             if (baseDuration == 0)
                 baseDuration = 1000;
 
-            // Scrolling rulesets typically have anchors/origins set to their start time, but if an object has no end time and lies on the control point
-            // then the baseDuration above will be 0. This will cause problems with masking when it is set as the value for Size in Update().
+            // Scrolling ruleset hit objects typically have anchors+origins set to the hit object's start time, but if the hit object doesn't implement IHasEndTime and lies on the control point
+            // then the baseDuration above will be 0. This will cause problems with masking when it is further set as the value for Size in Update(). We _want_ the timing section bounds to
+            // completely enclose the hit object to avoid the masking optimisations.
             //
-            // Thus we _want_ the timing section to completely contain the hit object, and to do with we'll need to find a duration that corresponds
-            // to the absolute size of the element that extrudes beyond our bounds. For simplicity, we can approximate this by just using the largest
-            // absolute size available from our children.
+            // To do this we need to find a duration that corresponds to the absolute size of the element that extrudes beyond the timing section's bounds and add that to baseDuration.
+            // We can utilize the fact that the Size and RelativeChildSpace are 1:1, meaning that an change in duration for the timing section has no change to the hit object's positioning
+            // and simply find the largest absolutely-sized element in this timing section. This introduces a little bit of error, but will never under-estimate the duration.
+
+            // Find the largest element that is absolutely-sized along ScrollingAxes
             float maxAbsoluteSize = Children.Where(c => (c.RelativeSizeAxes & ScrollingAxes) == 0)
                                             .Select(c => (ScrollingAxes & Axes.X) > 0 ? c.Width : c.Height)
                                             .DefaultIfEmpty().Max();
@@ -119,9 +123,9 @@ namespace osu.Game.Rulesets.Timing
         {
             base.Update();
 
-            // Consider that width/height are time values. To have ourselves span these time values 1:1, we first need to set our size
+            // We want our size and position-space along ScrollingAxes to span our duration to completely enclose all the hit objects
             Size = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)Duration : Size.X, (ScrollingAxes & Axes.Y) > 0 ? (float)Duration : Size.Y);
-            // Then to make our position-space be time values again, we need our relative child size to follow our size
+            // And we need to make sure the hit object's position-space doesn't change due to our resizing
             RelativeChildSize = Size;
         }
     }
