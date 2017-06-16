@@ -306,7 +306,7 @@ namespace osu.Game.Overlays.Profile
 
             if (user.IsSupporter) supporterTag.Show();
 
-            if(!string.IsNullOrEmpty(user.Colour))
+            if (!string.IsNullOrEmpty(user.Colour))
             {
                 colourBar.Colour = OsuColour.FromHex(user.Colour);
                 colourBar.Show();
@@ -329,8 +329,15 @@ namespace osu.Game.Overlays.Profile
             }
             infoTextLeft.NewParagraph();
 
-            infoTextLeft.AddText("Joined ");
-            infoTextLeft.AddText(user.JoinDate, boldItalic);
+            if (user.JoinDate.ToUniversalTime().Year < 2008)
+            {
+                infoTextLeft.AddText("Here since the beginning", boldItalic);
+            }
+            else
+            {
+                infoTextLeft.AddText("Joined ");
+                infoTextLeft.AddText(user.JoinDate.LocalDateTime.ToShortDateString(), boldItalic);
+            }
             infoTextLeft.NewLine();
             infoTextLeft.AddText("Last seen ");
             infoTextLeft.AddText(user.LastVisit.LocalDateTime.ToShortDateString(), boldItalic);
