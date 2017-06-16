@@ -295,8 +295,6 @@ namespace osu.Game.Overlays
 
             updateDisplay(beatmapBacking, direction);
             queuedDirection = null;
-
-            direction = TransformDirection.Prev;
         }
 
         private ScheduledDelegate pendingBeatmapSwitch;
