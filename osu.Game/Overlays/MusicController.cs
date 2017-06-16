@@ -269,6 +269,7 @@ namespace osu.Game.Overlays
 
             TransformDirection direction = TransformDirection.None;
 
+            // Change the transform direction only if the audio of both beatmaps is not equal.
             if (current != null && beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) != true)
             {
                 if (queuedDirection.HasValue)
