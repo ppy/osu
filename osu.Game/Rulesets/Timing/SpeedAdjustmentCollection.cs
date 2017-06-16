@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Caching;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -33,31 +35,64 @@ namespace osu.Game.Rulesets.Timing
             set { visibleTimeRange.BindTo(value); }
         }
 
+        protected override IComparer<Drawable> DepthComparer => new SpeedAdjustmentContainerReverseStartTimeComparer();
+
+        private readonly Cached layout = new Cached();
+
         /// <summary>
-        /// Adds a hit object to the <see cref="SpeedAdjustmentContainer"/> which provides the speed adjustment
-        /// active at the start time of the hit object.
+        /// Hit objects that are to be re-processed when <see cref="layout"/> is invalidated.
+        /// </summary>
+        private readonly Queue<DrawableHitObject> queuedHitObjects = new Queue<DrawableHitObject>();
+
+        /// <summary>
+        /// Adds a hit object to this <see cref="SpeedAdjustmentCollection"/>. The hit objects will be kept in a queue
+        /// and will be processed when new <see cref="SpeedAdjustmentContainer"/>s are added to this <see cref="SpeedAdjustmentCollection"/>.
         /// </summary>
         /// <param name="hitObject">The hit object to add.</param>
         public void Add(DrawableHitObject hitObject)
         {
-            var target = adjustmentContainerFor(hitObject);
-
-            if (hitObject.RelativePositionAxes != target.ScrollingAxes)
-                throw new InvalidOperationException($"Make sure to set all {nameof(DrawableHitObject)}'s {nameof(RelativePositionAxes)} are equal to the correct axes of scrolling ({target.ScrollingAxes}).");
-
-            if (target == null)
-                throw new ArgumentException("No speed adjustment could be found that can contain the hit object.", nameof(hitObject));
-
-            target.Add(hitObject);
+            queuedHitObjects.Enqueue(hitObject);
+            layout.Invalidate();
         }
 
         public override void Add(SpeedAdjustmentContainer speedAdjustment)
         {
             speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
+            layout.Invalidate();
             base.Add(speedAdjustment);
         }
 
-        protected override IComparer<Drawable> DepthComparer => new SpeedAdjustmentContainerReverseStartTimeComparer();
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!layout.IsValid)
+            {
+                layout.Refresh(() =>
+                {
+                    // An external count is kept because hit objects that can't be added are re-queued
+                    int count = queuedHitObjects.Count;
+                    while (count-- > 0)
+                    {
+                        var hitObject = queuedHitObjects.Dequeue();
+
+                        var target = adjustmentContainerFor(hitObject);
+                        if (target == null)
+                        {
+                            // We can't add this hit object to a speed adjustment container yet, so re-queue it
+                            // for re-processing when the layout next invalidated
+                            queuedHitObjects.Enqueue(hitObject);
+                            continue;
+                        }
+
+                        if (hitObject.RelativePositionAxes != target.ScrollingAxes)
+                            throw new InvalidOperationException($"Make sure to set all {nameof(DrawableHitObject)}'s {nameof(RelativePositionAxes)} are equal to the correct axes of scrolling ({target.ScrollingAxes}).");
+
+                        target.Add(hitObject);
+                    }
+                });
+            }
+        }
 
         /// <summary>
         /// Finds the <see cref="SpeedAdjustmentContainer"/> which provides the speed adjustment active at the start time
@@ -67,6 +102,14 @@ namespace osu.Game.Rulesets.Timing
         /// <param name="hitObject">The hit object to find the active <see cref="SpeedAdjustmentContainer"/> for.</param>
         /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="hitObject"/>'s start time. Null if there are no speed adjustments.</returns>
         private SpeedAdjustmentContainer adjustmentContainerFor(DrawableHitObject hitObject) => Children.FirstOrDefault(c => c.CanContain(hitObject)) ?? Children.LastOrDefault();
+
+        /// <summary>
+        /// Finds the <see cref="SpeedAdjustmentContainer"/> which provides the speed adjustment active at a time.
+        /// If there is no <see cref="SpeedAdjustmentContainer"/> active at the time, then the first (time-wise) speed adjustment is returned.
+        /// </summary>
+        /// <param name="time">The time to find the active <see cref="SpeedAdjustmentContainer"/> at.</param>
+        /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="time"/>. Null if there are no speed adjustments.</returns>
+        private SpeedAdjustmentContainer adjustmentContainerAt(double time) => Children.FirstOrDefault(c => c.CanContain(time)) ?? Children.LastOrDefault();
 
         /// <summary>
         /// Compares two speed adjustment containers by their control point start time, falling back to creation order

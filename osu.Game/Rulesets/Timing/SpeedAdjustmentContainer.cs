@@ -78,7 +78,12 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// Whether this speed adjustment can contain a hit object. This is true if the hit object occurs after this speed adjustment with respect to time.
         /// </summary>
-        public bool CanContain(DrawableHitObject hitObject) => ControlPoint.StartTime <= hitObject.HitObject.StartTime;
+        public bool CanContain(DrawableHitObject hitObject) => CanContain(hitObject.HitObject.StartTime);
+
+        /// <summary>
+        /// Whether this speed adjustment can contain an object placed at a time value. This is true if the time occurs after this speed adjustment.
+        /// </summary>
+        public bool CanContain(double startTime) => ControlPoint.StartTime <= startTime;
 
         /// <summary>
         /// Creates the container which handles the movement of a collection of hit objects.
