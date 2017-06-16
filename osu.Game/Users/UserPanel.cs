@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 
 namespace osu.Game.Users
 {
@@ -21,6 +22,7 @@ namespace osu.Game.Users
         private const float status_height = 30;
 
         private OsuColour colours;
+        private UserProfileOverlay profile;
 
         private readonly Container statusBar;
         private readonly Box statusBg;
@@ -74,7 +76,7 @@ namespace osu.Game.Users
                                 Radius = 4,
                             },
                         },
-                        new Container
+                        new ClickableContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = height - status_height - content_padding },
@@ -114,6 +116,7 @@ namespace osu.Game.Users
                                     },
                                 },
                             },
+                            Action = () => profile?.ShowUser(user)
                         },
                     },
                 },
@@ -159,10 +162,11 @@ namespace osu.Game.Users
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(permitNulls:true)]
+        private void load(OsuColour colours, UserProfileOverlay profile)
         {
             this.colours = colours;
+            this.profile = profile;
             Status.ValueChanged += displayStatus;
         }
 

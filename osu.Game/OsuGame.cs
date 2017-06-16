@@ -208,6 +208,7 @@ namespace osu.Game
             Dependencies.Cache(settings);
             Dependencies.Cache(social);
             Dependencies.Cache(chat);
+            Dependencies.Cache(userProfile);
             Dependencies.Cache(musicController);
             Dependencies.Cache(notificationManager);
             Dependencies.Cache(dialogOverlay);
