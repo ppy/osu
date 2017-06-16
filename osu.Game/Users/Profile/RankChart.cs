@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -23,8 +22,8 @@ namespace osu.Game.Users.Profile
         private readonly SpriteText rankText, performanceText, relativeText;
         private readonly RankChartLineGraph graph;
 
-        private int[] ranks, performances;
-        private int rank, performance, countryRank;
+        private int[] ranks;
+        private decimal?[] performances;
 
         private const float primary_textsize = 25, secondary_textsize = 13, padding = 10;
 
@@ -33,6 +32,7 @@ namespace osu.Game.Users.Profile
         public RankChart(User user)
         {
             this.user = user;
+
             Padding = new MarginPadding { Vertical = padding };
             Children = new Drawable[]
             {
@@ -69,20 +69,22 @@ namespace osu.Game.Users.Profile
                     BallMove = showHistoryRankTexts
                 }
             };
+            ranks = new[] { user.Statistics.Rank };
+            performances = new decimal?[] { user.Statistics.PP };
         }
 
         private void updateRankTexts()
         {
-            rankText.Text = $"#{rank:#,#}";
-            performanceText.Text = $"{performance:#,#}pp";
-            relativeText.Text = $"{user.Country?.FullName} #{countryRank:#,#}";
+            rankText.Text = user.Statistics.Rank > 0 ? $"#{user.Statistics.Rank:#,0}" : "no rank";
+            performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
+            //relativeText.Text = $"{user.Country?.FullName} #{countryRank:#,0}";
         }
 
         private void showHistoryRankTexts(int dayIndex)
         {
-            rankText.Text = $"#{ranks[dayIndex]:#,#}";
-            performanceText.Text = $"{performances[dayIndex]:#,#}pp";
-            relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
+            rankText.Text = ranks[dayIndex] > 0 ? $"#{ranks[dayIndex]:#,0}" : "no rank";
+            performanceText.Text = performances[dayIndex] != null ? $"{performances[dayIndex]:#,0}pp" : string.Empty;
+            //relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
             //plural should be handled in a general way
         }
 
@@ -90,20 +92,10 @@ namespace osu.Game.Users.Profile
         private void load(OsuColour colours)
         {
             graph.Colour = colours.Yellow;
-            Task.Factory.StartNew(() =>
-            {
-                System.Threading.Thread.Sleep(1000);
 
-                // put placeholder data here to show the transform
-                rank = 12345;
-                countryRank = 678;
-                performance = 4567;
-                ranks = Enumerable.Range(1234, 80).ToArray();
-                performances = ranks.Select(x => 6000 - x).ToArray();
-                // use logarithmic coordinates
-                graph.Values = ranks.Select(x => -(float)Math.Log(x));
-                graph.ResetBall();
-            });
+            // use logarithmic coordinates
+            graph.Values = ranks.Select(x => -(float)Math.Log(x));
+            graph.ResetBall();
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)

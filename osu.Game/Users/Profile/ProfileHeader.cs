@@ -23,7 +23,7 @@ namespace osu.Game.Users.Profile
         private readonly OsuTextFlowContainer infoTextLeft, infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
 
-        private readonly Container coverContainer;
+        private readonly Container coverContainer, chartContainer;
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
@@ -217,7 +217,7 @@ namespace osu.Game.Users.Profile
                                 }
                             }
                         },
-                        new Container
+                        chartContainer = new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             Anchor = Anchor.BottomCentre,
@@ -228,10 +228,6 @@ namespace osu.Game.Users.Profile
                                 new Box
                                 {
                                     Colour = Color4.Black.Opacity(0.25f),
-                                    RelativeSizeAxes = Axes.Both
-                                },
-                                new RankChart(user)
-                                {
                                     RelativeSizeAxes = Axes.Both
                                 }
                             }
@@ -327,6 +323,8 @@ namespace osu.Game.Users.Profile
                 gradeS.Show();
                 gradeA.Count = user.Statistics.GradesCount.A;
                 gradeA.Show();
+
+                chartContainer.Add(new RankChart(user) { RelativeSizeAxes = Axes.Both });
             }
         }
 
