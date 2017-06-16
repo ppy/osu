@@ -8,6 +8,7 @@ using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
 using osu.Framework.MathUtils;
@@ -16,6 +17,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Scoring;
@@ -23,78 +25,44 @@ using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaHitRenderer : HitRenderer<ManiaHitObject, ManiaJudgement>
+    public class ManiaHitRenderer : SpeedAdjustedHitRenderer<ManiaHitObject, ManiaJudgement>
     {
-        public int? Columns;
+        /// <summary>
+        /// Preferred column count. This will only have an effect during the initialization of the play field.
+        /// </summary>
+        public int PreferredColumns;
+
+        public IEnumerable<DrawableBarLine> BarLines;
+
+        /// <summary>
+        /// Per-column timing changes.
+        /// </summary>
+        private readonly List<SpeedAdjustmentContainer>[] hitObjectSpeedAdjustments;
+
+        /// <summary>
+        /// Bar line timing changes.
+        /// </summary>
+        private readonly List<SpeedAdjustmentContainer> barLineSpeedAdjustments = new List<SpeedAdjustmentContainer>();
 
         public ManiaHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(beatmap, isForCurrentRuleset)
         {
-        }
+            // Generate the speed adjustment container lists
+            hitObjectSpeedAdjustments = new List<SpeedAdjustmentContainer>[PreferredColumns];
+            for (int i = 0; i < PreferredColumns; i++)
+                hitObjectSpeedAdjustments[i] = new List<SpeedAdjustmentContainer>();
 
-        protected override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield()
-        {
-            double lastSpeedMultiplier = 1;
-            double lastBeatLength = 500;
-
-            // Merge timing + difficulty points
-            var allPoints = new SortedList<ControlPoint>(Comparer<ControlPoint>.Default);
-            allPoints.AddRange(Beatmap.ControlPointInfo.TimingPoints);
-            allPoints.AddRange(Beatmap.ControlPointInfo.DifficultyPoints);
-
-            // Generate the timing points, making non-timing changes use the previous timing change
-            var timingChanges = allPoints.Select(c =>
-            {
-                var timingPoint = c as TimingControlPoint;
-                var difficultyPoint = c as DifficultyControlPoint;
-
-                if (timingPoint != null)
-                    lastBeatLength = timingPoint.BeatLength;
-
-                if (difficultyPoint != null)
-                    lastSpeedMultiplier = difficultyPoint.SpeedMultiplier;
-
-                return new TimingChange
-                {
-                    Time = c.Time,
-                    BeatLength = lastBeatLength,
-                    SpeedMultiplier = lastSpeedMultiplier
-                };
-            });
-
-            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
-
-            // Perform some post processing of the timing changes
-            timingChanges = timingChanges
-                // Collapse sections after the last hit object
-                .Where(s => s.Time <= lastObjectTime)
-                // Collapse sections with the same start time
-                .GroupBy(s => s.Time).Select(g => g.Last()).OrderBy(s => s.Time)
-                // Collapse sections with the same beat length
-                .GroupBy(s => s.BeatLength * s.SpeedMultiplier).Select(g => g.First())
-                .ToList();
-
-            return new ManiaPlayfield(Columns ?? (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize), timingChanges)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                // Invert by default for now (should be moved to config/skin later)
-                Scale = new Vector2(1, -1)
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            var maniaPlayfield = (ManiaPlayfield)Playfield;
-
+            // Generate the bar lines
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
             SortedList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
+            var barLines = new List<DrawableBarLine>();
+
             for (int i = 0; i < timingPoints.Count; i++)
             {
                 TimingControlPoint point = timingPoints[i];
@@ -105,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 int index = 0;
                 for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength, index++)
                 {
-                    maniaPlayfield.Add(new DrawableBarLine(new BarLine
+                    barLines.Add(new DrawableBarLine(new BarLine
                     {
                         StartTime = t,
                         ControlPoint = point,
@@ -113,7 +81,70 @@ namespace osu.Game.Rulesets.Mania.UI
                     }));
                 }
             }
+
+            BarLines = barLines;
+
+            // Generate speed adjustments from mods first
+            bool useDefaultSpeedAdjustments = true;
+
+            if (Mods != null)
+            {
+                foreach (var speedAdjustmentMod in Mods.OfType<IGenerateSpeedAdjustments>())
+                {
+                    useDefaultSpeedAdjustments = false;
+                    speedAdjustmentMod.ApplyToHitRenderer(this, ref hitObjectSpeedAdjustments, ref barLineSpeedAdjustments);
+                }
+            }
+
+            // Generate the default speed adjustments
+            if (useDefaultSpeedAdjustments)
+                generateDefaultSpeedAdjustments();
         }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var maniaPlayfield = (ManiaPlayfield)Playfield;
+
+            BarLines.ForEach(maniaPlayfield.Add);
+        }
+
+        protected override void ApplyBeatmap()
+        {
+            base.ApplyBeatmap();
+
+            PreferredColumns = (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize);
+        }
+
+        protected override void ApplySpeedAdjustments()
+        {
+            var maniaPlayfield = (ManiaPlayfield)Playfield;
+
+            for (int i = 0; i < PreferredColumns; i++)
+                foreach (var change in hitObjectSpeedAdjustments[i])
+                    maniaPlayfield.Columns.ElementAt(i).Add(change);
+
+            foreach (var change in barLineSpeedAdjustments)
+                maniaPlayfield.Add(change);
+        }
+
+        private void generateDefaultSpeedAdjustments()
+        {
+            DefaultControlPoints.ForEach(c =>
+            {
+                foreach (List<SpeedAdjustmentContainer> t in hitObjectSpeedAdjustments)
+                    t.Add(new ManiaSpeedAdjustmentContainer(c, ScrollingAlgorithm.Basic));
+                barLineSpeedAdjustments.Add(new ManiaSpeedAdjustmentContainer(c, ScrollingAlgorithm.Basic));
+            });
+        }
+
+        protected sealed override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(PreferredColumns)
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            // Invert by default for now (should be moved to config/skin later)
+            Scale = new Vector2(1, -1)
+        };
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
@@ -121,9 +152,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
         {
-            var maniaPlayfield = Playfield as ManiaPlayfield;
-            if (maniaPlayfield == null)
-                return null;
+            var maniaPlayfield = (ManiaPlayfield)Playfield;
 
             Bindable<Key> key = maniaPlayfield.Columns.ElementAt(h.Column).Key;
 
