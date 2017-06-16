@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
     {
         private readonly BindableDouble lifetimeOffset = new BindableDouble();
         /// <summary>
-        /// Time offset before <see cref="HitObject.StartTime"/> at which this <see cref="DrawableHitObject"/> becomes visible and the time offset
-        /// after <see cref="HitObject.StartTime"/> or <see cref="IHasEndTime.EndTime"/> at which it expires.
+        /// Time offset before the hit object start time at which this <see cref="DrawableHitObject"/> becomes visible and the time offset
+        /// after the hit object's end time after which it expires.
         ///
         /// <para>
         /// This provides only a default life time range, however classes inheriting from <see cref="DrawableHitObject"/> should expire their state through
