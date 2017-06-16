@@ -5,6 +5,7 @@ using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
@@ -17,13 +18,21 @@ using osu.Game.Users.Profile;
 
 namespace osu.Game.Overlays
 {
-    public class UserProfileOverlay : WaveOverlayContainer
+    public class UserProfileOverlay : FocusedOverlayContainer
     {
         private ProfileSection lastSection;
         private GetUserRequest userReq;
         private APIAccess api;
 
         public const float CONTENT_X_MARGIN = 50;
+        private const float transition_length = 500;
+
+        public UserProfileOverlay()
+        {
+            RelativeSizeAxes = Axes.Both;
+            RelativePositionAxes = Axes.Both;
+            Padding = new MarginPadding { Horizontal = 50 };
+        }
 
         [BackgroundDependencyLoader]
         private void load(APIAccess api)
@@ -113,6 +122,22 @@ namespace osu.Game.Overlays
             api.Queue(userReq);
 
             Show();
+        }
+
+        protected override void PopIn()
+        {
+            MoveToY(0, transition_length, EasingTypes.OutQuint);
+            FadeIn(transition_length, EasingTypes.OutQuint);
+
+            base.PopIn();
+        }
+
+        protected override void PopOut()
+        {
+            MoveToY(Height, transition_length, EasingTypes.OutQuint);
+            FadeOut(transition_length, EasingTypes.OutQuint);
+
+            base.PopOut();
         }
 
         private class ProfileTabControl : PageTabControl<ProfileSection>

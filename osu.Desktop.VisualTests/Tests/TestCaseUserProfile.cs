@@ -16,13 +16,7 @@ namespace osu.Desktop.VisualTests.Tests
         public override void Reset()
         {
             base.Reset();
-            var profile = new UserProfileOverlay
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding { Horizontal = 50 },
-            };
+            var profile = new UserProfileOverlay();
             Add(profile);
 
             AddStep("Show ppy", () => profile.ShowUser(new User
