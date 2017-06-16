@@ -20,7 +20,7 @@ namespace osu.Game.Users.Profile
 {
     public class ProfileHeader : Container
     {
-        private readonly OsuTextFlowContainer infoText;
+        private readonly OsuTextFlowContainer infoTextLeft, infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
 
         private readonly Container coverContainer;
@@ -28,7 +28,7 @@ namespace osu.Game.Users.Profile
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
 
-        private const float cover_height = 350, info_height = 150, avatar_size = 110, avatar_bottom_position = -20, level_position = 30, level_height = 60;
+        private const float cover_height = 350, info_height = 150, info_width = 250, avatar_size = 110, avatar_bottom_position = -20, level_position = 30, level_height = 60;
         public ProfileHeader(User user)
         {
             RelativeSizeAxes = Axes.X;
@@ -92,17 +92,31 @@ namespace osu.Game.Users.Profile
                         }
                     }
                 },
-                infoText = new OsuTextFlowContainer(t =>
+                infoTextLeft = new OsuTextFlowContainer(t =>
                 {
                     t.TextSize = 14;
                     t.Alpha = 0.8f;
                 })
                 {
+                    X = UserProfileOverlay.CONTENT_X_MARGIN,
                     Y = cover_height + 20,
-                    Margin = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN },
-                    RelativeSizeAxes = Axes.X,
+                    Width = info_width,
                     AutoSizeAxes = Axes.Y,
-                    ParagraphSpacing = 1
+                    ParagraphSpacing = 0.8f,
+                    LineSpacing = 0.2f
+                },
+                infoTextRight = new OsuTextFlowContainer(t =>
+                {
+                    t.TextSize = 14;
+                    t.Alpha = 0.8f;
+                })
+                {
+                    X = UserProfileOverlay.CONTENT_X_MARGIN + info_width + 20,
+                    Y = cover_height + 20,
+                    Width = info_width,
+                    AutoSizeAxes = Axes.Y,
+                    ParagraphSpacing = 0.8f,
+                    LineSpacing = 0.2f
                 },
                 new Container
                 {
@@ -231,33 +245,6 @@ namespace osu.Game.Users.Profile
         private void load(TextureStore textures)
         {
             levelBadge.Texture = textures.Get(@"Profile/levelbadge");
-
-            Action<SpriteText> bold = t =>
-            {
-                t.Font = @"Exo2.0-Bold";
-                t.Alpha = 1;
-            };
-            // fill placeholder texts
-            infoText.AddTextAwesome(FontAwesome.fa_map_marker);
-            infoText.AddText(" position     ");
-            infoText.AddTextAwesome(FontAwesome.fa_twitter);
-            infoText.AddText(" tweet     ");
-            infoText.AddTextAwesome(FontAwesome.fa_heart_o);
-            infoText.AddText(" favorite     ");
-            infoText.NewParagraph();
-            infoText.AddText("0 years old");
-            infoText.NewLine();
-            infoText.AddText("Commander of ");
-            infoText.AddText("The Color Scribbles", bold);
-            infoText.NewParagraph();
-            infoText.AddText("Joined since ");
-            infoText.AddText("June 2017", bold);
-            infoText.NewLine();
-            infoText.AddText("Last seen ");
-            infoText.AddText("0 minutes ago", bold);
-            infoText.NewParagraph();
-            infoText.AddText("Play with ");
-            infoText.AddText("Mouse, Keyboard, Tablet", bold);
         }
 
         public void FillFullData(User user)
@@ -275,31 +262,75 @@ namespace osu.Game.Users.Profile
                 Depth = float.MaxValue
             });
 
-            levelBadge.Show();
-            levelText.Text = user.Statistics.Level.Current.ToString();
+            Action<SpriteText> boldItalic = t =>
+            {
+                t.Font = @"Exo2.0-BoldItalic";
+                t.Alpha = 1;
+            };
 
-            scoreText.Add(createScoreText("Ranked Score"));
-            scoreNumberText.Add(createScoreNumberText(user.Statistics.RankedScore.ToString(@"#,0")));
-            scoreText.Add(createScoreText("Accuracy"));
-            scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy}%"));
-            scoreText.Add(createScoreText("Play Count"));
-            scoreNumberText.Add(createScoreNumberText(user.Statistics.PlayCount.ToString(@"#,0")));
-            scoreText.Add(createScoreText("Total Score"));
-            scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalScore.ToString(@"#,0")));
-            scoreText.Add(createScoreText("Total Hits"));
-            scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalHits.ToString(@"#,0")));
-            scoreText.Add(createScoreText("Max Combo"));
-            scoreNumberText.Add(createScoreNumberText(user.Statistics.MaxCombo.ToString(@"#,0")));
-            scoreText.Add(createScoreText("Replay Watched by Others"));
-            scoreNumberText.Add(createScoreNumberText(user.Statistics.ReplayWatched.ToString(@"#,0")));
+            if (user.Age != null)
+            {
+                infoTextLeft.AddText($"{user.Age} years old", boldItalic);
+            }
+            if (user.Country != null)
+            {
+                infoTextLeft.AddText(" from ");
+                infoTextLeft.AddText(user.Country.FullName, boldItalic);
+            }
+            infoTextLeft.NewParagraph();
 
-            gradeSS.Count = user.Statistics.GradesCount.SS;
-            gradeSS.Show();
-            gradeS.Count = user.Statistics.GradesCount.S;
-            gradeS.Show();
-            gradeA.Count = user.Statistics.GradesCount.A;
-            gradeA.Show();
+            infoTextLeft.AddText("Joined ");
+            infoTextLeft.AddText(user.JoinDate, boldItalic);
+            infoTextLeft.NewLine();
+            infoTextLeft.AddText("Last seen ");
+            infoTextLeft.AddText(user.LastVisit.LocalDateTime.ToShortDateString(), boldItalic);
+            infoTextLeft.NewParagraph();
+
+            if (user.PlayStyle?.Length > 0)
+            {
+                infoTextLeft.AddText("Plays with ");
+                infoTextLeft.AddText(string.Join(", ", user.PlayStyle), boldItalic);
+            }
+
+            tryAddInfoRightLine(FontAwesome.fa_map_marker, user.Location);
+            tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Intrerests);
+            tryAddInfoRightLine(FontAwesome.fa_suitcase, user.Occupation);
+            infoTextRight.NewParagraph();
+            if (!string.IsNullOrEmpty(user.Twitter))
+                tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter);
+            tryAddInfoRightLine(FontAwesome.fa_globe, user.Website);
+            tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype);
+
+            if (user.Statistics != null)
+            {
+                levelBadge.Show();
+                levelText.Text = user.Statistics.Level.Current.ToString();
+
+                scoreText.Add(createScoreText("Ranked Score"));
+                scoreNumberText.Add(createScoreNumberText(user.Statistics.RankedScore.ToString(@"#,0")));
+                scoreText.Add(createScoreText("Accuracy"));
+                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy}%"));
+                scoreText.Add(createScoreText("Play Count"));
+                scoreNumberText.Add(createScoreNumberText(user.Statistics.PlayCount.ToString(@"#,0")));
+                scoreText.Add(createScoreText("Total Score"));
+                scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalScore.ToString(@"#,0")));
+                scoreText.Add(createScoreText("Total Hits"));
+                scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalHits.ToString(@"#,0")));
+                scoreText.Add(createScoreText("Max Combo"));
+                scoreNumberText.Add(createScoreNumberText(user.Statistics.MaxCombo.ToString(@"#,0")));
+                scoreText.Add(createScoreText("Replay Watched by Others"));
+                scoreNumberText.Add(createScoreNumberText(user.Statistics.ReplayWatched.ToString(@"#,0")));
+
+                gradeSS.Count = user.Statistics.GradesCount.SS;
+                gradeSS.Show();
+                gradeS.Count = user.Statistics.GradesCount.S;
+                gradeS.Show();
+                gradeA.Count = user.Statistics.GradesCount.A;
+                gradeA.Show();
+            }
         }
+
+        // These could be local functions when C# 7 enabled
 
         private OsuSpriteText createScoreText(string text) => new OsuSpriteText
         {
@@ -315,6 +346,18 @@ namespace osu.Game.Users.Profile
             Origin = Anchor.TopRight,
             Text = text
         };
+
+        private void tryAddInfoRightLine(FontAwesome icon, string str)
+        {
+            if (string.IsNullOrEmpty(str)) return;
+            infoTextRight.AddTextAwesome(icon);
+            infoTextRight.AddText(" " + str, t =>
+            {
+                t.Font = @"Exo2.0-RegularItalic";
+                t.Alpha = 1;
+            });
+            infoTextRight.NewLine();
+        }
 
         private class GradeBadge : Container
         {
