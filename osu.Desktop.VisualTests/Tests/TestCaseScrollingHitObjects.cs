@@ -195,11 +195,25 @@ namespace osu.Desktop.VisualTests.Tests
                 FadeInFromZero(250, EasingTypes.OutQuint);
             }
 
+            private bool hasExpired = false;
             protected override void Update()
             {
                 base.Update();
                 if (Time.Current >= HitObject.StartTime)
+                {
                     background.Colour = Color4.Red;
+
+                    if (!hasExpired)
+                    {
+                        using (BeginDelayedSequence(200))
+                        {
+                            FadeOut(200);
+                            Expire();
+                        }
+
+                        hasExpired = true;
+                    }
+                }
             }
         }
     }
