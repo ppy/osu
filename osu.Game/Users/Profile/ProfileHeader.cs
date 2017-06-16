@@ -23,10 +23,11 @@ namespace osu.Game.Users.Profile
         private readonly OsuTextFlowContainer infoTextLeft, infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
 
-        private readonly Container coverContainer, chartContainer;
+        private readonly Container coverContainer, chartContainer, supporterTag;
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
+        private readonly Box colourBar;
 
         private const float cover_height = 350, info_height = 150, info_width = 250, avatar_size = 110, level_position = 30, level_height = 60;
         public ProfileHeader(User user)
@@ -79,6 +80,33 @@ namespace osu.Game.Users.Profile
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
+                                        supporterTag = new CircularContainer
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Y = -75,
+                                            Size = new Vector2(25, 25),
+                                            Masking = true,
+                                            BorderThickness = 3,
+                                            BorderColour = Color4.White,
+                                            Alpha = 0,
+                                            Children = new Drawable[]
+                                            {
+                                                new Box
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Alpha = 0,
+                                                    AlwaysPresent = true
+                                                },
+                                                new TextAwesome
+                                                {
+                                                    Icon = FontAwesome.fa_heart,
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
+                                                    TextSize = 12
+                                                }
+                                            }
+                                        },
                                         new OsuSpriteText
                                         {
                                             Text = user.Username,
@@ -86,7 +114,7 @@ namespace osu.Game.Users.Profile
                                             Font = @"Exo2.0-RegularItalic",
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            Y = -55
+                                            Y = -48
                                         },
                                         new DrawableFlag(user.Country?.FlagName ?? "__")
                                         {
@@ -99,6 +127,15 @@ namespace osu.Game.Users.Profile
                                 }
                             }
                         },
+                        colourBar = new Box
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            X = UserProfileOverlay.CONTENT_X_MARGIN,
+                            Height = 5,
+                            Width = info_width,
+                            Alpha = 0
+                        }
                     }
                 },
                 infoTextLeft = new OsuTextFlowContainer(t =>
@@ -266,6 +303,14 @@ namespace osu.Game.Users.Profile
                 RelativeSizeAxes = Axes.Both,
                 Depth = float.MaxValue
             });
+
+            if (user.IsSupporter) supporterTag.Show();
+
+            if(!string.IsNullOrEmpty(user.Colour))
+            {
+                colourBar.Colour = OsuColour.FromHex(user.Colour);
+                colourBar.Show();
+            }
 
             Action<SpriteText> boldItalic = t =>
             {
