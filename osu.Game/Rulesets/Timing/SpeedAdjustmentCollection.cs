@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -36,8 +35,6 @@ namespace osu.Game.Rulesets.Timing
 
         protected override IComparer<Drawable> DepthComparer => new SpeedAdjustmentContainerReverseStartTimeComparer();
 
-        private Cached layout = new Cached();
-
         /// <summary>
         /// Hit objects that are to be re-processed when <see cref="layout"/> is invalidated.
         /// </summary>
@@ -51,13 +48,11 @@ namespace osu.Game.Rulesets.Timing
         public void Add(DrawableHitObject hitObject)
         {
             queuedHitObjects.Enqueue(hitObject);
-            layout.Invalidate();
         }
 
         public override void Add(SpeedAdjustmentContainer speedAdjustment)
         {
             speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
-            layout.Invalidate();
             base.Add(speedAdjustment);
         }
 
@@ -65,31 +60,25 @@ namespace osu.Game.Rulesets.Timing
         {
             base.Update();
 
-            if (!layout.IsValid)
+            // An external count is kept because hit objects that can't be added are re-queued
+            int count = queuedHitObjects.Count;
+            while (count-- > 0)
             {
-                layout.Refresh(() =>
+                var hitObject = queuedHitObjects.Dequeue();
+
+                var target = adjustmentContainerFor(hitObject);
+                if (target == null)
                 {
-                    // An external count is kept because hit objects that can't be added are re-queued
-                    int count = queuedHitObjects.Count;
-                    while (count-- > 0)
-                    {
-                        var hitObject = queuedHitObjects.Dequeue();
+                    // We can't add this hit object to a speed adjustment container yet, so re-queue it
+                    // for re-processing when the layout next invalidated
+                    queuedHitObjects.Enqueue(hitObject);
+                    continue;
+                }
 
-                        var target = adjustmentContainerFor(hitObject);
-                        if (target == null)
-                        {
-                            // We can't add this hit object to a speed adjustment container yet, so re-queue it
-                            // for re-processing when the layout next invalidated
-                            queuedHitObjects.Enqueue(hitObject);
-                            continue;
-                        }
+                if (hitObject.RelativePositionAxes != target.ScrollingAxes)
+                    throw new InvalidOperationException($"Make sure to set all {nameof(DrawableHitObject)}'s {nameof(RelativePositionAxes)} are equal to the correct axes of scrolling ({target.ScrollingAxes}).");
 
-                        if (hitObject.RelativePositionAxes != target.ScrollingAxes)
-                            throw new InvalidOperationException($"Make sure to set all {nameof(DrawableHitObject)}'s {nameof(RelativePositionAxes)} are equal to the correct axes of scrolling ({target.ScrollingAxes}).");
-
-                        target.Add(hitObject);
-                    }
-                });
+                target.Add(hitObject);
             }
         }
 
