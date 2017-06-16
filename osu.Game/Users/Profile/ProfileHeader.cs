@@ -28,7 +28,7 @@ namespace osu.Game.Users.Profile
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
 
-        private const float cover_height = 350, info_height = 150, info_width = 250, avatar_size = 110, avatar_bottom_position = -20, level_position = 30, level_height = 60;
+        private const float cover_height = 350, info_height = 150, info_width = 250, avatar_size = 110, level_position = 30, level_height = 60;
         public ProfileHeader(User user)
         {
             RelativeSizeAxes = Axes.X;
@@ -47,49 +47,58 @@ namespace osu.Game.Users.Profile
                             RelativeSizeAxes = Axes.Both,
                             ColourInfo = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.75f))
                         },
-                        new UpdateableAvatar
-                        {
-                            User = user,
-                            Size = new Vector2(avatar_size),
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            X = UserProfileOverlay.CONTENT_X_MARGIN,
-                            Y = avatar_bottom_position,
-                            Masking = true,
-                            CornerRadius = 5,
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Type = EdgeEffectType.Shadow,
-                                Colour = Color4.Black.Opacity(0.25f),
-                                Radius = 4,
-                            },
-                        },
                         new Container
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            X = UserProfileOverlay.CONTENT_X_MARGIN + avatar_size + 10,
-                            Y = avatar_bottom_position,
+                            X = UserProfileOverlay.CONTENT_X_MARGIN,
+                            Y = -20,
+                            AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                new UpdateableAvatar
                                 {
-                                    Text = user.Username,
-                                    TextSize = 30,
-                                    Font = @"Exo2.0-RegularItalic",
+                                    User = user,
+                                    Size = new Vector2(avatar_size),
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Y = -55
+                                    Masking = true,
+                                    CornerRadius = 5,
+                                    EdgeEffect = new EdgeEffectParameters
+                                    {
+                                        Type = EdgeEffectType.Shadow,
+                                        Colour = Color4.Black.Opacity(0.25f),
+                                        Radius = 4,
+                                    },
                                 },
-                                new DrawableFlag(user.Country?.FlagName ?? "__")
+                                new Container
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Width = 30,
-                                    Height = 20
+                                    X = avatar_size + 10,
+                                    AutoSizeAxes = Axes.Both,
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Text = user.Username,
+                                            TextSize = 30,
+                                            Font = @"Exo2.0-RegularItalic",
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Y = -55
+                                        },
+                                        new DrawableFlag(user.Country?.FlagName ?? "__")
+                                        {
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Width = 30,
+                                            Height = 20
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        },
                     }
                 },
                 infoTextLeft = new OsuTextFlowContainer(t =>
@@ -108,7 +117,7 @@ namespace osu.Game.Users.Profile
                 infoTextRight = new OsuTextFlowContainer(t =>
                 {
                     t.TextSize = 14;
-                    t.Alpha = 0.8f;
+                    t.Font = @"Exo2.0-RegularItalic";
                 })
                 {
                     X = UserProfileOverlay.CONTENT_X_MARGIN + info_width + 20,
@@ -349,11 +358,7 @@ namespace osu.Game.Users.Profile
         {
             if (string.IsNullOrEmpty(str)) return;
             infoTextRight.AddTextAwesome(icon);
-            infoTextRight.AddText(" " + str, t =>
-            {
-                t.Font = @"Exo2.0-RegularItalic";
-                t.Alpha = 1;
-            });
+            infoTextRight.AddText(" " + str);
             infoTextRight.NewLine();
         }
 
