@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
-using System;
 
 namespace osu.Game.Rulesets.Timing
 {
@@ -84,7 +83,7 @@ namespace osu.Game.Rulesets.Timing
         private Cached<double> durationBacking = new Cached<double>();
         /// <summary>
         /// The maximum duration of any one hit object inside this <see cref="DrawableTimingSection"/>. This is calculated as the maximum
-        /// end time between all hit objects relative to this <see cref="DrawableTimingSection"/>'s <see cref="ControlPoint.StartTime"/>.
+        /// end time between all hit objects relative to this <see cref="DrawableTimingSection"/>'s <see cref="MultiplierControlPoint.StartTime"/>.
         /// </summary>
         public double Duration => durationBacking.EnsureValid()
             ? durationBacking.Value
