@@ -46,18 +46,18 @@ namespace osu.Game.Rulesets.Timing
 
         protected override IComparer<Drawable> DepthComparer => new HitObjectReverseStartTimeComparer();
 
-        private readonly Axes autoSizingAxes;
+        /// <summary>
+        /// Axes through which this timing section scrolls. This is set from <see cref="SpeedAdjustmentContainer"/>.
+        /// </summary>
+        internal Axes ScrollingAxes;
 
         private Cached layout = new Cached();
 
         /// <summary>
         /// Creates a new <see cref="DrawableTimingSection"/>.
         /// </summary>
-        /// <param name="autoSizingAxes">The axes on which to auto-size to the total size of items in the container.</param>
-        protected DrawableTimingSection(Axes autoSizingAxes)
+        protected DrawableTimingSection()
         {
-            this.autoSizingAxes = autoSizingAxes;
-
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
         }
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Timing
                     float height = Children.Select(child => child.Y + child.Height).Max() - RelativeChildOffset.Y;
 
                     // Consider that width/height are time values. To have ourselves span these time values 1:1, we first need to set our size
-                    Size = new Vector2((autoSizingAxes & Axes.X) > 0 ? width : Size.X, (autoSizingAxes & Axes.Y) > 0 ? height : Size.Y);
+                    Size = new Vector2((ScrollingAxes & Axes.X) > 0 ? width : Size.X, (ScrollingAxes & Axes.Y) > 0 ? height : Size.Y);
                     // Then to make our position-space be time values again, we need our relative child size to follow our size
                     RelativeChildSize = Size;
                 });
