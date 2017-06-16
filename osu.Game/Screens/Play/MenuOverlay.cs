@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
                             Masking = true,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.6f),

@@ -21,9 +21,6 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
         {
-            activeInputHandlers = config.GetBindable<string>(FrameworkSetting.ActiveInputHandlers);
-            rawInputToggle.Value = activeInputHandlers.Value.Contains("Raw");
-
             Children = new Drawable[]
             {
                 new SettingsCheckbox
@@ -62,11 +59,17 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 activeInputHandlers.Value = enabled ?
                     activeInputHandlers.Value.Replace(standard_mouse_handler, raw_mouse_handler) :
                     activeInputHandlers.Value.Replace(raw_mouse_handler, standard_mouse_handler);
-
-                sensitivity.Bindable.Disabled = !enabled;
             };
 
-            rawInputToggle.TriggerChange();
+            activeInputHandlers = config.GetBindable<string>(FrameworkSetting.ActiveInputHandlers);
+            activeInputHandlers.ValueChanged += handlers =>
+            {
+                bool raw = handlers.Contains("Raw");
+                rawInputToggle.Value = raw;
+                sensitivity.Bindable.Disabled = !raw;
+            };
+
+            activeInputHandlers.TriggerChange();
         }
 
         private class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
