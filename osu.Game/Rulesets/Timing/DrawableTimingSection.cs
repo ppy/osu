@@ -10,6 +10,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
+using osu.Game.Rulesets.Objects.Types;
+using System;
 
 namespace osu.Game.Rulesets.Timing
 {
@@ -44,14 +46,17 @@ namespace osu.Game.Rulesets.Timing
             set { visibleTimeRange.BindTo(value); }
         }
 
-        protected override IComparer<Drawable> DepthComparer => new HitObjectReverseStartTimeComparer();
-
         /// <summary>
-        /// Axes through which this timing section scrolls. This is set from <see cref="SpeedAdjustmentContainer"/>.
+        /// Axes through which this timing section scrolls. This is set by the <see cref="SpeedAdjustmentContainer"/>.
         /// </summary>
         internal Axes ScrollingAxes;
 
-        private Cached layout = new Cached();
+        /// <summary>
+        /// The control point that provides the speed adjustments for this container. This is set by the <see cref="SpeedAdjustmentContainer"/>.
+        /// </summary>
+        internal MultiplierControlPoint ControlPoint;
+
+        protected override IComparer<Drawable> DepthComparer => new HitObjectReverseStartTimeComparer();
 
         /// <summary>
         /// Creates a new <see cref="DrawableTimingSection"/>.
@@ -71,41 +76,54 @@ namespace osu.Game.Rulesets.Timing
                 return;
             }
 
-            layout.Invalidate();
+            durationBacking.Invalidate();
 
             base.InvalidateFromChild(invalidation);
         }
 
-        protected override void UpdateAfterChildren()
+        private Cached<double> durationBacking = new Cached<double>();
+        /// <summary>
+        /// The maximum duration of any one hit object inside this <see cref="DrawableTimingSection"/>. This is calculated as the maximum
+        /// end time between all hit objects relative to this <see cref="DrawableTimingSection"/>'s <see cref="ControlPoint.StartTime"/>.
+        /// </summary>
+        public double Duration => durationBacking.EnsureValid()
+            ? durationBacking.Value
+            : durationBacking.Refresh(() =>
         {
-            base.UpdateAfterChildren();
+            if (!Children.Any())
+                return 0;
 
-            if (!layout.EnsureValid())
-            {
-                layout.Refresh(() =>
-                {
-                    if (!Children.Any())
-                        return;
+            double baseDuration = Children.Max(c => (c.HitObject as IHasEndTime)?.EndTime ?? c.HitObject.StartTime) - ControlPoint.StartTime;
 
-                    //double maxDuration = Children.Select(c => (c.HitObject as IHasEndTime)?.EndTime ?? c.HitObject.StartTime).Max();
-                    //float width = (float)maxDuration - RelativeChildOffset.X;
-                    //float height = (float)maxDuration - RelativeChildOffset.Y;
+            if (baseDuration == 0)
+                baseDuration = 1000;
 
+            // Scrolling rulesets typically have anchors/origins set to their start time, but if an object has no end time and lies on the control point
+            // then the baseDuration above will be 0. This will cause problems with masking when it is set as the value for Size in Update().
+            //
+            // Thus we _want_ the timing section to completely contain the hit object, and to do with we'll need to find a duration that corresponds
+            // to the absolute size of the element that extrudes beyond our bounds. For simplicity, we can approximate this by just using the largest
+            // absolute size available from our children.
+            float maxAbsoluteSize = Children.Where(c => (c.RelativeSizeAxes & ScrollingAxes) == 0)
+                                            .Select(c => (ScrollingAxes & Axes.X) > 0 ? c.Width : c.Height)
+                                            .DefaultIfEmpty().Max();
 
-                    // Auto-size to the total size of our children
-                    // This ends up being the total duration of our children, however for now this is a more sure-fire way to calculate this
-                    // than the above due to some undesired masking optimisations causing some hit objects to be culled...
-                    // Todo: When this is investigated more we should use the above method as it is a little more exact
-                    // Todo: This is not working correctly in the case that hit objects are absolutely-sized - needs a proper looking into in osu!framework
-                    float width = Children.Select(child => child.X + child.Width).Max() - RelativeChildOffset.X;
-                    float height = Children.Select(child => child.Y + child.Height).Max() - RelativeChildOffset.Y;
+            float ourAbsoluteSize = (ScrollingAxes & Axes.X) > 0 ? DrawWidth : DrawHeight;
 
-                    // Consider that width/height are time values. To have ourselves span these time values 1:1, we first need to set our size
-                    Size = new Vector2((ScrollingAxes & Axes.X) > 0 ? width : Size.X, (ScrollingAxes & Axes.Y) > 0 ? height : Size.Y);
-                    // Then to make our position-space be time values again, we need our relative child size to follow our size
-                    RelativeChildSize = Size;
-                });
-            }
+            // Add the extra duration to account for the absolute size
+            baseDuration *= 1 + maxAbsoluteSize / ourAbsoluteSize;
+
+            return baseDuration;
+        });
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Consider that width/height are time values. To have ourselves span these time values 1:1, we first need to set our size
+            Size = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)Duration : Size.X, (ScrollingAxes & Axes.Y) > 0 ? (float)Duration : Size.Y);
+            // Then to make our position-space be time values again, we need our relative child size to follow our size
+            RelativeChildSize = Size;
         }
     }
 }

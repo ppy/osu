@@ -7,6 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
+using System.Linq;
+using System;
 
 namespace osu.Game.Rulesets.Timing
 {
@@ -42,6 +44,8 @@ namespace osu.Game.Rulesets.Timing
 
         public readonly MultiplierControlPoint ControlPoint;
 
+        private DrawableTimingSection timingSection;
+
         /// <summary>
         /// Creates a new <see cref="SpeedAdjustmentContainer"/>.
         /// </summary>
@@ -56,9 +60,10 @@ namespace osu.Game.Rulesets.Timing
         [BackgroundDependencyLoader]
         private void load()
         {
-            DrawableTimingSection timingSection = CreateTimingSection();
+            timingSection = CreateTimingSection();
 
             timingSection.ScrollingAxes = ScrollingAxes;
+            timingSection.ControlPoint = ControlPoint;
             timingSection.VisibleTimeRange.BindTo(VisibleTimeRange);
             timingSection.RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
 
@@ -72,6 +77,15 @@ namespace osu.Game.Rulesets.Timing
             // The speed adjustment happens by modifying our size by the multiplier while maintaining the visible time range as the relatve size for our children
             Size = new Vector2((ScrollingAxes & Axes.X) > 0 ? multiplier : 1, (ScrollingAxes & Axes.Y) > 0 ? multiplier : 1);
             RelativeChildSize = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 1, (ScrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 1);
+        }
+
+        public override double LifetimeStart => ControlPoint.StartTime - VisibleTimeRange;
+        public override double LifetimeEnd => ControlPoint.StartTime + timingSection.Duration + VisibleTimeRange;
+
+        public override void Add(DrawableHitObject drawable)
+        {
+            drawable.LifetimeOffset.BindTo(VisibleTimeRange);
+            base.Add(drawable);
         }
 
         /// <summary>

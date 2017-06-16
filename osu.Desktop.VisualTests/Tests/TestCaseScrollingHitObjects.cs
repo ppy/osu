@@ -125,6 +125,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class TestSpeedAdjustmentContainer : SpeedAdjustmentContainer
         {
+            public override bool RemoveWhenNotAlive => false;
+
             public TestSpeedAdjustmentContainer(MultiplierControlPoint controlPoint)
                 : base(controlPoint)
             {
@@ -195,25 +197,11 @@ namespace osu.Desktop.VisualTests.Tests
                 FadeInFromZero(250, EasingTypes.OutQuint);
             }
 
-            private bool hasExpired;
             protected override void Update()
             {
                 base.Update();
                 if (Time.Current >= HitObject.StartTime)
-                {
                     background.Colour = Color4.Red;
-
-                    if (!hasExpired)
-                    {
-                        using (BeginDelayedSequence(200))
-                        {
-                            FadeOut(200);
-                            Expire();
-                        }
-
-                        hasExpired = true;
-                    }
-                }
             }
         }
     }
