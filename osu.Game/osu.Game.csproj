@@ -201,6 +201,10 @@
     <Compile Include="Database\RulesetDatabase.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
+    <Compile Include="Rulesets\Timing\SpeedAdjustmentContainer.cs" />
+    <Compile Include="Rulesets\Timing\DrawableTimingSection.cs" />
+    <Compile Include="Rulesets\Timing\MultiplierControlPoint.cs" />
+    <Compile Include="Rulesets\Timing\SpeedAdjustmentCollection.cs" />
     <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
     <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />
     <Compile Include="Screens\Play\HUDOverlay.cs" />
@@ -310,6 +314,7 @@
     <Compile Include="Screens\Select\SongSelect.cs" />
     <Compile Include="Rulesets\UI\HitRenderer.cs" />
     <Compile Include="Rulesets\UI\Playfield.cs" />
+    <Compile Include="Rulesets\UI\SpeedAdjustedHitRenderer.cs" />
     <Compile Include="Screens\Select\EditSongSelect.cs" />
     <Compile Include="Screens\Play\HUD\ComboCounter.cs" />
     <Compile Include="Screens\Play\HUD\ComboResultCounter.cs" />

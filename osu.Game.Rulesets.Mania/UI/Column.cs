@@ -11,13 +11,10 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Timing;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Judgements;
 using System;
 using osu.Framework.Configuration;
+using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -33,6 +30,13 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
+        private readonly BindableDouble visibleTimeRange = new BindableDouble();
+        public BindableDouble VisibleTimeRange
+        {
+            get { return visibleTimeRange; }
+            set { visibleTimeRange.BindTo(value); }
+        }
+
         /// <summary>
         /// The key that will trigger input actions for this column and hit objects contained inside it.
         /// </summary>
@@ -42,9 +46,9 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
-        public readonly ControlPointContainer ControlPointContainer;
+        private readonly SpeedAdjustmentCollection speedAdjustments;
 
-        public Column(IEnumerable<TimingChange> timingChanges)
+        public Column()
         {
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
@@ -93,10 +97,11 @@ namespace osu.Game.Rulesets.Mania.UI
                                 }
                             }
                         },
-                        ControlPointContainer = new ControlPointContainer(timingChanges)
+                        speedAdjustments = new SpeedAdjustmentCollection(Axes.Y)
                         {
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,
+                            VisibleTimeRange = VisibleTimeRange
                         },
                         // For column lighting, we need to capture input events before the notes
                         new InputTarget
@@ -187,10 +192,11 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject)
+        public void Add(SpeedAdjustmentContainer speedAdjustment) => speedAdjustments.Add(speedAdjustment);
+        public void Add(DrawableHitObject hitObject)
         {
             hitObject.AccentColour = AccentColour;
-            ControlPointContainer.Add(hitObject);
+            speedAdjustments.Add(hitObject);
         }
 
         private bool onKeyDown(InputState state, KeyDownEventArgs args)
