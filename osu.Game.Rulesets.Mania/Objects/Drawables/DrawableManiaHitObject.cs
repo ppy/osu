@@ -33,13 +33,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Y = (float)HitObject.StartTime;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            LifetimeStart = HitObject.StartTime - ManiaPlayfield.TIME_SPAN_MAX;
-        }
-
         public override Color4 AccentColour
         {
             get { return base.AccentColour; }

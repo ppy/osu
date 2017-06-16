@@ -12,11 +12,28 @@ using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Audio;
 using System.Linq;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
     public abstract class DrawableHitObject : Container
     {
+        private readonly BindableDouble lifetimeOffset = new BindableDouble();
+        /// <summary>
+        /// Time offset before <see cref="HitObject.StartTime"/> at which this <see cref="DrawableHitObject"/> becomes visible and the time offset
+        /// after <see cref="HitObject.StartTime"/> or <see cref="IHasEndTime.EndTime"/> at which it expires.
+        ///
+        /// <para>
+        /// This provides only a default life time range, however classes inheriting from <see cref="DrawableHitObject"/> should expire their state through
+        /// <see cref="DrawableHitObject{TObject, TJudgement}.UpdateState(ArmedState)"/> if more tight control over the life time is desired.
+        /// </para>
+        /// </summary>
+        public BindableDouble LifetimeOffset
+        {
+            get { return lifetimeOffset; }
+            set { lifetimeOffset.BindTo(value); }
+        }
+
         public readonly HitObject HitObject;
 
         /// <summary>
@@ -27,6 +44,22 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
+        }
+
+        public override double LifetimeStart
+        {
+            get { return Math.Min(HitObject.StartTime - lifetimeOffset, base.LifetimeStart); }
+            set { base.LifetimeStart = value; }
+        }
+
+        public override double LifetimeEnd
+        {
+            get
+            {
+                var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+                return Math.Max(endTime + LifetimeOffset, base.LifetimeEnd);
+            }
+            set { base.LifetimeEnd = value; }
         }
     }
 
@@ -190,6 +223,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 nestedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
             h.OnJudgement += d => OnJudgement?.Invoke(d);
+            h.LifetimeOffset = LifetimeOffset;
             nestedHitObjects.Add(h);
         }
 
