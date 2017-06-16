@@ -6,14 +6,16 @@ using osu.Framework.Testing;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.UI;
 using System;
-using System.Collections.Generic;
 using OpenTK;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Timing;
 using osu.Framework.Configuration;
 using OpenTK.Input;
 using osu.Framework.Timing;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using System.Linq;
+using osu.Game.Rulesets.Mania.Timing;
+using osu.Game.Rulesets.Timing;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -30,7 +32,7 @@ namespace osu.Desktop.VisualTests.Tests
             Action<int, SpecialColumnPosition> createPlayfield = (cols, pos) =>
             {
                 Clear();
-                Add(new ManiaPlayfield(cols, new List<TimingChange>())
+                Add(new ManiaPlayfield(cols)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -39,37 +41,22 @@ namespace osu.Desktop.VisualTests.Tests
                 });
             };
 
-            Action<int, SpecialColumnPosition> createPlayfieldWithNotes = (cols, pos) =>
+            const double start_time = 500;
+            const double duration = 500;
+
+            Func<double, bool, SpeedAdjustmentContainer> createTimingChange = (time, gravity) => new ManiaSpeedAdjustmentContainer(new MultiplierControlPoint(time)
+            {
+                TimingPoint = { BeatLength = 1000 }
+            }, gravity ? ScrollingAlgorithm.Gravity : ScrollingAlgorithm.Basic);
+
+            Action<bool> createPlayfieldWithNotes = gravity =>
             {
                 Clear();
 
-                ManiaPlayfield playField;
-                Add(playField = new ManiaPlayfield(cols, new List<TimingChange> { new TimingChange { BeatLength = 200 } })
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    SpecialColumnPosition = pos,
-                    Scale = new Vector2(1, -1)
-                });
-
-                for (int i = 0; i < cols; i++)
-                {
-                    playField.Add(new DrawableNote(new Note
-                    {
-                        StartTime = Time.Current + 1000,
-                        Column = i
-                    }));
-                }
-            };
-
-            Action createPlayfieldWithNotesAcceptingInput = () =>
-            {
-                Clear();
-
-                var rateAdjustClock = new StopwatchClock(true) { Rate = 0.5 };
+                var rateAdjustClock = new StopwatchClock(true) { Rate = 1 };
 
                 ManiaPlayfield playField;
-                Add(playField = new ManiaPlayfield(4, new List<TimingChange> { new TimingChange { BeatLength = 200 } })
+                Add(playField = new ManiaPlayfield(4)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -77,13 +64,22 @@ namespace osu.Desktop.VisualTests.Tests
                     Clock = new FramedClock(rateAdjustClock)
                 });
 
-                for (int t = 1000; t <= 2000; t += 100)
+                if (!gravity)
+                    playField.Columns.ForEach(c => c.Add(createTimingChange(0, false)));
+
+                for (double t = start_time; t <= start_time + duration; t += 100)
                 {
+                    if (gravity)
+                        playField.Columns.ElementAt(0).Add(createTimingChange(t, true));
+
                     playField.Add(new DrawableNote(new Note
                     {
                         StartTime = t,
                         Column = 0
                     }, new Bindable<Key>(Key.D)));
+
+                    if (gravity)
+                        playField.Columns.ElementAt(3).Add(createTimingChange(t, true));
 
                     playField.Add(new DrawableNote(new Note
                     {
@@ -92,17 +88,23 @@ namespace osu.Desktop.VisualTests.Tests
                     }, new Bindable<Key>(Key.K)));
                 }
 
-                playField.Add(new DrawableHoldNote(new HoldNote
-                {
-                    StartTime = 1000,
-                    Duration = 1000,
-                    Column = 1
-                }, new Bindable<Key>(Key.F)));
+                if (gravity)
+                    playField.Columns.ElementAt(1).Add(createTimingChange(start_time, true));
 
                 playField.Add(new DrawableHoldNote(new HoldNote
                 {
-                    StartTime = 1000,
-                    Duration = 1000,
+                    StartTime = start_time,
+                    Duration = duration,
+                    Column = 1
+                }, new Bindable<Key>(Key.F)));
+
+                if (gravity)
+                    playField.Columns.ElementAt(2).Add(createTimingChange(start_time, true));
+
+                playField.Add(new DrawableHoldNote(new HoldNote
+                {
+                    StartTime = start_time,
+                    Duration = duration,
                     Column = 2
                 }, new Bindable<Key>(Key.J)));
             };
@@ -116,16 +118,11 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep("Left special style", () => createPlayfield(8, SpecialColumnPosition.Left));
             AddStep("Right special style", () => createPlayfield(8, SpecialColumnPosition.Right));
 
-            AddStep("Normal special style", () => createPlayfield(4, SpecialColumnPosition.Normal));
+            AddStep("Notes with input", () => createPlayfieldWithNotes(false));
+            AddWaitStep((int)Math.Ceiling((start_time + duration) / TimePerAction));
 
-            AddStep("Notes", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Normal));
-            AddWaitStep(10);
-            AddStep("Left special style", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Left));
-            AddWaitStep(10);
-            AddStep("Right special style", () => createPlayfieldWithNotes(4, SpecialColumnPosition.Right));
-            AddWaitStep(10);
-
-            AddStep("Notes with input", () => createPlayfieldWithNotesAcceptingInput());
+            AddStep("Notes with gravity", () => createPlayfieldWithNotes(true));
+            AddWaitStep((int)Math.Ceiling((start_time + duration) / TimePerAction));
         }
 
         private void triggerKeyDown(Column column)

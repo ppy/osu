@@ -207,6 +207,7 @@
     <Compile Include="Tests\TestCaseReplay.cs" />
     <Compile Include="Tests\TestCaseResults.cs" />
     <Compile Include="Tests\TestCaseScoreCounter.cs" />
+    <Compile Include="Tests\TestCaseScrollingHitObjects.cs" />
     <Compile Include="Tests\TestCaseSkipButton.cs" />
     <Compile Include="Tests\TestCaseTabControl.cs" />
     <Compile Include="Tests\TestCaseTaikoHitObjects.cs" />
