@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
@@ -93,9 +92,12 @@ namespace osu.Game.Users.Profile
         {
             graph.Colour = colours.Yellow;
 
-            // use logarithmic coordinates
-            graph.Values = ranks.Select(x => -(float)Math.Log(x));
-            graph.ResetBall();
+            if (user.Statistics.Rank > 0)
+            {
+                // use logarithmic coordinates
+                graph.Values = ranks.Select(x => -(float)Math.Log(x));
+                graph.ResetBall();
+            }
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
@@ -136,9 +138,7 @@ namespace osu.Game.Users.Profile
 
             public void ResetBall()
             {
-                Trace.Assert(ActualMaxValue.HasValue);
-                Trace.Assert(ActualMinValue.HasValue);
-                ball.MoveTo(new Vector2(1, ((ActualMaxValue - Values.Last()) / (ActualMaxValue - ActualMinValue)).Value), ballShown ? transform_duration : 0, EasingTypes.OutQuint);
+                ball.MoveTo(new Vector2(1, GetYPosition(Values.Last())), ballShown ? transform_duration : 0, EasingTypes.OutQuint);
                 ball.Show();
                 BallRelease();
                 ballShown = true;
@@ -155,10 +155,7 @@ namespace osu.Game.Users.Profile
                     if (index >= count - values.Count)
                     {
                         int i = index + values.Count - count;
-                        float value = values[i];
-                        Trace.Assert(ActualMaxValue.HasValue);
-                        Trace.Assert(ActualMinValue.HasValue);
-                        float y = ((ActualMaxValue - value) / (ActualMaxValue - ActualMinValue)).Value;
+                        float y = GetYPosition(values[i]);
                         if (Math.Abs(y * DrawHeight - position.Y) <= 8f)
                         {
                             ball.MoveTo(new Vector2(index / (float)(count - 1), y), transform_duration, EasingTypes.OutQuint);

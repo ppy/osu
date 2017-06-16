@@ -23,8 +23,8 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public float? MinValue { get; set; }
 
-        public float? ActualMaxValue { get; private set; }
-        public float? ActualMinValue { get; private set; }
+        public float ActualMaxValue { get; private set; } = float.NaN;
+        public float ActualMinValue { get; private set; } = float.NaN;
 
         private const double transform_duration = 500;
 
@@ -87,10 +87,16 @@ namespace osu.Game.Graphics.UserInterface
             for (int i = 0; i < values.Length; i++)
             {
                 float x = (i + count - values.Length) / (float)(count - 1) * DrawWidth - 1;
-                float y = (max - values[i]) / (max - min) * DrawHeight - 1;
+                float y = GetYPosition(values[i]) * DrawHeight - 1;
                 // the -1 is for inner offset in path (actually -PathWidth)
                 path.AddVertex(new Vector2(x, y));
             }
+        }
+
+        protected float GetYPosition(float value)
+        {
+            if (ActualMaxValue == ActualMinValue) return 0;
+            return (ActualMaxValue - value) / (ActualMaxValue - ActualMinValue);
         }
     }
 }
