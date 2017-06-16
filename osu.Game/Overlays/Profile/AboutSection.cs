@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 
-namespace osu.Game.Users.Profile
+namespace osu.Game.Overlays.Profile
 {
     public class AboutSection : ProfileSection
     {

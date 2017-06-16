@@ -13,8 +13,9 @@ using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Users;
 
-namespace osu.Game.Users.Profile
+namespace osu.Game.Overlays.Profile
 {
     public class RankChart : Container
     {

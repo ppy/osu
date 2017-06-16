@@ -14,9 +14,9 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
+using osu.Game.Users;
 
-namespace osu.Game.Users.Profile
+namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : Container
     {

@@ -9,7 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 
-namespace osu.Game.Users.Profile
+namespace osu.Game.Overlays.Profile
 {
     public abstract class ProfileSection : FillFlowContainer
     {
