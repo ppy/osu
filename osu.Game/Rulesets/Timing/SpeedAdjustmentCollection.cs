@@ -40,6 +40,17 @@ namespace osu.Game.Rulesets.Timing
         /// </summary>
         private readonly Queue<DrawableHitObject> queuedHitObjects = new Queue<DrawableHitObject>();
 
+        private readonly Axes scrollingAxes;
+
+        /// <summary>
+        /// Creates a new <see cref="SpeedAdjustmentCollection"/>.
+        /// </summary>
+        /// <param name="scrollingAxes">The axes upon which hit objects should appear to scroll inside this container.</param>
+        public SpeedAdjustmentCollection(Axes scrollingAxes)
+        {
+            this.scrollingAxes = scrollingAxes;
+        }
+
         /// <summary>
         /// Adds a hit object to this <see cref="SpeedAdjustmentCollection"/>. The hit objects will be kept in a queue
         /// and will be processed when new <see cref="SpeedAdjustmentContainer"/>s are added to this <see cref="SpeedAdjustmentCollection"/>.
@@ -53,6 +64,7 @@ namespace osu.Game.Rulesets.Timing
         public override void Add(SpeedAdjustmentContainer speedAdjustment)
         {
             speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
+            speedAdjustment.ScrollingAxes = scrollingAxes;
             base.Add(speedAdjustment);
         }
 

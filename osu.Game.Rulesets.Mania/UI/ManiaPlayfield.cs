@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
                             {
-                                barLineContainer = new SpeedAdjustmentCollection
+                                barLineContainer = new SpeedAdjustmentCollection(Axes.Y)
                                 {
                                     Name = "Bar lines",
                                     Anchor = Anchor.TopCentre,

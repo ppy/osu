@@ -14,7 +14,6 @@ namespace osu.Game.Rulesets.Mania.Timing
         private readonly MultiplierControlPoint controlPoint;
 
         public BasicScrollingDrawableTimingSection(MultiplierControlPoint controlPoint)
-            : base(Axes.Y)
         {
             this.controlPoint = controlPoint;
         }

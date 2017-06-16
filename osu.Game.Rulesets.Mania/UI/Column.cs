@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 }
                             }
                         },
-                        speedAdjustments = new SpeedAdjustmentCollection
+                        speedAdjustments = new SpeedAdjustmentCollection(Axes.Y)
                         {
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,

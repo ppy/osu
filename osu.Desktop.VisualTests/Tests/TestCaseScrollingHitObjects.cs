@@ -69,7 +69,7 @@ namespace osu.Desktop.VisualTests.Tests
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0.25f
                         },
-                        adjustmentCollection = new SpeedAdjustmentCollection
+                        adjustmentCollection = new SpeedAdjustmentCollection(Axes.Y)
                         {
                             RelativeSizeAxes = Axes.Both,
                             VisibleTimeRange = timeRangeBindable,
@@ -126,18 +126,17 @@ namespace osu.Desktop.VisualTests.Tests
         private class TestSpeedAdjustmentContainer : SpeedAdjustmentContainer
         {
             public TestSpeedAdjustmentContainer(MultiplierControlPoint controlPoint)
-                : base(controlPoint, Axes.Y)
+                : base(controlPoint)
             {
             }
 
-            protected override DrawableTimingSection CreateTimingSection() => new TestDrawableTimingSection(ControlPoint);
+            protected override DrawableTimingSection CreateTimingSection(MultiplierControlPoint controlPoint) => new TestDrawableTimingSection(controlPoint);
 
             private class TestDrawableTimingSection : DrawableTimingSection
             {
                 private readonly MultiplierControlPoint controlPoint;
 
                 public TestDrawableTimingSection(MultiplierControlPoint controlPoint)
-                    : base(Axes.Y)
                 {
                     this.controlPoint = controlPoint;
                 }

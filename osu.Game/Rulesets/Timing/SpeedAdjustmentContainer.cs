@@ -7,6 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
+using System;
+using System.Linq;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Timing
 {
@@ -31,35 +34,34 @@ namespace osu.Game.Rulesets.Timing
             set { visibleTimeRange.BindTo(value); }
         }
 
-        /// <summary>
-        /// The <see cref="MultiplierControlPoint"/> which provides the speed adjustments for this container.
-        /// </summary>
-        public readonly MultiplierControlPoint ControlPoint;
-
         protected override Container<DrawableHitObject> Content => content;
         private Container<DrawableHitObject> content;
 
-        public readonly Axes ScrollingAxes;
+        /// <summary>
+        /// Axes which the content of this container will scroll through.
+        /// </summary>
+        /// <returns></returns>
+        public Axes ScrollingAxes { get; internal set; }
+
+        public readonly MultiplierControlPoint ControlPoint;
 
         /// <summary>
         /// Creates a new <see cref="SpeedAdjustmentContainer"/>.
         /// </summary>
         /// <param name="controlPoint">The <see cref="MultiplierControlPoint"/> which provides the speed adjustments for this container.</param>
-        /// <param name="scrollingAxes">The axes through which the content of this container should scroll through.</param>
-        protected SpeedAdjustmentContainer(MultiplierControlPoint controlPoint, Axes scrollingAxes)
+        protected SpeedAdjustmentContainer(MultiplierControlPoint controlPoint)
         {
-            ScrollingAxes = scrollingAxes;
+            this.ControlPoint = controlPoint;
 
             RelativeSizeAxes = Axes.Both;
-
-            ControlPoint = controlPoint;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            DrawableTimingSection timingSection = CreateTimingSection();
+            DrawableTimingSection timingSection = CreateTimingSection(ControlPoint);
 
+            timingSection.ScrollingAxes = ScrollingAxes;
             timingSection.VisibleTimeRange.BindTo(VisibleTimeRange);
             timingSection.RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
 
@@ -89,6 +91,6 @@ namespace osu.Game.Rulesets.Timing
         /// Creates the container which handles the movement of a collection of hit objects.
         /// </summary>
         /// <returns>The <see cref="DrawableTimingSection"/>.</returns>
-        protected abstract DrawableTimingSection CreateTimingSection();
+        protected abstract DrawableTimingSection CreateTimingSection(MultiplierControlPoint controlPoint);
     }
 }
