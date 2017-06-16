@@ -269,21 +269,25 @@ namespace osu.Game.Overlays
 
             TransformDirection direction = TransformDirection.None;
 
-            // Change the transform direction only if the audio of both beatmaps is not equal.
-            if (current != null && beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) != true)
+            if (current != null)
             {
-                if (queuedDirection.HasValue)
-                {
-                    direction = queuedDirection.Value;
-                    queuedDirection = null;
-                }
-                else
-                {
-                    //figure out the best direction based on order in playlist.
-                    var last = playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo.ID).Count();
-                    var next = beatmapBacking.Value == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmapBacking.Value.BeatmapSetInfo.ID).Count();
+                bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
 
-                    direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
+                if (!audioEquals)
+                {
+                    if (queuedDirection.HasValue)
+                    {
+                        direction = queuedDirection.Value;
+                        queuedDirection = null;
+                    }
+                    else
+                    {
+                        //figure out the best direction based on order in playlist.
+                        var last = playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo.ID).Count();
+                        var next = beatmapBacking.Value == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmapBacking.Value.BeatmapSetInfo.ID).Count();
+
+                        direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
+                    }
                 }
             }
 
@@ -291,6 +295,8 @@ namespace osu.Game.Overlays
 
             updateDisplay(beatmapBacking, direction);
             queuedDirection = null;
+
+            direction = TransformDirection.Prev;
         }
 
         private ScheduledDelegate pendingBeatmapSwitch;
