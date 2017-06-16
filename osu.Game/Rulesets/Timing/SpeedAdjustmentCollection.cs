@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Timing
         protected override IComparer<Drawable> DepthComparer => new SpeedAdjustmentContainerReverseStartTimeComparer();
 
         /// <summary>
-        /// Hit objects that are to be re-processed when <see cref="layout"/> is invalidated.
+        /// Hit objects that are to be re-processed on the next update.
         /// </summary>
         private readonly Queue<DrawableHitObject> queuedHitObjects = new Queue<DrawableHitObject>();
 
@@ -59,6 +59,9 @@ namespace osu.Game.Rulesets.Timing
         protected override void Update()
         {
             base.Update();
+
+            // Todo: At the moment this is going to re-process every single Update, however this will only be a null-op
+            // when there are no SpeedAdjustmentContainers available. This should probably error or something, but it's okay for now.
 
             // An external count is kept because hit objects that can't be added are re-queued
             int count = queuedHitObjects.Count;
