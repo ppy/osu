@@ -13,8 +13,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Profile;
 using osu.Game.Users;
-using osu.Game.Users.Profile;
 
 namespace osu.Game.Overlays
 {
