@@ -250,7 +250,7 @@ namespace osu.Game.Rulesets.UI
         {
             KeyConversionInputManager.Add(Playfield = CreatePlayfield());
 
-            LoadObjects();
+            loadObjects();
 
             if (InputManager?.ReplayInputHandler != null)
                 InputManager.ReplayInputHandler.ToScreenSpace = Playfield.ScaledContent.ToScreenSpace;
@@ -259,7 +259,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Creates and adds drawable representations of hit objects to the play field.
         /// </summary>
-        protected virtual void LoadObjects()
+        private void loadObjects()
         {
             drawableObjects.Capacity = Beatmap.HitObjects.Count;
 
