@@ -45,6 +45,7 @@ namespace osu.Game.Graphics.UserInterface
                     case Key.Up:
                     case Key.Down:
                         return false;
+                    case Key.KeypadEnter:
                     case Key.Enter:
                         if (!AllowCommit) return false;
                         break;
