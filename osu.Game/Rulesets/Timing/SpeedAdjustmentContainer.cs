@@ -7,9 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
-using System;
-using System.Linq;
-using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Timing
 {
@@ -51,7 +48,7 @@ namespace osu.Game.Rulesets.Timing
         /// <param name="controlPoint">The <see cref="MultiplierControlPoint"/> which provides the speed adjustments for this container.</param>
         protected SpeedAdjustmentContainer(MultiplierControlPoint controlPoint)
         {
-            this.ControlPoint = controlPoint;
+            ControlPoint = controlPoint;
 
             RelativeSizeAxes = Axes.Both;
         }
