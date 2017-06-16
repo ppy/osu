@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Ranking
                 },
                 new CircularContainer
                 {
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = colours.GrayF.Opacity(0.8f),
                         Type = EdgeEffectType.Shadow,
@@ -64,7 +64,8 @@ namespace osu.Game.Screens.Ranking
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        new Box{
+                        new Box
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
                             AlwaysPresent = true
@@ -73,7 +74,7 @@ namespace osu.Game.Screens.Ranking
                 },
                 content = new CircularContainer
                 {
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = Color4.Black.Opacity(0.2f),
                         Type = EdgeEffectType.Shadow,
@@ -87,6 +88,5 @@ namespace osu.Game.Screens.Ranking
                 }
             });
         }
-
     }
 }

@@ -26,6 +26,8 @@ namespace osu.Game.Overlays.Chat
 
         public readonly Bindable<bool> ChannelSelectorActive = new Bindable<bool>();
 
+        private readonly ChannelTabItem.ChannelSelectorTabItem selectorTab;
+
         public ChatTabControl()
         {
             TabContainer.Margin = new MarginPadding { Left = 50 };
@@ -41,7 +43,22 @@ namespace osu.Game.Overlays.Chat
                 Padding = new MarginPadding(10),
             });
 
-            AddTabItem(new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }, ChannelSelectorActive));
+            AddTabItem(selectorTab = new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }));
+
+            ChannelSelectorActive.BindTo(selectorTab.Active);
+        }
+
+        protected override void SelectTab(TabItem<Channel> tab)
+        {
+            if (tab is ChannelTabItem.ChannelSelectorTabItem)
+            {
+                tab.Active.Toggle();
+                return;
+            }
+
+            selectorTab.Active.Value = false;
+
+            base.SelectTab(tab);
         }
 
         private class ChannelTabItem : TabItem<Channel>
@@ -55,18 +72,6 @@ namespace osu.Game.Overlays.Chat
             private readonly Box box;
             private readonly Box highlightBox;
             private readonly TextAwesome icon;
-
-            public override bool Active
-            {
-                get { return base.Active; }
-                set
-                {
-                    if (Active == value) return;
-
-                    base.Active = value;
-                    updateState();
-                }
-            }
 
             private void updateState()
             {
@@ -141,7 +146,7 @@ namespace osu.Game.Overlays.Chat
                 Shear = new Vector2(shear_width / ChatOverlay.TAB_AREA_HEIGHT, 0);
 
                 Masking = true;
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Radius = 10,
@@ -205,28 +210,8 @@ namespace osu.Game.Overlays.Chat
 
             public class ChannelSelectorTabItem : ChannelTabItem
             {
-                public override bool Active
+                public ChannelSelectorTabItem(Channel value) : base(value)
                 {
-                    get { return false; }
-                    // ReSharper disable once ValueParameterNotUsed
-                    set
-                    {
-                        // we basically never want this tab to become active.
-                        // this allows us to become a "toggle" tab.
-                        // is a bit hacky, to say the least.
-                        activeBindable.Value = !activeBindable.Value;
-                        base.Active = false;
-                    }
-                }
-
-                private readonly Bindable<bool> activeBindable;
-
-                public ChannelSelectorTabItem(Channel value, Bindable<bool> active) : base(value)
-                {
-                    activeBindable = active;
-                    activeBindable.ValueChanged += v => selectorUpdateState();
-
-
                     Depth = float.MaxValue;
                     Width = 45;
 
@@ -242,27 +227,11 @@ namespace osu.Game.Overlays.Chat
                     backgroundInactive = colour.Gray2;
                     backgroundActive = colour.Gray3;
                 }
-
-                protected override void LoadComplete()
-                {
-                    base.LoadComplete();
-
-                    selectorUpdateState();
-                }
-
-                protected override void OnHoverLost(InputState state)
-                {
-                    selectorUpdateState();
-                }
-
-                private void selectorUpdateState()
-                {
-                    if (activeBindable.Value)
-                        fadeActive();
-                    else
-                        fadeInactive();
-                }
             }
+
+            protected override void OnActivated() => updateState();
+
+            protected override void OnDeactivated() => updateState();
         }
     }
 }

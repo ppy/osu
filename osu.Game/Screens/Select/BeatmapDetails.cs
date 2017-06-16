@@ -47,6 +47,7 @@ namespace osu.Game.Screens.Select
         public BeatmapInfo Beatmap
         {
             get { return beatmap; }
+
             set
             {
                 if (beatmap == value) return;
@@ -79,8 +80,8 @@ namespace osu.Game.Screens.Select
                 lookup.Success += res =>
                 {
                     if (beatmap != requestedBeatmap)
-                            //the beatmap has been changed since we started the lookup.
-                            return;
+                        //the beatmap has been changed since we started the lookup.
+                        return;
 
                     requestedBeatmap.Metrics = res;
                     Schedule(() => updateMetrics(res));
@@ -88,6 +89,7 @@ namespace osu.Game.Screens.Select
                 lookup.Failure += e => updateMetrics(null);
 
                 api.Queue(lookup);
+                loading.Show();
             }
 
             updateMetrics(requestedBeatmap.Metrics, false);
@@ -102,6 +104,9 @@ namespace osu.Game.Screens.Select
         {
             var hasRatings = metrics?.Ratings.Any() ?? false;
             var hasRetriesFails = (metrics?.Retries.Any() ?? false) && metrics.Fails.Any();
+
+            if (failOnMissing)
+                loading.Hide();
 
             if (hasRatings)
             {
@@ -165,7 +170,7 @@ namespace osu.Game.Screens.Select
                     Direction = FillDirection.Vertical,
                     LayoutDuration = 200,
                     LayoutEasing = EasingTypes.OutQuint,
-                    Children = new []
+                    Children = new[]
                     {
                         description = new MetadataSegment("Description"),
                         source = new MetadataSegment("Source"),
@@ -199,9 +204,9 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0,5),
+                                    Spacing = new Vector2(0, 5),
                                     Padding = new MarginPadding(10),
-                                    Children = new []
+                                    Children = new[]
                                     {
                                         circleSize = new DifficultyRow("Circle Size", 7),
                                         drainRate = new DifficultyRow("HP Drain"),
@@ -319,11 +324,13 @@ namespace osu.Game.Screens.Select
                             }
                         },
                     },
-                }
+                },
+                loading = new LoadingAnimation()
             };
         }
 
         private APIAccess api;
+        private readonly LoadingAnimation loading;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, APIAccess api)
@@ -479,7 +486,7 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Full,
-                        Spacing = new Vector2(5,0),
+                        Spacing = new Vector2(5, 0),
                         Margin = new MarginPadding { Top = header.TextSize }
                     }
                 };

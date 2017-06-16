@@ -79,7 +79,8 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 score.Current.Value += 300 + (ulong)(300.0 * (comboCounter.Current > 0 ? comboCounter.Current - 1 : 0) / 25.0);
                 comboCounter.Increment();
-                numerator++; denominator++;
+                numerator++;
+                denominator++;
                 accuracyCounter.SetFraction(numerator, denominator);
             });
 
