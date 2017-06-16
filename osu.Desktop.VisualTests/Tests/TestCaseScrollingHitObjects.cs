@@ -195,7 +195,7 @@ namespace osu.Desktop.VisualTests.Tests
                 FadeInFromZero(250, EasingTypes.OutQuint);
             }
 
-            private bool hasExpired = false;
+            private bool hasExpired;
             protected override void Update()
             {
                 base.Update();
