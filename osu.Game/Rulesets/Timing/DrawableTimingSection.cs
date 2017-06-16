@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Timing
 
             // If we have a singular hit object at the timing section's start time, let's set a sane default duration
             if (baseDuration == 0)
-                baseDuration = 1000;
+                baseDuration = 1;
 
             // Scrolling ruleset hit objects typically have anchors+origins set to the hit object's start time, but if the hit object doesn't implement IHasEndTime and lies on the control point
             // then the baseDuration above will be 0. This will cause problems with masking when it is further set as the value for Size in Update(). We _want_ the timing section bounds to
