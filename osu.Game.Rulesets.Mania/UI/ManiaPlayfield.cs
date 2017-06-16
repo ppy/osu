@@ -212,9 +212,8 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
-
-        public void Add(SpeedAdjustmentContainer timingChange) => barLineContainer.Add(timingChange);
         public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
+        public void Add(SpeedAdjustmentContainer speedAdjustment) => barLineContainer.Add(speedAdjustment);
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {

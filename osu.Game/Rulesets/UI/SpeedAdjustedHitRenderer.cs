@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.UI
     {
         protected readonly SortedList<MultiplierControlPoint> DefaultControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
-        public SpeedAdjustedHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+        protected SpeedAdjustedHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(beatmap, isForCurrentRuleset)
         {
         }
