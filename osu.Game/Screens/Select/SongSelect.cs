@@ -21,7 +21,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select.Options;
-using System;
 
 namespace osu.Game.Screens.Select
 {
