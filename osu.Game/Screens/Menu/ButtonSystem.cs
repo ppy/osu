@@ -192,10 +192,8 @@ namespace osu.Game.Screens.Menu
 
         public MenuState State
         {
-            get
-            {
-                return state;
-            }
+            get { return state; }
+
             set
             {
                 if (state == value) return;

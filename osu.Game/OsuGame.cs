@@ -43,6 +43,8 @@ namespace osu.Game
 
         private DirectOverlay direct;
 
+        private SocialOverlay social;
+
         private Intro intro
         {
             get
@@ -75,8 +77,10 @@ namespace osu.Game
         public void ToggleDirect() => direct.ToggleVisibility();
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(FrameworkConfigManager frameworkConfig)
         {
+            this.frameworkConfig = frameworkConfig;
+
             if (!Host.IsPrimaryInstance)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
@@ -148,7 +152,7 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                 },
                 volume = new VolumeControl(),
-                overlayContent = new Container{ RelativeSizeAxes = Axes.Both },
+                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 new OnScreenDisplay(),
                 new GlobalHotkeys //exists because UserInputManager is at a level below us.
                 {
@@ -165,6 +169,7 @@ namespace osu.Game
 
             //overlay elements
             LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
+            LoadComponentAsync(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
             LoadComponentAsync(musicController = new MusicController
@@ -198,10 +203,15 @@ namespace osu.Game
             };
 
             Dependencies.Cache(settings);
+            Dependencies.Cache(social);
             Dependencies.Cache(chat);
             Dependencies.Cache(musicController);
             Dependencies.Cache(notificationManager);
             Dependencies.Cache(dialogOverlay);
+
+            // ensure both overlays aren't presented at the same time
+            chat.StateChanged += (container, state) => social.State = state == Visibility.Visible ? Visibility.Hidden : social.State;
+            social.StateChanged += (container, state) => chat.State = state == Visibility.Visible ? Visibility.Hidden : chat.State;
 
             LoadComponentAsync(Toolbar = new Toolbar
             {
@@ -234,6 +244,9 @@ namespace osu.Game
                 case Key.F8:
                     chat.ToggleVisibility();
                     return true;
+                case Key.F9:
+                    social.ToggleVisibility();
+                    return true;
                 case Key.PageUp:
                 case Key.PageDown:
                     var swClock = (Clock as ThrottledFrameClock)?.Source as StopwatchClock;
@@ -248,6 +261,19 @@ namespace osu.Game
             {
                 switch (args.Key)
                 {
+                    case Key.R:
+                        if (state.Keyboard.AltPressed)
+                        {
+                            var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
+
+                            sensitivity.Disabled = false;
+                            sensitivity.Value = 1;
+                            sensitivity.Disabled = true;
+
+                            frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
+                            return true;
+                        }
+                        break;
                     case Key.T:
                         Toolbar.ToggleVisibility();
                         return true;
@@ -273,6 +299,7 @@ namespace osu.Game
         private Container overlayContent;
 
         private OsuScreen currentScreen;
+        private FrameworkConfigManager frameworkConfig;
 
         private void screenChanged(Screen newScreen)
         {
@@ -292,6 +319,7 @@ namespace osu.Game
                 musicController.State = Visibility.Hidden;
                 chat.State = Visibility.Hidden;
                 direct.State = Visibility.Hidden;
+                social.State = Visibility.Hidden;
             }
             else
             {

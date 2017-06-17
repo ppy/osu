@@ -34,7 +34,7 @@ namespace osu.Game.Users
             Height = height - status_height;
             Masking = true;
             CornerRadius = 5;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = Color4.Black.Opacity(0.25f),
@@ -68,7 +68,7 @@ namespace osu.Game.Users
                             User = user,
                             Masking = true,
                             CornerRadius = 5,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.25f),

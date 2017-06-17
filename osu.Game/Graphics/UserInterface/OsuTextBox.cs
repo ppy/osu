@@ -45,11 +45,10 @@ namespace osu.Game.Graphics.UserInterface
             BorderColour = colour.Yellow;
         }
 
-        protected override bool OnFocus(InputState state)
+        protected override void OnFocus(InputState state)
         {
             BorderThickness = 3;
-
-            return base.OnFocus(state);
+            base.OnFocus(state);
         }
 
         protected override void OnFocusLost(InputState state)
