@@ -55,12 +55,16 @@ namespace osu.Game.Screens.Select
 
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
+            base.setBeatmapSetDisabled(beatmap);
+
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
 
             if (Beatmap?.Track != null)
                 Beatmap.Track.Looping = false;
 
-            beatmapDetails.Beatmap = beatmap;
+            // Prevent detail area from attemping to load details for a disabled beatmapset
+            if (!base.disabledSet)
+                beatmapDetails.Beatmap = beatmap;
 
             if (beatmap?.Track != null)
                 beatmap.Track.Looping = true;

@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select
 
             set
             {
-                if (beatmap == value || value.OnlineBeatmapSetID < 1) return;
+                if (beatmap == value) return;
 
                 beatmap = value;
 

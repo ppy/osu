@@ -21,6 +21,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select.Options;
+using System;
 
 namespace osu.Game.Screens.Select
 {
@@ -193,6 +194,8 @@ namespace osu.Game.Screens.Select
                 carousel.SelectNext();
         }
 
+        protected bool disabledSet = false;
+
         private void raiseSelect()
         {
             var pendingSelection = selectionChangedDebounce;
@@ -204,9 +207,8 @@ namespace osu.Game.Screens.Select
                 pendingSelection?.Cancel(); // cancel the already scheduled task.
             }
 
-            if (Beatmap == null) return;
-
-            if (Beatmap.BeatmapSetInfo.OnlineBeatmapSetID < 1) return;
+            // Prevent being able to enter a disabled beatmap
+            if (Beatmap == null || disabledSet) return;
 
             OnSelected();
         }
@@ -292,8 +294,11 @@ namespace osu.Game.Screens.Select
                 backgroundModeBeatmap.BlurTo(background_blur, 1000);
                 backgroundModeBeatmap.FadeTo(1, 250);
             }
+        }
 
-            beatmapInfoWedge.UpdateBeatmap(beatmap);
+        protected void setBeatmapSetDisabled(WorkingBeatmap beatmap)
+        {
+            disabledSet = database.DisabledBeatmapSetHashes.Exists(x => x == beatmap.BeatmapSetInfo.Hash);
         }
 
         /// <summary>
@@ -301,12 +306,12 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
-            // Prevents invalid beatmaps from being selected i.e. main theme song
-            if (beatmap.BeatmapSetInfo.OnlineBeatmapSetID < 1)
-                return;
+            // Prevent changing background and wedge info for a disabled beatmapset
+            if (disabledSet) return;
 
             base.OnBeatmapChanged(beatmap);
 
+            beatmapInfoWedge.UpdateBeatmap(beatmap);
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
             carousel.SelectBeatmap(beatmap?.BeatmapInfo);

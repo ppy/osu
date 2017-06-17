@@ -285,5 +285,11 @@ namespace osu.Game.Database
         }
 
         public bool Exists(BeatmapSetInfo beatmapSet) => Storage.Exists(beatmapSet.Path);
+
+        public readonly List<string> DisabledBeatmapSetHashes = new List<string>
+        {
+            // Hash for theme song `Nekodex - Circles`
+            "21c1271b91234385978b5418881fdd88",
+        };
     }
 }
