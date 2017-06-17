@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             get { return beatmap; }
             set
             {
-                if (beatmap == value) return;
+                if (beatmap == value || value.OnlineBeatmapSetID < 1) return;
 
                 beatmap = value;
                 Scores = null;

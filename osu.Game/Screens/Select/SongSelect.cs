@@ -206,6 +206,8 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap == null) return;
 
+            if (Beatmap.BeatmapSetInfo.OnlineBeatmapSetID < 1) return;
+
             OnSelected();
         }
 
@@ -299,6 +301,10 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
+            // Prevents invalid beatmaps from being selected i.e. main theme song
+            if (beatmap.BeatmapSetInfo.OnlineBeatmapSetID < 1)
+                return;
+
             base.OnBeatmapChanged(beatmap);
 
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
