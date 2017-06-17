@@ -55,16 +55,15 @@ namespace osu.Game.Screens.Select
 
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
-            base.setBeatmapSetDisabled(beatmap);
+            // Prevent DeletePending beatmap from appearing in SongSelect, e.g. main theme
+            if (beatmap.BeatmapSetInfo.DeletePending) return;
 
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
 
             if (Beatmap?.Track != null)
                 Beatmap.Track.Looping = false;
 
-            // Prevent detail area from attemping to load details for a disabled beatmapset
-            if (!base.disabledSet)
-                beatmapDetails.Beatmap = beatmap;
+            beatmapDetails.Beatmap = beatmap;
 
             if (beatmap?.Track != null)
                 beatmap.Track.Looping = true;

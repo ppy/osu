@@ -194,8 +194,6 @@ namespace osu.Game.Screens.Select
                 carousel.SelectNext();
         }
 
-        protected bool disabledSet = false;
-
         private void raiseSelect()
         {
             var pendingSelection = selectionChangedDebounce;
@@ -207,8 +205,10 @@ namespace osu.Game.Screens.Select
                 pendingSelection?.Cancel(); // cancel the already scheduled task.
             }
 
-            // Prevent being able to enter a disabled beatmap
-            if (Beatmap == null || disabledSet) return;
+            if (Beatmap == null) return;
+
+            // Prevent DeletePending beatmap from being played, e.g. main theme
+            if (Beatmap.BeatmapSetInfo.DeletePending) return;
 
             OnSelected();
         }
@@ -296,19 +296,11 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected void setBeatmapSetDisabled(WorkingBeatmap beatmap)
-        {
-            disabledSet = database.DisabledBeatmapSetHashes.Exists(x => x == beatmap.BeatmapSetInfo.Hash);
-        }
-
         /// <summary>
         /// The global Beatmap was changed.
         /// </summary>
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
-            // Prevent changing background and wedge info for a disabled beatmapset
-            if (disabledSet) return;
-
             base.OnBeatmapChanged(beatmap);
 
             beatmapInfoWedge.UpdateBeatmap(beatmap);
