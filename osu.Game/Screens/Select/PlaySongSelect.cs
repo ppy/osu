@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Select
         protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
         {
             // Prevent DeletePending beatmap from appearing in SongSelect, e.g. main theme
-            if (beatmap?.BeatmapSetInfo.DeletePending.GetValueOrDefault()) return;
+            if (beatmap?.BeatmapSetInfo.DeletePending ?? false) return;
 
             beatmap?.Mods.BindTo(modSelect.SelectedMods);
 
