@@ -85,6 +85,8 @@ namespace osu.Game.Overlays
         {
             this.localisation = localisation;
 
+            AlwaysPresent = true;
+
             Children = new Drawable[]
             {
                 dragContainer = new Container
