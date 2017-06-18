@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
         private void resetEdgeEffects()
         {
-            background.EdgeEffect = new EdgeEffect
+            background.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = AccentColour.Opacity(KiaiMode ? edge_alpha_kiai : 1f),
