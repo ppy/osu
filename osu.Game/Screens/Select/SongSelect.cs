@@ -344,7 +344,6 @@ namespace osu.Game.Screens.Select
             if (track != null)
             {
                 trackManager.SetExclusive(track);
-                System.Diagnostics.Debug.WriteLine("Preview: {0}", preview);
                 if (preview)
                     track.Seek(Beatmap.Metadata.PreviewTime);
                 track.Start();
