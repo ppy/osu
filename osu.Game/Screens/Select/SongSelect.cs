@@ -206,9 +206,6 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap == null) return;
 
-            // Prevent DeletePending beatmap from being played, e.g. main theme
-            if (Beatmap.BeatmapSetInfo.DeletePending) return;
-
             OnSelected();
         }
 

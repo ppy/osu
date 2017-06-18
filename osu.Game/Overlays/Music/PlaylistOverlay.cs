@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>().ToList();
+            list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending).ToList();
 
             beatmapBacking.BindTo(game.Beatmap);
 
