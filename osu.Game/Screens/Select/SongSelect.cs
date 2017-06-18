@@ -321,7 +321,7 @@ namespace osu.Game.Screens.Select
             if (beatmap.Equals(Beatmap?.BeatmapInfo))
                 return;
 
-            bool preview = beatmap.BeatmapSetInfoID != Beatmap.BeatmapInfo.BeatmapSetInfoID;
+            bool preview = beatmap.BeatmapSetInfoID != Beatmap?.BeatmapInfo.BeatmapSetInfoID;
 
             if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
                 sampleChangeDifficulty.Play();
