@@ -46,8 +46,6 @@ namespace osu.Game
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        public readonly Bindable<OsuScreen> CurrentScreen = new Bindable<OsuScreen>();
-
         private Bindable<bool> fpsDisplayVisible;
 
         protected AssemblyName AssemblyName => Assembly.GetEntryAssembly()?.GetName() ?? new AssemblyName { Version = new Version() };

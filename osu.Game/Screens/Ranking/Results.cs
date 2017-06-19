@@ -280,6 +280,6 @@ namespace osu.Game.Screens.Ranking
             modeChangeButtons.Current.TriggerChange();
         }
 
-        internal override bool CanBeatmapChange => false;
+        internal override bool AllowBeatmapChange => false;
     }
 }
