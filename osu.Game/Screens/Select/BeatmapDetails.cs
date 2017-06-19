@@ -75,6 +75,7 @@ namespace osu.Game.Screens.Select
 
             loading.Hide();
             ratingsContainer.Hide();
+            retryFailContainer.Hide();
         }
 
         private void updateStats()
