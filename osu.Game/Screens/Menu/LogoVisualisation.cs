@@ -25,8 +25,8 @@ namespace osu.Game.Screens.Menu
         private Color4 barColour;
 
         private const int index_change = 5;
-        private const float bar_length = 1200;
-        private const int bars_per_visualizer = 250;
+        private const float bar_length = 600;
+        private const int bars_per_visualizer = 200;
         private const float visualizers = 5;
 
         /// <summary>
@@ -44,8 +44,6 @@ namespace osu.Game.Screens.Menu
             }
             set
             {
-                //Half alpha makes it look really good!
-                value.A = 0.5f;
                 barColour = value;
             }
         }
@@ -60,7 +58,8 @@ namespace osu.Game.Screens.Menu
         public LogoVisualisation()
         {
             texture = Texture.WhitePixel;
-            AccentColour = Color4.White;
+            AccentColour = new Color4(1, 1, 1, 0.2f);
+            BlendingMode = BlendingMode.Additive;
         }
 
         [BackgroundDependencyLoader(true)]
