@@ -23,15 +23,35 @@ namespace osu.Game.Screens.Menu
     {
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
+        /// <summary>
+        /// The number of bars to jump each update iteration.
+        /// </summary>
         private const int index_change = 5;
+
+        /// <summary>
+        /// The maximum length of each bar in the visualiser. Will be reduced when kiai is not activated.
+        /// </summary>
         private const float bar_length = 600;
+
+        /// <summary>
+        /// The number of bars in one rotation of the visualiser.
+        /// </summary>
         private const int bars_per_visualizer = 200;
-        private const float visualizers = 5;
+
+        /// <summary>
+        /// How many times we should stretch around the circumference (overlapping overselves).
+        /// </summary>
+        private const float visualiser_rounds = 5;
 
         /// <summary>
         /// How much should each bar go down each milisecond (based on a full bar)
         /// </summary>
         private const float decay_per_milisecond = 0.0024f;
+
+        /// <summary>
+        /// Number of milliseconds between each amplitude update.
+        /// </summary>
+        private const float time_between_updates = 50;
 
         private int indexOffset;
 
@@ -59,7 +79,7 @@ namespace osu.Game.Screens.Menu
             shader = shaders?.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
-        private void ensureAmplitudes()
+        private void updateAmplitudes()
         {
             float[] temporalAmplitudes = beatmap.Value?.Track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
 
@@ -79,14 +99,15 @@ namespace osu.Game.Screens.Menu
                         frequencyAmplitudes[i] = frequencyAmplitudes[(i + index_change) % bars_per_visualizer];
                 }
             }
+
             indexOffset = (indexOffset + index_change) % bars_per_visualizer;
-            Scheduler.AddDelayed(ensureAmplitudes, 50);
+            Scheduler.AddDelayed(updateAmplitudes, time_between_updates);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            ensureAmplitudes();
+            updateAmplitudes();
         }
 
         protected override void Update()
@@ -152,11 +173,11 @@ namespace osu.Game.Screens.Menu
 
                 if (AudioData != null)
                 {
-                    for (int j = 0; j < visualizers; j++)
+                    for (int j = 0; j < visualiser_rounds; j++)
                     {
                         for (int i = 0; i < bars_per_visualizer; i++)
                         {
-                            float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualizer * 360 + j * 360 / visualizers);
+                            float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualizer * 360 + j * 360 / visualiser_rounds);
                             float rotationCos = (float)Math.Cos(rotation);
                             float rotationSin = (float)Math.Sin(rotation);
                             //taking the cos and sin to the 0..1 range
