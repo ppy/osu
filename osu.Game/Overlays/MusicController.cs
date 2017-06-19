@@ -53,12 +53,8 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-        private readonly Bindable<OsuScreen> currentScreenBacking = new Bindable<OsuScreen>();
-
         private Container dragContainer;
         private Container playerContainer;
-
-        private bool canChangeBeatmap;
 
         public MusicController()
         {
@@ -204,7 +200,6 @@ namespace osu.Game.Overlays
             };
 
             beatmapBacking.BindTo(game.Beatmap);
-            currentScreenBacking.BindTo(game.CurrentScreen);
 
             playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, EasingTypes.OutQuint);
         }
@@ -214,19 +209,7 @@ namespace osu.Game.Overlays
             beatmapBacking.ValueChanged += beatmapChanged;
             beatmapBacking.TriggerChange();
 
-            currentScreenBacking.ValueChanged += screenChanged;
-            currentScreenBacking.TriggerChange();
-
             base.LoadComplete();
-        }
-
-        private void screenChanged(OsuScreen newScreen)
-        {
-            canChangeBeatmap = newScreen?.CanChangeBeatmap ?? true;
-
-            prevButton.Enabled = canChangeBeatmap;
-            nextButton.Enabled = canChangeBeatmap;
-            playlistButton.Enabled = canChangeBeatmap;
         }
 
         protected override void UpdateAfterChildren()
@@ -246,7 +229,7 @@ namespace osu.Game.Overlays
                 progressBar.UpdatePosition(track.Length == 0 ? 0 : (float)(track.CurrentTime / track.Length));
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping && canChangeBeatmap) next();
+                if (track.HasCompleted && !track.Looping) next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
