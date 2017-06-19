@@ -145,7 +145,7 @@ namespace osu.Game.Database
         {
             foreach (string p in paths)
             {
-                //Somehow this fixes a crash when importing a beatmap twice in quick succession
+                //In case the file was imported twice and deleted after the first time
                 if (File.Exists(p))
                     Import(p);
             }
@@ -180,13 +180,14 @@ namespace osu.Game.Database
 
             var existing = Connection.Table<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
 
-            if (existing != null && !existing.DeletePending)
+            if (existing != null)
             {
-                //Already exists
-                return existing;
-            }
-            else if (existing != null)
-            {
+                if(!existing.DeletePending)
+                {
+                    //Already exists
+                    return existing;
+                }
+
                 //Already exists but pending deletion
                 //delete it now and recreate it
                 try
