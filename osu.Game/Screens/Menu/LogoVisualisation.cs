@@ -22,7 +22,6 @@ namespace osu.Game.Screens.Menu
     internal class LogoVisualisation : Drawable, IHasAccentColour
     {
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-        private Color4 barColour;
 
         private const int index_change = 5;
         private const float bar_length = 600;
@@ -36,17 +35,7 @@ namespace osu.Game.Screens.Menu
 
         private int indexOffset;
 
-        public Color4 AccentColour
-        {
-            get
-            {
-                return barColour;
-            }
-            set
-            {
-                barColour = value;
-            }
-        }
+        public Color4 AccentColour { get; set; }
 
         private readonly float[] frequencyAmplitudes = new float[256];
 
@@ -129,7 +118,7 @@ namespace osu.Game.Screens.Menu
             visNode.Texture = texture;
             visNode.Size = DrawSize.X;
             visNode.Shared = sharedData;
-            visNode.Colour = barColour;
+            visNode.Colour = AccentColour;
             visNode.AudioData = frequencyAmplitudes;
         }
 
