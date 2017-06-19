@@ -39,9 +39,7 @@ namespace osu.Game.Overlays
         private Drawable currentBackground;
         private DragBar progressBar;
 
-        private IconButton prevButton;
         private IconButton playButton;
-        private IconButton nextButton;
         private IconButton playlistButton;
 
         private SpriteText title, artist;
@@ -155,7 +153,7 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.Centre,
                                             Children = new[]
                                             {
-                                                prevButton = new IconButton
+                                                new IconButton
                                                 {
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
@@ -167,7 +165,7 @@ namespace osu.Game.Overlays
                                                     Action = play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
-                                                nextButton = new IconButton
+                                                new IconButton
                                                 {
                                                     Action = next,
                                                     Icon = FontAwesome.fa_step_forward,
