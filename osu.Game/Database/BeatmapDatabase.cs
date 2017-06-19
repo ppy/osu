@@ -174,21 +174,40 @@ namespace osu.Game.Database
                         input.CopyTo(output);
             }
 
-            var existing = Connection.Table<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
+            var beatmapSet = Connection.Table<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
 
-            if (existing != null)
+            if (beatmapSet != null && !beatmapSet.DeletePending)
             {
-                if (existing.DeletePending)
+                //Already exists
+                return beatmapSet;
+            }
+            else if (beatmapSet != null)
+            {
+                //Already exists but pending deletion
+                //delete it now and recreate it
+                try
                 {
-                    existing.DeletePending = false;
-                    Update(existing, false);
-                    BeatmapSetAdded?.Invoke(existing);
-                }
+                    if (beatmapSet.Beatmaps != null)
+                    {
+                        foreach (var i in beatmapSet.Beatmaps)
+                        {
+                            if (i.Metadata != null) Connection.Delete(i.Metadata);
+                            if (i.Difficulty != null) Connection.Delete(i.Difficulty);
 
-                return existing;
+                            Connection.Delete(i);
+                        }
+                    }
+
+                    if (beatmapSet.Metadata != null) Connection.Delete(beatmapSet.Metadata);
+                    Connection.Delete(beatmapSet);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not delete beatmap {beatmapSet}");
+                }
             }
 
-            var beatmapSet = new BeatmapSetInfo
+            beatmapSet = new BeatmapSetInfo
             {
                 OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
