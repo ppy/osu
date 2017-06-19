@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Menu
 {
     internal class LogoVisualisation : Drawable, IHasAccentColour
     {
-        private Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
         private Color4 barColour;
 
         private const int index_change = 5;
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private float[] fftData = new float[256];
+        private readonly float[] frequencyAmplitudes = new float[256];
 
         public override bool HandleInput => false;
 
@@ -70,32 +70,32 @@ namespace osu.Game.Screens.Menu
             shader = shaders?.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
-        private void ensureFFTData()
+        private void ensureAmplitudes()
         {
-            float[] temporalFFTData = beatmap?.Value?.Track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
+            float[] temporalAmplitudes = beatmap?.Value?.Track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
 
             for (int i = 0; i < bars_per_visualizer; i++)
             {
                 int index = (i + indexOffset) % bars_per_visualizer;
                 if (beatmap?.Value?.Track?.IsRunning ?? false)
                 {
-                    if (temporalFFTData[index] > fftData[i])
-                        fftData[i] = temporalFFTData[index];
+                    if (temporalAmplitudes[index] > frequencyAmplitudes[i])
+                        frequencyAmplitudes[i] = temporalAmplitudes[index];
                 }
                 else
                 {
-                    if (fftData[(i + index_change) % bars_per_visualizer] > fftData[i])
-                        fftData[i] = fftData[(i + index_change) % bars_per_visualizer];
+                    if (frequencyAmplitudes[(i + index_change) % bars_per_visualizer] > frequencyAmplitudes[i])
+                        frequencyAmplitudes[i] = frequencyAmplitudes[(i + index_change) % bars_per_visualizer];
                 }
             }
             indexOffset = (indexOffset + index_change) % bars_per_visualizer;
-            Scheduler.AddDelayed(ensureFFTData, 50);
+            Scheduler.AddDelayed(ensureAmplitudes, 50);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            ensureFFTData();
+            ensureAmplitudes();
         }
 
         protected override void Update()
@@ -106,9 +106,9 @@ namespace osu.Game.Screens.Menu
             for (int i = 0; i < bars_per_visualizer; i++)
             {
                 //0.03% of extra bar length to make it a little faster when bar is almost at it's minimum
-                fftData[i] -= decayFactor * (fftData[i] + 0.03f);
-                if (fftData[i] < 0)
-                    fftData[i] = 0;
+                frequencyAmplitudes[i] -= decayFactor * (frequencyAmplitudes[i] + 0.03f);
+                if (frequencyAmplitudes[i] < 0)
+                    frequencyAmplitudes[i] = 0;
             }
 
             Invalidate(Invalidation.DrawNode, shallPropagate: false);
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Menu
             visNode.Size = DrawSize.X;
             visNode.Shared = sharedData;
             visNode.Colour = barColour;
-            visNode.AudioData = fftData;
+            visNode.AudioData = frequencyAmplitudes;
         }
 
         private class VisualizerSharedData
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Menu
                 {
                     for (int i = 0; i < bars_per_visualizer * visualizers; i++)
                     {
-                        float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualizer * 360 + (i / bars_per_visualizer * (360 / visualizers)));
+                        float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualizer * 360 + i / bars_per_visualizer * 360 / visualizers);
                         float rotationCos = (float)Math.Cos(rotation);
                         float rotationSin = (float)Math.Sin(rotation);
                         //taking the cos and sin to the 0..1 range
