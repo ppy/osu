@@ -162,34 +162,37 @@ namespace osu.Game.Screens.Menu
 
                 if (AudioData != null)
                 {
-                    for (int i = 0; i < bars_per_visualizer * visualizers; i++)
+                    for (int j = 0; j < visualizers; j++)
                     {
-                        float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualizer * 360 + (i / bars_per_visualizer) * (360 / visualizers));
-                        float rotationCos = (float)Math.Cos(rotation);
-                        float rotationSin = (float)Math.Sin(rotation);
-                        //taking the cos and sin to the 0..1 range
-                        var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * Size;
+                        for (int i = 0; i < bars_per_visualizer; i++)
+                        {
+                            float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualizer * 360 + j * 360 / visualizers);
+                            float rotationCos = (float)Math.Cos(rotation);
+                            float rotationSin = (float)Math.Sin(rotation);
+                            //taking the cos and sin to the 0..1 range
+                            var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * Size;
 
-                        var barSize = new Vector2(Size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualizer)))) / 2f, bar_length * AudioData[i % bars_per_visualizer]);
-                        //The distance between the position and the sides of the bar.
-                        var bottomOffset = new Vector2(-rotationSin * barSize.X / 2, rotationCos * barSize.X / 2);
-                        //The distance between the bottom side of the bar and the top side.
-                        var amplitudeOffset = new Vector2(rotationCos * barSize.Y, rotationSin * barSize.Y);
+                            var barSize = new Vector2(Size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualizer)))) / 2f, bar_length * AudioData[i % bars_per_visualizer]);
+                            //The distance between the position and the sides of the bar.
+                            var bottomOffset = new Vector2(-rotationSin * barSize.X / 2, rotationCos * barSize.X / 2);
+                            //The distance between the bottom side of the bar and the top side.
+                            var amplitudeOffset = new Vector2(rotationCos * barSize.Y, rotationSin * barSize.Y);
 
-                        var rectangle = new Quad(
-                            (barPosition - bottomOffset) * DrawInfo.Matrix,
-                            (barPosition - bottomOffset + amplitudeOffset) * DrawInfo.Matrix,
-                            (barPosition + bottomOffset) * DrawInfo.Matrix,
-                            (barPosition + bottomOffset + amplitudeOffset) * DrawInfo.Matrix
-                        );
+                            var rectangle = new Quad(
+                                (barPosition - bottomOffset) * DrawInfo.Matrix,
+                                (barPosition - bottomOffset + amplitudeOffset) * DrawInfo.Matrix,
+                                (barPosition + bottomOffset) * DrawInfo.Matrix,
+                                (barPosition + bottomOffset + amplitudeOffset) * DrawInfo.Matrix
+                            );
 
-                        Texture.DrawQuad(
-                            rectangle,
-                            colourInfo,
-                            null,
-                            Shared.VertexBatch.Add,
-                            //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
-                            Vector2.Divide(inflation, barSize.Yx));
+                            Texture.DrawQuad(
+                                rectangle,
+                                colourInfo,
+                                null,
+                                Shared.VertexBatch.Add,
+                                //barSize by itself will make it smooth more in the X axis than in the Y axis, this reverts that.
+                                Vector2.Divide(inflation, barSize.Yx));
+                        }
                     }
                 }
                 Shader.Unbind();
