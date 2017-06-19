@@ -16,6 +16,7 @@ namespace osu.Game.Overlays
         protected readonly Container Fill;
 
         public Action<float> SeekRequested;
+        public Action SeekStartRequested;
 
         public bool IsSeeking { get; private set; }
 
@@ -59,28 +60,38 @@ namespace osu.Game.Overlays
         {
             if (IsSeeking || !IsEnabled) return;
 
-            updatePosition(position, false);
+            updatePosition(position);
         }
 
         private void seek(InputState state)
         {
-            float seekLocation = state.Mouse.Position.X / DrawWidth;
-
             if (!IsEnabled) return;
+
+            float seekLocation = state.Mouse.Position.X / DrawWidth;
 
             SeekRequested?.Invoke(seekLocation);
             updatePosition(seekLocation);
         }
 
-        private void updatePosition(float position, bool easing = true)
+        private void updatePosition(float position)
         {
             position = MathHelper.Clamp(position, 0, 1);
-            Fill.TransformTo(() => Fill.Width, position, easing ? 200 : 0, EasingTypes.OutQuint, new TransformSeek());
+            Fill.TransformTo(() => Fill.Width, position, 200, EasingTypes.OutQuint, new TransformSeek());
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
+            IsSeeking = true;
+            SeekStartRequested?.Invoke();
+
             seek(state);
+            return true;
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            IsSeeking = false;
+
             return true;
         }
 
@@ -90,13 +101,9 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDragStart(InputState state) => IsSeeking = true;
+        protected override bool OnDragStart(InputState state) => true;
 
-        protected override bool OnDragEnd(InputState state)
-        {
-            IsSeeking = false;
-            return true;
-        }
+        protected override bool OnDragEnd(InputState state) => true;
 
         private class TransformSeek : TransformFloat
         {
