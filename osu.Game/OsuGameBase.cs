@@ -18,6 +18,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
+using osu.Game.Screens;
 using SQLite.Net;
 using osu.Framework.Graphics.Performance;
 
@@ -44,6 +45,8 @@ namespace osu.Game
         protected MenuCursor Cursor;
 
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        public readonly Bindable<OsuScreen> CurrentScreen = new Bindable<OsuScreen>();
 
         private Bindable<bool> fpsDisplayVisible;
 

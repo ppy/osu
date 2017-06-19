@@ -88,7 +88,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game, OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuGameBase game, OsuColour colours, LocalisationEngine localisation)
         {
             this.localisation = localisation;
 
@@ -222,7 +222,7 @@ namespace osu.Game.Overlays
 
         private void screenChanged(OsuScreen newScreen)
         {
-            canChangeBeatmap = newScreen?.CanChangeBeatmap ?? false;
+            canChangeBeatmap = newScreen?.CanChangeBeatmap ?? true;
 
             prevButton.Enabled = canChangeBeatmap;
             playButton.Enabled = canChangeBeatmap;
