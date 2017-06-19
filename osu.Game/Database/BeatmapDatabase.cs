@@ -182,7 +182,7 @@ namespace osu.Game.Database
 
             if (existing != null)
             {
-                if(!existing.DeletePending)
+                if (!existing.DeletePending)
                 {
                     //Already exists
                     return existing;
