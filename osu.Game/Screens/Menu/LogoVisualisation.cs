@@ -63,10 +63,11 @@ namespace osu.Game.Screens.Menu
             AccentColour = Color4.White;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(ShaderManager shaders, OsuGame game)
         {
-            beatmap.BindTo(game.Beatmap);
+            if (game?.Beatmap != null)
+                beatmap.BindTo(game.Beatmap);
             shader = shaders?.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
