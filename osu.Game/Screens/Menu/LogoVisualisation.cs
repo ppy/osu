@@ -25,9 +25,9 @@ namespace osu.Game.Screens.Menu
         private Color4 barColour;
 
         private const int index_change = 5;
-        private const int bar_length = 1200;
+        private const float bar_length = 1200;
         private const int bars_per_visualizer = 250;
-        private const int visualizers = 5;
+        private const float visualizers = 5;
 
         /// <summary>
         /// How much should each bar go down each milisecond (based on a full bar)
