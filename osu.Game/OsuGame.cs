@@ -298,21 +298,22 @@ namespace osu.Game
 
         private Container overlayContent;
 
-        private OsuScreen currentScreen;
+        public readonly Bindable<OsuScreen> CurrentScreen = new Bindable<OsuScreen>();
+
         private FrameworkConfigManager frameworkConfig;
 
         private void screenChanged(Screen newScreen)
         {
-            currentScreen = newScreen as OsuScreen;
+            CurrentScreen.Value = newScreen as OsuScreen;
 
-            if (currentScreen == null)
+            if (CurrentScreen.Value == null)
             {
                 Exit();
                 return;
             }
 
             //central game screen change logic.
-            if (!currentScreen.ShowOverlays)
+            if (!CurrentScreen.Value.ShowOverlays)
             {
                 settings.State = Visibility.Hidden;
                 Toolbar.State = Visibility.Hidden;
@@ -362,7 +363,7 @@ namespace osu.Game
 
             mainContent.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
 
-            Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
+            Cursor.State = CurrentScreen.Value?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
         }
 
         private void screenAdded(Screen newScreen)

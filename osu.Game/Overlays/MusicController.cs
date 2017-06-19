@@ -16,13 +16,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Threading;
 using osu.Game.Overlays.Music;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens;
 
 namespace osu.Game.Overlays
 {
@@ -39,7 +40,9 @@ namespace osu.Game.Overlays
         private Drawable currentBackground;
         private DragBar progressBar;
 
+        private IconButton prevButton;
         private IconButton playButton;
+        private IconButton nextButton;
         private IconButton playlistButton;
 
         private SpriteText title, artist;
@@ -50,8 +53,12 @@ namespace osu.Game.Overlays
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
+        private readonly Bindable<OsuScreen> currentScreenBacking = new Bindable<OsuScreen>();
+
         private Container dragContainer;
         private Container playerContainer;
+
+        private bool canChangeBeatmap;
 
         public MusicController()
         {
@@ -81,7 +88,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuGame game, OsuColour colours, LocalisationEngine localisation)
         {
             this.localisation = localisation;
 
@@ -153,7 +160,7 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.Centre,
                                             Children = new[]
                                             {
-                                                new IconButton
+                                                prevButton = new IconButton
                                                 {
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
@@ -165,7 +172,7 @@ namespace osu.Game.Overlays
                                                     Action = play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
-                                                new IconButton
+                                                nextButton = new IconButton
                                                 {
                                                     Action = next,
                                                     Icon = FontAwesome.fa_step_forward,
@@ -197,6 +204,7 @@ namespace osu.Game.Overlays
             };
 
             beatmapBacking.BindTo(game.Beatmap);
+            currentScreenBacking.BindTo(game.CurrentScreen);
 
             playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, EasingTypes.OutQuint);
         }
@@ -206,7 +214,22 @@ namespace osu.Game.Overlays
             beatmapBacking.ValueChanged += beatmapChanged;
             beatmapBacking.TriggerChange();
 
+            currentScreenBacking.ValueChanged += screenChanged;
+            currentScreenBacking.TriggerChange();
+
             base.LoadComplete();
+        }
+
+        private void screenChanged(OsuScreen newScreen)
+        {
+            canChangeBeatmap = newScreen?.CanChangeBeatmap ?? false;
+
+            prevButton.Enabled = canChangeBeatmap;
+            playButton.Enabled = canChangeBeatmap;
+            nextButton.Enabled = canChangeBeatmap;
+            playlistButton.Enabled = canChangeBeatmap;
+
+            progressBar.IsEnabled = canChangeBeatmap;
         }
 
         protected override void UpdateAfterChildren()
@@ -250,12 +273,16 @@ namespace osu.Game.Overlays
 
         private void prev()
         {
+            if(!canChangeBeatmap) return;
+
             queuedDirection = TransformDirection.Prev;
             playlist.PlayPrevious();
         }
 
         private void next()
         {
+            if (!canChangeBeatmap) return;
+
             queuedDirection = TransformDirection.Next;
             playlist.PlayNext();
         }
