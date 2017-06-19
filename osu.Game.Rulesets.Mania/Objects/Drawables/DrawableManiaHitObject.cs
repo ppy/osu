@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
-    public abstract class DrawableManiaHitObject<TObject> : DrawableHitObject<ManiaHitObject, ManiaJudgement>
+    public abstract class DrawableManiaHitObject<TObject> : DrawableScrollingHitObject<ManiaHitObject, ManiaJudgement>
         where TObject : ManiaHitObject
     {
         /// <summary>
