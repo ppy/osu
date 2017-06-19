@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// The number of bars in one rotation of the visualiser.
         /// </summary>
-        private const int bars_per_visualizer = 200;
+        private const int bars_per_visualiser = 200;
 
         /// <summary>
         /// How many times we should stretch around the circumference (overlapping overselves).
@@ -85,9 +85,9 @@ namespace osu.Game.Screens.Menu
 
             var effect = beatmap.Value?.Beatmap.ControlPointInfo.EffectPointAt(beatmap.Value.Track?.CurrentTime ?? Time.Current);
 
-            for (int i = 0; i < bars_per_visualizer; i++)
+            for (int i = 0; i < bars_per_visualiser; i++)
             {
-                int index = (i + indexOffset) % bars_per_visualizer;
+                int index = (i + indexOffset) % bars_per_visualiser;
                 if (beatmap?.Value?.Track?.IsRunning ?? false)
                 {
                     if (temporalAmplitudes[index] > frequencyAmplitudes[i])
@@ -95,12 +95,12 @@ namespace osu.Game.Screens.Menu
                 }
                 else
                 {
-                    if (frequencyAmplitudes[(i + index_change) % bars_per_visualizer] > frequencyAmplitudes[i])
-                        frequencyAmplitudes[i] = frequencyAmplitudes[(i + index_change) % bars_per_visualizer];
+                    if (frequencyAmplitudes[(i + index_change) % bars_per_visualiser] > frequencyAmplitudes[i])
+                        frequencyAmplitudes[i] = frequencyAmplitudes[(i + index_change) % bars_per_visualiser];
                 }
             }
 
-            indexOffset = (indexOffset + index_change) % bars_per_visualizer;
+            indexOffset = (indexOffset + index_change) % bars_per_visualiser;
             Scheduler.AddDelayed(updateAmplitudes, time_between_updates);
         }
 
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Menu
             base.Update();
 
             float decayFactor = (float)Time.Elapsed * decay_per_milisecond;
-            for (int i = 0; i < bars_per_visualizer; i++)
+            for (int i = 0; i < bars_per_visualiser; i++)
             {
                 //0.03% of extra bar length to make it a little faster when bar is almost at it's minimum
                 frequencyAmplitudes[i] -= decayFactor * (frequencyAmplitudes[i] + 0.03f);
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Menu
 
         protected override DrawNode CreateDrawNode() => new VisualisationDrawNode();
 
-        private readonly VisualizerSharedData sharedData = new VisualizerSharedData();
+        private readonly VisualiserSharedData sharedData = new VisualiserSharedData();
         protected override void ApplyDrawNode(DrawNode node)
         {
             base.ApplyDrawNode(node);
@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Menu
             visNode.AudioData = frequencyAmplitudes;
         }
 
-        private class VisualizerSharedData
+        private class VisualiserSharedData
         {
             public readonly LinearBatch<TexturedVertex2D> VertexBatch = new LinearBatch<TexturedVertex2D>(100 * 4, 10, PrimitiveType.Quads);
         }
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Menu
         {
             public Shader Shader;
             public Texture Texture;
-            public VisualizerSharedData Shared;
+            public VisualiserSharedData Shared;
             //Asuming the logo is a circle, we don't need a second dimension.
             public float Size;
 
@@ -175,15 +175,15 @@ namespace osu.Game.Screens.Menu
                 {
                     for (int j = 0; j < visualiser_rounds; j++)
                     {
-                        for (int i = 0; i < bars_per_visualizer; i++)
+                        for (int i = 0; i < bars_per_visualiser; i++)
                         {
-                            float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualizer * 360 + j * 360 / visualiser_rounds);
+                            float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
                             float rotationCos = (float)Math.Cos(rotation);
                             float rotationSin = (float)Math.Sin(rotation);
                             //taking the cos and sin to the 0..1 range
                             var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * Size;
 
-                            var barSize = new Vector2(Size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualizer)))) / 2f, bar_length * AudioData[i % bars_per_visualizer]);
+                            var barSize = new Vector2(Size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * AudioData[i % bars_per_visualiser]);
                             //The distance between the position and the sides of the bar.
                             var bottomOffset = new Vector2(-rotationSin * barSize.X / 2, rotationCos * barSize.X / 2);
                             //The distance between the bottom side of the bar and the top side.
