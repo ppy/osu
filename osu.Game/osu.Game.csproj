@@ -290,7 +290,7 @@
     <Compile Include="Screens\Menu\Intro.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
     <Compile Include="Screens\Menu\MainMenu.cs" />
-    <Compile Include="Screens\Menu\MenuVisualisation.cs" />
+    <Compile Include="Screens\Menu\LogoVisualisation.cs" />
     <Compile Include="Screens\Menu\OsuLogo.cs" />
     <Compile Include="Screens\Multiplayer\Lobby.cs" />
     <Compile Include="Screens\Multiplayer\Match.cs" />
