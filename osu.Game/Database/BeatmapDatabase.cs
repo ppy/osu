@@ -144,7 +144,11 @@ namespace osu.Game.Database
         public void Import(params string[] paths)
         {
             foreach (string p in paths)
-                Import(p);
+            {
+                //Somehow this fixes a crash when importing a beatmap twice in quick succession
+                if (File.Exists(p))
+                    Import(p);
+            }
         }
 
         /// <summary>
@@ -174,22 +178,22 @@ namespace osu.Game.Database
                         input.CopyTo(output);
             }
 
-            var beatmapSet = Connection.Table<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
+            var existing = Connection.Table<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
 
-            if (beatmapSet != null && !beatmapSet.DeletePending)
+            if (existing != null && !existing.DeletePending)
             {
                 //Already exists
-                return beatmapSet;
+                return existing;
             }
-            else if (beatmapSet != null)
+            else if (existing != null)
             {
                 //Already exists but pending deletion
                 //delete it now and recreate it
                 try
                 {
-                    if (beatmapSet.Beatmaps != null)
+                    if (existing.Beatmaps != null)
                     {
-                        foreach (var i in beatmapSet.Beatmaps)
+                        foreach (var i in existing.Beatmaps)
                         {
                             if (i.Metadata != null) Connection.Delete(i.Metadata);
                             if (i.Difficulty != null) Connection.Delete(i.Difficulty);
@@ -198,16 +202,16 @@ namespace osu.Game.Database
                         }
                     }
 
-                    if (beatmapSet.Metadata != null) Connection.Delete(beatmapSet.Metadata);
-                    Connection.Delete(beatmapSet);
+                    if (existing.Metadata != null) Connection.Delete(existing.Metadata);
+                    Connection.Delete(existing);
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $@"Could not delete beatmap {beatmapSet}");
+                    Logger.Error(e, $@"Could not delete beatmap {existing}");
                 }
             }
 
-            beatmapSet = new BeatmapSetInfo
+            var beatmapSet = new BeatmapSetInfo
             {
                 OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
