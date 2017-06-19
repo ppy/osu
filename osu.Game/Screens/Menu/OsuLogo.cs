@@ -34,6 +34,7 @@ namespace osu.Game.Screens.Menu
         private readonly Container logoBeatContainer;
         private readonly Container logoAmplitudeContainer;
         private readonly Container logoHoverContainer;
+        private readonly LogoVisualisation visualizer;
 
         private SampleChannel sampleClick;
 
@@ -120,6 +121,14 @@ namespace osu.Game.Screens.Menu
                                             AutoSizeAxes = Axes.Both,
                                             Children = new Drawable[]
                                             {
+                                                visualizer = new LogoVisualisation
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Origin = Anchor.Centre,
+                                                    Anchor = Anchor.Centre,
+                                                    Alpha = 0.5f,
+                                                    Size = new Vector2(0.96f)
+                                                },
                                                 new BufferedContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
@@ -189,14 +198,6 @@ namespace osu.Game.Screens.Menu
                                                             Alpha = 0,
                                                         }
                                                     }
-                                                },
-                                                new MenuVisualisation
-                                                {
-                                                    Anchor = Anchor.Centre,
-                                                    Origin = Anchor.Centre,
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    BlendingMode = BlendingMode.Additive,
-                                                    Alpha = 0.2f,
                                                 }
                                             }
                                         }
@@ -246,10 +247,14 @@ namespace osu.Game.Screens.Menu
             if (effectPoint.KiaiMode && flashLayer.Alpha < 0.4f)
             {
                 flashLayer.ClearTransforms();
+                visualizer.ClearTransforms();
 
                 flashLayer.FadeTo(0.2f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
+                visualizer.FadeTo(0.9f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
                 using (flashLayer.BeginDelayedSequence(beat_in_time))
                     flashLayer.FadeOut(beatLength);
+                using (visualizer.BeginDelayedSequence(beat_in_time))
+                    visualizer.FadeTo(0.5f, beatLength);
             }
         }
 
