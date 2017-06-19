@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Menu
                 {
                     for (int i = 0; i < bars_per_visualizer * visualizers; i++)
                     {
-                        float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualizer * 360 + i / bars_per_visualizer * 360 / visualizers);
+                        float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualizer * 360 + i / bars_per_visualizer * (360 / visualizers));
                         float rotationCos = (float)Math.Cos(rotation);
                         float rotationSin = (float)Math.Sin(rotation);
                         //taking the cos and sin to the 0..1 range
