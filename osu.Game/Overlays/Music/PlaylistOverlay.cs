@@ -36,12 +36,10 @@ namespace osu.Game.Overlays.Music
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-        private readonly Bindable<OsuScreen> currentScreenBacking = new Bindable<OsuScreen>();
+        public bool AllowBeatmapChange = true;
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets;
         private InputManager inputManager;
-
-        private bool canBeatmapChange => currentScreenBacking.Value?.CanBeatmapChange != false;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, BeatmapDatabase beatmaps, OsuColour colours, UserInputManager inputManager)
@@ -91,7 +89,6 @@ namespace osu.Game.Overlays.Music
             list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>().ToList();
 
             beatmapBacking.BindTo(game.Beatmap);
-            currentScreenBacking.BindTo(game.CurrentScreen);
 
             filter.Search.OnCommit = (sender, newText) => {
                 var beatmap = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
@@ -158,7 +155,7 @@ namespace osu.Game.Overlays.Music
 
         private void playSpecified(BeatmapInfo info)
         {
-            if (!canBeatmapChange)
+            if (!AllowBeatmapChange)
             {
                 beatmapBacking.Value?.Track?.Seek(0);
                 return;

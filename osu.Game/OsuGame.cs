@@ -298,20 +298,21 @@ namespace osu.Game
 
         private Container overlayContent;
 
+        private OsuScreen currentScreen;
         private FrameworkConfigManager frameworkConfig;
 
         private void screenChanged(Screen newScreen)
         {
-            CurrentScreen.Value = newScreen as OsuScreen;
+            currentScreen = newScreen as OsuScreen;
 
-            if (CurrentScreen.Value == null)
+            if (currentScreen == null)
             {
                 Exit();
                 return;
             }
 
             //central game screen change logic.
-            if (!CurrentScreen.Value.ShowOverlays)
+            if (!currentScreen.ShowOverlays)
             {
                 settings.State = Visibility.Hidden;
                 Toolbar.State = Visibility.Hidden;
@@ -326,6 +327,8 @@ namespace osu.Game
             }
 
             ScreenChanged?.Invoke(newScreen);
+
+            musicController.AllowBeatmapChange = currentScreen.AllowBeatmapChange;
         }
 
         protected override bool OnExiting()
@@ -361,7 +364,7 @@ namespace osu.Game
 
             mainContent.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
 
-            Cursor.State = CurrentScreen.Value?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
+            Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
         }
 
         private void screenAdded(Screen newScreen)

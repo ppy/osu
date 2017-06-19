@@ -29,7 +29,7 @@ namespace osu.Game.Screens
 
         internal virtual bool AllowRulesetChange => true;
 
-        internal virtual bool CanBeatmapChange => true;
+        internal virtual bool AllowBeatmapChange => true;
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
