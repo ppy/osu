@@ -225,11 +225,8 @@ namespace osu.Game.Overlays
             canChangeBeatmap = newScreen?.CanChangeBeatmap ?? true;
 
             prevButton.Enabled = canChangeBeatmap;
-            playButton.Enabled = canChangeBeatmap;
             nextButton.Enabled = canChangeBeatmap;
             playlistButton.Enabled = canChangeBeatmap;
-
-            progressBar.IsEnabled = canChangeBeatmap;
         }
 
         protected override void UpdateAfterChildren()
@@ -249,7 +246,7 @@ namespace osu.Game.Overlays
                 progressBar.UpdatePosition(track.Length == 0 ? 0 : (float)(track.CurrentTime / track.Length));
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping) next();
+                if (track.HasCompleted && !track.Looping && canChangeBeatmap) next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
@@ -273,16 +270,12 @@ namespace osu.Game.Overlays
 
         private void prev()
         {
-            if(!canChangeBeatmap) return;
-
             queuedDirection = TransformDirection.Prev;
             playlist.PlayPrevious();
         }
 
         private void next()
         {
-            if (!canChangeBeatmap) return;
-
             queuedDirection = TransformDirection.Next;
             playlist.PlayNext();
         }
