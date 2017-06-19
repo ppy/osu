@@ -59,9 +59,31 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        /// <summary>
+        /// Blanks out the details screen
+        /// </summary>
+        private void clear()
+        {
+            description.Text = null;
+            source.Text = null;
+            tags.Text = null;
+            circleSize.Value = 0;
+            drainRate.Value = 0;
+            overallDifficulty.Value = 0;
+            approachRate.Value = 0;
+            stars.Value = 0;
+
+            loading.Hide();
+            ratingsContainer.Hide();
+        }
+
         private void updateStats()
         {
-            if (beatmap == null) return;
+            if (beatmap == null)
+            {
+                clear();
+                return;
+            }
 
             description.Text = beatmap.Version;
             source.Text = beatmap.Metadata.Source;

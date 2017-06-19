@@ -69,6 +69,7 @@ namespace osu.Game.Screens.Select
                 beatmapInfoContainer?.FadeOut(250);
                 beatmapInfoContainer?.Expire();
                 beatmapInfoContainer = null;
+                FadeOut(250);
                 return;
             }
 
