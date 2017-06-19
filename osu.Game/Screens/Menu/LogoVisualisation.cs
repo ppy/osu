@@ -73,7 +73,9 @@ namespace osu.Game.Screens.Menu
 
         private void ensureAmplitudes()
         {
-            float[] temporalAmplitudes = beatmap?.Value?.Track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
+            float[] temporalAmplitudes = beatmap.Value?.Track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
+
+            var effect = beatmap.Value?.Beatmap.ControlPointInfo.EffectPointAt(beatmap.Value.Track?.CurrentTime ?? Time.Current);
 
             for (int i = 0; i < bars_per_visualizer; i++)
             {
@@ -81,7 +83,7 @@ namespace osu.Game.Screens.Menu
                 if (beatmap?.Value?.Track?.IsRunning ?? false)
                 {
                     if (temporalAmplitudes[index] > frequencyAmplitudes[i])
-                        frequencyAmplitudes[i] = temporalAmplitudes[index];
+                        frequencyAmplitudes[i] = temporalAmplitudes[index] * (effect?.KiaiMode == true ? 1 : 0.5f);
                 }
                 else
                 {
