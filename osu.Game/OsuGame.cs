@@ -298,8 +298,6 @@ namespace osu.Game
 
         private Container overlayContent;
 
-        public readonly Bindable<OsuScreen> CurrentScreen = new Bindable<OsuScreen>();
-
         private FrameworkConfigManager frameworkConfig;
 
         private void screenChanged(Screen newScreen)
