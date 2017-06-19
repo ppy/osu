@@ -159,7 +159,10 @@ namespace osu.Game.Overlays.Music
         private void playSpecified(BeatmapInfo info)
         {
             if (!canBeatmapChange)
+            {
+                beatmapBacking.Value?.Track?.Seek(0);
                 return;
+            }
 
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
 
