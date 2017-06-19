@@ -18,22 +18,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 {
     public abstract class DrawableHitObject : Container
     {
-        private readonly BindableDouble lifetimeOffset = new BindableDouble();
-        /// <summary>
-        /// Time offset before the hit object start time at which this <see cref="DrawableHitObject"/> becomes visible and the time offset
-        /// after the hit object's end time after which it expires.
-        ///
-        /// <para>
-        /// This provides only a default life time range, however classes inheriting from <see cref="DrawableHitObject"/> should expire their state through
-        /// <see cref="DrawableHitObject{TObject, TJudgement}.UpdateState(ArmedState)"/> if more tight control over the life time is desired.
-        /// </para>
-        /// </summary>
-        public BindableDouble LifetimeOffset
-        {
-            get { return lifetimeOffset; }
-            set { lifetimeOffset.BindTo(value); }
-        }
-
         public readonly HitObject HitObject;
 
         /// <summary>
@@ -44,22 +28,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
-        }
-
-        public override double LifetimeStart
-        {
-            get { return Math.Min(HitObject.StartTime - lifetimeOffset, base.LifetimeStart); }
-            set { base.LifetimeStart = value; }
-        }
-
-        public override double LifetimeEnd
-        {
-            get
-            {
-                var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-                return Math.Max(endTime + LifetimeOffset, base.LifetimeEnd);
-            }
-            set { base.LifetimeEnd = value; }
         }
     }
 
@@ -217,13 +185,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
         protected IEnumerable<DrawableHitObject<TObject, TJudgement>> NestedHitObjects => nestedHitObjects;
 
-        protected void AddNested(DrawableHitObject<TObject, TJudgement> h)
+        protected virtual void AddNested(DrawableHitObject<TObject, TJudgement> h)
         {
             if (nestedHitObjects == null)
                 nestedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
             h.OnJudgement += d => OnJudgement?.Invoke(d);
-            h.LifetimeOffset = LifetimeOffset;
             nestedHitObjects.Add(h);
         }
 

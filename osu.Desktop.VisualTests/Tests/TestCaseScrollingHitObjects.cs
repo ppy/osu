@@ -152,10 +152,12 @@ namespace osu.Desktop.VisualTests.Tests
             }
         }
 
-        private class TestDrawableHitObject : DrawableHitObject
+        private class TestDrawableHitObject : DrawableHitObject, IScrollingHitObject
         {
             private readonly Box background;
             private const float height = 14;
+
+            public BindableDouble LifetimeOffset { get; } = new BindableDouble();
 
             public TestDrawableHitObject(HitObject hitObject)
                 : base(hitObject)

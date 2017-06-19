@@ -82,7 +82,9 @@ namespace osu.Game.Rulesets.Timing
 
         public override void Add(DrawableHitObject drawable)
         {
-            drawable.LifetimeOffset.BindTo(VisibleTimeRange);
+            var scrollingHitObject = drawable as IScrollingHitObject;
+            scrollingHitObject?.LifetimeOffset.BindTo(VisibleTimeRange);
+
             base.Add(drawable);
         }
 
