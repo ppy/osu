@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using osu.Game.Screens;
 using OpenTK;
 using OpenTK.Graphics;
 
