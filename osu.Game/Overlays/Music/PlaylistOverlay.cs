@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Music
         public IEnumerable<BeatmapSetInfo> BeatmapSets;
         private InputManager inputManager;
 
-        private bool canChangeBeatmap => currentScreenBacking.Value?.CanChangeBeatmap != false;
+        private bool canBeatmapChange => currentScreenBacking.Value?.CanBeatmapChange != false;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, BeatmapDatabase beatmaps, OsuColour colours, UserInputManager inputManager)
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Music
 
         private void playSpecified(BeatmapInfo info)
         {
-            if (!canChangeBeatmap)
+            if (!canBeatmapChange)
                 return;
 
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
