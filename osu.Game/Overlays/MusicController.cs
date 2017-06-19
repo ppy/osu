@@ -53,17 +53,14 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
-        private bool allowBeatmapChange = true;
-
         public bool AllowBeatmapChange
         {
             get
             {
-                return allowBeatmapChange;
+                return playlist.AllowBeatmapChange;
             }
             set
             {
-                allowBeatmapChange = value;
                 playlist.AllowBeatmapChange = value;
             }
         }
