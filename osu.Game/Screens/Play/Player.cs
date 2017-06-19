@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Play
 
         internal override bool ShowOverlays => false;
 
+        internal override bool CanChangeBeatmap => false;
+
         internal override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && HitRenderer.ProvidingUserCursor;
 
         public BeatmapInfo BeatmapInfo;

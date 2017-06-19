@@ -279,5 +279,7 @@ namespace osu.Game.Screens.Ranking
 
             modeChangeButtons.Current.TriggerChange();
         }
+
+        internal override bool CanChangeBeatmap => false;
     }
 }
