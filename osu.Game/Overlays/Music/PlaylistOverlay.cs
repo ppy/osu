@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Music
             }
             set
             {
-                if (!IsLoaded || allowBeatmapChange == value) return;
+                if (allowBeatmapChange == value) return;
 
                 allowBeatmapChange = value;
 
@@ -66,8 +66,7 @@ namespace osu.Game.Overlays.Music
                 list.Filter(filter.Search.Text);
 
                 // Select the current beatmap
-                if (beatmapBacking.Value != null)
-                    list.SelectedItem = beatmapBacking.Value.BeatmapSetInfo;
+                list.SelectedItem = beatmapBacking.Value?.BeatmapSetInfo;
             }
         }
 
