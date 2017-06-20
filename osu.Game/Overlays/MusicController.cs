@@ -39,8 +39,12 @@ namespace osu.Game.Overlays
         private Drawable currentBackground;
         private DragBar progressBar;
 
+        private IconButton prevButton;
         private IconButton playButton;
+        private IconButton nextButton;
         private IconButton playlistButton;
+
+        private Color4 colorYellow;
 
         private SpriteText title, artist;
 
@@ -53,16 +57,36 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
+        private bool showPlaylistOnceAvailable;
+
+        private bool allowBeatmapChange = true;
+
         public bool AllowBeatmapChange
         {
             get
             {
-                return playlist.AllowBeatmapChange;
+                return allowBeatmapChange;
             }
             set
             {
-                if(IsLoaded)
-                    playlist.AllowBeatmapChange = value;
+                if (allowBeatmapChange == value) return;
+
+                allowBeatmapChange = value;
+
+                // Toggle the playlist's visibility if required
+                if (!allowBeatmapChange)
+                {
+                    showPlaylistOnceAvailable = playlist.State == Visibility.Visible;
+
+                    if (showPlaylistOnceAvailable)
+                        playlist?.Hide();
+                }
+                else if (showPlaylistOnceAvailable)
+                    playlist?.Show();
+
+                prevButton.Enabled = allowBeatmapChange;
+                nextButton.Enabled = allowBeatmapChange;
+                playlistButton.Enabled = allowBeatmapChange;
             }
         }
 
@@ -166,7 +190,7 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.Centre,
                                             Children = new[]
                                             {
-                                                new IconButton
+                                                prevButton = new IconButton
                                                 {
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
@@ -178,7 +202,7 @@ namespace osu.Game.Overlays
                                                     Action = play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
-                                                new IconButton
+                                                nextButton = new IconButton
                                                 {
                                                     Action = next,
                                                     Icon = FontAwesome.fa_step_forward,
@@ -211,7 +235,9 @@ namespace osu.Game.Overlays
 
             beatmapBacking.BindTo(game.Beatmap);
 
-            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, EasingTypes.OutQuint);
+            colorYellow = colours.Yellow;
+
+            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colorYellow : Color4.White, 200, EasingTypes.OutQuint);
         }
 
         protected override void LoadComplete()
@@ -384,6 +410,8 @@ namespace osu.Game.Overlays
 
             FadeOut(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
+
+            showPlaylistOnceAvailable = false;
         }
 
         private enum TransformDirection

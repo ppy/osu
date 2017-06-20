@@ -33,6 +33,39 @@ namespace osu.Game.Graphics.UserInterface
             set { icon.Scale = value; }
         }
 
+        private Color4 disabledColour;
+
+        public override bool Enabled
+        {
+            get
+            {
+                return base.Enabled;
+            }
+
+            set
+            {
+                if (base.Enabled == value) return;
+
+                base.Enabled = value;
+
+                if (!value)
+                {
+                    FadeColour(disabledColour, 200, EasingTypes.OutQuint);
+                    content.ScaleTo(1, 200, EasingTypes.OutElastic);
+
+                    if (Hovering)
+                        hover.FadeOut(200, EasingTypes.OutQuint);
+                }
+                else
+                {
+                    FadeColour(Color4.White, 200, EasingTypes.OutQuint);
+
+                    if(Hovering)
+                        hover.FadeIn(500, EasingTypes.OutQuint);
+                }
+            }
+        }
+
         public IconButton()
         {
             AutoSizeAxes = Axes.Both;
@@ -79,34 +112,46 @@ namespace osu.Game.Graphics.UserInterface
         {
             hover.Colour = colours.Yellow.Opacity(0.6f);
             flashColour = colours.Yellow;
+            disabledColour = colours.Gray9;
         }
 
         protected override bool OnHover(InputState state)
         {
+            if (!Enabled)
+                return true;
+
             hover.FadeIn(500, EasingTypes.OutQuint);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
+            if (!Enabled)
+                return;
+
             hover.FadeOut(500, EasingTypes.OutQuint);
             base.OnHoverLost(state);
         }
 
         protected override bool OnClick(InputState state)
         {
-            hover.FlashColour(flashColour, 800, EasingTypes.OutQuint);
             return base.OnClick(state);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
+            if (!Enabled)
+                return true;
+
             content.ScaleTo(0.75f, 2000, EasingTypes.OutQuint);
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
+            if (!Enabled)
+                return true;
+
             content.ScaleTo(1, 1000, EasingTypes.OutElastic);
             return base.OnMouseUp(state, args);
         }

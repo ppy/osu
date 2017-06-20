@@ -35,41 +35,6 @@ namespace osu.Game.Overlays.Music
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-        private bool allowBeatmapChange = true;
-
-        public bool AllowBeatmapChange
-        {
-            get
-            {
-                return allowBeatmapChange;
-            }
-            set
-            {
-                if (allowBeatmapChange == value) return;
-
-                allowBeatmapChange = value;
-
-                // Get the new list of available beatmap sets
-                if (allowBeatmapChange)
-                    list.BeatmapSets = BeatmapSets;
-                else if (beatmapBacking.Value != null)
-                {
-                    list.BeatmapSets = new List<BeatmapSetInfo>()
-                    {
-                        beatmapBacking.Value.BeatmapSetInfo
-                    };
-                }
-                else
-                    list.BeatmapSets = new List<BeatmapSetInfo>();
-
-                // Apply the current filter
-                list.Filter(filter.Search.Text);
-
-                // Select the current beatmap
-                list.SelectedItem = beatmapBacking.Value?.BeatmapSetInfo;
-            }
-        }
-
         public IEnumerable<BeatmapSetInfo> BeatmapSets;
         private InputManager inputManager;
 
@@ -187,12 +152,6 @@ namespace osu.Game.Overlays.Music
 
         private void playSpecified(BeatmapInfo info)
         {
-            if (!AllowBeatmapChange)
-            {
-                beatmapBacking.Value?.Track?.Seek(0);
-                return;
-            }
-
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
 
             Task.Run(() =>
