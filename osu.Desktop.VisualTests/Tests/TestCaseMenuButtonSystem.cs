@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Menu;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Desktop.VisualTests.Tests
 {
