@@ -61,7 +61,8 @@ namespace osu.Game.Overlays
             }
             set
             {
-                playlist.AllowBeatmapChange = value;
+                if(IsLoaded)
+                    playlist.AllowBeatmapChange = value;
             }
         }
 
