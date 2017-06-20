@@ -73,6 +73,10 @@ namespace osu.Game.Overlays
 
                 allowBeatmapChange = value;
 
+                prevButton.Enabled = allowBeatmapChange;
+                nextButton.Enabled = allowBeatmapChange;
+                playlistButton.Enabled = allowBeatmapChange;
+
                 // Toggle the playlist's visibility if required
                 if (!allowBeatmapChange)
                 {
@@ -81,12 +85,8 @@ namespace osu.Game.Overlays
                     if (showPlaylistOnceAvailable)
                         playlist?.Hide();
                 }
-                else if (showPlaylistOnceAvailable)
+                else if (showPlaylistOnceAvailable && State == Visibility.Visible)
                     playlist?.Show();
-
-                prevButton.Enabled = allowBeatmapChange;
-                nextButton.Enabled = allowBeatmapChange;
-                playlistButton.Enabled = allowBeatmapChange;
             }
         }
 
@@ -237,7 +237,11 @@ namespace osu.Game.Overlays
 
             colorYellow = colours.Yellow;
 
-            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colorYellow : Color4.White, 200, EasingTypes.OutQuint);
+            playlist.StateChanged += (c, s) =>
+            {
+                if (playlistButton.Enabled)
+                    playlistButton.FadeColour(s == Visibility.Visible ? colorYellow : Color4.White, 200, EasingTypes.OutQuint);
+            };
         }
 
         protected override void LoadComplete()
@@ -402,6 +406,9 @@ namespace osu.Game.Overlays
 
             FadeIn(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(1, transition_length, EasingTypes.OutElastic);
+
+            if(Alpha == 0)
+                showPlaylistOnceAvailable = false;
         }
 
         protected override void PopOut()
@@ -410,8 +417,6 @@ namespace osu.Game.Overlays
 
             FadeOut(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
-
-            showPlaylistOnceAvailable = false;
         }
 
         private enum TransformDirection
