@@ -25,8 +25,7 @@ namespace osu.Game.Screens.Play
             Fill.RelativeSizeAxes = Axes.X;
             Fill.Height = barHeight;
 
-            Add(new 
-                Box
+            Add(new Box
             {
                 Name = "Background",
                 Anchor = Anchor.BottomLeft,
