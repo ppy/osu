@@ -6,7 +6,7 @@ using OpenTK.Graphics;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
 {
@@ -25,7 +25,8 @@ namespace osu.Game.Screens.Play
             Fill.RelativeSizeAxes = Axes.X;
             Fill.Height = barHeight;
 
-            Add(new Box
+            Add(new 
+                Box
             {
                 Name = "Background",
                 Anchor = Anchor.BottomLeft,
