@@ -16,6 +16,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Ranking
 {
