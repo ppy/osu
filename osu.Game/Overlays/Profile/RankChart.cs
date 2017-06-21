@@ -8,6 +8,7 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics;
@@ -70,7 +71,7 @@ namespace osu.Game.Overlays.Profile
                 }
             };
             ranks = new[] { user.Statistics.Rank };
-            performances = new [] { user.Statistics.PP };
+            performances = new[] { user.Statistics.PP };
         }
 
         private void updateRankTexts()

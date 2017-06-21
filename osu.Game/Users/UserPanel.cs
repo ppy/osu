@@ -9,7 +9,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
@@ -163,7 +162,7 @@ namespace osu.Game.Users
             };
         }
 
-        [BackgroundDependencyLoader(permitNulls:true)]
+        [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuColour colours, UserProfileOverlay profile)
         {
             this.colours = colours;
