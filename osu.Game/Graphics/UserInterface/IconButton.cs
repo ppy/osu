@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -34,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
             set { icon.Scale = value; }
         }
 
-        private Color4 disabledColour;
+        private Color4 disableColour;
 
         public IconButton()
         {
@@ -82,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             hover.Colour = colours.Yellow.Opacity(0.6f);
             flashColour = colours.Yellow;
-            disabledColour = colours.Gray9;
+            disableColour = colours.Gray9;
 
             Enabled.ValueChanged += enabledChanged;
         }
@@ -91,26 +90,14 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (newEnabled)
             {
-                // Only fade the colour to white if there is no colour transformation pending
-                bool colorTransformation = false;
-                foreach (ITransform<IconButton> t in Transforms)
-                {
-                    if (t is TransformColour)
-                    {
-                        colorTransformation = true;
-                        break;
-                    }
-                }
-
-                if(!colorTransformation)
-                    FadeColour(Color4.White, 200, EasingTypes.OutQuint);
+                FadeColour(Color4.White, 200, EasingTypes.OutQuint);
 
                 if (Hovering)
                     OnHover(new InputState());
             }
             else
             {
-                FadeColour(disabledColour, 200, EasingTypes.OutQuint);
+                FadeColour(disableColour, 200, EasingTypes.OutQuint);
                 content.ScaleTo(1, 200, EasingTypes.OutElastic);
 
                 if (Hovering)
