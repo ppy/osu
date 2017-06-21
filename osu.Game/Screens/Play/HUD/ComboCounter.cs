@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Play.HUD
             Transforms.Add(transform);
         }
 
-        protected class TransformComboRoll : Transform<int>
+        protected class TransformComboRoll : Transform<int, Drawable>
         {
             public override int CurrentValue
             {

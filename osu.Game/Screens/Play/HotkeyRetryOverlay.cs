@@ -9,7 +9,7 @@ using osu.Framework.Audio;
 using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
