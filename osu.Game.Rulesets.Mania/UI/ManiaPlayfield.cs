@@ -28,11 +28,13 @@ namespace osu.Game.Rulesets.Mania.UI
     public class ManiaPlayfield : Playfield<ManiaHitObject, ManiaJudgement>
     {
         public const float HIT_TARGET_POSITION = 50;
-
-        private const double time_span_default = 1500;
         private const double time_span_min = 50;
         private const double time_span_max = 10000;
+
+        private const double time_span_default = 1500;
         private const double time_span_step = 50;
+
+        private const float judgement_text_offset = 160;
 
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.
@@ -55,6 +57,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        private readonly Container<DrawableManiaJudgement> judgementContainer;
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
@@ -132,6 +135,13 @@ namespace osu.Game.Rulesets.Mania.UI
                                     // Width is set in the Update method
                                 }
                             }
+                        },
+                        judgementContainer = new Container<DrawableManiaJudgement>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            AutoSizeAxes = Axes.Both,
+                            Scale = new Vector2(1, -1)
                         }
                     }
                 }
@@ -211,9 +221,26 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        protected override void Update()
+        {
+            // Due to masking differences, it is not possible to get the width of the columns container automatically
+            // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
+            barLineContainer.Width = columns.Width;
+        }
+
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
         public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
         public void Add(SpeedAdjustmentContainer speedAdjustment) => barLineContainer.Add(speedAdjustment);
+
+        public override void OnJudgement(DrawableHitObject<ManiaHitObject, ManiaJudgement> judgedObject)
+        {
+            base.OnJudgement(judgedObject);
+
+            judgementContainer.Add(new DrawableManiaJudgement(judgedObject.Judgement)
+            {
+                Y = judgement_text_offset
+            });
+        }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -236,13 +263,6 @@ namespace osu.Game.Rulesets.Mania.UI
         private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
             TransformTo(() => visibleTimeRange.Value, newTimeRange, duration, easing, new TransformTimeSpan());
-        }
-
-        protected override void Update()
-        {
-            // Due to masking differences, it is not possible to get the width of the columns container automatically
-            // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
-            barLineContainer.Width = columns.Width;
         }
 
         private class TransformTimeSpan : Transform<double, Drawable>

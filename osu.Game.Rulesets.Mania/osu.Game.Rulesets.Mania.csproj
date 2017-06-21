@@ -83,6 +83,7 @@
     <Compile Include="Timing\GravityScrollingDrawableTimingSection.cs" />
     <Compile Include="Timing\ScrollingAlgorithm.cs" />
     <Compile Include="UI\Column.cs" />
+    <Compile Include="UI\DrawableManiaJudgement.cs" />
     <Compile Include="UI\ManiaHitRenderer.cs" />
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />

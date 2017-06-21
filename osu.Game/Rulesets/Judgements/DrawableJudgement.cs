@@ -60,6 +60,27 @@ namespace osu.Game.Rulesets.Judgements
             }
         }
 
+        protected virtual void AddMissTransforms()
+        {
+            ScaleTo(1.6f);
+            ScaleTo(1, 100, EasingTypes.In);
+
+            MoveToOffset(new Vector2(0, 100), 800, EasingTypes.InQuint);
+            RotateTo(40, 800, EasingTypes.InQuint);
+
+            Delay(600);
+            FadeOut(200);
+        }
+
+        protected virtual void AddHitTransforms()
+        {
+            ScaleTo(0.9f);
+            ScaleTo(1, 500, EasingTypes.OutElastic);
+
+            Delay(100);
+            FadeOut(400);
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -69,21 +90,10 @@ namespace osu.Game.Rulesets.Judgements
             switch (Judgement.Result)
             {
                 case HitResult.Miss:
-                    ScaleTo(1.6f);
-                    ScaleTo(1, 100, EasingTypes.In);
-
-                    MoveToOffset(new Vector2(0, 100), 800, EasingTypes.InQuint);
-                    RotateTo(40, 800, EasingTypes.InQuint);
-
-                    Delay(600);
-                    FadeOut(200);
+                    AddMissTransforms();
                     break;
                 case HitResult.Hit:
-                    ScaleTo(0.9f);
-                    ScaleTo(1, 500, EasingTypes.OutElastic);
-
-                    Delay(100);
-                    FadeOut(400);
+                    AddHitTransforms();
                     break;
             }
 
