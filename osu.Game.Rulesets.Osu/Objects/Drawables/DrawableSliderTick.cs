@@ -3,11 +3,11 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {

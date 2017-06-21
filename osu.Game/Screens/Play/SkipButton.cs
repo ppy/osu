@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
@@ -18,6 +17,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
 {

@@ -5,7 +5,7 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;

@@ -14,6 +14,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using System;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
