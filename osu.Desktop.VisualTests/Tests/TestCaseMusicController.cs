@@ -1,11 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Testing;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Timing;
-using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
+using osu.Framework.Timing;
+using osu.Game;
+using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -15,9 +19,17 @@ namespace osu.Desktop.VisualTests.Tests
 
         private MusicController mc;
 
+        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
+
         public TestCaseMusicController()
         {
             Clock = new FramedClock();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase game)
+        {
+            beatmapBacking.BindTo(game.Beatmap);
         }
 
         public override void Reset()
@@ -33,6 +45,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddToggleStep(@"toggle visibility", state => mc.State = state ? Visibility.Visible : Visibility.Hidden);
             AddStep(@"show", () => mc.State = Visibility.Visible);
+            AddToggleStep(@"toggle beatmap lock", state => beatmapBacking.Disabled = state);
         }
     }
 }

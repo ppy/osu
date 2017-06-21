@@ -45,7 +45,7 @@ namespace osu.Game.Overlays
         private IconButton nextButton;
         private IconButton playlistButton;
 
-        private Color4 colorYellow;
+        private Color4 playlistButtonColor;
 
         private SpriteText title, artist;
 
@@ -59,8 +59,6 @@ namespace osu.Game.Overlays
         private Container playerContainer;
 
         private bool showPlaylistOnceAvailable;
-
-        private bool AllowBeatmapChange => !beatmapBacking.Disabled;
 
         public MusicController()
         {
@@ -207,12 +205,12 @@ namespace osu.Game.Overlays
 
             beatmapBacking.BindTo(game.Beatmap);
 
-            colorYellow = colours.Yellow;
+            playlistButtonColor = colours.Yellow;
 
             playlist.StateChanged += (c, s) =>
             {
-                if (AllowBeatmapChange)
-                    playlistButton.FadeColour(s == Visibility.Visible ? colorYellow : Color4.White, 200, EasingTypes.OutQuint);
+                if (!beatmapBacking.Disabled)
+                    playlistButton.FadeColour(s == Visibility.Visible ? playlistButtonColor : Color4.White, 200, EasingTypes.OutQuint);
             };
         }
 
@@ -262,7 +260,7 @@ namespace osu.Game.Overlays
                 progressBar.UpdatePosition(track.Length == 0 ? 0 : (float)(track.CurrentTime / track.Length));
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping && AllowBeatmapChange) next();
+                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled) next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
@@ -274,7 +272,7 @@ namespace osu.Game.Overlays
 
             if (track == null)
             {
-                if (AllowBeatmapChange)
+                if (!beatmapBacking.Disabled)
                     playlist.PlayNext();
                 return;
             }
