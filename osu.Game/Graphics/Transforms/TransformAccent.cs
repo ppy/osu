@@ -8,7 +8,7 @@ using osu.Framework.MathUtils;
 
 namespace osu.Game.Graphics.Transforms
 {
-    public class TransformAccent : Transform<Color4>
+    public class TransformAccent : Transform<Color4, Drawable>
     {
         /// <summary>
         /// Current value of the transformed colour in linear colour space.

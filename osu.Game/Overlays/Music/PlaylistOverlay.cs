@@ -12,7 +12,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;

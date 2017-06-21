@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Ranking
 {
