@@ -185,6 +185,7 @@
     <Compile Include="Rulesets\Objects\SliderCurve.cs" />
     <Compile Include="Rulesets\Objects\Types\CurveType.cs" />
     <Compile Include="Rulesets\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
+    <Compile Include="Rulesets\Objects\Drawables\IScrollingHitObject.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
     <Compile Include="Rulesets\Objects\HitObjectParser.cs" />
     <Compile Include="Rulesets\Objects\HitObjectStartTimeComparer.cs" />
@@ -223,6 +224,7 @@
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
     <Compile Include="Rulesets\Objects\Drawables\DrawableHitObject.cs" />
+    <Compile Include="Rulesets\Objects\Drawables\DrawableScrollingHitObject.cs" />
     <Compile Include="Rulesets\Objects\HitObject.cs" />
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />

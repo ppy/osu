@@ -6,12 +6,11 @@ using OpenTK.Input;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
-    public abstract class DrawableManiaHitObject<TObject> : DrawableHitObject<ManiaHitObject, ManiaJudgement>
+    public abstract class DrawableManiaHitObject<TObject> : DrawableScrollingHitObject<ManiaHitObject, ManiaJudgement>
         where TObject : ManiaHitObject
     {
         /// <summary>
@@ -31,13 +30,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             RelativePositionAxes = Axes.Y;
             Y = (float)HitObject.StartTime;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            LifetimeStart = HitObject.StartTime - ManiaPlayfield.TIME_SPAN_MAX;
         }
 
         public override Color4 AccentColour
