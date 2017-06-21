@@ -54,14 +54,14 @@ namespace osu.Game.Graphics.UserInterface
                     content.ScaleTo(1, 200, EasingTypes.OutElastic);
 
                     if (Hovering)
-                        hover.FadeOut(200, EasingTypes.OutQuint);
+                        OnHoverLost(new InputState());
                 }
                 else
                 {
                     FadeColour(Color4.White, 200, EasingTypes.OutQuint);
 
-                    if(Hovering)
-                        hover.FadeIn(500, EasingTypes.OutQuint);
+                    if (Hovering)
+                        OnHover(new InputState());
                 }
             }
         }
@@ -135,6 +135,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(InputState state)
         {
+            hover.FlashColour(flashColour, 800, EasingTypes.OutQuint);
             return base.OnClick(state);
         }
 
