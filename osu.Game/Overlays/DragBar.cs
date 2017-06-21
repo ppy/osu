@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        private class TransformSeek : TransformFloat
+        private class TransformSeek : TransformFloat<Drawable>
         {
             public override void Apply(Drawable d)
             {
