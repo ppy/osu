@@ -83,6 +83,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both
                 }
             };
+            sectionsContainer.ScrollContainer.ScrollbarVisible = false;
             Add(sectionsContainer);
             sectionsContainer.SelectedSection.ValueChanged += s =>
             {
