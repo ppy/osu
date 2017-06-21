@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
             Current.Value = Current + amount;
         }
 
-        protected class TransformAccuracy : Transform<double>
+        protected class TransformAccuracy : Transform<double, Drawable>
         {
             public override double CurrentValue
             {
