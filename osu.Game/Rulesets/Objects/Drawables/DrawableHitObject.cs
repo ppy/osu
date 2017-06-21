@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Audio;
 using System.Linq;
-using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
