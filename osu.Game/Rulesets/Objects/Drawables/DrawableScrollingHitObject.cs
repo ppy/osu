@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
     {
         public BindableDouble LifetimeOffset { get; } = new BindableDouble();
 
-        public DrawableScrollingHitObject(TObject hitObject)
+        protected DrawableScrollingHitObject(TObject hitObject)
             : base(hitObject)
         {
         }
