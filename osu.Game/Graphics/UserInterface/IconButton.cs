@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 // Only fade the colour to white if there is no colour transformation pending
                 bool colorTransformation = false;
-                foreach (ITransform t in Transforms)
+                foreach (ITransform<IconButton> t in Transforms)
                 {
                     if (t is TransformColour)
                     {
