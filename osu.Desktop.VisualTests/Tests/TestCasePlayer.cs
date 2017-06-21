@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using OpenTK;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
@@ -15,6 +14,7 @@ using osu.Game.Screens.Play;
 using OpenTK.Graphics;
 using osu.Desktop.VisualTests.Beatmaps;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Desktop.VisualTests.Tests
 {

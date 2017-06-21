@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
             Current.Value = Current + amount;
         }
 
-        private class TransformCounterCount : Transform<int>
+        private class TransformCounterCount : Transform<int, Drawable>
         {
             public override int CurrentValue
             {
