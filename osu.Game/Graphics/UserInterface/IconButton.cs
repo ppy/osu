@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -34,37 +35,6 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 disabledColour;
-
-        public override bool Enabled
-        {
-            get
-            {
-                return base.Enabled;
-            }
-
-            set
-            {
-                if (base.Enabled == value) return;
-
-                base.Enabled = value;
-
-                if (!value)
-                {
-                    FadeColour(disabledColour, 200, EasingTypes.OutQuint);
-                    content.ScaleTo(1, 200, EasingTypes.OutElastic);
-
-                    if (Hovering)
-                        OnHoverLost(new InputState());
-                }
-                else
-                {
-                    FadeColour(Color4.White, 200, EasingTypes.OutQuint);
-
-                    if (Hovering)
-                        OnHover(new InputState());
-                }
-            }
-        }
 
         public IconButton()
         {
@@ -113,11 +83,44 @@ namespace osu.Game.Graphics.UserInterface
             hover.Colour = colours.Yellow.Opacity(0.6f);
             flashColour = colours.Yellow;
             disabledColour = colours.Gray9;
+
+            Enabled.ValueChanged += enabledChanged;
+        }
+
+        private void enabledChanged(bool newEnabled)
+        {
+            if (newEnabled)
+            {
+                // Only fade the colour to white if there is no colour transformation pending
+                bool colorTransformation = false;
+                foreach (ITransform t in Transforms)
+                {
+                    if (t is TransformColour)
+                    {
+                        colorTransformation = true;
+                        break;
+                    }
+                }
+
+                if(!colorTransformation)
+                    FadeColour(Color4.White, 200, EasingTypes.OutQuint);
+
+                if (Hovering)
+                    OnHover(new InputState());
+            }
+            else
+            {
+                FadeColour(disabledColour, 200, EasingTypes.OutQuint);
+                content.ScaleTo(1, 200, EasingTypes.OutElastic);
+
+                if (Hovering)
+                    OnHoverLost(new InputState());
+            }
         }
 
         protected override bool OnHover(InputState state)
         {
-            if (!Enabled)
+            if (!Enabled.Value)
                 return true;
 
             hover.FadeIn(500, EasingTypes.OutQuint);
@@ -126,7 +129,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(InputState state)
         {
-            if (!Enabled)
+            if (!Enabled.Value)
                 return;
 
             hover.FadeOut(500, EasingTypes.OutQuint);
@@ -141,7 +144,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (!Enabled)
+            if (!Enabled.Value)
                 return true;
 
             content.ScaleTo(0.75f, 2000, EasingTypes.OutQuint);
@@ -150,7 +153,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            if (!Enabled)
+            if (!Enabled.Value)
                 return true;
 
             content.ScaleTo(1, 1000, EasingTypes.OutElastic);

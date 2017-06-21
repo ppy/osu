@@ -59,36 +59,7 @@ namespace osu.Game.Overlays
 
         private bool showPlaylistOnceAvailable;
 
-        private bool allowBeatmapChange = true;
-
-        public bool AllowBeatmapChange
-        {
-            get
-            {
-                return allowBeatmapChange;
-            }
-            set
-            {
-                if (allowBeatmapChange == value) return;
-
-                allowBeatmapChange = value;
-
-                prevButton.Enabled = allowBeatmapChange;
-                nextButton.Enabled = allowBeatmapChange;
-                playlistButton.Enabled = allowBeatmapChange;
-
-                // Toggle the playlist's visibility if required
-                if (!allowBeatmapChange)
-                {
-                    showPlaylistOnceAvailable = playlist.State == Visibility.Visible;
-
-                    if (showPlaylistOnceAvailable)
-                        playlist?.Hide();
-                }
-                else if (showPlaylistOnceAvailable && State == Visibility.Visible)
-                    playlist?.Show();
-            }
-        }
+        private bool AllowBeatmapChange => !beatmapBacking.Disabled;
 
         public MusicController()
         {
@@ -239,7 +210,7 @@ namespace osu.Game.Overlays
 
             playlist.StateChanged += (c, s) =>
             {
-                if (playlistButton.Enabled)
+                if (AllowBeatmapChange)
                     playlistButton.FadeColour(s == Visibility.Visible ? colorYellow : Color4.White, 200, EasingTypes.OutQuint);
             };
         }
@@ -249,7 +220,28 @@ namespace osu.Game.Overlays
             beatmapBacking.ValueChanged += beatmapChanged;
             beatmapBacking.TriggerChange();
 
+            beatmapBacking.DisabledChanged += beatmapDisabledChanged;
+            beatmapDisabledChanged(beatmapBacking.Disabled);
+
             base.LoadComplete();
+        }
+
+        private void beatmapDisabledChanged(bool newBeatmapDisabled)
+        {
+            prevButton.Enabled.Value = !newBeatmapDisabled;
+            nextButton.Enabled.Value = !newBeatmapDisabled;
+            playlistButton.Enabled.Value = !newBeatmapDisabled;
+
+            // Toggle the playlist's visibility if required
+            if (newBeatmapDisabled)
+            {
+                showPlaylistOnceAvailable = playlist.State == Visibility.Visible;
+
+                if (showPlaylistOnceAvailable)
+                    playlist?.Hide();
+            }
+            else if (showPlaylistOnceAvailable && State == Visibility.Visible)
+                playlist?.Show();
         }
 
         protected override void UpdateAfterChildren()
@@ -281,7 +273,8 @@ namespace osu.Game.Overlays
 
             if (track == null)
             {
-                playlist.PlayNext();
+                if (AllowBeatmapChange)
+                    playlist.PlayNext();
                 return;
             }
 
@@ -407,7 +400,7 @@ namespace osu.Game.Overlays
             FadeIn(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(1, transition_length, EasingTypes.OutElastic);
 
-            if(Alpha == 0)
+            if (Alpha == 0)
                 showPlaylistOnceAvailable = false;
         }
 

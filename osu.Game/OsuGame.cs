@@ -328,7 +328,7 @@ namespace osu.Game
 
             ScreenChanged?.Invoke(newScreen);
 
-            musicController.AllowBeatmapChange = currentScreen.AllowBeatmapChange;
+            Beatmap.Disabled = !currentScreen.AllowBeatmapChange;
         }
 
         protected override bool OnExiting()
