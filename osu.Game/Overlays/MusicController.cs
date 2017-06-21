@@ -209,7 +209,7 @@ namespace osu.Game.Overlays
 
             playlist.StateChanged += (c, s) =>
             {
-                if (!beatmapBacking.Disabled)
+                if (playlistButton.Enabled)
                     playlistButton.FadeColour(s == Visibility.Visible ? playlistButtonColor : Color4.White, 200, EasingTypes.OutQuint);
             };
         }
@@ -217,30 +217,28 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             beatmapBacking.ValueChanged += beatmapChanged;
-            beatmapBacking.TriggerChange();
-
             beatmapBacking.DisabledChanged += beatmapDisabledChanged;
-            beatmapDisabledChanged(beatmapBacking.Disabled);
+            beatmapBacking.TriggerChange();
 
             base.LoadComplete();
         }
 
-        private void beatmapDisabledChanged(bool newBeatmapDisabled)
+        private void beatmapDisabledChanged(bool newBeatmapBackingDisabled)
         {
-            prevButton.Enabled.Value = !newBeatmapDisabled;
-            nextButton.Enabled.Value = !newBeatmapDisabled;
-            playlistButton.Enabled.Value = !newBeatmapDisabled;
+            prevButton.Enabled.Value = !newBeatmapBackingDisabled;
+            nextButton.Enabled.Value = !newBeatmapBackingDisabled;
+            playlistButton.Enabled.Value = !newBeatmapBackingDisabled;
 
             // Toggle the playlist's visibility if required
-            if (newBeatmapDisabled)
+            if (newBeatmapBackingDisabled)
             {
                 showPlaylistOnceAvailable = playlist.State == Visibility.Visible;
 
                 if (showPlaylistOnceAvailable)
-                    playlist?.Hide();
+                    playlist.Hide();
             }
             else if (showPlaylistOnceAvailable && State == Visibility.Visible)
-                playlist?.Show();
+                playlist.Show();
         }
 
         protected override void UpdateAfterChildren()
