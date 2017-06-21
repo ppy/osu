@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// The minimum amplitude to show a bar.
         /// </summary>
-        private const float amplitude_dead_zone = 1f / (bar_length);
+        private const float amplitude_dead_zone = 1f / bar_length;
 
         private int indexOffset;
 
@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Menu
                     {
                         for (int i = 0; i < bars_per_visualiser; i++)
                         {
-                            if (AudioData[i] < bar_dead_zone)
+                            if (AudioData[i] < amplitude_dead_zone)
                                 continue;
 
                             float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
