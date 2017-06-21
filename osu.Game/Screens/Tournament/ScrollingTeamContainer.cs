@@ -308,7 +308,7 @@ namespace osu.Game.Screens.Tournament
             Scrolling
         }
 
-        public class TransformScrollSpeed : TransformFloat
+        public class TransformScrollSpeed : TransformFloat<Drawable>
         {
             public override void Apply(Drawable d)
             {

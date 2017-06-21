@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Mania.UI
             barLineContainer.Width = columns.Width;
         }
 
-        private class TransformTimeSpan : Transform<double>
+        private class TransformTimeSpan : Transform<double, Drawable>
         {
             public override double CurrentValue
             {
