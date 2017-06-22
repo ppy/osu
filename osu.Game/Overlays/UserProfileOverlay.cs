@@ -115,10 +115,16 @@ namespace osu.Game.Overlays
             {
                 header.FillFullData(u);
 
-                var reorderedSections = u.ProfileOrder.Select(x => sections.FirstOrDefault(s => s.Identifier == x)).Where(s => s != null).ToList();
-
-                sectionsContainer.Children = reorderedSections;
-                reorderedSections.ForEach(tabs.AddItem);
+                for (int i = 0; i < u.ProfileOrder.Length; i++)
+                {
+                    var sec = sections.FirstOrDefault(s => s.Identifier == u.ProfileOrder[i]);
+                    if (sec != null)
+                    {
+                        sec.Depth = -i;
+                        sectionsContainer.Add(sec);
+                        tabs.AddItem(sec);
+                    }
+                }
             };
             api.Queue(userReq);
 
