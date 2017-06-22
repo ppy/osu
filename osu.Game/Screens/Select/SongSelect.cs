@@ -377,6 +377,7 @@ namespace osu.Game.Screens.Select
 
             switch (args.Key)
             {
+                case Key.KeypadEnter:
                 case Key.Enter:
                     raiseSelect();
                     return true;
