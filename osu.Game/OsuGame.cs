@@ -324,6 +324,7 @@ namespace osu.Game
                 chat.State = Visibility.Hidden;
                 direct.State = Visibility.Hidden;
                 social.State = Visibility.Hidden;
+                userProfile.State = Visibility.Hidden;
             }
             else
             {
