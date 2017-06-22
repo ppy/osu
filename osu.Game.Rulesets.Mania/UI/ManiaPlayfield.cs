@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public readonly BindableBool Flipped = new BindableBool();
 
-        private readonly BindableDouble visibleTimeRange = new BindableDouble(time_span_default)
+        public readonly BindableDouble VisibleTimeRange = new BindableDouble(time_span_default)
         {
             MinValue = time_span_min,
             MaxValue = time_span_max
@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.Y,
-                                    VisibleTimeRange = visibleTimeRange
+                                    VisibleTimeRange = VisibleTimeRange
                                     // Width is set in the Update method
                                 }
                             }
@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < columnCount; i++)
-                columns.Add(new Column { VisibleTimeRange = visibleTimeRange });
+                columns.Add(new Column { VisibleTimeRange = VisibleTimeRange });
         }
 
         [BackgroundDependencyLoader]
@@ -264,10 +264,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 switch (args.Key)
                 {
                     case Key.Minus:
-                        transformVisibleTimeRangeTo(visibleTimeRange + time_span_step, 200, EasingTypes.OutQuint);
+                        transformVisibleTimeRangeTo(VisibleTimeRange + time_span_step, 200, EasingTypes.OutQuint);
                         break;
                     case Key.Plus:
-                        transformVisibleTimeRangeTo(visibleTimeRange - time_span_step, 200, EasingTypes.OutQuint);
+                        transformVisibleTimeRangeTo(VisibleTimeRange - time_span_step, 200, EasingTypes.OutQuint);
                         break;
                 }
             }
@@ -277,7 +277,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
-            TransformTo(() => visibleTimeRange.Value, newTimeRange, duration, easing, new TransformTimeSpan());
+            TransformTo(() => VisibleTimeRange.Value, newTimeRange, duration, easing, new TransformTimeSpan());
         }
 
         private class TransformTimeSpan : Transform<double, Drawable>
@@ -299,7 +299,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 base.Apply(d);
 
                 var p = (ManiaPlayfield)d;
-                p.visibleTimeRange.Value = (float)CurrentValue;
+                p.VisibleTimeRange.Value = (float)CurrentValue;
             }
         }
     }
