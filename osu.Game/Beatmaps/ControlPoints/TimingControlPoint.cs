@@ -15,6 +15,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The beat length at this control point.
         /// </summary>
-        public double BeatLength = 500;
+        public double BeatLength = 1000;
     }
 }
