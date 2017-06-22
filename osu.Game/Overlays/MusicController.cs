@@ -445,7 +445,7 @@ namespace osu.Game.Overlays
             public ProgressBar()
             {
                 CurrentNumber.MinValue = 0;
-                CurrentNumber.MinValue = 1;
+                CurrentNumber.MaxValue = 1;
                 RelativeSizeAxes = Axes.X;
 
                 Children = new Drawable[]
