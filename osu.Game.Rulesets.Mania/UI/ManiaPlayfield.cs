@@ -242,6 +242,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             judgementContainer.Add(new DrawableManiaJudgement(judgedObject.Judgement)
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Y = judgement_text_offset
             });
         }
