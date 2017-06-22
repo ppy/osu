@@ -16,6 +16,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -134,7 +135,7 @@ namespace osu.Game.Screens.Ranking
                         circleOuter = new CircularContainer
                         {
                             Size = new Vector2(circle_outer_scale),
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Colour = Color4.Black.Opacity(0.4f),
                                 Type = EdgeEffectType.Shadow,
@@ -225,7 +226,7 @@ namespace osu.Game.Screens.Ranking
                         circleInner = new CircularContainer
                         {
                             Size = new Vector2(0.6f),
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Colour = Color4.Black.Opacity(0.4f),
                                 Type = EdgeEffectType.Shadow,

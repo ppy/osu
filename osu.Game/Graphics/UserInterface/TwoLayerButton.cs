@@ -14,6 +14,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using System;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -79,18 +80,21 @@ namespace osu.Game.Graphics.UserInterface
                     Width = 0.4f,
                     Children = new Drawable[]
                     {
-                        new Container {
+                        new Container
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Shear = new Vector2(shear, 0),
                             Masking = true,
                             MaskingSmoothness = 2,
-                            EdgeEffect = new EdgeEffect {
+                            EdgeEffect = new EdgeEffectParameters
+                            {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
                                 Offset = new Vector2(2, 0),
                                 Radius = 2,
                             },
-                            Children = new[] {
+                            Children = new[]
+                            {
                                 IconLayer = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -113,18 +117,21 @@ namespace osu.Game.Graphics.UserInterface
                     Width = 0.6f,
                     Children = new Drawable[]
                     {
-                        new Container {
+                        new Container
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Shear = new Vector2(shear, 0),
                             Masking = true,
                             MaskingSmoothness = 2,
-                            EdgeEffect = new EdgeEffect {
+                            EdgeEffect = new EdgeEffectParameters
+                            {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
                                 Offset = new Vector2(2, 0),
                                 Radius = 2,
                             },
-                            Children = new[] {
+                            Children = new[]
+                            {
                                 TextLayer = new Box
                                 {
                                     Origin = Anchor.TopLeft,

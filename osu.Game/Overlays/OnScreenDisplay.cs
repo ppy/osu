@@ -9,6 +9,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using OpenTK;
@@ -253,7 +254,7 @@ namespace osu.Game.Overlays
                 Masking = true;
                 CornerRadius = 3;
 
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Colour = colours.BlueDark.Opacity(glow_strength),
                     Type = EdgeEffectType.Glow,

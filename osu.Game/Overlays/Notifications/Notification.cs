@@ -7,12 +7,12 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -238,7 +238,7 @@ namespace osu.Game.Overlays.Notifications
                 set
                 {
                     base.Colour = value;
-                    pulsateLayer.EdgeEffect = new EdgeEffect
+                    pulsateLayer.EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = ((Color4)value).Opacity(0.5f), //todo: avoid cast
                         Type = EdgeEffectType.Glow,

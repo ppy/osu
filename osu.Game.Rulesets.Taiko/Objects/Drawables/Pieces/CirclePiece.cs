@@ -4,7 +4,7 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Backgrounds;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
         private void resetEdgeEffects()
         {
-            background.EdgeEffect = new EdgeEffect
+            background.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = AccentColour.Opacity(KiaiMode ? edge_alpha_kiai : 1f),

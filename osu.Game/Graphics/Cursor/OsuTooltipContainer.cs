@@ -8,7 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Cursor
@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.Cursor
 
                 CornerRadius = 5;
                 Masking = true;
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Colour = Color4.Black.Opacity(40),

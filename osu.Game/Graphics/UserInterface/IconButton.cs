@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
 
                     CornerRadius = 5,
                     Masking = true,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = Color4.Black.Opacity(0.04f),
                         Type = EdgeEffectType.Shadow,
