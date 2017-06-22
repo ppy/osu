@@ -13,6 +13,8 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Game.Graphics.UserInterface;
+using OpenTK.Input;
+using System.Linq;
 using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
@@ -22,6 +24,8 @@ namespace osu.Game.Screens.Play
         private const int transition_duration = 200;
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
+
+        private readonly OsuSpriteText header;
 
         protected override bool HideOnEscape => false;
 
@@ -33,7 +37,7 @@ namespace osu.Game.Screens.Play
         public abstract string Header { get; }
         public abstract string Description { get; }
 
-        protected FillFlowContainer<DialogButton> Buttons;
+        protected FillFlowContainer<Button> Buttons;
 
         public int Retries
         {
@@ -73,7 +77,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private FillFlowContainer retryCounterContainer;
+        private readonly FillFlowContainer retryCounterContainer;
 
         public override bool HandleInput => State == Visibility.Visible;
 
@@ -96,16 +100,19 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.TopCentre,
                 Anchor = Anchor.TopCentre,
                 Height = button_height,
-                Action = delegate {
+                Action = () => {
                     action?.Invoke();
                     Hide();
-                }
+                },
+                OnHoverAction = setSelectedButton,
+                OnClickAction = deselectAll,
             });
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        protected MenuOverlay()
         {
+            AlwaysReceiveInput = true;
+            RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
                 new Box
@@ -134,7 +141,7 @@ namespace osu.Game.Screens.Play
                             Spacing = new Vector2(0, 20),
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                header = new OsuSpriteText
                                 {
                                     Text = Header,
                                     Font = @"Exo2.0-Medium",
@@ -142,7 +149,6 @@ namespace osu.Game.Screens.Play
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     TextSize = 30,
-                                    Colour = colours.Yellow,
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
                                 },
@@ -156,7 +162,7 @@ namespace osu.Game.Screens.Play
                                 }
                             }
                         },
-                        Buttons = new FillFlowContainer<DialogButton>
+                        Buttons = new FillFlowContainer<Button>
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
@@ -184,19 +190,140 @@ namespace osu.Game.Screens.Play
             Retries = 0;
         }
 
-        protected MenuOverlay()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
-            AlwaysReceiveInput = true;
-            RelativeSizeAxes = Axes.Both;
+            header.Colour = colours.Yellow;
+        }
+
+        private int buttonCount => Buttons.Children.Count();
+        private int selectedButton = -1;
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Repeat) return true;
+
+            switch (args.Key)
+            {
+                case Key.Down:
+                    if (buttonCount == 0) return true;
+
+                    if (selectedButton != -1)
+                        Buttons.Children.ElementAt(selectedButton).Deselect();
+
+                    if (selectedButton == -1 || selectedButton == buttonCount - 1)
+                        selectedButton = 0;
+                    else
+                        selectedButton++;
+
+                    Buttons.Children.ElementAt(selectedButton).Select();
+                    return true;
+
+                case Key.Up:
+                    if (buttonCount == 0) return true;
+
+                    if (selectedButton != -1)
+                        Buttons.Children.ElementAt(selectedButton).Deselect();
+
+                    if (selectedButton == -1 || selectedButton == 0)
+                        selectedButton = buttonCount - 1;
+                    else
+                        selectedButton--;
+
+                    Buttons.Children.ElementAt(selectedButton).Select();
+                    return true;
+
+                case Key.Enter:
+                    if (buttonCount == 0) return true;
+
+                    if (selectedButton != -1)
+                    {
+                        Buttons.Children.ElementAt(selectedButton).TriggerOnClick();
+                        Buttons.Children.ElementAt(selectedButton).Deselect();
+                        selectedButton = -1;
+                    }
+                    return true;
+            }
+
+            return base.OnKeyDown(state, args);
+        }
+
+        private void deselectAll()
+        {
+            foreach (var button in Buttons.Children)
+                button.Deselect();
+        }
+
+        private void setSelectedButton()
+        {
+            deselectAll();
+
+            int counter = 0;
+
+            foreach (var button in Buttons.Children)
+            {
+                if (button.Hovering)
+                {
+                    selectedButton = counter;
+                    break;
+                }
+                counter++;
+            }
         }
 
         public class Button : DialogButton
         {
+            public Action OnHoverAction;
+            public Action OnClickAction;
+
+            private UserInputManager inputManager;
+
+            private bool isSelected;
+
             [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
+            private void load(AudioManager audio, UserInputManager inputManager)
             {
+                this.inputManager = inputManager;
+
                 SampleHover = audio.Sample.Get(@"Menu/menuclick");
                 SampleClick = audio.Sample.Get(@"Menu/menuback");
+            }
+
+            // We should know the difference between selecting by mouse and by keyboard
+            public void Select()
+            {
+                if (!isSelected)
+                {
+                    isSelected = true;
+                    base.OnHover(inputManager.CurrentState);
+                }
+            }
+            public void Deselect() => TriggerOnHoverLost(inputManager.CurrentState);
+
+            protected override bool OnHover(InputState state)
+            {
+                OnHoverAction?.Invoke();
+                isSelected = true;
+                return base.OnHover(state);
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                isSelected = false;
+                base.OnHoverLost(state);
+            }
+
+            protected override bool OnClick(InputState state)
+            {
+                OnClickAction?.Invoke();
+                return base.OnClick(state);
+            }
+
+            protected override bool OnMouseMove(InputState state)
+            {
+                if (!isSelected)
+                    TriggerOnHover(state);
+                return base.OnMouseMove(state);
             }
         }
     }
