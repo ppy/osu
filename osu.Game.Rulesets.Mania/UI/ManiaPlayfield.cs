@@ -28,11 +28,13 @@ namespace osu.Game.Rulesets.Mania.UI
     public class ManiaPlayfield : Playfield<ManiaHitObject, ManiaJudgement>
     {
         public const float HIT_TARGET_POSITION = 50;
-
-        private const double time_span_default = 1500;
         private const double time_span_min = 50;
         private const double time_span_max = 10000;
+
+        private const double time_span_default = 1500;
         private const double time_span_step = 50;
+
+        private const float judgement_text_offset = 0.35f;
 
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.
@@ -55,16 +57,20 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        private readonly Container<DrawableManiaJudgement> judgementContainer;
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
-        private readonly BindableDouble visibleTimeRange = new BindableDouble(time_span_default)
+        public readonly BindableBool Flipped = new BindableBool();
+
+        public readonly BindableDouble VisibleTimeRange = new BindableDouble(time_span_default)
         {
             MinValue = time_span_min,
             MaxValue = time_span_max
         };
 
         private readonly SpeedAdjustmentCollection barLineContainer;
+        private readonly Container flippableElements;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
@@ -78,12 +84,14 @@ namespace osu.Game.Rulesets.Mania.UI
             if (columnCount <= 0)
                 throw new ArgumentException("Can't have zero or fewer columns.");
 
+            Flipped.ValueChanged += flippedChanged;
+
             Children = new Drawable[]
             {
-                new Container
+                flippableElements = new Container
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     Children = new Drawable[]
@@ -128,17 +136,24 @@ namespace osu.Game.Rulesets.Mania.UI
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.Y,
-                                    VisibleTimeRange = visibleTimeRange
+                                    VisibleTimeRange = VisibleTimeRange
                                     // Width is set in the Update method
                                 }
                             }
-                        }
+                        },
                     }
+                },
+                judgementContainer = new Container<DrawableManiaJudgement>
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    RelativePositionAxes = Axes.Y,
+                    Y = judgement_text_offset
                 }
             };
 
             for (int i = 0; i < columnCount; i++)
-                columns.Add(new Column { VisibleTimeRange = visibleTimeRange });
+                columns.Add(new Column { VisibleTimeRange = VisibleTimeRange });
         }
 
         [BackgroundDependencyLoader]
@@ -211,9 +226,36 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        private void flippedChanged(bool flipped)
+        {
+            flippableElements.Scale = new Vector2(1, flipped ? -1 : 1);
+
+            judgementContainer.Anchor = flipped ? Anchor.BottomCentre : Anchor.TopCentre;
+            judgementContainer.Origin = judgementContainer.Anchor;
+            judgementContainer.Y = flipped ? -judgement_text_offset : judgement_text_offset;
+        }
+
+        protected override void Update()
+        {
+            // Due to masking differences, it is not possible to get the width of the columns container automatically
+            // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
+            barLineContainer.Width = columns.Width;
+        }
+
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
         public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
         public void Add(SpeedAdjustmentContainer speedAdjustment) => barLineContainer.Add(speedAdjustment);
+
+        public override void OnJudgement(DrawableHitObject<ManiaHitObject, ManiaJudgement> judgedObject)
+        {
+            base.OnJudgement(judgedObject);
+
+            judgementContainer.Add(new DrawableManiaJudgement(judgedObject.Judgement)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre
+            });
+        }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -222,10 +264,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 switch (args.Key)
                 {
                     case Key.Minus:
-                        transformVisibleTimeRangeTo(visibleTimeRange + time_span_step, 200, EasingTypes.OutQuint);
+                        transformVisibleTimeRangeTo(VisibleTimeRange + time_span_step, 200, EasingTypes.OutQuint);
                         break;
                     case Key.Plus:
-                        transformVisibleTimeRangeTo(visibleTimeRange - time_span_step, 200, EasingTypes.OutQuint);
+                        transformVisibleTimeRangeTo(VisibleTimeRange - time_span_step, 200, EasingTypes.OutQuint);
                         break;
                 }
             }
@@ -235,14 +277,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
-            TransformTo(() => visibleTimeRange.Value, newTimeRange, duration, easing, new TransformTimeSpan());
-        }
-
-        protected override void Update()
-        {
-            // Due to masking differences, it is not possible to get the width of the columns container automatically
-            // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
-            barLineContainer.Width = columns.Width;
+            TransformTo(() => VisibleTimeRange.Value, newTimeRange, duration, easing, new TransformTimeSpan());
         }
 
         private class TransformTimeSpan : Transform<double, Drawable>
@@ -264,7 +299,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 base.Apply(d);
 
                 var p = (ManiaPlayfield)d;
-                p.visibleTimeRange.Value = (float)CurrentValue;
+                p.VisibleTimeRange.Value = (float)CurrentValue;
             }
         }
     }
