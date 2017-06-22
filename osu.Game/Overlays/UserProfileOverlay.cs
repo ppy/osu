@@ -3,8 +3,11 @@
 
 using System.Linq;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
@@ -35,7 +38,17 @@ namespace osu.Game.Overlays
 
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
-            Padding = new MarginPadding { Horizontal = 50 };
+            Width = 0.85f;
+            Anchor = Anchor.TopCentre;
+            Origin = Anchor.TopCentre;
+
+            Masking = true;
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Colour = Color4.Black.Opacity(0.5f),
+                Type = EdgeEffectType.Shadow,
+                Radius = 10
+            };
         }
 
         [BackgroundDependencyLoader]
