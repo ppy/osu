@@ -226,7 +226,7 @@ namespace osu.Game.Overlays
             {
                 var track = current.Track;
 
-                progressBar.Progress = track.CurrentTime;
+                progressBar.CurrentTime = track.CurrentTime;
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
                 if (track.HasCompleted && !track.Looping) next();
@@ -437,7 +437,7 @@ namespace osu.Game.Overlays
                 set { CurrentNumber.MaxValue = value; }
             }
 
-            public double Progress
+            public double CurrentTime
             {
                 set { CurrentNumber.Value = value; }
             }
@@ -445,7 +445,7 @@ namespace osu.Game.Overlays
             public ProgressBar()
             {
                 CurrentNumber.MinValue = 0;
-                CurrentNumber.MaxValue = 1;
+                CurrentNumber.MinValue = 1;
                 RelativeSizeAxes = Axes.X;
 
                 Children = new Drawable[]
