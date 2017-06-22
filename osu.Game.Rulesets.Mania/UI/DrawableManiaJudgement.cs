@@ -2,9 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -18,11 +16,16 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
-        protected override void AddHitTransforms()
+        protected override void LoadComplete()
         {
-            base.AddHitTransforms();
+            switch (Judgement.Result)
+            {
+                case HitResult.Hit:
+                    JudgementText.TransformSpacingTo(new Vector2(14, 0), 1800, EasingTypes.OutQuint);
+                    break;
+            }
 
-            JudgementText.TransformSpacingTo(new Vector2(14, 0), 1800, EasingTypes.OutQuint);
+            base.LoadComplete();
         }
     }
 }

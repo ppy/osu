@@ -6,7 +6,6 @@ using osu.Framework.Testing;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.UI;
 using System;
-using OpenTK;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Framework.Configuration;
@@ -18,9 +17,6 @@ using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
-using OpenTK.Graphics;
 
 namespace osu.Desktop.VisualTests.Tests
 {
