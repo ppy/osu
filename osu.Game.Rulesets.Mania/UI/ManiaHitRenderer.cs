@@ -107,6 +107,9 @@ namespace osu.Game.Rulesets.Mania.UI
             var maniaPlayfield = (ManiaPlayfield)Playfield;
 
             BarLines.ForEach(maniaPlayfield.Add);
+
+            // By default the mania playfield scrolls downward. This should be moved to config later.
+            maniaPlayfield.Flipped.Value = true;
         }
 
         protected override void ApplyBeatmap()
@@ -142,8 +145,6 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            // Invert by default for now (should be moved to config/skin later)
-            Scale = new Vector2(1, -1)
         };
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);

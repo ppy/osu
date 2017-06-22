@@ -18,18 +18,6 @@ namespace osu.Game.Rulesets.Mania.UI
         {
         }
 
-        protected override void AddMissTransforms()
-        {
-            ScaleTo(1.6f);
-            ScaleTo(1, 100, EasingTypes.In);
-
-            MoveToOffset(new Vector2(0, -100), 800, EasingTypes.InQuint);
-            RotateTo(40, 800, EasingTypes.InQuint);
-
-            Delay(600);
-            FadeOut(200);
-        }
-
         protected override void AddHitTransforms()
         {
             base.AddHitTransforms();

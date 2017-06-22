@@ -61,6 +61,8 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
+        public readonly BindableBool Flipped = new BindableBool();
+
         private readonly BindableDouble visibleTimeRange = new BindableDouble(time_span_default)
         {
             MinValue = time_span_min,
@@ -68,6 +70,7 @@ namespace osu.Game.Rulesets.Mania.UI
         };
 
         private readonly SpeedAdjustmentCollection barLineContainer;
+        private readonly Container flippableElements;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
@@ -81,12 +84,14 @@ namespace osu.Game.Rulesets.Mania.UI
             if (columnCount <= 0)
                 throw new ArgumentException("Can't have zero or fewer columns.");
 
+            Flipped.ValueChanged += v => flippableElements.Scale = new Vector2(1, v ? -1 : 1);
+
             Children = new Drawable[]
             {
-                new Container
+                flippableElements = new Container
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     Children = new Drawable[]
@@ -136,14 +141,13 @@ namespace osu.Game.Rulesets.Mania.UI
                                 }
                             }
                         },
-                        judgementContainer = new Container<DrawableManiaJudgement>
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
-                            Scale = new Vector2(1, -1)
-                        }
                     }
+                },
+                judgementContainer = new Container<DrawableManiaJudgement>
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Both
                 }
             };
 
