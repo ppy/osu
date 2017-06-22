@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private const double time_span_default = 1500;
         private const double time_span_step = 50;
 
-        private const float judgement_text_offset = 160;
+        private const float judgement_text_offset = 0.35f;
 
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.
@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Mania.UI
             if (columnCount <= 0)
                 throw new ArgumentException("Can't have zero or fewer columns.");
 
-            Flipped.ValueChanged += v => flippableElements.Scale = new Vector2(1, v ? -1 : 1);
+            Flipped.ValueChanged += flippedChanged;
 
             Children = new Drawable[]
             {
@@ -147,7 +147,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both
+                    RelativePositionAxes = Axes.Y,
+                    Y = judgement_text_offset
                 }
             };
 
@@ -225,6 +226,15 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        private void flippedChanged(bool flipped)
+        {
+            flippableElements.Scale = new Vector2(1, flipped ? -1 : 1);
+
+            judgementContainer.Anchor = flipped ? Anchor.BottomCentre : Anchor.TopCentre;
+            judgementContainer.Origin = judgementContainer.Anchor;
+            judgementContainer.Y = flipped ? -judgement_text_offset : judgement_text_offset;
+        }
+
         protected override void Update()
         {
             // Due to masking differences, it is not possible to get the width of the columns container automatically
@@ -243,8 +253,7 @@ namespace osu.Game.Rulesets.Mania.UI
             judgementContainer.Add(new DrawableManiaJudgement(judgedObject.Judgement)
             {
                 Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Y = judgement_text_offset
+                Origin = Anchor.Centre
             });
         }
 
