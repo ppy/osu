@@ -117,7 +117,8 @@ namespace osu.Game.Overlays
 
                 for (int i = 0; i < u.ProfileOrder.Length; i++)
                 {
-                    var sec = sections.FirstOrDefault(s => s.Identifier == u.ProfileOrder[i]);
+                    string id = u.ProfileOrder[i];
+                    var sec = sections.FirstOrDefault(s => s.Identifier == id);
                     if (sec != null)
                     {
                         sec.Depth = -i;
