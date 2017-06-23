@@ -33,8 +33,6 @@ namespace osu.Game.Overlays.Toolbar
 
         public Toolbar()
         {
-            AlwaysReceiveInput = true;
-
             Children = new Drawable[]
             {
                 new ToolbarBackground(),
@@ -55,7 +53,6 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 new FillFlowContainer
                 {
-                    AlwaysReceiveInput = true,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Direction = FillDirection.Horizontal,
