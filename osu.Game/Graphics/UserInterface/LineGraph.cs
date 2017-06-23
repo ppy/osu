@@ -58,9 +58,12 @@ namespace osu.Game.Graphics.UserInterface
             Add(maskingContainer = new Container<Path>
             {
                 Masking = true,
-                RelativeSizeAxes = Axes.Both
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
+                {
+                    path = new Path { RelativeSizeAxes = Axes.Both, PathWidth = 1 }
+                }
             });
-            maskingContainer.Add(path = new Path { RelativeSizeAxes = Axes.Both, PathWidth = 1 });
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
@@ -72,9 +75,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private void applyPath()
         {
+            path.ClearVertices();
             if (values == null) return;
 
-            path.ClearVertices();
             int count = Math.Max(values.Length, DefaultValueCount);
 
             float max = values.Max(), min = values.Min();
