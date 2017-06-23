@@ -65,6 +65,7 @@ namespace osu.Game.Screens.Play
 
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
+        private SectionCheckOverlay sectionCheckOverlay;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
@@ -144,6 +145,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
+                sectionCheckOverlay = new SectionCheckOverlay(),
                 pauseContainer = new PauseContainer
                 {
                     AudioClock = decoupledClock,
@@ -192,6 +194,8 @@ namespace osu.Game.Screens.Play
                     },
                 }
             };
+
+            sectionCheckOverlay.Beatmap = Beatmap;
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 
