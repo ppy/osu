@@ -145,7 +145,11 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                sectionCheckOverlay = new SectionCheckOverlay(),
+                sectionCheckOverlay = new SectionCheckOverlay
+                {
+                    Breaks = Beatmap.Beatmap.Breaks,
+                    AudioClock = decoupledClock,
+                },
                 pauseContainer = new PauseContainer
                 {
                     AudioClock = decoupledClock,
@@ -208,9 +212,8 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
 
-            sectionCheckOverlay.AudioClock = decoupledClock;
-            sectionCheckOverlay.Breaks = Beatmap.Beatmap.Breaks;
             sectionCheckOverlay.BindHealth(scoreProcessor.Health);
+            sectionCheckOverlay.HudOverlay = hudOverlay;
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;

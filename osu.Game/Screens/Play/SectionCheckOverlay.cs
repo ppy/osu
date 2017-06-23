@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Play
 {
     public class SectionCheckOverlay : Container
     {
-        private const double fade_time = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
+        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
 
         private List<BreakPeriod> breaks = new List<BreakPeriod>();
 
@@ -35,6 +35,9 @@ namespace osu.Game.Screens.Play
         private double health;
 
         private readonly TextAwesome resultIcon;
+
+        private HUDOverlay hudOverlay;
+        public HUDOverlay HudOverlay { set { hudOverlay = value; } }
 
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = value; } }
@@ -86,6 +89,7 @@ namespace osu.Game.Screens.Play
                     imageHasBeenShown = false;
                     imageAppearTime = currentTime + (currentBreak.EndTime - currentBreak.StartTime) / 2;
                     backgroundDim.Value = 0;
+                    hudOverlay.FadeTo(0, fade_duration);
                     return;
                 }
             }
@@ -96,7 +100,7 @@ namespace osu.Game.Screens.Play
                     if (currentBreak.HasPeriodResult)
                     {
                         // Show icon depends on HP
-                        resultIcon.Icon = health < 0.3 ? FontAwesome.fa_crosshairs : FontAwesome.fa_check;
+                        resultIcon.Icon = health < 0.3 ? FontAwesome.fa_close : FontAwesome.fa_check;
 
                         resultIcon.FadeTo(1);
                         Delay(100);
@@ -111,10 +115,10 @@ namespace osu.Game.Screens.Play
                 }
                 
                 // Exit from break
-                if (currentBreak.EndTime - currentTime < fade_time)
+                if (currentBreak.EndTime - currentTime < fade_duration)
                 {
                     backgroundDim.Value = backgroundDimUserValue;
-                    showHudOverlay();
+                    hudOverlay.FadeTo(1, fade_duration);
                     currentBreakIndex++;
                     isBreak = false;
                 }
@@ -122,15 +126,5 @@ namespace osu.Game.Screens.Play
         }
 
         public void RestoreBackgroundDim() => backgroundDim.Value = backgroundDimUserValue;
-
-        private void hideHudOverlay()
-        {
-
-        }
-
-        private void showHudOverlay()
-        {
-
-        }
     }
 }
