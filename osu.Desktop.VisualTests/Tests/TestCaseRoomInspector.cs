@@ -21,35 +21,43 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            var room = new Room();
-            room.Name.Value = @"My Awesome Room";
-            room.Host.Value = new User { Username = @"flyte", Id = 3103765, Country = new Country { FlagName = @"JP" } };
-            room.Status.Value = new RoomStatusOpen();
-            room.Type.Value = new GameTypeTeamVersus();
-            room.Beatmap.Value = new BeatmapInfo
+            var room = new Room
             {
-                StarDifficulty = 3.7,
-                Ruleset = rulesets.GetRuleset(3),
-                Metadata = new BeatmapMetadata
+                Name = { Value = @"My Awesome Room" },
+                Host = { Value = new User { Username = @"flyte", Id = 3103765, Country = new Country { FlagName = @"JP" } } },
+                Status = { Value = new RoomStatusOpen() },
+                Type = { Value = new GameTypeTeamVersus() },
+                Beatmap =
                 {
-                    Title = @"Platina",
-                    Artist = @"Maaya Sakamoto",
-                    Author = @"uwutm8",
+                    Value = new BeatmapInfo
+                    {
+                        StarDifficulty = 3.7,
+                        Ruleset = rulesets.GetRuleset(3),
+                        Metadata = new BeatmapMetadata
+                        {
+                            Title = @"Platina",
+                            Artist = @"Maaya Sakamoto",
+                            Author = @"uwutm8",
+                        },
+                        OnlineInfo = new BeatmapOnlineInfo
+                        {
+                            Covers = new[] { @"https://assets.ppy.sh//beatmaps/560573/covers/cover.jpg?1492722343" },
+                        },
+                    }
                 },
-                OnlineInfo = new BeatmapOnlineInfo
+                MaxParticipants = { Value = 200 },
+                Participants =
                 {
-                    Covers = new[] { @"https://assets.ppy.sh//beatmaps/560573/covers/cover.jpg?1492722343" },
-                },
-            };
-            room.MaxParticipants.Value = 200;
-            room.Participants.Value = new[]
-            {
-                new User { Username = @"flyte", Id = 3103765, GlobalRank = 1425 },
-                new User { Username = @"Cookiezi", Id = 124493, GlobalRank = 5466 },
-                new User { Username = @"Angelsim", Id = 1777162, GlobalRank = 2873 },
-                new User { Username = @"Rafis", Id = 2558286, GlobalRank = 4687 },
-                new User { Username = @"hvick225", Id = 50265, GlobalRank = 3258 },
-                new User { Username = @"peppy", Id = 2, GlobalRank = 6251 }
+                    Value = new[]
+                    {
+                        new User { Username = @"flyte", Id = 3103765, GlobalRank = 1425 },
+                        new User { Username = @"Cookiezi", Id = 124493, GlobalRank = 5466 },
+                        new User { Username = @"Angelsim", Id = 1777162, GlobalRank = 2873 },
+                        new User { Username = @"Rafis", Id = 2558286, GlobalRank = 4687 },
+                        new User { Username = @"hvick225", Id = 50265, GlobalRank = 3258 },
+                        new User { Username = @"peppy", Id = 2, GlobalRank = 6251 }
+                    }
+                }
             };
 
             RoomInspector inspector;
@@ -74,32 +82,40 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddStep(@"change room", () =>
             {
-                var newRoom = new Room();
-                newRoom.Name.Value = @"My New, Better Than Ever Room";
-                newRoom.Host.Value = new User { Username = @"Angelsim", Id = 1777162, Country = new Country { FlagName = @"KR" } };
-                newRoom.Status.Value = new RoomStatusOpen();
-                newRoom.Type.Value = new GameTypeTagTeam();
-                newRoom.Beatmap.Value = new BeatmapInfo
+                var newRoom = new Room
                 {
-                    StarDifficulty = 7.07,
-                    Ruleset = rulesets.GetRuleset(0),
-                    Metadata = new BeatmapMetadata
+                    Name = { Value = @"My New, Better Than Ever Room" },
+                    Host = { Value = new User { Username = @"Angelsim", Id = 1777162, Country = new Country { FlagName = @"KR" } } },
+                    Status = { Value = new RoomStatusOpen() },
+                    Type = { Value = new GameTypeTagTeam() },
+                    Beatmap =
                     {
-                        Title = @"xi",
-                        Artist = @"FREEDOM DIVE",
-                        Author = @"Nakagawa-Kanon",
+                        Value = new BeatmapInfo
+                        {
+                            StarDifficulty = 7.07,
+                            Ruleset = rulesets.GetRuleset(0),
+                            Metadata = new BeatmapMetadata
+                            {
+                                Title = @"xi",
+                                Artist = @"FREEDOM DIVE",
+                                Author = @"Nakagawa-Kanon",
+                            },
+                            OnlineInfo = new BeatmapOnlineInfo
+                            {
+                                Covers = new[] { @"https://assets.ppy.sh//beatmaps/39804/covers/cover.jpg?1456506845" },
+                            },
+                        }
                     },
-                    OnlineInfo = new BeatmapOnlineInfo
+                    MaxParticipants = { Value = 10 },
+                    Participants =
                     {
-                        Covers = new[] { @"https://assets.ppy.sh//beatmaps/39804/covers/cover.jpg?1456506845" },
-                    },
-                };
-                newRoom.MaxParticipants.Value = 10;
-                newRoom.Participants.Value = new[]
-                {
-                    new User { Username = @"Angelsim", Id = 1777162, GlobalRank = 4 },
-                    new User { Username = @"HappyStick", Id = 256802, GlobalRank = 752 },
-                    new User { Username = @"-Konpaku-", Id = 2258797, GlobalRank = 571 }
+                        Value = new[]
+                        {
+                            new User { Username = @"Angelsim", Id = 1777162, GlobalRank = 4 },
+                            new User { Username = @"HappyStick", Id = 256802, GlobalRank = 752 },
+                            new User { Username = @"-Konpaku-", Id = 2258797, GlobalRank = 571 }
+                        }
+                    }
                 };
 
                 inspector.Room = newRoom;
