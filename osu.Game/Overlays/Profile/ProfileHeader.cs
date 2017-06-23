@@ -321,11 +321,11 @@ namespace osu.Game.Overlays.Profile
 
             if (user.Age != null)
             {
-                infoTextLeft.AddText($"{user.Age} years old", boldItalic);
+                infoTextLeft.AddText($"{user.Age} years old ", boldItalic);
             }
             if (user.Country != null)
             {
-                infoTextLeft.AddText(" from ");
+                infoTextLeft.AddText("from ");
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
             }
             infoTextLeft.NewParagraph();

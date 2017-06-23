@@ -42,19 +42,10 @@ namespace osu.Game.Overlays.Profile
                     Direction = FillDirection.Vertical,
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding
+                    Padding = new MarginPadding
                     {
                         Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                        Bottom = 200
-                    },
-                    Children = new Drawable[]
-                    {
-                        new TextFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                            Text = "Coming soon!"
-                        }
+                        Bottom = 20
                     }
                 },
                 new Box
@@ -65,6 +56,17 @@ namespace osu.Game.Overlays.Profile
                     EdgeSmoothness = new Vector2(1)
                 }
             };
+
+            // placeholder
+            Add(new OsuSpriteText
+            {
+                Text = @"Coming soon!",
+                TextSize = 36,
+                Font = @"Exo2.0-RegularItalic",
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Margin = new MarginPadding { Bottom = 200 }
+            });
         }
     }
 }
