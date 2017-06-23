@@ -51,6 +51,13 @@ namespace osu.Game.Rulesets.Timing
             this.scrollingAxes = scrollingAxes;
         }
 
+        public override void Add(SpeedAdjustmentContainer speedAdjustment)
+        {
+            speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
+            speedAdjustment.ScrollingAxes = scrollingAxes;
+            base.Add(speedAdjustment);
+        }
+
         /// <summary>
         /// Adds a hit object to this <see cref="SpeedAdjustmentCollection"/>. The hit objects will be kept in a queue
         /// and will be processed when new <see cref="SpeedAdjustmentContainer"/>s are added to this <see cref="SpeedAdjustmentCollection"/>.
@@ -58,14 +65,10 @@ namespace osu.Game.Rulesets.Timing
         /// <param name="hitObject">The hit object to add.</param>
         public void Add(DrawableHitObject hitObject)
         {
-            queuedHitObjects.Enqueue(hitObject);
-        }
+            if (!(hitObject is IScrollingHitObject))
+                throw new InvalidOperationException($"Hit objects added to a {nameof(SpeedAdjustmentCollection)} must implement {nameof(IScrollingHitObject)}.");
 
-        public override void Add(SpeedAdjustmentContainer speedAdjustment)
-        {
-            speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
-            speedAdjustment.ScrollingAxes = scrollingAxes;
-            base.Add(speedAdjustment);
+            queuedHitObjects.Enqueue(hitObject);
         }
 
         protected override void Update()
