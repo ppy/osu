@@ -6,7 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -16,6 +15,7 @@ using System.Linq;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Threading;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Select
 {

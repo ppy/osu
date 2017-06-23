@@ -8,6 +8,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
@@ -37,6 +38,7 @@ namespace osu.Game.Screens.Menu
         private readonly LogoVisualisation visualizer;
 
         private SampleChannel sampleClick;
+        private SampleChannel sampleBeat;
 
         private readonly Container colourAndTriangles;
 
@@ -214,6 +216,7 @@ namespace osu.Game.Screens.Menu
         private void load(TextureStore textures, AudioManager audio)
         {
             sampleClick = audio.Sample.Get(@"Menu/menuhit");
+            sampleBeat = audio.Sample.Get(@"Menu/heartbeat");
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
         }
@@ -223,6 +226,9 @@ namespace osu.Game.Screens.Menu
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+            if (Hovering)
+                sampleBeat.Play();
 
             lastBeatIndex = beatIndex;
 

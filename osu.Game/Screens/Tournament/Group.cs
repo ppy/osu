@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Screens.Tournament.Teams;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Tournament
 {
