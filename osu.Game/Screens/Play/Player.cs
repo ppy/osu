@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Play
 
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
-        private SectionCheckOverlay sectionCheckOverlay;
+        private SectionTrackOverlay sectionTrackOverlay;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                sectionCheckOverlay = new SectionCheckOverlay
+                sectionTrackOverlay = new SectionTrackOverlay
                 {
                     Breaks = Beatmap.Beatmap.Breaks,
                     AudioClock = decoupledClock,
@@ -212,8 +212,8 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
 
-            sectionCheckOverlay.BindHealth(scoreProcessor.Health);
-            sectionCheckOverlay.HudOverlay = hudOverlay;
+            sectionTrackOverlay.BindHealth(scoreProcessor.Health);
+            sectionTrackOverlay.HudOverlay = hudOverlay;
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
@@ -318,7 +318,7 @@ namespace osu.Game.Screens.Play
             HitRenderer?.FadeOut(fade_out_duration);
             Content.FadeOut(fade_out_duration);
 
-            sectionCheckOverlay.RestoreBackgroundDim();
+            sectionTrackOverlay.RestoreBackgroundDim();
 
             hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
 

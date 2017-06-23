@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +15,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
 {
-    public class SectionCheckOverlay : Container
+    public class SectionTrackOverlay : Container
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
 
@@ -34,6 +36,9 @@ namespace osu.Game.Screens.Play
         private bool imageHasBeenShown;
         private double health;
 
+        private SampleChannel samplePass;
+        private SampleChannel sampleFail;
+
         private readonly TextAwesome resultIcon;
 
         private HUDOverlay hudOverlay;
@@ -44,7 +49,7 @@ namespace osu.Game.Screens.Play
 
         public List<BreakPeriod> Breaks { set { breaks = value; } }
 
-        public SectionCheckOverlay()
+        public SectionTrackOverlay()
         {
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
@@ -63,17 +68,20 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, AudioManager audio)
         {
             backgroundDim = config.GetBindable<double>(OsuSetting.DimLevel);
             backgroundDimUserValue = backgroundDim.Value;
+
+            samplePass = audio.Sample.Get(@"SectionResult/sectionpass");
+            sampleFail = audio.Sample.Get(@"SectionResult/sectionfail");
         }
 
         public void BindHealth(BindableDouble health) => healthBindable.BindTo(health);
 
         protected override void Update()
         {
-            if (breaks.Count == 0) return;
+            if (breaks?.Count == 0) return;
 
             if (currentBreakIndex == breaks.Count) return;
 
@@ -89,7 +97,7 @@ namespace osu.Game.Screens.Play
                     imageHasBeenShown = false;
                     imageAppearTime = currentTime + (currentBreak.EndTime - currentBreak.StartTime) / 2;
                     backgroundDim.Value = 0;
-                    hudOverlay.FadeTo(0, fade_duration);
+                    hudOverlay?.FadeTo(0, fade_duration);
                     return;
                 }
             }
@@ -100,7 +108,16 @@ namespace osu.Game.Screens.Play
                     if (currentBreak.HasPeriodResult)
                     {
                         // Show icon depends on HP
-                        resultIcon.Icon = health < 0.3 ? FontAwesome.fa_close : FontAwesome.fa_check;
+                        if(health < 0.3)
+                        {
+                            resultIcon.Icon = FontAwesome.fa_close;
+                            sampleFail.Play();
+                        }
+                        else
+                        {
+                            resultIcon.Icon = FontAwesome.fa_check;
+                            samplePass.Play();
+                        }
 
                         resultIcon.FadeTo(1);
                         Delay(100);
@@ -118,7 +135,7 @@ namespace osu.Game.Screens.Play
                 if (currentBreak.EndTime - currentTime < fade_duration)
                 {
                     backgroundDim.Value = backgroundDimUserValue;
-                    hudOverlay.FadeTo(1, fade_duration);
+                    hudOverlay?.FadeTo(1, fade_duration);
                     currentBreakIndex++;
                     isBreak = false;
                 }

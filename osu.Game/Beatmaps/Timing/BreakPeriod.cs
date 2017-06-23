@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.Timing
         /// <summary>
         /// The minimum duration required for a break to show period result.
         /// </summary>
-        private const double min_break_duration_for_result = 2000;
+        private const double min_break_duration_for_result = 3000;
 
         /// <summary>
         /// The break start time.
