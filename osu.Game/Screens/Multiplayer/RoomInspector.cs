@@ -48,6 +48,7 @@ namespace osu.Game.Screens.Multiplayer
         private TextureStore textures;
 
         private Room room;
+
         public Room Room
         {
             get { return room; }
