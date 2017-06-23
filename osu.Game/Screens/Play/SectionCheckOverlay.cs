@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics.Sprites;
@@ -13,7 +14,6 @@ namespace osu.Game.Screens.Play
     public class SectionCheckOverlay : Container
     {
         private List<BreakPeriod> breaks = new List<BreakPeriod>();
-        private WorkingBeatmap beatmap;
 
         private int currentBreakIndex;
         private double imageAppearTime;
@@ -22,14 +22,10 @@ namespace osu.Game.Screens.Play
 
         private OsuSpriteText tempText;
 
-        public WorkingBeatmap Beatmap
-        {
-            set
-            {
-                beatmap = value;
-                breaks = value.Beatmap.Breaks;
-            }
-        }
+        private IClock audioClock;
+        public IClock AudioClock { set { audioClock = value; } }
+
+        public List<BreakPeriod> Breaks { set { breaks = value; } }
 
         public SectionCheckOverlay()
         {
@@ -50,17 +46,15 @@ namespace osu.Game.Screens.Play
 
         protected override void Update()
         {
-            if (beatmap == null) return;
-
             if (breaks.Count == 0) return;
 
             if (currentBreakIndex == breaks.Count) return;
 
-            double currentTime = beatmap.Track.CurrentTime;
+            double currentTime = audioClock?.CurrentTime ?? Time.Current;
 
             if (!isBreak)
             {
-                if (breaks[currentBreakIndex].StartTime > currentTime)
+                if (currentTime > breaks[currentBreakIndex].StartTime)
                 {
                     isBreak = true;
                     imageHasBeenShown = false;
@@ -70,18 +64,20 @@ namespace osu.Game.Screens.Play
             }
             else
             {
-                // Show image
                 if (currentTime > imageAppearTime && !imageHasBeenShown)
                 {
-                    tempText.FadeTo(1, 100);
-                    Delay(1000);
-                    Schedule(() => tempText.FadeTo(0, 100));
+                    if (breaks[currentBreakIndex].HasEffect)
+                    {
+                        // Show image depends on HP
+                        tempText.FadeTo(1, 100);
+                        Delay(1000);
+                        Schedule(() => tempText.FadeTo(0, 100));
+
+                        imageHasBeenShown = true;
+                    }
                     // Increase bg dim
                     // Hide overlay
-                    // Show image depends on HP
-                    imageHasBeenShown = true;
                 }
-
                 // Exit from break
                 if (currentTime > breaks[currentBreakIndex].EndTime)
                 {

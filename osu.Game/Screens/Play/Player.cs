@@ -195,7 +195,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            sectionCheckOverlay.Beatmap = Beatmap;
+            sectionCheckOverlay.AudioClock = decoupledClock;
+            sectionCheckOverlay.Breaks = Beatmap.Beatmap.Breaks;
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 
