@@ -8,13 +8,13 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using OpenTK;
 using System;
-using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.OpenGL.Buffers;
 using OpenTK.Graphics.ES30;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Timing;
 using System.Diagnostics;
+using osu.Framework.Graphics.OpenGL.Vertices;
 
 namespace osu.Game.Graphics.Cursor
 {

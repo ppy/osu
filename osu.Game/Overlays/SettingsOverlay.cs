@@ -6,7 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -138,10 +138,14 @@ namespace osu.Game.Overlays
                 InputManager.ChangeFocus(null);
         }
 
-        protected override bool OnFocus(InputState state)
+        public override bool AcceptsFocus => true;
+
+        protected override bool OnClick(InputState state) => true;
+
+        protected override void OnFocus(InputState state)
         {
             InputManager.ChangeFocus(searchTextBox);
-            return false;
+            base.OnFocus(state);
         }
 
         private class SettingsSectionsContainer : SectionsContainer
@@ -159,7 +163,7 @@ namespace osu.Game.Overlays
 
             public SettingsSectionsContainer()
             {
-                ScrollContainer.ScrollDraggerVisible = false;
+                ScrollContainer.ScrollbarVisible = false;
                 Add(headerBackground = new Box
                 {
                     Colour = Color4.Black,

@@ -6,6 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -24,7 +25,7 @@ namespace osu.Game.Overlays.Settings
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
         public string[] FilterTerms => new[] { Header };
-        public bool MatchingCurrentFilter
+        public bool MatchingFilter
         {
             set
             {

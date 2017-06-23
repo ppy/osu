@@ -9,7 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.Cursor
                         Masking = true,
                         BorderThickness = Size.X / 6,
                         BorderColour = Color4.White,
-                        EdgeEffect = new EdgeEffect
+                        EdgeEffect = new EdgeEffectParameters
                         {
                             Type = EdgeEffectType.Shadow,
                             Colour = Color4.Pink.Opacity(0.5f),

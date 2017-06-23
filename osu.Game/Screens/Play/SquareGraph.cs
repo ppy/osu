@@ -8,9 +8,9 @@ using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
 {
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Play
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {
-            if ((invalidation & Invalidation.SizeInParentSpace) > 0)
+            if ((invalidation & Invalidation.DrawSize) > 0)
                 layout.Invalidate();
             return base.Invalidate(invalidation, source, shallPropagate);
         }
