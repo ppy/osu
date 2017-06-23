@@ -45,7 +45,16 @@ namespace osu.Game.Overlays.Profile
                     Margin = new MarginPadding
                     {
                         Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                        Bottom = 20
+                        Bottom = 200
+                    },
+                    Children = new Drawable[]
+                    {
+                        new TextFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Coming soon!"
+                        }
                     }
                 },
                 new Box
