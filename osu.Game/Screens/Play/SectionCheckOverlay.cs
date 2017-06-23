@@ -1,12 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
 using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
@@ -15,12 +17,19 @@ namespace osu.Game.Screens.Play
     {
         private List<BreakPeriod> breaks = new List<BreakPeriod>();
 
+        private readonly BindableDouble healthBindable = new BindableDouble
+        {
+            MinValue = 0,
+            MaxValue = 1
+        };
+
         private int currentBreakIndex;
         private double imageAppearTime;
         private bool isBreak;
         private bool imageHasBeenShown;
+        private double health;
 
-        private OsuSpriteText tempText;
+        private readonly TextAwesome resultIcon;
 
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = value; } }
@@ -33,16 +42,19 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Add(tempText = new OsuSpriteText
+            Add(resultIcon = new TextAwesome
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Text = @"BREAK",
-                TextSize = 50,
+                TextSize = 100,
                 Alpha = 0,
                 AlwaysPresent = true,
             });
+
+            healthBindable.ValueChanged += newValue => { health = newValue; };
         }
+
+        public void BindHealth(BindableDouble health) => healthBindable.BindTo(health);
 
         protected override void Update()
         {
@@ -52,34 +64,43 @@ namespace osu.Game.Screens.Play
 
             double currentTime = audioClock?.CurrentTime ?? Time.Current;
 
+            var currentBreak = breaks[currentBreakIndex];
+
             if (!isBreak)
             {
-                if (currentTime > breaks[currentBreakIndex].StartTime)
+                if (currentTime > currentBreak.StartTime)
                 {
                     isBreak = true;
                     imageHasBeenShown = false;
-                    imageAppearTime = currentTime + (breaks[currentBreakIndex].EndTime - breaks[currentBreakIndex].StartTime) / 2;
+                    imageAppearTime = currentTime + (currentBreak.EndTime - currentBreak.StartTime) / 2;
                     return;
                 }
             }
             else
             {
-                if (currentTime > imageAppearTime && !imageHasBeenShown)
+                if (currentTime > imageAppearTime && !imageHasBeenShown && currentBreak.HasEffect)
                 {
-                    if (breaks[currentBreakIndex].HasEffect)
+                    if (currentBreak.HasPeriodResult)
                     {
-                        // Show image depends on HP
-                        tempText.FadeTo(1, 100);
+                        // Show icon depends on HP
+                        resultIcon.Icon = health < 0.3 ? FontAwesome.fa_crosshairs : FontAwesome.fa_check;
+
+                        resultIcon.FadeTo(1);
+                        Delay(100);
+                        Schedule(() => resultIcon.FadeTo(0));
+                        Delay(100);
+                        Schedule(() => resultIcon.FadeTo(1));
                         Delay(1000);
-                        Schedule(() => tempText.FadeTo(0, 100));
+                        Schedule(() => resultIcon.FadeTo(0, 200));
 
                         imageHasBeenShown = true;
                     }
                     // Increase bg dim
                     // Hide overlay
                 }
+                
                 // Exit from break
-                if (currentTime > breaks[currentBreakIndex].EndTime)
+                if (currentTime > currentBreak.EndTime)
                 {
                     currentBreakIndex++;
                     isBreak = false;

@@ -8,7 +8,12 @@ namespace osu.Game.Beatmaps.Timing
         /// <summary>
         /// The minimum duration required for a break to have any effect.
         /// </summary>
-        private const double min_break_duration = 650;
+        private const double min_break_duration_for_effect = 650;
+
+        /// <summary>
+        /// The minimum duration required for a break to show period result.
+        /// </summary>
+        private const double min_break_duration_for_result = 2000;
 
         /// <summary>
         /// The break start time.
@@ -28,6 +33,11 @@ namespace osu.Game.Beatmaps.Timing
         /// <summary>
         /// Whether the break has any effect. Breaks that are too short are culled before they are added to the beatmap.
         /// </summary>
-        public bool HasEffect => Duration >= min_break_duration;
+        public bool HasEffect => Duration >= min_break_duration_for_effect;
+
+        /// <summary>
+        /// Whether the break should show period result.
+        /// </summary>
+        public bool HasPeriodResult => Duration >= min_break_duration_for_result;
     }
 }

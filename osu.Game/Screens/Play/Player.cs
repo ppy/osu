@@ -195,9 +195,6 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            sectionCheckOverlay.AudioClock = decoupledClock;
-            sectionCheckOverlay.Breaks = Beatmap.Beatmap.Breaks;
-
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 
             hudOverlay.KeyCounter.Add(rulesetInstance.CreateGameplayKeys());
@@ -210,6 +207,10 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
             hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
+
+            sectionCheckOverlay.AudioClock = decoupledClock;
+            sectionCheckOverlay.Breaks = Beatmap.Beatmap.Breaks;
+            sectionCheckOverlay.BindHealth(scoreProcessor.Health);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
