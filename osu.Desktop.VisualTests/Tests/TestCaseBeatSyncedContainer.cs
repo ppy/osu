@@ -82,7 +82,7 @@ namespace osu.Desktop.VisualTests.Tests
                             beatCount = new InfoString(@"Beats amount (in the current timing point)"),
                             currentBeat = new InfoString(@"Current beat"),
                             beatsPerMinute = new InfoString(@"BPM"),
-                            adjustedBeatLength = new InfoString(@"Beat length"),
+                            adjustedBeatLength = new InfoString(@"Adjusted beat length"),
                         }
                     },
                     new Container
