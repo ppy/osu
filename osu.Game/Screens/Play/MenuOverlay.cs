@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
@@ -14,6 +13,7 @@ using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
 {
