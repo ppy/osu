@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Play
 {
     public class SectionCheckOverlay : Container
     {
+        private const double fade_time = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
+
         private List<BreakPeriod> breaks = new List<BreakPeriod>();
 
         private readonly BindableDouble healthBindable = new BindableDouble
@@ -22,6 +24,9 @@ namespace osu.Game.Screens.Play
             MinValue = 0,
             MaxValue = 1
         };
+
+        private Bindable<double> backgroundDim;
+        private double backgroundDimUserValue;
 
         private int currentBreakIndex;
         private double imageAppearTime;
@@ -54,6 +59,13 @@ namespace osu.Game.Screens.Play
             healthBindable.ValueChanged += newValue => { health = newValue; };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            backgroundDim = config.GetBindable<double>(OsuSetting.DimLevel);
+            backgroundDimUserValue = backgroundDim.Value;
+        }
+
         public void BindHealth(BindableDouble health) => healthBindable.BindTo(health);
 
         protected override void Update()
@@ -73,6 +85,7 @@ namespace osu.Game.Screens.Play
                     isBreak = true;
                     imageHasBeenShown = false;
                     imageAppearTime = currentTime + (currentBreak.EndTime - currentBreak.StartTime) / 2;
+                    backgroundDim.Value = 0;
                     return;
                 }
             }
@@ -95,17 +108,29 @@ namespace osu.Game.Screens.Play
 
                         imageHasBeenShown = true;
                     }
-                    // Increase bg dim
-                    // Hide overlay
                 }
                 
                 // Exit from break
-                if (currentTime > currentBreak.EndTime)
+                if (currentBreak.EndTime - currentTime < fade_time)
                 {
+                    backgroundDim.Value = backgroundDimUserValue;
+                    showHudOverlay();
                     currentBreakIndex++;
                     isBreak = false;
                 }
             }
+        }
+
+        public void RestoreBackgroundDim() => backgroundDim.Value = backgroundDimUserValue;
+
+        private void hideHudOverlay()
+        {
+
+        }
+
+        private void showHudOverlay()
+        {
+
         }
     }
 }

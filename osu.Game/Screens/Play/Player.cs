@@ -315,6 +315,8 @@ namespace osu.Game.Screens.Play
             HitRenderer?.FadeOut(fade_out_duration);
             Content.FadeOut(fade_out_duration);
 
+            sectionCheckOverlay.RestoreBackgroundDim();
+
             hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
 
             Background?.FadeTo(1f, fade_out_duration);
