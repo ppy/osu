@@ -45,7 +45,7 @@ namespace osu.Game.Overlays
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
             {
-                Colour = Color4.Black.Opacity(0.5f),
+                Colour = Color4.Black.Opacity(0),
                 Type = EdgeEffectType.Shadow,
                 Radius = 10
             };
@@ -55,6 +55,18 @@ namespace osu.Game.Overlays
         private void load(APIAccess api)
         {
             this.api = api;
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+            FadeEdgeEffectTo(0.5f, APPEAR_DURATION, EasingTypes.In);
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+            FadeEdgeEffectTo(0, DISAPPEAR_DURATION, EasingTypes.Out);
         }
 
         public void ShowUser(User user)
