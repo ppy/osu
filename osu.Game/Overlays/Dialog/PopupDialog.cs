@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.Dialog
 {

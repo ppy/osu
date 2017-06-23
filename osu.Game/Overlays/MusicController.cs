@@ -23,6 +23,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Threading;
 using osu.Game.Overlays.Music;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays
 {

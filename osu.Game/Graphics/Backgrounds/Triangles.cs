@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
@@ -56,7 +55,7 @@ namespace osu.Game.Graphics.Backgrounds
         /// <summary>
         /// Whether we should drop-off alpha values of triangles more quickly to improve
         /// the visual appearance of fading. This defaults to on as it is generally more
-        /// aesthetically pleasing, but should be turned off in <see cref="BufferedContainer{T}"/>s.
+        /// aesthetically pleasing, but should be turned off in buffered containers.
         /// </summary>
         public bool HideAlphaDiscrepancies = true;
 
