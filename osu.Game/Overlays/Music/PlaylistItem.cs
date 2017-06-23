@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Music
         private Color4 artistColour;
 
         private TextAwesome handle;
-        private Paragraph text;
+        private TextFlowContainer text;
         private IEnumerable<SpriteText> titleSprites;
         private UnicodeBindableString titleBind;
         private UnicodeBindableString artistBind;
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Music
                     Margin = new MarginPadding { Left = 5 },
                     Padding = new MarginPadding { Top = 2 },
                 },
-                text = new Paragraph
+                text = new TextFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -135,8 +135,9 @@ namespace osu.Game.Overlays.Music
 
         private bool matching = true;
 
-        public bool MatchingCurrentFilter
+        public bool MatchingFilter
         {
+            get { return matching; }
             set
             {
                 if (matching == value) return;
@@ -144,10 +145,6 @@ namespace osu.Game.Overlays.Music
                 matching = value;
 
                 FadeTo(matching ? 1 : 0, 200);
-            }
-            get
-            {
-                return matching;
             }
         }
     }

@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -74,21 +75,6 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public override bool Active
-            {
-                get { return base.Active; }
-                set
-                {
-                    if (Active == value) return;
-
-                    if (value)
-                        fadeActive();
-                    else
-                        fadeInactive();
-                    base.Active = value;
-                }
-            }
-
             private const float transition_length = 500;
 
             private void fadeActive()
@@ -150,6 +136,10 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 };
             }
+
+            protected override void OnActivated() => fadeActive();
+
+            protected override void OnDeactivated() => fadeInactive();
         }
 
         private class OsuTabDropdown : OsuDropdown<T>

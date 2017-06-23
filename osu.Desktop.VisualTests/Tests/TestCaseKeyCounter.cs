@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.MathUtils;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Play;
 
@@ -54,7 +55,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Children = new Drawable[]
                 {
                     new SpriteText { Text = "FadeTime" },
-                    sliderBar =new TestSliderBar<int>
+                    sliderBar = new TestSliderBar<int>
                     {
                         Width = 150,
                         Height = 10,

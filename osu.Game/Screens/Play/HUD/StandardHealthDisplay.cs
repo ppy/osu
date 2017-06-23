@@ -5,12 +5,12 @@ using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD
                     return;
                 glowColour = value;
 
-                fill.EdgeEffect = new EdgeEffect
+                fill.EdgeEffect = new EdgeEffectParameters
                 {
                     Colour = glowColour.Opacity(base_glow_opacity),
                     Radius = 8,

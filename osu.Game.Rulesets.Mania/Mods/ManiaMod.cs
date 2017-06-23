@@ -34,6 +34,11 @@ namespace osu.Game.Rulesets.Mania.Mods
 
     }
 
+    public class ManiaModDaycore : ModDaycore
+    {
+        public override double ScoreMultiplier => 0.3;
+    }
+
     public class ManiaModDoubleTime : ModDoubleTime
     {
         public override double ScoreMultiplier => 1.0;

@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
         protected IEnumerable<DrawableHitObject<TObject, TJudgement>> NestedHitObjects => nestedHitObjects;
 
-        protected void AddNested(DrawableHitObject<TObject, TJudgement> h)
+        protected virtual void AddNested(DrawableHitObject<TObject, TJudgement> h)
         {
             if (nestedHitObjects == null)
                 nestedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();

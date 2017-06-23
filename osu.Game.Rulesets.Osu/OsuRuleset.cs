@@ -7,6 +7,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.OsuDifficulty;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
@@ -46,7 +47,14 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModEasy(),
                         new OsuModNoFail(),
-                        new OsuModHalfTime(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new OsuModHalfTime(),
+                                new OsuModDaycore(),
+                            },
+                        },
                     };
 
                 case ModType.DifficultyIncrease:

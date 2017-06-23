@@ -13,17 +13,17 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
             // UI/selection defaults
-
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10);
             Set(OsuSetting.DisplayStarsMaximum, 10.0, 0, 10);
 
+            Set(OsuSetting.SelectionRandomType, SelectionRandomType.RandomPermutation);
+
             Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
 
             // Online settings
-
             Set(OsuSetting.Username, string.Empty);
             Set(OsuSetting.Token, string.Empty);
 
@@ -38,14 +38,12 @@ namespace osu.Game.Configuration
             };
 
             // Audio
-
             Set(OsuSetting.MenuVoice, true);
             Set(OsuSetting.MenuMusic, true);
 
             Set(OsuSetting.AudioOffset, 0, -500.0, 500.0);
 
             // Input
-
             Set(OsuSetting.MenuCursorSize, 1.0, 0.5f, 2);
             Set(OsuSetting.GameplayCursorSize, 1.0, 0.5f, 2);
             Set(OsuSetting.AutoCursorSize, false);
@@ -54,7 +52,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.MouseDisableWheel, false);
 
             // Graphics
-
             Set(OsuSetting.ShowFpsDisplay, false);
 
             Set(OsuSetting.MenuParallax, true);
@@ -63,14 +60,15 @@ namespace osu.Game.Configuration
             Set(OsuSetting.SnakingOutSliders, true);
 
             // Gameplay
-
             Set(OsuSetting.DimLevel, 0.3, 0, 1);
 
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.KeyOverlay, false);
 
-            // Update
+            Set(OsuSetting.FloatingComments, false);
+            Set(OsuSetting.PlaybackSpeed, 1.0, 0.5f, 2);
 
+            // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
         }
 
@@ -88,6 +86,8 @@ namespace osu.Game.Configuration
         AutoCursorSize,
         DimLevel,
         KeyOverlay,
+        FloatingComments,
+        PlaybackSpeed,
         ShowInterface,
         MouseDisableButtons,
         MouseDisableWheel,
@@ -102,6 +102,7 @@ namespace osu.Game.Configuration
         SaveUsername,
         DisplayStarsMinimum,
         DisplayStarsMaximum,
+        SelectionRandomType,
         SnakingInSliders,
         SnakingOutSliders,
         ShowFpsDisplay,
