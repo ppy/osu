@@ -293,17 +293,22 @@ namespace osu.Game.Overlays
 
             current = beatmapBacking.Value;
 
-            updateProgressBar(current?.Track);
+            updateProgressBarLimit(current?.Track);
             updateDisplay(beatmapBacking, direction);
             queuedDirection = null;
         }
 
-        private void updateProgressBar(Track t)
+        private void updateProgressBarLimit(Track t)
         {
-            if (t?.IsLoaded ?? false)
-                progressBar.EndTime = t.Length;
-            else if (t != null)
+            if (t != null)
+            {
                 t.OnLoaded += loadedTrack => progressBar.EndTime = loadedTrack.Length;
+                if (t.IsLoaded)
+                {
+                    progressBar.EndTime = t.Length;
+                    t.OnLoaded = null;
+                }
+            }
         }
 
         private ScheduledDelegate pendingBeatmapSwitch;

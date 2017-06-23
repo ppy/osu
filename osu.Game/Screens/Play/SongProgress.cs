@@ -12,7 +12,6 @@ using System.Linq;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-
 namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
@@ -92,7 +91,7 @@ namespace osu.Game.Screens.Play
                     Alpha = 0,
                     Anchor = Anchor.BottomLeft,
                     Origin =  Anchor.BottomLeft,
-                    OnSeek = position => this.OnSeek?.Invoke(position),
+                    OnSeek = position => OnSeek?.Invoke(position),
                 },
             };
         }
