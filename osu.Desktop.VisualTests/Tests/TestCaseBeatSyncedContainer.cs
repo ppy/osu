@@ -57,7 +57,7 @@ namespace osu.Desktop.VisualTests.Tests
             private readonly InfoString beatCount;
             private readonly InfoString currentBeat;
             private readonly InfoString beatsPerMinute;
-            private readonly InfoString beatLength;
+            private readonly InfoString adjustedBeatLength;
 
             private readonly Box flashLayer;
 
@@ -77,12 +77,12 @@ namespace osu.Desktop.VisualTests.Tests
                         Margin = new MarginPadding { Bottom = flash_layer_heigth, },
                         Children = new Drawable[]
                         {
-                            timingPointCount = new InfoString(@"Timing points amount: "),
-                            currentTimingPoint = new InfoString(@"Current timing point: "),
-                            beatCount = new InfoString(@"Beats amount (in the current timing point): "),
-                            currentBeat = new InfoString(@"Current beat: "),
-                            beatsPerMinute = new InfoString(@"BPM: "),
-                            beatLength = new InfoString(@"Beat length: "),
+                            timingPointCount = new InfoString(@"Timing points amount"),
+                            currentTimingPoint = new InfoString(@"Current timing point"),
+                            beatCount = new InfoString(@"Beats amount (in the current timing point)"),
+                            currentBeat = new InfoString(@"Current beat"),
+                            beatsPerMinute = new InfoString(@"BPM"),
+                            adjustedBeatLength = new InfoString(@"Beat length"),
                         }
                     },
                     new Container
@@ -116,7 +116,7 @@ namespace osu.Desktop.VisualTests.Tests
                     beatCount.Value = 0;
                     currentBeat.Value = 0;
                     beatsPerMinute.Value = 0;
-                    beatLength.Value = 0;
+                    adjustedBeatLength.Value = 0;
                 };
             }
 
@@ -146,7 +146,7 @@ namespace osu.Desktop.VisualTests.Tests
                 beatCount.Value = calculateBeatCount(timingPoint);
                 currentBeat.Value = beatIndex + 1;
                 beatsPerMinute.Value = (float)Math.Round(60000 / timingPoint.BeatLength, 1);
-                beatLength.Value = (float)timingPoint.BeatLength;
+                adjustedBeatLength.Value = (float)timingPoint.BeatLength;
 
                 flashLayer.ClearTransforms();
                 flashLayer.FadeTo(1);
@@ -177,7 +177,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
-                Add(new OsuSpriteText { Text = header, TextSize = text_size });
+                Add(new OsuSpriteText { Text = header + @": ", TextSize = text_size });
                 Add(valueText = new OsuSpriteText() { TextSize = text_size });
                 Margin = new MarginPadding { Vertical = margin, };
             }
