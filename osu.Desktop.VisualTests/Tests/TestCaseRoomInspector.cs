@@ -23,7 +23,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             var room = new Room();
             room.Name.Value = @"My Awesome Room";
-            room.Host.Value = new User { Username = @"flyte", Id = 3103765, Country = new Country { FlagName = @"JP" }};
+            room.Host.Value = new User { Username = @"flyte", Id = 3103765, Country = new Country { FlagName = @"JP" } };
             room.Status.Value = new RoomStatusOpen();
             room.Type.Value = new GameTypeTeamVersus();
             room.Beatmap.Value = new BeatmapInfo
@@ -42,12 +42,15 @@ namespace osu.Desktop.VisualTests.Tests
                 },
             };
             room.MaxParticipants.Value = 200;
-            room.Participants.Value = new[] { new User { Username = @"flyte", Id = 3103765, GlobalRank = 1425 },
-                                              new User { Username = @"Cookiezi", Id = 124493, GlobalRank = 5466 },
-                                              new User { Username = @"Angelsim", Id = 1777162, GlobalRank = 2873 },
-                                              new User { Username = @"Rafis", Id = 2558286, GlobalRank = 4687 },
-                                              new User { Username = @"hvick225", Id = 50265, GlobalRank = 3258 },
-                                              new User { Username = @"peppy", Id = 2, GlobalRank = 6251 }};
+            room.Participants.Value = new[]
+            {
+                new User { Username = @"flyte", Id = 3103765, GlobalRank = 1425 },
+                new User { Username = @"Cookiezi", Id = 124493, GlobalRank = 5466 },
+                new User { Username = @"Angelsim", Id = 1777162, GlobalRank = 2873 },
+                new User { Username = @"Rafis", Id = 2558286, GlobalRank = 4687 },
+                new User { Username = @"hvick225", Id = 50265, GlobalRank = 3258 },
+                new User { Username = @"peppy", Id = 2, GlobalRank = 6251 }
+            };
 
             RoomInspector inspector;
             Add(inspector = new RoomInspector
@@ -58,7 +61,7 @@ namespace osu.Desktop.VisualTests.Tests
             });
 
             AddStep(@"change title", () => room.Name.Value = @"A Better Room Than The Above");
-            AddStep(@"change host", () => room.Host.Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" }});
+            AddStep(@"change host", () => room.Host.Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } });
             AddStep(@"change status", () => room.Status.Value = new RoomStatusPlaying());
             AddStep(@"change type", () => room.Type.Value = new GameTypeTag());
             AddStep(@"change beatmap", () => room.Beatmap.Value = null);
@@ -73,7 +76,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 var newRoom = new Room();
                 newRoom.Name.Value = @"My New, Better Than Ever Room";
-                newRoom.Host.Value = new User { Username = @"Angelsim", Id = 1777162, Country = new Country { FlagName = @"KR" }};
+                newRoom.Host.Value = new User { Username = @"Angelsim", Id = 1777162, Country = new Country { FlagName = @"KR" } };
                 newRoom.Status.Value = new RoomStatusOpen();
                 newRoom.Type.Value = new GameTypeTagTeam();
                 newRoom.Beatmap.Value = new BeatmapInfo
