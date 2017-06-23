@@ -82,7 +82,6 @@ namespace osu.Game.Screens.Select
                 new Container
                 {
                     Padding = new MarginPadding(20),
-                    AlwaysReceiveInput = true,
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
                     Anchor = Anchor.TopRight,
@@ -109,7 +108,6 @@ namespace osu.Game.Screens.Select
                             Direction = FillDirection.Horizontal,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            AlwaysReceiveInput = true,
                             Children = new Drawable[]
                             {
                                 groupTabs = new OsuTabControl<GroupMode>
