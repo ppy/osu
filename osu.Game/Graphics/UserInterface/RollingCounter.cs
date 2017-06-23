@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <remarks>
         /// Must be a subclass of Transform(T)
         /// </remarks>
-        protected virtual Type TransformType => typeof(Transform<T>);
+        protected virtual Type TransformType => typeof(Transform<T, Drawable>);
 
         protected SpriteText DisplayedCountSpriteText;
 
@@ -181,17 +181,17 @@ namespace osu.Game.Graphics.UserInterface
         protected virtual void TransformCount(T currentValue, T newValue)
         {
             Debug.Assert(
-                typeof(Transform<T>).IsAssignableFrom(TransformType),
+                typeof(Transform<T, Drawable>).IsAssignableFrom(TransformType),
                 @"transformType should be a subclass of Transform<T>."
             );
 
-            TransformCount((Transform<T>)Activator.CreateInstance(TransformType), currentValue, newValue);
+            TransformCount((Transform<T, Drawable>)Activator.CreateInstance(TransformType), currentValue, newValue);
         }
 
         /// <summary>
         /// Intended to be used by TransformCount(T currentValue, T newValue).
         /// </summary>
-        protected void TransformCount(Transform<T> transform, T currentValue, T newValue)
+        protected void TransformCount(Transform<T, Drawable> transform, T currentValue, T newValue)
         {
             Type type = transform.GetType();
 

@@ -4,10 +4,10 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays
 {
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        private class TransformSeek : TransformFloat
+        private class TransformSeek : TransformFloat<Drawable>
         {
             public override void Apply(Drawable d)
             {

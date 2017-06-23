@@ -10,7 +10,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -18,6 +17,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions;
 using osu.Framework.Input;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.Music
 {
