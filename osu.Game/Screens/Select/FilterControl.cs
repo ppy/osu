@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Select
 
         private readonly SearchTextBox searchTextBox;
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
 
         public FilterControl()
         {

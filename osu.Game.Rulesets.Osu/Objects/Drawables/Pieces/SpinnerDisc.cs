@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             };
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => true;
+        public override bool Contains(Vector2 screenSpacePos) => true;
 
         private bool tracking;
         public bool Tracking

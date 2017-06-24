@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Play
                 this.target = target;
             }
 
-            protected override bool InternalContains(Vector2 screenSpacePos) => true;
+            public override bool Contains(Vector2 screenSpacePos) => true;
 
             public override bool HandleInput => true;
 
