@@ -17,8 +17,6 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarUserArea()
         {
-            AlwaysReceiveInput = true;
-
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
 
