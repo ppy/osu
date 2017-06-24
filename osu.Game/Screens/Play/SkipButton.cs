@@ -34,8 +34,6 @@ namespace osu.Game.Screens.Play
 
         public SkipButton(double startTime)
         {
-            AlwaysReceiveInput = true;
-
             this.startTime = startTime;
 
             RelativePositionAxes = Axes.Both;

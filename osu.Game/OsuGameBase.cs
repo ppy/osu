@@ -152,7 +152,6 @@ namespace osu.Game
                 {
                     new Container
                     {
-                        AlwaysReceiveInput = true,
                         RelativeSizeAxes = Axes.Both,
                         Depth = float.MinValue,
                         Children = new Drawable[]
