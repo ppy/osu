@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Multiplayer
         private const float transition_duration = 100;
 
         private readonly Box statusStrip;
-        private readonly Container coverContainer, rulesetContainer, gameTypeContainer;
+        private readonly Container coverContainer;
         private readonly FillFlowContainer topFlow, participantsFlow;
         private readonly ModeTypeInfo modeTypeInfo;
         private readonly OsuSpriteText participants, participantsSlash, maxParticipants, name, status, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor;
