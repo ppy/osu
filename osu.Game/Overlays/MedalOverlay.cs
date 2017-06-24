@@ -21,6 +21,8 @@ using osu.Framework.Input;
 using OpenTK.Input;
 using System.Linq;
 using osu.Framework.Graphics.Shapes;
+using System;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Overlays
 {
@@ -144,6 +146,13 @@ namespace osu.Game.Overlays
             };
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            Add(new MedalParticle(RNG.Next(0, 359)));
+        }
+
         protected override void PopIn()
         {
             base.PopIn();
@@ -223,6 +232,37 @@ namespace osu.Game.Overlays
                         Colour = Color4.White,
                     }
                 };
+            }
+        }
+
+        private class MedalParticle : CircularContainer
+        {
+            private readonly float direction;
+
+            private Vector2 positionForOffset(float offset) => new Vector2((float)(offset * Math.Sin(direction)), (float)(offset * Math.Cos(direction)));
+
+            public MedalParticle(float direction)
+            {
+                this.direction = direction;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                Position = positionForOffset(DISC_SIZE / 2);
+                Masking = true;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = colours.Blue.Opacity(0.5f),
+                    Radius = 5,
+                };
+
+                MoveTo(positionForOffset(DISC_SIZE / 2 + 200), 500);
+                FadeOut(500);
+                Expire();
             }
         }
     }
