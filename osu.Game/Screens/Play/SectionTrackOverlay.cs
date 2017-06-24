@@ -34,7 +34,9 @@ namespace osu.Game.Screens.Play
         private bool isBreak;
         private bool iconHasBeenShown;
         private bool arrowsHasBeenShown;
+        private bool startArrowsHasBeenShown;
         private double health;
+        private readonly double startTime;
 
         private SampleChannel samplePass;
         private SampleChannel sampleFail;
@@ -50,8 +52,10 @@ namespace osu.Game.Screens.Play
         public Action BreakIn;
         public Action BreakOut;
 
-        public SectionTrackOverlay()
+        public SectionTrackOverlay(double startTime)
         {
+            this.startTime = startTime;
+
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
@@ -83,6 +87,13 @@ namespace osu.Game.Screens.Play
             if (currentBreakIndex == breaks.Count) return;
 
             double currentTime = audioClock?.CurrentTime ?? Time.Current;
+
+            // Show arrows if we are in the lead-in part
+            if (!startArrowsHasBeenShown && startTime - SkipButton.SKIP_REQUIRED_CUTOFF > 0 && currentTime > startTime - arrows_appear_offset)
+            {
+                arrows.PlayWarning();
+                startArrowsHasBeenShown = true;
+            }
 
             var currentBreak = breaks[currentBreakIndex];
 

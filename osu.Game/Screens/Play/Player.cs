@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                sectionTrackOverlay = new SectionTrackOverlay
+                sectionTrackOverlay = new SectionTrackOverlay(firstObjectTime)
                 {
                     Breaks = Beatmap.Beatmap.Breaks,
                     AudioClock = decoupledClock,
