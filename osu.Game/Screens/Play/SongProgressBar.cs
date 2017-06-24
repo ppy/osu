@@ -15,9 +15,8 @@ namespace osu.Game.Screens.Play
     {
         public Action<double> OnSeek;
 
-        private Box fill;
-        private Box background;
-        private Container handleBase;
+        private readonly Box fill;
+        private readonly Container handleBase;
 
         public Color4 FillColour
         {
@@ -49,7 +48,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     Name = "Background",
                     Anchor = Anchor.BottomLeft,
