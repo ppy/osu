@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -18,6 +19,7 @@ namespace osu.Game.Screens.Play
     public class SectionTrackOverlay : Container
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
+        private const int arrows_appear_offset = 850;
 
         private List<BreakPeriod> breaks = new List<BreakPeriod>();
 
@@ -31,12 +33,14 @@ namespace osu.Game.Screens.Play
         private double iconAppearTime;
         private bool isBreak;
         private bool iconHasBeenShown;
+        private bool arrowsHasBeenShown;
         private double health;
 
         private SampleChannel samplePass;
         private SampleChannel sampleFail;
 
         private readonly TextAwesome resultIcon;
+        private readonly ArrowsOverlay arrows;
 
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = value; } }
@@ -48,18 +52,18 @@ namespace osu.Game.Screens.Play
 
         public SectionTrackOverlay()
         {
-            AutoSizeAxes = Axes.Both;
-            Anchor = Anchor.Centre;
-            Origin = Anchor.Centre;
-
-            Add(resultIcon = new TextAwesome
+            RelativeSizeAxes = Axes.Both;
+            Children = new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                TextSize = 100,
-                Alpha = 0,
-                AlwaysPresent = true,
-            });
+                resultIcon = new TextAwesome
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    TextSize = 100,
+                    Alpha = 0,
+                },
+                arrows = new ArrowsOverlay()
+            };
 
             healthBindable.ValueChanged += newValue => { health = newValue; };
         }
@@ -91,6 +95,7 @@ namespace osu.Game.Screens.Play
                     if (currentBreak.HasEffect)
                     {
                         iconHasBeenShown = false;
+                        arrowsHasBeenShown = false;
                         iconAppearTime = currentTime + (currentBreak.EndTime - currentBreak.StartTime) / 2;
                         BreakIn?.Invoke();
                     }
@@ -123,6 +128,15 @@ namespace osu.Game.Screens.Play
                     iconHasBeenShown = true;
                 }
 
+                // Show warning arrows
+                if (currentBreak.EndTime - currentTime < arrows_appear_offset && !arrowsHasBeenShown)
+                {
+                    if (currentBreak.HasEffect)
+                        arrows.PlayWarning();
+
+                    arrowsHasBeenShown = true;
+                }
+
                 // Exit from break
                 if (currentBreak.EndTime - currentTime < fade_duration)
                 {
@@ -131,6 +145,84 @@ namespace osu.Game.Screens.Play
 
                     currentBreakIndex++;
                     isBreak = false;
+                }
+            }
+        }
+
+        private class ArrowsOverlay : Container
+        {
+            private const int appear_duration = 120;
+            private const int margin_vertical = 120;
+            private const int margin_horizontal = 90;
+
+            private Container content;
+
+            public ArrowsOverlay()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Add(content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0,
+                    Children = new Drawable[]
+                    {
+                        new Arrow
+                        {
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                            Margin = new MarginPadding { Top = margin_vertical, Left = margin_horizontal },
+                        },
+                        new Arrow(false)
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Margin = new MarginPadding { Top = margin_vertical, Right = margin_horizontal },
+                        },
+                        new Arrow
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Margin = new MarginPadding { Bottom = margin_vertical, Left = margin_horizontal },
+                        },
+                        new Arrow(false)
+                        {
+                            Anchor = Anchor.BottomRight,
+                            Origin = Anchor.BottomRight,
+                            Margin = new MarginPadding { Bottom = margin_vertical, Right = margin_horizontal },
+                        },
+                    }
+                });
+            }
+
+            public void PlayWarning()
+            {
+                content.FadeTo(1);
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(0));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(1));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(0));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(1));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(0));
+            }
+
+            private class Arrow : Container
+            {
+                private readonly TextAwesome arrow;
+
+                /// <param name="direction">If true - arrow will be turned to the right.</param>
+                public Arrow(bool direction = true)
+                {
+                    AutoSizeAxes = Axes.Both;
+                    Add(arrow = new TextAwesome
+                    {
+                        Colour = Color4.Red,
+                        TextSize = 90,
+                        Icon = direction ? FontAwesome.fa_arrow_right : FontAwesome.fa_arrow_left,
+                    });
                 }
             }
         }
