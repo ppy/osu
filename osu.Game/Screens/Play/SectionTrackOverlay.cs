@@ -76,7 +76,6 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             if (breaks == null) return;
-            if (breaks.Count == 0) return;
             if (currentBreakIndex == breaks.Count) return;
 
             double currentTime = audioClock?.CurrentTime ?? Time.Current;
@@ -99,10 +98,10 @@ namespace osu.Game.Screens.Play
             }
             else
             {
+                // Show icon depends on HP
                 if (currentTime > iconAppearTime && !iconHasBeenShown && currentBreak.HasPeriodResult)
                 {
-                    // Show icon depends on HP
-                    if(health < 0.3)
+                    if (health < 0.3)
                     {
                         resultIcon.Icon = FontAwesome.fa_close;
                         sampleFail.Play();
@@ -127,7 +126,7 @@ namespace osu.Game.Screens.Play
                 // Exit from break
                 if (currentBreak.EndTime - currentTime < fade_duration)
                 {
-                    if(currentBreak.HasEffect)
+                    if (currentBreak.HasEffect)
                         BreakOut?.Invoke();
 
                     currentBreakIndex++;
