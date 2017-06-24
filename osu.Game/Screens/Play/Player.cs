@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Play
                                 HitRenderer,
                             }
                         },
-                        hudOverlay = new StandardHUDOverlay
+                        hudOverlay = new HUDOverlay
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
@@ -278,7 +278,6 @@ namespace osu.Game.Screens.Play
                 {
                     if (!pauseContainer.IsPaused)
                         decoupledClock.Start();
-
                 });
 
             pauseContainer.Alpha = 0;

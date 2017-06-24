@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play.HUD
             Current.Value = Current + amount;
         }
 
-        protected class TransformComboResult : Transform<ulong>
+        protected class TransformComboResult : Transform<ulong, Drawable>
         {
             public override ulong CurrentValue
             {

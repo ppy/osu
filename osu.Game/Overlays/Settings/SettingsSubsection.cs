@@ -52,4 +52,3 @@ namespace osu.Game.Overlays.Settings
         }
     }
 }
-

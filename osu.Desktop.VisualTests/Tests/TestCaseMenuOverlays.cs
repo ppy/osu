@@ -35,7 +35,7 @@ namespace osu.Desktop.VisualTests.Tests
             });
 
             AddStep(@"Pause", delegate {
-                if(failOverlay.State == Visibility.Visible)
+                if (failOverlay.State == Visibility.Visible)
                 {
                     failOverlay.Hide();
                 }

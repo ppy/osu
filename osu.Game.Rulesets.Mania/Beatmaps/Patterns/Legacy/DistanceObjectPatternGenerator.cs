@@ -448,7 +448,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             return curveData.RepeatSamples[index];
         }
 
-
         /// <summary>
         /// Constructs and adds a note to a pattern.
         /// </summary>
@@ -479,7 +478,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     Head = { Samples = sampleInfoListAt(startTime) },
                     Tail = { Samples = sampleInfoListAt(endTime) }
                 };
-
 
                 newObject = holdNote;
             }

@@ -5,7 +5,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using System;
 
 namespace osu.Game.Graphics.UserInterface
@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0,0,0,0)
+                    Colour = new Color4(0, 0, 0, 0)
                 },
                 bar = new Box
                 {

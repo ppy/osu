@@ -6,9 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Notifications;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays
 {
@@ -46,19 +46,19 @@ namespace osu.Game.Overlays
                             Direction = FillDirection.Vertical,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Children = new []
+                            Children = new[]
                             {
                                 new NotificationSection
                                 {
                                     Title = @"Notifications",
                                     ClearText = @"Clear All",
-                                    AcceptTypes = new [] { typeof(SimpleNotification) },
+                                    AcceptTypes = new[] { typeof(SimpleNotification) },
                                 },
                                 new NotificationSection
                                 {
                                     Title = @"Running Tasks",
                                     ClearText = @"Cancel All",
-                                    AcceptTypes = new [] { typeof(ProgressNotification) },
+                                    AcceptTypes = new[] { typeof(ProgressNotification) },
                                 },
                             }
                         }

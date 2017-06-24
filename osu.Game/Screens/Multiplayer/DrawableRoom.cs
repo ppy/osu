@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Multiplayer
             Height = height;
             CornerRadius = 5;
             Masking = true;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = Color4.Black.Opacity(40),
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Multiplayer
                 },
                 avatar = new UpdateableAvatar
                 {
-                    Size = new Vector2(Height - content_padding* 2),
+                    Size = new Vector2(Height - content_padding * 2),
                     Masking = true,
                     CornerRadius = 5f,
                     Margin = new MarginPadding { Left = content_padding * 2, Top = content_padding },
@@ -227,13 +227,13 @@ namespace osu.Game.Screens.Multiplayer
                 d.FadeColour(value.GetAppropriateColour(colours), 100);
         }
 
-        private void displayBeatmap(BeatmapMetadata value)
+        private void displayBeatmap(BeatmapInfo value)
         {
             if (value != null)
             {
-                beatmapTitle.Current = localisation.GetUnicodePreference(value.TitleUnicode, value.Title);
+                beatmapTitle.Current = localisation.GetUnicodePreference(value.Metadata.TitleUnicode, value.Metadata.Title);
                 beatmapDash.Text = @" - ";
-                beatmapArtist.Current = localisation.GetUnicodePreference(value.ArtistUnicode, value.Artist);
+                beatmapArtist.Current = localisation.GetUnicodePreference(value.Metadata.ArtistUnicode, value.Metadata.Artist);
             }
             else
             {

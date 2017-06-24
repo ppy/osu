@@ -36,4 +36,3 @@ namespace osu.Game.Database
         public string StoryboardFile { get; set; }
     }
 }
-
