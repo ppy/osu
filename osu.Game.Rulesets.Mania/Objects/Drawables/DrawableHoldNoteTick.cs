@@ -7,9 +7,9 @@ using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             {
                 base.AccentColour = value;
 
-                glowContainer.EdgeEffect = new EdgeEffect
+                glowContainer.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
                     Radius = 2f,

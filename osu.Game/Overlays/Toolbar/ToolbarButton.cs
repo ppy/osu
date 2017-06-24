@@ -15,6 +15,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -172,7 +173,7 @@ namespace osu.Game.Overlays.Toolbar
             RelativeSizeAxes = Axes.Both;
             Masking = true;
             MaskingSmoothness = 0;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = Color4.Black.Opacity(40),

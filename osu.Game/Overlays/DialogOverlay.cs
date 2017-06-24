@@ -4,9 +4,9 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays
 {
@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
             State = Visibility.Visible;
         }
 
-        private void onDialogOnStateChanged(OverlayContainer dialog, Visibility v)
+        private void onDialogOnStateChanged(VisibilityContainer dialog, Visibility v)
         {
             if (v != Visibility.Hidden) return;
 

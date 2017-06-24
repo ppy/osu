@@ -5,7 +5,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                         CornerRadius = corner_radius,
                                         Masking = true,
                                         OnLoadComplete = d => d.FadeInFromZero(200),
-                                        EdgeEffect = new EdgeEffect
+                                        EdgeEffect = new EdgeEffectParameters
                                         {
                                             Type = EdgeEffectType.Shadow,
                                             Radius = 1,

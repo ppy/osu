@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Configuration;
 using osu.Framework.Lists;
 
 namespace osu.Game.Online.Chat
@@ -25,7 +26,7 @@ namespace osu.Game.Online.Chat
 
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
 
-        //internal bool Joined;
+        public Bindable<bool> Joined = new Bindable<bool>();
 
         public bool ReadOnly => Name != "#lazer";
 

@@ -6,8 +6,8 @@ using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using System;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays
 {
@@ -173,7 +173,7 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.X;
                 Width = 1.5f;
                 Masking = true;
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Colour = Color4.Black.Opacity(50),

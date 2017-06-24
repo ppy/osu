@@ -5,7 +5,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Game.Overlays.Toolbar;
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings
                 },
                 new SidebarScrollContainer
                 {
-                    Children = new []
+                    Children = new[]
                     {
                         content = new FillFlowContainer
                         {

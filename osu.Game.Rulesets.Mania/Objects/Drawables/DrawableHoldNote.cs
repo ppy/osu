@@ -55,7 +55,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tickContainer = new Container<DrawableHoldNoteTick>
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RelativeCoordinateSpace = new Vector2(1, (float)HitObject.Duration)
+                    RelativeChildOffset = new Vector2(0, (float)HitObject.StartTime),
+                    RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
                 },
                 head = new DrawableHeadNote(this, key)
                 {
@@ -75,9 +76,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 {
                     HoldStartTime = () => holdStartTime
                 };
-
-                // To make the ticks relative to ourselves we need to offset them backwards
-                drawableTick.Y -= (float)HitObject.StartTime;
 
                 tickContainer.Add(drawableTick);
                 AddNested(drawableTick);

@@ -20,6 +20,7 @@ using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK.Input;
 using System.Linq;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays
 {
@@ -135,7 +136,7 @@ namespace osu.Game.Overlays
             getSample = audio.Sample.Get(@"MedalSplash/medal-get");
             innerSpin.Texture = outterSpin.Texture = textures.Get(@"MedalSplash/disc-spin");
 
-            disc.EdgeEffect = leftStrip.EdgeEffect = rightStrip.EdgeEffect = new EdgeEffect
+            disc.EdgeEffect = leftStrip.EdgeEffect = rightStrip.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = colours.Blue.Opacity(0.5f),
