@@ -15,14 +15,12 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.Reset();
 
-            MedalOverlay overlay;
-            Add(overlay = new MedalOverlay(new Medal
+            Add(new MedalOverlay(new Medal
             {
                 Name = @"Animations",
+                InternalName = @"all-intro-doubletime",
                 Description = @"More complex than you think.",
             }));
-
-            AddStep(@"show", overlay.Show);
         }
     }
 }
