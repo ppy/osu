@@ -28,9 +28,9 @@ namespace osu.Game.Screens.Play
         };
 
         private int currentBreakIndex;
-        private double imageAppearTime;
+        private double iconAppearTime;
         private bool isBreak;
-        private bool imageHasBeenShown;
+        private bool iconHasBeenShown;
         private double health;
 
         private SampleChannel samplePass;
@@ -43,8 +43,8 @@ namespace osu.Game.Screens.Play
 
         public List<BreakPeriod> Breaks { set { breaks = value; } }
 
-        public Action BreakPeriodIn;
-        public Action BreakPeriodOut;
+        public Action BreakIn;
+        public Action BreakOut;
 
         public SectionTrackOverlay()
         {
@@ -88,45 +88,48 @@ namespace osu.Game.Screens.Play
                 if (currentTime > currentBreak.StartTime)
                 {
                     isBreak = true;
-                    imageHasBeenShown = false;
-                    imageAppearTime = currentTime + (currentBreak.EndTime - currentBreak.StartTime) / 2;
-                    BreakPeriodIn?.Invoke();
+
+                    if (currentBreak.HasEffect)
+                    {
+                        iconHasBeenShown = false;
+                        iconAppearTime = currentTime + (currentBreak.EndTime - currentBreak.StartTime) / 2;
+                        BreakIn?.Invoke();
+                    }
                 }
             }
             else
             {
-                if (currentTime > imageAppearTime && !imageHasBeenShown && currentBreak.HasEffect)
+                if (currentTime > iconAppearTime && !iconHasBeenShown && currentBreak.HasPeriodResult)
                 {
-                    if (currentBreak.HasPeriodResult)
+                    // Show icon depends on HP
+                    if(health < 0.3)
                     {
-                        // Show icon depends on HP
-                        if(health < 0.3)
-                        {
-                            resultIcon.Icon = FontAwesome.fa_close;
-                            sampleFail.Play();
-                        }
-                        else
-                        {
-                            resultIcon.Icon = FontAwesome.fa_check;
-                            samplePass.Play();
-                        }
-
-                        resultIcon.FadeTo(1);
-                        Delay(100);
-                        Schedule(() => resultIcon.FadeTo(0));
-                        Delay(100);
-                        Schedule(() => resultIcon.FadeTo(1));
-                        Delay(1000);
-                        Schedule(() => resultIcon.FadeTo(0, 200));
-
-                        imageHasBeenShown = true;
+                        resultIcon.Icon = FontAwesome.fa_close;
+                        sampleFail.Play();
                     }
+                    else
+                    {
+                        resultIcon.Icon = FontAwesome.fa_check;
+                        samplePass.Play();
+                    }
+
+                    resultIcon.FadeTo(1);
+                    Delay(100);
+                    Schedule(() => resultIcon.FadeTo(0));
+                    Delay(100);
+                    Schedule(() => resultIcon.FadeTo(1));
+                    Delay(1000);
+                    Schedule(() => resultIcon.FadeTo(0, 200));
+
+                    iconHasBeenShown = true;
                 }
 
+                // Exit from break
                 if (currentBreak.EndTime - currentTime < fade_duration)
                 {
-                    // Exit from break
-                    BreakPeriodOut?.Invoke();
+                    if(currentBreak.HasEffect)
+                        BreakOut?.Invoke();
+
                     currentBreakIndex++;
                     isBreak = false;
                 }

@@ -152,12 +152,12 @@ namespace osu.Game.Screens.Play
                 {
                     Breaks = Beatmap.Beatmap.Breaks,
                     AudioClock = decoupledClock,
-                    BreakPeriodIn = () =>
+                    BreakIn = () =>
                     {
                         Background?.FadeTo(1, fade_duration);
                         hudOverlay?.FadeTo(0, fade_duration);
                     },
-                    BreakPeriodOut = () =>
+                    BreakOut = () =>
                     {
                         Background?.FadeTo(1 - (float)dimLevel, fade_duration);
                         hudOverlay?.FadeTo(1, fade_duration);
