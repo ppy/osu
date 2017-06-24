@@ -168,6 +168,8 @@ namespace osu.Game.Overlays
                 Colour = colours.Blue.Opacity(0.5f),
                 Radius = 50,
             };
+
+            Show();
         }
 
         protected override void Update()

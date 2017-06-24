@@ -19,8 +19,9 @@ namespace osu.Game.Overlays.MedalSplash
         private const float scale_when_unlocked = 0.76f;
         private const float scale_when_full = 0.6f;
 
-        private readonly Container medal;
-        private readonly Sprite medalGlow;
+        private readonly Medal medal;
+        private readonly Container medalContainer;
+        private readonly Sprite medalGlow, medalSprite;
         private readonly OsuSpriteText unlocked, name;
         private readonly TextFlowContainer description;
         private readonly FillFlowContainer infoFlow;
@@ -28,11 +29,12 @@ namespace osu.Game.Overlays.MedalSplash
 
         public DrawableMedal(Medal medal)
         {
+            this.medal = medal;
             Position = new Vector2(0f, MedalOverlay.DISC_SIZE / 2);
 
             Children = new Drawable[]
             {
-                this.medal = new Container
+                this.medalContainer = new Container
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.Centre,
@@ -40,6 +42,12 @@ namespace osu.Game.Overlays.MedalSplash
                     Alpha = 0f,
                     Children = new[]
                     {
+                        medalSprite = new Sprite
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Scale = new Vector2(0.81f),
+                        },
                         medalGlow = new Sprite
                         {
                             Anchor = Anchor.Centre,
@@ -102,12 +110,13 @@ namespace osu.Game.Overlays.MedalSplash
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures)
         {
+            medalSprite.Texture = textures.Get(medal.ImageUrl);
             medalGlow.Texture = textures.Get(@"MedalSplash/medal-glow");
 
             foreach (var s in descriptionSprites)
                 s.Colour = colours.BlueLight;
 
-            var pos = new Vector2(0f, medal.Size.Y / 2 + 10);
+            var pos = new Vector2(0f, medalContainer.Size.Y / 2 + 10);
             unlocked.Position = pos;
             pos.Y += 90;
             infoFlow.Position = pos;
@@ -118,9 +127,9 @@ namespace osu.Game.Overlays.MedalSplash
             switch (newState)
             {
                 case DisplayState.Icon:
-                    medal.Scale = Vector2.Zero;
-                    medal.ScaleTo(1, duration, EasingTypes.OutElastic);
-                    medal.FadeInFromZero(duration);
+                    medalContainer.Scale = Vector2.Zero;
+                    medalContainer.ScaleTo(1, duration, EasingTypes.OutElastic);
+                    medalContainer.FadeInFromZero(duration);
                     break;
                 case DisplayState.MedalUnlocked:
                     ScaleTo(scale_when_unlocked, duration, EasingTypes.OutExpo);
