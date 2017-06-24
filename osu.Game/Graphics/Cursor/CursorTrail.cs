@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.Cursor
             }
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => true;
+        public override bool Contains(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)

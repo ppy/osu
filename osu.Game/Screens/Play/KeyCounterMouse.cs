@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play
             Button = button;
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => true;
+        public override bool Contains(Vector2 screenSpacePos) => true;
 
         private static string getStringRepresentation(MouseButton button)
         {

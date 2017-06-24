@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract T DefaultTab { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || DisplayStyleControl.Dropdown.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || DisplayStyleControl.Dropdown.Contains(screenSpacePos);
 
         protected SearchableListFilterControl()
         {
