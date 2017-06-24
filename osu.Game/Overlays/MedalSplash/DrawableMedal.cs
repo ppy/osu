@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.MedalSplash
 
             Children = new Drawable[]
             {
-                this.medalContainer = new Container
+                medalContainer = new Container
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.Centre,
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.MedalSplash
                     TextSize = 24,
                     Font = @"Exo2.0-Light",
                     Alpha = 0f,
-                    Scale = new Vector2(1 / scale_when_unlocked),
+                    Scale = new Vector2(1f / scale_when_unlocked),
                 },
                 infoFlow = new FillFlowContainer
                 {
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.MedalSplash
                             TextSize = 20,
                             Font = @"Exo2.0-Bold",
                             Alpha = 0f,
-                            Scale = new Vector2(1 / scale_when_full),
+                            Scale = new Vector2(1f / scale_when_full),
                         },
                         description = new TextFlowContainer
                         {
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.MedalSplash
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Alpha = 0f,
-                            Scale = new Vector2(1 / scale_when_full),
+                            Scale = new Vector2(1f / scale_when_full),
                         },
                     },
                 },
@@ -116,10 +116,8 @@ namespace osu.Game.Overlays.MedalSplash
             foreach (var s in descriptionSprites)
                 s.Colour = colours.BlueLight;
 
-            var pos = new Vector2(0f, medalContainer.Size.Y / 2 + 10);
-            unlocked.Position = pos;
-            pos.Y += 90;
-            infoFlow.Position = pos;
+            unlocked.Position = new Vector2(0f, medalContainer.Size.Y / 2 + 10);
+            infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
         }
 
         public void ChangeState(DisplayState newState, double duration)

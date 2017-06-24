@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
         private const float border_width = 5;
 
         private readonly Box background;
-        private readonly Container backgroundStrip;
+        private readonly Container backgroundStrip, particleContainer;
         private readonly BackgroundStrip leftStrip, rightStrip;
         private readonly CircularContainer disc;
         private readonly Sprite innerSpin, outterSpin;
@@ -61,7 +61,6 @@ namespace osu.Game.Overlays
             {
                 background = new Box
                 {
-                    Name = @"dim",
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(60),
                 },
@@ -74,7 +73,6 @@ namespace osu.Game.Overlays
                 },
                 backgroundStrip = new Container
                 {
-                    Name = @"background strip",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
@@ -112,9 +110,12 @@ namespace osu.Game.Overlays
                         },
                     },
                 },
+                particleContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 disc = new CircularContainer
                 {
-                    Name = @"content",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Alpha = 0f,
@@ -168,7 +169,11 @@ namespace osu.Game.Overlays
                 Colour = colours.Blue.Opacity(0.5f),
                 Radius = 50,
             };
+        }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             Show();
         }
 
@@ -176,7 +181,7 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            Add(new MedalParticle(RNG.Next(0, 359)));
+            particleContainer.Add(new MedalParticle(RNG.Next(0, 359)));
         }
 
         protected override void PopIn()
