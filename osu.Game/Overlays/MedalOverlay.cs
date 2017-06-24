@@ -19,6 +19,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK.Input;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
@@ -37,7 +38,16 @@ namespace osu.Game.Overlays
 
         private SampleChannel getSample;
 
-        protected override bool BlockPassThroughKeyboard => true;
+        protected override bool OnClick(InputState state)
+        {
+            dismiss();
+            return true;
+        }
+
+        protected override void OnFocusLost(InputState state)
+        {
+            if (state.Keyboard.Keys.Contains(Key.Escape)) dismiss();
+        }
 
         public MedalOverlay(Medal medal)
         {
@@ -187,6 +197,12 @@ namespace osu.Game.Overlays
             base.PopOut();
 
             FadeOut(200);
+        }
+
+        private void dismiss()
+        {
+            if (drawableMedal.Transforms.Count != 0) return;
+            Hide();
         }
 
         private class BackgroundStrip : Container
