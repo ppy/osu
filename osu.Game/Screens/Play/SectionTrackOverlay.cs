@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play
     public class SectionTrackOverlay : Container
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
-        private const int arrows_appear_offset = 850;
+        private const int arrows_appear_offset = 900;
 
         private List<BreakPeriod> breaks = new List<BreakPeriod>();
 
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Play
                     TextSize = 100,
                     Alpha = 0,
                 },
-                arrows = new ArrowsOverlay()
+                arrows = new ArrowsOverlay(),
             };
 
             healthBindable.ValueChanged += newValue => { health = newValue; };
@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Play
 
         private class ArrowsOverlay : Container
         {
-            private const int appear_duration = 120;
+            private const int appear_duration = 140;
             private const int margin_vertical = 120;
             private const int margin_horizontal = 90;
 
@@ -177,28 +177,40 @@ namespace osu.Game.Screens.Play
                     Alpha = 0,
                     Children = new Drawable[]
                     {
-                        new Arrow
+                        new TextAwesome
                         {
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
+                            Colour = Color4.Red,
+                            TextSize = 90,
+                            Icon = FontAwesome.fa_arrow_right,
                             Margin = new MarginPadding { Top = margin_vertical, Left = margin_horizontal },
                         },
-                        new Arrow(false)
+                        new TextAwesome
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
+                            Colour = Color4.Red,
+                            TextSize = 90,
+                            Icon = FontAwesome.fa_arrow_left,
                             Margin = new MarginPadding { Top = margin_vertical, Right = margin_horizontal },
                         },
-                        new Arrow
+                        new TextAwesome
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
+                            Colour = Color4.Red,
+                            TextSize = 90,
+                            Icon = FontAwesome.fa_arrow_right,
                             Margin = new MarginPadding { Bottom = margin_vertical, Left = margin_horizontal },
                         },
-                        new Arrow(false)
+                        new TextAwesome
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
+                            Colour = Color4.Red,
+                            TextSize = 90,
+                            Icon = FontAwesome.fa_arrow_left,
                             Margin = new MarginPadding { Bottom = margin_vertical, Right = margin_horizontal },
                         },
                     }
@@ -218,21 +230,6 @@ namespace osu.Game.Screens.Play
                 Schedule(() => content.FadeTo(1));
                 Delay(appear_duration);
                 Schedule(() => content.FadeTo(0));
-            }
-
-            private class Arrow : Container
-            {
-                /// <param name="direction">If true - arrow will be turned to the right.</param>
-                public Arrow(bool direction = true)
-                {
-                    AutoSizeAxes = Axes.Both;
-                    Add(new TextAwesome
-                    {
-                        Colour = Color4.Red,
-                        TextSize = 90,
-                        Icon = direction ? FontAwesome.fa_arrow_right : FontAwesome.fa_arrow_left,
-                    });
-                }
             }
         }
     }

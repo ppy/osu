@@ -148,21 +148,6 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                sectionTrackOverlay = new SectionTrackOverlay(firstObjectTime)
-                {
-                    Breaks = Beatmap.Beatmap.Breaks,
-                    AudioClock = decoupledClock,
-                    BreakIn = () =>
-                    {
-                        Background?.FadeTo(1, fade_duration);
-                        hudOverlay?.FadeTo(0, fade_duration);
-                    },
-                    BreakOut = () =>
-                    {
-                        Background?.FadeTo(1 - (float)dimLevel, fade_duration);
-                        hudOverlay?.FadeTo(1, fade_duration);
-                    }
-                },
                 pauseContainer = new PauseContainer
                 {
                     AudioClock = decoupledClock,
@@ -179,7 +164,6 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
-                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -193,6 +177,22 @@ namespace osu.Game.Screens.Play
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
+                        },
+                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
+                        sectionTrackOverlay = new SectionTrackOverlay(firstObjectTime)
+                        {
+                            Breaks = Beatmap.Beatmap.Breaks,
+                            AudioClock = decoupledClock,
+                            BreakIn = () =>
+                            {
+                                Background?.FadeTo(1, fade_duration);
+                                hudOverlay?.FadeTo(0, fade_duration);
+                            },
+                            BreakOut = () =>
+                            {
+                                Background?.FadeTo(1 - (float)dimLevel, fade_duration);
+                                hudOverlay?.FadeTo(1, fade_duration);
+                            }
                         },
                     }
                 },
