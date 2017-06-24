@@ -99,8 +99,7 @@ namespace osu.Game.Screens.Multiplayer
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding
                     {
-                        Top = content_padding,
-                        Bottom = content_padding,
+                        Vertical = content_padding,
                         Left = side_strip_width + cover_width + content_padding,
                         Right = content_padding,
                     },
