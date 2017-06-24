@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Play
             private const int margin_vertical = 120;
             private const int margin_horizontal = 90;
 
-            private Container content;
+            private readonly Container content;
 
             public ArrowsOverlay()
             {
@@ -211,13 +211,11 @@ namespace osu.Game.Screens.Play
 
             private class Arrow : Container
             {
-                private readonly TextAwesome arrow;
-
                 /// <param name="direction">If true - arrow will be turned to the right.</param>
                 public Arrow(bool direction = true)
                 {
                     AutoSizeAxes = Axes.Both;
-                    Add(arrow = new TextAwesome
+                    Add(new TextAwesome
                     {
                         Colour = Color4.Red,
                         TextSize = 90,
