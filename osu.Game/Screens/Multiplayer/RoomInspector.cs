@@ -27,11 +27,11 @@ namespace osu.Game.Screens.Multiplayer
     {
         private readonly MarginPadding contentPadding = new MarginPadding { Horizontal = 20, Vertical = 10 };
         private const float transition_duration = 100;
-        private const float ruleset_height = 30;
 
         private readonly Box statusStrip;
         private readonly Container coverContainer, rulesetContainer, gameTypeContainer;
         private readonly FillFlowContainer topFlow, participantsFlow;
+        private readonly ModeTypeInfo modeTypeInfo;
         private readonly OsuSpriteText participants, participantsSlash, maxParticipants, name, status, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor;
         private readonly ParticipantInfo participantInfo;
         private readonly ScrollContainer participantsScroll;
@@ -191,20 +191,13 @@ namespace osu.Game.Screens.Multiplayer
                                         new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.X,
-                                            Height = ruleset_height,
+                                            Height = 30,
                                             Direction = FillDirection.Horizontal,
                                             LayoutDuration = transition_duration,
                                             Spacing = new Vector2(5f, 0f),
                                             Children = new Drawable[]
                                             {
-                                                rulesetContainer = new Container
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                },
-                                                gameTypeContainer = new Container
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                },
+                                                modeTypeInfo = new ModeTypeInfo(),
                                                 new Container
                                                 {
                                                     AutoSizeAxes = Axes.X,
@@ -329,17 +322,13 @@ namespace osu.Game.Screens.Multiplayer
 
         private void displayGameType(GameType value)
         {
-            gameTypeContainer.Children = new[]
-            {
-                new DrawableGameType(value)
-                {
-                    Size = new Vector2(ruleset_height),
-                },
-            };
+            modeTypeInfo.Type = value;
         }
 
         private void displayBeatmap(BeatmapInfo value)
         {
+            modeTypeInfo.Beatmap = value;
+
             if (value != null)
             {
                 coverContainer.FadeIn(transition_duration);
@@ -354,15 +343,6 @@ namespace osu.Game.Screens.Multiplayer
                     }) { RelativeSizeAxes = Axes.Both }
                 };
 
-                rulesetContainer.FadeIn(transition_duration);
-                rulesetContainer.Children = new[]
-                {
-                    new DifficultyIcon(value)
-                    {
-                        Size = new Vector2(ruleset_height),
-                    }
-                };
-
                 beatmapTitle.Current = localisation.GetUnicodePreference(value.Metadata.TitleUnicode, value.Metadata.Title);
                 beatmapDash.Text = @" - ";
                 beatmapArtist.Current = localisation.GetUnicodePreference(value.Metadata.ArtistUnicode, value.Metadata.Artist);
@@ -371,7 +351,6 @@ namespace osu.Game.Screens.Multiplayer
             else
             {
                 coverContainer.FadeOut(transition_duration);
-                rulesetContainer.FadeOut(transition_duration);
 
                 beatmapTitle.Current = null;
                 beatmapArtist.Current = null;
