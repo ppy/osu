@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
         private const float border_width = 5;
 
         private readonly Box background;
-        private readonly FillFlowContainer backgroundStrip;
+        private readonly Container backgroundStrip;
         private readonly BackgroundStrip leftStrip, rightStrip;
         private readonly CircularContainer disc;
         private readonly Sprite innerSpin, outterSpin;
@@ -72,20 +72,44 @@ namespace osu.Game.Overlays
                     Size = new Vector2(DISC_SIZE + 500),
                     Alpha = 0f,
                 },
-                backgroundStrip = new FillFlowContainer
+                backgroundStrip = new Container
                 {
                     Name = @"background strip",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
-                    Width = 0f,
                     Height = border_width,
                     Alpha = 0f,
-                    Direction = FillDirection.Horizontal,
                     Children = new[]
                     {
-                        leftStrip = new BackgroundStrip(0f, 1f),
-                        rightStrip = new BackgroundStrip(1f, 0f),
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreRight,
+                            Width = 0.5f,
+                            Padding = new MarginPadding { Right = DISC_SIZE / 2 },
+                            Children = new[]
+                            {
+                                leftStrip = new BackgroundStrip(0f, 1f)
+                                {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                },
+                            },
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreLeft,
+                            Width = 0.5f,
+                            Padding = new MarginPadding { Left = DISC_SIZE / 2 },
+                            Children = new[]
+                            {
+                                rightStrip = new BackgroundStrip(1f, 0f),
+                            },
+                        },
                     },
                 },
                 disc = new CircularContainer
@@ -187,12 +211,13 @@ namespace osu.Game.Overlays
             });
 
             disc.FadeIn(duration1);
-            backgroundStrip.FadeIn(duration1);
-            backgroundStrip.ResizeWidthTo(1f, duration1 * 2, EasingTypes.OutQuint);
             outterSpin.FadeTo(0.1f, duration1 * 2);
             disc.ScaleTo(1f, duration1 * 2, EasingTypes.OutElastic);
 
             Delay(duration1 + 200, true);
+            backgroundStrip.FadeIn(duration2);
+            leftStrip.ResizeWidthTo(1f, duration2, EasingTypes.OutQuint);
+            rightStrip.ResizeWidthTo(1f, duration2, EasingTypes.OutQuint);
             drawableMedal.ChangeState(DrawableMedal.DisplayState.Icon, duration2);
 
             Delay(duration2, true);
@@ -220,7 +245,7 @@ namespace osu.Game.Overlays
             public BackgroundStrip(float start, float end)
             {
                 RelativeSizeAxes = Axes.Both;
-                Width = 0.5f;
+                Width = 0f;
                 ColourInfo = ColourInfo.GradientHorizontal(Color4.White.Opacity(start), Color4.White.Opacity(end));
                 Masking = true;
 
