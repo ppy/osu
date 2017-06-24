@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Multiplayer
                         new DifficultyIcon(value)
                         {
                             Size = new Vector2(height),
-                        }
+                        },
                     };
                 }
                 else

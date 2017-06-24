@@ -30,14 +30,10 @@ namespace osu.Game.Screens.Multiplayer
 
         private readonly Box sideStrip;
         private readonly Container coverContainer;
-        private readonly OsuSpriteText name;
+        private readonly OsuSpriteText name, status, beatmapTitle, beatmapDash, beatmapArtist;
+        private readonly FillFlowContainer<OsuSpriteText> beatmapInfoFlow;
         private readonly ParticipantInfo participantInfo;
         private readonly ModeTypeInfo modeTypeInfo;
-        private readonly OsuSpriteText status;
-        private readonly FillFlowContainer<OsuSpriteText> beatmapInfoFlow;
-        private readonly OsuSpriteText beatmapTitle;
-        private readonly OsuSpriteText beatmapDash;
-        private readonly OsuSpriteText beatmapArtist;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
         private readonly Bindable<User> hostBind = new Bindable<User>();
@@ -170,6 +166,7 @@ namespace osu.Game.Screens.Multiplayer
 
             nameBind.ValueChanged += displayName;
             hostBind.ValueChanged += displayUser;
+            typeBind.ValueChanged += displayGameType;
             participantsBind.ValueChanged += displayParticipants;
 
             nameBind.BindTo(Room.Name);
@@ -191,11 +188,9 @@ namespace osu.Game.Screens.Multiplayer
 
             //binded here instead of ctor because dependencies are needed
             statusBind.ValueChanged += displayStatus;
-            typeBind.ValueChanged += displayGameType;
             beatmapBind.ValueChanged += displayBeatmap;
 
             statusBind.TriggerChange();
-            typeBind.TriggerChange();
             beatmapBind.TriggerChange();
         }
 
@@ -238,7 +233,7 @@ namespace osu.Game.Screens.Multiplayer
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,
                         OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
-                    }) { RelativeSizeAxes = Axes.Both }
+                    }) { RelativeSizeAxes = Axes.Both },
                 };
 
                 beatmapTitle.Current = localisation.GetUnicodePreference(value.Metadata.TitleUnicode, value.Metadata.Title);
