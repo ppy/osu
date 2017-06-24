@@ -331,7 +331,6 @@ namespace osu.Game.Screens.Multiplayer
                                         },
                                         levelRangeHigher = new OsuSpriteText
                                         {
-                                            Text = "6251",
                                             TextSize = 14,
                                             Font = @"Exo2.0-Bold",
                                         },
