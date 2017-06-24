@@ -272,6 +272,7 @@ namespace osu.Game.Screens.Multiplayer
 
             nameBind.ValueChanged += displayName;
             hostBind.ValueChanged += displayUser;
+            typeBind.ValueChanged += displayGameType;
             maxParticipantsBind.ValueChanged += displayMaxParticipants;
             participantsBind.ValueChanged += displayParticipants;
         }
@@ -287,11 +288,9 @@ namespace osu.Game.Screens.Multiplayer
 
             //binded here instead of ctor because dependencies are needed
             statusBind.ValueChanged += displayStatus;
-            typeBind.ValueChanged += displayGameType;
             beatmapBind.ValueChanged += displayBeatmap;
 
             statusBind.TriggerChange();
-            typeBind.TriggerChange();
             beatmapBind.TriggerChange();
         }
 
@@ -340,7 +339,7 @@ namespace osu.Game.Screens.Multiplayer
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,
                         OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
-                    }) { RelativeSizeAxes = Axes.Both }
+                    }) { RelativeSizeAxes = Axes.Both },
                 };
 
                 beatmapTitle.Current = localisation.GetUnicodePreference(value.Metadata.TitleUnicode, value.Metadata.Title);
