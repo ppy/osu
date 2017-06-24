@@ -65,7 +65,6 @@ namespace osu.Game.Graphics.Cursor
             // as we are currently very dependent on having a running clock, let's make our own clock for the time being.
             Clock = new FramedClock();
 
-            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
 
             for (int i = 0; i < max_sprites; i++)
@@ -74,6 +73,8 @@ namespace osu.Game.Graphics.Cursor
                 parts[i].WasUpdated = true;
             }
         }
+
+        public override bool Contains(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
