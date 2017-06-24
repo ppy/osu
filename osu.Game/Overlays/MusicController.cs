@@ -430,7 +430,7 @@ namespace osu.Game.Overlays
         {
             public Action<double> OnSeek;
 
-            private Box fill;
+            private readonly Box fill;
 
             public Color4 FillColour
             {
