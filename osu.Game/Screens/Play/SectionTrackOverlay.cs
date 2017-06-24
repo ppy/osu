@@ -81,8 +81,8 @@ namespace osu.Game.Screens.Play
 
         protected override void Update()
         {
-            if (breaks?.Count == 0) return;
-
+            if (breaks == null) return;
+            if (breaks.Count == 0) return;
             if (currentBreakIndex == breaks.Count) return;
 
             double currentTime = audioClock?.CurrentTime ?? Time.Current;
@@ -98,7 +98,6 @@ namespace osu.Game.Screens.Play
                     imageAppearTime = currentTime + (currentBreak.EndTime - currentBreak.StartTime) / 2;
                     backgroundDim.Value = 0;
                     hudOverlay?.FadeTo(0, fade_duration);
-                    return;
                 }
             }
             else
@@ -130,10 +129,10 @@ namespace osu.Game.Screens.Play
                         imageHasBeenShown = true;
                     }
                 }
-                
-                // Exit from break
+
                 if (currentBreak.EndTime - currentTime < fade_duration)
                 {
+                    // Exit from break
                     backgroundDim.Value = backgroundDimUserValue;
                     hudOverlay?.FadeTo(1, fade_duration);
                     currentBreakIndex++;
