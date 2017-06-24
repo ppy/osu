@@ -9,8 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
+using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
@@ -27,9 +27,6 @@ namespace osu.Game.Screens.Play
             MaxValue = 1
         };
 
-        private Bindable<double> backgroundDim;
-        private double backgroundDimUserValue;
-
         private int currentBreakIndex;
         private double imageAppearTime;
         private bool isBreak;
@@ -41,13 +38,13 @@ namespace osu.Game.Screens.Play
 
         private readonly TextAwesome resultIcon;
 
-        private HUDOverlay hudOverlay;
-        public HUDOverlay HudOverlay { set { hudOverlay = value; } }
-
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = value; } }
 
         public List<BreakPeriod> Breaks { set { breaks = value; } }
+
+        public Action BreakPeriodIn;
+        public Action BreakPeriodOut;
 
         public SectionTrackOverlay()
         {
@@ -68,11 +65,8 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, AudioManager audio)
+        private void load(AudioManager audio)
         {
-            backgroundDim = config.GetBindable<double>(OsuSetting.DimLevel);
-            backgroundDimUserValue = backgroundDim.Value;
-
             samplePass = audio.Sample.Get(@"SectionResult/sectionpass");
             sampleFail = audio.Sample.Get(@"SectionResult/sectionfail");
         }
@@ -96,8 +90,7 @@ namespace osu.Game.Screens.Play
                     isBreak = true;
                     imageHasBeenShown = false;
                     imageAppearTime = currentTime + (currentBreak.EndTime - currentBreak.StartTime) / 2;
-                    backgroundDim.Value = 0;
-                    hudOverlay?.FadeTo(0, fade_duration);
+                    BreakPeriodIn?.Invoke();
                 }
             }
             else
@@ -133,14 +126,11 @@ namespace osu.Game.Screens.Play
                 if (currentBreak.EndTime - currentTime < fade_duration)
                 {
                     // Exit from break
-                    backgroundDim.Value = backgroundDimUserValue;
-                    hudOverlay?.FadeTo(1, fade_duration);
+                    BreakPeriodOut?.Invoke();
                     currentBreakIndex++;
                     isBreak = false;
                 }
             }
         }
-
-        public void RestoreBackgroundDim() => backgroundDim.Value = backgroundDimUserValue;
     }
 }

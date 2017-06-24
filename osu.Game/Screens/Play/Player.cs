@@ -23,11 +23,14 @@ using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Play
 {
     public class Player : OsuScreen
     {
+        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
@@ -149,6 +152,16 @@ namespace osu.Game.Screens.Play
                 {
                     Breaks = Beatmap.Beatmap.Breaks,
                     AudioClock = decoupledClock,
+                    BreakPeriodIn = () =>
+                    {
+                        Background?.FadeTo(1, fade_duration);
+                        hudOverlay?.FadeTo(0, fade_duration);
+                    },
+                    BreakPeriodOut = () =>
+                    {
+                        Background?.FadeTo(1 - (float)dimLevel, fade_duration);
+                        hudOverlay?.FadeTo(1, fade_duration);
+                    }
                 },
                 pauseContainer = new PauseContainer
                 {
@@ -213,7 +226,6 @@ namespace osu.Game.Screens.Play
             hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
 
             sectionTrackOverlay.BindHealth(scoreProcessor.Health);
-            sectionTrackOverlay.HudOverlay = hudOverlay;
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
@@ -317,8 +329,6 @@ namespace osu.Game.Screens.Play
 
             HitRenderer?.FadeOut(fade_out_duration);
             Content.FadeOut(fade_out_duration);
-
-            sectionTrackOverlay.RestoreBackgroundDim();
 
             hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
 
