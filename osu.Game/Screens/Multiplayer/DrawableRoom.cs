@@ -97,7 +97,13 @@ namespace osu.Game.Screens.Multiplayer
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = content_padding, Bottom = content_padding, Left = side_strip_width + cover_width + content_padding, Right = content_padding },
+                    Padding = new MarginPadding
+                    {
+                        Top = content_padding,
+                        Bottom = content_padding,
+                        Left = side_strip_width + cover_width + content_padding,
+                        Right = content_padding,
+                    },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
