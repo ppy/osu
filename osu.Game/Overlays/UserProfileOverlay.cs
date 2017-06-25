@@ -112,7 +112,6 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both
                 }
             };
-            sectionsContainer.ScrollContainer.ScrollbarVisible = false;
             Add(sectionsContainer);
             sectionsContainer.SelectedSection.ValueChanged += s =>
             {
@@ -135,7 +134,7 @@ namespace osu.Game.Overlays
                 if (lastSection != s)
                 {
                     lastSection = s;
-                    sectionsContainer.ScrollContainer.ScrollIntoView(lastSection);
+                    sectionsContainer.ScrollToTop(lastSection);
                 }
             };
 

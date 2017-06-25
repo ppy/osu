@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.Containers
         where T : Drawable
     {
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
-        public readonly ScrollContainer ScrollContainer;
+        private readonly ScrollContainer scrollContainer;
         private readonly Container headerBackgroundContainer;
         private readonly FlowContainer<T> scrollContentContainer;
 
@@ -62,13 +62,13 @@ namespace osu.Game.Graphics.Containers
                 if (value == footer) return;
 
                 if (footer != null)
-                    ScrollContainer.Remove(footer);
+                    scrollContainer.Remove(footer);
                 footer = value;
                 if (value == null) return;
 
                 footer.Anchor |= Anchor.y2;
                 footer.Origin |= Anchor.y2;
-                ScrollContainer.Add(footer);
+                scrollContainer.Add(footer);
                 lastKnownScroll = float.NaN;
             }
         }
@@ -122,10 +122,11 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            AddInternal(ScrollContainer = new ScrollContainer()
+            AddInternal(scrollContainer = new ScrollContainer()
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
+                ScrollbarVisible = false,
                 Children = new Drawable[] { scrollContentContainer = CreateScrollContentContainer() },
                 Depth = float.MaxValue
             });
@@ -135,6 +136,15 @@ namespace osu.Game.Graphics.Containers
                 Depth = float.MaxValue / 2
             });
             originalSectionsMargin = scrollContentContainer.Margin;
+        }
+
+        public void ScrollToTop(T section)
+        {
+            float pos = scrollContainer.GetChildPosInContent(section);
+            float current = scrollContainer.Current;
+            float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
+            if (section == Children.First() && current < pos - scrollOffset) return;
+            scrollContainer.ScrollTo(pos - scrollOffset);
         }
 
         private float lastKnownScroll;
@@ -151,7 +161,7 @@ namespace osu.Game.Graphics.Containers
                 updateSectionsMargin();
             }
 
-            float currentScroll = Math.Max(0, ScrollContainer.Current);
+            float currentScroll = Math.Max(0, scrollContainer.Current);
             if (currentScroll != lastKnownScroll)
             {
                 lastKnownScroll = currentScroll;
@@ -169,10 +179,11 @@ namespace osu.Game.Graphics.Containers
 
                 T bestMatch = null;
                 float minDiff = float.MaxValue;
+                float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
 
                 foreach (var section in Children)
                 {
-                    float diff = Math.Abs(ScrollContainer.GetChildPosInContent(section) - currentScroll);
+                    float diff = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset);
                     if (diff < minDiff)
                     {
                         minDiff = diff;

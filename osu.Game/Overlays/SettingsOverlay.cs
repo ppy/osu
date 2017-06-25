@@ -93,7 +93,7 @@ namespace osu.Game.Overlays
                         new SidebarButton
                         {
                             Section = section,
-                            Action = sectionsContainer.ScrollContainer.ScrollIntoView,
+                            Action = sectionsContainer.ScrollToTop
                         }
                     ).ToArray()
                 }
@@ -162,7 +162,6 @@ namespace osu.Game.Overlays
 
             public SettingsSectionsContainer()
             {
-                ScrollContainer.ScrollbarVisible = false;
                 HeaderBackground = new Box
                 {
                     Colour = Color4.Black,
