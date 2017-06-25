@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Tournament.Components
             {
                 base.UpdateAfterChildren();
 
-                while (Children.Count() < 3)
+                while (Children.Count < 3)
                     addLine();
 
                 float pos = leftPos;
