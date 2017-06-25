@@ -12,7 +12,6 @@ namespace osu.Game.Graphics.Processing
     {
         public RatioAdjust()
         {
-            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
         }
 

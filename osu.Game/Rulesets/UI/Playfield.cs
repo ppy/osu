@@ -37,8 +37,6 @@ namespace osu.Game.Rulesets.UI
         /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width.</param>
         protected Playfield(float? customWidth = null)
         {
-            AlwaysReceiveInput = true;
-
             // Default height since we force relative size axes
             Size = Vector2.One;
 
@@ -50,7 +48,6 @@ namespace osu.Game.Rulesets.UI
                 {
                     content = new Container
                     {
-                        AlwaysReceiveInput = true,
                         RelativeSizeAxes = Axes.Both,
                     }
                 }
@@ -100,19 +97,10 @@ namespace osu.Game.Rulesets.UI
 
             //dividing by the customwidth will effectively scale our content to the required container size.
             protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
-
-            public ScaledContainer()
-            {
-                AlwaysReceiveInput = true;
-            }
         }
 
         public class HitObjectContainer<U> : Container<U> where U : Drawable
         {
-            public HitObjectContainer()
-            {
-                AlwaysReceiveInput = true;
-            }
         }
     }
 }
