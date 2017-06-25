@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
             const float duration = 100;
             // 8 notches in spinner requre 8 animation intervals
             const float intervals = 8;
-            // angle to rotate the spinner one notch 
+            // angle to rotate the spinner one notch
             const float angle = 360 / intervals;
 
             for (int i = 0; i < intervals; i++)
