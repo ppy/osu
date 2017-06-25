@@ -82,7 +82,6 @@ namespace osu.Game.Overlays.SearchableList
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    AlwaysReceiveInput = true,
                     Children = new Drawable[]
                     {
                         Header = CreateHeader(),

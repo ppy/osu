@@ -186,7 +186,6 @@ namespace osu.Game.Screens.Play
 
         protected MenuOverlay()
         {
-            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
         }
 

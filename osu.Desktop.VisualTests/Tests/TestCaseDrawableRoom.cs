@@ -38,12 +38,26 @@ namespace osu.Desktop.VisualTests.Tests
             first.Room.Name.Value = @"Great Room Right Here";
             first.Room.Host.Value = new User { Username = @"Naeferith", Id = 9492835, Country = new Country { FlagName = @"FR" } };
             first.Room.Status.Value = new RoomStatusOpen();
-            first.Room.Beatmap.Value = new BeatmapMetadata { Title = @"Seiryu", Artist = @"Critical Crystal" };
+            first.Room.Beatmap.Value = new BeatmapInfo
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Title = @"Seiryu",
+                    Artist = @"Critical Crystal",
+                },
+            };
 
             second.Room.Name.Value = @"Relax It's The Weekend";
             second.Room.Host.Value = new User { Username = @"peppy", Id = 2, Country = new Country { FlagName = @"AU" } };
             second.Room.Status.Value = new RoomStatusPlaying();
-            second.Room.Beatmap.Value = new BeatmapMetadata { Title = @"ZAQ", Artist = @"Serendipity" };
+            second.Room.Beatmap.Value = new BeatmapInfo
+            {
+                Metadata = new BeatmapMetadata
+                {
+                    Title = @"Serendipity",
+                    Artist = @"ZAQ",
+                },
+            };
 
             AddStep(@"change state", () =>
             {

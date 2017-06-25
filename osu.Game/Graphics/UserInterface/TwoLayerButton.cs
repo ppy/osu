@@ -171,7 +171,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => IconLayer.Contains(screenSpacePos) || TextLayer.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => IconLayer.Contains(screenSpacePos) || TextLayer.Contains(screenSpacePos);
 
         protected override bool OnHover(InputState state)
         {

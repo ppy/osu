@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Direct
             SetInfo = setInfo;
         }
 
-        protected IEnumerable<DifficultyIcon> GetDifficultyIcons()
+        protected List<DifficultyIcon> GetDifficultyIcons()
         {
             var icons = new List<DifficultyIcon>();
 
