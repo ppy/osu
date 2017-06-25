@@ -195,7 +195,7 @@ namespace osu.Game.Screens.Play
             header.Colour = colours.Yellow;
         }
 
-        private int buttonCount => Buttons.Children.Count();
+        private int buttonCount => Buttons.Children.Count;
         private int selectedButton = -1;
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
