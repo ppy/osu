@@ -17,6 +17,11 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Graphics.Containers;
+using osu.Framework.Audio.Track;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Framework.Lists;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Menu
 {
@@ -24,7 +29,7 @@ namespace osu.Game.Screens.Menu
     /// Button designed specifically for the osu!next main menu.
     /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
     /// </summary>
-    public class Button : Container, IStateful<ButtonState>
+    public class Button : BeatSyncedContainer, IStateful<ButtonState>
     {
         private readonly Container iconText;
         private readonly Container box;
@@ -116,99 +121,82 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        // true if icon going to jump from left to right
+        private bool jumpSide;
+        private ScheduledDelegate defaultAnimationDelegate;
+        private double previousBeatTime;
+        private bool isAnimated;
+
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        {
+            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+            if (Hovering)
+            {
+                // Beat length can be trimmed by the next timing point
+                double beatTime = calculateBeatTime(timingPoint, getNextControlPoint(timingPoint));
+
+                if(previousBeatTime != beatTime || !isAnimated)
+                    restartAnimation(beatTime);
+
+                // If animation will be restarted - we should know, on which side we've stopped
+                // to start animation from the correct side
+                jumpSide = !jumpSide;
+
+                previousBeatTime = beatTime;
+            }
+        }
+
+        private double calculateBeatTime(TimingControlPoint current, TimingControlPoint next)
+        {
+            double currentTime = Beatmap.Value.Track.CurrentTime;
+
+            double difference = current.Time - currentTime;
+            if (difference < current.BeatLength && difference > 0)
+                return difference;
+
+            if (current == next)
+                return current.BeatLength;
+
+            if (next.Time - current.Time < current.BeatLength)
+                return next.Time - current.Time;
+
+            difference = next.Time - currentTime;
+            if (difference < current.BeatLength)
+                return difference;
+
+            return current.BeatLength;
+        }
+
         protected override bool OnHover(InputState state)
         {
             if (State != ButtonState.Expanded) return true;
 
-            //if (OsuGame.Instance.IsActive)
-            //    Game.Audio.PlaySamplePositional($@"menu-{internalName}-hover", @"menuclick");
-
             box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
 
-            int duration = 0; //(int)(Game.Audio.BeatLength / 2);
-            if (duration == 0) duration = 250;
+            double offset = getNextBeatTimeLeft();
 
             icon.ClearTransforms();
-
-            icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
-
-            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
-            double startTime = Time.Current + offset;
-
-            icon.RotateTo(10, offset, EasingTypes.InOutSine);
+            icon.MoveTo(Vector2.Zero, offset, EasingTypes.Out);
+            icon.RotateTo(-10, offset, EasingTypes.InOutSine);
             icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);
 
-            icon.Transforms.Add(new TransformRotation
-            {
-                StartValue = -10,
-                EndValue = 10,
-                StartTime = startTime,
-                EndTime = startTime + duration * 2,
-                Easing = EasingTypes.InOutSine,
-                LoopCount = -1,
-                LoopDelay = duration * 2
-            });
+            jumpSide = true;
 
-            icon.Transforms.Add(new TransformPosition
+            if (Beatmap.Value?.Track == null)
             {
-                StartValue = Vector2.Zero,
-                EndValue = new Vector2(0, -10),
-                StartTime = startTime,
-                EndTime = startTime + duration,
-                Easing = EasingTypes.Out,
-                LoopCount = -1,
-                LoopDelay = duration
-            });
-
-            icon.Transforms.Add(new TransformScale
-            {
-                StartValue = new Vector2(1, 0.9f),
-                EndValue = Vector2.One,
-                StartTime = startTime,
-                EndTime = startTime + duration,
-                Easing = EasingTypes.Out,
-                LoopCount = -1,
-                LoopDelay = duration
-            });
-
-            icon.Transforms.Add(new TransformPosition
-            {
-                StartValue = new Vector2(0, -10),
-                EndValue = Vector2.Zero,
-                StartTime = startTime + duration,
-                EndTime = startTime + duration * 2,
-                Easing = EasingTypes.In,
-                LoopCount = -1,
-                LoopDelay = duration
-            });
-
-            icon.Transforms.Add(new TransformScale
-            {
-                StartValue = Vector2.One,
-                EndValue = new Vector2(1, 0.9f),
-                StartTime = startTime + duration,
-                EndTime = startTime + duration * 2,
-                Easing = EasingTypes.In,
-                LoopCount = -1,
-                LoopDelay = duration
-            });
-
-            icon.Transforms.Add(new TransformRotation
-            {
-                StartValue = 10,
-                EndValue = -10,
-                StartTime = startTime + duration * 2,
-                EndTime = startTime + duration * 4,
-                Easing = EasingTypes.InOutSine,
-                LoopCount = -1,
-                LoopDelay = duration * 2
-            });
+                Delay(offset);
+                defaultAnimationDelegate = Schedule(() => restartAnimation(500));
+            }
 
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
+            defaultAnimationDelegate?.Cancel();
+            isAnimated = false;
+
             icon.ClearTransforms();
             icon.RotateTo(0, 500, EasingTypes.Out);
             icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
@@ -217,6 +205,103 @@ namespace osu.Game.Screens.Menu
 
             if (State == ButtonState.Expanded)
                 box.ScaleTo(new Vector2(1, 1), 500, EasingTypes.OutElastic);
+        }
+
+        private double getNextBeatTimeLeft()
+        {
+            if (Beatmap.Value?.Track == null)
+                return 200;
+
+            double currentTime = Beatmap.Value.Track.CurrentTime;
+
+            TimingControlPoint current = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTime);
+            TimingControlPoint next = getNextControlPoint(current);
+
+            // If the difference between the current time and the start time of the next timing point
+            // less than beat time of the current timing point
+            if (Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTime + current.BeatLength) == next && current != next)
+                return next.Time - currentTime;
+
+            return current.BeatLength - (currentTime - current.Time) % current.BeatLength;
+        }
+
+        private TimingControlPoint getNextControlPoint(TimingControlPoint current)
+        {
+            SortedList<TimingControlPoint> timingPoints = Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints;
+
+            if (timingPoints[timingPoints.Count - 1] == current)
+                return current;
+
+            return timingPoints[timingPoints.IndexOf(current) + 1];
+        }
+
+        private void restartAnimation(double beatLength)
+        {
+            icon.ClearTransforms();
+
+            double startTime = Time.Current;
+            isAnimated = true;
+
+            icon.Transforms.Add(new TransformRotation
+            {
+                StartValue = jumpSide ? -10 : 10,
+                EndValue = jumpSide ? 10 : -10,
+                StartTime = startTime,
+                EndTime = startTime + beatLength,
+                Easing = EasingTypes.InOutSine,
+                LoopCount = -1,
+                LoopDelay = beatLength
+            });
+            icon.Transforms.Add(new TransformPosition
+            {
+                StartValue = Vector2.Zero,
+                EndValue = new Vector2(0, -10),
+                StartTime = startTime,
+                EndTime = startTime + beatLength / 2,
+                Easing = EasingTypes.Out,
+                LoopCount = -1,
+                LoopDelay = beatLength / 2
+            });
+            icon.Transforms.Add(new TransformScale
+            {
+                StartValue = new Vector2(1, 0.9f),
+                EndValue = Vector2.One,
+                StartTime = startTime,
+                EndTime = startTime + beatLength / 2,
+                Easing = EasingTypes.Out,
+                LoopCount = -1,
+                LoopDelay = beatLength / 2
+            });
+            icon.Transforms.Add(new TransformPosition
+            {
+                StartValue = new Vector2(0, -10),
+                EndValue = Vector2.Zero,
+                StartTime = startTime + beatLength / 2,
+                EndTime = startTime + beatLength,
+                Easing = EasingTypes.In,
+                LoopCount = -1,
+                LoopDelay = beatLength / 2
+            });
+            icon.Transforms.Add(new TransformScale
+            {
+                StartValue = Vector2.One,
+                EndValue = new Vector2(1, 0.9f),
+                StartTime = startTime + beatLength / 2,
+                EndTime = startTime + beatLength,
+                Easing = EasingTypes.In,
+                LoopCount = -1,
+                LoopDelay = beatLength / 2
+            });
+            icon.Transforms.Add(new TransformRotation
+            {
+                StartValue = jumpSide ? 10 : -10,
+                EndValue = jumpSide ? -10 : 10,
+                StartTime = startTime + beatLength,
+                EndTime = startTime + beatLength * 2,
+                Easing = EasingTypes.InOutSine,
+                LoopCount = -1,
+                LoopDelay = beatLength
+            });
         }
 
         [BackgroundDependencyLoader]
