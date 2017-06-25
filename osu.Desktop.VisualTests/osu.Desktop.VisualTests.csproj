@@ -223,6 +223,7 @@
     <Compile Include="Tests\TestCaseDialogOverlay.cs" />
     <Compile Include="Tests\TestCaseBeatmapOptionsOverlay.cs" />
     <Compile Include="Tests\TestCaseLeaderboard.cs" />
+    <Compile Include="Tests\TestCaseLoadingAnimation.cs" />
     <Compile Include="Beatmaps\TestWorkingBeatmap.cs" />
     <Compile Include="Tests\TestCaseBeatmapDetailArea.cs" />
     <Compile Include="Tests\TestCaseDrawableRoom.cs" />
