@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Ranking
 
         internal override bool AllowRulesetChange => false;
 
+        internal override bool AllowBeatmapChange => false;
+
         private Container currentPage;
 
         private static readonly Vector2 background_blur = new Vector2(20);
@@ -280,7 +282,5 @@ namespace osu.Game.Screens.Ranking
 
             modeChangeButtons.Current.TriggerChange();
         }
-
-        internal override bool AllowBeatmapChange => false;
     }
 }
