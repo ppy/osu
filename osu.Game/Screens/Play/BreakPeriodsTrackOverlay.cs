@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
 {
-    public class SectionTrackOverlay : Container
+    public class BreakPeriodsTrackOverlay : Container
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
         private const int arrows_appear_offset = 900;
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play
         public Action BreakIn;
         public Action BreakOut;
 
-        public SectionTrackOverlay(double startTime)
+        public BreakPeriodsTrackOverlay(double startTime)
         {
             this.startTime = startTime;
 
@@ -75,8 +75,8 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            samplePass = audio.Sample.Get(@"SectionResult/sectionpass");
-            sampleFail = audio.Sample.Get(@"SectionResult/sectionfail");
+            samplePass = audio.Sample.Get(@"Gameplay/sectionpass");
+            sampleFail = audio.Sample.Get(@"Gameplay/sectionfail");
         }
 
         public void BindHealth(BindableDouble health) => healthBindable.BindTo(health);

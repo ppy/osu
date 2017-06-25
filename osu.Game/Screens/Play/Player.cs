@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
 
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
-        private SectionTrackOverlay sectionTrackOverlay;
+        private BreakPeriodsTrackOverlay breakPeriodsTrackOverlay;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre
                         },
                         new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
-                        sectionTrackOverlay = new SectionTrackOverlay(firstObjectTime)
+                        breakPeriodsTrackOverlay = new BreakPeriodsTrackOverlay(firstObjectTime)
                         {
                             Breaks = Beatmap.Beatmap.Breaks,
                             AudioClock = decoupledClock,
@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
 
-            sectionTrackOverlay.BindHealth(scoreProcessor.Health);
+            breakPeriodsTrackOverlay.BindHealth(scoreProcessor.Health);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
