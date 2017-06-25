@@ -124,5 +124,32 @@ namespace osu.Game.Users
 
         [JsonProperty(@"defaultStatistics")]
         public UserStatistics Statistics;
+
+        public class RankHistories
+        {
+            [JsonProperty(@"osu")]
+            public RankHistory Osu;
+
+            [JsonProperty(@"taiko")]
+            public RankHistory Taiko;
+
+            [JsonProperty(@"fruits")]
+            public RankHistory Fruits;
+
+            [JsonProperty(@"mania")]
+            public RankHistory Mania;
+        }
+
+        public class RankHistory
+        {
+            [JsonProperty(@"mode")]
+            public string Mode;
+
+            [JsonProperty(@"data")]
+            public int[] Data;
+        }
+
+        [JsonProperty(@"allRankHistories")]
+        public RankHistories AllRankHistories;
     }
 }
