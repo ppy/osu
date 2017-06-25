@@ -63,8 +63,12 @@ namespace osu.Game.Graphics.UserInterface
 
                 X = (value & Anchor.x2) > 0 ? SIZE_RETRACTED.X * shear * 0.5f : 0;
 
+                Remove(c1);
+                Remove(c2);
                 c1.Depth = (value & Anchor.x2) > 0 ? 0 : 1;
                 c2.Depth = (value & Anchor.x2) > 0 ? 1 : 0;
+                Add(c1);
+                Add(c2);
             }
         }
 
@@ -167,7 +171,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => IconLayer.Contains(screenSpacePos) || TextLayer.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => IconLayer.Contains(screenSpacePos) || TextLayer.Contains(screenSpacePos);
 
         protected override bool OnHover(InputState state)
         {
