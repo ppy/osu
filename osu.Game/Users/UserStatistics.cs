@@ -10,7 +10,7 @@ namespace osu.Game.Users
         [JsonProperty(@"level")]
         public LevelInfo Level;
 
-        public class LevelInfo
+        public struct LevelInfo
         {
             [JsonProperty(@"current")]
             public int Current;
@@ -49,7 +49,7 @@ namespace osu.Game.Users
         [JsonProperty(@"grade_counts")]
         public Grades GradesCount;
 
-        public class Grades
+        public struct Grades
         {
             [JsonProperty(@"ss")]
             public int SS;
