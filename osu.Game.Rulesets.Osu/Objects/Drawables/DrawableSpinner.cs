@@ -38,8 +38,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSpinner(Spinner s) : base(s)
         {
-            AlwaysReceiveInput = true;
-
             Origin = Anchor.Centre;
             Position = s.Position;
 

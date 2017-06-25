@@ -38,7 +38,7 @@ namespace osu.Game.Graphics.UserInterface
             public readonly TextAwesome Chevron;
 
             //don't allow clicking between transitions and don't make the chevron clickable
-            protected override bool InternalContains(Vector2 screenSpacePos) => Alpha == 1f && Text.Contains(screenSpacePos);
+            public override bool Contains(Vector2 screenSpacePos) => Alpha == 1f && Text.Contains(screenSpacePos);
             public override bool HandleInput => State == Visibility.Visible;
 
             private Visibility state;

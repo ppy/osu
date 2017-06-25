@@ -378,7 +378,7 @@ namespace osu.Game.Screens.Multiplayer
         {
             participants.Text = value.Length.ToString();
             participantInfo.Participants = value;
-            participantsFlow.Children = value.Select(u => new UserTile(u));
+            participantsFlow.ChildrenEnumerable = value.Select(u => new UserTile(u));
         }
 
         private class UserTile : Container, IHasTooltip
