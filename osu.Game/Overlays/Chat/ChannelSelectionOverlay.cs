@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Chat
         {
             set
             {
-                sectionsFlow.Children = value;
+                sectionsFlow.ChildrenEnumerable = value;
 
                 foreach (ChannelSection s in sectionsFlow.Children)
                 {

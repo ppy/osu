@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Ranking
                 }
             };
 
-            statisticsContainer.Children = Score.Statistics.Select(s => new DrawableScoreStatistic(s));
+            statisticsContainer.ChildrenEnumerable = Score.Statistics.Select(s => new DrawableScoreStatistic(s));
         }
 
         protected override void LoadComplete()
