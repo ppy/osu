@@ -9,6 +9,7 @@ using osu.Framework.Input;
 using osu.Framework.Configuration;
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
+using OpenTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -20,8 +21,6 @@ namespace osu.Game.Screens.Play
 
         public KeyCounterCollection()
         {
-            AlwaysReceiveInput = true;
-
             Direction = FillDirection.Horizontal;
             AutoSizeAxes = Axes.Both;
         }
@@ -124,10 +123,11 @@ namespace osu.Game.Screens.Play
 
             public Receptor(KeyCounterCollection target)
             {
-                AlwaysReceiveInput = true;
                 RelativeSizeAxes = Axes.Both;
                 this.target = target;
             }
+
+            public override bool Contains(Vector2 screenSpacePos) => true;
 
             public override bool HandleInput => true;
 

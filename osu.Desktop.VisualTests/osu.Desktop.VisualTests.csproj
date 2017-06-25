@@ -230,6 +230,7 @@
     <Compile Include="Tests\TestCaseDirect.cs" />
     <Compile Include="Tests\TestCaseSocial.cs" />
     <Compile Include="Tests\TestCaseBreadcrumbs.cs" />
+    <Compile Include="Tests\TestCaseRoomInspector.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
