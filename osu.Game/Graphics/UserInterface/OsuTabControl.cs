@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || Dropdown.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || Dropdown.Contains(screenSpacePos);
 
         private bool isEnumType => typeof(T).IsEnum;
 
