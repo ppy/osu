@@ -23,8 +23,12 @@ namespace osu.Game.Overlays
     public class UserProfileOverlay : WaveOverlayContainer
     {
         private ProfileSection lastSection;
+        private ProfileSection[] sections;
         private GetUserRequest userReq;
         private APIAccess api;
+        private ProfileHeader header;
+        private SectionsContainer<ProfileSection> sectionsContainer;
+        private ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 50;
         private const float transition_length = 500;
@@ -69,13 +73,13 @@ namespace osu.Game.Overlays
             FadeEdgeEffectTo(0, DISAPPEAR_DURATION, EasingTypes.Out);
         }
 
-        public void ShowUser(User user)
+        public void ShowUser(User user, bool fetchOnline = true)
         {
             userReq?.Cancel();
             Clear();
             lastSection = null;
 
-            var sections = new ProfileSection[]
+            sections = new ProfileSection[]
             {
                 new AboutSection(),
                 new RecentSection(),
@@ -85,7 +89,7 @@ namespace osu.Game.Overlays
                 new BeatmapsSection(),
                 new KudosuSection()
             };
-            var tabs = new ProfileTabControl
+            tabs = new ProfileTabControl
             {
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,
@@ -99,9 +103,9 @@ namespace osu.Game.Overlays
                 Colour = OsuColour.Gray(0.2f)
             });
 
-            var header = new ProfileHeader(user);
+            header = new ProfileHeader(user);
 
-            var sectionsContainer = new SectionsContainer<ProfileSection>
+            Add(sectionsContainer = new SectionsContainer<ProfileSection>
             {
                 RelativeSizeAxes = Axes.Both,
                 ExpandableHeader = header,
@@ -111,8 +115,7 @@ namespace osu.Game.Overlays
                     Colour = OsuColour.Gray(34),
                     RelativeSizeAxes = Axes.Both
                 }
-            };
-            Add(sectionsContainer);
+            });
             sectionsContainer.SelectedSection.ValueChanged += s =>
             {
                 if (lastSection != s)
@@ -138,26 +141,36 @@ namespace osu.Game.Overlays
                 }
             };
 
-            userReq = new GetUserRequest(user.Id); //fetch latest full data
-            userReq.Success += u =>
+            if (fetchOnline)
             {
-                header.FillFullData(u);
-
-                for (int i = 0; i < u.ProfileOrder.Length; i++)
-                {
-                    string id = u.ProfileOrder[i];
-                    var sec = sections.FirstOrDefault(s => s.Identifier == id);
-                    if (sec != null)
-                    {
-                        sec.Depth = -i;
-                        sectionsContainer.Add(sec);
-                        tabs.AddItem(sec);
-                    }
-                }
-            };
-            api.Queue(userReq);
+                userReq = new GetUserRequest(user.Id);
+                userReq.Success += fillData;
+                api.Queue(userReq);
+            }
+            else
+            {
+                userReq = null;
+                fillData(user);
+            }
 
             Show();
+        }
+
+        private void fillData(User user)
+        {
+            header.FillFullData(user);
+
+            for (int i = 0; i < user.ProfileOrder.Length; i++)
+            {
+                string id = user.ProfileOrder[i];
+                var sec = sections.FirstOrDefault(s => s.Identifier == id);
+                if (sec != null)
+                {
+                    sec.Depth = -i;
+                    sectionsContainer.Add(sec);
+                    tabs.AddItem(sec);
+                }
+            }
         }
 
         private class ProfileTabControl : PageTabControl<ProfileSection>
