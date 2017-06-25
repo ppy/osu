@@ -223,14 +223,14 @@ namespace osu.Game.Overlays
             base.LoadComplete();
         }
 
-        private void beatmapDisabledChanged(bool newBeatmapBackingDisabled)
+        private void beatmapDisabledChanged(bool disabled)
         {
-            prevButton.Enabled.Value = !newBeatmapBackingDisabled;
-            nextButton.Enabled.Value = !newBeatmapBackingDisabled;
-            playlistButton.Enabled.Value = !newBeatmapBackingDisabled;
+            prevButton.Enabled.Value = !disabled;
+            nextButton.Enabled.Value = !disabled;
+            playlistButton.Enabled.Value = !disabled;
 
             // Toggle the playlist's visibility if required
-            if (newBeatmapBackingDisabled)
+            if (disabled)
             {
                 showPlaylistOnceAvailable = playlist.State == Visibility.Visible;
 
