@@ -166,12 +166,12 @@ namespace osu.Game.Graphics.Containers
             {
                 lastKnownScroll = currentScroll;
 
-                if (expandableHeader != null && fixedHeader != null)
+                if (ExpandableHeader != null && FixedHeader != null)
                 {
-                    float offset = Math.Min(expandableHeader.LayoutSize.Y, currentScroll);
+                    float offset = Math.Min(ExpandableHeader.LayoutSize.Y, currentScroll);
 
-                    expandableHeader.Y = -offset;
-                    fixedHeader.Y = -offset + expandableHeader.LayoutSize.Y;
+                    ExpandableHeader.Y = -offset;
+                    FixedHeader.Y = -offset + ExpandableHeader.LayoutSize.Y;
                 }
 
                 headerBackgroundContainer.Height = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
