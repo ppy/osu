@@ -227,9 +227,6 @@ namespace osu.Game.Screens.Menu
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-            if (Hovering)
-                sampleBeat.Play();
-
             lastBeatIndex = beatIndex;
 
             var beatLength = timingPoint.BeatLength;
@@ -237,6 +234,9 @@ namespace osu.Game.Screens.Menu
             float amplitudeAdjust = Math.Min(1, 0.4f + amplitudes.Maximum);
 
             if (beatIndex < 0) return;
+
+            if (Hovering)
+                sampleBeat.Play();
 
             logoBeatContainer.ScaleTo(1 - 0.02f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
             using (logoBeatContainer.BeginDelayedSequence(beat_in_time))
