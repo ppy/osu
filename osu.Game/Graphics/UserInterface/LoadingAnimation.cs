@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using OpenTK;
 
 namespace osu.Game.Graphics.UserInterface
@@ -25,18 +26,35 @@ namespace osu.Game.Graphics.UserInterface
                     TextSize = 20,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.fa_spinner
+                    Icon = FontAwesome.fa_spinner,
+                    Shadow = false
                 }
             };
         }
+
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            spinner.RotateTo(360, 2000);
-            using (spinner.BeginDelayedSequence(2000))
-                spinner.Loop();
+            const float duration = 100;
+            // 8 notches in spinner requre 8 animation intervals
+            const float intervals = 8;
+            // angle to rotate the spinner one notch 
+            const float angle = 360 / intervals;
+
+            for (int i = 0; i < intervals; i++)
+            {
+                spinner.Transforms.Add(new TransformRotation
+                {
+                    StartValue = angle * i,
+                    EndValue = angle * i,
+                    StartTime = duration * i,
+                    EndTime = duration + (duration * i),
+                    LoopCount = -1,
+                    LoopDelay = duration * (intervals - 1)
+                });
+            }
         }
 
         private const float transition_duration = 500;
