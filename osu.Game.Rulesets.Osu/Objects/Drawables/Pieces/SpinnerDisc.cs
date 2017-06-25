@@ -31,7 +31,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             spinner = s;
 
-            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]
@@ -39,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 background = new SpinnerBackground { Alpha = idle_alpha },
             };
         }
+
+        public override bool Contains(Vector2 screenSpacePos) => true;
 
         private bool tracking;
         public bool Tracking
