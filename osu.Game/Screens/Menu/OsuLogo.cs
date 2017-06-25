@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Menu
             set { colourAndTriangles.Alpha = value ? 1 : 0; }
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => logoContainer.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => logoContainer.Contains(screenSpacePos);
 
         public bool Ripple
         {
