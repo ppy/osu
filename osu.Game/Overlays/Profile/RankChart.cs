@@ -24,7 +24,6 @@ namespace osu.Game.Overlays.Profile
         private readonly RankChartLineGraph graph;
 
         private readonly int[] ranks;
-        private readonly decimal?[] performances;
 
         private const float primary_textsize = 25, secondary_textsize = 13, padding = 10;
 
@@ -70,22 +69,19 @@ namespace osu.Game.Overlays.Profile
                     BallMove = showHistoryRankTexts
                 }
             };
-            ranks = new[] { user.Statistics.Rank };
-            performances = new[] { user.Statistics.PP };
+            ranks = user.AllRankHistories?.Osu?.Data ?? new[] { user.Statistics.Rank };
         }
 
         private void updateRankTexts()
         {
             rankText.Text = user.Statistics.Rank > 0 ? $"#{user.Statistics.Rank:#,0}" : "no rank";
             performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
-            //relativeText.Text = $"{user.Country?.FullName} #{countryRank:#,0}";
-            relativeText.Text = string.Empty;
+            relativeText.Text = $"{user.Country?.FullName} #{user.CountryRank:#,0}";
         }
 
         private void showHistoryRankTexts(int dayIndex)
         {
             rankText.Text = ranks[dayIndex] > 0 ? $"#{ranks[dayIndex]:#,0}" : "no rank";
-            performanceText.Text = performances[dayIndex] != null ? $"{performances[dayIndex]:#,0}pp" : string.Empty;
             relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
             //plural should be handled in a general way
         }
