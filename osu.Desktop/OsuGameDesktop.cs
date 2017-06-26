@@ -12,6 +12,7 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using osu.Game.Screens.Menu;
+using System.Resources;
 
 namespace osu.Desktop
 {
@@ -45,7 +46,7 @@ namespace osu.Desktop
             {
                 desktopWindow.CursorState |= CursorState.Hidden;
 
-                desktopWindow.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+                desktopWindow.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream(this.GetType(), "lazer.ico"));
                 desktopWindow.Title = Name;
 
                 desktopWindow.DragEnter += dragEnter;
