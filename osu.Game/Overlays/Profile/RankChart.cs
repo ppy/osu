@@ -69,6 +69,7 @@ namespace osu.Game.Overlays.Profile
                     BallMove = showHistoryRankTexts
                 }
             };
+
             ranks = user.AllRankHistories?.Osu?.Data ?? new[] { user.Statistics.Rank };
         }
 
