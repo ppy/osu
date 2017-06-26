@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         public float ActualMaxValue { get; private set; } = float.NaN;
         public float ActualMinValue { get; private set; } = float.NaN;
 
-        private const double transform_duration = 500;
+        private const double transform_duration = 1500;
 
         /// <summary>
         /// Hold an empty area if values are less.
