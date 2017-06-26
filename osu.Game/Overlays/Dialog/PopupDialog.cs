@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Dialog
             get { return buttonsContainer.Children; }
             set
             {
-                buttonsContainer.Children = value;
+                buttonsContainer.ChildrenEnumerable = value;
                 foreach (PopupDialogButton b in value)
                 {
                     var action = b.Action;
