@@ -487,6 +487,9 @@
     <Compile Include="Overlays\SearchableList\SlimEnumDropdown.cs" />
     <Compile Include="Overlays\SearchableList\DisplayStyleControl.cs" />
     <Compile Include="Graphics\UserInterface\BreadcrumbControl.cs" />
+    <Compile Include="Screens\Multiplayer\RoomInspector.cs" />
+    <Compile Include="Online\Multiplayer\GameType.cs" />
+    <Compile Include="Screens\Multiplayer\DrawableGameType.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

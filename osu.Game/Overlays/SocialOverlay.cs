@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
                     panelFlow.Clear();
                 else
                 {
-                    panelFlow.Children = users.Select(u =>
+                    panelFlow.ChildrenEnumerable = users.Select(u =>
                     {
                         var p = new UserPanel(u) { Width = 300 };
                         p.Status.BindTo(u.Status);

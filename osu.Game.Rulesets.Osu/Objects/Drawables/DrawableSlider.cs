@@ -28,10 +28,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSlider(Slider s) : base(s)
         {
-            // Since the DrawableSlider itself is just a container without a size we need to
-            // pass all input through.
-            AlwaysReceiveInput = true;
-
             SliderBouncer bouncer1;
             slider = s;
 
@@ -129,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
-                var ticksCount = ticks.Children.Count() + 1;
+                var ticksCount = ticks.Children.Count + 1;
                 var ticksHit = ticks.Children.Count(t => t.Judgement.Result == HitResult.Hit);
                 if (initialCircle.Judgement.Result == HitResult.Hit)
                     ticksHit++;
