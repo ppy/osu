@@ -12,7 +12,6 @@ namespace osu.Game.Screens.Backgrounds
         private int currentDisplay;
         private const int background_count = 5;
 
-
         private string backgroundName => $@"Menu/menu-background-{currentDisplay % background_count + 1}";
 
         private Background current;
@@ -23,12 +22,12 @@ namespace osu.Game.Screens.Backgrounds
             display(new Background(backgroundName));
         }
 
-        private void display(Background b)
+        private void display(Background newBackground)
         {
             current?.FadeOut(800, EasingTypes.OutQuint);
             current?.Expire();
 
-            Add(current = b);
+            Add(current = newBackground);
         }
 
         public void Next()
