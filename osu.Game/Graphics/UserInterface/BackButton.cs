@@ -20,7 +20,6 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            ActivationSound = audio.Sample.Get(@"Menu/menuback");
             BackgroundColour = colours.Pink;
             HoverColour = colours.PinkDark;
         }

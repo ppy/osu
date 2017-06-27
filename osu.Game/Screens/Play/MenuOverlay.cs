@@ -191,12 +191,6 @@ namespace osu.Game.Screens.Play
 
         public class Button : DialogButton
         {
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
-            {
-                SampleHover = audio.Sample.Get(@"Menu/menuclick");
-                SampleClick = audio.Sample.Get(@"Menu/menuback");
-            }
         }
     }
 }
