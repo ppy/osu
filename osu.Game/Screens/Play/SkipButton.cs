@@ -16,8 +16,8 @@ using osu.Game.Screens.Ranking;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Play
 {
@@ -175,16 +175,14 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class Button : Container
+        private class Button : OsuClickableContainer
         {
-            public Action Action;
             private Color4 colourNormal;
             private Color4 colourHover;
             private Box box;
             private FillFlowContainer flow;
             private Box background;
             private AspectContainer aspect;
-            private SampleChannel activationSound;
 
             public Button()
             {
@@ -194,8 +192,6 @@ namespace osu.Game.Screens.Play
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, AudioManager audio)
             {
-                activationSound = audio.Sample.Get(@"Menu/menuhit");
-
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
 
@@ -282,13 +278,9 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnClick(InputState state)
             {
-                Action?.Invoke();
-
-                activationSound.Play();
-
                 box.FlashColour(Color4.White, 500, EasingTypes.OutQuint);
                 aspect.ScaleTo(1.2f, 2000, EasingTypes.OutQuint);
-                return true;
+                return base.OnClick(state);
             }
         }
     }
