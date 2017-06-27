@@ -8,6 +8,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
@@ -19,7 +20,7 @@ namespace osu.Game.Screens.Play
     public class BreakPeriodsTrackOverlay : Container
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
-        private const int arrows_appear_offset = 900;
+        private const int arrows_appear_offset = 1000;
 
         private List<BreakPeriod> breaks = new List<BreakPeriod>();
 
@@ -219,17 +220,28 @@ namespace osu.Game.Screens.Play
 
             public void PlayWarning()
             {
-                content.FadeTo(1);
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(0));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(1));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(0));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(1));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(0));
+                content.ClearTransforms();
+
+                double currentTime = Time.Current;
+
+                content.Transforms.Add(new TransformAlpha
+                {
+                    StartValue = 0,
+                    EndValue = 1,
+                    StartTime = currentTime,
+                    EndTime = currentTime,
+                    LoopCount = 4,
+                    LoopDelay = appear_duration * 2,
+                });
+                content.Transforms.Add(new TransformAlpha
+                {
+                    StartValue = 1,
+                    EndValue = 0,
+                    StartTime = currentTime + appear_duration,
+                    EndTime = currentTime + appear_duration,
+                    LoopCount = 4,
+                    LoopDelay = appear_duration * 2,
+                });
             }
         }
     }
