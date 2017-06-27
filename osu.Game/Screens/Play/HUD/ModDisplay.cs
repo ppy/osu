@@ -53,7 +53,6 @@ namespace osu.Game.Screens.Play.HUD
             mods.ValueChanged += mods =>
             {
                 iconsContainer.Clear();
-
                 foreach (Mod mod in mods)
                 {
                     iconsContainer.Add(new ModIcon(mod)
@@ -68,28 +67,17 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        private bool playIsRanked()
-        {
-            if (!mods.Value.Any()) return true;
-
-            foreach (var mod in mods.Value)
-            {
-                if (!mod.Ranked)
-                    return false;
-            }
-
-            return true;
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
             appearTransform();
         }
 
+        private bool playIsRanked => !mods.Value.Any(m => !m.Ranked);
+
         private void appearTransform()
         {
-            if (!playIsRanked())
+            if (!playIsRanked)
                 unrankedText.FadeInFromZero(fade_duration, EasingTypes.OutQuint);
             else
                 unrankedText.FadeTo(0);
