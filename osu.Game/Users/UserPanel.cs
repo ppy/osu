@@ -46,6 +46,7 @@ namespace osu.Game.Users
             {
                 new AsyncLoadWrapper(new CoverBackgroundSprite(user)
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
