@@ -196,12 +196,6 @@ namespace osu.Game.Screens
                 Anchor = Anchor.BottomRight;
                 Origin = Anchor.BottomRight;
             }
-
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
-            {
-                ActivationSound = audio.Sample.Get(@"Menu/menuhit");
-            }
         }
     }
 }
