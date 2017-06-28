@@ -16,10 +16,11 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelSelectionOverlay : FocusedOverlayContainer
+    public class ChannelSelectionOverlay : OsuFocusedOverlayContainer
     {
         public static readonly float WIDTH_PADDING = 170;
 
