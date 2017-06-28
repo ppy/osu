@@ -10,11 +10,9 @@ namespace osu.Game.Overlays.Dialog
     public class PopupDialogOkButton : PopupDialogButton
     {
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OsuColour colours)
         {
             ButtonColour = colours.Pink;
-            SampleHover = audio.Sample.Get(@"Menu/menuclick");
-            SampleClick = audio.Sample.Get(@"Menu/menu-play-click");
         }
     }
 }

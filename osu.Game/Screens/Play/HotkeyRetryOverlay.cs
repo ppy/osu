@@ -18,7 +18,6 @@ namespace osu.Game.Screens.Play
     {
         public Action Action;
 
-        private SampleChannel retrySample;
         private Box overlay;
 
         private const int activate_delay = 400;
@@ -29,7 +28,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            retrySample = audio.Sample.Get(@"Menu/menuback");
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
 
@@ -74,7 +72,6 @@ namespace osu.Game.Screens.Play
             if (!fired && overlay.Alpha == 1)
             {
                 fired = true;
-                retrySample.Play();
                 Action?.Invoke();
             }
         }
