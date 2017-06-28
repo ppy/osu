@@ -61,11 +61,8 @@ namespace osu.Game.Screens.Multiplayer
             {
                 new FillFlowContainer
                 {
-                    Anchor = Anchor.BottomRight,
-                    Origin = Anchor.BottomRight,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    LayoutDuration = transition_duration,
                     Spacing = new Vector2(5f, 0f),
                     Children = new[]
                     {
