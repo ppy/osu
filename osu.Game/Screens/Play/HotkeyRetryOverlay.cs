@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
         private bool fired;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;

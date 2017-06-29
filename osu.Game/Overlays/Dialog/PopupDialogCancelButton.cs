@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Dialog
     public class PopupDialogCancelButton : PopupDialogButton
     {
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OsuColour colours)
         {
             ButtonColour = colours.Blue;
         }

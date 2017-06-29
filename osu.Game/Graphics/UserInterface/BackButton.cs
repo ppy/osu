@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(OsuColour colours)
         {
             BackgroundColour = colours.Pink;
             HoverColour = colours.PinkDark;
