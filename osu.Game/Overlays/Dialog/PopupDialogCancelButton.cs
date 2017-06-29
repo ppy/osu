@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Dialog
