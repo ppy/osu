@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, AudioManager audio)
+            private void load(OsuColour colours)
             {
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
