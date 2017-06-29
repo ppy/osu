@@ -11,7 +11,6 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 
