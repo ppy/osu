@@ -11,8 +11,6 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
