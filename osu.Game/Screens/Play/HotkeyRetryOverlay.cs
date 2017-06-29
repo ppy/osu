@@ -4,7 +4,6 @@
 using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
