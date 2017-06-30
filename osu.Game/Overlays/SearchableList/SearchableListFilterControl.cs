@@ -29,8 +29,6 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract T DefaultTab { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
 
-        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || DisplayStyleControl.Dropdown.Contains(screenSpacePos);
-
         protected SearchableListFilterControl()
         {
             if (!typeof(T).IsEnum)
