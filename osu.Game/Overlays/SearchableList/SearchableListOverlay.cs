@@ -4,7 +4,7 @@
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics.Backgrounds;
 
@@ -82,7 +82,6 @@ namespace osu.Game.Overlays.SearchableList
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
-                    AlwaysReceiveInput = true,
                     Children = new Drawable[]
                     {
                         Header = CreateHeader(),

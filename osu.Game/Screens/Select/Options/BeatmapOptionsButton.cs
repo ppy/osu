@@ -4,7 +4,7 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Select.Options
             return false;
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
 
         public BeatmapOptionsButton()
         {

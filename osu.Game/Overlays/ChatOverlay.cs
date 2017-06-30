@@ -10,7 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -59,7 +59,7 @@ namespace osu.Game.Overlays
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => chatContainer.Contains(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => chatContainer.Contains(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.Contains(screenSpacePos);
 
         public ChatOverlay()
         {

@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Chat
         {
             set
             {
-                sectionsFlow.Children = value;
+                sectionsFlow.ChildrenEnumerable = value;
 
                 foreach (ChannelSection s in sectionsFlow.Children)
                 {

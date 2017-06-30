@@ -3,12 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using OpenTK;
@@ -181,7 +181,7 @@ namespace osu.Game.Overlays
                 textLine2.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
                 textLine2.Y = optionCount > 0 ? 0 : 5;
 
-                if (optionLights.Children.Count() != optionCount)
+                if (optionLights.Children.Count != optionCount)
                 {
                     optionLights.Clear();
                     for (int i = 0; i < optionCount; i++)
@@ -189,7 +189,7 @@ namespace osu.Game.Overlays
                 }
 
                 for (int i = 0; i < optionCount; i++)
-                    optionLights.Children.Skip(i).First().Glowing = i == selectedOption;
+                    optionLights.Children[i].Glowing = i == selectedOption;
             });
         }
 

@@ -6,10 +6,10 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -33,8 +33,6 @@ namespace osu.Game.Overlays.Toolbar
 
         public Toolbar()
         {
-            AlwaysReceiveInput = true;
-
             Children = new Drawable[]
             {
                 new ToolbarBackground(),
@@ -55,7 +53,6 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 new FillFlowContainer
                 {
-                    AlwaysReceiveInput = true,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Direction = FillDirection.Horizontal,

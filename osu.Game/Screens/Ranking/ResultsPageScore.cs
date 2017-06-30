@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -163,7 +164,7 @@ namespace osu.Game.Screens.Ranking
                 }
             };
 
-            statisticsContainer.Children = Score.Statistics.Select(s => new DrawableScoreStatistic(s));
+            statisticsContainer.ChildrenEnumerable = Score.Statistics.Select(s => new DrawableScoreStatistic(s));
         }
 
         protected override void LoadComplete()

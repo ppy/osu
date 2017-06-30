@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -16,6 +15,7 @@ using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Input;
 using osu.Game.Database;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Select
 {
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Select
 
         private readonly SearchTextBox searchTextBox;
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => base.Contains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
 
         public FilterControl()
         {
@@ -82,7 +82,6 @@ namespace osu.Game.Screens.Select
                 new Container
                 {
                     Padding = new MarginPadding(20),
-                    AlwaysReceiveInput = true,
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
                     Anchor = Anchor.TopRight,
@@ -109,7 +108,6 @@ namespace osu.Game.Screens.Select
                             Direction = FillDirection.Horizontal,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            AlwaysReceiveInput = true,
                             Children = new Drawable[]
                             {
                                 groupTabs = new OsuTabControl<GroupMode>

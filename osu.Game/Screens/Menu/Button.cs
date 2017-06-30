@@ -8,7 +8,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Menu
         private readonly Key triggerKey;
         private SampleChannel sampleClick;
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
 
         public Button(string text, string internalName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {

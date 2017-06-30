@@ -5,6 +5,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Audio.Sample;
@@ -92,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's when clicking
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
 
         protected override bool OnClick(Framework.Input.InputState state)
         {
