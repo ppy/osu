@@ -20,6 +20,7 @@ using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 using SQLite.Net;
 using osu.Framework.Graphics.Performance;
+using System.Linq;
 
 namespace osu.Game
 {
@@ -145,6 +146,8 @@ namespace osu.Game
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            RulesetDatabase.AllRulesets.Select(info => info.CreateInstance()).ToList().ForEach(ruleset => Dependencies.Initialize(ruleset));
 
             base.Content.Add(ratioContainer = new RatioAdjust
             {
