@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Menu
         private readonly Key triggerKey;
         private SampleChannel sampleClick;
 
-        public override bool Contains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
 
         public Button(string text, string internalName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
