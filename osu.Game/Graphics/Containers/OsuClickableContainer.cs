@@ -11,7 +11,7 @@ namespace osu.Game.Graphics.Containers
 {
     public class OsuClickableContainer : ClickableContainer
     {
-        public SampleChannel SampleClick, SampleHover;
+        protected SampleChannel SampleClick, SampleHover;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
