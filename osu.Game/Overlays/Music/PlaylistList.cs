@@ -52,6 +52,7 @@ namespace osu.Game.Overlays.Music
                 new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    RelativeMouseDrag = true,
                     Children = new Drawable[]
                     {
                         search = new SearchContainer
