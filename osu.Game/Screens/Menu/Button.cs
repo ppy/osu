@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Menu
         {
             sampleHover = audio.Sample.Get(@"Menu/hover");
             if (!string.IsNullOrEmpty(sampleName))
-            sampleClick = audio.Sample.Get($@"Menu/{sampleName}");
+                sampleClick = audio.Sample.Get($@"Menu/{sampleName}");
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
