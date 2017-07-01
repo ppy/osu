@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Textures;
 using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -151,7 +152,7 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        private class DownloadButton : ClickableContainer
+        private class DownloadButton : OsuClickableContainer
         {
             private readonly TextAwesome icon;
 

@@ -106,8 +106,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleChecked = audio.Sample.Get(@"Checkbox/check-on");
-            sampleUnchecked = audio.Sample.Get(@"Checkbox/check-off");
+            sampleChecked = audio.Sample.Get(@"UI/check-on");
+            sampleUnchecked = audio.Sample.Get(@"UI/check-off");
         }
     }
 }
