@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.SearchableList;
 
 namespace osu.Game.Overlays.Direct
@@ -42,7 +43,7 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        private class RulesetToggleButton : ClickableContainer
+        private class RulesetToggleButton : OsuClickableContainer
         {
             private readonly TextAwesome icon;
 
