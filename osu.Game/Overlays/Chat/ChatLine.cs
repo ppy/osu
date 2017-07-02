@@ -127,17 +127,18 @@ namespace osu.Game.Overlays.Chat
             bool bold = false;
             bool italic = false;
 
-            foreach(string text in message.Content.Split(new string[] { "**" }, StringSplitOptions.None))
+            foreach(string text in message.Content.Split(new [] { "**" }, StringSplitOptions.None))
             {
-                string[] textArray = text.Split(new string[] { "*" }, StringSplitOptions.None);
+                string[] textArray = text.Split(new [] { "*" }, StringSplitOptions.None);
                 for (int i = 0; i < textArray.Length; i++)
                 {
                     if (i != 0) //we shouldn't switch when the i is zero because then there wasn't a asterisk yet and we don't want to switch at the end because then there could've just been two asterisks
                         italic = !italic;
+                    string font = "Exo2.0-" + (bold ? "Bold" : "Regular") + (italic ? "Italic" : string.Empty);
                     textContainer.AddText(textArray[i], spriteText =>
                     {
                         spriteText.TextSize = text_size;
-                        spriteText.Font = "Exo2.0-" + (bold ? "Bold" : "Regular") + (italic ? "Italic" : string.Empty);
+                        spriteText.Font = font;
                     });
                 }
                 bold = !bold;
