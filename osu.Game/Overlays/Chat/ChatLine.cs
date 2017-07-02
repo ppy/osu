@@ -8,6 +8,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -77,6 +78,8 @@ namespace osu.Game.Overlays.Chat
 
             Padding = new MarginPadding { Left = padding, Right = padding };
 
+            TextFlowContainer textContainer;
+
             Children = new Drawable[]
             {
                 new Container
@@ -112,16 +115,33 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        textContainer = new TextFlowContainer
                         {
-                            Text = Message.Content,
-                            TextSize = text_size,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                         }
                     }
                 }
             };
+
+            bool bold = false;
+            bool italic = false;
+
+            foreach(string text in message.Content.Split(new string[] { "**" }, StringSplitOptions.None))
+            {
+                string[] textArray = text.Split(new string[] { "*" }, StringSplitOptions.None);
+                for (int i = 0; i < textArray.Length; i++)
+                {
+                    if (i != 0) //we shouldn't switch when the i is zero because then there wasn't a asterisk yet and we don't want to switch at the end because then there could've just been two asterisks
+                        italic = !italic;
+                    textContainer.AddText(textArray[i], spriteText =>
+                    {
+                        spriteText.TextSize = text_size;
+                        spriteText.Font = "Exo2.0-" + (bold ? "Bold" : "Regular") + (italic ? "Italic" : string.Empty);
+                    });
+                }
+                bold = !bold;
+            }
         }
     }
 }
