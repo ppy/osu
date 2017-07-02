@@ -22,10 +22,11 @@ using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Chat;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
+    public class ChatOverlay : OsuFocusedOverlayContainer, IOnlineComponent
     {
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;

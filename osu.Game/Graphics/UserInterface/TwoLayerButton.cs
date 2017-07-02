@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -18,7 +17,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class TwoLayerButton : ClickableContainer
+    public class TwoLayerButton : OsuClickableContainer
     {
         private readonly BouncingIcon bouncingIcon;
 
@@ -32,7 +31,6 @@ namespace osu.Game.Graphics.UserInterface
 
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
-        public SampleChannel ActivationSound;
         private readonly SpriteText text;
 
         public Color4 HoverColour;
@@ -209,8 +207,6 @@ namespace osu.Game.Graphics.UserInterface
             flash.Alpha = 1;
             flash.FadeOut(500, EasingTypes.OutQuint);
             flash.Expire();
-
-            ActivationSound.Play();
 
             return base.OnClick(state);
         }

@@ -30,16 +30,17 @@ namespace osu.Game.Screens.Menu
         private readonly Container box;
         private readonly Box boxHoverLayer;
         private readonly TextAwesome icon;
-        private readonly string internalName;
+        private readonly string sampleName;
         private readonly Action clickAction;
         private readonly Key triggerKey;
         private SampleChannel sampleClick;
+        private SampleChannel sampleHover;
 
         public override bool Contains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
 
-        public Button(string text, string internalName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
+        public Button(string text, string sampleName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
-            this.internalName = internalName;
+            this.sampleName = sampleName;
             this.clickAction = clickAction;
             this.triggerKey = triggerKey;
 
@@ -120,8 +121,7 @@ namespace osu.Game.Screens.Menu
         {
             if (State != ButtonState.Expanded) return true;
 
-            //if (OsuGame.Instance.IsActive)
-            //    Game.Audio.PlaySamplePositional($@"menu-{internalName}-hover", @"menuclick");
+            sampleHover?.Play();
 
             box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
 
@@ -222,7 +222,9 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Sample.Get($@"Menu/menu-{internalName}-click") ?? audio.Sample.Get(internalName.Contains(@"back") ? @"Menu/menuback" : @"Menu/menuhit");
+            sampleHover = audio.Sample.Get(@"Menu/hover");
+            if (!string.IsNullOrEmpty(sampleName))
+                sampleClick = audio.Sample.Get($@"Menu/{sampleName}");
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -259,7 +261,7 @@ namespace osu.Game.Screens.Menu
 
         private void trigger()
         {
-            sampleClick.Play();
+            sampleClick?.Play();
 
             clickAction?.Invoke();
 
