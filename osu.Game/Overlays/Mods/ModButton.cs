@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.Mods
 
         public void SelectNext()
         {
-            (++SelectedIndex == Mods.Count() ? sampleOff : sampleOn).Play();
+            (++SelectedIndex == Mods.Length ? sampleOff : sampleOn).Play();
             Action?.Invoke(SelectedMod);
         }
 
