@@ -165,14 +165,14 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        enum SplitType
+        private enum SplitType
         {
             None,
             Italic,
             Bold,
         }
 
-        struct SplitMarker
+        private struct SplitMarker
         {
             public int Index;
             public int Length;
