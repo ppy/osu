@@ -8,7 +8,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
-using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Chat
@@ -125,61 +124,96 @@ namespace osu.Game.Overlays.Chat
                 }
             };
 
-            List<int> boldIndices = split(message.Content, "**");
-            List<int> italicIndices = split(message.Content, "_");
-            italicIndices.AddRange(split(message.Content.Replace("**", "  "), "*"));
-            italicIndices.RemoveAll(italicInt => italicInt > 1 && message.Content.Substring(italicInt - 2, 3) == @"\**");
+            string toParse = string.Copy(message.Content);
+            List<SplitMarker> markers = new List<SplitMarker>();
+            markers.AddRange(processMarkers(ref toParse, "**", SplitType.Bold));
+            markers.AddRange(processMarkers(ref toParse, "*", SplitType.Italic));
+            markers.AddRange(processMarkers(ref toParse, "_", SplitType.Italic));
 
+            // Add a sentinel marker for the end of the string such that the entire string is rendered
+            // without requiring code duplication.
+            markers.Add(new SplitMarker { Index = toParse.Length, Length = 0, Type = SplitType.None });
+
+            // Sort markers from earliest to latest
+            markers.Sort((a, b) => a.Index.CompareTo(b.Index));
+
+            // Cut up string into parts according to all found markers
+            int lastIndex = 0;
             bool bold = false, italic = false;
-            int currentBold = 0, currentItalic = 0;
-
-            string text = string.Empty;
-            for(int i = 0; i < message.Content.Length; i++)
+            foreach (var marker in markers)
             {
-                char character = Message.Content[i];
-
-                bool boldChange =   boldIndices.Contains(i)   && currentBold   < boldIndices.Count   - boldIndices.Count   % 2;
-                bool italicChange = italicIndices.Contains(i) && currentItalic < italicIndices.Count - italicIndices.Count % 2;
-
-                text += boldChange || italicChange ? '\0' : character;
-
-                if (i == message.Content.Length - 1 || boldChange || italicChange)
+                // We do not need to add empty strings if we have 2 consecutive markers
+                if (lastIndex != marker.Index)
                 {
                     string font = "Exo2.0-" + (bold ? "Bold" : "Regular") + (italic ? "Italic" : string.Empty);
-                    textContainer.AddText(text, spriteText =>
+                    textContainer.AddText(message.Content.Substring(lastIndex, marker.Index - lastIndex), spriteText =>
                     {
                         spriteText.TextSize = text_size;
                         spriteText.Font = font;
                     });
-                    text = string.Empty;
                 }
 
-                bold ^= boldChange;
-                italic ^= italicChange;
-                i += Convert.ToInt32(boldChange);
-                currentBold += Convert.ToInt32(boldChange);
-                currentItalic += Convert.ToInt32(italicChange);
+                lastIndex = marker.Index + marker.Length;
+
+                // Switch bold / italic state based on the marker we just encountered.
+                switch (marker.Type)
+                {
+                    case SplitType.Bold: bold = !bold; break;
+                    case SplitType.Italic: italic = !italic; break;
+                }
             }
         }
 
-        private static List<int> split(string content, string delimeter)
+        enum SplitType
         {
-            List<int> output = new List<int>();
-            for (int i = 0; i < content.Length; i++)
+            None,
+            Italic,
+            Bold,
+        }
+
+        struct SplitMarker
+        {
+            public int Index;
+            public int Length;
+            public SplitType Type;
+        }
+
+        private static List<SplitMarker> processMarkers(ref string toParse, string delimiter, SplitType type)
+        {
+            List<SplitMarker> output = new List<SplitMarker>();
+
+            // For each char in toParse...
+            for (int i = 0; i < toParse.Length; i++)
             {
-                if (content[i] == '\\')
+                // ...check whether delimiter is matched char-by-char.
+                for (int j = 0; j + i < toParse.Length && j < delimiter.Length; j++)
                 {
-                    i++;
-                    continue;
-                }
-                for (int j = 0; j + i < content.Length && j < delimeter.Length; j++)
-                {
-                    if (content[j + i] != delimeter[j])
+                    if (toParse[j + i] != delimiter[j])
                         break;
-                    else if (j == delimeter.Length - 1)
-                        output.Add(i);
+                    else if (j == delimiter.Length - 1)
+                    {
+                        // Were we escaped? In this case put a marker skipping the escape character
+                        if (i > 0 && toParse[i - 1] == '\\')
+                            output.Add(new SplitMarker { Index = i-1, Type = SplitType.None, Length = 1 });
+                        else
+                        {
+                            output.Add(new SplitMarker { Index = i, Type = type, Length = delimiter.Length });
+                            i += delimiter.Length - 1; // Make sure we advance beyond the end of the discovered delimiter
+                        }
+                    }
                 }
             }
+
+            // Disregard trailing marker if we have an odd amount
+            if (output.Count % 2 == 1)
+                output.RemoveAt(output.Count - 1);
+
+            // We replace all occurences of the delimiter with spaces such that further delimiters
+            // potentially being a substring of the current delimiter parse correctly. This is needed
+            // to parse both ** and * correctly in markdown. The replacement with spaces happens such that
+            // the string remains the same length and indices remain valid.
+            toParse = toParse.Replace(delimiter, new string(' ', delimiter.Length));
+
             return output;
         }
     }
