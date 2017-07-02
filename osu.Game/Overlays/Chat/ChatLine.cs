@@ -9,7 +9,6 @@ using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Chat
@@ -126,13 +125,12 @@ namespace osu.Game.Overlays.Chat
                 }
             };
 
-            bool bold = false, italic = false;
-
             List<int> boldIndices = split(message.Content, "**");
             List<int> italicIndices = split(message.Content, "_");
             italicIndices.AddRange(split(message.Content.Replace("**", "  "), "*"));
             italicIndices.RemoveAll(italicInt => italicInt > 1 && message.Content.Substring(italicInt - 2, 3) == @"\**");
 
+            bool bold = false, italic = false;
             int currentBold = 0, currentItalic = 0;
 
             string text = string.Empty;
@@ -140,12 +138,8 @@ namespace osu.Game.Overlays.Chat
             {
                 char character = Message.Content[i];
 
-                bool boldChange, italicChange;
-                if (boldChange = boldIndices.Contains(i) && currentBold < boldIndices.Count - (boldIndices.Count % 2))
-                    currentBold++;
-
-                if (italicChange = italicIndices.Contains(i) && currentItalic < italicIndices.Count - (italicIndices.Count % 2))
-                    currentItalic++;
+                bool boldChange =   boldIndices.Contains(i)   && currentBold   < boldIndices.Count   - boldIndices.Count   % 2;
+                bool italicChange = italicIndices.Contains(i) && currentItalic < italicIndices.Count - italicIndices.Count % 2;
 
                 text += boldChange || italicChange ? '\0' : character;
 
@@ -163,6 +157,8 @@ namespace osu.Game.Overlays.Chat
                 bold ^= boldChange;
                 italic ^= italicChange;
                 i += Convert.ToInt32(boldChange);
+                currentBold += Convert.ToInt32(boldChange);
+                currentItalic += Convert.ToInt32(italicChange);
             }
         }
 
