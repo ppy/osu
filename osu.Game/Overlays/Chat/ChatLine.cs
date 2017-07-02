@@ -126,9 +126,9 @@ namespace osu.Game.Overlays.Chat
 
             string toParse = string.Copy(message.Content);
             List<SplitMarker> markers = new List<SplitMarker>();
-            markers.AddRange(processMarkers(ref toParse, "**", SplitType.Bold));
-            markers.AddRange(processMarkers(ref toParse, "*", SplitType.Italic));
-            markers.AddRange(processMarkers(ref toParse, "_", SplitType.Italic));
+            markers.AddRange(parseSplitMarkers(ref toParse, "**", SplitType.Bold));
+            markers.AddRange(parseSplitMarkers(ref toParse, "*", SplitType.Italic));
+            markers.AddRange(parseSplitMarkers(ref toParse, "_", SplitType.Italic));
 
             // Add a sentinel marker for the end of the string such that the entire string is rendered
             // without requiring code duplication.
@@ -178,7 +178,7 @@ namespace osu.Game.Overlays.Chat
             public SplitType Type;
         }
 
-        private static List<SplitMarker> processMarkers(ref string toParse, string delimiter, SplitType type)
+        private static List<SplitMarker> parseSplitMarkers(ref string toParse, string delimiter, SplitType type)
         {
             List<SplitMarker> output = new List<SplitMarker>();
 
