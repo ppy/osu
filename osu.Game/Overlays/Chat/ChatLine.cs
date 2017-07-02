@@ -9,6 +9,7 @@ using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
 using System.Collections.Generic;
+using System.Text;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -124,7 +125,7 @@ namespace osu.Game.Overlays.Chat
                 }
             };
 
-            string toParse = string.Copy(message.Content);
+            string toParse = message.Content;
             List<SplitMarker> markers = new List<SplitMarker>();
             markers.AddRange(parseSplitMarkers(ref toParse, "**", SplitType.Bold));
             markers.AddRange(parseSplitMarkers(ref toParse, "*", SplitType.Italic));
@@ -143,7 +144,7 @@ namespace osu.Game.Overlays.Chat
             foreach (var marker in markers)
             {
                 // We do not need to add empty strings if we have 2 consecutive markers
-                if (lastIndex != marker.Index)
+                if (lastIndex < marker.Index)
                 {
                     string font = "Exo2.0-" + (bold ? "Bold" : "Regular") + (italic ? "Italic" : string.Empty);
                     textContainer.AddText(message.Content.Substring(lastIndex, marker.Index - lastIndex), spriteText =>
@@ -180,7 +181,12 @@ namespace osu.Game.Overlays.Chat
 
         private static List<SplitMarker> parseSplitMarkers(ref string toParse, string delimiter, SplitType type)
         {
-            List<SplitMarker> output = new List<SplitMarker>();
+            List<SplitMarker> escapeMarkers = new List<SplitMarker>();
+            List<SplitMarker> delimiterMarkers = new List<SplitMarker>();
+
+            // The output string will contain toParse with all successfully parsed
+            // delimiters replaced by spaces.
+            StringBuilder outputString = new StringBuilder(toParse);
 
             // For each char in toParse...
             for (int i = 0; i < toParse.Length; i++)
@@ -194,27 +200,32 @@ namespace osu.Game.Overlays.Chat
                     {
                         // Were we escaped? In this case put a marker skipping the escape character
                         if (i > 0 && toParse[i - 1] == '\\')
-                            output.Add(new SplitMarker { Index = i-1, Type = SplitType.None, Length = 1 });
+                            escapeMarkers.Add(new SplitMarker { Index = i - 1, Type = SplitType.None, Length = 1 });
                         else
                         {
-                            output.Add(new SplitMarker { Index = i, Type = type, Length = delimiter.Length });
-                            i += delimiter.Length - 1; // Make sure we advance beyond the end of the discovered delimiter
+                            delimiterMarkers.Add(new SplitMarker { Index = i, Type = type, Length = delimiter.Length });
+
+                            // Replace parsed delimiter with spaces such that future delimiters which may be substrings
+                            // do not parse a second time. One specific usecase are ** and * for markdown.
+                            for (int k = i; k < i + delimiter.Length; ++k)
+                                outputString[k] = ' ';
+
+                            // Make sure we advance beyond the end of the discovered delimiter
+                            i += delimiter.Length - 1;
                         }
                     }
                 }
             }
 
             // Disregard trailing marker if we have an odd amount
-            if (output.Count % 2 == 1)
-                output.RemoveAt(output.Count - 1);
+            if (delimiterMarkers.Count % 2 == 1)
+                delimiterMarkers.RemoveAt(delimiterMarkers.Count - 1);
 
-            // We replace all occurences of the delimiter with spaces such that further delimiters
-            // potentially being a substring of the current delimiter parse correctly. This is needed
-            // to parse both ** and * correctly in markdown. The replacement with spaces happens such that
-            // the string remains the same length and indices remain valid.
-            toParse = toParse.Replace(delimiter, new string(' ', delimiter.Length));
+            toParse = outputString.ToString();
 
-            return output;
+            // Return a single list containing all markers
+            escapeMarkers.AddRange(delimiterMarkers);
+            return escapeMarkers;
         }
     }
 }
