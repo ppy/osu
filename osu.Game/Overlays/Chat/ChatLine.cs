@@ -9,6 +9,8 @@ using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
 using System;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -124,25 +126,65 @@ namespace osu.Game.Overlays.Chat
                 }
             };
 
-            bool bold = false;
-            bool italic = false;
+            bool bold = false, italic = false;
 
-            foreach(string text in message.Content.Split(new [] { "**" }, StringSplitOptions.None))
+            List<int> boldIndices = split(message.Content, "**");
+            List<int> italicIndices = split(message.Content, "_");
+            italicIndices.AddRange(split(message.Content.Replace("**", "  "), "*"));
+            italicIndices.RemoveAll(italicInt => italicInt > 1 && message.Content.Substring(italicInt - 2, 3) == @"\**");
+
+            int currentBold = 0, currentItalic = 0;
+
+            string text = string.Empty;
+            for(int i = 0; i < message.Content.Length; i++)
             {
-                string[] textArray = text.Split(new [] { "*" }, StringSplitOptions.None);
-                for (int i = 0; i < textArray.Length; i++)
+                char character = Message.Content[i];
+
+                bool boldChange, italicChange;
+                if (boldChange = boldIndices.Contains(i) && currentBold < boldIndices.Count - (boldIndices.Count % 2))
+                    currentBold++;
+
+                if (italicChange = italicIndices.Contains(i) && currentItalic < italicIndices.Count - (italicIndices.Count % 2))
+                    currentItalic++;
+
+                text += boldChange || italicChange ? '\0' : character;
+
+                if (i == message.Content.Length - 1 || boldChange || italicChange)
                 {
-                    if (i != 0) //we shouldn't switch when the i is zero because then there wasn't a asterisk yet and we don't want to switch at the end because then there could've just been two asterisks
-                        italic = !italic;
                     string font = "Exo2.0-" + (bold ? "Bold" : "Regular") + (italic ? "Italic" : string.Empty);
-                    textContainer.AddText(textArray[i], spriteText =>
+                    textContainer.AddText(text, spriteText =>
                     {
                         spriteText.TextSize = text_size;
                         spriteText.Font = font;
                     });
+                    text = string.Empty;
                 }
-                bold = !bold;
+
+                bold ^= boldChange;
+                italic ^= italicChange;
+                i += Convert.ToInt32(boldChange);
             }
+        }
+
+        private static List<int> split(string content, string delimeter)
+        {
+            List<int> output = new List<int>();
+            for (int i = 0; i < content.Length; i++)
+            {
+                if (content[i] == '\\')
+                {
+                    i++;
+                    continue;
+                }
+                for (int j = 0; j + i < content.Length && j < delimeter.Length; j++)
+                {
+                    if (content[j + i] != delimeter[j])
+                        break;
+                    else if (j == delimeter.Length - 1)
+                        output.Add(i);
+                }
+            }
+            return output;
         }
     }
 }
