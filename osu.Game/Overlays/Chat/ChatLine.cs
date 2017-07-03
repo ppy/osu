@@ -10,6 +10,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using System.Collections.Generic;
 using System.Text;
+using System;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -64,6 +65,7 @@ namespace osu.Game.Overlays.Chat
             return username_colours[message.UserId % username_colours.Length];
         }
 
+        [Flags]
         private enum FontStyles
         {
             None = 0,
