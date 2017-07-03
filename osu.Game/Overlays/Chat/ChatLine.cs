@@ -213,11 +213,14 @@ namespace osu.Game.Overlays.Chat
             {
                 // We do not need to add empty strings if we have 2 consecutive markers
                 if (currentStartIndex < marker.Index)
+                {
+                    string font = getFont(currentStyles);
                     textContainer.AddText(message.Content.Substring(currentStartIndex, marker.Index - currentStartIndex), spriteText =>
                     {
                         spriteText.TextSize = text_size;
-                        spriteText.Font = getFont(currentStyles);
+                        spriteText.Font = font;
                     });
+                }
 
                 // Flip those styles which the marker denotes.
                 currentStyles ^= marker.Styles;
