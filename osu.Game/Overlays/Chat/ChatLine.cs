@@ -127,26 +127,26 @@ namespace osu.Game.Overlays.Chat
 
             string toParse = message.Content;
             List<SplitMarker> markers = new List<SplitMarker>();
-            markers.AddRange(parseSplitMarkers(ref toParse, "**", SplitType.Bold));
-            markers.AddRange(parseSplitMarkers(ref toParse, "*", SplitType.Italic));
-            markers.AddRange(parseSplitMarkers(ref toParse, "_", SplitType.Italic));
+            markers.AddRange(parseSplitMarkers(ref toParse, "**", SplitTypes.Bold));
+            markers.AddRange(parseSplitMarkers(ref toParse, "*", SplitTypes.Italic));
+            markers.AddRange(parseSplitMarkers(ref toParse, "_", SplitTypes.Italic));
 
             // Add a sentinel marker for the end of the string such that the entire string is rendered
             // without requiring code duplication.
-            markers.Add(new SplitMarker { Index = toParse.Length, Length = 0, Type = SplitType.None });
+            markers.Add(new SplitMarker { Index = toParse.Length, Length = 0, Types = SplitTypes.None });
 
             // Sort markers from earliest to latest
             markers.Sort((a, b) => a.Index.CompareTo(b.Index));
 
             // Cut up string into parts according to all found markers
             int lastIndex = 0;
-            bool bold = false, italic = false;
+            SplitTypes splitTypes = SplitTypes.None;
             foreach (var marker in markers)
             {
                 // We do not need to add empty strings if we have 2 consecutive markers
                 if (lastIndex < marker.Index)
                 {
-                    string font = "Exo2.0-" + (bold ? "Bold" : "Regular") + (italic ? "Italic" : string.Empty);
+                    string font = "Exo2.0-" + ((splitTypes & SplitTypes.Bold) > 0 ? "Bold" : "Regular") + ((splitTypes & SplitTypes.Italic) > 0 ? "Italic" : string.Empty);
                     textContainer.AddText(message.Content.Substring(lastIndex, marker.Index - lastIndex), spriteText =>
                     {
                         spriteText.TextSize = text_size;
@@ -156,30 +156,26 @@ namespace osu.Game.Overlays.Chat
 
                 lastIndex = marker.Index + marker.Length;
 
-                // Switch bold / italic state based on the marker we just encountered.
-                switch (marker.Type)
-                {
-                    case SplitType.Bold: bold = !bold; break;
-                    case SplitType.Italic: italic = !italic; break;
-                }
+                // Flip those types which the marker denotes.
+                splitTypes ^= marker.Types;
             }
         }
 
-        private enum SplitType
+        private enum SplitTypes
         {
-            None,
-            Italic,
-            Bold,
+            None = 0,
+            Italic = 1 << 0,
+            Bold = 1 << 1,
         }
 
         private struct SplitMarker
         {
             public int Index;
             public int Length;
-            public SplitType Type;
+            public SplitTypes Types;
         }
 
-        private static List<SplitMarker> parseSplitMarkers(ref string toParse, string delimiter, SplitType type)
+        private static List<SplitMarker> parseSplitMarkers(ref string toParse, string delimiter, SplitTypes types)
         {
             List<SplitMarker> escapeMarkers = new List<SplitMarker>();
             List<SplitMarker> delimiterMarkers = new List<SplitMarker>();
@@ -200,10 +196,10 @@ namespace osu.Game.Overlays.Chat
                     {
                         // Were we escaped? In this case put a marker skipping the escape character
                         if (i > 0 && toParse[i - 1] == '\\')
-                            escapeMarkers.Add(new SplitMarker { Index = i - 1, Type = SplitType.None, Length = 1 });
+                            escapeMarkers.Add(new SplitMarker { Index = i - 1, Types = SplitTypes.None, Length = 1 });
                         else
                         {
-                            delimiterMarkers.Add(new SplitMarker { Index = i, Type = type, Length = delimiter.Length });
+                            delimiterMarkers.Add(new SplitMarker { Index = i, Types = types, Length = delimiter.Length });
 
                             // Replace parsed delimiter with spaces such that future delimiters which may be substrings
                             // do not parse a second time. One specific usecase are ** and * for markdown.
