@@ -269,25 +269,22 @@ namespace osu.Game.Overlays
 
             TransformDirection direction = TransformDirection.None;
 
-            if (current != null)
+            bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current?.BeatmapInfo) ?? false;
+
+            if (current != null && !audioEquals)
             {
-                bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
-
-                if (!audioEquals)
+                if (queuedDirection.HasValue)
                 {
-                    if (queuedDirection.HasValue)
-                    {
-                        direction = queuedDirection.Value;
-                        queuedDirection = null;
-                    }
-                    else
-                    {
-                        //figure out the best direction based on order in playlist.
-                        var last = playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo.ID).Count();
-                        var next = beatmapBacking.Value == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmapBacking.Value.BeatmapSetInfo.ID).Count();
+                    direction = queuedDirection.Value;
+                    queuedDirection = null;
+                }
+                else
+                {
+                    //figure out the best direction based on order in playlist.
+                    var last = playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo.ID).Count();
+                    var next = beatmapBacking.Value == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmapBacking.Value.BeatmapSetInfo.ID).Count();
 
-                        direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
-                    }
+                    direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
             }
 
