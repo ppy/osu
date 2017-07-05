@@ -8,14 +8,14 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Audio.Sample;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DialogButton : ClickableContainer
+    public class DialogButton : OsuClickableContainer
     {
         private const float hover_width = 0.9f;
         private const float hover_duration = 500;
@@ -79,8 +79,6 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public SampleChannel SampleClick, SampleHover;
-
         private readonly Container backgroundContainer;
         private readonly Container colourContainer;
         private readonly Container glowContainer;
@@ -100,8 +98,6 @@ namespace osu.Game.Graphics.UserInterface
             didClick = true;
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, EasingTypes.In);
             flash();
-            SampleClick?.Play();
-            Action?.Invoke();
 
             Delay(click_duration);
             Schedule(delegate {
@@ -110,7 +106,7 @@ namespace osu.Game.Graphics.UserInterface
                 glowContainer.FadeOut();
             });
 
-            return true;
+            return base.OnClick(state);
         }
 
         protected override bool OnHover(Framework.Input.InputState state)
@@ -119,7 +115,7 @@ namespace osu.Game.Graphics.UserInterface
 
             colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, EasingTypes.OutElastic);
             glowContainer.FadeIn(glow_fade_duration, EasingTypes.Out);
-            SampleHover?.Play();
+            base.OnHover(state);
             return true;
         }
 
