@@ -60,7 +60,7 @@ namespace osu.Game.Overlays
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
-        public override bool Contains(Vector2 screenSpacePos) => chatContainer.Contains(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.Contains(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceiveMouseInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceiveMouseInputAt(screenSpacePos);
 
         public ChatOverlay()
         {
