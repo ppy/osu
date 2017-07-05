@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Menu
             set { colourAndTriangles.Alpha = value ? 1 : 0; }
         }
 
-        public override bool Contains(Vector2 screenSpacePos) => logoContainer.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => logoContainer.ReceiveMouseInputAt(screenSpacePos);
 
         public bool Ripple
         {
