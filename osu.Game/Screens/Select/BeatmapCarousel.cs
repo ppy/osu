@@ -84,6 +84,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapCarousel()
         {
+            RelativeMouseDrag = true;
             Add(scrollableContent = new Container<Panel>
             {
                 RelativeSizeAxes = Axes.X,
