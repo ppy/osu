@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
                 throw new InvalidOperationException("OsuEnumDropdown only supports enums as the generic type argument");
 
             List<KeyValuePair<string, T>> items = new List<KeyValuePair<string, T>>();
-            foreach(var val in (T[])Enum.GetValues(typeof(T)))
+            foreach (var val in (T[])Enum.GetValues(typeof(T)))
             {
                 var field = typeof(T).GetField(Enum.GetName(typeof(T), val));
                 items.Add(

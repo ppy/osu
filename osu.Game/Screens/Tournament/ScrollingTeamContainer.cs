@@ -83,6 +83,7 @@ namespace osu.Game.Screens.Tournament
         private ScrollState scrollState
         {
             get { return _scrollState; }
+
             set
             {
                 if (_scrollState == value)
@@ -329,6 +330,7 @@ namespace osu.Game.Screens.Tournament
             public bool Selected
             {
                 get { return selected; }
+
                 set
                 {
                     selected = value;

@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Multiplayer
             Height = height;
             CornerRadius = 5;
             Masking = true;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = Color4.Black.Opacity(40),
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Multiplayer
                 },
                 avatar = new UpdateableAvatar
                 {
-                    Size = new Vector2(Height - content_padding* 2),
+                    Size = new Vector2(Height - content_padding * 2),
                     Masking = true,
                     CornerRadius = 5f,
                     Margin = new MarginPadding { Left = content_padding * 2, Top = content_padding },

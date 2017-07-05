@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     DrawableIcon.Colour = Color4.White;
                     DrawableIcon.Masking = true;
-                    DrawableIcon.EdgeEffect = new EdgeEffect
+                    DrawableIcon.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Colour = new Color4(255, 194, 224, 100),

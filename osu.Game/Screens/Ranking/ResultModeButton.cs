@@ -36,19 +36,6 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        public override bool Active
-        {
-            get
-            {
-                return base.Active;
-            }
-            set
-            {
-                base.Active = value;
-                colouredPart.FadeColour(Active ? activeColour : inactiveColour, 200, EasingTypes.OutQuint);
-            }
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -60,7 +47,7 @@ namespace osu.Game.Screens.Ranking
             activeColour = colours.PinkDarker;
             inactiveColour = OsuColour.Gray(0.8f);
 
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Colour = Color4.Black.Opacity(0.4f),
                 Type = EdgeEffectType.Shadow,
@@ -104,5 +91,9 @@ namespace osu.Game.Screens.Ranking
                 }
             };
         }
+
+        protected override void OnActivated() => colouredPart.FadeColour(activeColour, 200, EasingTypes.OutQuint);
+
+        protected override void OnDeactivated() => colouredPart.FadeColour(inactiveColour, 200, EasingTypes.OutQuint);
     }
 }

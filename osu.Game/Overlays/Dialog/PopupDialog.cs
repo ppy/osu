@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Dialog
         {
             if (args.Repeat) return false;
 
-            if (args.Key == Key.Enter)
+            if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
             {
                 Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
                 return true;
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Dialog
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.5f),

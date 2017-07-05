@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 Disc.Colour = value;
 
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Hollow = true,
                     Type = EdgeEffectType.Glow,
