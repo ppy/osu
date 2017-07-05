@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Timing
             base.InvalidateFromChild(invalidation);
         }
 
-        private Cached<double> durationBacking = new Cached<double>();
+        private Cached<double> durationBacking;
 
         private double computeDuration()
         {
