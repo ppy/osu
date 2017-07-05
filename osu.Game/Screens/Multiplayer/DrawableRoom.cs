@@ -11,13 +11,14 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Multiplayer
 {
-    public class DrawableRoom : ClickableContainer
+    public class DrawableRoom : OsuClickableContainer
     {
         private const float content_padding = 5;
         private const float height = 90;

@@ -11,10 +11,11 @@ using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsButton : ClickableContainer
+    public class BeatmapOptionsButton : OsuClickableContainer
     {
         private const float width = 130;
 
