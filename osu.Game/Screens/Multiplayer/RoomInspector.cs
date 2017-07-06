@@ -495,7 +495,7 @@ namespace osu.Game.Screens.Multiplayer
             levelRangeLower.Text = ranks.Min().ToString();
             levelRangeHigher.Text = ranks.Max().ToString();
 
-            participantsFlow.Children = value.Select(u => new UserTile(u));
+            participantsFlow.ChildrenEnumerable = value.Select(u => new UserTile(u));
         }
 
         private class UserTile : Container, IHasTooltip

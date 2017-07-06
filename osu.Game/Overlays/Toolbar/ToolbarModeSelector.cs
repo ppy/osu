@@ -113,8 +113,11 @@ namespace osu.Game.Overlays.Toolbar
         {
             base.UpdateAfterChildren();
 
-            if (!activeMode.EnsureValid())
-                activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.DrawPosition.X, 200, EasingTypes.OutQuint));
+            if (!activeMode.IsValid)
+            {
+                modeButtonLine.MoveToX(activeButton.DrawPosition.X, 200, EasingTypes.OutQuint);
+                activeMode.Validate();
+            }
         }
     }
 }
