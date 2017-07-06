@@ -439,7 +439,7 @@ namespace osu.Game.Screens.Select
                     {
                         Show();
                         if (header.Text == "Tags")
-                            content.Children = value.Split(' ').Select(text => new OsuSpriteText
+                            content.ChildrenEnumerable = value.Split(' ').Select(text => new OsuSpriteText
                             {
                                 Text = text,
                                 Font = "Exo2.0-Regular",

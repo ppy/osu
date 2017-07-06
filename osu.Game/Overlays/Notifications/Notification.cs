@@ -13,6 +13,7 @@ using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -152,7 +153,7 @@ namespace osu.Game.Overlays.Notifications
             Expire();
         }
 
-        private class CloseButton : ClickableContainer
+        private class CloseButton : OsuClickableContainer
         {
             private Color4 hoverColour;
 

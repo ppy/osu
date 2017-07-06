@@ -77,8 +77,9 @@ namespace osu.Game.Screens.Select
 
         private readonly List<Panel> panels = new List<Panel>();
 
-        private BeatmapGroup selectedGroup;
+        private readonly Stack<KeyValuePair<BeatmapGroup, BeatmapPanel>> randomSelectedBeatmaps = new Stack<KeyValuePair<BeatmapGroup, BeatmapPanel>>();
 
+        private BeatmapGroup selectedGroup;
         private BeatmapPanel selectedPanel;
 
         public BeatmapCarousel()
@@ -170,16 +171,21 @@ namespace osu.Game.Screens.Select
             } while (index != startIndex);
         }
 
-        public void SelectRandom()
+        private IEnumerable<BeatmapGroup> getVisibleGroups() => groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden);
+
+        public void SelectNextRandom()
         {
-            IEnumerable<BeatmapGroup> visibleGroups = groups.Where(selectGroup => selectGroup.State != BeatmapGroupState.Hidden);
+            randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
+
+            var visibleGroups = getVisibleGroups();
             if (!visibleGroups.Any())
                 return;
 
             BeatmapGroup group;
+
             if (randomType == SelectionRandomType.RandomPermutation)
             {
-                IEnumerable<BeatmapGroup> notSeenGroups = visibleGroups.Except(seenGroups);
+                var notSeenGroups = visibleGroups.Except(seenGroups);
                 if (!notSeenGroups.Any())
                 {
                     seenGroups.Clear();
@@ -195,6 +201,27 @@ namespace osu.Game.Screens.Select
             BeatmapPanel panel = group.BeatmapPanels[RNG.Next(group.BeatmapPanels.Count)];
 
             selectGroup(group, panel);
+        }
+
+        public void SelectPreviousRandom()
+        {
+            if (!randomSelectedBeatmaps.Any())
+                return;
+
+            var visibleGroups = getVisibleGroups();
+            if (!visibleGroups.Any())
+                return;
+
+            while (randomSelectedBeatmaps.Any())
+            {
+                var beatmapCoordinates = randomSelectedBeatmaps.Pop();
+                var group = beatmapCoordinates.Key;
+                if (visibleGroups.Contains(group))
+                {
+                    selectGroup(group, beatmapCoordinates.Value);
+                    break;
+                }
+            }
         }
 
         private FilterCriteria criteria = new FilterCriteria();

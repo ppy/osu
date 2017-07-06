@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
-                var ticksCount = ticks.Children.Count() + 1;
+                var ticksCount = ticks.Children.Count + 1;
                 var ticksHit = ticks.Children.Count(t => t.Judgement.Result == HitResult.Hit);
                 if (initialCircle.Judgement.Result == HitResult.Hit)
                     ticksHit++;
