@@ -3,6 +3,7 @@
 
 using osu.Framework.Input;
 using OpenTK.Input;
+using OpenTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -12,9 +13,10 @@ namespace osu.Game.Screens.Play
 
         public KeyCounterMouse(MouseButton button) : base(getStringRepresentation(button))
         {
-            AlwaysReceiveInput = true;
             Button = button;
         }
+
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         private static string getStringRepresentation(MouseButton button)
         {

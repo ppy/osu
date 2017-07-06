@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Select
             updateModeLight();
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || StartButton.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || StartButton.ReceiveMouseInputAt(screenSpacePos);
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 

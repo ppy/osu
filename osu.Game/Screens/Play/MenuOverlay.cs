@@ -11,7 +11,6 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 
@@ -186,18 +185,11 @@ namespace osu.Game.Screens.Play
 
         protected MenuOverlay()
         {
-            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
         }
 
         public class Button : DialogButton
         {
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
-            {
-                SampleHover = audio.Sample.Get(@"Menu/menuclick");
-                SampleClick = audio.Sample.Get(@"Menu/menuback");
-            }
         }
     }
 }
