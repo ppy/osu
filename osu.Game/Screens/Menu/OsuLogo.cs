@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Menu
 
             if (beatIndex < 0) return;
 
-            if (Hovering)
+            if (IsHovered)
             {
                 using (BeginDelayedSequence(early_activation))
                     Schedule(() => sampleBeat.Play());
