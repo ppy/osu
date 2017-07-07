@@ -15,10 +15,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private ExampleContainer container;
 
-        public override void Reset()
+        public TestCaseReplaySettingsOverlay()
         {
-            base.Reset();
-
             Add(new ReplaySettingsOverlay()
             {
                 Anchor = Anchor.TopRight,

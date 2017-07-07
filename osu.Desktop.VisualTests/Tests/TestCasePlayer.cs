@@ -33,52 +33,45 @@ namespace osu.Desktop.VisualTests.Tests
             this.db = db;
         }
 
-        public override void Reset()
+        protected override void LoadComplete()
         {
-            base.Reset();
+            base.LoadComplete();
 
             WorkingBeatmap beatmap = null;
 
-            var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.RulesetID == 0);
-            if (beatmapInfo != null)
-                beatmap = db.GetWorkingBeatmap(beatmapInfo);
+            var objects = new List<HitObject>();
 
-            if (beatmap?.Track == null)
+            int time = 1500;
+            for (int i = 0; i < 50; i++)
             {
-                var objects = new List<HitObject>();
-
-                int time = 1500;
-                for (int i = 0; i < 50; i++)
+                objects.Add(new HitCircle
                 {
-                    objects.Add(new HitCircle
-                    {
-                        StartTime = time,
-                        Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : OsuPlayfield.BASE_SIZE.X,
-                        i % 4 < 2 ? 0 : OsuPlayfield.BASE_SIZE.Y),
-                        NewCombo = i % 4 == 0
-                    });
+                    StartTime = time,
+                    Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : OsuPlayfield.BASE_SIZE.X,
+                    i % 4 < 2 ? 0 : OsuPlayfield.BASE_SIZE.Y),
+                    NewCombo = i % 4 == 0
+                });
 
-                    time += 500;
-                }
-
-                Beatmap b = new Beatmap
-                {
-                    HitObjects = objects,
-                    BeatmapInfo = new BeatmapInfo
-                    {
-                        Difficulty = new BeatmapDifficulty(),
-                        Ruleset = rulesets.Query<RulesetInfo>().First(),
-                        Metadata = new BeatmapMetadata
-                        {
-                            Artist = @"Unknown",
-                            Title = @"Sample Beatmap",
-                            Author = @"peppy",
-                        }
-                    }
-                };
-
-                beatmap = new TestWorkingBeatmap(b);
+                time += 500;
             }
+
+            Beatmap b = new Beatmap
+            {
+                HitObjects = objects,
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty(),
+                    Ruleset = rulesets.Query<RulesetInfo>().First(),
+                    Metadata = new BeatmapMetadata
+                    {
+                        Artist = @"Unknown",
+                        Title = @"Sample Beatmap",
+                        Author = @"peppy",
+                    }
+                }
+            };
+
+            beatmap = new TestWorkingBeatmap(b);
 
             Add(new Box
             {

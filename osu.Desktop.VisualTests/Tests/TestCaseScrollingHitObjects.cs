@@ -28,10 +28,8 @@ namespace osu.Desktop.VisualTests.Tests
         private OsuSpriteText bottomLabel;
         private SpriteText topTime, bottomTime;
 
-        public override void Reset()
+        public TestCaseScrollingHitObjects()
         {
-            base.Reset();
-
             timeRangeBindable = new BindableDouble(2000)
             {
                 MinValue = 200,
