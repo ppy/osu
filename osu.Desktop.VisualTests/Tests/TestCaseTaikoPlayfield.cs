@@ -29,10 +29,8 @@ namespace osu.Desktop.VisualTests.Tests
         private TaikoPlayfield playfield;
         private Container playfieldContainer;
 
-        public override void Reset()
+        public TestCaseTaikoPlayfield()
         {
-            base.Reset();
-
             AddStep("Hit!", addHitJudgement);
             AddStep("Miss :(", addMissJudgement);
             AddStep("DrumRoll", () => addDrumRoll(false));

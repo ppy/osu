@@ -16,10 +16,8 @@ namespace osu.Desktop.VisualTests.Tests
         private FailOverlay failOverlay;
         private int retryCount;
 
-        public override void Reset()
+        public TestCaseMenuOverlays()
         {
-            base.Reset();
-
             retryCount = 0;
 
             Add(pauseOverlay = new PauseContainer.PauseOverlay

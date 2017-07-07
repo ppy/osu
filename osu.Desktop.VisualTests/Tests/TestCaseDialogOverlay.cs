@@ -14,10 +14,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private DialogOverlay overlay;
 
-        public override void Reset()
+        public TestCaseDialogOverlay()
         {
-            base.Reset();
-
             Add(overlay = new DialogOverlay());
 
             AddStep("dialog #1", () => overlay.Push(new PopupDialog

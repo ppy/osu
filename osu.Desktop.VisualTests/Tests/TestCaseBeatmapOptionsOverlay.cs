@@ -13,10 +13,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Beatmap options in song select";
 
-        public override void Reset()
+        public TestCaseBeatmapOptionsOverlay()
         {
-            base.Reset();
-
             var overlay = new BeatmapOptionsOverlay();
 
             overlay.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, Color4.Purple, null, Key.Number1);

@@ -20,10 +20,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private StopwatchClock clock;
 
-        public override void Reset()
+        public TestCaseSongProgress()
         {
-            base.Reset();
-
             clock = new StopwatchClock(true);
 
             Add(progress = new SongProgress

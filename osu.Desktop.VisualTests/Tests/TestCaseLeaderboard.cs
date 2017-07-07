@@ -207,10 +207,8 @@ namespace osu.Desktop.VisualTests.Tests
             leaderboard.Scores = scores;
         }
 
-        public override void Reset()
+        public TestCaseLeaderboard()
         {
-            base.Reset();
-
             Add(leaderboard = new Leaderboard
             {
                 Origin = Anchor.Centre,

@@ -23,10 +23,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private MyContextMenuContainer container;
 
-        public override void Reset()
+        public TestCaseContextMenu()
         {
-            base.Reset();
-
             Add(container = new MyContextMenuContainer
             {
                 Size = new Vector2(200),
