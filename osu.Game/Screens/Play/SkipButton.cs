@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Play
                             if (lastState == Visibility.Hidden)
                                 FadeIn(500, EasingTypes.OutExpo);
 
-                            if (!Hovering)
+                            if (!IsHovered)
                                 using (BeginDelayedSequence(1000))
                                     scheduledHide = Schedule(() => State = Visibility.Hidden);
                             break;
