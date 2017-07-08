@@ -37,9 +37,9 @@ namespace osu.Game
 
         public APIAccess API;
 
-        protected override Container<Drawable> Content => ratioContainer;
+        private Container content;
 
-        private RatioAdjust ratioContainer;
+        protected override Container<Drawable> Content => content;
 
         protected MenuCursor Cursor;
 
@@ -146,21 +146,19 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            base.Content.Add(ratioContainer = new RatioAdjust
+            base.Content.Add(new RatioAdjust
             {
                 Children = new Drawable[]
                 {
-                    new Container
+                    Cursor = new MenuCursor(),
+                    new OsuTooltipContainer(Cursor)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Depth = float.MinValue,
-                        Children = new Drawable[]
+                        Child = content = new OsuContextMenuContainer
                         {
-                            Cursor = new MenuCursor(),
-                            new OsuContextMenuContainer(Cursor) { Depth = -2 },
-                            new OsuTooltipContainer(Cursor) { Depth = -1 },
-                        }
-                    },
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    }
                 }
             });
 

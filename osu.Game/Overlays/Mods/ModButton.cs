@@ -151,8 +151,8 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleOn = audio.Sample.Get(@"Checkbox/check-on");
-            sampleOff = audio.Sample.Get(@"Checkbox/check-off");
+            sampleOn = audio.Sample.Get(@"UI/check-on");
+            sampleOff = audio.Sample.Get(@"UI/check-off");
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.Mods
 
         public void SelectNext()
         {
-            (++SelectedIndex == -1 ? sampleOff : sampleOn).Play();
+            (++SelectedIndex == Mods.Length ? sampleOff : sampleOn).Play();
             Action?.Invoke(SelectedMod);
         }
 

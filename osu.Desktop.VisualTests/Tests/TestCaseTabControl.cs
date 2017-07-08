@@ -14,10 +14,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Filter for song select";
 
-        public override void Reset()
+        public TestCaseTabControl()
         {
-            base.Reset();
-
             OsuSpriteText text;
             OsuTabControl<GroupMode> filter;
             Add(filter = new OsuTabControl<GroupMode>
