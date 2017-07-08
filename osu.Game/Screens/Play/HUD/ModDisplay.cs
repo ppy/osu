@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Play.HUD
             if (!playIsRanked)
                 unrankedText.FadeInFromZero(fade_duration, EasingTypes.OutQuint);
             else
-                unrankedText.FadeTo(0);
+                unrankedText.Hide();
 
             iconsContainer.Flush();
             iconsContainer.FadeInFromZero(fade_duration, EasingTypes.OutQuint);
