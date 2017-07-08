@@ -27,9 +27,9 @@ namespace osu.Desktop.VisualTests.Tests
             this.rulesets = rulesets;
         }
 
-        public override void Reset()
+        protected override void LoadComplete()
         {
-            base.Reset();
+            base.LoadComplete();
 
             Add(modSelect = new ModSelectOverlay
             {

@@ -281,10 +281,13 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
-            database.BeatmapSetAdded -= onBeatmapSetAdded;
-            database.BeatmapSetRemoved -= onBeatmapSetRemoved;
+            if (database != null)
+            {
+                database.BeatmapSetAdded -= onBeatmapSetAdded;
+                database.BeatmapSetRemoved -= onBeatmapSetRemoved;
+            }
 
-            initialAddSetsTask.Cancel();
+            initialAddSetsTask?.Cancel();
         }
 
         private void changeBackground(WorkingBeatmap beatmap)
