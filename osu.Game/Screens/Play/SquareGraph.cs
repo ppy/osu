@@ -77,7 +77,12 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             base.Update();
-            layout.Refresh(recreateGraph);
+
+            if (!layout.IsValid)
+            {
+                recreateGraph();
+                layout.Validate();
+            }
         }
 
         /// <summary>

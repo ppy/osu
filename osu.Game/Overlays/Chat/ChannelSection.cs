@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Chat
 
         public IEnumerable<Channel> Channels
         {
-            set { ChannelFlow.Children = value.Select(c => new ChannelListItem(c)); }
+            set { ChannelFlow.ChildrenEnumerable = value.Select(c => new ChannelListItem(c)); }
         }
 
         public ChannelSection()
