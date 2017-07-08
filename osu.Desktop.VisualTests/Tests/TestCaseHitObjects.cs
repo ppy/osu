@@ -77,8 +77,8 @@ namespace osu.Desktop.VisualTests.Tests
         private HitObjectType mode = HitObjectType.Slider;
 
         private readonly BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
-        private Container playfieldContainer;
-        private Container approachContainer;
+        private readonly Container playfieldContainer;
+        private readonly Container approachContainer;
 
         private void loadHitobjects(HitObjectType mode)
         {

@@ -12,10 +12,10 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Display dialogs";
 
-        private DialogOverlay overlay;
-
         public TestCaseDialogOverlay()
         {
+            DialogOverlay overlay;
+
             Add(overlay = new DialogOverlay());
 
             AddStep("dialog #1", () => overlay.Push(new PopupDialog

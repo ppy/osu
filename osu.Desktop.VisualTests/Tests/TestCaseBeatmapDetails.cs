@@ -13,7 +13,7 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => "BeatmapDetails tab of BeatmapDetailArea";
 
-        private BeatmapDetails details;
+        private readonly BeatmapDetails details;
 
         public TestCaseBeatmapDetails()
         {

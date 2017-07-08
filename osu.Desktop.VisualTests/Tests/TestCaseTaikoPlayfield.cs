@@ -26,8 +26,8 @@ namespace osu.Desktop.VisualTests.Tests
         protected override double TimePerAction => default_duration * 2;
 
         private readonly Random rng = new Random(1337);
-        private TaikoPlayfield playfield;
-        private Container playfieldContainer;
+        private readonly TaikoPlayfield playfield;
+        private readonly Container playfieldContainer;
 
         public TestCaseTaikoPlayfield()
         {

@@ -10,7 +10,7 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests the settings overlay";
 
-        private SettingsOverlay settings;
+        private readonly SettingsOverlay settings;
 
         public TestCaseSettings()
         {

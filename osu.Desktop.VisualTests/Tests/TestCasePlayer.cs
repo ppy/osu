@@ -20,23 +20,19 @@ namespace osu.Desktop.VisualTests.Tests
     internal class TestCasePlayer : TestCase
     {
         protected Player Player;
-        private BeatmapDatabase db;
         private RulesetDatabase rulesets;
 
         public override string Description => @"Showing everything to play the game.";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDatabase db, RulesetDatabase rulesets)
+        private void load(RulesetDatabase rulesets)
         {
             this.rulesets = rulesets;
-            this.db = db;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            WorkingBeatmap beatmap = null;
 
             var objects = new List<HitObject>();
 
@@ -70,7 +66,7 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             };
 
-            beatmap = new TestWorkingBeatmap(b);
+            WorkingBeatmap beatmap = new TestWorkingBeatmap(b);
 
             Add(new Box
             {

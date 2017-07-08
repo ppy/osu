@@ -13,10 +13,10 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => "graph";
 
-        private BarGraph graph;
-
         public TestCaseGraph()
         {
+            BarGraph graph;
+
             Children = new[]
             {
                 graph = new BarGraph
