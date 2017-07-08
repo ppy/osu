@@ -13,11 +13,9 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => "graph";
 
-        private BarGraph graph;
-
-        public override void Reset()
+        public TestCaseGraph()
         {
-            base.Reset();
+            BarGraph graph;
 
             Children = new[]
             {

@@ -12,10 +12,11 @@ using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelListItem : ClickableContainer, IFilterable
+    public class ChannelListItem : OsuClickableContainer, IFilterable
     {
         private const float width_padding = 5;
         private const float channel_width = 150;

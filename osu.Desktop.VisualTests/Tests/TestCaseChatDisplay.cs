@@ -11,10 +11,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Testing chat api and overlay";
 
-        public override void Reset()
+        public TestCaseChatDisplay()
         {
-            base.Reset();
-
             Add(new ChatOverlay
             {
                 State = Visibility.Visible
