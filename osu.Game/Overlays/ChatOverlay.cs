@@ -194,7 +194,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnDragStart(InputState state)
         {
-            if (!channelTabs.Hovering)
+            if (!channelTabs.IsHovered)
                 return base.OnDragStart(state);
 
             startDragChatHeight = chatHeight.Value;
