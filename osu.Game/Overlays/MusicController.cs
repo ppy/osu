@@ -24,10 +24,11 @@ using osu.Framework.Threading;
 using osu.Game.Overlays.Music;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class MusicController : FocusedOverlayContainer
+    public class MusicController : OsuFocusedOverlayContainer
     {
         private const float player_height = 130;
 

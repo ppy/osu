@@ -25,10 +25,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         protected override double TimePerAction => 200;
 
-        public override void Reset()
+        public TestCaseManiaPlayfield()
         {
-            base.Reset();
-
             Action<int, SpecialColumnPosition> createPlayfield = (cols, pos) =>
             {
                 Clear();

@@ -28,9 +28,9 @@ namespace osu.Desktop.VisualTests.Tests
 
         private WorkingBeatmap beatmap;
 
-        public override void Reset()
+        protected override void LoadComplete()
         {
-            base.Reset();
+            base.LoadComplete();
 
             if (beatmap == null)
             {
@@ -38,8 +38,6 @@ namespace osu.Desktop.VisualTests.Tests
                 if (beatmapInfo != null)
                     beatmap = db.GetWorkingBeatmap(beatmapInfo);
             }
-
-            base.Reset();
 
             Add(new Results(new Score
             {

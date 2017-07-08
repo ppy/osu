@@ -76,6 +76,8 @@
     <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
+    <Compile Include="Graphics\Containers\OsuClickableContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuFocusedOverlayContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuContextMenuContainer.cs" />
     <Compile Include="Graphics\UserInterface\IconButton.cs" />
     <Compile Include="Configuration\SelectionRandomType.cs" />
