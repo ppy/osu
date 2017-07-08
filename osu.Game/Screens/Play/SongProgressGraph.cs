@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play
             set
             {
                 objects = value;
-                
+
                 const int granularity = 200;
                 Values = new int[granularity];
 
