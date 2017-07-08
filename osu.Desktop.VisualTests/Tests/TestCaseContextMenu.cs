@@ -21,10 +21,10 @@ namespace osu.Desktop.VisualTests.Tests
         private const int start_time = 0;
         private const int duration = 1000;
 
-        private MyContextMenuContainer container;
-
         public TestCaseContextMenu()
         {
+            MyContextMenuContainer container;
+
             Add(container = new MyContextMenuContainer
             {
                 Size = new Vector2(200),

@@ -21,15 +21,16 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => "SpeedAdjustmentContainer/DrawableTimingSection";
 
-        private SpeedAdjustmentCollection adjustmentCollection;
-
-        private BindableDouble timeRangeBindable;
-        private OsuSpriteText timeRangeText;
-        private OsuSpriteText bottomLabel;
-        private SpriteText topTime, bottomTime;
+        private readonly BindableDouble timeRangeBindable;
+        private readonly OsuSpriteText bottomLabel;
+        private readonly SpriteText topTime;
+        private readonly SpriteText bottomTime;
 
         public TestCaseScrollingHitObjects()
         {
+            OsuSpriteText timeRangeText;
+            SpeedAdjustmentCollection adjustmentCollection;
+
             timeRangeBindable = new BindableDouble(2000)
             {
                 MinValue = 200,

@@ -13,13 +13,11 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests music controller ui.";
 
-        private MusicController mc;
-
         public TestCaseMusicController()
         {
             Clock = new FramedClock();
 
-            mc = new MusicController
+            var mc = new MusicController
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre

@@ -12,13 +12,12 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests pause and fail overlays";
 
-        private PauseContainer.PauseOverlay pauseOverlay;
-        private FailOverlay failOverlay;
-        private int retryCount;
-
         public TestCaseMenuOverlays()
         {
-            retryCount = 0;
+            FailOverlay failOverlay;
+            PauseContainer.PauseOverlay pauseOverlay;
+
+            var retryCount = 0;
 
             Add(pauseOverlay = new PauseContainer.PauseOverlay
             {
@@ -32,14 +31,16 @@ namespace osu.Desktop.VisualTests.Tests
                 OnQuit = () => Logger.Log(@"Quit"),
             });
 
-            AddStep(@"Pause", delegate {
+            AddStep(@"Pause", delegate
+            {
                 if (failOverlay.State == Visibility.Visible)
                 {
                     failOverlay.Hide();
                 }
                 pauseOverlay.Show();
             });
-            AddStep("Fail", delegate {
+            AddStep("Fail", delegate
+            {
                 if (pauseOverlay.State == Visibility.Visible)
                 {
                     pauseOverlay.Hide();
