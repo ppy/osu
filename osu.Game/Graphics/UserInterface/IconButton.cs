@@ -9,10 +9,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class IconButton : ClickableContainer
+    public class IconButton : OsuClickableContainer
     {
         private readonly TextAwesome icon;
         private readonly Box hover;

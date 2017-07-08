@@ -11,10 +11,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"breadcrumb > control";
 
-        public override void Reset()
+        public TestCaseBreadcrumbs()
         {
-            base.Reset();
-
             BreadcrumbControl<BreadcrumbTab> c;
             Add(c = new BreadcrumbControl<BreadcrumbTab>
             {
