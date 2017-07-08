@@ -31,6 +31,7 @@ namespace osu.Game.Users
 
             Add(new Sprite
             {
+                RelativeSizeAxes = Axes.Both,
                 Texture = texture,
                 FillMode = FillMode.Fit,
                 Anchor = Anchor.Centre,
