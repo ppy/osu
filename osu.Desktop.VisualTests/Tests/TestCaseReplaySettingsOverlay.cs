@@ -13,13 +13,11 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Settings visible in replay/auto";
 
-        private ExampleContainer container;
-
-        public override void Reset()
+        public TestCaseReplaySettingsOverlay()
         {
-            base.Reset();
+            ExampleContainer container;
 
-            Add(new ReplaySettingsOverlay()
+            Add(new ReplaySettingsOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,

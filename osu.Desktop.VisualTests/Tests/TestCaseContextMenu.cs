@@ -21,11 +21,9 @@ namespace osu.Desktop.VisualTests.Tests
         private const int start_time = 0;
         private const int duration = 1000;
 
-        private MyContextMenuContainer container;
-
-        public override void Reset()
+        public TestCaseContextMenu()
         {
-            base.Reset();
+            MyContextMenuContainer container;
 
             Add(container = new MyContextMenuContainer
             {

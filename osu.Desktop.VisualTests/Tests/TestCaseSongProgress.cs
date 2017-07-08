@@ -15,15 +15,13 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"With fake data";
 
-        private SongProgress progress;
-        private SongProgressGraph graph;
+        private readonly SongProgress progress;
+        private readonly SongProgressGraph graph;
 
-        private StopwatchClock clock;
+        private readonly StopwatchClock clock;
 
-        public override void Reset()
+        public TestCaseSongProgress()
         {
-            base.Reset();
-
             clock = new StopwatchClock(true);
 
             Add(progress = new SongProgress
