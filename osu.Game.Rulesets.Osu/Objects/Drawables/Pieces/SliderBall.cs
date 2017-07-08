@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             base.Update();
 
             if (Time.Current < slider.EndTime)
-                Tracking = canCurrentlyTrack && lastState != null && Contains(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
+                Tracking = canCurrentlyTrack && lastState != null && ReceiveMouseInputAt(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
         }
 
         public void UpdateProgress(double progress, int repeat)

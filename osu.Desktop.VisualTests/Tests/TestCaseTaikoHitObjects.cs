@@ -16,10 +16,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private bool kiai;
 
-        public override void Reset()
+        public TestCaseTaikoHitObjects()
         {
-            base.Reset();
-
             AddToggleStep("Kiai", b =>
             {
                 kiai = !kiai;
