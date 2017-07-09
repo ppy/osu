@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Lists;
 using System;
 using System.Globalization;
+using osu.Framework.Allocation;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -27,11 +28,6 @@ namespace osu.Desktop.VisualTests.Tests
         public TestCaseBeatSyncedContainer()
         {
             Clock = new FramedClock();
-        }
-
-        public override void Reset()
-        {
-            base.Reset();
             Clock.ProcessFrame();
 
             Add(new BeatContainer
@@ -45,7 +41,12 @@ namespace osu.Desktop.VisualTests.Tests
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,
             });
-            mc.State = Visibility.Visible;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            mc.ToggleVisibility();
         }
 
         private class BeatContainer : BeatSyncedContainer
@@ -140,6 +141,8 @@ namespace osu.Desktop.VisualTests.Tests
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+                if (beatIndex < 0) return;
 
                 timingPointCount.Value = timingPoints.Count;
                 currentTimingPoint.Value = timingPoints.IndexOf(timingPoint) + 1;
