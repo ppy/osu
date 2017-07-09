@@ -157,8 +157,6 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if (beatIndex < 0) return;
-
                 timingPointCount.Value = timingPoints.Count;
                 currentTimingPoint.Value = timingPoints.IndexOf(timingPoint) + 1;
                 beatCount.Value = calculateBeatCount(timingPoint);
