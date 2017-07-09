@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
@@ -24,7 +25,7 @@ namespace osu.Game.Screens.Menu
 
         internal override bool ShowOverlays => buttons.State != MenuState.Initial;
 
-        private readonly BackgroundScreen background;
+        private readonly BackgroundScreenDefault background;
         private Screen songSelect;
 
         protected override BackgroundScreen CreateBackground() => background;
@@ -64,6 +65,12 @@ namespace osu.Game.Screens.Menu
             buttons.OnDirect = game.ToggleDirect;
 
             preloadSongSelect();
+        }
+
+        protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
+        {
+            base.OnBeatmapChanged(beatmap);
+            background.Next();
         }
 
         private void preloadSongSelect()
@@ -110,6 +117,8 @@ namespace osu.Game.Screens.Menu
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
+
+            background.Next();
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();

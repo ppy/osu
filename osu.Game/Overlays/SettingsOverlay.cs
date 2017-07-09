@@ -15,7 +15,7 @@ using osu.Game.Overlays.Settings.Sections;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsOverlay : FocusedOverlayContainer
+    public class SettingsOverlay : OsuFocusedOverlayContainer
     {
         internal const float CONTENT_MARGINS = 10;
 
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays
                         new SidebarButton
                         {
                             Section = section,
-                            Action = sectionsContainer.ScrollContainer.ScrollIntoView,
+                            Action = b => sectionsContainer.ScrollContainer.ScrollTo(b),
                         }
                     ).ToArray()
                 }
