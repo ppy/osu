@@ -161,8 +161,8 @@ namespace osu.Desktop.VisualTests.Tests
                 currentTimingPoint.Value = timingPoints.IndexOf(timingPoint) + 1;
                 beatCount.Value = calculateBeatCount(timingPoint);
                 currentBeat.Value = beatIndex + 1;
-                beatsPerMinute.Value = (float)Math.Round(60000 / timingPoint.BeatLength, 1);
-                adjustedBeatLength.Value = (float)timingPoint.BeatLength;
+                beatsPerMinute.Value = 60000 / timingPoint.BeatLength;
+                adjustedBeatLength.Value = timingPoint.BeatLength;
 
                 flashLayer.ClearTransforms();
                 flashLayer.FadeTo(1);
@@ -177,9 +177,9 @@ namespace osu.Desktop.VisualTests.Tests
 
             private readonly OsuSpriteText valueText;
 
-            public float Value
+            public double Value
             {
-                set { valueText.Text = value.ToString(); }
+                set { valueText.Text = $"{value:G}"; }
             }
 
             public InfoString(string header)
