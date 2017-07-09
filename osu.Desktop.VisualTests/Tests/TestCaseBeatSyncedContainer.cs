@@ -158,9 +158,9 @@ namespace osu.Desktop.VisualTests.Tests
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
                 timingPointCount.Value = timingPoints.Count;
-                currentTimingPoint.Value = timingPoints.IndexOf(timingPoint) + 1;
+                currentTimingPoint.Value = timingPoints.IndexOf(timingPoint);
                 beatCount.Value = calculateBeatCount(timingPoint);
-                currentBeat.Value = beatIndex + 1;
+                currentBeat.Value = beatIndex;
                 beatsPerMinute.Value = 60000 / timingPoint.BeatLength;
                 adjustedBeatLength.Value = timingPoint.BeatLength;
 
