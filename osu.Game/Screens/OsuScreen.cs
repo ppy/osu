@@ -8,6 +8,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using OpenTK;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Audio;
 
 namespace osu.Game.Screens
 {
@@ -33,6 +35,8 @@ namespace osu.Game.Screens
 
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
+        private SampleChannel sampleExit;
+
         public WorkingBeatmap Beatmap
         {
             get
@@ -46,7 +50,7 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGameBase game, OsuGame osuGame)
+        private void load(OsuGameBase game, OsuGame osuGame, AudioManager audio)
         {
             if (game != null)
             {
@@ -59,6 +63,8 @@ namespace osu.Game.Screens
 
             if (osuGame != null)
                 ruleset.BindTo(osuGame.Ruleset);
+
+            sampleExit = audio.Sample.Get(@"UI/melodic-1");
         }
 
         protected override void LoadComplete()
@@ -80,6 +86,12 @@ namespace osu.Game.Screens
             if (!IsCurrentScreen) return;
 
             ruleset.Disabled = !AllowRulesetChange;
+        }
+
+        protected override void OnResuming(Screen last)
+        {
+            base.OnResuming(last);
+            sampleExit?.Play();
         }
 
         protected override void OnEntering(Screen last)
