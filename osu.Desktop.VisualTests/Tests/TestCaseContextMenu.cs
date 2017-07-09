@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
@@ -21,7 +20,7 @@ namespace osu.Desktop.VisualTests.Tests
         private const int start_time = 0;
         private const int duration = 1000;
 
-        private Container container;
+        private readonly Container container;
 
         public TestCaseContextMenu()
         {
