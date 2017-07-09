@@ -16,6 +16,7 @@ using osu.Framework.Lists;
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -68,22 +69,36 @@ namespace osu.Desktop.VisualTests.Tests
                 AutoSizeAxes = Axes.Y;
                 Children = new Drawable[]
                 {
-                    new FillFlowContainer
+                    new Container
                     {
                         Name = @"Info Layer",
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Both,
-                        Margin = new MarginPadding { Bottom = flash_layer_heigth, },
+                        Margin = new MarginPadding { Bottom = flash_layer_heigth },
                         Children = new Drawable[]
                         {
-                            timingPointCount = new InfoString(@"Timing points amount"),
-                            currentTimingPoint = new InfoString(@"Current timing point"),
-                            beatCount = new InfoString(@"Beats amount (in the current timing point)"),
-                            currentBeat = new InfoString(@"Current beat"),
-                            beatsPerMinute = new InfoString(@"BPM"),
-                            adjustedBeatLength = new InfoString(@"Adjusted beat length"),
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Black.Opacity(150),
+                            },
+                            new FillFlowContainer
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    timingPointCount = new InfoString(@"Timing points amount"),
+                                    currentTimingPoint = new InfoString(@"Current timing point"),
+                                    beatCount = new InfoString(@"Beats amount (in the current timing point)"),
+                                    currentBeat = new InfoString(@"Current beat"),
+                                    beatsPerMinute = new InfoString(@"BPM"),
+                                    adjustedBeatLength = new InfoString(@"Adjusted beat length"),
+                                }
+                            }
                         }
                     },
                     new Container
@@ -182,7 +197,7 @@ namespace osu.Desktop.VisualTests.Tests
                 Direction = FillDirection.Horizontal;
                 Add(new OsuSpriteText { Text = header + @": ", TextSize = text_size });
                 Add(valueText = new OsuSpriteText() { TextSize = text_size });
-                Margin = new MarginPadding { Vertical = margin, };
+                Margin = new MarginPadding { Vertical = margin, Horizontal = margin };
             }
         }
     }
