@@ -44,9 +44,9 @@ namespace osu.Desktop.VisualTests.Tests
             });
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
             mc.ToggleVisibility();
         }
 
@@ -147,7 +147,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             private int calculateBeatCount(TimingControlPoint current)
             {
-                if (timingPoints.IndexOf(current) + 1 == timingPoints.Count)
+                if (timingPoints[timingPoints.Count - 1] == current)
                     return (int)Math.Ceiling((Beatmap.Value.Track.Length - current.Time) / current.BeatLength);
 
                 return (int)Math.Ceiling((getNextTimingPoint(current).Time - current.Time) / current.BeatLength);
@@ -177,16 +177,9 @@ namespace osu.Desktop.VisualTests.Tests
 
             private readonly OsuSpriteText valueText;
 
-            private float? value;
             public float Value
             {
-                set
-                {
-                    if (value == this.value) return;
-                    this.value = value;
-
-                    valueText.Text = value.ToString(CultureInfo.CurrentCulture);
-                }
+                set { valueText.Text = value.ToString(); }
             }
 
             public InfoString(string header)
