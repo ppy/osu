@@ -23,6 +23,11 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected double EarlyActivationMilliseconds;
 
+        /// <summary>
+        /// The time in milliseconds until the next beat.
+        /// </summary>
+        public double TimeUntilNextBeat { get; private set; }
+
         protected override void Update()
         {
             if (Beatmap.Value?.Track == null)
@@ -42,12 +47,12 @@ namespace osu.Game.Graphics.Containers
             if (currentTrackTime < timingPoint.Time)
                 beatIndex--;
 
+            TimeUntilNextBeat = (timingPoint.Time - currentTrackTime) % timingPoint.BeatLength;
+
             if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
                 return;
 
-            double offsetFromBeat = (timingPoint.Time - currentTrackTime) % timingPoint.BeatLength;
-
-            using (BeginDelayedSequence(offsetFromBeat, true))
+            using (BeginDelayedSequence(TimeUntilNextBeat, true))
                 OnNewBeat(beatIndex, timingPoint, effectPoint, Beatmap.Value.Track.CurrentAmplitudes);
 
             lastBeat = beatIndex;
