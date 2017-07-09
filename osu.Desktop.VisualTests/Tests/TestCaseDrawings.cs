@@ -12,10 +12,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => "Tournament drawings";
 
-        public override void Reset()
+        public TestCaseDrawings()
         {
-            base.Reset();
-
             Add(new Drawings
             {
                 TeamList = new TestTeamList(),

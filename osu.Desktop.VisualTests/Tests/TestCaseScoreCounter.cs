@@ -15,10 +15,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests multiple counters";
 
-        public override void Reset()
+        public TestCaseScoreCounter()
         {
-            base.Reset();
-
             int numerator = 0, denominator = 0;
 
             ScoreCounter score = new ScoreCounter(7)

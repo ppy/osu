@@ -15,9 +15,9 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Select your favourite room";
 
-        public override void Reset()
+        protected override void LoadComplete()
         {
-            base.Reset();
+            base.LoadComplete();
 
             DrawableRoom first;
             DrawableRoom second;

@@ -13,10 +13,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Main menu button system";
 
-        public override void Reset()
+        public TestCaseMenuButtonSystem()
         {
-            base.Reset();
-
             Add(new Box
             {
                 ColourInfo = ColourInfo.GradientVertical(Color4.Gray, Color4.WhiteSmoke),
