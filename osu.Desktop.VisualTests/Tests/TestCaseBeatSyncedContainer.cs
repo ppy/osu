@@ -14,8 +14,6 @@ using OpenTK.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Lists;
 using System;
-using System.Globalization;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Desktop.VisualTests.Tests
