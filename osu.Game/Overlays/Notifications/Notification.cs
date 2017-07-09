@@ -213,7 +213,7 @@ namespace osu.Game.Overlays.Notifications
                     if (pulsate)
                     {
                         const float length = 1000;
-                        using (pulsateLayer.BeginLoopedSequece(length / 2))
+                        using (pulsateLayer.BeginLoopedSequence(length / 2))
                         {
                             pulsateLayer.FadeTo(0.4f, length, EasingTypes.In);
                             using (pulsateLayer.BeginDelayedSequence(length))

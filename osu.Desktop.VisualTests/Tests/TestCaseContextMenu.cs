@@ -60,7 +60,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.LoadComplete();
 
-            using (container.BeginLoopedSequece())
+            using (container.BeginLoopedSequence())
             {
                 container.MoveTo(new Vector2(0, 100), duration);
                 using (container.BeginDelayedSequence(duration))

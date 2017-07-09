@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            using (spinner.BeginLoopedSequece())
+            using (spinner.BeginLoopedSequence())
                 spinner.RotateTo(360, 2000);
         }
 
