@@ -23,7 +23,7 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests beat synced containers.";
 
-        private MusicController mc;
+        private readonly MusicController mc;
 
         public TestCaseBeatSyncedContainer()
         {
