@@ -58,6 +58,8 @@ namespace osu.Desktop.VisualTests.Tests
             private readonly InfoString currentBeat;
             private readonly InfoString beatsPerMinute;
             private readonly InfoString adjustedBeatLength;
+            private readonly InfoString timeUntilNextBeat;
+            private readonly InfoString timeSinceLastBeat;
 
             private readonly Box flashLayer;
 
@@ -95,6 +97,8 @@ namespace osu.Desktop.VisualTests.Tests
                                     currentBeat = new InfoString(@"Current beat"),
                                     beatsPerMinute = new InfoString(@"BPM"),
                                     adjustedBeatLength = new InfoString(@"Adjusted beat length"),
+                                    timeUntilNextBeat = new InfoString(@"Time until next beat"),
+                                    timeSinceLastBeat = new InfoString(@"Time since last beat"),
                                 }
                             }
                         }
@@ -131,6 +135,8 @@ namespace osu.Desktop.VisualTests.Tests
                     currentBeat.Value = 0;
                     beatsPerMinute.Value = 0;
                     adjustedBeatLength.Value = 0;
+                    timeUntilNextBeat.Value = 0;
+                    timeSinceLastBeat.Value = 0;
                 };
             }
 
@@ -149,6 +155,13 @@ namespace osu.Desktop.VisualTests.Tests
                     return (int)Math.Ceiling((Beatmap.Value.Track.Length - current.Time) / current.BeatLength);
 
                 return (int)Math.Ceiling((getNextTimingPoint(current).Time - current.Time) / current.BeatLength);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                timeUntilNextBeat.Value = TimeUntilNextBeat;
+                timeSinceLastBeat.Value = TimeSinceLastBeat;
             }
 
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
