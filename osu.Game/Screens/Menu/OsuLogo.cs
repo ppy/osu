@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Menu
             set { colourAndTriangles.Alpha = value ? 1 : 0; }
         }
 
-        public override bool Contains(Vector2 screenSpacePos) => logoContainer.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => logoContainer.ReceiveMouseInputAt(screenSpacePos);
 
         public bool Ripple
         {
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Menu
 
             if (beatIndex < 0) return;
 
-            if (Hovering)
+            if (IsHovered)
             {
                 using (BeginDelayedSequence(early_activation))
                     Schedule(() => sampleBeat.Play());

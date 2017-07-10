@@ -163,6 +163,7 @@ namespace osu.Game.Screens.Ranking
                                     {
                                         new Sprite
                                         {
+                                            RelativeSizeAxes = Axes.Both,
                                             Alpha = 0.2f,
                                             Texture = Beatmap?.Background,
                                             Anchor = Anchor.Centre,
