@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private class TransformTimeSpan : Transform<double, Drawable>
         {
-            public virtual double CurrentValue
+            public double CurrentValue
             {
                 get
                 {

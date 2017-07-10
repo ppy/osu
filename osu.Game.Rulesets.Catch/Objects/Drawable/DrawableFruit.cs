@@ -11,11 +11,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     internal class DrawableFruit : Sprite
     {
-        private readonly CatchBaseHit h;
+        //private readonly CatchBaseHit h;
 
         public DrawableFruit(CatchBaseHit h)
         {
-            this.h = h;
+            //this.h = h;
 
             Origin = Anchor.Centre;
             Scale = new Vector2(0.1f);
