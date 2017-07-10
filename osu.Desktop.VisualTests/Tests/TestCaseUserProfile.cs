@@ -13,9 +13,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => "Tests user's profile page.";
 
-        public override void Reset()
+        public TestCaseUserProfile()
         {
-            base.Reset();
             var profile = new UserProfileOverlay();
             Add(profile);
 
