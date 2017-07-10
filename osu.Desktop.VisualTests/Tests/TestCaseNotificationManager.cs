@@ -34,7 +34,7 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep(@"simple #2", sendNotification2);
             AddStep(@"progress #1", sendProgress1);
             AddStep(@"progress #2", sendProgress2);
-            //AddStep(@"barrage", () => sendBarrage());
+            AddStep(@"barrage", () => sendBarrage());
         }
 
         private void sendBarrage(int remaining = 100)

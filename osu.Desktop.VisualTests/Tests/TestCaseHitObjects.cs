@@ -34,9 +34,9 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddStep(@"circles", () => loadHitobjects(HitObjectType.Circle));
             AddStep(@"slider", () => loadHitobjects(HitObjectType.Slider));
-            //AddStep(@"spinner", () => loadHitobjects(HitObjectType.Spinner));
+            AddStep(@"spinner", () => loadHitobjects(HitObjectType.Spinner));
 
-            //AddToggleStep(@"auto", state => { auto = state; loadHitobjects(mode); });
+            AddToggleStep(@"auto", state => { auto = state; loadHitobjects(mode); });
 
             BasicSliderBar<double> sliderBar;
             Add(new Container
@@ -87,7 +87,7 @@ namespace osu.Desktop.VisualTests.Tests
             switch (mode)
             {
                 case HitObjectType.Circle:
-                    const int count = 1;
+                    const int count = 10;
 
                     for (int i = 0; i < count; i++)
                     {
