@@ -16,10 +16,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests display of icons";
 
-        public override void Reset()
+        public TestCaseTextAwesome()
         {
-            base.Reset();
-
             FillFlowContainer flow;
 
             Add(flow = new FillFlowContainer

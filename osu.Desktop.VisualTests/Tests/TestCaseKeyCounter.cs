@@ -20,10 +20,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests key counter";
 
-        public override void Reset()
+        public TestCaseKeyCounter()
         {
-            base.Reset();
-
             KeyCounterCollection kc = new KeyCounterCollection
             {
                 Origin = Anchor.Centre,

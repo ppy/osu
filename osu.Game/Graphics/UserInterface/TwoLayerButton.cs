@@ -169,7 +169,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public override bool Contains(Vector2 screenSpacePos) => IconLayer.Contains(screenSpacePos) || TextLayer.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => IconLayer.ReceiveMouseInputAt(screenSpacePos) || TextLayer.ReceiveMouseInputAt(screenSpacePos);
 
         protected override bool OnHover(InputState state)
         {

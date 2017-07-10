@@ -17,9 +17,9 @@ namespace osu.Desktop.VisualTests.Tests
 
         private RulesetDatabase rulesets;
 
-        public override void Reset()
+        protected override void LoadComplete()
         {
-            base.Reset();
+            base.LoadComplete();
 
             var room = new Room
             {

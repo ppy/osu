@@ -80,14 +80,9 @@ namespace osu.Game.Rulesets.Timing
             base.InvalidateFromChild(invalidation);
         }
 
-        private Cached<double> durationBacking = new Cached<double>();
-        /// <summary>
-        /// The maximum duration of any one hit object inside this <see cref="DrawableTimingSection"/>. This is calculated as the maximum
-        /// end time between all hit objects relative to this <see cref="DrawableTimingSection"/>'s <see cref="MultiplierControlPoint.StartTime"/>.
-        /// </summary>
-        public double Duration => durationBacking.EnsureValid()
-            ? durationBacking.Value
-            : durationBacking.Refresh(() =>
+        private Cached<double> durationBacking;
+
+        private double computeDuration()
         {
             if (!Children.Any())
                 return 0;
@@ -117,7 +112,13 @@ namespace osu.Game.Rulesets.Timing
             baseDuration *= 1 + maxAbsoluteSize / ourAbsoluteSize;
 
             return baseDuration;
-        });
+        }
+
+        /// <summary>
+        /// The maximum duration of any one hit object inside this <see cref="DrawableTimingSection"/>. This is calculated as the maximum
+        /// end time between all hit objects relative to this <see cref="DrawableTimingSection"/>'s <see cref="MultiplierControlPoint.StartTime"/>.
+        /// </summary>
+        public double Duration => durationBacking.IsValid ? durationBacking : (durationBacking.Value = computeDuration());
 
         protected override void Update()
         {

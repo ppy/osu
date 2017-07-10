@@ -187,6 +187,7 @@
   <ItemGroup>
     <Compile Include="AutomatedVisualTestGame.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Tests\TestCaseBeatSyncedContainer.cs" />
     <Compile Include="Tests\TestCaseChatDisplay.cs" />
     <Compile Include="Tests\TestCaseBeatmapDetails.cs" />
     <Compile Include="Tests\TestCaseContextMenu.cs" />

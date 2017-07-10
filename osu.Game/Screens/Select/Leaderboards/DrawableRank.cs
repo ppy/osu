@@ -31,6 +31,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 rankSprite = new Sprite
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fit

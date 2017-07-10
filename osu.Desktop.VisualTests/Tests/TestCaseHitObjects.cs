@@ -29,15 +29,58 @@ namespace osu.Desktop.VisualTests.Tests
             var rateAdjustClock = new StopwatchClock(true);
             framedClock = new FramedClock(rateAdjustClock);
             playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
+
+            playbackSpeed.TriggerChange();
+
+            AddStep(@"circles", () => loadHitobjects(HitObjectType.Circle));
+            AddStep(@"slider", () => loadHitobjects(HitObjectType.Slider));
+            AddStep(@"spinner", () => loadHitobjects(HitObjectType.Spinner));
+
+            AddToggleStep(@"auto", state => { auto = state; loadHitobjects(mode); });
+
+            BasicSliderBar<double> sliderBar;
+            Add(new Container
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                AutoSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new SpriteText { Text = "Playback Speed" },
+                    sliderBar = new BasicSliderBar<double>
+                    {
+                        Width = 150,
+                        Height = 10,
+                        SelectionColor = Color4.Orange,
+                    }
+                }
+            });
+
+            sliderBar.Current.BindTo(playbackSpeed);
+
+            framedClock.ProcessFrame();
+
+            var clockAdjustContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Clock = framedClock,
+                Children = new[]
+                {
+                    playfieldContainer = new Container { RelativeSizeAxes = Axes.Both },
+                    approachContainer = new Container { RelativeSizeAxes = Axes.Both }
+                }
+            };
+
+            Add(clockAdjustContainer);
         }
 
         private HitObjectType mode = HitObjectType.Slider;
 
         private readonly BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
-        private Container playfieldContainer;
-        private Container approachContainer;
+        private readonly Container playfieldContainer;
+        private readonly Container approachContainer;
 
-        private void load(HitObjectType mode)
+        private void loadHitobjects(HitObjectType mode)
         {
             this.mode = mode;
 
@@ -81,54 +124,6 @@ namespace osu.Desktop.VisualTests.Tests
                     }));
                     break;
             }
-        }
-
-        public override void Reset()
-        {
-            base.Reset();
-
-            playbackSpeed.TriggerChange();
-
-            AddStep(@"circles", () => load(HitObjectType.Circle));
-            AddStep(@"slider", () => load(HitObjectType.Slider));
-            AddStep(@"spinner", () => load(HitObjectType.Spinner));
-
-            AddToggleStep(@"auto", state => { auto = state; load(mode); });
-
-            BasicSliderBar<double> sliderBar;
-            Add(new Container
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new SpriteText { Text = "Playback Speed" },
-                    sliderBar = new BasicSliderBar<double>
-                    {
-                        Width = 150,
-                        Height = 10,
-                        SelectionColor = Color4.Orange,
-                    }
-                }
-            });
-
-            sliderBar.Current.BindTo(playbackSpeed);
-
-            framedClock.ProcessFrame();
-
-            var clockAdjustContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Clock = framedClock,
-                Children = new[]
-                {
-                    playfieldContainer = new Container { RelativeSizeAxes = Axes.Both },
-                    approachContainer = new Container { RelativeSizeAxes = Axes.Both }
-                }
-            };
-
-            Add(clockAdjustContainer);
         }
 
         private int depth;
