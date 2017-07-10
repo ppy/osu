@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play
 
         private const int max_catch_up_updates_per_frame = 50;
 
-        protected override bool UpdateSubTree()
+        public override bool UpdateSubTree()
         {
             requireMoreUpdateLoops = true;
             validState = true;
