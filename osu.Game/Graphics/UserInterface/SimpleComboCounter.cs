@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private class TransformCounterCount : Transform<int, Drawable>
         {
-            public virtual int CurrentValue
+            public int CurrentValue
             {
                 get
                 {
