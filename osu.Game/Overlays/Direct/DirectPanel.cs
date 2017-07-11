@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Direct
             private void load(TextureStore textures)
             {
                 if (set.OnlineInfo?.Covers?.Card != null)
-                    Texture = textures.Get(doubleSize ? set.OnlineInfo.Covers.Card2x : set.OnlineInfo.Covers.Card);
+                    Texture = textures.Get(doubleSize ? set.OnlineInfo.Covers.Card2X : set.OnlineInfo.Covers.Card);
             }
         }
     }

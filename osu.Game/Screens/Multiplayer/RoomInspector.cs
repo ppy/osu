@@ -539,8 +539,8 @@ namespace osu.Game.Screens.Multiplayer
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                if (set.OnlineInfo?.Covers?.Cover2x != null)
-                    Texture = textures.Get(set.OnlineInfo.Covers.Cover2x);
+                if (set.OnlineInfo?.Covers?.Cover2X != null)
+                    Texture = textures.Get(set.OnlineInfo.Covers.Cover2X);
             }
         }
     }

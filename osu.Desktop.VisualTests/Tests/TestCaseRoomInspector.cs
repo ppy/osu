@@ -45,7 +45,7 @@ namespace osu.Desktop.VisualTests.Tests
                             {
                                 Covers = new BeatmapSetOnlineCovers
                                 {
-                                    Cover2x = @"https://assets.ppy.sh/beatmaps/560573/covers/cover.jpg?1492722343",
+                                    Cover2X = @"https://assets.ppy.sh/beatmaps/560573/covers/cover.jpg?1492722343",
                                 },
                             },
                         },
@@ -112,7 +112,7 @@ namespace osu.Desktop.VisualTests.Tests
                                 {
                                     Covers = new BeatmapSetOnlineCovers
                                     {
-                                        Cover2x = @"https://assets.ppy.sh/beatmaps/39804/covers/cover.jpg?1456506845",
+                                        Cover2X = @"https://assets.ppy.sh/beatmaps/39804/covers/cover.jpg?1456506845",
                                     },
                                 },
                             },
