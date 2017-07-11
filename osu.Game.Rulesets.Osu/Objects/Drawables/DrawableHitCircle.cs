@@ -89,11 +89,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialState();
 
-            //sane defaults
-            ring.Alpha = circle.Alpha = number.Alpha = glow.Alpha = 1;
-            ApproachCircle.Alpha = 0;
-            ApproachCircle.Scale = new Vector2(4);
-            explode.Alpha = 0;
+            // sane defaults
+            ring.Show();
+            circle.Show();
+            number.Show();
+            glow.Show();
+
+            ApproachCircle.Hide();
+            ApproachCircle.ScaleTo(new Vector2(4));
+            explode.Hide();
         }
 
         protected override void UpdatePreemptState()
@@ -106,43 +110,45 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            ApproachCircle.FadeOut();
+            double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime;
 
-            double endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-            double duration = endTime - HitObject.StartTime;
-
-            glow.Delay(duration);
-            glow.FadeOut(400);
+            using (glow.BeginDelayedSequence(duration))
+                glow.FadeOut(400);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    Delay(duration + TIME_PREEMPT);
-                    FadeOut(TIME_FADEOUT);
+                    using (BeginDelayedSequence(duration + TIME_PREEMPT))
+                        FadeOut(TIME_FADEOUT);
                     Expire(true);
                     break;
                 case ArmedState.Miss:
+                    ApproachCircle.FadeOut(50);
                     FadeOut(TIME_FADEOUT / 5);
                     Expire();
                     break;
                 case ArmedState.Hit:
+                    ApproachCircle.FadeOut(50);
+
                     const double flash_in = 40;
 
                     flash.FadeTo(0.8f, flash_in);
-                    flash.Delay(flash_in);
-                    flash.FadeOut(100);
+                    using (flash.BeginDelayedSequence(flash_in))
+                        flash.FadeOut(100);
 
                     explode.FadeIn(flash_in);
 
-                    Delay(flash_in, true);
+                    using (BeginDelayedSequence(flash_in, true))
+                    {
+                        //after the flash, we can hide some elements that were behind it
+                        ring.FadeOut();
+                        circle.FadeOut();
+                        number.FadeOut();
 
-                    //after the flash, we can hide some elements that were behind it
-                    ring.FadeOut();
-                    circle.FadeOut();
-                    number.FadeOut();
+                        FadeOut(800);
+                        ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
+                    }
 
-                    FadeOut(800);
-                    ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
                     Expire();
                     break;
             }

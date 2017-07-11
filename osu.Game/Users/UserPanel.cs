@@ -8,6 +8,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
@@ -34,7 +35,7 @@ namespace osu.Game.Users
             Height = height - status_height;
             Masking = true;
             CornerRadius = 5;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = Color4.Black.Opacity(0.25f),
@@ -45,6 +46,7 @@ namespace osu.Game.Users
             {
                 new AsyncLoadWrapper(new CoverBackgroundSprite(user)
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
@@ -68,7 +70,7 @@ namespace osu.Game.Users
                             User = user,
                             Masking = true,
                             CornerRadius = 5,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.25f),

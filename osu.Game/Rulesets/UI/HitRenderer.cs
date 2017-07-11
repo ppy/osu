@@ -121,6 +121,16 @@ namespace osu.Game.Rulesets.UI
         public Beatmap<TObject> Beatmap;
 
         /// <summary>
+        /// All the converted hit objects contained by this hit renderer.
+        /// </summary>
+        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
+
+        /// <summary>
+        /// The mods which are to be applied.
+        /// </summary>
+        protected IEnumerable<Mod> Mods;
+
+        /// <summary>
         /// Creates a hit renderer for a beatmap.
         /// </summary>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
@@ -129,6 +139,8 @@ namespace osu.Game.Rulesets.UI
         {
             Debug.Assert(beatmap != null, "HitRenderer initialized with a null beatmap.");
 
+            Mods = beatmap.Mods.Value;
+
             RelativeSizeAxes = Axes.Both;
 
             BeatmapConverter<TObject> converter = CreateBeatmapConverter();
@@ -136,7 +148,7 @@ namespace osu.Game.Rulesets.UI
 
             // Check if the beatmap can be converted
             if (!converter.CanConvert(beatmap.Beatmap))
-                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can't be converted for the current ruleset.");
+                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can not be converted for the current ruleset (converter: {converter}).");
 
             // Convert the beatmap
             Beatmap = converter.Convert(beatmap.Beatmap, isForCurrentRuleset);
@@ -147,6 +159,8 @@ namespace osu.Game.Rulesets.UI
 
             // Post-process the beatmap
             processor.PostProcess(Beatmap);
+
+            ApplyBeatmap();
 
             // Add mods, should always be the last thing applied to give full control to mods
             applyMods(beatmap.Mods.Value);
@@ -164,6 +178,11 @@ namespace osu.Game.Rulesets.UI
             foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
                 mod.ApplyToHitRenderer(this);
         }
+
+        /// <summary>
+        /// Called when the beatmap of this hit renderer has been set. Used to apply any default values from the beatmap.
+        /// </summary>
+        protected virtual void ApplyBeatmap() { }
 
         /// <summary>
         /// Creates a processor to perform post-processing operations
@@ -192,7 +211,10 @@ namespace osu.Game.Rulesets.UI
 
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
-        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
+        /// <summary>
+        /// All the converted hit objects contained by this hit renderer.
+        /// </summary>
+        public new IEnumerable<TObject> Objects => Beatmap.HitObjects;
 
         protected override bool AllObjectsJudged => drawableObjects.All(h => h.Judged);
 
@@ -234,6 +256,9 @@ namespace osu.Game.Rulesets.UI
                 InputManager.ReplayInputHandler.ToScreenSpace = Playfield.ScaledContent.ToScreenSpace;
         }
 
+        /// <summary>
+        /// Creates and adds drawable representations of hit objects to the play field.
+        /// </summary>
         private void loadObjects()
         {
             drawableObjects.Capacity = Beatmap.HitObjects.Count;

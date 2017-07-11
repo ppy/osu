@@ -4,17 +4,18 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsButton : ClickableContainer
+    public class BeatmapOptionsButton : OsuClickableContainer
     {
         private const float width = 130;
 
@@ -83,7 +84,7 @@ namespace osu.Game.Screens.Select.Options
             return false;
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
 
         public BeatmapOptionsButton()
         {
@@ -99,7 +100,7 @@ namespace osu.Game.Screens.Select.Options
                     RelativeSizeAxes = Axes.Both,
                     Shear = new Vector2(0.2f, 0f),
                     Masking = true,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = Color4.Black.Opacity(0.2f),

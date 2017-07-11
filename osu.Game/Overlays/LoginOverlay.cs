@@ -4,14 +4,15 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings.Sections.General;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    internal class LoginOverlay : FocusedOverlayContainer
+    internal class LoginOverlay : OsuFocusedOverlayContainer
     {
         private LoginSettings settingsSection;
 
@@ -27,7 +28,8 @@ namespace osu.Game.Overlays
         {
             Children = new Drawable[]
             {
-                new Box {
+                new Box
+                {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                     Alpha = 0.6f,

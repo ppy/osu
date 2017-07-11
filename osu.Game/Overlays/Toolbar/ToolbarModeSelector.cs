@@ -6,11 +6,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Database;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -46,14 +46,14 @@ namespace osu.Game.Overlays.Toolbar
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                     Masking = true,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Colour = new Color4(255, 194, 224, 100),
                         Radius = 15,
                         Roundness = 15,
                     },
-                    Children = new []
+                    Children = new[]
                     {
                         new Box
                         {
@@ -113,8 +113,11 @@ namespace osu.Game.Overlays.Toolbar
         {
             base.UpdateAfterChildren();
 
-            if (!activeMode.EnsureValid())
-                activeMode.Refresh(() => modeButtonLine.MoveToX(activeButton.DrawPosition.X, 200, EasingTypes.OutQuint));
+            if (!activeMode.IsValid)
+            {
+                modeButtonLine.MoveToX(activeButton.DrawPosition.X, 200, EasingTypes.OutQuint);
+                activeMode.Validate();
+            }
         }
     }
 }

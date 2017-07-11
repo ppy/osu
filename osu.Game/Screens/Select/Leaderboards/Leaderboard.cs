@@ -12,6 +12,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
 using osu.Game.Database;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -24,6 +25,8 @@ namespace osu.Game.Screens.Select.Leaderboards
         private readonly FillFlowContainer<LeaderboardScore> scrollFlow;
 
         public Action<Score> ScoreSelected;
+
+        private readonly LoadingAnimation loading;
 
         private IEnumerable<Score> scores;
         public IEnumerable<Score> Scores
@@ -86,6 +89,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         },
                     },
                 },
+                loading = new LoadingAnimation()
             };
         }
 
@@ -117,6 +121,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         private GetScoresRequest getScoresRequest;
+
         private void updateScores()
         {
             if (!IsLoaded) return;
@@ -126,8 +131,14 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (api == null || Beatmap == null) return;
 
+            loading.Show();
+
             getScoresRequest = new GetScoresRequest(Beatmap);
-            getScoresRequest.Success += r => Scores = r.Scores;
+            getScoresRequest.Success += r =>
+            {
+                Scores = r.Scores;
+                loading.Hide();
+            };
             api.Queue(getScoresRequest);
         }
 

@@ -13,11 +13,9 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => "graph";
 
-        private BarGraph graph;
-
-        public override void Reset()
+        public TestCaseGraph()
         {
-            base.Reset();
+            BarGraph graph;
 
             Children = new[]
             {
@@ -30,7 +28,7 @@ namespace osu.Desktop.VisualTests.Tests
                 },
             };
 
-            AddStep("values from 1-10", () => graph.Values = Enumerable.Range(1,10).Select(i => (float)i));
+            AddStep("values from 1-10", () => graph.Values = Enumerable.Range(1, 10).Select(i => (float)i));
             AddStep("values from 1-100", () => graph.Values = Enumerable.Range(1, 100).Select(i => (float)i));
             AddStep("reversed values from 1-10", () => graph.Values = Enumerable.Range(1, 10).Reverse().Select(i => (float)i));
             AddStep("Bottom to top", () => graph.Direction = BarDirection.BottomToTop);

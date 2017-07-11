@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Direct
             SetInfo = setInfo;
         }
 
-        protected IEnumerable<DifficultyIcon> GetDifficultyIcons()
+        protected List<DifficultyIcon> GetDifficultyIcons()
         {
             var icons = new List<DifficultyIcon>();
 
@@ -40,6 +40,7 @@ namespace osu.Game.Overlays.Direct
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
             }) { RelativeSizeAxes = Axes.Both, TimeBeforeLoad = 300 };

@@ -154,11 +154,11 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
+        private void load(BeatmapDatabase beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, UserInputManager input)
         {
             if (Footer != null)
             {
-                Footer.AddButton(@"random", colours.Green, SelectRandom, Key.F2);
+                Footer.AddButton(@"random", colours.Green, () => triggerRandom(input), Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
 
                 BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
@@ -209,7 +209,13 @@ namespace osu.Game.Screens.Select
             OnSelected();
         }
 
-        public void SelectRandom() => carousel.SelectRandom();
+        private void triggerRandom(UserInputManager input)
+        {
+            if (input.CurrentState.Keyboard.ShiftPressed)
+                carousel.SelectPreviousRandom();
+            else
+                carousel.SelectNextRandom();
+        }
 
         protected abstract void OnSelected();
 
@@ -275,10 +281,13 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
-            database.BeatmapSetAdded -= onBeatmapSetAdded;
-            database.BeatmapSetRemoved -= onBeatmapSetRemoved;
+            if (database != null)
+            {
+                database.BeatmapSetAdded -= onBeatmapSetAdded;
+                database.BeatmapSetRemoved -= onBeatmapSetRemoved;
+            }
 
-            initialAddSetsTask.Cancel();
+            initialAddSetsTask?.Cancel();
         }
 
         private void changeBackground(WorkingBeatmap beatmap)
@@ -371,6 +380,7 @@ namespace osu.Game.Screens.Select
 
             switch (args.Key)
             {
+                case Key.KeypadEnter:
                 case Key.Enter:
                     raiseSelect();
                     return true;

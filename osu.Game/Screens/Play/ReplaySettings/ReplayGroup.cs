@@ -6,7 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
                                 {
                                     Origin = Anchor.Centre,
                                     Anchor = Anchor.CentreRight,
-                                    Position = new Vector2(-15,0),
+                                    Position = new Vector2(-15, 0),
                                     Icon = FontAwesome.fa_bars,
                                     Scale = new Vector2(0.75f),
                                     Action = toggleContentVisibility,
