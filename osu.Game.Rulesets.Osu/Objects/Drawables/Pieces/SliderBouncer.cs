@@ -37,8 +37,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            icon.RotateTo(360, 1000);
-            icon.Loop();
+            using (icon.BeginLoopedSequence())
+                icon.RotateTo(360, 1000);
         }
 
         public void UpdateProgress(double progress, int repeat)
