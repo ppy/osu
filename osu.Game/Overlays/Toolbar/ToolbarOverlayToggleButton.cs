@@ -4,7 +4,7 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Toolbar
                 stateContainer.StateChanged -= stateChanged;
         }
 
-        private void stateChanged(OverlayContainer c, Visibility state)
+        private void stateChanged(VisibilityContainer c, Visibility state)
         {
             switch (state)
             {

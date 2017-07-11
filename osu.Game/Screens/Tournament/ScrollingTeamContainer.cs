@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Transforms;
@@ -83,6 +84,7 @@ namespace osu.Game.Screens.Tournament
         private ScrollState scrollState
         {
             get { return _scrollState; }
+
             set
             {
                 if (_scrollState == value)
@@ -295,7 +297,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None) => TransformTo(() => speed, value, duration, easing, new TransformScrollSpeed());
+        private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None) => TransformTo(value, duration, easing, new TransformScrollSpeed());
 
         private enum ScrollState
         {
@@ -306,13 +308,10 @@ namespace osu.Game.Screens.Tournament
             Scrolling
         }
 
-        public class TransformScrollSpeed : TransformFloat
+        public class TransformScrollSpeed : TransformFloat<Drawable>
         {
-            public override void Apply(Drawable d)
-            {
-                base.Apply(d);
-                ((ScrollingTeamContainer)d).speed = CurrentValue;
-            }
+            public override void Apply(Drawable d) => ((ScrollingTeamContainer)d).speed = CurrentValue;
+            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ScrollingTeamContainer)d).speed;
         }
 
         public class ScrollingTeam : Container
@@ -329,6 +328,7 @@ namespace osu.Game.Screens.Tournament
             public bool Selected
             {
                 get { return selected; }
+
                 set
                 {
                     selected = value;

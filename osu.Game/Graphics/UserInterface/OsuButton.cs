@@ -3,8 +3,11 @@
 
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -16,6 +19,9 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuButton : Button
     {
         private Box hover;
+
+        private SampleChannel sampleClick;
+        private SampleChannel sampleHover;
 
         public OsuButton()
         {
@@ -33,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface
         public override bool HandleInput => Action != null;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             if (Action == null)
                 Colour = OsuColour.Gray(0.5f);
@@ -59,10 +65,20 @@ namespace osu.Game.Graphics.UserInterface
                     Alpha = 0,
                 },
             });
+
+            sampleClick = audio.Sample.Get(@"UI/generic-click");
+            sampleHover = audio.Sample.Get(@"UI/generic-hover");
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            sampleClick?.Play();
+            return base.OnClick(state);
         }
 
         protected override bool OnHover(InputState state)
         {
+            sampleHover?.Play();
             hover.FadeIn(200);
             return base.OnHover(state);
         }

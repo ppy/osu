@@ -9,17 +9,18 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelSelectionOverlay : FocusedOverlayContainer
+    public class ChannelSelectionOverlay : OsuFocusedOverlayContainer
     {
         public static readonly float WIDTH_PADDING = 170;
 
@@ -38,7 +39,7 @@ namespace osu.Game.Overlays.Chat
         {
             set
             {
-                sectionsFlow.Children = value;
+                sectionsFlow.ChildrenEnumerable = value;
 
                 foreach (ChannelSection s in sectionsFlow.Children)
                 {

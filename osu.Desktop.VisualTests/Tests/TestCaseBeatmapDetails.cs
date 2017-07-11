@@ -13,12 +13,10 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => "BeatmapDetails tab of BeatmapDetailArea";
 
-        private BeatmapDetails details;
+        private readonly BeatmapDetails details;
 
-        public override void Reset()
+        public TestCaseBeatmapDetails()
         {
-            base.Reset();
-
             Add(details = new BeatmapDetails
             {
                 RelativeSizeAxes = Axes.Both,
@@ -41,7 +39,7 @@ namespace osu.Desktop.VisualTests.Tests
                     StarDifficulty = 5.3f,
                     Metrics = new BeatmapMetrics
                     {
-                        Ratings = Enumerable.Range(0,10),
+                        Ratings = Enumerable.Range(0, 10),
                         Fails = Enumerable.Range(lastRange, 100).Select(i => i % 12 - 6),
                         Retries = Enumerable.Range(lastRange - 3, 100).Select(i => i % 12 - 6),
                     },

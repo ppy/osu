@@ -20,7 +20,6 @@ using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Mods
 {
-
     /// <summary>
     /// Represents a clickable button which can cycle through one of more mods.
     /// </summary>
@@ -80,7 +79,7 @@ namespace osu.Game.Overlays.Mods
                     backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
 
                     backgroundIcon.Icon = modAfter.Icon;
-                    using (iconsContainer.BeginDelayedSequence(mod_switch_duration, true))
+                    using (BeginDelayedSequence(mod_switch_duration, true))
                     {
                         foregroundIcon.RotateTo(-rotate_angle * direction);
                         foregroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
@@ -88,7 +87,7 @@ namespace osu.Game.Overlays.Mods
                         backgroundIcon.RotateTo(rotate_angle * direction);
                         backgroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
 
-                        iconsContainer.Schedule(() => displayMod(modAfter));
+                        Schedule(() => displayMod(modAfter));
                     }
                 }
 
@@ -152,8 +151,8 @@ namespace osu.Game.Overlays.Mods
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleOn = audio.Sample.Get(@"Checkbox/check-on");
-            sampleOff = audio.Sample.Get(@"Checkbox/check-off");
+            sampleOn = audio.Sample.Get(@"UI/check-on");
+            sampleOff = audio.Sample.Get(@"UI/check-off");
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -172,7 +171,7 @@ namespace osu.Game.Overlays.Mods
 
         public void SelectNext()
         {
-            (++SelectedIndex == -1 ? sampleOff : sampleOn).Play();
+            (++SelectedIndex == Mods.Length ? sampleOff : sampleOn).Play();
             Action?.Invoke(SelectedMod);
         }
 

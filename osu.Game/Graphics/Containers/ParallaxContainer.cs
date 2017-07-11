@@ -19,8 +19,6 @@ namespace osu.Game.Graphics.Containers
 
         public ParallaxContainer()
         {
-            AlwaysReceiveInput = true;
-
             RelativeSizeAxes = Axes.Both;
             AddInternal(content = new Container
             {

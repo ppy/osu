@@ -6,7 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -15,7 +15,7 @@ using osu.Game.Overlays.Settings.Sections;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsOverlay : FocusedOverlayContainer
+    public class SettingsOverlay : OsuFocusedOverlayContainer
     {
         internal const float CONTENT_MARGINS = 10;
 
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays
                         new SidebarButton
                         {
                             Section = section,
-                            Action = sectionsContainer.ScrollContainer.ScrollIntoView,
+                            Action = b => sectionsContainer.ScrollContainer.ScrollTo(b),
                         }
                     ).ToArray()
                 }

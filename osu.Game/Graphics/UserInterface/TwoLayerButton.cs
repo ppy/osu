@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,10 +13,11 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using System;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class TwoLayerButton : ClickableContainer
+    public class TwoLayerButton : OsuClickableContainer
     {
         private readonly BouncingIcon bouncingIcon;
 
@@ -31,7 +31,6 @@ namespace osu.Game.Graphics.UserInterface
 
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
-        public SampleChannel ActivationSound;
         private readonly SpriteText text;
 
         public Color4 HoverColour;
@@ -62,8 +61,12 @@ namespace osu.Game.Graphics.UserInterface
 
                 X = (value & Anchor.x2) > 0 ? SIZE_RETRACTED.X * shear * 0.5f : 0;
 
+                Remove(c1);
+                Remove(c2);
                 c1.Depth = (value & Anchor.x2) > 0 ? 0 : 1;
                 c2.Depth = (value & Anchor.x2) > 0 ? 1 : 0;
+                Add(c1);
+                Add(c2);
             }
         }
 
@@ -79,18 +82,21 @@ namespace osu.Game.Graphics.UserInterface
                     Width = 0.4f,
                     Children = new Drawable[]
                     {
-                        new Container {
+                        new Container
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Shear = new Vector2(shear, 0),
                             Masking = true,
                             MaskingSmoothness = 2,
-                            EdgeEffect = new EdgeEffect {
+                            EdgeEffect = new EdgeEffectParameters
+                            {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
                                 Offset = new Vector2(2, 0),
                                 Radius = 2,
                             },
-                            Children = new [] {
+                            Children = new[]
+                            {
                                 IconLayer = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -113,18 +119,21 @@ namespace osu.Game.Graphics.UserInterface
                     Width = 0.6f,
                     Children = new Drawable[]
                     {
-                        new Container {
+                        new Container
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Shear = new Vector2(shear, 0),
                             Masking = true,
                             MaskingSmoothness = 2,
-                            EdgeEffect = new EdgeEffect {
+                            EdgeEffect = new EdgeEffectParameters
+                            {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
                                 Offset = new Vector2(2, 0),
                                 Radius = 2,
                             },
-                            Children = new [] {
+                            Children = new[]
+                            {
                                 TextLayer = new Box
                                 {
                                     Origin = Anchor.TopLeft,
@@ -160,7 +169,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => IconLayer.Contains(screenSpacePos) || TextLayer.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => IconLayer.ReceiveMouseInputAt(screenSpacePos) || TextLayer.ReceiveMouseInputAt(screenSpacePos);
 
         protected override bool OnHover(InputState state)
         {
@@ -198,8 +207,6 @@ namespace osu.Game.Graphics.UserInterface
             flash.Alpha = 1;
             flash.FadeOut(500, EasingTypes.OutQuint);
             flash.Expire();
-
-            ActivationSound.Play();
 
             return base.OnClick(state);
         }

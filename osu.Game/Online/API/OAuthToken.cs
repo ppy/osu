@@ -59,7 +59,6 @@ namespace osu.Game.Online.API
             {
 
             }
-
             return null;
         }
     }

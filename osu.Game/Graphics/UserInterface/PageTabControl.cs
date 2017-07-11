@@ -7,7 +7,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
@@ -28,21 +28,6 @@ namespace osu.Game.Graphics.UserInterface
             private const float transition_duration = 100;
 
             private readonly Box box;
-
-            public override bool Active
-            {
-                get { return base.Active; }
-                set
-                {
-                    if (Active == value) return;
-
-                    if (value)
-                        slideActive();
-                    else
-                        slideInactive();
-                    base.Active = value;
-                }
-            }
 
             public PageTabItem(T value) : base(value)
             {
@@ -100,6 +85,10 @@ namespace osu.Game.Graphics.UserInterface
             {
                 box.ScaleTo(new Vector2(1f, 0f), transition_duration);
             }
+
+            protected override void OnActivated() => slideActive();
+
+            protected override void OnDeactivated() => slideInactive();
         }
     }
 }

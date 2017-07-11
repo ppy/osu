@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -21,8 +22,6 @@ namespace osu.Game.Graphics.UserInterface
         protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown();
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
-
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || Dropdown.Contains(screenSpacePos);
 
         private bool isEnumType => typeof(T).IsEnum;
 
@@ -71,21 +70,6 @@ namespace osu.Game.Graphics.UserInterface
                     accentColour = value;
                     if (!Active)
                         Text.Colour = value;
-                }
-            }
-
-            public override bool Active
-            {
-                get { return base.Active; }
-                set
-                {
-                    if (Active == value) return;
-
-                    if (value)
-                        fadeActive();
-                    else
-                        fadeInactive();
-                    base.Active = value;
                 }
             }
 
@@ -150,6 +134,10 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 };
             }
+
+            protected override void OnActivated() => fadeActive();
+
+            protected override void OnDeactivated() => fadeInactive();
         }
 
         private class OsuTabDropdown : OsuDropdown<T>

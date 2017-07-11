@@ -2,15 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -28,8 +27,6 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract Color4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
-
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || DisplayStyleControl.Dropdown.Contains(screenSpacePos);
 
         protected SearchableListFilterControl()
         {

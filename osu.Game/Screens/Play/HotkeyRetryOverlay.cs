@@ -4,12 +4,10 @@
 using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Audio;
 using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
@@ -18,7 +16,6 @@ namespace osu.Game.Screens.Play
     {
         public Action Action;
 
-        private SampleChannel retrySample;
         private Box overlay;
 
         private const int activate_delay = 400;
@@ -27,9 +24,8 @@ namespace osu.Game.Screens.Play
         private bool fired;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            retrySample = audio.Sample.Get(@"Menu/menuback");
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
 
@@ -74,7 +70,6 @@ namespace osu.Game.Screens.Play
             if (!fired && overlay.Alpha == 1)
             {
                 fired = true;
-                retrySample.Play();
                 Action?.Invoke();
             }
         }

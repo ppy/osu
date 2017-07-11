@@ -5,7 +5,7 @@ using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
@@ -14,7 +14,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsOverlay : FocusedOverlayContainer
+    public class BeatmapOptionsOverlay : OsuFocusedOverlayContainer
     {
         private const float transition_duration = 500;
         private const float x_position = 0.2f;

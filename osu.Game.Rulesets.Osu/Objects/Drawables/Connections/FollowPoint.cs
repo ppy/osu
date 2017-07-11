@@ -6,7 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             Masking = true;
             AutoSizeAxes = Axes.Both;
             CornerRadius = width / 2;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = Color4.White.Opacity(0.2f),

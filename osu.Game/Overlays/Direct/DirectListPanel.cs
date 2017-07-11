@@ -6,7 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -15,6 +14,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.Direct
             Height = height;
             CornerRadius = 5;
             Masking = true;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(0f, 1f),
@@ -150,7 +151,7 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        private class DownloadButton : ClickableContainer
+        private class DownloadButton : OsuClickableContainer
         {
             private readonly TextAwesome icon;
 

@@ -11,10 +11,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"social browser overlay";
 
-        public override void Reset()
+        public TestCaseSocial()
         {
-            base.Reset();
-
             SocialOverlay s = new SocialOverlay
             {
                 Users = new[]

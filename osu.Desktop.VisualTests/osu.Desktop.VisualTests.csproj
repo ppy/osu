@@ -87,11 +87,13 @@
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTK, Version=2.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.2.0.50727.1341\lib\net45\OpenTK.dll</HintPath>
+    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\ppy.OpenTK.3.0\lib\net45\OpenTK.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="SharpCompress, Version=0.15.2.0, Culture=neutral, PublicKeyToken=afb0a02973931d96, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\SharpCompress.0.15.2\lib\net45\SharpCompress.dll</HintPath>
+    <Reference Include="SharpCompress, Version=0.17.1.0, Culture=neutral, PublicKeyToken=afb0a02973931d96, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\SharpCompress.0.17.1\lib\net45\SharpCompress.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="SQLite.Net, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -185,8 +187,10 @@
   <ItemGroup>
     <Compile Include="AutomatedVisualTestGame.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Tests\TestCaseBeatSyncedContainer.cs" />
     <Compile Include="Tests\TestCaseChatDisplay.cs" />
     <Compile Include="Tests\TestCaseBeatmapDetails.cs" />
+    <Compile Include="Tests\TestCaseContextMenu.cs" />
     <Compile Include="Tests\TestCaseDrawings.cs" />
     <Compile Include="Tests\TestCaseGamefield.cs" />
     <Compile Include="Tests\TestCaseGraph.cs" />
@@ -204,6 +208,7 @@
     <Compile Include="Tests\TestCaseReplay.cs" />
     <Compile Include="Tests\TestCaseResults.cs" />
     <Compile Include="Tests\TestCaseScoreCounter.cs" />
+    <Compile Include="Tests\TestCaseScrollingHitObjects.cs" />
     <Compile Include="Tests\TestCaseSkipButton.cs" />
     <Compile Include="Tests\TestCaseTabControl.cs" />
     <Compile Include="Tests\TestCaseTaikoHitObjects.cs" />
@@ -226,6 +231,7 @@
     <Compile Include="Tests\TestCaseDirect.cs" />
     <Compile Include="Tests\TestCaseSocial.cs" />
     <Compile Include="Tests\TestCaseBreadcrumbs.cs" />
+    <Compile Include="Tests\TestCaseRoomInspector.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

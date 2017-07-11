@@ -56,9 +56,9 @@ namespace osu.Game.Graphics.UserInterface
             Current.Value = Current + amount;
         }
 
-        protected class TransformScore : Transform<double>
+        protected class TransformScore : Transform<double, Drawable>
         {
-            public override double CurrentValue
+            public virtual double CurrentValue
             {
                 get
                 {
@@ -70,11 +70,8 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public override void Apply(Drawable d)
-            {
-                base.Apply(d);
-                ((ScoreCounter)d).DisplayedCount = CurrentValue;
-            }
+            public override void Apply(Drawable d) => ((ScoreCounter)d).DisplayedCount = CurrentValue;
+            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ScoreCounter)d).DisplayedCount;
         }
     }
 }

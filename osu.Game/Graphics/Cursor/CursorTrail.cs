@@ -8,13 +8,13 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using OpenTK;
 using System;
-using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.OpenGL.Buffers;
 using OpenTK.Graphics.ES30;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Timing;
 using System.Diagnostics;
+using osu.Framework.Graphics.OpenGL.Vertices;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -65,7 +65,6 @@ namespace osu.Game.Graphics.Cursor
             // as we are currently very dependent on having a running clock, let's make our own clock for the time being.
             Clock = new FramedClock();
 
-            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
 
             for (int i = 0; i < max_sprites; i++)
@@ -74,6 +73,8 @@ namespace osu.Game.Graphics.Cursor
                 parts[i].WasUpdated = true;
             }
         }
+
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)

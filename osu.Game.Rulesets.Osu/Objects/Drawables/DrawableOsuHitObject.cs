@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             : base(hitObject)
         {
             AccentColour = HitObject.ComboColour;
+            Alpha = 0;
         }
 
         protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.Hit300 };
@@ -25,10 +26,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Flush();
 
-            UpdateInitialState();
-
             using (BeginAbsoluteSequence(HitObject.StartTime - TIME_PREEMPT, true))
             {
+                UpdateInitialState();
+
                 UpdatePreemptState();
 
                 using (BeginDelayedSequence(TIME_PREEMPT + Judgement.TimeOffset, true))
@@ -36,8 +37,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected virtual void UpdateCurrentState(ArmedState state)
+        protected virtual void UpdateInitialState()
         {
+            Hide();
         }
 
         protected virtual void UpdatePreemptState()
@@ -45,9 +47,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             FadeIn(TIME_FADEIN);
         }
 
-        protected virtual void UpdateInitialState()
+        protected virtual void UpdateCurrentState(ArmedState state)
         {
-            Alpha = 0;
         }
     }
 

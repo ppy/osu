@@ -3,12 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using OpenTK;
@@ -125,6 +125,14 @@ namespace osu.Game.Overlays
             trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Width), v => displayResolution());
             trackSetting(frameworkConfig.GetBindable<int>(FrameworkSetting.Height), v => displayResolution());
 
+            trackSetting(frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity), v => display(v, "Cursor Sensitivity", v.ToString(@"0.##x"), "Ctrl+Alt+R to reset"));
+            trackSetting(frameworkConfig.GetBindable<string>(FrameworkSetting.ActiveInputHandlers),
+                delegate (string v)
+                {
+                    bool raw = v.Contains("Raw");
+                    display(raw, "Raw Input", raw ? "enabled" : "disabled", "Ctrl+Alt+R to reset");
+                });
+
             trackSetting(frameworkConfig.GetBindable<WindowMode>(FrameworkSetting.WindowMode), v => display(v, "Screen Mode", v.ToString(), "Alt+Enter"));
         }
 
@@ -173,7 +181,7 @@ namespace osu.Game.Overlays
                 textLine2.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
                 textLine2.Y = optionCount > 0 ? 0 : 5;
 
-                if (optionLights.Children.Count() != optionCount)
+                if (optionLights.Children.Count != optionCount)
                 {
                     optionLights.Clear();
                     for (int i = 0; i < optionCount; i++)
@@ -181,7 +189,7 @@ namespace osu.Game.Overlays
                 }
 
                 for (int i = 0; i < optionCount; i++)
-                    optionLights.Children.Skip(i).First().Glowing = i == selectedOption;
+                    optionLights.Children[i].Glowing = i == selectedOption;
             });
         }
 
@@ -245,14 +253,12 @@ namespace osu.Game.Overlays
                 Masking = true;
                 CornerRadius = 3;
 
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Colour = colours.BlueDark.Opacity(glow_strength),
                     Type = EdgeEffectType.Glow,
                     Radius = 8,
                 };
-
-                FadeEdgeEffectTo(0);
 
                 updateGlow();
                 Flush(true);
