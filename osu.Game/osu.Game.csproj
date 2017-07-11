@@ -190,7 +190,6 @@
     <Compile Include="Rulesets\Objects\Drawables\IScrollingHitObject.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
     <Compile Include="Rulesets\Objects\HitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\HitObjectStartTimeComparer.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasCombo.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasEndTime.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasDistance.cs" />
