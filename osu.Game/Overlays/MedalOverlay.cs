@@ -199,23 +199,25 @@ namespace osu.Game.Overlays
             getSample.Play();
             Delay(200, true);
 
-            innerSpin.Transforms.Add(new TransformRotation
+            var innerRotate = new TransformRotation
             {
-                StartValue = 0,
                 EndValue = 359,
                 StartTime = Clock.TimeInfo.Current,
                 EndTime = Clock.TimeInfo.Current + 20000,
-                LoopCount = -1,
-            });
+            };
 
-            outterSpin.Transforms.Add(new TransformRotation
+            innerRotate.Loop(0);
+            innerSpin.Transforms.Add(innerRotate);
+
+            var outerRotate = new TransformRotation
             {
-                StartValue = 0,
                 EndValue = 359,
                 StartTime = Clock.TimeInfo.Current,
                 EndTime = Clock.TimeInfo.Current + 40000,
-                LoopCount = -1,
-            });
+            };
+
+            outerRotate.Loop(0);
+            outterSpin.Transforms.Add(outerRotate);
 
             disc.FadeIn(duration1);
             outterSpin.FadeTo(0.1f, duration1 * 2);
