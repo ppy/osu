@@ -255,12 +255,16 @@ namespace osu.Game.Overlays
 
         private void prev()
         {
+            if (beatmapBacking.Disabled) return;
+
             queuedDirection = TransformDirection.Prev;
             playlist.PlayPrevious();
         }
 
         private void next()
         {
+            if (beatmapBacking.Disabled) return;
+
             queuedDirection = TransformDirection.Next;
             playlist.PlayNext();
         }
