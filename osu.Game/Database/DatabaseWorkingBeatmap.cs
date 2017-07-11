@@ -69,7 +69,7 @@ namespace osu.Game.Database
                 var trackData = getReader()?.GetStream(Metadata.AudioFile);
                 return trackData == null ? null : new TrackBass(trackData);
             }
-            catch { return null; }
+            catch { return new TrackVirtual(); }
         }
     }
 }
