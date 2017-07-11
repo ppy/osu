@@ -194,7 +194,7 @@ namespace osu.Game.Overlays
 
             getSetsRequest.Success += r =>
             {
-                BeatmapSets = r?.Select(response => response.ToSetInfo(rulesets));
+                BeatmapSets = r?.Select(response => response.ToBeatmapSet(rulesets));
 
                 var artists = new List<string>();
                 var songs = new List<string>();

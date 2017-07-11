@@ -50,7 +50,11 @@ namespace osu.Desktop.VisualTests.Tests
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
-                        Covers = new BeatmapSetOnlineCovers { Card = @"https://assets.ppy.sh//beatmaps/578332/covers/cover.jpg?1494591390" },
+                        Covers = new BeatmapSetOnlineCovers
+                        {
+                            Card = @"https://assets.ppy.sh/beatmaps/578332/covers/card.jpg?1494591390",
+                            Card2x = @"https://assets.ppy.sh/beatmaps/578332/covers/cover.jpg?1494591390",
+                        },
                         Preview = @"https://b.ppy.sh/preview/578332.mp3",
                         PlayCount = 97,
                         FavouriteCount = 72,
@@ -76,7 +80,11 @@ namespace osu.Desktop.VisualTests.Tests
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
-                        Covers = new BeatmapSetOnlineCovers { Card = @"https://assets.ppy.sh//beatmaps/599627/covers/cover.jpg?1494539318" },
+                        Covers = new BeatmapSetOnlineCovers
+                        {
+                            Card = @"https://assets.ppy.sh/beatmaps/599627/covers/card.jpg?1494539318",
+                            Card2x = @"https://assets.ppy.sh/beatmaps/599627/covers/cover.jpg?1494539318",
+                        },
                         Preview = @"https//b.ppy.sh/preview/599627.mp3",
                         PlayCount = 3082,
                         FavouriteCount = 14,
@@ -102,7 +110,11 @@ namespace osu.Desktop.VisualTests.Tests
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
-                        Covers = new BeatmapSetOnlineCovers { Card = @"https://assets.ppy.sh//beatmaps/513268/covers/cover.jpg?1494502863" },
+                        Covers = new BeatmapSetOnlineCovers
+                        {
+                            Card = @"https://assets.ppy.sh/beatmaps/513268/covers/card.jpg?1494502863",
+                            Card2x = @"https://assets.ppy.sh/beatmaps/513268/covers/cover.jpg?1494502863",
+                        },
                         Preview = @"https//b.ppy.sh/preview/513268.mp3",
                         PlayCount = 2762,
                         FavouriteCount = 15,
@@ -143,7 +155,11 @@ namespace osu.Desktop.VisualTests.Tests
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
-                        Covers = new BeatmapSetOnlineCovers { Card = @"https://assets.ppy.sh//beatmaps/586841/covers/cover.jpg?1494052741" },
+                        Covers = new BeatmapSetOnlineCovers
+                        {
+                            Card = @"https://assets.ppy.sh/beatmaps/586841/covers/card.jpg?1494052741",
+                            Card2x = @"https://assets.ppy.sh/beatmaps/586841/covers/cover.jpg?1494052741",
+                        },
                         Preview = @"https//b.ppy.sh/preview/586841.mp3",
                         PlayCount = 62317,
                         FavouriteCount = 161,
