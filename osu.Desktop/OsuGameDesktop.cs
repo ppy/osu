@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Menu;
 
 namespace osu.Desktop
@@ -22,18 +23,22 @@ namespace osu.Desktop
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
-            versionManager = new VersionManager { Depth = int.MinValue };
+            versionManager = new VersionManager
+            {
+                Depth = int.MinValue,
+                State = Visibility.Hidden
+            };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            LoadComponentAsync(versionManager);
+            LoadComponentAsync(versionManager, Add);
             ScreenChanged += s =>
             {
-                if (!versionManager.IsAlive && s is Intro)
-                    Add(versionManager);
+                if (!versionManager.IsPresent && s is Intro)
+                    versionManager.State = Visibility.Visible;
             };
         }
 

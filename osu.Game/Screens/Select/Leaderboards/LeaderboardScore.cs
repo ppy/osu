@@ -13,10 +13,11 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 using osu.Framework;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class LeaderboardScore : ClickableContainer, IStateful<Visibility>
+    public class LeaderboardScore : OsuClickableContainer, IStateful<Visibility>
     {
         public static readonly float HEIGHT = 60;
 

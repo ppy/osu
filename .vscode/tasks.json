@@ -9,15 +9,9 @@
     "showOutput": "silent",
     "args": [
         "/property:GenerateFullPaths=true",
-        "/property:DebugType=portable"
+        "/property:DebugType=portable",
+        "/m" //parallel compiling support.
     ],
-    "windows": {
-        "args": [
-            "/property:GenerateFullPaths=true",
-            "/property:DebugType=portable",
-            "/m" //parallel compiling support. doesn't work well with mono atm
-        ]
-    },
     "tasks": [
         {
             "taskName": "Build (Debug)",

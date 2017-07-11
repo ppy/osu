@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected class TransformAccuracy : Transform<double, Drawable>
         {
-            public override double CurrentValue
+            public virtual double CurrentValue
             {
                 get
                 {
@@ -59,11 +59,8 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public override void Apply(Drawable d)
-            {
-                base.Apply(d);
-                ((PercentageCounter)d).DisplayedCount = CurrentValue;
-            }
+            public override void Apply(Drawable d) => ((PercentageCounter)d).DisplayedCount = CurrentValue;
+            public override void ReadIntoStartValue(Drawable d) => StartValue = ((PercentageCounter)d).DisplayedCount;
         }
     }
 }

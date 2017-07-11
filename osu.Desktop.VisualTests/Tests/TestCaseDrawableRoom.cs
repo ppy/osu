@@ -19,8 +19,9 @@ namespace osu.Desktop.VisualTests.Tests
         private RulesetDatabase rulesets;
 
         public override void Reset()
+        protected override void LoadComplete()
         {
-            base.Reset();
+            base.LoadComplete();
 
             DrawableRoom first;
             Add(new FillFlowContainer

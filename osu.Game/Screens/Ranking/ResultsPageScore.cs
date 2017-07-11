@@ -343,6 +343,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     cover = new Sprite
                     {
+                        RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fill,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

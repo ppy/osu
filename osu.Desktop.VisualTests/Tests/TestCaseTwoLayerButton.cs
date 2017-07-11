@@ -10,10 +10,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Mostly back button";
 
-        public override void Reset()
+        public TestCaseTwoLayerButton()
         {
-            base.Reset();
-
             Add(new BackButton());
         }
     }
