@@ -84,7 +84,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 File.Delete(temp);
 
-                Assert.IsFalse(File.Exists(temp), "We likely help a read lock not he file when we shouldn't");
+                Assert.IsFalse(File.Exists(temp), "We likely held a read lock on the file when we shouldn't");
             }
         }
 
