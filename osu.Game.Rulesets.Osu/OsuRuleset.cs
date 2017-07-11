@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -118,6 +119,8 @@ namespace osu.Game.Rulesets.Osu
         };
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
+
+        public override SettingsSubsection CreateSettings() => new OsuSettings();
 
         public override int LegacyID => 0;
     }
