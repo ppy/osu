@@ -11,10 +11,11 @@ using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsButton : ClickableContainer
+    public class BeatmapOptionsButton : OsuClickableContainer
     {
         private const float width = 130;
 
@@ -83,7 +84,7 @@ namespace osu.Game.Screens.Select.Options
             return false;
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => box.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
 
         public BeatmapOptionsButton()
         {

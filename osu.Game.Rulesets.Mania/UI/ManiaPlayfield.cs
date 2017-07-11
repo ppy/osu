@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
-            TransformTo(() => visibleTimeRange.Value, newTimeRange, duration, easing, new TransformTimeSpan());
+            TransformTo(newTimeRange, duration, easing, new TransformTimeSpan());
         }
 
         protected override void Update()
@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private class TransformTimeSpan : Transform<double, Drawable>
         {
-            public override double CurrentValue
+            public double CurrentValue
             {
                 get
                 {
@@ -259,13 +259,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 }
             }
 
-            public override void Apply(Drawable d)
-            {
-                base.Apply(d);
-
-                var p = (ManiaPlayfield)d;
-                p.visibleTimeRange.Value = (float)CurrentValue;
-            }
+            public override void Apply(Drawable d) => ((ManiaPlayfield)d).visibleTimeRange.Value = (float)CurrentValue;
+            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ManiaPlayfield)d).visibleTimeRange.Value;
         }
     }
 }

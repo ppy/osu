@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             return osu;
         }
 
-        private void ensureLoaded(GameHost host, int timeout = 10000)
+        private void ensureLoaded(GameHost host, int timeout = 60000)
         {
             IEnumerable<BeatmapSetInfo> resultSets = null;
 
