@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
 
 namespace osu.Game.Screens
@@ -20,9 +19,9 @@ namespace osu.Game.Screens
         private void load(OsuGame game)
         {
             if (game.IsDeployedBuild)
-                LoadComponentAsync(new Disclaimer(), d => Push((Screen)d));
+                LoadComponentAsync(new Disclaimer(), d => Push(d));
             else
-                LoadComponentAsync(new Intro(), d => Push((Screen)d));
+                LoadComponentAsync(new Intro(), d => Push(d));
         }
     }
 }

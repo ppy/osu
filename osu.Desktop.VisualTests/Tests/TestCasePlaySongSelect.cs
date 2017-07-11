@@ -13,20 +13,19 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCasePlaySongSelect : TestCase
     {
-        private BeatmapDatabase db;
-        private TestStorage storage;
-        private PlaySongSelect songSelect;
+        private readonly BeatmapDatabase db;
 
         public override string Description => @"with fake data";
 
-        private RulesetDatabase rulesets;
+        private readonly RulesetDatabase rulesets;
 
-        public override void Reset()
+        public TestCasePlaySongSelect()
         {
-            base.Reset();
+            PlaySongSelect songSelect;
+
             if (db == null)
             {
-                storage = new TestStorage(@"TestCasePlaySongSelect");
+                var storage = new TestStorage(@"TestCasePlaySongSelect");
 
                 var backingDatabase = storage.GetDatabase(@"client");
 

@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
                 base.Direction = (direction & BarDirection.Horizontal) > 0 ? FillDirection.Vertical : FillDirection.Horizontal;
                 foreach (var bar in Children)
                 {
-                    bar.Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / Children.Count()) : new Vector2(1.0f / Children.Count(), 1);
+                    bar.Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / Children.Count) : new Vector2(1.0f / Children.Count, 1);
                     bar.Direction = direction;
                 }
             }

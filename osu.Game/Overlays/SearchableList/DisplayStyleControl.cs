@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.SearchableList
             DisplayStyle.Value = PanelDisplayStyle.Grid;
         }
 
-        private class DisplayStyleToggleButton : ClickableContainer
+        private class DisplayStyleToggleButton : OsuClickableContainer
         {
             private readonly TextAwesome icon;
             private readonly PanelDisplayStyle style;

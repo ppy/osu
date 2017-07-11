@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Direct
             SetInfo = setInfo;
         }
 
-        protected IEnumerable<DifficultyIcon> GetDifficultyIcons()
+        protected List<DifficultyIcon> GetDifficultyIcons()
         {
             var icons = new List<DifficultyIcon>();
 
@@ -38,6 +38,7 @@ namespace osu.Game.Overlays.Direct
         {
             return new AsyncLoadWrapper(new BeatmapBackgroundSprite(new OnlineWorkingBeatmap(SetInfo.Beatmaps.FirstOrDefault(), textures, null))
             {
+                RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fill,
                 OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
             }) { RelativeSizeAxes = Axes.Both };

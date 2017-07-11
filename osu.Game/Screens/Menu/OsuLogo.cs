@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Menu
             set { colourAndTriangles.Alpha = value ? 1 : 0; }
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => logoContainer.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => logoContainer.ReceiveMouseInputAt(screenSpacePos);
 
         public bool Ripple
         {
@@ -72,11 +72,11 @@ namespace osu.Game.Screens.Menu
 
         private const float default_size = 480;
 
-        private const double beat_in_time = 60;
+        private const double early_activation = 60;
 
         public OsuLogo()
         {
-            EarlyActivationMilliseconds = beat_in_time;
+            EarlyActivationMilliseconds = early_activation;
 
             Size = new Vector2(default_size);
 
@@ -215,8 +215,9 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, AudioManager audio)
         {
-            sampleClick = audio.Sample.Get(@"Menu/menuhit");
+            sampleClick = audio.Sample.Get(@"Menu/select-2");
             sampleBeat = audio.Sample.Get(@"Menu/heartbeat");
+
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
         }
@@ -227,9 +228,6 @@ namespace osu.Game.Screens.Menu
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-            if (Hovering)
-                sampleBeat.Play();
-
             lastBeatIndex = beatIndex;
 
             var beatLength = timingPoint.BeatLength;
@@ -238,8 +236,14 @@ namespace osu.Game.Screens.Menu
 
             if (beatIndex < 0) return;
 
-            logoBeatContainer.ScaleTo(1 - 0.02f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
-            using (logoBeatContainer.BeginDelayedSequence(beat_in_time))
+            if (IsHovered)
+            {
+                using (BeginDelayedSequence(early_activation))
+                    Schedule(() => sampleBeat.Play());
+            }
+
+            logoBeatContainer.ScaleTo(1 - 0.02f * amplitudeAdjust, early_activation, EasingTypes.Out);
+            using (logoBeatContainer.BeginDelayedSequence(early_activation))
                 logoBeatContainer.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
 
             ripple.ClearTransforms();
@@ -255,11 +259,11 @@ namespace osu.Game.Screens.Menu
                 flashLayer.ClearTransforms();
                 visualizer.ClearTransforms();
 
-                flashLayer.FadeTo(0.2f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
-                visualizer.FadeTo(0.9f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
-                using (flashLayer.BeginDelayedSequence(beat_in_time))
+                flashLayer.FadeTo(0.2f * amplitudeAdjust, early_activation, EasingTypes.Out);
+                visualizer.FadeTo(0.9f * amplitudeAdjust, early_activation, EasingTypes.Out);
+                using (flashLayer.BeginDelayedSequence(early_activation))
                     flashLayer.FadeOut(beatLength);
-                using (visualizer.BeginDelayedSequence(beat_in_time))
+                using (visualizer.BeginDelayedSequence(early_activation))
                     visualizer.FadeTo(0.5f, beatLength);
             }
         }
