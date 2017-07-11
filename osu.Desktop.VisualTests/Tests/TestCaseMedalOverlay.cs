@@ -11,10 +11,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"medal get!";
 
-        public override void Reset()
+        public TestCaseMedalOverlay()
         {
-            base.Reset();
-
             Add(new MedalOverlay(new Medal
             {
                 Name = @"Animations",
