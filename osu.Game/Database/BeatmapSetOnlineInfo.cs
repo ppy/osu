@@ -40,16 +40,16 @@ namespace osu.Game.Database
         public string Cover { get; set; }
 
         [JsonProperty(@"cover@2x")]
-        public string Cover2x { get; set; }
+        public string Cover2X { get; set; }
 
         public string Card { get; set; }
 
         [JsonProperty(@"card@2x")]
-        public string Card2x { get; set; }
+        public string Card2X { get; set; }
 
         public string List { get; set; }
 
         [JsonProperty(@"list@2x")]
-        public string List2x { get; set; }
+        public string List2X { get; set; }
     }
 }
