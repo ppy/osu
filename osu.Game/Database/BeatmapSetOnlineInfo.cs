@@ -11,25 +11,25 @@ namespace osu.Game.Database
     public class BeatmapSetOnlineInfo
     {
         /// <summary>
-        /// The different sizes of cover art for this beatmap.
+        /// The different sizes of cover art for this beatmap set.
         /// </summary>
         [JsonProperty(@"covers")]
         public BeatmapSetOnlineCovers Covers { get; set; }
 
         /// <summary>
-        /// A small sample clip of this beatmap's song.
+        /// A small sample clip of this beatmap set's song.
         /// </summary>
         [JsonProperty(@"previewUrl")]
         public string Preview { get; set; }
 
         /// <summary>
-        /// The amount of plays this set has.
+        /// The amount of plays this beatmap set has.
         /// </summary>
         [JsonProperty(@"play_count")]
         public int PlayCount { get; set; }
 
         /// <summary>
-        /// The amount of people who have favourited this map.
+        /// The amount of people who have favourited this beatmap set.
         /// </summary>
         [JsonProperty(@"favourite_count")]
         public int FavouriteCount { get; set; }
