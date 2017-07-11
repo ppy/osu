@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Settings
             const int header_size = 26;
             const int header_margin = 25;
             const int border_size = 2;
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new Box
                 {

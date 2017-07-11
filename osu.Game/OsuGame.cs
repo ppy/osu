@@ -141,7 +141,7 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            Add(new Drawable[] {
+            AddRange(new Drawable[] {
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
