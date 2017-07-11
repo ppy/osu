@@ -11,8 +11,6 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Shapes;
@@ -195,12 +193,6 @@ namespace osu.Game.Screens
                 Icon = FontAwesome.fa_osu_right_o;
                 Anchor = Anchor.BottomRight;
                 Origin = Anchor.BottomRight;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
-            {
-                ActivationSound = audio.Sample.Get(@"Menu/menuhit");
             }
         }
     }

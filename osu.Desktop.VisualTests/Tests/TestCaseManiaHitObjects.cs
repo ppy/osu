@@ -13,10 +13,8 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseManiaHitObjects : TestCase
     {
-        public override void Reset()
+        public TestCaseManiaHitObjects()
         {
-            base.Reset();
-
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,

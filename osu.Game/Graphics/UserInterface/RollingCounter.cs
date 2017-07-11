@@ -210,7 +210,6 @@ namespace osu.Game.Graphics.UserInterface
 
             transform.StartTime = TransformStartTime;
             transform.EndTime = TransformStartTime + rollingTotalDuration;
-            transform.StartValue = currentValue;
             transform.EndValue = newValue;
             transform.Easing = RollingEasing;
 

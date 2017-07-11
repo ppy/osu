@@ -30,7 +30,7 @@ namespace osu.Game.Graphics
         public static void FadeAccent<T>(this T accentedDrawable, Color4 newColour, double duration = 0, EasingTypes easing = EasingTypes.None)
             where T : Transformable<Drawable>, IHasAccentColour
         {
-            accentedDrawable.TransformTo(() => accentedDrawable.AccentColour, newColour, duration, easing, new TransformAccent());
+            accentedDrawable.TransformTo(newColour, duration, easing, new TransformAccent());
         }
     }
 }
