@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new OsuSpriteText
                 {
