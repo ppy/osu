@@ -18,7 +18,6 @@ namespace osu.Desktop.VisualTests.Tests
 
         private RulesetDatabase rulesets;
 
-        public override void Reset()
         protected override void LoadComplete()
         {
             base.LoadComplete();
