@@ -34,9 +34,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            spinner.RotateTo(360, 2000);
-            using (spinner.BeginDelayedSequence(2000))
-                spinner.Loop();
+            using (spinner.BeginLoopedSequence())
+                spinner.RotateTo(360, 2000);
         }
 
         private const float transition_duration = 500;
