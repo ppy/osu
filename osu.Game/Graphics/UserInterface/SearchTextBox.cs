@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
         public SearchTextBox()
         {
             Height = 35;
-            Add(new Drawable[]
+            AddRange(new Drawable[]
             {
                 new TextAwesome
                 {
