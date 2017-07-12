@@ -182,17 +182,16 @@ namespace osu.Game.Overlays
             if (state.Keyboard.Keys.Contains(Key.Escape)) dismiss();
         }
 
+        private const double duration1 = 400;
+        private const double duration2 = 900;
+        private const double duration3 = 900;
+        private const double duration4 = 1000;
         protected override void PopIn()
         {
             base.PopIn();
 
             FadeIn(200);
             background.FlashColour(Color4.White.Opacity(0.25f), 400);
-
-            var duration1 = 400;
-            var duration2 = 900;
-            var duration3 = 900;
-            var duration4 = 1000;
 
             getSample.Play();
             Delay(200, true);
