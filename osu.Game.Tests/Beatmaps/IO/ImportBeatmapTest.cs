@@ -75,18 +75,16 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 var temp = prepareTempCopy(osz_path);
 
-                Assert.IsTrue(File.Exists(temp));
+                Assert.IsTrue(File.Exists(temp), "Temporary file copy never substantiated");
 
                 using (File.OpenRead(temp))
                     host.Dependencies.Get<BeatmapDatabase>().Import(temp);
 
                 ensureLoaded(host);
 
-                Assert.IsTrue(File.Exists(temp));
-
                 File.Delete(temp);
 
-                Assert.IsFalse(File.Exists(temp));
+                Assert.IsFalse(File.Exists(temp), "We likely held a read lock on the file when we shouldn't");
             }
         }
 
@@ -111,7 +109,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             return osu;
         }
 
-        private void ensureLoaded(GameHost host, int timeout = 10000)
+        private void ensureLoaded(GameHost host, int timeout = 60000)
         {
             IEnumerable<BeatmapSetInfo> resultSets = null;
 

@@ -93,6 +93,7 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     new BeatmapBackgroundSprite(working)
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,

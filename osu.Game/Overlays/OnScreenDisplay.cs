@@ -260,8 +260,6 @@ namespace osu.Game.Overlays
                     Radius = 8,
                 };
 
-                FadeEdgeEffectTo(0);
-
                 updateGlow();
                 Flush(true);
             }

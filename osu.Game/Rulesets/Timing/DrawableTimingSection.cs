@@ -1,13 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
@@ -55,7 +53,22 @@ namespace osu.Game.Rulesets.Timing
         /// </summary>
         internal MultiplierControlPoint ControlPoint;
 
-        protected override IComparer<Drawable> DepthComparer => new HitObjectReverseStartTimeComparer();
+        protected override int Compare(Drawable x, Drawable y)
+        {
+            var xHitObject = x as DrawableHitObject;
+            var yHitObject = y as DrawableHitObject;
+
+            // If either of the two drawables are not hit objects, fall back to the base comparer
+            if (xHitObject?.HitObject == null || yHitObject?.HitObject == null)
+                return base.Compare(x, y);
+
+            // Compare by start time
+            int i = yHitObject.HitObject.StartTime.CompareTo(xHitObject.HitObject.StartTime);
+            if (i != 0)
+                return i;
+
+            return base.Compare(x, y);
+        }
 
         /// <summary>
         /// Creates a new <see cref="DrawableTimingSection"/>.

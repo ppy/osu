@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDetailArea()
         {
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new BeatmapDetailAreaTabControl
                 {
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select
                 },
             });
 
-            Add(new Drawable[]
+            AddRange(new Drawable[]
             {
                 Details = new BeatmapDetails
                 {

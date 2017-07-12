@@ -398,6 +398,7 @@ namespace osu.Game.Overlays
                 {
                     sprite = new Sprite
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(150),
                         FillMode = FillMode.Fill,
                     },
