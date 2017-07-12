@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -20,7 +19,6 @@ namespace osu.Game.Overlays.MedalSplash
         private const float scale_when_unlocked = 0.76f;
         private const float scale_when_full = 0.6f;
 
-        private readonly Medal medal;
         private readonly Container medalContainer;
         private readonly Sprite medalGlow;
         private readonly OsuSpriteText unlocked, name;
@@ -31,7 +29,6 @@ namespace osu.Game.Overlays.MedalSplash
 
         public DrawableMedal(Medal medal)
         {
-            this.medal = medal;
             Position = new Vector2(0f, MedalOverlay.DISC_SIZE / 2);
             AlwaysPresent = true;
 
