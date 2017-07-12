@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Notifications
                 Left = 20,
             };
 
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new Container
                 {

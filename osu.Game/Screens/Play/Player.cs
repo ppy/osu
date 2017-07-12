@@ -200,7 +200,7 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 
-            hudOverlay.KeyCounter.Add(rulesetInstance.CreateGameplayKeys());
+            hudOverlay.KeyCounter.AddRange(rulesetInstance.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindHitRenderer(HitRenderer);
 
