@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public Drawable CentreTarget;
 
-        protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
+        protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
 
         protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 

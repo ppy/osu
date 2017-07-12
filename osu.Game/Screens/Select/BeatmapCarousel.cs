@@ -12,7 +12,6 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Framework.Input;
 using OpenTK.Input;
-using System.Collections;
 using osu.Framework.MathUtils;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -22,7 +21,7 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Screens.Select
 {
-    internal class BeatmapCarousel : ScrollContainer, IEnumerable<BeatmapGroup>
+    internal class BeatmapCarousel : ScrollContainer
     {
         public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
 
@@ -265,10 +264,6 @@ namespace osu.Game.Screens.Select
                 perform();
         }
 
-        public IEnumerator<BeatmapGroup> GetEnumerator() => groups.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
         {
             foreach (var b in beatmapSet.Beatmaps)
@@ -307,7 +302,7 @@ namespace osu.Game.Screens.Select
                 panels.Remove(p);
 
             scrollableContent.Remove(group.Header);
-            scrollableContent.Remove(group.BeatmapPanels);
+            scrollableContent.RemoveRange(group.BeatmapPanels);
 
             if (selectedGroup == group)
                 SelectNext();
