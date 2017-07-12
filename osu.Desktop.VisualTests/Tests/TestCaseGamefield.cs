@@ -76,7 +76,7 @@ namespace osu.Desktop.VisualTests.Tests
                 ControlPointInfo = controlPointInfo
             });
 
-            Add(new Drawable[]
+            AddRange(new Drawable[]
             {
                 new Container
                 {

@@ -58,7 +58,7 @@ namespace osu.Game.Graphics.UserInterface
                             Direction = Direction,
                         });
                 //I'm using ToList() here because Where() returns an Enumerable which can change it's elements afterwards
-                Remove(Children.Where((bar, index) => index >= value.Count()).ToList());
+                RemoveRange(Children.Where((bar, index) => index >= value.Count()).ToList());
             }
         }
     }
