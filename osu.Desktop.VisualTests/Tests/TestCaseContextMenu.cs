@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
@@ -21,10 +20,10 @@ namespace osu.Desktop.VisualTests.Tests
         private const int start_time = 0;
         private const int duration = 1000;
 
+        private readonly Container container;
+
         public TestCaseContextMenu()
         {
-            MyContextMenuContainer container;
-
             Add(container = new MyContextMenuContainer
             {
                 Size = new Vector2(200),
@@ -54,43 +53,26 @@ namespace osu.Desktop.VisualTests.Tests
                     }
                 }
             });
+        }
 
-            container.Transforms.Add(new TransformPosition
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            using (container.BeginLoopedSequence())
             {
-                StartValue = Vector2.Zero,
-                EndValue = new Vector2(0, 100),
-                StartTime = start_time,
-                EndTime = start_time + duration,
-                LoopCount = -1,
-                LoopDelay = duration * 3
-            });
-            container.Transforms.Add(new TransformPosition
-            {
-                StartValue = new Vector2(0, 100),
-                EndValue = new Vector2(100, 100),
-                StartTime = start_time + duration,
-                EndTime = start_time + duration * 2,
-                LoopCount = -1,
-                LoopDelay = duration * 3
-            });
-            container.Transforms.Add(new TransformPosition
-            {
-                StartValue = new Vector2(100, 100),
-                EndValue = new Vector2(100, 0),
-                StartTime = start_time + duration * 2,
-                EndTime = start_time + duration * 3,
-                LoopCount = -1,
-                LoopDelay = duration * 3
-            });
-            container.Transforms.Add(new TransformPosition
-            {
-                StartValue = new Vector2(100, 0),
-                EndValue = Vector2.Zero,
-                StartTime = start_time + duration * 3,
-                EndTime = start_time + duration * 4,
-                LoopCount = -1,
-                LoopDelay = duration * 3
-            });
+                container.MoveTo(new Vector2(0, 100), duration);
+                using (container.BeginDelayedSequence(duration))
+                {
+                    container.MoveTo(new Vector2(100, 100), duration);
+                    using (container.BeginDelayedSequence(duration))
+                    {
+                        container.MoveTo(new Vector2(100, 0), duration);
+                        using (container.BeginDelayedSequence(duration))
+                            container.MoveTo(Vector2.Zero, duration);
+                    }
+                }
+            }
         }
 
         private class MyContextMenuContainer : Container, IHasContextMenu

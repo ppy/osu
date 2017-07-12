@@ -33,7 +33,20 @@ namespace osu.Game.Rulesets.Timing
             set { visibleTimeRange.BindTo(value); }
         }
 
-        protected override IComparer<Drawable> DepthComparer => new SpeedAdjustmentContainerReverseStartTimeComparer();
+        protected override int Compare(Drawable x, Drawable y)
+        {
+            var xSpeedAdjust = x as SpeedAdjustmentContainer;
+            var ySpeedAdjust = y as SpeedAdjustmentContainer;
+
+            // If either of the two drawables are not hit objects, fall back to the base comparer
+            if (xSpeedAdjust?.ControlPoint == null || ySpeedAdjust?.ControlPoint == null)
+                return CompareReverseChildID(x, y);
+
+            // Compare by start time
+            int i = ySpeedAdjust.ControlPoint.StartTime.CompareTo(xSpeedAdjust.ControlPoint.StartTime);
+
+            return i != 0 ? i : CompareReverseChildID(x, y);
+        }
 
         /// <summary>
         /// Hit objects that are to be re-processed on the next update.
@@ -116,27 +129,5 @@ namespace osu.Game.Rulesets.Timing
         /// <param name="time">The time to find the active <see cref="SpeedAdjustmentContainer"/> at.</param>
         /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="time"/>. Null if there are no speed adjustments.</returns>
         private SpeedAdjustmentContainer adjustmentContainerAt(double time) => Children.FirstOrDefault(c => c.CanContain(time)) ?? Children.LastOrDefault();
-
-        /// <summary>
-        /// Compares two speed adjustment containers by their control point start time, falling back to creation order
-        // if their control point start time is equal. This will compare the two speed adjustment containers in reverse order.
-        /// </summary>
-        private class SpeedAdjustmentContainerReverseStartTimeComparer : ReverseCreationOrderDepthComparer
-        {
-            public override int Compare(Drawable x, Drawable y)
-            {
-                var speedAdjustmentX = x as SpeedAdjustmentContainer;
-                var speedAdjustmentY = y as SpeedAdjustmentContainer;
-
-                // If either of the two drawables are not hit objects, fall back to the base comparer
-                if (speedAdjustmentX?.ControlPoint == null || speedAdjustmentY?.ControlPoint == null)
-                    return base.Compare(x, y);
-
-                // Compare by start time
-                int i = speedAdjustmentY.ControlPoint.StartTime.CompareTo(speedAdjustmentX.ControlPoint.StartTime);
-
-                return i != 0 ? i : base.Compare(x, y);
-            }
-        }
     }
 }

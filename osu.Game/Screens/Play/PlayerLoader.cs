@@ -227,6 +227,7 @@ namespace osu.Game.Screens.Play
                                 {
                                     new Sprite
                                     {
+                                        RelativeSizeAxes = Axes.Both,
                                         Texture = beatmap?.Background,
                                         Origin = Anchor.Centre,
                                         Anchor = Anchor.Centre,
