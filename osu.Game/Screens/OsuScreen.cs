@@ -89,8 +89,13 @@ namespace osu.Game.Screens
         {
             if (!IsCurrentScreen) return;
 
-            ruleset.Disabled = !AllowBeatmapRulesetChange;
-            beatmap.Disabled = !AllowBeatmapRulesetChange;
+            if (ParentScreen != null)
+            {
+                // we only want to apply these restrictions when we are inside a screen stack.
+                // the use case for not applying is in visual/unit tests.
+                ruleset.Disabled = !AllowBeatmapRulesetChange;
+                beatmap.Disabled = !AllowBeatmapRulesetChange;
+            }
         }
 
         protected override void OnResuming(Screen last)
