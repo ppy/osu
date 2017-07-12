@@ -41,17 +41,6 @@ namespace osu.Game.Overlays
 
         private SampleChannel getSample;
 
-        protected override bool OnClick(InputState state)
-        {
-            dismiss();
-            return true;
-        }
-
-        protected override void OnFocusLost(InputState state)
-        {
-            if (state.Keyboard.Keys.Contains(Key.Escape)) dismiss();
-        }
-
         public MedalOverlay(Medal medal)
         {
             RelativeSizeAxes = Axes.Both;
@@ -180,6 +169,17 @@ namespace osu.Game.Overlays
             base.Update();
 
             particleContainer.Add(new MedalParticle(RNG.Next(0, 359)));
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            dismiss();
+            return true;
+        }
+
+        protected override void OnFocusLost(InputState state)
+        {
+            if (state.Keyboard.Keys.Contains(Key.Escape)) dismiss();
         }
 
         protected override void PopIn()

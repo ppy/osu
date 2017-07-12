@@ -26,7 +26,6 @@ namespace osu.Game.Overlays.MedalSplash
         private readonly OsuSpriteText unlocked, name;
         private readonly TextFlowContainer description;
         private readonly FillFlowContainer infoFlow;
-        private readonly IEnumerable<SpriteText> descriptionSprites;
 
         public Action<Drawable> OnSpriteLoadComplete;
 
@@ -108,7 +107,7 @@ namespace osu.Game.Overlays.MedalSplash
                 },
             };
 
-            descriptionSprites = description.AddText(medal.Description, s =>
+            description.AddText(medal.Description, s =>
             {
                 s.Anchor = Anchor.TopCentre;
                 s.Origin = Anchor.TopCentre;
@@ -120,9 +119,7 @@ namespace osu.Game.Overlays.MedalSplash
         private void load(OsuColour colours, TextureStore textures)
         {
             medalGlow.Texture = textures.Get(@"MedalSplash/medal-glow");
-
-            foreach (var s in descriptionSprites)
-                s.Colour = colours.BlueLight;
+            description.Colour = colours.BlueLight;
 
             unlocked.Position = new Vector2(0f, medalContainer.Size.Y / 2 + 10);
             infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
