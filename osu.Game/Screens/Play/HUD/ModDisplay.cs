@@ -73,11 +73,9 @@ namespace osu.Game.Screens.Play.HUD
             appearTransform();
         }
 
-        private bool playIsRanked => !mods.Value.Any(m => !m.Ranked);
-
         private void appearTransform()
         {
-            if (!playIsRanked)
+            if (mods.Value.Any(m => !m.Ranked))
                 unrankedText.FadeInFromZero(fade_duration, EasingTypes.OutQuint);
             else
                 unrankedText.Hide();
