@@ -56,6 +56,7 @@ namespace osu.Game.Overlays
         {
             RelativeSizeAxes = Axes.Both;
             Alpha = 0f;
+            AlwaysPresent = true;
 
             Children = new Drawable[]
             {
@@ -120,6 +121,7 @@ namespace osu.Game.Overlays
                     Origin = Anchor.Centre,
                     Alpha = 0f,
                     Masking = true,
+                    AlwaysPresent = true,
                     BorderColour = Color4.White,
                     BorderThickness = border_width,
                     Size = new Vector2(DISC_SIZE),
@@ -151,6 +153,8 @@ namespace osu.Game.Overlays
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
+                            AlwaysPresent = true,
+                            OnSpriteLoadComplete = drawable => Show(),
                         },
                     },
                 },
@@ -169,12 +173,6 @@ namespace osu.Game.Overlays
                 Colour = colours.Blue.Opacity(0.5f),
                 Radius = 50,
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Show();
         }
 
         protected override void Update()
@@ -247,6 +245,7 @@ namespace osu.Game.Overlays
         {
             if (drawableMedal.Transforms.Count != 0) return;
             Hide();
+            Expire();
         }
 
         private class BackgroundStrip : Container

@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using OpenTK;
 using osu.Framework.Allocation;
@@ -21,16 +22,19 @@ namespace osu.Game.Overlays.MedalSplash
 
         private readonly Medal medal;
         private readonly Container medalContainer;
-        private readonly Sprite medalGlow, medalSprite;
+        private readonly Sprite medalGlow;
         private readonly OsuSpriteText unlocked, name;
         private readonly TextFlowContainer description;
         private readonly FillFlowContainer infoFlow;
         private readonly IEnumerable<SpriteText> descriptionSprites;
 
+        public Action<Drawable> OnSpriteLoadComplete;
+
         public DrawableMedal(Medal medal)
         {
             this.medal = medal;
             Position = new Vector2(0f, MedalOverlay.DISC_SIZE / 2);
+            AlwaysPresent = true;
 
             Children = new Drawable[]
             {
@@ -40,12 +44,17 @@ namespace osu.Game.Overlays.MedalSplash
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
                     Alpha = 0f,
-                    Children = new[]
+                    AlwaysPresent = true,
+                    Children = new Drawable[]
                     {
-                        medalSprite = new Sprite
+                        new AsyncLoadWrapper(new MedalSprite(medal)
+                        {
+                            OnLoadComplete = drawable => OnSpriteLoadComplete?.Invoke(drawable),
+                        })
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
                             Scale = new Vector2(0.81f),
                         },
                         medalGlow = new Sprite
@@ -110,7 +119,6 @@ namespace osu.Game.Overlays.MedalSplash
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, TextureStore textures)
         {
-            medalSprite.Texture = textures.Get(medal.ImageUrl);
             medalGlow.Texture = textures.Get(@"MedalSplash/medal-glow");
 
             foreach (var s in descriptionSprites)
@@ -148,6 +156,23 @@ namespace osu.Game.Overlays.MedalSplash
             Icon,
             MedalUnlocked,
             Full,
+        }
+
+        private class MedalSprite : Sprite
+        {
+            private readonly Medal medal;
+
+            public MedalSprite(Medal medal)
+            {
+                this.medal = medal;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                if (medal?.InternalName != null)
+                    Texture = textures.Get(medal.ImageUrl);
+            }
         }
     }
 }
