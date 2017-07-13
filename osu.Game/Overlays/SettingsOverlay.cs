@@ -93,7 +93,7 @@ namespace osu.Game.Overlays
                         new SidebarButton
                         {
                             Section = section,
-                            Action = b => sectionsContainer.ScrollContainer.ScrollTo(b),
+                            Action = s => sectionsContainer.ScrollTo(s),
                         }
                     ).ToArray()
                 }
