@@ -202,7 +202,7 @@ namespace osu.Desktop.Overlays
             {
                 this.game = game;
 
-                IconContent.Add(new Drawable[]
+                IconContent.AddRange(new Drawable[]
                 {
                     new Box
                     {
