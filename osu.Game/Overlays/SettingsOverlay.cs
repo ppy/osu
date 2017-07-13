@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -34,6 +35,8 @@ namespace osu.Game.Overlays
         private SettingsSectionsContainer sectionsContainer;
 
         private SearchTextBox searchTextBox;
+
+        private Func<float> getToolbarHeight;
 
         public SettingsOverlay()
         {
@@ -111,7 +114,7 @@ namespace osu.Game.Overlays
 
             searchTextBox.Current.ValueChanged += newValue => sectionsContainer.SearchContainer.SearchTerm = newValue;
 
-            sectionsContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
+            getToolbarHeight = () => game?.ToolbarOffset ?? 0;
         }
 
         protected override void PopIn()
@@ -153,6 +156,7 @@ namespace osu.Game.Overlays
             base.UpdateAfterChildren();
 
             sectionsContainer.Margin = new MarginPadding { Left = sidebar.DrawWidth };
+            sectionsContainer.Padding = new MarginPadding { Top = getToolbarHeight() };
         }
 
         private class SettingsSectionsContainer : SectionsContainer
