@@ -34,23 +34,25 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable GetBackground(TextureStore textures, bool doubleSize)
+        protected Drawable CreateBackground() => new DelayedLoadWrapper(new BeatmapSetBackgroundSprite(SetInfo)
         {
-            return new DelayedLoadWrapper(new BeatmapSetBackgroundSprite(SetInfo, doubleSize)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fill,
-                OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
-            }) { RelativeSizeAxes = Axes.Both, TimeBeforeLoad = 300 };
-        }
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            RelativeSizeAxes = Axes.Both,
+            FillMode = FillMode.Fill,
+            OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
+        })
+        {
+            RelativeSizeAxes = Axes.Both,
+            TimeBeforeLoad = 300
+        };
 
         public class Statistic : FillFlowContainer
         {
             private readonly SpriteText text;
 
             private int value;
+
             public int Value
             {
                 get { return value; }
@@ -91,19 +93,18 @@ namespace osu.Game.Overlays.Direct
         private class BeatmapSetBackgroundSprite : Sprite
         {
             private readonly BeatmapSetInfo set;
-            private readonly bool doubleSize;
-
-            public BeatmapSetBackgroundSprite(BeatmapSetInfo set, bool doubleSize)
+            public BeatmapSetBackgroundSprite(BeatmapSetInfo set)
             {
                 this.set = set;
-                this.doubleSize = doubleSize;
             }
 
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
-                if (set.OnlineInfo?.Covers?.Card != null)
-                    Texture = textures.Get(doubleSize ? set.OnlineInfo.Covers.Card2X : set.OnlineInfo.Covers.Card);
+                string resource = set.OnlineInfo.Covers.Card;
+
+                if (resource != null)
+                    Texture = textures.Get(resource);
             }
         }
     }

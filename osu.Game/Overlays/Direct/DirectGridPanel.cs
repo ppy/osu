@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                GetBackground(textures, false),
+                CreateBackground(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,

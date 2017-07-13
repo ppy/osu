@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
@@ -48,7 +47,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation, TextureStore textures)
+        private void load(LocalisationEngine localisation)
         {
             Children = new[]
             {
@@ -57,7 +56,7 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                GetBackground(textures, true),
+                CreateBackground(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
