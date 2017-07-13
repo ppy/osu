@@ -180,15 +180,18 @@ namespace osu.Game.Overlays
         private string lastQuery = string.Empty;
         private void updateSearch()
         {
-            if (!IsLoaded || Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || lastQuery == string.Empty)) return;
+            if (!IsLoaded) return;
 
             BeatmapSets = null;
             ResultAmounts = null;
+
             getSetsRequest?.Cancel();
 
             if (api == null) return;
 
-            getSetsRequest = new GetBeatmapSetsRequest(lastQuery,
+            if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty)) return;
+
+            getSetsRequest = new GetBeatmapSetsRequest(currentQuery,
                                                        ((FilterControl)Filter).Ruleset.Value,
                                                        Filter.DisplayStyleControl.Dropdown.Current.Value,
                                                        Filter.Tabs.Current.Value); //todo: sort direction (?)
