@@ -9,10 +9,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -45,7 +43,6 @@ namespace osu.Game.Screens.Multiplayer
         private readonly Bindable<User[]> participantsBind = new Bindable<User[]>();
 
         private OsuColour colours;
-        private TextureStore textures;
         private LocalisationEngine localisation;
 
         public readonly Room Room;
@@ -188,7 +185,6 @@ namespace osu.Game.Screens.Multiplayer
         private void load(OsuColour colours, TextureStore textures, LocalisationEngine localisation)
         {
             this.localisation = localisation;
-            this.textures = textures;
             this.colours = colours;
 
             beatmapInfoFlow.Colour = colours.Gray9;
@@ -234,7 +230,7 @@ namespace osu.Game.Screens.Multiplayer
                 coverContainer.FadeIn(transition_duration);
                 coverContainer.Children = new[]
                 {
-                    new AsyncLoadWrapper(new BeatmapSetBackgroundSprite(value.BeatmapSet)
+                    new AsyncLoadWrapper(new BeatmapSetCover(value.BeatmapSet)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -262,24 +258,6 @@ namespace osu.Game.Screens.Multiplayer
         private void displayParticipants(User[] value)
         {
             participantInfo.Participants = value;
-        }
-
-        private class BeatmapSetBackgroundSprite : Sprite
-        {
-            private readonly BeatmapSetInfo set;
-            public BeatmapSetBackgroundSprite(BeatmapSetInfo set)
-            {
-                this.set = set;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                string resource = set.OnlineInfo.Covers.Cover;
-
-                if (resource != null)
-                    Texture = textures.Get(resource);
-            }
         }
     }
 }
