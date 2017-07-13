@@ -96,7 +96,11 @@ namespace osu.Game.Overlays
                         new SidebarButton
                         {
                             Section = section,
-                            Action = s => sectionsContainer.ScrollTo(s),
+                            Action = s =>
+                            {
+                                sectionsContainer.ScrollTo(s);
+                                sidebar.State = ExpandedState.Contracted;
+                            },
                         }
                     ).ToArray()
                 }
