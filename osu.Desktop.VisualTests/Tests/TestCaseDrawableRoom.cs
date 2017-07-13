@@ -49,9 +49,15 @@ namespace osu.Desktop.VisualTests.Tests
                                     Title = @"Critical Crystal",
                                     Artist = @"Seiryu",
                                 },
-                                OnlineInfo = new BeatmapOnlineInfo
+                                BeatmapSet = new BeatmapSetInfo
                                 {
-                                    Covers = new[] { @"https://assets.ppy.sh//beatmaps/376340/covers/cover.jpg?1456478455" },
+                                    OnlineInfo = new BeatmapSetOnlineInfo
+                                    {
+                                        Covers = new BeatmapSetOnlineCovers
+                                        {
+                                            Cover = @"https://assets.ppy.sh//beatmaps/376340/covers/cover.jpg?1456478455",
+                                        },
+                                    },
                                 },
                             },
                         },
@@ -81,9 +87,15 @@ namespace osu.Desktop.VisualTests.Tests
                                     Title = @"Serendipity",
                                     Artist = @"ZAQ",
                                 },
-                                OnlineInfo = new BeatmapOnlineInfo
+                                BeatmapSet = new BeatmapSetInfo
                                 {
-                                    Covers = new[] { @"https://assets.ppy.sh//beatmaps/526839/covers/cover.jpg?1493815706" },
+                                    OnlineInfo = new BeatmapSetOnlineInfo
+                                    {
+                                        Covers = new BeatmapSetOnlineCovers
+                                        {
+                                            Cover = @"https://assets.ppy.sh//beatmaps/526839/covers/cover.jpg?1493815706",
+                                        },
+                                    },
                                 },
                             },
                         },
