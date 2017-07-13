@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Select
                                 //        Bottom = 5
                                 //    },
                                 //},
-                                sortTabs = new OsuTabControl<SortMode>()
+                                sortTabs = new OsuTabControl<SortMode>
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Width = 0.5f,

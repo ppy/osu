@@ -114,7 +114,7 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            Add(ScrollContainer = new ScrollContainer()
+            Add(ScrollContainer = new ScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = false,
