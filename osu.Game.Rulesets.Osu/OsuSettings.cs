@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuSettings : SettingsSubsection
     {
-        protected override string Header => "osu";
+        protected override string Header => "osu!";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
