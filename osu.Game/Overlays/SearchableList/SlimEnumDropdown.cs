@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.SearchableList
         {
             public SlimMenu()
             {
-                Background.Colour = Color4.Black.Opacity(0.25f);
+                Background.Colour = Color4.Black.Opacity(0.7f);
             }
         }
     }

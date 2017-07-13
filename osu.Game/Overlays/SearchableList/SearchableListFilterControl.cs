@@ -120,6 +120,7 @@ namespace osu.Game.Overlays.SearchableList
         {
             protected override Color4 BackgroundUnfocused => backgroundColour;
             protected override Color4 BackgroundFocused => backgroundColour;
+            protected override bool AllowCommit => true;
 
             private Color4 backgroundColour;
 
