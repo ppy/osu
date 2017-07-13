@@ -37,19 +37,19 @@ namespace osu.Game.Database
 
     public class BeatmapSetOnlineCovers
     {
-        public string Cover { get; set; }
+        public string CoverLowRes { get; set; }
 
         [JsonProperty(@"cover@2x")]
-        public string Cover2X { get; set; }
+        public string Cover { get; set; }
 
-        public string Card { get; set; }
+        public string CardLowRes { get; set; }
 
         [JsonProperty(@"card@2x")]
-        public string Card2X { get; set; }
+        public string Card { get; set; }
 
-        public string List { get; set; }
+        public string ListLowRes { get; set; }
 
         [JsonProperty(@"list@2x")]
-        public string List2X { get; set; }
+        public string List { get; set; }
     }
 }
