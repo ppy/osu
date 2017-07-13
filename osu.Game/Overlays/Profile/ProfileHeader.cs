@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Profile
         private readonly Box colourBar;
 
         private const float cover_height = 350, info_height = 150, info_width = 220, avatar_size = 110, level_position = 30, level_height = 60;
+
         public ProfileHeader(User user)
         {
             RelativeSizeAxes = Axes.X;
@@ -414,7 +415,8 @@ namespace osu.Game.Overlays.Profile
         private void tryAddInfoRightLine(FontAwesome icon, string str)
         {
             if (string.IsNullOrEmpty(str)) return;
-            infoTextRight.AddTextAwesome(icon);
+
+            infoTextRight.AddIcon(icon);
             infoTextRight.AddText(" " + str);
             infoTextRight.NewLine();
         }
@@ -428,10 +430,7 @@ namespace osu.Game.Overlays.Profile
 
             public int DisplayCount
             {
-                set
-                {
-                    numberText.Text = value.ToString(@"#,0");
-                }
+                set { numberText.Text = value.ToString(@"#,0"); }
             }
 
             public GradeBadge(string grade)
