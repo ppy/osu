@@ -1,14 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -50,7 +48,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation, TextureStore textures)
+        private void load(OsuColour colours, LocalisationEngine localisation)
         {
             Children = new[]
             {
@@ -59,7 +57,7 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                GetBackground(textures),
+                CreateBackground(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -180,11 +178,11 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Top = vertical_padding, Right = vertical_padding },
                     Children = new[]
                     {
-                        new Statistic(FontAwesome.fa_play_circle, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.PlayCount ?? 0)
+                        new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
                         {
                             Margin = new MarginPadding { Right = 1 },
                         },
-                        new Statistic(FontAwesome.fa_heart, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.FavouriteCount ?? 0),
+                        new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
             };
