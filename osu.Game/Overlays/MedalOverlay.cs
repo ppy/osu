@@ -163,7 +163,11 @@ namespace osu.Game.Overlays
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
                 RelativeSizeAxes = Axes.X,
-            }, m => { disc.Add(m); Show(); });
+            }, m =>
+            {
+                disc.Add(m);
+                Show();
+            });
         }
 
         protected override void Update()
