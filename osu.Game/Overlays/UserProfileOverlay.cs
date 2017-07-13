@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
+using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays
