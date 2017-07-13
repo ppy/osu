@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -15,14 +16,12 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Users
 {
-    public class UserPanel : Container
+    public class UserPanel : ClickableContainer
     {
+        private readonly User user;
         private const float height = 100;
         private const float content_padding = 10;
         private const float status_height = 30;
-
-        private OsuColour colours;
-        private UserProfileOverlay profile;
 
         private readonly Container statusBar;
         private readonly Box statusBg;
@@ -30,8 +29,12 @@ namespace osu.Game.Users
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
+        public new Action Action;
+
         public UserPanel(User user)
         {
+            this.user = user;
+
             Height = height - status_height;
             Masking = true;
             CornerRadius = 5;
@@ -77,7 +80,7 @@ namespace osu.Game.Users
                                 Radius = 4,
                             },
                         },
-                        new ClickableContainer
+                        new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = height - status_height - content_padding },
@@ -117,7 +120,6 @@ namespace osu.Game.Users
                                     },
                                 },
                             },
-                            Action = () => profile?.ShowUser(user)
                         },
                     },
                 },
@@ -166,9 +168,14 @@ namespace osu.Game.Users
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuColour colours, UserProfileOverlay profile)
         {
-            this.colours = colours;
-            this.profile = profile;
             Status.ValueChanged += displayStatus;
+            Status.ValueChanged += status => statusBg.FadeColour(status.GetAppropriateColour(colours), 500, EasingTypes.OutQuint);
+
+            base.Action = () =>
+            {
+                Action?.Invoke();
+                profile?.ShowUser(user);
+            };
         }
 
         protected override void LoadComplete()
@@ -193,7 +200,6 @@ namespace osu.Game.Users
                 statusBar.FadeIn(transition_duration, EasingTypes.OutQuint);
                 ResizeHeightTo(height, transition_duration, EasingTypes.OutQuint);
 
-                statusBg.FadeColour(status.GetAppropriateColour(colours), 500, EasingTypes.OutQuint);
                 statusMessage.Text = status.Message;
             }
         }
