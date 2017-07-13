@@ -169,7 +169,7 @@ namespace osu.Game.Users
         private void load(OsuColour colours, UserProfileOverlay profile)
         {
             Status.ValueChanged += displayStatus;
-            Status.ValueChanged += status => statusBg.FadeColour(status.GetAppropriateColour(colours), 500, EasingTypes.OutQuint);
+            Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, EasingTypes.OutQuint);
 
             base.Action = () =>
             {
