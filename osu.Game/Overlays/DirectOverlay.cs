@@ -185,7 +185,17 @@ namespace osu.Game.Overlays
         private void recreatePanels(PanelDisplayStyle displayStyle)
         {
             if (BeatmapSets == null) return;
-            panels.ChildrenEnumerable = BeatmapSets.Select(b => displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)new DirectGridPanel(b) { Width = 400 } : new DirectListPanel(b));
+
+            panels.ChildrenEnumerable = BeatmapSets.Select<BeatmapSetInfo, DirectPanel>(b =>
+             {
+                 switch (displayStyle)
+                 {
+                     case PanelDisplayStyle.Grid:
+                         return new DirectGridPanel(b) { Width = 400 };
+                     default:
+                         return new DirectListPanel(b);
+                 }
+             });
         }
 
         private GetBeatmapSetsRequest getSetsRequest;
