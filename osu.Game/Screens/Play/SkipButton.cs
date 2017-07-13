@@ -182,7 +182,6 @@ namespace osu.Game.Screens.Play
             private FillFlowContainer flow;
             private Box background;
             private AspectContainer aspect;
-            private bool isClicked;
 
             public Button()
             {
@@ -278,14 +277,16 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnClick(InputState state)
             {
-                if (isClicked)
+                if (!Enabled)
                     return false;
-
-                isClicked = true;
 
                 box.FlashColour(Color4.White, 500, EasingTypes.OutQuint);
                 aspect.ScaleTo(1.2f, 2000, EasingTypes.OutQuint);
-                return base.OnClick(state);
+
+                bool result = base.OnClick(state);
+                Enabled.Value = false;
+
+                return result;
             }
         }
     }
