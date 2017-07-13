@@ -162,7 +162,8 @@ namespace osu.Game.Graphics.Containers
                 updateSectionsMargin();
             }
 
-            float currentScroll = Math.Max(0, scrollContainer.Current);
+            float currentScroll = scrollContainer.Current;
+
             if (currentScroll != lastKnownScroll)
             {
                 lastKnownScroll = currentScroll;
