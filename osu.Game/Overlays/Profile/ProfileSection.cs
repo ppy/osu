@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Profile
                     Margin = new MarginPadding
                     {
                         Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                        Vertical = 20
+                        Vertical = 10
                     }
                 },
                 content = new FillFlowContainer
