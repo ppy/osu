@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
@@ -12,7 +13,7 @@ using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class Sidebar : Container
+    public class Sidebar : Container, IStateful<ExpandedState>
     {
         private readonly FillFlowContainer content;
         internal const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
@@ -47,21 +48,18 @@ namespace osu.Game.Overlays.Settings
         }
 
         private ScheduledDelegate expandEvent;
+        private ExpandedState state;
 
         protected override bool OnHover(InputState state)
         {
-            expandEvent?.Cancel();
-            expandEvent = Scheduler.AddDelayed(() =>
-            {
-                ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, EasingTypes.OutQuint);
-            }, 750);
+            queueExpandIfHovering();
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             expandEvent?.Cancel();
-            ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 500, EasingTypes.OutQuint);
+            State = ExpandedState.Contracted;
             base.OnHoverLost(state);
         }
 
@@ -74,5 +72,44 @@ namespace osu.Game.Overlays.Settings
                 RelativeSizeAxes = Axes.Both;
             }
         }
+
+        public ExpandedState State
+        {
+            get { return state; }
+            set
+            {
+                // if the state is changed externally, we want to re-queue a delayed expand.
+                queueExpandIfHovering();
+
+                if (state == value) return;
+
+                state = value;
+
+                switch (state)
+                {
+                    default:
+                        ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 500, EasingTypes.OutQuint);
+                        break;
+                    case ExpandedState.Expanded:
+                        ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, EasingTypes.OutQuint);
+                        break;
+                }
+            }
+        }
+
+        private void queueExpandIfHovering()
+        {
+            if (IsHovered)
+            {
+                expandEvent?.Cancel();
+                expandEvent = Scheduler.AddDelayed(() => State = ExpandedState.Expanded, 750);
+            }
+        }
+    }
+
+    public enum ExpandedState
+    {
+        Contracted,
+        Expanded,
     }
 }
