@@ -7,7 +7,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    class OsuScrollContainer : ScrollContainer
+    internal class OsuScrollContainer : ScrollContainer
     {
         /// <summary>
         /// Add the ability to seek to an absolute scroll position when the right mouse button is pressed or dragged.
