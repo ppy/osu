@@ -12,8 +12,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
@@ -332,7 +330,7 @@ namespace osu.Game.Screens.Multiplayer
                 coverContainer.FadeIn(transition_duration);
                 coverContainer.Children = new[]
                 {
-                    new AsyncLoadWrapper(new CoverSprite(value.BeatmapSet)
+                    new AsyncLoadWrapper(new BeatmapSetCover(value.BeatmapSet)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
@@ -407,23 +405,6 @@ namespace osu.Game.Screens.Multiplayer
                         User = user,
                     },
                 };
-            }
-        }
-
-        private class CoverSprite : Sprite
-        {
-            private readonly BeatmapSetInfo set;
-
-            public CoverSprite(BeatmapSetInfo set)
-            {
-                this.set = set;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                if (set.OnlineInfo?.Covers?.Cover != null)
-                    Texture = textures.Get(set.OnlineInfo.Covers.Cover);
             }
         }
     }

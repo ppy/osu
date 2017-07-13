@@ -9,8 +9,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Multiplayer
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures, LocalisationEngine localisation)
+        private void load(OsuColour colours, LocalisationEngine localisation)
         {
             this.localisation = localisation;
             this.colours = colours;
