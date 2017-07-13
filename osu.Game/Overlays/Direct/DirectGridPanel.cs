@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -49,7 +48,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation, TextureStore textures)
+        private void load(OsuColour colours, LocalisationEngine localisation)
         {
             Children = new[]
             {
