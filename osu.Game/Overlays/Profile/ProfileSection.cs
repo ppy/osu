@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -60,12 +61,13 @@ namespace osu.Game.Overlays.Profile
             // placeholder
             Add(new OsuSpriteText
             {
-                Text = @"Coming soon!",
-                TextSize = 36,
-                Font = @"Exo2.0-RegularItalic",
+                Text = @"coming soon!",
+                TextSize = 16,
+                Font = @"Exo2.0-Medium",
+                Colour = Color4.Gray,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Margin = new MarginPadding { Bottom = 200 }
+                Margin = new MarginPadding { Top = 100, Bottom = 100 }
             });
         }
     }
