@@ -31,7 +31,6 @@ namespace osu.Game.Overlays
         private ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 50;
-        private const float transition_length = 500;
 
         public UserProfileOverlay()
         {
