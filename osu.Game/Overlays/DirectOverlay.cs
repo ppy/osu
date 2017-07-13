@@ -7,6 +7,7 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -115,9 +116,9 @@ namespace osu.Game.Overlays
             };
 
             Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
-            ((FilterControl)Filter).Ruleset.ValueChanged += ruleset => updateSets();
+            ((FilterControl)Filter).Ruleset.ValueChanged += ruleset => Scheduler.AddOnce(updateSearch);
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => updateSets();
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => Scheduler.AddOnce(updateSearch);
 
             Header.Tabs.Current.ValueChanged += tab =>
             {
@@ -125,7 +126,7 @@ namespace osu.Game.Overlays
                 {
                     Filter.Search.Text = lastQuery = string.Empty;
                     Filter.Tabs.Current.Value = (DirectSortCriteria)Header.Tabs.Current.Value;
-                    updateSets();
+                    Scheduler.AddOnce(updateSearch);
                 }
             };
 
@@ -140,7 +141,7 @@ namespace osu.Game.Overlays
                 if (Header.Tabs.Current.Value != DirectTab.Search && sortCriteria != (DirectSortCriteria)Header.Tabs.Current.Value)
                     Header.Tabs.Current.Value = DirectTab.Search;
 
-                updateSets();
+                Scheduler.AddOnce(updateSearch);
             };
 
             updateResultCounts();
@@ -177,7 +178,7 @@ namespace osu.Game.Overlays
 
         private GetBeatmapSetsRequest getSetsRequest;
         private string lastQuery = string.Empty;
-        private void updateSets()
+        private void updateSearch()
         {
             if (!IsLoaded || Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || lastQuery == string.Empty)) return;
 
