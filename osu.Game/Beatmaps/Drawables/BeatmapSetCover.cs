@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Database;
 
-namespace osu.Game
+namespace osu.Game.Beatmaps.Drawables
 {
     public class BeatmapSetCover : Sprite
     {
