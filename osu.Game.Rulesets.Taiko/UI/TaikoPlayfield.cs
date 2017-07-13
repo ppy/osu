@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public TaikoPlayfield()
         {
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new ScaleFixContainer
                 {

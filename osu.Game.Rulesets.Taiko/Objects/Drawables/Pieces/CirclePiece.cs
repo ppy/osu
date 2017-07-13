@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         {
             EarlyActivationMilliseconds = pre_beat_transition_time;
 
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 background = new CircularContainer
                 {

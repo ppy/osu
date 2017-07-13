@@ -85,6 +85,7 @@ namespace osu.Game.Graphics.Containers
                 if (value == null) return;
 
                 headerBackgroundContainer.Add(headerBackground);
+
                 lastKnownScroll = float.NaN;
             }
         }

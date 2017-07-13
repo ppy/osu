@@ -380,15 +380,15 @@ namespace osu.Game.Overlays.Profile
                 scoreText.Add(createScoreText("Replay Watched by Others"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.ReplayWatched.ToString(@"#,0")));
 
-                gradeSS.Count = user.Statistics.GradesCount.SS;
+                gradeSS.DisplayCount = user.Statistics.GradesCount.SS;
                 gradeSS.Show();
-                gradeS.Count = user.Statistics.GradesCount.S;
+                gradeS.DisplayCount = user.Statistics.GradesCount.S;
                 gradeS.Show();
-                gradeA.Count = user.Statistics.GradesCount.A;
+                gradeA.DisplayCount = user.Statistics.GradesCount.A;
                 gradeA.Show();
 
-                gradeSPlus.Count = 0;
-                gradeSSPlus.Count = 0;
+                gradeSPlus.DisplayCount = 0;
+                gradeSSPlus.DisplayCount = 0;
 
                 chartContainer.Add(new RankChart(user) { RelativeSizeAxes = Axes.Both });
             }
@@ -426,7 +426,7 @@ namespace osu.Game.Overlays.Profile
             private readonly Sprite badge;
             private readonly SpriteText numberText;
 
-            public int Count
+            public int DisplayCount
             {
                 set
                 {

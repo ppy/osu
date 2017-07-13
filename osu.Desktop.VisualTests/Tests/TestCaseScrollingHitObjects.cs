@@ -55,7 +55,7 @@ namespace osu.Desktop.VisualTests.Tests
             timeRangeBindable.ValueChanged += v => timeRangeText.Text = $"Visible Range: {v:#,#.#}";
             timeRangeBindable.ValueChanged += v => bottomLabel.Text = $"t minus {v:#,#}";
 
-            Add(new Drawable[]
+            AddRange(new Drawable[]
             {
                 new Container
                 {
