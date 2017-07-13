@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Notifications
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 Light = new NotificationLight
                 {
