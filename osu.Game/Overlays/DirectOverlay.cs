@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
@@ -124,17 +125,28 @@ namespace osu.Game.Overlays
             {
                 if (tab != DirectTab.Search)
                 {
-                    Filter.Search.Text = lastQuery = string.Empty;
+                    currentQuery.Value = string.Empty;
                     Filter.Tabs.Current.Value = (DirectSortCriteria)Header.Tabs.Current.Value;
                     Scheduler.AddOnce(updateSearch);
                 }
             };
 
-            Filter.Search.OnCommit = (sender, text) =>
+            currentQuery.ValueChanged += v =>
             {
-                lastQuery = Filter.Search.Text;
-                updateSets();
+                queryChangedDebounce?.Cancel();
+
+                if (string.IsNullOrEmpty(v))
+                    Scheduler.AddOnce(updateSearch);
+                else
+                {
+                    BeatmapSets = null;
+                    ResultAmounts = null;
+
+                    queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
+                }
             };
+
+            currentQuery.BindTo(Filter.Search.Current);
 
             Filter.Tabs.Current.ValueChanged += sortCriteria =>
             {
@@ -157,7 +169,7 @@ namespace osu.Game.Overlays
 
         private void updateResultCounts()
         {
-            resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, EasingTypes.Out);
+            resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, EasingTypes.OutQuint);
             if (ResultAmounts == null) return;
 
             resultCountsText.Text = pluralize("Artist", ResultAmounts.Artists) + ", " +
@@ -177,9 +189,15 @@ namespace osu.Game.Overlays
         }
 
         private GetBeatmapSetsRequest getSetsRequest;
-        private string lastQuery = string.Empty;
+
+        private readonly Bindable<string> currentQuery = new Bindable<string>();
+
+        private ScheduledDelegate queryChangedDebounce;
+
         private void updateSearch()
         {
+            queryChangedDebounce?.Cancel();
+
             if (!IsLoaded) return;
 
             BeatmapSets = null;
@@ -211,10 +229,9 @@ namespace osu.Game.Overlays
                     tags.AddRange(s.Metadata.Tags.Split(' '));
                 }
 
-                ResultAmounts = new ResultCounts(distinctCount(artists),
-                                                 distinctCount(songs),
-                                                 distinctCount(tags));
+                ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));
             };
+
             api.Queue(getSetsRequest);
         }
 
