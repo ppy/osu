@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 fill = new Box
                 {

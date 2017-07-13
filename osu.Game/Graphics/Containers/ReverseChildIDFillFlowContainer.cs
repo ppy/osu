@@ -8,9 +8,10 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class ReverseDepthFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable
+    public class ReverseChildIDFillFlowContainer<T> : FillFlowContainer<T> where T : Drawable
     {
-        protected override IComparer<Drawable> DepthComparer => new ReverseCreationOrderDepthComparer();
+        protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
+
         protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
     }
 }
