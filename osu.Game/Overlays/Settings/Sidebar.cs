@@ -50,10 +50,10 @@ namespace osu.Game.Overlays.Settings
 
         protected override bool OnHover(InputState state)
         {
+            expandEvent?.Cancel();
             expandEvent = Scheduler.AddDelayed(() =>
             {
-                expandEvent = null;
-                ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 150, EasingTypes.OutQuad);
+                ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, EasingTypes.OutQuint);
             }, 750);
             return true;
         }
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Settings
         protected override void OnHoverLost(InputState state)
         {
             expandEvent?.Cancel();
-            ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 150, EasingTypes.OutQuad);
+            ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 500, EasingTypes.OutQuint);
             base.OnHoverLost(state);
         }
 
