@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             Children = new Drawable[]
             {
-                iconsContainer = new ReverseDepthFillFlowContainer<ModIcon>
+                iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,

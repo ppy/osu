@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Notifications
 
         public SimpleNotification()
         {
-            IconContent.Add(new Drawable[]
+            IconContent.AddRange(new Drawable[]
             {
                 IconBackgound = new Box
                 {

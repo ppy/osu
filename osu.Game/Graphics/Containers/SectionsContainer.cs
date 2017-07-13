@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.Containers
                 sections = value.ToList();
                 if (sections.Count == 0) return;
 
-                sectionsContainer.Add(sections);
+                sectionsContainer.AddRange(sections);
                 SelectedSection.Value = sections[0];
                 lastKnownScroll = float.NaN;
             }

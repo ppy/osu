@@ -93,12 +93,6 @@ namespace osu.Desktop.Overlays
                 checkForUpdateAsync();
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            State = Visibility.Visible;
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -208,7 +202,7 @@ namespace osu.Desktop.Overlays
             {
                 this.game = game;
 
-                IconContent.Add(new Drawable[]
+                IconContent.AddRange(new Drawable[]
                 {
                     new Box
                     {

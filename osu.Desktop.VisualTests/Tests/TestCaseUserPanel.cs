@@ -13,10 +13,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Panels for displaying a user's status";
 
-        public override void Reset()
+        public TestCaseUserPanel()
         {
-            base.Reset();
-
             UserPanel flyte;
             UserPanel peppy;
             Add(new FillFlowContainer

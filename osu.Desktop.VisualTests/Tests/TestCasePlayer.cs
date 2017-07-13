@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -21,64 +20,53 @@ namespace osu.Desktop.VisualTests.Tests
     internal class TestCasePlayer : TestCase
     {
         protected Player Player;
-        private BeatmapDatabase db;
         private RulesetDatabase rulesets;
 
         public override string Description => @"Showing everything to play the game.";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDatabase db, RulesetDatabase rulesets)
+        private void load(RulesetDatabase rulesets)
         {
             this.rulesets = rulesets;
-            this.db = db;
         }
 
-        public override void Reset()
+        protected override void LoadComplete()
         {
-            base.Reset();
+            base.LoadComplete();
 
-            WorkingBeatmap beatmap = null;
+            var objects = new List<HitObject>();
 
-            var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.RulesetID == 0);
-            if (beatmapInfo != null)
-                beatmap = db.GetWorkingBeatmap(beatmapInfo);
-
-            if (beatmap?.Track == null)
+            int time = 1500;
+            for (int i = 0; i < 50; i++)
             {
-                var objects = new List<HitObject>();
-
-                int time = 1500;
-                for (int i = 0; i < 50; i++)
+                objects.Add(new HitCircle
                 {
-                    objects.Add(new HitCircle
-                    {
-                        StartTime = time,
-                        Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : OsuPlayfield.BASE_SIZE.X,
-                        i % 4 < 2 ? 0 : OsuPlayfield.BASE_SIZE.Y),
-                        NewCombo = i % 4 == 0
-                    });
+                    StartTime = time,
+                    Position = new Vector2(i % 4 == 0 || i % 4 == 2 ? 0 : OsuPlayfield.BASE_SIZE.X,
+                    i % 4 < 2 ? 0 : OsuPlayfield.BASE_SIZE.Y),
+                    NewCombo = i % 4 == 0
+                });
 
-                    time += 500;
-                }
-
-                Beatmap b = new Beatmap
-                {
-                    HitObjects = objects,
-                    BeatmapInfo = new BeatmapInfo
-                    {
-                        Difficulty = new BeatmapDifficulty(),
-                        Ruleset = rulesets.Query<RulesetInfo>().First(),
-                        Metadata = new BeatmapMetadata
-                        {
-                            Artist = @"Unknown",
-                            Title = @"Sample Beatmap",
-                            Author = @"peppy",
-                        }
-                    }
-                };
-
-                beatmap = new TestWorkingBeatmap(b);
+                time += 500;
             }
+
+            Beatmap b = new Beatmap
+            {
+                HitObjects = objects,
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Difficulty = new BeatmapDifficulty(),
+                    Ruleset = rulesets.Query<RulesetInfo>().First(),
+                    Metadata = new BeatmapMetadata
+                    {
+                        Artist = @"Unknown",
+                        Title = @"Sample Beatmap",
+                        Author = @"peppy",
+                    }
+                }
+            };
+
+            WorkingBeatmap beatmap = new TestWorkingBeatmap(b);
 
             Add(new Box
             {
