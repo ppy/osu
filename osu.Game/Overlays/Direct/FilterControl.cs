@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Direct
         {
             DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 
-            Ruleset.BindTo(game?.Ruleset ?? new Bindable<RulesetInfo>() { Value = rulesets.GetRuleset(0) });
+            Ruleset.BindTo(game?.Ruleset ?? new Bindable<RulesetInfo> { Value = rulesets.GetRuleset(0) });
             foreach (var r in rulesets.AllRulesets)
             {
                 modeButtons.Add(new RulesetToggleButton(Ruleset, r));

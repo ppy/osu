@@ -46,7 +46,7 @@ namespace osu.Desktop.VisualTests.Tests
                 MaxCombo = 123,
                 Rank = ScoreRank.A,
                 Date = DateTimeOffset.Now,
-                Statistics = new Dictionary<string, dynamic>()
+                Statistics = new Dictionary<string, dynamic>
                 {
                     { "300", 50 },
                     { "100", 20 },
