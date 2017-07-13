@@ -8,6 +8,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets
 {
@@ -35,6 +36,8 @@ namespace osu.Game.Rulesets
         public abstract string Description { get; }
 
         public abstract IEnumerable<KeyCounter> CreateGameplayKeys();
+
+        public virtual SettingsSubsection CreateSettings() => null;
 
         /// <summary>
         /// Do not override this unless you are a legacy mode.
