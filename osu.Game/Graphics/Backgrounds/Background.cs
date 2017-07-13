@@ -26,6 +26,7 @@ namespace osu.Game.Graphics.Backgrounds
 
             Add(Sprite = new Sprite
             {
+                RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Colour = Color4.DarkGray,

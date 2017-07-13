@@ -16,7 +16,7 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"From song select";
 
-        private Leaderboard leaderboard;
+        private readonly Leaderboard leaderboard;
 
         private void newScores()
         {
@@ -207,10 +207,8 @@ namespace osu.Desktop.VisualTests.Tests
             leaderboard.Scores = scores;
         }
 
-        public override void Reset()
+        public TestCaseLeaderboard()
         {
-            base.Reset();
-
             Add(leaderboard = new Leaderboard
             {
                 Origin = Anchor.Centre,

@@ -152,6 +152,7 @@ namespace osu.Game.Screens.Select
                             // Zoomed-in and cropped beatmap background
                             new BeatmapBackgroundSprite(beatmap)
                             {
+                                RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 FillMode = FillMode.Fill,
