@@ -114,8 +114,8 @@ namespace osu.Game.Screens.Menu
             buttonsTopLevel.Add(new Button(@"osu!direct", string.Empty, FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
             buttonsTopLevel.Add(new Button(@"exit", string.Empty, FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), onExit, 0, Key.Q));
 
-            buttonFlow.Add(buttonsPlay);
-            buttonFlow.Add(buttonsTopLevel);
+            buttonFlow.AddRange(buttonsPlay);
+            buttonFlow.AddRange(buttonsTopLevel);
         }
 
         [BackgroundDependencyLoader(true)]
