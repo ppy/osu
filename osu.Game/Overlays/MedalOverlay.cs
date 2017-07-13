@@ -32,17 +32,19 @@ namespace osu.Game.Overlays
 
         private const float border_width = 5;
 
+        private readonly Medal medal;
         private readonly Box background;
         private readonly Container backgroundStrip, particleContainer;
         private readonly BackgroundStrip leftStrip, rightStrip;
         private readonly CircularContainer disc;
         private readonly Sprite innerSpin, outterSpin;
-        private readonly DrawableMedal drawableMedal;
+        private DrawableMedal drawableMedal;
 
         private SampleChannel getSample;
 
         public MedalOverlay(Medal medal)
         {
+            this.medal = medal;
             RelativeSizeAxes = Axes.Both;
             Alpha = 0f;
             AlwaysPresent = true;
@@ -103,6 +105,7 @@ namespace osu.Game.Overlays
                 particleContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Alpha = 0f,
                 },
                 disc = new CircularContainer
                 {
@@ -137,14 +140,6 @@ namespace osu.Game.Overlays
                             Size = new Vector2(1.05f),
                             Alpha = 0.25f,
                         },
-                        drawableMedal = new DrawableMedal(medal)
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AlwaysPresent = true,
-                            OnSpriteLoadComplete = drawable => Show(),
-                        },
                     },
                 },
             };
@@ -162,6 +157,13 @@ namespace osu.Game.Overlays
                 Colour = colours.Blue.Opacity(0.5f),
                 Radius = 50,
             };
+
+            LoadComponentAsync(drawableMedal = new DrawableMedal(medal)
+            {
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                RelativeSizeAxes = Axes.X,
+            }, m => { disc.Add(m); Show(); });
         }
 
         protected override void Update()
@@ -217,6 +219,7 @@ namespace osu.Game.Overlays
             outterSpin.Transforms.Add(outerRotate);
 
             disc.FadeIn(duration1);
+            particleContainer.FadeIn(duration1);
             outterSpin.FadeTo(0.1f, duration1 * 2);
             disc.ScaleTo(1f, duration1 * 2, EasingTypes.OutElastic);
 

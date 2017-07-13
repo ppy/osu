@@ -13,12 +13,15 @@ namespace osu.Desktop.VisualTests.Tests
 
         public TestCaseMedalOverlay()
         {
-            Add(new MedalOverlay(new Medal
+            AddStep(@"display", () =>
             {
-                Name = @"Animations",
-                InternalName = @"all-intro-doubletime",
-                Description = @"More complex than you think.",
-            }));
+                Add(new MedalOverlay(new Medal
+                {
+                    Name = @"Animations",
+                    InternalName = @"all-intro-doubletime",
+                    Description = @"More complex than you think.",
+                }));
+            });
         }
     }
 }
