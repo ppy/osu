@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
         private readonly Container backgroundStrip, particleContainer;
         private readonly BackgroundStrip leftStrip, rightStrip;
         private readonly CircularContainer disc;
-        private readonly Sprite innerSpin, outterSpin;
+        private readonly Sprite innerSpin, outerSpin;
         private DrawableMedal drawableMedal;
 
         private SampleChannel getSample;
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black.Opacity(60),
                 },
-                outterSpin = new Sprite
+                outerSpin = new Sprite
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -149,7 +149,7 @@ namespace osu.Game.Overlays
         private void load(OsuColour colours, TextureStore textures, AudioManager audio)
         {
             getSample = audio.Sample.Get(@"MedalSplash/medal-get");
-            innerSpin.Texture = outterSpin.Texture = textures.Get(@"MedalSplash/disc-spin");
+            innerSpin.Texture = outerSpin.Texture = textures.Get(@"MedalSplash/disc-spin");
 
             disc.EdgeEffect = leftStrip.EdgeEffect = rightStrip.EdgeEffect = new EdgeEffectParameters
             {
@@ -216,11 +216,11 @@ namespace osu.Game.Overlays
             };
 
             outerRotate.Loop(0);
-            outterSpin.Transforms.Add(outerRotate);
+            outerSpin.Transforms.Add(outerRotate);
 
             disc.FadeIn(duration1);
             particleContainer.FadeIn(duration1);
-            outterSpin.FadeTo(0.1f, duration1 * 2);
+            outerSpin.FadeTo(0.1f, duration1 * 2);
             disc.ScaleTo(1f, duration1 * 2, EasingTypes.OutElastic);
 
             Delay(duration1 + 200, true);
