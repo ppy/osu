@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 
-namespace osu.Game.Rulesets.Osu
+namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuSettings : SettingsSubsection
     {
