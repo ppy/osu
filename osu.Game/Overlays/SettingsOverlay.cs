@@ -148,6 +148,13 @@ namespace osu.Game.Overlays
             base.OnFocus(state);
         }
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            sectionsContainer.Margin = new MarginPadding { Left = sidebar.DrawWidth };
+        }
+
         private class SettingsSectionsContainer : SectionsContainer
         {
             public SearchContainer SearchContainer;
