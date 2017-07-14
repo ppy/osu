@@ -4,7 +4,11 @@
 using osu.Framework.Testing;
 using osu.Framework.Graphics;
 using osu.Framework.Timing;
+using osu.Game;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Desktop.VisualTests.Tests
@@ -12,6 +16,8 @@ namespace osu.Desktop.VisualTests.Tests
     internal class TestCaseMusicController : TestCase
     {
         public override string Description => @"Tests music controller ui.";
+
+        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
         public TestCaseMusicController()
         {
@@ -26,6 +32,13 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddToggleStep(@"toggle visibility", state => mc.State = state ? Visibility.Visible : Visibility.Hidden);
             AddStep(@"show", () => mc.State = Visibility.Visible);
+            AddToggleStep(@"toggle beatmap lock", state => beatmapBacking.Disabled = state);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase game)
+        {
+            beatmapBacking.BindTo(game.Beatmap);
         }
     }
 }
