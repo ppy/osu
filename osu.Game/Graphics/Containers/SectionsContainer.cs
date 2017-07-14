@@ -123,6 +123,8 @@ namespace osu.Game.Graphics.Containers
             originalSectionsMargin = sectionsContainer.Margin;
         }
 
+        public void ScrollTo(Drawable section) => ScrollContainer.ScrollTo(ScrollContainer.GetChildPosInContent(section) - FixedHeader.BoundingBox.Height);
+
         private float lastKnownScroll;
         protected override void UpdateAfterChildren()
         {
