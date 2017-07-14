@@ -78,6 +78,7 @@
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Graphics\Containers\OsuClickableContainer.cs" />
     <Compile Include="Graphics\Containers\OsuFocusedOverlayContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuScrollContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuContextMenuContainer.cs" />
     <Compile Include="Graphics\UserInterface\IconButton.cs" />
     <Compile Include="Configuration\SelectionRandomType.cs" />
@@ -473,10 +474,11 @@
     <Compile Include="Overlays\Direct\DirectPanel.cs" />
     <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
     <Compile Include="Overlays\Direct\DirectListPanel.cs" />
-    <Compile Include="Database\OnlineWorkingBeatmap.cs" />
     <Compile Include="Database\BeatmapOnlineInfo.cs" />
     <Compile Include="Graphics\Containers\ReverseChildIDFillFlowContainer.cs" />
     <Compile Include="Database\RankStatus.cs" />
+    <Compile Include="Database\BeatmapSetOnlineInfo.cs" />
+    <Compile Include="Online\API\Requests\GetBeatmapSetsRequest.cs" />
     <Compile Include="Overlays\SearchableList\SearchableListHeader.cs" />
     <Compile Include="Overlays\SearchableList\HeaderTabControl.cs" />
     <Compile Include="Overlays\Social\FilterControl.cs" />
@@ -488,9 +490,15 @@
     <Compile Include="Overlays\SearchableList\SlimEnumDropdown.cs" />
     <Compile Include="Overlays\SearchableList\DisplayStyleControl.cs" />
     <Compile Include="Graphics\UserInterface\BreadcrumbControl.cs" />
+    <Compile Include="Overlays\MedalOverlay.cs" />
+    <Compile Include="Users\Medal.cs" />
+    <Compile Include="Overlays\MedalSplash\DrawableMedal.cs" />
     <Compile Include="Screens\Multiplayer\RoomInspector.cs" />
     <Compile Include="Online\Multiplayer\GameType.cs" />
     <Compile Include="Screens\Multiplayer\DrawableGameType.cs" />
+    <Compile Include="Screens\Multiplayer\ParticipantInfo.cs" />
+    <Compile Include="Screens\Multiplayer\ModeTypeInfo.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

@@ -2,12 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -34,21 +32,25 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable GetBackground(TextureStore textures)
+        protected Drawable CreateBackground() => new DelayedLoadWrapper(new BeatmapSetCover(SetInfo)
         {
-            return new AsyncLoadWrapper(new BeatmapBackgroundSprite(new OnlineWorkingBeatmap(SetInfo.Beatmaps.FirstOrDefault(), textures, null))
-            {
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fill,
-                OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
-            }) { RelativeSizeAxes = Axes.Both };
-        }
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            RelativeSizeAxes = Axes.Both,
+            FillMode = FillMode.Fill,
+            OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
+        })
+        {
+            RelativeSizeAxes = Axes.Both,
+            TimeBeforeLoad = 300
+        };
 
         public class Statistic : FillFlowContainer
         {
             private readonly SpriteText text;
 
             private int value;
+
             public int Value
             {
                 get { return value; }
