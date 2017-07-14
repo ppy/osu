@@ -188,20 +188,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void transformRoll(TransformComboRoll transform, int currentValue, int newValue)
         {
-            Flush(false, typeof(TransformComboRoll));
-
-            if (RollingDuration < 1)
-            {
-                DisplayedCount = Current;
-                return;
-            }
-
-            transform.StartTime = Time.Current;
-            transform.EndTime = Time.Current + getProportionalDuration(currentValue, newValue);
-            transform.EndValue = newValue;
-            transform.Easing = RollingEasing;
-
-            Transforms.Add(transform);
+            TransformTo(newValue, getProportionalDuration(currentValue, newValue), RollingEasing, new TransformComboRoll());
         }
 
         protected class TransformComboRoll : Transform<int, Drawable>
