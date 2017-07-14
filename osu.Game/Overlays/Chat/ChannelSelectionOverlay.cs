@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Top = 85, Right = WIDTH_PADDING },
                     Children = new[]
                     {
-                        new ScrollContainer
+                        new OsuScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Children = new[]
