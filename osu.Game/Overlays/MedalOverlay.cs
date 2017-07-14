@@ -45,8 +45,6 @@ namespace osu.Game.Overlays
         {
             this.medal = medal;
             RelativeSizeAxes = Axes.Both;
-            Alpha = 0f;
-            AlwaysPresent = true;
 
             Children = new Drawable[]
             {
