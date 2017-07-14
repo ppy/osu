@@ -1,13 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
@@ -55,7 +53,22 @@ namespace osu.Game.Rulesets.Timing
         /// </summary>
         internal MultiplierControlPoint ControlPoint;
 
-        protected override IComparer<Drawable> DepthComparer => new HitObjectReverseStartTimeComparer();
+        protected override int Compare(Drawable x, Drawable y)
+        {
+            var xHitObject = x as DrawableHitObject;
+            var yHitObject = y as DrawableHitObject;
+
+            // If either of the two drawables are not hit objects, fall back to the base comparer
+            if (xHitObject?.HitObject == null || yHitObject?.HitObject == null)
+                return base.Compare(x, y);
+
+            // Compare by start time
+            int i = yHitObject.HitObject.StartTime.CompareTo(xHitObject.HitObject.StartTime);
+            if (i != 0)
+                return i;
+
+            return base.Compare(x, y);
+        }
 
         /// <summary>
         /// Creates a new <see cref="DrawableTimingSection"/>.
@@ -80,14 +93,9 @@ namespace osu.Game.Rulesets.Timing
             base.InvalidateFromChild(invalidation);
         }
 
-        private Cached<double> durationBacking = new Cached<double>();
-        /// <summary>
-        /// The maximum duration of any one hit object inside this <see cref="DrawableTimingSection"/>. This is calculated as the maximum
-        /// end time between all hit objects relative to this <see cref="DrawableTimingSection"/>'s <see cref="MultiplierControlPoint.StartTime"/>.
-        /// </summary>
-        public double Duration => durationBacking.EnsureValid()
-            ? durationBacking.Value
-            : durationBacking.Refresh(() =>
+        private Cached<double> durationBacking;
+
+        private double computeDuration()
         {
             if (!Children.Any())
                 return 0;
@@ -117,7 +125,13 @@ namespace osu.Game.Rulesets.Timing
             baseDuration *= 1 + maxAbsoluteSize / ourAbsoluteSize;
 
             return baseDuration;
-        });
+        }
+
+        /// <summary>
+        /// The maximum duration of any one hit object inside this <see cref="DrawableTimingSection"/>. This is calculated as the maximum
+        /// end time between all hit objects relative to this <see cref="DrawableTimingSection"/>'s <see cref="MultiplierControlPoint.StartTime"/>.
+        /// </summary>
+        public double Duration => durationBacking.IsValid ? durationBacking : (durationBacking.Value = computeDuration());
 
         protected override void Update()
         {

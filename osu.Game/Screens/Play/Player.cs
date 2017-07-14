@@ -23,6 +23,7 @@ using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Framework.Audio.Sample;
 
 namespace osu.Game.Screens.Play
 {
@@ -40,7 +41,7 @@ namespace osu.Game.Screens.Play
 
         public Action RestartRequested;
 
-        internal override bool AllowRulesetChange => false;
+        internal override bool AllowBeatmapRulesetChange => false;
 
         public bool HasFailed { get; private set; }
 
@@ -63,6 +64,8 @@ namespace osu.Game.Screens.Play
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
 
+        private SampleChannel sampleRestart;
+
         #endregion
 
         private HUDOverlay hudOverlay;
@@ -73,6 +76,8 @@ namespace osu.Game.Screens.Play
         {
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+
+            sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
             Ruleset rulesetInstance;
 
@@ -197,7 +202,7 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = HitRenderer.CreateScoreProcessor();
 
-            hudOverlay.KeyCounter.Add(rulesetInstance.CreateGameplayKeys());
+            hudOverlay.KeyCounter.AddRange(rulesetInstance.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindHitRenderer(HitRenderer);
 
@@ -217,6 +222,7 @@ namespace osu.Game.Screens.Play
 
         public void Restart()
         {
+            sampleRestart?.Play();
             ValidForResume = false;
             RestartRequested?.Invoke();
             Exit();

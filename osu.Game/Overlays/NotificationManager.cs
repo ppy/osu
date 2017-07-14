@@ -9,10 +9,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class NotificationManager : FocusedOverlayContainer
+    public class NotificationManager : OsuFocusedOverlayContainer
     {
         private const float width = 320;
 
@@ -35,7 +36,7 @@ namespace osu.Game.Overlays
                     Colour = Color4.Black,
                     Alpha = 0.6f,
                 },
-                scrollContainer = new ScrollContainer
+                scrollContainer = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Margin = new MarginPadding { Top = Toolbar.Toolbar.HEIGHT },

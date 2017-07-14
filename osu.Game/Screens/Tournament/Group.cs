@@ -151,9 +151,9 @@ namespace osu.Game.Screens.Tournament
                         {
                             flagSprite = new Sprite
                             {
+                                RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-
                                 FillMode = FillMode.Fit
                             },
                             new OsuSpriteText

@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.Containers
                 sections = value.ToList();
                 if (sections.Count == 0) return;
 
-                sectionsContainer.Add(sections);
+                sectionsContainer.AddRange(sections);
                 SelectedSection.Value = sections[0];
                 lastKnownScroll = float.NaN;
             }
@@ -114,7 +114,7 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            Add(ScrollContainer = new ScrollContainer()
+            Add(ScrollContainer = new OsuScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = false,
@@ -122,6 +122,8 @@ namespace osu.Game.Graphics.Containers
             });
             originalSectionsMargin = sectionsContainer.Margin;
         }
+
+        public void ScrollTo(Drawable section) => ScrollContainer.ScrollTo(ScrollContainer.GetChildPosInContent(section) - FixedHeader.BoundingBox.Height);
 
         private float lastKnownScroll;
         protected override void UpdateAfterChildren()

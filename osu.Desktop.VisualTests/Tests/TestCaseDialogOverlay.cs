@@ -12,11 +12,9 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Display dialogs";
 
-        private DialogOverlay overlay;
-
-        public override void Reset()
+        public TestCaseDialogOverlay()
         {
-            base.Reset();
+            DialogOverlay overlay;
 
             Add(overlay = new DialogOverlay());
 

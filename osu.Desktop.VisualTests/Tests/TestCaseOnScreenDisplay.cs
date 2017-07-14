@@ -15,9 +15,9 @@ namespace osu.Desktop.VisualTests.Tests
 
         public override string Description => @"Make it easier to see setting changes";
 
-        public override void Reset()
+        protected override void LoadComplete()
         {
-            base.Reset();
+            base.LoadComplete();
 
             Add(new OnScreenDisplay());
 

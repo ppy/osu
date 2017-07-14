@@ -10,13 +10,16 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Tests the settings overlay";
 
-        private SettingsOverlay settings;
+        private readonly SettingsOverlay settings;
 
-        public override void Reset()
+        public TestCaseSettings()
         {
-            base.Reset();
-
             Children = new[] { settings = new SettingsOverlay() };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             settings.ToggleVisibility();
         }
     }

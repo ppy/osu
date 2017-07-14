@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected class TransformComboResult : Transform<ulong, Drawable>
         {
-            public override ulong CurrentValue
+            public virtual ulong CurrentValue
             {
                 get
                 {
@@ -48,11 +48,8 @@ namespace osu.Game.Screens.Play.HUD
                 }
             }
 
-            public override void Apply(Drawable d)
-            {
-                base.Apply(d);
-                ((ComboResultCounter)d).DisplayedCount = CurrentValue;
-            }
+            public override void Apply(Drawable d) => ((ComboResultCounter)d).DisplayedCount = CurrentValue;
+            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ComboResultCounter)d).DisplayedCount;
         }
     }
 }
