@@ -15,12 +15,12 @@ namespace osu.Desktop.VisualTests.Tests
         {
             AddStep(@"display", () =>
             {
-                Add(new MedalOverlay(new Medal
+                LoadComponentAsync(new MedalOverlay(new Medal
                 {
                     Name = @"Animations",
                     InternalName = @"all-intro-doubletime",
                     Description = @"More complex than you think.",
-                }));
+                }), Add);
             });
         }
     }
