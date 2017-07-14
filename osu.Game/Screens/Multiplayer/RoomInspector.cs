@@ -12,12 +12,11 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
@@ -28,12 +27,13 @@ namespace osu.Game.Screens.Multiplayer
     {
         private readonly MarginPadding contentPadding = new MarginPadding { Horizontal = 20, Vertical = 10 };
         private const float transition_duration = 100;
-        private const float ruleset_height = 30;
 
         private readonly Box statusStrip;
-        private readonly Container coverContainer, rulesetContainer, gameTypeContainer, flagContainer;
-        private readonly FillFlowContainer topFlow, levelRangeContainer, participantsFlow;
-        private readonly OsuSpriteText participants, participantsSlash, maxParticipants, name, status, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor, host, levelRangeLower, levelRangeHigher;
+        private readonly Container coverContainer;
+        private readonly FillFlowContainer topFlow, participantsFlow;
+        private readonly ModeTypeInfo modeTypeInfo;
+        private readonly OsuSpriteText participants, participantsSlash, maxParticipants, name, status, beatmapTitle, beatmapDash, beatmapArtist, beatmapAuthor;
+        private readonly ParticipantInfo participantInfo;
         private readonly ScrollContainer participantsScroll;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
@@ -190,20 +190,13 @@ namespace osu.Game.Screens.Multiplayer
                                         new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.X,
-                                            Height = ruleset_height,
+                                            Height = 30,
                                             Direction = FillDirection.Horizontal,
                                             LayoutDuration = transition_duration,
                                             Spacing = new Vector2(5f, 0f),
                                             Children = new Drawable[]
                                             {
-                                                rulesetContainer = new Container
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                },
-                                                gameTypeContainer = new Container
-                                                {
-                                                    AutoSizeAxes = Axes.Both,
-                                                },
+                                                modeTypeInfo = new ModeTypeInfo(),
                                                 new Container
                                                 {
                                                     AutoSizeAxes = Axes.X,
@@ -252,96 +245,12 @@ namespace osu.Game.Screens.Multiplayer
                             Padding = contentPadding,
                             Children = new Drawable[]
                             {
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.X,
-                                    Height = 15f,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(5f, 0f),
-                                    Children = new Drawable[]
-                                    {
-                                        flagContainer = new Container
-                                        {
-                                            Width = 22f,
-                                            RelativeSizeAxes = Axes.Y,
-                                        },
-                                        new Container //todo: team banners
-                                        {
-                                            Width = 38f,
-                                            RelativeSizeAxes = Axes.Y,
-                                            CornerRadius = 2f,
-                                            Masking = true,
-                                            Children = new[]
-                                            {
-                                                new Box
-                                                {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Colour = OsuColour.FromHex(@"ad387e"),
-                                                },
-                                            },
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = "hosted by",
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
-                                            TextSize = 14,
-                                        },
-                                        host = new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
-                                            TextSize = 14,
-                                            Font = @"Exo2.0-BoldItalic",
-                                        },
-                                    },
-                                },
-                                levelRangeContainer = new FillFlowContainer
-                                {
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Children = new[]
-                                    {
-                                        new OsuSpriteText
-                                        {
-                                            Text = "Rank Range ",
-                                            TextSize = 14,
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = "#",
-                                            TextSize = 14,
-                                        },
-                                        levelRangeLower = new OsuSpriteText
-                                        {
-                                            TextSize = 14,
-                                            Font = @"Exo2.0-Bold",
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = " - ",
-                                            TextSize = 14,
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = "#",
-                                            TextSize = 14,
-                                        },
-                                        levelRangeHigher = new OsuSpriteText
-                                        {
-                                            Text = "6251",
-                                            TextSize = 14,
-                                            Font = @"Exo2.0-Bold",
-                                        },
-                                    },
-                                },
+                                participantInfo = new ParticipantInfo(@"Rank Range "),
                             },
                         },
                     },
                 },
-                participantsScroll = new ScrollContainer
+                participantsScroll = new OsuScrollContainer
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -362,6 +271,7 @@ namespace osu.Game.Screens.Multiplayer
 
             nameBind.ValueChanged += displayName;
             hostBind.ValueChanged += displayUser;
+            typeBind.ValueChanged += displayGameType;
             maxParticipantsBind.ValueChanged += displayMaxParticipants;
             participantsBind.ValueChanged += displayParticipants;
         }
@@ -372,16 +282,13 @@ namespace osu.Game.Screens.Multiplayer
             this.localisation = localisation;
             this.colours = colours;
 
-            beatmapAuthor.Colour = levelRangeContainer.Colour = colours.Gray9;
-            host.Colour = colours.Blue;
+            beatmapAuthor.Colour = colours.Gray9;
 
             //binded here instead of ctor because dependencies are needed
             statusBind.ValueChanged += displayStatus;
-            typeBind.ValueChanged += displayGameType;
             beatmapBind.ValueChanged += displayBeatmap;
 
             statusBind.TriggerChange();
-            typeBind.TriggerChange();
             beatmapBind.TriggerChange();
         }
 
@@ -399,14 +306,7 @@ namespace osu.Game.Screens.Multiplayer
 
         private void displayUser(User value)
         {
-            host.Text = value.Username;
-            flagContainer.Children = new[]
-            {
-                new DrawableFlag(value.Country?.FlagName ?? @"__")
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-            };
+            participantInfo.Host = value;
         }
 
         private void displayStatus(RoomStatus value)
@@ -419,39 +319,26 @@ namespace osu.Game.Screens.Multiplayer
 
         private void displayGameType(GameType value)
         {
-            gameTypeContainer.Children = new[]
-            {
-                new DrawableGameType(value)
-                {
-                    Size = new Vector2(ruleset_height),
-                },
-            };
+            modeTypeInfo.Type = value;
         }
 
         private void displayBeatmap(BeatmapInfo value)
         {
+            modeTypeInfo.Beatmap = value;
+
             if (value != null)
             {
                 coverContainer.FadeIn(transition_duration);
                 coverContainer.Children = new[]
                 {
-                    new AsyncLoadWrapper(new CoverSprite(value.BeatmapSet)
+                    new AsyncLoadWrapper(new BeatmapSetCover(value.BeatmapSet)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,
                         OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
-                    }) { RelativeSizeAxes = Axes.Both }
-                };
-
-                rulesetContainer.FadeIn(transition_duration);
-                rulesetContainer.Children = new[]
-                {
-                    new DifficultyIcon(value)
-                    {
-                        Size = new Vector2(ruleset_height),
-                    }
+                    }) { RelativeSizeAxes = Axes.Both },
                 };
 
                 beatmapTitle.Current = localisation.GetUnicodePreference(value.Metadata.TitleUnicode, value.Metadata.Title);
@@ -462,7 +349,6 @@ namespace osu.Game.Screens.Multiplayer
             else
             {
                 coverContainer.FadeOut(transition_duration);
-                rulesetContainer.FadeOut(transition_duration);
 
                 beatmapTitle.Current = null;
                 beatmapArtist.Current = null;
@@ -490,11 +376,7 @@ namespace osu.Game.Screens.Multiplayer
         private void displayParticipants(User[] value)
         {
             participants.Text = value.Length.ToString();
-
-            var ranks = value.Select(u => u.GlobalRank);
-            levelRangeLower.Text = ranks.Min().ToString();
-            levelRangeHigher.Text = ranks.Max().ToString();
-
+            participantInfo.Participants = value;
             participantsFlow.ChildrenEnumerable = value.Select(u => new UserTile(u));
         }
 
@@ -524,23 +406,6 @@ namespace osu.Game.Screens.Multiplayer
                         User = user,
                     },
                 };
-            }
-        }
-
-        private class CoverSprite : Sprite
-        {
-            private readonly BeatmapSetInfo set;
-
-            public CoverSprite(BeatmapSetInfo set)
-            {
-                this.set = set;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                if (set.OnlineInfo?.Covers?.Cover != null)
-                    Texture = textures.Get(set.OnlineInfo.Covers.Cover);
             }
         }
     }

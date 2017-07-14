@@ -59,6 +59,9 @@ namespace osu.Game.Overlays
         {
             Width = 400;
             Margin = new MarginPadding(10);
+
+            // required to let MusicController handle beatmap cycling.
+            AlwaysPresent = true;
         }
 
         protected override bool OnDragStart(InputState state) => true;
@@ -252,12 +255,16 @@ namespace osu.Game.Overlays
 
         private void prev()
         {
+            if (beatmapBacking.Disabled) return;
+
             queuedDirection = TransformDirection.Prev;
             playlist.PlayPrevious();
         }
 
         private void next()
         {
+            if (beatmapBacking.Disabled) return;
+
             queuedDirection = TransformDirection.Next;
             playlist.PlayNext();
         }
