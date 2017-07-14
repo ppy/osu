@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework;
 using OpenTK;
 using OpenTK.Graphics;
@@ -59,8 +60,16 @@ namespace osu.Game.Overlays.Settings
         protected override void OnHoverLost(InputState state)
         {
             expandEvent?.Cancel();
+            lastHoveredButton = null;
             State = ExpandedState.Contracted;
+
             base.OnHoverLost(state);
+        }
+
+        protected override bool OnMouseMove(InputState state)
+        {
+            queueExpandIfHovering();
+            return base.OnMouseMove(state);
         }
 
         private class SidebarScrollContainer : ScrollContainer
@@ -78,9 +87,6 @@ namespace osu.Game.Overlays.Settings
             get { return state; }
             set
             {
-                // if the state is changed externally, we want to re-queue a delayed expand.
-                queueExpandIfHovering();
-
                 if (state == value) return;
 
                 state = value;
@@ -97,13 +103,24 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
+        private Drawable lastHoveredButton;
+
+        private Drawable hoveredButton => content.Children.FirstOrDefault(c => c.IsHovered);
+
         private void queueExpandIfHovering()
         {
-            if (IsHovered)
+            // only expand when we hover a different button.
+            if (lastHoveredButton == hoveredButton) return;
+
+            if (!IsHovered) return;
+
+            if (State != ExpandedState.Expanded)
             {
                 expandEvent?.Cancel();
                 expandEvent = Scheduler.AddDelayed(() => State = ExpandedState.Expanded, 750);
             }
+
+            lastHoveredButton = hoveredButton;
         }
     }
 
