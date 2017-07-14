@@ -59,8 +59,6 @@ namespace osu.Game.Overlays
         private Container dragContainer;
         private Container playerContainer;
 
-        private bool showPlaylistOnceAvailable;
-
         public MusicController()
         {
             Width = 400;
@@ -233,16 +231,8 @@ namespace osu.Game.Overlays
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;
 
-            // Toggle the playlist's visibility if required
             if (disabled)
-            {
-                showPlaylistOnceAvailable = playlist.State == Visibility.Visible;
-
-                if (showPlaylistOnceAvailable)
-                    playlist.Hide();
-            }
-            else if (showPlaylistOnceAvailable && State == Visibility.Visible)
-                playlist.Show();
+                playlist.Hide();
         }
 
         protected override void UpdateAfterChildren()
@@ -401,9 +391,6 @@ namespace osu.Game.Overlays
 
             FadeIn(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(1, transition_length, EasingTypes.OutElastic);
-
-            if (Alpha == 0)
-                showPlaylistOnceAvailable = false;
         }
 
         protected override void PopOut()
