@@ -186,7 +186,7 @@ namespace osu.Desktop.Overlays
         {
             private OsuGame game;
 
-            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification()
+            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification
             {
                 Text = @"Update ready to install. Click to restart!",
                 Activated = () =>
