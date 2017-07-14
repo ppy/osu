@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play
         private bool showOverlays = true;
         internal override bool ShowOverlays => showOverlays;
 
-        internal override bool AllowRulesetChange => false;
+        internal override bool AllowBeatmapRulesetChange => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
