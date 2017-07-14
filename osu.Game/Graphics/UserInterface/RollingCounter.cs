@@ -15,6 +15,7 @@ using OpenTK.Graphics;
 namespace osu.Game.Graphics.UserInterface
 {
     public abstract class RollingCounter<T> : Container, IHasAccentColour
+        where T : struct, IEquatable<T>
     {
         /// <summary>
         /// The current value.
@@ -193,27 +194,12 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         protected void TransformCount(Transform<T, Drawable> transform, T currentValue, T newValue)
         {
-            Type type = transform.GetType();
-
-            Flush(false, type);
-
-            if (RollingDuration < 1)
-            {
-                DisplayedCount = Current;
-                return;
-            }
-
             double rollingTotalDuration =
                 IsRollingProportional
                     ? GetProportionalDuration(currentValue, newValue)
                     : RollingDuration;
 
-            transform.StartTime = TransformStartTime;
-            transform.EndTime = TransformStartTime + rollingTotalDuration;
-            transform.EndValue = newValue;
-            transform.Easing = RollingEasing;
-
-            Transforms.Add(transform);
+            TransformTo(newValue, rollingTotalDuration, RollingEasing, transform);
         }
     }
 }
