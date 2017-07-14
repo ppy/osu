@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using OpenTK.Graphics;
 using osu.Framework.MathUtils;
 

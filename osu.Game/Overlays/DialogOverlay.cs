@@ -45,13 +45,13 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            FadeIn(PopupDialog.ENTER_DURATION, EasingTypes.OutQuint);
+            this.FadeIn(PopupDialog.ENTER_DURATION, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            FadeOut(PopupDialog.EXIT_DURATION, EasingTypes.InSine);
+            this.FadeOut(PopupDialog.EXIT_DURATION, EasingTypes.InSine);
         }
 
         public DialogOverlay()

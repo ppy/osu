@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.HUD
@@ -130,7 +129,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected virtual void OnCountRolling(int currentValue, int newValue)
         {
-            transformRoll(new TransformComboRoll(), currentValue, newValue);
+            transformRoll(new TransformComboRoll(this), currentValue, newValue);
         }
 
         protected virtual void OnCountIncrement(int currentValue, int newValue)
@@ -188,25 +187,17 @@ namespace osu.Game.Screens.Play.HUD
 
         private void transformRoll(TransformComboRoll transform, int currentValue, int newValue)
         {
-            TransformTo(newValue, getProportionalDuration(currentValue, newValue), RollingEasing, new TransformComboRoll());
+            this.TransformTo(newValue, getProportionalDuration(currentValue, newValue), RollingEasing, new TransformComboRoll(this));
         }
 
-        protected class TransformComboRoll : Transform<int, Drawable>
+        protected class TransformComboRoll : TransformInt<ComboCounter>
         {
-            public virtual int CurrentValue
+            public TransformComboRoll(ComboCounter target) : base(target)
             {
-                get
-                {
-                    double time = Time?.Current ?? 0;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
-
-                    return (int)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-                }
             }
 
-            public override void Apply(Drawable d) => ((ComboCounter)d).DisplayedCount = CurrentValue;
-            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ComboCounter)d).DisplayedCount;
+            public override void Apply(ComboCounter d) => d.DisplayedCount = CurrentValue;
+            public override void ReadIntoStartValue(ComboCounter d) => StartValue = d.DisplayedCount;
         }
 
         protected abstract void OnDisplayedCountRolling(int currentValue, int newValue);

@@ -173,7 +173,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            ResizeTo(SIZE_EXTENDED, transform_time, EasingTypes.OutElastic);
+            this.ResizeTo(SIZE_EXTENDED, transform_time, EasingTypes.OutElastic);
             IconLayer.FadeColour(HoverColour, transform_time, EasingTypes.OutElastic);
 
             bouncingIcon.ScaleTo(1.1f, transform_time, EasingTypes.OutElastic);
@@ -183,7 +183,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(InputState state)
         {
-            ResizeTo(SIZE_RETRACTED, transform_time, EasingTypes.OutElastic);
+            this.ResizeTo(SIZE_RETRACTED, transform_time, EasingTypes.OutElastic);
             IconLayer.FadeColour(TextLayer.Colour, transform_time, EasingTypes.OutElastic);
 
             bouncingIcon.ScaleTo(1, transform_time, EasingTypes.OutElastic);

@@ -62,12 +62,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             var animIn = Math.Min(150, sliderTick.StartTime - FadeInTime);
 
-            ScaleTo(0.5f);
-            ScaleTo(1.2f, animIn);
-            FadeIn(animIn);
+            this.ScaleTo(0.5f);
+            this.ScaleTo(1.2f, animIn);
+            this.FadeIn(animIn);
 
             Delay(animIn);
-            ScaleTo(1, 150, EasingTypes.Out);
+            this.ScaleTo(1, 150, EasingTypes.Out);
 
             Delay(-animIn);
         }
@@ -78,15 +78,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Idle:
                     Delay(FadeOutTime - sliderTick.StartTime);
-                    FadeOut();
+                    this.FadeOut();
                     break;
                 case ArmedState.Miss:
-                    FadeOut(160);
-                    FadeColour(Color4.Red, 80);
+                    this.FadeOut(160);
+                    this.FadeColour(Color4.Red, 80);
                     break;
                 case ArmedState.Hit:
-                    FadeOut(120, EasingTypes.OutQuint);
-                    ScaleTo(Scale * 1.5f, 120, EasingTypes.OutQuint);
+                    this.FadeOut(120, EasingTypes.OutQuint);
+                    this.ScaleTo(Scale * 1.5f, 120, EasingTypes.OutQuint);
                     break;
             }
         }

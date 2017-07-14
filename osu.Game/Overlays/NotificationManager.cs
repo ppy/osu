@@ -90,8 +90,8 @@ namespace osu.Game.Overlays
             base.PopIn();
 
             scrollContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            FadeTo(1, TRANSITION_LENGTH / 2);
+            this.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
+            this.FadeTo(1, TRANSITION_LENGTH / 2);
         }
 
         private void markAllRead()
@@ -105,8 +105,8 @@ namespace osu.Game.Overlays
 
             markAllRead();
 
-            MoveToX(width, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            FadeTo(0, TRANSITION_LENGTH / 2);
+            this.MoveToX(width, TRANSITION_LENGTH, EasingTypes.OutQuint);
+            this.FadeTo(0, TRANSITION_LENGTH / 2);
         }
     }
 }

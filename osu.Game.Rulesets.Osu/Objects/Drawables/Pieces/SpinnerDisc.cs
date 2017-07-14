@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 background.FadeTo(tracking_alpha, 250, EasingTypes.OutQuint);
             }
 
-            RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, EasingTypes.OutExpo);
+            this.RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, EasingTypes.OutExpo);
         }
     }
 }

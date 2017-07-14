@@ -2,9 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
 
 namespace osu.Game.Graphics.UserInterface
 {

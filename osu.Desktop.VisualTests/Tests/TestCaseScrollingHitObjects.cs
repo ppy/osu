@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
@@ -196,7 +197,7 @@ namespace osu.Desktop.VisualTests.Tests
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                FadeInFromZero(250, EasingTypes.OutQuint);
+                this.FadeInFromZero(250, EasingTypes.OutQuint);
             }
 
             protected override void Update()

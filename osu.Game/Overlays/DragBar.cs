@@ -75,7 +75,7 @@ namespace osu.Game.Overlays
         private void updatePosition(float position, bool easing = true)
         {
             position = MathHelper.Clamp(position, 0, 1);
-            Fill.TransformTo(position, easing ? 200 : 0, EasingTypes.OutQuint, new TransformSeek());
+            Fill.TransformTo(position, easing ? 200 : 0, EasingTypes.OutQuint, new TransformSeek(this));
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -100,6 +100,10 @@ namespace osu.Game.Overlays
 
         private class TransformSeek : TransformFloat<Drawable>
         {
+            public TransformSeek(Drawable target) : base(target)
+            {
+            }
+
             public override void Apply(Drawable d) => d.Width = CurrentValue;
             public override void ReadIntoStartValue(Drawable d) => StartValue = d.Width;
         }

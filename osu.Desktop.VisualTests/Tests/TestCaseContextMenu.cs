@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
@@ -59,20 +60,13 @@ namespace osu.Desktop.VisualTests.Tests
         {
             base.LoadComplete();
 
-            using (container.BeginLoopedSequence())
-            {
-                container.MoveTo(new Vector2(0, 100), duration);
-                using (container.BeginDelayedSequence(duration))
-                {
-                    container.MoveTo(new Vector2(100, 100), duration);
-                    using (container.BeginDelayedSequence(duration))
-                    {
-                        container.MoveTo(new Vector2(100, 0), duration);
-                        using (container.BeginDelayedSequence(duration))
-                            container.MoveTo(Vector2.Zero, duration);
-                    }
-                }
-            }
+            // Move box along a square trajectory
+            container.Loop(b => b
+                .MoveTo(new Vector2(0, 100), duration)
+                .Then().MoveTo(new Vector2(100, 100), duration)
+                .Then().MoveTo(new Vector2(100, 0), duration)
+                .Then().MoveTo(Vector2.Zero, duration)
+            );
         }
 
         private class MyContextMenuContainer : Container, IHasContextMenu
@@ -95,10 +89,10 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 new OsuContextMenuItem(@"Simple option"),
                 new OsuContextMenuItem(@"Simple very very long option"),
-                new OsuContextMenuItem(@"Change width", MenuItemType.Highlighted) { Action = () => ResizeWidthTo(Width * 2, 100, EasingTypes.OutQuint) },
-                new OsuContextMenuItem(@"Change height", MenuItemType.Highlighted) { Action = () => ResizeHeightTo(Height * 2, 100, EasingTypes.OutQuint) },
-                new OsuContextMenuItem(@"Change width back", MenuItemType.Destructive) { Action = () => ResizeWidthTo(Width / 2, 100, EasingTypes.OutQuint) },
-                new OsuContextMenuItem(@"Change height back", MenuItemType.Destructive) { Action = () => ResizeHeightTo(Height / 2, 100, EasingTypes.OutQuint) },
+                new OsuContextMenuItem(@"Change width", MenuItemType.Highlighted) { Action = () => this.ResizeWidthTo(Width * 2, 100, EasingTypes.OutQuint) },
+                new OsuContextMenuItem(@"Change height", MenuItemType.Highlighted) { Action = () => this.ResizeHeightTo(Height * 2, 100, EasingTypes.OutQuint) },
+                new OsuContextMenuItem(@"Change width back", MenuItemType.Destructive) { Action = () => this.ResizeWidthTo(Width / 2, 100, EasingTypes.OutQuint) },
+                new OsuContextMenuItem(@"Change height back", MenuItemType.Destructive) { Action = () => this.ResizeHeightTo(Height / 2, 100, EasingTypes.OutQuint) },
             };
         }
     }

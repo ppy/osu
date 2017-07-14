@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
         private void load(OsuConfigManager config)
         {
             showKeyCounter = config.GetBindable<bool>(OsuSetting.KeyOverlay);
-            showKeyCounter.ValueChanged += keyCounterVisibility => FadeTo(keyCounterVisibility ? 1 : 0, duration);
+            showKeyCounter.ValueChanged += keyCounterVisibility => this.FadeTo(keyCounterVisibility ? 1 : 0, duration);
             showKeyCounter.TriggerChange();
         }
 

@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             switch (Judgement.Result)
             {
                 case HitResult.Hit:
-                    MoveToY(-100, 500);
+                    this.MoveToY(-100, 500);
                     break;
             }
 
