@@ -217,23 +217,14 @@ namespace osu.Game.Overlays
                     backgroundStrip.FadeIn(step_duration);
                     leftStrip.ResizeWidthTo(1f, step_duration, EasingTypes.OutQuint);
                     rightStrip.ResizeWidthTo(1f, step_duration, EasingTypes.OutQuint);
-                    Schedule(() =>
-                    {
-                        if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.Icon;
-                    });
+                    Schedule(() => { if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.Icon; });
 
                     using (BeginDelayedSequence(step_duration, true))
                     {
-                        Schedule(() =>
-                        {
-                            if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.MedalUnlocked;
-                        });
+                        Schedule(() => { if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.MedalUnlocked; });
 
                         using (BeginDelayedSequence(step_duration, true))
-                            Schedule(() =>
-                            {
-                                if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.Full;
-                            });
+                            Schedule(() => { if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.Full; });
                     }
                 }
             }
