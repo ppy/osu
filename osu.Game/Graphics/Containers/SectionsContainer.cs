@@ -139,16 +139,7 @@ namespace osu.Game.Graphics.Containers
             originalSectionsMargin = scrollContentContainer.Margin;
         }
 
-        public void ScrollToTop(T section)
-        {
-            float pos = scrollContainer.GetChildPosInContent(section);
-            float current = scrollContainer.Current;
-            float scrollOffset = FixedHeader?.LayoutSize.Y ?? 0;
-            if (section == Children.First() && current < pos - scrollOffset) return;
-            scrollContainer.ScrollTo(pos - scrollOffset);
-        }
-
-        public void ScrollTo(Drawable section) => ScrollContainer.ScrollTo(ScrollContainer.GetChildPosInContent(section) - FixedHeader.BoundingBox.Height);
+        public void ScrollTo(Drawable section) => scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
 
         private float lastKnownScroll;
         protected override void UpdateAfterChildren()
