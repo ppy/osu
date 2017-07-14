@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,7 +14,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.MedalSplash
 {
-    public class DrawableMedal : Container
+    public class DrawableMedal : Container, IStateful<DisplayState>
     {
         private const float scale_when_unlocked = 0.76f;
         private const float scale_when_full = 0.6f;
@@ -24,7 +25,7 @@ namespace osu.Game.Overlays.MedalSplash
         private readonly OsuSpriteText unlocked, name;
         private readonly TextFlowContainer description;
         private readonly FillFlowContainer infoFlow;
-
+        private DisplayState state;
         public DrawableMedal(Medal medal)
         {
             this.medal = medal;
@@ -116,34 +117,67 @@ namespace osu.Game.Overlays.MedalSplash
             infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
         }
 
-        public void ChangeState(DisplayState newState, double duration)
+        protected override void LoadComplete()
         {
-            switch (newState)
+            base.LoadComplete();
+            updateState();
+        }
+
+        public DisplayState State
+        {
+            get { return state; }
+            set
             {
+                if (state == value) return;
+
+                state = value;
+                updateState();
+            }
+        }
+
+        private void updateState()
+        {
+            if (!IsLoaded) return;
+
+            const double duration = 900;
+
+            switch (state)
+            {
+                case DisplayState.None:
+                    medalContainer.ScaleTo(0);
+                    break;
                 case DisplayState.Icon:
-                    medalContainer.Scale = Vector2.Zero;
                     medalContainer.ScaleTo(1, duration, EasingTypes.OutElastic);
-                    medalContainer.FadeInFromZero(duration);
+                    medalContainer.FadeIn(duration);
                     break;
                 case DisplayState.MedalUnlocked:
+                    medalContainer.ScaleTo(1);
+                    medalContainer.Show();
+
                     ScaleTo(scale_when_unlocked, duration, EasingTypes.OutExpo);
                     MoveToY(MedalOverlay.DISC_SIZE / 2 - 30, duration, EasingTypes.OutExpo);
                     unlocked.FadeInFromZero(duration);
                     break;
                 case DisplayState.Full:
+                    medalContainer.ScaleTo(1);
+                    medalContainer.Show();
+
                     ScaleTo(scale_when_full, duration, EasingTypes.OutExpo);
                     MoveToY(MedalOverlay.DISC_SIZE / 2 - 60, duration, EasingTypes.OutExpo);
-                    name.FadeInFromZero(duration);
+                    name.FadeInFromZero(duration + 100);
                     description.FadeInFromZero(duration * 2);
                     break;
             }
-        }
 
-        public enum DisplayState
-        {
-            Icon,
-            MedalUnlocked,
-            Full,
+
         }
+    }
+
+    public enum DisplayState
+    {
+        None,
+        Icon,
+        MedalUnlocked,
+        Full,
     }
 }

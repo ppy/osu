@@ -16,7 +16,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using OpenTK.Input;
 using System.Linq;
@@ -188,10 +187,9 @@ namespace osu.Game.Overlays
             if (state.Keyboard.Keys.Contains(Key.Escape)) dismiss();
         }
 
-        private const double duration1 = 400;
-        private const double duration2 = 900;
-        private const double duration3 = 900;
-        private const double duration4 = 1000;
+        private const double initial_duration = 400;
+        private const double step_duration = 900;
+
         protected override void PopIn()
         {
             base.PopIn();
@@ -200,56 +198,63 @@ namespace osu.Game.Overlays
             background.FlashColour(Color4.White.Opacity(0.25f), 400);
 
             getSample.Play();
-            Delay(200, true);
 
-            var innerRotate = new TransformRotation
+            using (innerSpin.BeginLoopedSequence())
+                innerSpin.RotateTo(360, 20000);
+
+            using (outerSpin.BeginLoopedSequence())
+                outerSpin.RotateTo(360, 40000);
+
+            using (BeginDelayedSequence(200, true))
             {
-                EndValue = 359,
-                StartTime = Clock.TimeInfo.Current,
-                EndTime = Clock.TimeInfo.Current + 20000,
-            };
+                disc.FadeIn(initial_duration);
+                particleContainer.FadeIn(initial_duration);
+                outerSpin.FadeTo(0.1f, initial_duration * 2);
+                disc.ScaleTo(1f, initial_duration * 2, EasingTypes.OutElastic);
 
-            innerRotate.Loop(0);
-            innerSpin.Transforms.Add(innerRotate);
+                using (BeginDelayedSequence(initial_duration + 200, true))
+                {
+                    backgroundStrip.FadeIn(step_duration);
+                    leftStrip.ResizeWidthTo(1f, step_duration, EasingTypes.OutQuint);
+                    rightStrip.ResizeWidthTo(1f, step_duration, EasingTypes.OutQuint);
+                    Schedule(() =>
+                    {
+                        if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.Icon;
+                    });
 
-            var outerRotate = new TransformRotation
-            {
-                EndValue = 359,
-                StartTime = Clock.TimeInfo.Current,
-                EndTime = Clock.TimeInfo.Current + 40000,
-            };
+                    using (BeginDelayedSequence(step_duration, true))
+                    {
+                        Schedule(() =>
+                        {
+                            if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.MedalUnlocked;
+                        });
 
-            outerRotate.Loop(0);
-            outerSpin.Transforms.Add(outerRotate);
-
-            disc.FadeIn(duration1);
-            particleContainer.FadeIn(duration1);
-            outerSpin.FadeTo(0.1f, duration1 * 2);
-            disc.ScaleTo(1f, duration1 * 2, EasingTypes.OutElastic);
-
-            Delay(duration1 + 200, true);
-            backgroundStrip.FadeIn(duration2);
-            leftStrip.ResizeWidthTo(1f, duration2, EasingTypes.OutQuint);
-            rightStrip.ResizeWidthTo(1f, duration2, EasingTypes.OutQuint);
-            drawableMedal.ChangeState(DrawableMedal.DisplayState.Icon, duration2);
-
-            Delay(duration2, true);
-            drawableMedal.ChangeState(DrawableMedal.DisplayState.MedalUnlocked, duration3);
-
-            Delay(duration3, true);
-            drawableMedal.ChangeState(DrawableMedal.DisplayState.Full, duration4);
+                        using (BeginDelayedSequence(step_duration, true))
+                            Schedule(() =>
+                            {
+                                if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.Full;
+                            });
+                    }
+                }
+            }
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-
             FadeOut(200);
         }
 
         private void dismiss()
         {
-            if (drawableMedal.Transforms.Count != 0) return;
+            if (drawableMedal.State != DisplayState.Full)
+            {
+                // if we haven't yet, play out the animation fully
+                drawableMedal.State = DisplayState.Full;
+                Flush(true);
+                return;
+            }
+
             Hide();
             Expire();
         }
