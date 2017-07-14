@@ -207,13 +207,7 @@ namespace osu.Game.Overlays
 
             beatmapBacking.BindTo(game.Beatmap);
 
-            playlistButtonColor = colours.Yellow;
-
-            playlist.StateChanged += (c, s) =>
-            {
-                if (playlistButton.Enabled)
-                    playlistButton.FadeColour(s == Visibility.Visible ? playlistButtonColor : Color4.White, 200, EasingTypes.OutQuint);
-            };
+            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, EasingTypes.OutQuint);
         }
 
         protected override void LoadComplete()
@@ -227,12 +221,12 @@ namespace osu.Game.Overlays
 
         private void beatmapDisabledChanged(bool disabled)
         {
+            if (disabled)
+                playlist.Hide();
+
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;
-
-            if (disabled)
-                playlist.Hide();
         }
 
         protected override void UpdateAfterChildren()
