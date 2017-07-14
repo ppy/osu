@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using OpenTK.Graphics;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -21,14 +22,6 @@ namespace osu.Game.Graphics.UserInterface
         /// The current value.
         /// </summary>
         public Bindable<T> Current = new Bindable<T>();
-
-        /// <summary>
-        /// Type of the Transform to use.
-        /// </summary>
-        /// <remarks>
-        /// Must be a subclass of Transform(T)
-        /// </remarks>
-        protected virtual Type TransformType => typeof(Transform<T, Drawable>);
 
         protected SpriteText DisplayedCountSpriteText;
 
@@ -59,7 +52,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 return displayedCount;
             }
-            protected set
+
+            set
             {
                 if (EqualityComparer<T>.Default.Equals(displayedCount, value))
                     return;
@@ -134,7 +128,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual void StopRolling()
         {
-            Flush(false, TransformType);
+            Flush(false, typeof(TransformRollingCounter));
             DisplayedCount = Current;
         }
 
@@ -181,25 +175,43 @@ namespace osu.Game.Graphics.UserInterface
         /// <seealso cref="TransformType"/>
         protected virtual void TransformCount(T currentValue, T newValue)
         {
-            Debug.Assert(
-                typeof(Transform<T, Drawable>).IsAssignableFrom(TransformType),
-                @"transformType should be a subclass of Transform<T>."
-            );
-
-            TransformCount((Transform<T, Drawable>)Activator.CreateInstance(TransformType), currentValue, newValue);
+            TransformCount(new TransformRollingCounter(this), currentValue, newValue);
         }
 
         /// <summary>
         /// Intended to be used by TransformCount(T currentValue, T newValue).
         /// </summary>
-        protected void TransformCount(Transform<T, Drawable> transform, T currentValue, T newValue)
+        protected void TransformCount(TransformRollingCounter transform, T currentValue, T newValue)
         {
             double rollingTotalDuration =
                 IsRollingProportional
                     ? GetProportionalDuration(currentValue, newValue)
                     : RollingDuration;
 
-            TransformTo(newValue, rollingTotalDuration, RollingEasing, transform);
+            this.TransformTo(newValue, rollingTotalDuration, RollingEasing, transform);
+        }
+
+        protected class TransformRollingCounter : Transform<T, RollingCounter<T>>
+        {
+            public TransformRollingCounter(RollingCounter<T> target) : base(target)
+            {
+            }
+
+            public T CurrentValue
+            {
+                get
+                {
+                    double time = Time?.Current ?? 0;
+                    if (time < StartTime) return StartValue;
+                    if (time >= EndTime) return EndValue;
+
+                    double result = Interpolation.ValueAt(time, Convert.ToDouble(StartValue), Convert.ToDouble(EndValue), StartTime, EndTime, Easing);
+                    return (T)Convert.ChangeType(result, typeof(T), null);
+                }
+            }
+
+            public override void Apply(RollingCounter<T> d) => d.DisplayedCount = CurrentValue;
+            public override void ReadIntoStartValue(RollingCounter<T> d) => StartValue = d.DisplayedCount;
         }
     }
 }
