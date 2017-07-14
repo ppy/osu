@@ -20,15 +20,15 @@ namespace osu.Game.Screens.Play
         private SpriteText countSpriteText;
 
         public bool IsCounting { get; set; }
-        private int count;
-        public int Count
+        private int countPresses;
+        public int CountPresses
         {
-            get { return count; }
+            get { return countPresses; }
             private set
             {
-                if (count != value)
+                if (countPresses != value)
                 {
-                    count = value;
+                    countPresses = value;
                     countSpriteText.Text = value.ToString(@"#,0");
                 }
             }
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play
                     isLit = value;
                     updateGlowSprite(value);
                     if (value && IsCounting)
-                        Count++;
+                        CountPresses++;
                 }
             }
         }
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Play
                         },
                         countSpriteText = new OsuSpriteText
                         {
-                            Text = Count.ToString(@"#,0"),
+                            Text = CountPresses.ToString(@"#,0"),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Both,
@@ -128,6 +128,6 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public void ResetCount() => Count = 0;
+        public void ResetCount() => CountPresses = 0;
     }
 }

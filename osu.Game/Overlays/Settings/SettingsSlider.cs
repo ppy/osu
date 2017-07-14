@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings
         where T : struct, IEquatable<T>
         where U : SliderBar<T>, new()
     {
-        protected override Drawable CreateControl() => new U()
+        protected override Drawable CreateControl() => new U
         {
             Margin = new MarginPadding { Top = 5, Bottom = 5 },
             RelativeSizeAxes = Axes.X

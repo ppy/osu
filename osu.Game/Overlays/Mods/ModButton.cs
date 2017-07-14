@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.Mods
             iconsContainer.Clear();
             if (Mods.Length > 1)
             {
-                iconsContainer.Add(new[]
+                iconsContainer.AddRange(new[]
                 {
                     backgroundIcon = new ModIcon(Mods[1])
                     {
