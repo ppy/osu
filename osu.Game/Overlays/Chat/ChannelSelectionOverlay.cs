@@ -16,10 +16,11 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelSelectionOverlay : FocusedOverlayContainer
+    public class ChannelSelectionOverlay : OsuFocusedOverlayContainer
     {
         public static readonly float WIDTH_PADDING = 170;
 
@@ -38,7 +39,7 @@ namespace osu.Game.Overlays.Chat
         {
             set
             {
-                sectionsFlow.Children = value;
+                sectionsFlow.ChildrenEnumerable = value;
 
                 foreach (ChannelSection s in sectionsFlow.Children)
                 {
@@ -80,7 +81,7 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Top = 85, Right = WIDTH_PADDING },
                     Children = new[]
                     {
-                        new ScrollContainer
+                        new OsuScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Children = new[]

@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.Cursor
             }
         }
 
-        public override bool Contains(Vector2 screenSpacePos) => true;
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)

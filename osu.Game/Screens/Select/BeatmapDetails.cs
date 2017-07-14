@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Select
                     Colour = Color4.Black,
                     Alpha = 0.5f,
                 },
-                new FillFlowContainer<MetadataSegment>()
+                new FillFlowContainer<MetadataSegment>
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -439,7 +439,7 @@ namespace osu.Game.Screens.Select
                     {
                         Show();
                         if (header.Text == "Tags")
-                            content.Children = value.Split(' ').Select(text => new OsuSpriteText
+                            content.ChildrenEnumerable = value.Split(' ').Select(text => new OsuSpriteText
                             {
                                 Text = text,
                                 Font = "Exo2.0-Regular",

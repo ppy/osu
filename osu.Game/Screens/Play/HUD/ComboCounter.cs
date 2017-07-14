@@ -198,7 +198,6 @@ namespace osu.Game.Screens.Play.HUD
 
             transform.StartTime = Time.Current;
             transform.EndTime = Time.Current + getProportionalDuration(currentValue, newValue);
-            transform.StartValue = currentValue;
             transform.EndValue = newValue;
             transform.Easing = RollingEasing;
 
@@ -207,7 +206,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected class TransformComboRoll : Transform<int, Drawable>
         {
-            public override int CurrentValue
+            public virtual int CurrentValue
             {
                 get
                 {
@@ -219,11 +218,8 @@ namespace osu.Game.Screens.Play.HUD
                 }
             }
 
-            public override void Apply(Drawable d)
-            {
-                base.Apply(d);
-                ((ComboCounter)d).DisplayedCount = CurrentValue;
-            }
+            public override void Apply(Drawable d) => ((ComboCounter)d).DisplayedCount = CurrentValue;
+            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ComboCounter)d).DisplayedCount;
         }
 
         protected abstract void OnDisplayedCountRolling(int currentValue, int newValue);
