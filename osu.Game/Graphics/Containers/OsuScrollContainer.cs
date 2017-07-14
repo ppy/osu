@@ -10,7 +10,7 @@ namespace osu.Game.Graphics.Containers
     internal class OsuScrollContainer : ScrollContainer
     {
         /// <summary>
-        /// Add the ability to seek to an absolute scroll position when the right mouse button is pressed or dragged.
+        /// Allows controlling the scroll bar from any position in the container using the right mouse button.
         /// Uses the value of <see cref="DistanceDecayOnRightMouseScrollbar"/> to smoothly scroll to the dragged location.
         /// </summary>
         public bool RightMouseScrollbar = false;
@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public double DistanceDecayOnRightMouseScrollbar = 0.02;
 
-        private bool shouldPerformRelativeDrag(InputState state) => RightMouseScrollbar && state.Mouse.IsPressed(MouseButton.Right);
+        private bool shouldPerformRightMouseScroll(InputState state) => RightMouseScrollbar && state.Mouse.IsPressed(MouseButton.Right);
 
         private void scrollToRelative(float value) => ScrollTo(Clamp((value - Scrollbar.DrawSize[ScrollDim] / 2) / Scrollbar.Size[ScrollDim]), true, DistanceDecayOnRightMouseScrollbar);
 
@@ -30,7 +30,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (shouldPerformRelativeDrag(state))
+            if (shouldPerformRightMouseScroll(state))
             {
                 scrollToRelative(state.Mouse.Position[ScrollDim]);
                 return true;
@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnDragStart(InputState state)
         {
-            if (shouldPerformRelativeDrag(state))
+            if (shouldPerformRightMouseScroll(state))
             {
                 mouseScrollBarDragging = true;
                 return true;
