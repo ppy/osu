@@ -3,11 +3,9 @@
 
 using System.Collections.Generic;
 using OpenTK;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -34,7 +32,7 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable CreateBackground() => new DelayedLoadWrapper(new BeatmapSetBackgroundSprite(SetInfo)
+        protected Drawable CreateBackground() => new DelayedLoadWrapper(new BeatmapSetCover(SetInfo)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -87,24 +85,6 @@ namespace osu.Game.Overlays.Direct
                 };
 
                 Value = value;
-            }
-        }
-
-        private class BeatmapSetBackgroundSprite : Sprite
-        {
-            private readonly BeatmapSetInfo set;
-            public BeatmapSetBackgroundSprite(BeatmapSetInfo set)
-            {
-                this.set = set;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                string resource = set.OnlineInfo.Covers.Card;
-
-                if (resource != null)
-                    Texture = textures.Get(resource);
             }
         }
     }
