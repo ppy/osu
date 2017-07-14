@@ -46,8 +46,6 @@ namespace osu.Game.Overlays
         private IconButton nextButton;
         private IconButton playlistButton;
 
-        private Color4 playlistButtonColor;
-
         private SpriteText title, artist;
 
         private PlaylistOverlay playlist;
