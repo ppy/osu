@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             RelativeSizeAxes = Axes.Both;
             Height = (float)HitObject.Duration;
 
-            Add(new Drawable[]
+            AddRange(new Drawable[]
             {
                 // For now the body piece covers the entire height of the container
                 // whereas possibly in the future we don't want to extend under the head/tail.

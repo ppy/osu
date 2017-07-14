@@ -91,7 +91,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             if (time < list[0].Time)
                 return prePoint ?? new T();
 
-            int index = list.BinarySearch(new T() { Time = time });
+            int index = list.BinarySearch(new T { Time = time });
 
             // Check if we've found an exact match (t == time)
             if (index >= 0)

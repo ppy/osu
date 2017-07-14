@@ -198,7 +198,7 @@ namespace osu.Desktop.VisualTests.Tests
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
                 Add(new OsuSpriteText { Text = header + @": ", TextSize = text_size });
-                Add(valueText = new OsuSpriteText() { TextSize = text_size });
+                Add(valueText = new OsuSpriteText { TextSize = text_size });
                 Margin = new MarginPadding(margin);
             }
         }

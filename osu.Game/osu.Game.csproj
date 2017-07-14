@@ -190,7 +190,6 @@
     <Compile Include="Rulesets\Objects\Drawables\IScrollingHitObject.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
     <Compile Include="Rulesets\Objects\HitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\HitObjectStartTimeComparer.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasCombo.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasEndTime.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasDistance.cs" />
@@ -474,10 +473,11 @@
     <Compile Include="Overlays\Direct\DirectPanel.cs" />
     <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
     <Compile Include="Overlays\Direct\DirectListPanel.cs" />
-    <Compile Include="Database\OnlineWorkingBeatmap.cs" />
     <Compile Include="Database\BeatmapOnlineInfo.cs" />
-    <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
+    <Compile Include="Graphics\Containers\ReverseChildIDFillFlowContainer.cs" />
     <Compile Include="Database\RankStatus.cs" />
+    <Compile Include="Database\BeatmapSetOnlineInfo.cs" />
+    <Compile Include="Online\API\Requests\GetBeatmapSetsRequest.cs" />
     <Compile Include="Overlays\SearchableList\SearchableListHeader.cs" />
     <Compile Include="Overlays\SearchableList\HeaderTabControl.cs" />
     <Compile Include="Overlays\Social\FilterControl.cs" />
