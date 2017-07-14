@@ -137,7 +137,7 @@ namespace osu.Game.Overlays
                 if (lastSection != s)
                 {
                     lastSection = s;
-                    sectionsContainer.ScrollToTop(lastSection);
+                    sectionsContainer.ScrollTo(lastSection);
                 }
             };
 
