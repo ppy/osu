@@ -84,42 +84,17 @@ namespace osu.Game.Graphics.UserInterface
             flashColour = colours.Yellow;
             disableColour = colours.Gray9;
 
-            Enabled.ValueChanged += enabledChanged;
-        }
-
-        private void enabledChanged(bool newEnabled)
-        {
-            if (newEnabled)
-            {
-                FadeColour(Color4.White, 200, EasingTypes.OutQuint);
-
-                if (IsHovered)
-                    OnHover(new InputState());
-            }
-            else
-            {
-                FadeColour(disableColour, 200, EasingTypes.OutQuint);
-                content.ScaleTo(1, 200, EasingTypes.OutElastic);
-
-                if (IsHovered)
-                    OnHoverLost(new InputState());
-            }
+            Enabled.ValueChanged += newEnabled => FadeColour(newEnabled ? Color4.White : disableColour, 200, EasingTypes.OutQuint);
         }
 
         protected override bool OnHover(InputState state)
         {
-            if (!Enabled.Value)
-                return true;
-
             hover.FadeIn(500, EasingTypes.OutQuint);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            if (!Enabled.Value)
-                return;
-
             hover.FadeOut(500, EasingTypes.OutQuint);
             base.OnHoverLost(state);
         }
@@ -132,18 +107,12 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (!Enabled.Value)
-                return true;
-
             content.ScaleTo(0.75f, 2000, EasingTypes.OutQuint);
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            if (!Enabled.Value)
-                return true;
-
             content.ScaleTo(1, 1000, EasingTypes.OutElastic);
             return base.OnMouseUp(state, args);
         }
