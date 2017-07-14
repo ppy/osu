@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 FadeColour(Color4.White, 200, EasingTypes.OutQuint);
 
-                if (Hovering)
+                if (IsHovered)
                     OnHover(new InputState());
             }
             else
@@ -101,7 +101,7 @@ namespace osu.Game.Graphics.UserInterface
                 FadeColour(disableColour, 200, EasingTypes.OutQuint);
                 content.ScaleTo(1, 200, EasingTypes.OutElastic);
 
-                if (Hovering)
+                if (IsHovered)
                     OnHoverLost(new InputState());
             }
         }

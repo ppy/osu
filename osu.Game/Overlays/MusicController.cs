@@ -262,7 +262,8 @@ namespace osu.Game.Overlays
                 progressBar.UpdatePosition(track.Length == 0 ? 0 : (float)(track.CurrentTime / track.Length));
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled) next();
+                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled)
+                    next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
@@ -287,16 +288,12 @@ namespace osu.Game.Overlays
 
         private void prev()
         {
-            if (beatmapBacking.Disabled) return;
-
             queuedDirection = TransformDirection.Prev;
             playlist.PlayPrevious();
         }
 
         private void next()
         {
-            if (beatmapBacking.Disabled) return;
-
             queuedDirection = TransformDirection.Next;
             playlist.PlayNext();
         }
