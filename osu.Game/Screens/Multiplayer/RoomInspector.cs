@@ -16,6 +16,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Database;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
@@ -249,7 +250,7 @@ namespace osu.Game.Screens.Multiplayer
                         },
                     },
                 },
-                participantsScroll = new ScrollContainer
+                participantsScroll = new OsuScrollContainer
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,

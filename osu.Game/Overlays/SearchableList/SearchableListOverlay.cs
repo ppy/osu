@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -60,7 +61,7 @@ namespace osu.Game.Overlays.SearchableList
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        new ScrollContainer
+                        new OsuScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             ScrollbarVisible = false,
