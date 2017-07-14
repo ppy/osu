@@ -14,12 +14,13 @@ using osu.Game.Overlays.SearchableList;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class FilterControl : SearchableListFilterControl<DirectSortCritera, RankStatus>
+    public class FilterControl : SearchableListFilterControl<DirectSortCriteria, RankStatus>
     {
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
         private FillFlowContainer<RulesetToggleButton> modeButtons;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"384552");
-        protected override DirectSortCritera DefaultTab => DirectSortCritera.Title;
+        protected override DirectSortCriteria DefaultTab => DirectSortCriteria.Ranked;
         protected override Drawable CreateSupplementaryControls()
         {
             modeButtons = new FillFlowContainer<RulesetToggleButton>
@@ -36,10 +37,10 @@ namespace osu.Game.Overlays.Direct
         {
             DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 
-            var b = new Bindable<RulesetInfo>(); //backup bindable incase the game is null
+            Ruleset.BindTo(game?.Ruleset ?? new Bindable<RulesetInfo> { Value = rulesets.GetRuleset(0) });
             foreach (var r in rulesets.AllRulesets)
             {
-                modeButtons.Add(new RulesetToggleButton(game?.Ruleset ?? b, r));
+                modeButtons.Add(new RulesetToggleButton(Ruleset, r));
             }
         }
 
@@ -95,7 +96,7 @@ namespace osu.Game.Overlays.Direct
         }
     }
 
-    public enum DirectSortCritera
+    public enum DirectSortCriteria
     {
         Title,
         Artist,
@@ -103,5 +104,6 @@ namespace osu.Game.Overlays.Direct
         Difficulty,
         Ranked,
         Rating,
+        Plays,
     }
 }

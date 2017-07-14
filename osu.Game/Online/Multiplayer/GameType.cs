@@ -52,10 +52,32 @@ namespace osu.Game.Online.Multiplayer
         public override string Name => "Tag Team";
         public override Drawable GetIcon(OsuColour colours, float size)
         {
-            return new VersusRow(colours.Blue, colours.Blue, size * 0.6f)
+            return new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(2f),
+                Children = new[]
+                {
+                    new TextAwesome
+                    {
+                        Icon = FontAwesome.fa_refresh,
+                        TextSize = size * 0.75f,
+                        Colour = colours.Blue,
+                        Shadow = false,
+                        UseFullGlyphHeight = false,
+                    },
+                    new TextAwesome
+                    {
+                        Icon = FontAwesome.fa_refresh,
+                        TextSize = size * 0.75f,
+                        Colour = colours.Pink,
+                        Shadow = false,
+                        UseFullGlyphHeight = false,
+                    },
+                },
             };
         }
     }

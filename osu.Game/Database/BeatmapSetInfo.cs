@@ -24,6 +24,9 @@ namespace osu.Game.Database
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<BeatmapInfo> Beatmaps { get; set; }
 
+        [Ignore]
+        public BeatmapSetOnlineInfo OnlineInfo { get; set; }
+
         public double MaxStarDifficulty => Beatmaps.Max(b => b.StarDifficulty);
 
         [Indexed]
