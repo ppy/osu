@@ -13,7 +13,6 @@ using osu.Framework.MathUtils;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Play;
-using osu.Framework.Graphics.Transforms;
 
 namespace osu.Desktop.VisualTests.Tests
 {

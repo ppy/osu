@@ -15,7 +15,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Lists;
 using System;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Transforms;
 
 namespace osu.Desktop.VisualTests.Tests
 {
