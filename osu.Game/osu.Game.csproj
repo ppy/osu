@@ -490,9 +490,15 @@
     <Compile Include="Overlays\SearchableList\SlimEnumDropdown.cs" />
     <Compile Include="Overlays\SearchableList\DisplayStyleControl.cs" />
     <Compile Include="Graphics\UserInterface\BreadcrumbControl.cs" />
+    <Compile Include="Overlays\MedalOverlay.cs" />
+    <Compile Include="Users\Medal.cs" />
+    <Compile Include="Overlays\MedalSplash\DrawableMedal.cs" />
     <Compile Include="Screens\Multiplayer\RoomInspector.cs" />
     <Compile Include="Online\Multiplayer\GameType.cs" />
     <Compile Include="Screens\Multiplayer\DrawableGameType.cs" />
+    <Compile Include="Screens\Multiplayer\ParticipantInfo.cs" />
+    <Compile Include="Screens\Multiplayer\ModeTypeInfo.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

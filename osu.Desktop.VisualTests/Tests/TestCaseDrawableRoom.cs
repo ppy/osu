@@ -8,6 +8,7 @@ using osu.Game.Screens.Multiplayer;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
 using osu.Game.Database;
+using osu.Framework.Allocation;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -15,74 +16,117 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Select your favourite room";
 
+        private RulesetDatabase rulesets;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             DrawableRoom first;
-            DrawableRoom second;
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Y,
-                Width = 500f,
+                Width = 580f,
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    first = new DrawableRoom(new Room()),
-                    second = new DrawableRoom(new Room()),
+                    first = new DrawableRoom(new Room
+                    {
+                        Name = { Value = @"Great Room Right Here" },
+                        Host = { Value = new User { Username = @"Naeferith", Id = 9492835, Country = new Country { FlagName = @"FR" } } },
+                        Status = { Value = new RoomStatusOpen() },
+                        Type = { Value = new GameTypeTeamVersus() },
+                        Beatmap =
+                        {
+                            Value = new BeatmapInfo
+                            {
+                                StarDifficulty = 4.65,
+                                Ruleset = rulesets.GetRuleset(3),
+                                Metadata = new BeatmapMetadata
+                                {
+                                    Title = @"Critical Crystal",
+                                    Artist = @"Seiryu",
+                                },
+                                BeatmapSet = new BeatmapSetInfo
+                                {
+                                    OnlineInfo = new BeatmapSetOnlineInfo
+                                    {
+                                        Covers = new BeatmapSetOnlineCovers
+                                        {
+                                            Cover = @"https://assets.ppy.sh//beatmaps/376340/covers/cover.jpg?1456478455",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        Participants =
+                        {
+                            Value = new[]
+                            {
+                                new User { GlobalRank = 1355 },
+                                new User { GlobalRank = 8756 },
+                            },
+                        },
+                    }),
+                    new DrawableRoom(new Room
+                    {
+                        Name = { Value = @"Relax It's The Weekend" },
+                        Host = { Value = new User { Username = @"peppy", Id = 2, Country = new Country { FlagName = @"AU" } } },
+                        Status = { Value = new RoomStatusPlaying() },
+                        Type = { Value = new GameTypeTagTeam() },
+                        Beatmap =
+                        {
+                            Value = new BeatmapInfo
+                            {
+                                StarDifficulty = 1.96,
+                                Ruleset = rulesets.GetRuleset(0),
+                                Metadata = new BeatmapMetadata
+                                {
+                                    Title = @"Serendipity",
+                                    Artist = @"ZAQ",
+                                },
+                                BeatmapSet = new BeatmapSetInfo
+                                {
+                                    OnlineInfo = new BeatmapSetOnlineInfo
+                                    {
+                                        Covers = new BeatmapSetOnlineCovers
+                                        {
+                                            Cover = @"https://assets.ppy.sh//beatmaps/526839/covers/cover.jpg?1493815706",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        Participants =
+                        {
+                            Value =  new[]
+                            {
+                                new User { GlobalRank = 578975 },
+                                new User { GlobalRank = 24554 },
+                            },
+                        },
+                    }),
                 }
             });
 
-            first.Room.Name.Value = @"Great Room Right Here";
-            first.Room.Host.Value = new User { Username = @"Naeferith", Id = 9492835, Country = new Country { FlagName = @"FR" } };
-            first.Room.Status.Value = new RoomStatusOpen();
-            first.Room.Beatmap.Value = new BeatmapInfo
+            AddStep(@"change title", () => first.Room.Name.Value = @"I Changed Name");
+            AddStep(@"change host", () => first.Room.Host.Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } });
+            AddStep(@"change status", () => first.Room.Status.Value = new RoomStatusPlaying());
+            AddStep(@"change type", () => first.Room.Type.Value = new GameTypeVersus());
+            AddStep(@"change beatmap", () => first.Room.Beatmap.Value = null);
+            AddStep(@"change participants", () => first.Room.Participants.Value = new[]
             {
-                Metadata = new BeatmapMetadata
-                {
-                    Title = @"Seiryu",
-                    Artist = @"Critical Crystal",
-                },
-            };
-
-            second.Room.Name.Value = @"Relax It's The Weekend";
-            second.Room.Host.Value = new User { Username = @"peppy", Id = 2, Country = new Country { FlagName = @"AU" } };
-            second.Room.Status.Value = new RoomStatusPlaying();
-            second.Room.Beatmap.Value = new BeatmapInfo
-            {
-                Metadata = new BeatmapMetadata
-                {
-                    Title = @"Serendipity",
-                    Artist = @"ZAQ",
-                },
-            };
-
-            AddStep(@"change state", () =>
-            {
-                first.Room.Status.Value = new RoomStatusPlaying();
+                new User { GlobalRank = 1254 },
+                new User { GlobalRank = 123189 },
             });
+        }
 
-            AddStep(@"change name", () =>
-            {
-                first.Room.Name.Value = @"I Changed Name";
-            });
-
-            AddStep(@"change host", () =>
-            {
-                first.Room.Host.Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } };
-            });
-
-            AddStep(@"change beatmap", () =>
-            {
-                first.Room.Beatmap.Value = null;
-            });
-
-            AddStep(@"change state", () =>
-            {
-                first.Room.Status.Value = new RoomStatusOpen();
-            });
+        [BackgroundDependencyLoader]
+        private void load(RulesetDatabase rulesets)
+        {
+            this.rulesets = rulesets;
         }
     }
 }
