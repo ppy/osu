@@ -39,9 +39,15 @@ namespace osu.Desktop.VisualTests.Tests
                             Artist = @"Maaya Sakamoto",
                             Author = @"uwutm8",
                         },
-                        OnlineInfo = new BeatmapOnlineInfo
+                        BeatmapSet = new BeatmapSetInfo
                         {
-                            Covers = new[] { @"https://assets.ppy.sh//beatmaps/560573/covers/cover.jpg?1492722343" },
+                            OnlineInfo = new BeatmapSetOnlineInfo
+                            {
+                                Covers = new BeatmapSetOnlineCovers
+                                {
+                                    Cover = @"https://assets.ppy.sh/beatmaps/560573/covers/cover.jpg?1492722343",
+                                },
+                            },
                         },
                     }
                 },
@@ -96,15 +102,21 @@ namespace osu.Desktop.VisualTests.Tests
                             Ruleset = rulesets.GetRuleset(0),
                             Metadata = new BeatmapMetadata
                             {
-                                Title = @"xi",
-                                Artist = @"FREEDOM DIVE",
+                                Title = @"FREEDOM DIVE",
+                                Artist = @"xi",
                                 Author = @"Nakagawa-Kanon",
                             },
-                            OnlineInfo = new BeatmapOnlineInfo
+                            BeatmapSet = new BeatmapSetInfo
                             {
-                                Covers = new[] { @"https://assets.ppy.sh//beatmaps/39804/covers/cover.jpg?1456506845" },
+                                OnlineInfo = new BeatmapSetOnlineInfo
+                                {
+                                    Covers = new BeatmapSetOnlineCovers
+                                    {
+                                        Cover = @"https://assets.ppy.sh/beatmaps/39804/covers/cover.jpg?1456506845",
+                                    },
+                                },
                             },
-                        }
+                        },
                     },
                     MaxParticipants = { Value = 10 },
                     Participants =

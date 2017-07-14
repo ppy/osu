@@ -78,6 +78,7 @@
     <Compile Include="OsuDifficulty\Skills\Speed.cs" />
     <Compile Include="OsuDifficulty\Utils\History.cs" />
     <Compile Include="OsuKeyConversionInputManager.cs" />
+    <Compile Include="UI\OsuSettings.cs" />
     <Compile Include="Scoring\OsuScoreProcessor.cs" />
     <Compile Include="UI\OsuHitRenderer.cs" />
     <Compile Include="UI\OsuPlayfield.cs" />
