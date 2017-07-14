@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
+using Newtonsoft.Json;
 using SQLite.Net.Attributes;
 
 namespace osu.Game.Database
@@ -17,8 +18,13 @@ namespace osu.Game.Database
         public string TitleUnicode { get; set; }
         public string Artist { get; set; }
         public string ArtistUnicode { get; set; }
+
+        [JsonProperty(@"creator")]
         public string Author { get; set; }
+
         public string Source { get; set; }
+
+        [JsonProperty(@"tags")]
         public string Tags { get; set; }
         public int PreviewTime { get; set; }
         public string AudioFile { get; set; }
