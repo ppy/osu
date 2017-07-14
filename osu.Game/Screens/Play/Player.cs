@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Play
 
         public Action RestartRequested;
 
-        internal override bool AllowRulesetChange => false;
+        internal override bool AllowBeatmapRulesetChange => false;
 
         public bool HasFailed { get; private set; }
 

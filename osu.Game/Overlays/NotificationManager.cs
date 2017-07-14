@@ -36,7 +36,7 @@ namespace osu.Game.Overlays
                     Colour = Color4.Black,
                     Alpha = 0.6f,
                 },
-                scrollContainer = new ScrollContainer
+                scrollContainer = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Margin = new MarginPadding { Top = Toolbar.Toolbar.HEIGHT },

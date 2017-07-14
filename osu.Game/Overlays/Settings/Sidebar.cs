@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
+using osu.Framework;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
@@ -12,7 +14,7 @@ using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class Sidebar : Container
+    public class Sidebar : Container, IStateful<ExpandedState>
     {
         private readonly FillFlowContainer content;
         internal const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
@@ -47,22 +49,27 @@ namespace osu.Game.Overlays.Settings
         }
 
         private ScheduledDelegate expandEvent;
+        private ExpandedState state;
 
         protected override bool OnHover(InputState state)
         {
-            expandEvent = Scheduler.AddDelayed(() =>
-            {
-                expandEvent = null;
-                ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 150, EasingTypes.OutQuad);
-            }, 750);
+            queueExpandIfHovering();
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             expandEvent?.Cancel();
-            ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 150, EasingTypes.OutQuad);
+            lastHoveredButton = null;
+            State = ExpandedState.Contracted;
+
             base.OnHoverLost(state);
+        }
+
+        protected override bool OnMouseMove(InputState state)
+        {
+            queueExpandIfHovering();
+            return base.OnMouseMove(state);
         }
 
         private class SidebarScrollContainer : ScrollContainer
@@ -74,5 +81,52 @@ namespace osu.Game.Overlays.Settings
                 RelativeSizeAxes = Axes.Both;
             }
         }
+
+        public ExpandedState State
+        {
+            get { return state; }
+            set
+            {
+                if (state == value) return;
+
+                state = value;
+
+                switch (state)
+                {
+                    default:
+                        ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 500, EasingTypes.OutQuint);
+                        break;
+                    case ExpandedState.Expanded:
+                        ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, EasingTypes.OutQuint);
+                        break;
+                }
+            }
+        }
+
+        private Drawable lastHoveredButton;
+
+        private Drawable hoveredButton => content.Children.FirstOrDefault(c => c.IsHovered);
+
+        private void queueExpandIfHovering()
+        {
+            // only expand when we hover a different button.
+            if (lastHoveredButton == hoveredButton) return;
+
+            if (!IsHovered) return;
+
+            if (State != ExpandedState.Expanded)
+            {
+                expandEvent?.Cancel();
+                expandEvent = Scheduler.AddDelayed(() => State = ExpandedState.Expanded, 750);
+            }
+
+            lastHoveredButton = hoveredButton;
+        }
+    }
+
+    public enum ExpandedState
+    {
+        Contracted,
+        Expanded,
     }
 }
