@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Notifications
 
         private ProgressNotificationState state;
 
-        protected virtual Notification CreateCompletionNotification() => new ProgressCompletionNotification()
+        protected virtual Notification CreateCompletionNotification() => new ProgressCompletionNotification
         {
             Activated = CompletionClickAction,
             Text = $"Task \"{Text}\" has completed!"

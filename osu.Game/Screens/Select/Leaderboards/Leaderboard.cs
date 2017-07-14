@@ -12,6 +12,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
 using osu.Game.Database;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
@@ -74,7 +75,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             Children = new Drawable[]
             {
-                scrollContainer = new ScrollContainer
+                scrollContainer = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,

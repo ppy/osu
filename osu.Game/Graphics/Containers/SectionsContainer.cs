@@ -123,7 +123,7 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            AddInternal(scrollContainer = new ScrollContainer()
+            AddInternal(scrollContainer = new ScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
@@ -147,6 +147,8 @@ namespace osu.Game.Graphics.Containers
             if (section == Children.First() && current < pos - scrollOffset) return;
             scrollContainer.ScrollTo(pos - scrollOffset);
         }
+
+        public void ScrollTo(Drawable section) => ScrollContainer.ScrollTo(ScrollContainer.GetChildPosInContent(section) - FixedHeader.BoundingBox.Height);
 
         private float lastKnownScroll;
         protected override void UpdateAfterChildren()

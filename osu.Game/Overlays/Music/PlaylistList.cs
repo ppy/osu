@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Database;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Music
 {
@@ -49,7 +50,7 @@ namespace osu.Game.Overlays.Music
         {
             Children = new Drawable[]
             {
-                new ScrollContainer
+                new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]

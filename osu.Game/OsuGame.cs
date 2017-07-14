@@ -58,6 +58,8 @@ namespace osu.Game
             }
         }
 
+        public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
+
         private OsuScreen screenStack;
 
         private VolumeControl volume;
@@ -365,7 +367,7 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            mainContent.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
+            mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
         }

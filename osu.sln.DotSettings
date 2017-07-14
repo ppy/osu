@@ -66,8 +66,8 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantCommaInAttributeList/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantCommaInEnumDeclaration/@EntryIndexedValue">DO_NOT_SHOW</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantCommaInInitializer/@EntryIndexedValue">DO_NOT_SHOW</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantEmptyObjectCreationArgumentList/@EntryIndexedValue"></s:String>
-	<s:Boolean x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantEmptyObjectCreationArgumentList/@EntryIndexRemoved">True</s:Boolean>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantEmptyObjectCreationArgumentList/@EntryIndexedValue">WARNING</s:String>
+	
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantExplicitParamsArrayCreation/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantImmediateDelegateInvocation/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantLambdaSignatureParentheses/@EntryIndexedValue">WARNING</s:String>

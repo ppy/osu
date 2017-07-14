@@ -29,7 +29,11 @@ namespace osu.Game.Screens
 
         internal virtual bool HasLocalCursorDisplayed => false;
 
-        internal virtual bool AllowRulesetChange => true;
+        /// <summary>
+        /// Whether the beatmap or ruleset should be allowed to be changed by the user or game.
+        /// Used to mark exclusive areas where this is strongly prohibited, like gameplay.
+        /// </summary>
+        internal virtual bool AllowBeatmapRulesetChange => true;
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
@@ -85,7 +89,13 @@ namespace osu.Game.Screens
         {
             if (!IsCurrentScreen) return;
 
-            ruleset.Disabled = !AllowRulesetChange;
+            if (ParentScreen != null)
+            {
+                // we only want to apply these restrictions when we are inside a screen stack.
+                // the use case for not applying is in visual/unit tests.
+                ruleset.Disabled = !AllowBeatmapRulesetChange;
+                beatmap.Disabled = !AllowBeatmapRulesetChange;
+            }
         }
 
         protected override void OnResuming(Screen last)
