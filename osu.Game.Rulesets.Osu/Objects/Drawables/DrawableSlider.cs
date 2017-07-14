@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             body.FadeOut(160);
             ball.FadeOut(160);
 
-            FadeOut(800);
+            this.FadeOut(800);
 
             Expire();
         }

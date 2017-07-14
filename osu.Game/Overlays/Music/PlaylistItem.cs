@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Music
 
                 matching = value;
 
-                FadeTo(matching ? 1 : 0, 200);
+                this.FadeTo(matching ? 1 : 0, 200);
             }
         }
     }

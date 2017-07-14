@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     break;
             }
 
-            FadeOut(out_transition_time, EasingTypes.Out);
+            this.FadeOut(out_transition_time, EasingTypes.Out);
 
             Expire();
         }

@@ -200,16 +200,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             Delay(spinner.Duration, true);
 
-            FadeOut(160);
+            this.FadeOut(160);
 
             switch (state)
             {
                 case ArmedState.Hit:
-                    ScaleTo(Scale * 1.2f, 320, EasingTypes.Out);
+                    this.ScaleTo(Scale * 1.2f, 320, EasingTypes.Out);
                     Expire();
                     break;
                 case ArmedState.Miss:
-                    ScaleTo(Scale * 0.8f, 320, EasingTypes.In);
+                    this.ScaleTo(Scale * 0.8f, 320, EasingTypes.In);
                     Expire();
                     break;
             }

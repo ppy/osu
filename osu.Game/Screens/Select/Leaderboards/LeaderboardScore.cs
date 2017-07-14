@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         nameLabel.MoveToX(150);
                         break;
                     case Visibility.Visible:
-                        FadeIn(200);
+                        this.FadeIn(200);
                         content.MoveToY(0, 800, EasingTypes.OutQuint);
 
                         Delay(100, true);

@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Play
         protected override bool OnExiting(Screen next)
         {
             Content.ScaleTo(0.7f, 150, EasingTypes.InQuint);
-            FadeOut(150);
+            this.FadeOut(150);
 
             return base.OnExiting(next);
         }

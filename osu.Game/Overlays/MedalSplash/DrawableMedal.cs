@@ -154,16 +154,16 @@ namespace osu.Game.Overlays.MedalSplash
                     medalContainer.ScaleTo(1);
                     medalContainer.Show();
 
-                    ScaleTo(scale_when_unlocked, duration, EasingTypes.OutExpo);
-                    MoveToY(MedalOverlay.DISC_SIZE / 2 - 30, duration, EasingTypes.OutExpo);
+                    this.ScaleTo(scale_when_unlocked, duration, EasingTypes.OutExpo);
+                    this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 30, duration, EasingTypes.OutExpo);
                     unlocked.FadeInFromZero(duration);
                     break;
                 case DisplayState.Full:
                     medalContainer.ScaleTo(1);
                     medalContainer.Show();
 
-                    ScaleTo(scale_when_full, duration, EasingTypes.OutExpo);
-                    MoveToY(MedalOverlay.DISC_SIZE / 2 - 60, duration, EasingTypes.OutExpo);
+                    this.ScaleTo(scale_when_full, duration, EasingTypes.OutExpo);
+                    this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 60, duration, EasingTypes.OutExpo);
                     name.FadeInFromZero(duration + 100);
                     description.FadeInFromZero(duration * 2);
                     break;

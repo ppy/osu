@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
             base.PopIn();
 
             settingsSection.Bounding = true;
-            FadeIn(transition_time, EasingTypes.OutQuint);
+            this.FadeIn(transition_time, EasingTypes.OutQuint);
 
             InputManager.ChangeFocus(settingsSection);
         }
@@ -76,7 +76,7 @@ namespace osu.Game.Overlays
             base.PopOut();
 
             settingsSection.Bounding = false;
-            FadeOut(transition_time);
+            this.FadeOut(transition_time);
         }
     }
 }

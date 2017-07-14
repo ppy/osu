@@ -119,12 +119,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 case ArmedState.Idle:
                     using (BeginDelayedSequence(duration + TIME_PREEMPT))
-                        FadeOut(TIME_FADEOUT);
+                        this.FadeOut(TIME_FADEOUT);
                     Expire(true);
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
-                    FadeOut(TIME_FADEOUT / 5);
+                    this.FadeOut(TIME_FADEOUT / 5);
                     Expire();
                     break;
                 case ArmedState.Hit:
@@ -145,8 +145,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         circle.FadeOut();
                         number.FadeOut();
 
-                        FadeOut(800);
-                        ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
+                        this.FadeOut(800);
+                        this.ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
                     }
 
                     Expire();

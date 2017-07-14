@@ -194,16 +194,13 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            FadeIn(200);
+            this.FadeIn(200);
             background.FlashColour(Color4.White.Opacity(0.25f), 400);
 
             getSample.Play();
 
-            using (innerSpin.BeginLoopedSequence())
-                innerSpin.RotateTo(360, 20000);
-
-            using (outerSpin.BeginLoopedSequence())
-                outerSpin.RotateTo(360, 40000);
+            innerSpin.Spin(20000);
+            outerSpin.Spin(40000);
 
             using (BeginDelayedSequence(200, true))
             {
@@ -233,7 +230,7 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
-            FadeOut(200);
+            this.FadeOut(200);
         }
 
         private void dismiss()
@@ -295,8 +292,8 @@ namespace osu.Game.Overlays
                     Radius = 5,
                 };
 
-                MoveTo(positionForOffset(DISC_SIZE / 2 + 200), 500);
-                FadeOut(500);
+                this.MoveTo(positionForOffset(DISC_SIZE / 2 + 200), 500);
+                this.FadeOut(500);
                 Expire();
             }
         }

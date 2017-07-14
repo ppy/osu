@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Framework.Configuration;
@@ -235,7 +234,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
-            TransformTo(newTimeRange, duration, easing, new TransformTimeSpan());
+            this.TransformTo(newTimeRange, duration, easing, new TransformTimeSpan(this));
         }
 
         protected override void Update()
@@ -245,22 +244,14 @@ namespace osu.Game.Rulesets.Mania.UI
             barLineContainer.Width = columns.Width;
         }
 
-        private class TransformTimeSpan : Transform<double, Drawable>
+        private class TransformTimeSpan : TransformDouble<ManiaPlayfield>
         {
-            public double CurrentValue
+            public TransformTimeSpan(ManiaPlayfield target) : base(target)
             {
-                get
-                {
-                    double time = Time?.Current ?? 0;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
-
-                    return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-                }
             }
 
-            public override void Apply(Drawable d) => ((ManiaPlayfield)d).visibleTimeRange.Value = (float)CurrentValue;
-            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ManiaPlayfield)d).visibleTimeRange.Value;
+            public override void Apply(ManiaPlayfield d) => d.visibleTimeRange.Value = CurrentValue;
+            public override void ReadIntoStartValue(ManiaPlayfield d) => StartValue = d.visibleTimeRange.Value;
         }
     }
 }

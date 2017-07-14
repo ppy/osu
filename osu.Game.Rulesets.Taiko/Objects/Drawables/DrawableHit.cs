@@ -77,10 +77,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     Delay(HitObject.HitWindowMiss);
                     break;
                 case ArmedState.Miss:
-                    FadeOut(100);
+                    this.FadeOut(100);
                     break;
                 case ArmedState.Hit:
-                    FadeOut(600);
+                    this.FadeOut(600);
 
                     var flash = circlePiece?.FlashBox;
                     if (flash != null)
@@ -90,16 +90,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     }
 
 
-                    FadeOut(800);
+                    this.FadeOut(800);
 
                     const float gravity_time = 300;
                     const float gravity_travel_height = 200;
 
                     Content.ScaleTo(0.8f, gravity_time * 2, EasingTypes.OutQuad);
 
-                    MoveToY(-gravity_travel_height, gravity_time, EasingTypes.Out);
+                    this.MoveToY(-gravity_travel_height, gravity_time, EasingTypes.Out);
                     Delay(gravity_time, true);
-                    MoveToY(gravity_travel_height * 2, gravity_time * 2, EasingTypes.In);
+                    this.MoveToY(gravity_travel_height * 2, gravity_time * 2, EasingTypes.In);
                     break;
             }
 

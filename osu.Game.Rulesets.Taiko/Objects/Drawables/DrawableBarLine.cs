@@ -65,10 +65,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.LoadComplete();
             Delay(BarLine.StartTime - Time.Current);
-            FadeOut(base_fadeout_time * BarLine.ScrollTime / 1000);
+            this.FadeOut(base_fadeout_time * BarLine.ScrollTime / 1000);
         }
 
-        private void updateScrollPosition(double time) => MoveToX((float)((BarLine.StartTime - time) / BarLine.ScrollTime));
+        private void updateScrollPosition(double time) => this.MoveToX((float)((BarLine.StartTime - time) / BarLine.ScrollTime));
 
         protected override void Update()
         {

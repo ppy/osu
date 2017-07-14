@@ -2,14 +2,17 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.MathUtils;
 
 namespace osu.Game.Graphics.Transforms
 {
-    public class TransformAccent : Transform<Color4, Drawable>
+    public class TransformAccent : Transform<Color4, IHasAccentColour>
     {
+        public TransformAccent(IHasAccentColour target) : base(target)
+        {
+        }
+
         /// <summary>
         /// Current value of the transformed colour in linear colour space.
         /// </summary>
@@ -25,7 +28,7 @@ namespace osu.Game.Graphics.Transforms
             }
         }
 
-        public override void Apply(Drawable d) => ((IHasAccentColour)d).AccentColour = CurrentValue;
-        public override void ReadIntoStartValue(Drawable d) => StartValue = ((IHasAccentColour)d).AccentColour;
+        public override void Apply(IHasAccentColour d) => d.AccentColour = CurrentValue;
+        public override void ReadIntoStartValue(IHasAccentColour d) => StartValue = d.AccentColour;
     }
 }
