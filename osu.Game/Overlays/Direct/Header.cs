@@ -30,10 +30,10 @@ namespace osu.Game.Overlays.Direct
     {
         Search,
         [Description("Newest Maps")]
-        NewestMaps,
+        NewestMaps = DirectSortCriteria.Ranked,
         [Description("Top Rated")]
-        TopRated,
+        TopRated = DirectSortCriteria.Rating,
         [Description("Most Played")]
-        MostPlayed
+        MostPlayed = DirectSortCriteria.Plays,
     }
 }

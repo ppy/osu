@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Select
                     Colour = Color4.Black,
                     Alpha = 0.5f,
                 },
-                new FillFlowContainer<MetadataSegment>()
+                new FillFlowContainer<MetadataSegment>
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,

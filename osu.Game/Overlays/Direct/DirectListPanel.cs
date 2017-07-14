@@ -12,8 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
-using osu.Framework.Graphics.Textures;
-using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
@@ -49,7 +47,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation, TextureStore textures)
+        private void load(LocalisationEngine localisation)
         {
             Children = new[]
             {
@@ -58,7 +56,7 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                GetBackground(textures),
+                CreateBackground(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -105,11 +103,11 @@ namespace osu.Game.Overlays.Direct
                             Margin = new MarginPadding { Right = height - vertical_padding * 2 + vertical_padding },
                             Children = new Drawable[]
                             {
-                                new Statistic(FontAwesome.fa_play_circle, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.PlayCount ?? 0)
+                                new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
                                 {
                                     Margin = new MarginPadding { Right = 1 },
                                 },
-                                new Statistic(FontAwesome.fa_heart, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.FavouriteCount ?? 0),
+                                new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                                 new FillFlowContainer
                                 {
                                     Anchor = Anchor.TopRight,

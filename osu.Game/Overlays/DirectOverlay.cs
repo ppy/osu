@@ -5,20 +5,27 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCritera, RankStatus>
+    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCriteria, RankStatus>
     {
         private const float panel_padding = 10f;
+
+        private APIAccess api;
+        private RulesetDatabase rulesets;
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
@@ -29,7 +36,7 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
-        protected override SearchableListFilterControl<DirectSortCritera, RankStatus> CreateFilterControl() => new FilterControl();
+        protected override SearchableListFilterControl<DirectSortCriteria, RankStatus> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;
         public IEnumerable<BeatmapSetInfo> BeatmapSets
@@ -39,6 +46,17 @@ namespace osu.Game.Overlays
             {
                 if (beatmapSets?.Equals(value) ?? false) return;
                 beatmapSets = value;
+
+                if (BeatmapSets == null)
+                {
+                    foreach (var p in panels.Children)
+                    {
+                        p.FadeOut(200);
+                        p.Expire();
+                    }
+
+                    return;
+                }
 
                 recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             }
@@ -98,22 +116,60 @@ namespace osu.Game.Overlays
                 },
             };
 
-            Header.Tabs.Current.ValueChanged += tab => { if (tab != DirectTab.Search) Filter.Search.Text = string.Empty; };
             Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
+            ((FilterControl)Filter).Ruleset.ValueChanged += ruleset => Scheduler.AddOnce(updateSearch);
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => Scheduler.AddOnce(updateSearch);
+
+            Header.Tabs.Current.ValueChanged += tab =>
+            {
+                if (tab != DirectTab.Search)
+                {
+                    currentQuery.Value = string.Empty;
+                    Filter.Tabs.Current.Value = (DirectSortCriteria)Header.Tabs.Current.Value;
+                    Scheduler.AddOnce(updateSearch);
+                }
+            };
+
+            currentQuery.ValueChanged += v =>
+            {
+                queryChangedDebounce?.Cancel();
+
+                if (string.IsNullOrEmpty(v))
+                    Scheduler.AddOnce(updateSearch);
+                else
+                {
+                    BeatmapSets = null;
+                    ResultAmounts = null;
+
+                    queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
+                }
+            };
+
+            currentQuery.BindTo(Filter.Search.Current);
+
+            Filter.Tabs.Current.ValueChanged += sortCriteria =>
+            {
+                if (Header.Tabs.Current.Value != DirectTab.Search && sortCriteria != (DirectSortCriteria)Header.Tabs.Current.Value)
+                    Header.Tabs.Current.Value = DirectTab.Search;
+
+                Scheduler.AddOnce(updateSearch);
+            };
 
             updateResultCounts();
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, APIAccess api, RulesetDatabase rulesets)
         {
+            this.api = api;
+            this.rulesets = rulesets;
             resultCountsContainer.Colour = colours.Yellow;
         }
 
         private void updateResultCounts()
         {
-            resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, EasingTypes.Out);
+            resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, EasingTypes.OutQuint);
             if (ResultAmounts == null) return;
 
             resultCountsText.Text = pluralize("Artist", ResultAmounts.Artists) + ", " +
@@ -129,8 +185,67 @@ namespace osu.Game.Overlays
         private void recreatePanels(PanelDisplayStyle displayStyle)
         {
             if (BeatmapSets == null) return;
-            panels.ChildrenEnumerable = BeatmapSets.Select(b => displayStyle == PanelDisplayStyle.Grid ? (DirectPanel)new DirectGridPanel(b) { Width = 400 } : new DirectListPanel(b));
+
+            panels.ChildrenEnumerable = BeatmapSets.Select<BeatmapSetInfo, DirectPanel>(b =>
+             {
+                 switch (displayStyle)
+                 {
+                     case PanelDisplayStyle.Grid:
+                         return new DirectGridPanel(b) { Width = 400 };
+                     default:
+                         return new DirectListPanel(b);
+                 }
+             });
         }
+
+        private GetBeatmapSetsRequest getSetsRequest;
+
+        private readonly Bindable<string> currentQuery = new Bindable<string>();
+
+        private ScheduledDelegate queryChangedDebounce;
+
+        private void updateSearch()
+        {
+            queryChangedDebounce?.Cancel();
+
+            if (!IsLoaded) return;
+
+            BeatmapSets = null;
+            ResultAmounts = null;
+
+            getSetsRequest?.Cancel();
+
+            if (api == null) return;
+
+            if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty)) return;
+
+            getSetsRequest = new GetBeatmapSetsRequest(currentQuery,
+                                                       ((FilterControl)Filter).Ruleset.Value,
+                                                       Filter.DisplayStyleControl.Dropdown.Current.Value,
+                                                       Filter.Tabs.Current.Value); //todo: sort direction (?)
+
+            getSetsRequest.Success += r =>
+            {
+                BeatmapSets = r?.Select(response => response.ToBeatmapSet(rulesets));
+                if (BeatmapSets == null) return;
+
+                var artists = new List<string>();
+                var songs = new List<string>();
+                var tags = new List<string>();
+                foreach (var s in BeatmapSets)
+                {
+                    artists.Add(s.Metadata.Artist);
+                    songs.Add(s.Metadata.Title);
+                    tags.AddRange(s.Metadata.Tags.Split(' '));
+                }
+
+                ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));
+            };
+
+            api.Queue(getSetsRequest);
+        }
+
+        private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
 
         public class ResultCounts
         {
