@@ -34,8 +34,6 @@ namespace osu.Game.Graphics.UserInterface
             set { icon.Scale = value; }
         }
 
-        private Color4 disableColour;
-
         public IconButton()
         {
             AutoSizeAxes = Axes.Both;
@@ -82,9 +80,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             hover.Colour = colours.Yellow.Opacity(0.6f);
             flashColour = colours.Yellow;
-            disableColour = colours.Gray9;
 
-            Enabled.ValueChanged += newEnabled => FadeColour(newEnabled ? Color4.White : disableColour, 200, EasingTypes.OutQuint);
+            Enabled.ValueChanged += newEnabled => FadeColour(newEnabled ? Color4.White : colours.Gray9, 200, EasingTypes.OutQuint);
         }
 
         protected override bool OnHover(InputState state)
