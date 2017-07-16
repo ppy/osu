@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             ball.FadeIn();
 
-            Delay(slider.Duration, true);
+            ApplyDelay(slider.Duration, true);
 
             body.FadeOut(160);
             ball.FadeOut(160);

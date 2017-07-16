@@ -99,7 +99,7 @@ namespace osu.Game.Graphics.UserInterface
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, EasingTypes.In);
             flash();
 
-            Delay(click_duration);
+            ApplyDelay(click_duration);
             Schedule(delegate {
                 colourContainer.ResizeTo(new Vector2(0.8f, 1f));
                 spriteText.Spacing = Vector2.Zero;

@@ -119,7 +119,7 @@ namespace osu.Game
             if (!menu.IsCurrentScreen)
             {
                 menu.MakeCurrent();
-                Delay(500);
+                ApplyDelay(500);
                 scoreLoad = Schedule(() => LoadScore(s));
                 return;
             }

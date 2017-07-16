@@ -100,14 +100,14 @@ namespace osu.Game.Screens.Menu
 
             Content.FadeInFromZero(500);
 
-            icon.Delay(1500);
+            icon.ApplyDelay(1500);
             icon.FadeColour(iconColour, 200);
 
-            Delay(6000, true);
+            ApplyDelay(6000, true);
 
             Content.FadeOut(250);
 
-            Delay(250);
+            ApplyDelay(250);
 
             Schedule(() => Push(intro));
         }

@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Ranking
                 foreach (var s in statisticsContainer.Children)
                 {
                     s.FadeOut();
-                    s.Delay(delay += 200);
+                    s.ApplyDelay(delay += 200);
                     s.FadeIn(300 + delay, EasingTypes.Out);
                 }
             });
