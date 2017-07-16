@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Ranking
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            fill.ApplyDelay(400);
+            fill.AddDelay(400);
             fill.FadeInFromZero(600);
         }
 

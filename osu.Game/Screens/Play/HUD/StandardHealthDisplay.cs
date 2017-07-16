@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Play.HUD
                 return;
 
             fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, EasingTypes.OutQuint);
-            fill.ApplyDelay(glow_fade_delay);
+            fill.AddDelay(glow_fade_delay);
             fill.FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, EasingTypes.OutQuint);
         }
 

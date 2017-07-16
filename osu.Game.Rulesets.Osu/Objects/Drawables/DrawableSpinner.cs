@@ -192,13 +192,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             mainContainer.ScaleTo(0);
             mainContainer.ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, EasingTypes.OutQuint);
 
-            mainContainer.ApplyDelay(TIME_PREEMPT - 150);
+            mainContainer.AddDelay(TIME_PREEMPT - 150);
             mainContainer.ScaleTo(1, 500, EasingTypes.OutQuint);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            ApplyDelay(spinner.Duration, true);
+            AddDelay(spinner.Duration, true);
 
             this.FadeOut(160);
 

@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play
                 Beatmap = player.Beatmap,
             });
 
-            ApplyDelay(400);
+            AddDelay(400);
 
             Schedule(pushWhenLoaded);
         }
@@ -104,14 +104,14 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
-            ApplyDelay(500, true);
+            AddDelay(500, true);
 
             logo.MoveToOffset(new Vector2(0, -180), 500, EasingTypes.InOutExpo);
-            ApplyDelay(250, true);
+            AddDelay(250, true);
 
             info.FadeIn(500);
 
-            ApplyDelay(1400, true);
+            AddDelay(1400, true);
 
             Schedule(pushWhenLoaded);
         }
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Play
 
             contentOut();
 
-            ApplyDelay(250);
+            AddDelay(250);
 
             Schedule(() =>
             {

@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            ApplyDelay(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true);
+            AddDelay(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true);
 
             var circlePiece = MainPiece as CirclePiece;
 
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             switch (State)
             {
                 case ArmedState.Idle:
-                    ApplyDelay(HitObject.HitWindowMiss);
+                    AddDelay(HitObject.HitWindowMiss);
                     break;
                 case ArmedState.Miss:
                     this.FadeOut(100);
@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     Content.ScaleTo(0.8f, gravity_time * 2, EasingTypes.OutQuad);
 
                     this.MoveToY(-gravity_travel_height, gravity_time, EasingTypes.Out);
-                    ApplyDelay(gravity_time, true);
+                    AddDelay(gravity_time, true);
                     this.MoveToY(gravity_travel_height * 2, gravity_time * 2, EasingTypes.In);
                     break;
             }

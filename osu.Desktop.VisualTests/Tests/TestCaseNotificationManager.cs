@@ -57,7 +57,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             if (remaining > 0)
             {
-                ApplyDelay(80);
+                AddDelay(80);
                 Schedule(() => sendBarrage(remaining - 1));
             }
         }

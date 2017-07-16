@@ -64,18 +64,18 @@ namespace osu.Game.Screens.Select.Leaderboards
                         this.FadeIn(200);
                         content.MoveToY(0, 800, EasingTypes.OutQuint);
 
-                        ApplyDelay(100, true);
+                        AddDelay(100, true);
                         avatar.FadeIn(300, EasingTypes.OutQuint);
                         nameLabel.FadeIn(350, EasingTypes.OutQuint);
 
                         avatar.MoveToX(0, 300, EasingTypes.OutQuint);
                         nameLabel.MoveToX(0, 350, EasingTypes.OutQuint);
 
-                        ApplyDelay(250, true);
+                        AddDelay(250, true);
                         scoreLabel.FadeIn(200);
                         scoreRank.FadeIn(200);
 
-                        ApplyDelay(50, true);
+                        AddDelay(50, true);
                         var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
 
                         for (int i = 0; i < drawables.Length; i++)

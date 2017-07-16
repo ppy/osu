@@ -150,12 +150,12 @@ namespace osu.Game.Rulesets.Taiko.UI
                     const float up_time = 1000;
 
                     back.ScaleTo(target.Scale.X - scale_amount, down_time, EasingTypes.OutQuint);
-                    back.ApplyDelay(down_time);
+                    back.AddDelay(down_time);
                     back.ScaleTo(1, up_time, EasingTypes.OutQuint);
 
                     target.ScaleTo(target.Scale.X - scale_amount, down_time, EasingTypes.OutQuint);
                     target.FadeTo(Math.Min(target.Alpha + alpha_amount, 1), down_time, EasingTypes.OutQuint);
-                    target.ApplyDelay(down_time);
+                    target.AddDelay(down_time);
                     target.ScaleTo(1, up_time, EasingTypes.OutQuint);
                     target.FadeOut(up_time, EasingTypes.OutQuint);
                 }
