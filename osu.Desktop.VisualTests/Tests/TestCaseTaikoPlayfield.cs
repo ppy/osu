@@ -84,7 +84,7 @@ namespace osu.Desktop.VisualTests.Tests
                     break;
                 case 5:
                     addSwell(1000);
-                    playfieldContainer.Delay(scroll_time - 100);
+                    playfieldContainer.ApplyDelay(scroll_time - 100);
                     break;
             }
 

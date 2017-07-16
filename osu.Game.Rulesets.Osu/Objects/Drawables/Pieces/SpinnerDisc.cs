@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 background.Flush(false, nameof(Alpha));
                 background.FadeTo(tracking_alpha + 0.2f, 60, EasingTypes.OutExpo);
-                background.Delay(60);
+                background.ApplyDelay(60);
                 background.FadeTo(tracking_alpha, 250, EasingTypes.OutQuint);
             }
 

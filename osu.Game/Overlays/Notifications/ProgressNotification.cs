@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Notifications
                             NotificationContent.MoveToY(-DrawSize.Y / 2, 200, EasingTypes.OutQuint);
                             this.FadeTo(0.01f, 200); //don't completely fade out or our scheduled task won't run.
 
-                            Delay(100);
+                            ApplyDelay(100);
                             Schedule(Completed);
                             break;
                     }

@@ -44,7 +44,7 @@ namespace osu.Game.Screens
             boxContainer.ScaleTo(0.2f);
             boxContainer.RotateTo(-20);
 
-            Content.Delay(300, true);
+            Content.ApplyDelay(300, true);
 
             boxContainer.ScaleTo(1, transition_time, EasingTypes.OutElastic);
             boxContainer.RotateTo(0, transition_time / 2, EasingTypes.OutQuint);
