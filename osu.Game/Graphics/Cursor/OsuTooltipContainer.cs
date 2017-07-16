@@ -86,11 +86,7 @@ namespace osu.Game.Graphics.Cursor
                 this.FadeIn(500, EasingTypes.OutQuint);
             }
 
-            protected override void PopOut()
-            {
-                using (BeginDelayedSequence(150))
-                    this.FadeOut(500, EasingTypes.OutQuint);
-            }
+            protected override void PopOut() => this.Delay(150).FadeOut(500, EasingTypes.OutQuint);
 
             public override void Move(Vector2 pos)
             {

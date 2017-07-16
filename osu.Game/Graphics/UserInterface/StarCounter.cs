@@ -133,12 +133,8 @@ namespace osu.Game.Graphics.UserInterface
                 star.ClearTransforms(true);
 
                 var delay = (countStars <= newValue ? Math.Max(i - countStars, 0) : Math.Max(countStars - 1 - i, 0)) * animationDelay;
-
-                using (BeginDelayedSequence(delay, true))
-                {
-                    star.FadeTo(i < newValue ? 1.0f : minStarAlpha, fadingDuration);
-                    star.Icon.ScaleTo(getStarScale(i, newValue), scalingDuration, scalingEasing);
-                }
+                star.Delay(delay).FadeTo(i < newValue ? 1.0f : minStarAlpha, fadingDuration);
+                star.Icon.Delay(delay).ScaleTo(getStarScale(i, newValue), scalingDuration, scalingEasing);
 
                 i++;
             }

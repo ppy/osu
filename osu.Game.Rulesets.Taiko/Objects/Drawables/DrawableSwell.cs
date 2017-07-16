@@ -147,9 +147,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 var completion = (float)userHits / HitObject.RequiredHits;
 
-                expandingRing.FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50);
-                using (expandingRing.BeginDelayedSequence(50))
-                    expandingRing.FadeTo(completion / 8, 2000, EasingTypes.OutQuint);
+                expandingRing.FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
+                    .Then().FadeTo(completion / 8, 2000, EasingTypes.OutQuint);
 
                 symbol.RotateTo((float)(completion * HitObject.Duration / 8), 4000, EasingTypes.OutQuint);
 

@@ -272,19 +272,14 @@ namespace osu.Game.Screens.Play
 
             dimLevel.ValueChanged += newDim => Background?.FadeTo(1 - (float)newDim, 800);
 
-            Content.ScaleTo(0.7f);
+            Content.ScaleTo(0.7f).ScaleTo(1, 750, EasingTypes.OutQuint);
+            Content.Delay(250).FadeIn(250);
 
-            using (Content.BeginDelayedSequence(250))
-                Content.FadeIn(250);
-
-            Content.ScaleTo(1, 750, EasingTypes.OutQuint);
-
-            using (BeginDelayedSequence(750))
-                Schedule(() =>
-                {
-                    if (!pauseContainer.IsPaused)
-                        decoupledClock.Start();
-                });
+            this.Delay(750).Schedule(() =>
+            {
+                if (!pauseContainer.IsPaused)
+                    decoupledClock.Start();
+            });
 
             pauseContainer.Alpha = 0;
             pauseContainer.FadeIn(750, EasingTypes.OutQuint);

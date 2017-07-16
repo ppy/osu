@@ -204,25 +204,31 @@ namespace osu.Game.Overlays
 
             using (BeginDelayedSequence(200, true))
             {
-                disc.FadeIn(initial_duration);
+                disc.FadeIn(initial_duration).ScaleTo(1f, initial_duration * 2, EasingTypes.OutElastic);
                 particleContainer.FadeIn(initial_duration);
                 outerSpin.FadeTo(0.1f, initial_duration * 2);
-                disc.ScaleTo(1f, initial_duration * 2, EasingTypes.OutElastic);
 
                 using (BeginDelayedSequence(initial_duration + 200, true))
                 {
                     backgroundStrip.FadeIn(step_duration);
                     leftStrip.ResizeWidthTo(1f, step_duration, EasingTypes.OutQuint);
                     rightStrip.ResizeWidthTo(1f, step_duration, EasingTypes.OutQuint);
-                    Schedule(() => { if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.Icon; });
 
-                    using (BeginDelayedSequence(step_duration, true))
+                    this.Animate().Schedule(() =>
                     {
-                        Schedule(() => { if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.MedalUnlocked; });
-
-                        using (BeginDelayedSequence(step_duration, true))
-                            Schedule(() => { if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.Full; });
-                    }
+                        if (drawableMedal.State != DisplayState.Full)
+                            drawableMedal.State = DisplayState.Icon;
+                    })
+                    .Delay(step_duration).Schedule(() =>
+                    {
+                        if (drawableMedal.State != DisplayState.Full)
+                            drawableMedal.State = DisplayState.MedalUnlocked;
+                    })
+                    .Delay(step_duration).Schedule(() =>
+                    {
+                        if (drawableMedal.State != DisplayState.Full)
+                            drawableMedal.State = DisplayState.Full;
+                    });
                 }
             }
         }
