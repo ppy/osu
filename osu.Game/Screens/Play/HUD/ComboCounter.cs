@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected virtual void OnCountRolling(int currentValue, int newValue)
         {
-            transformRoll(new TransformComboRoll(this), currentValue, newValue);
+            transformRoll(currentValue, newValue);
         }
 
         protected virtual void OnCountIncrement(int currentValue, int newValue)
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (!rolling)
             {
-                Flush(false, typeof(TransformComboRoll));
+                Flush(false, nameof(DisplayedCount));
                 IsRolling = false;
                 DisplayedCount = prev;
 
@@ -185,19 +185,9 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void transformRoll(TransformComboRoll transform, int currentValue, int newValue)
+        private void transformRoll(int currentValue, int newValue)
         {
-            this.TransformTo(newValue, getProportionalDuration(currentValue, newValue), RollingEasing, new TransformComboRoll(this));
-        }
-
-        protected class TransformComboRoll : TransformInt<ComboCounter>
-        {
-            public TransformComboRoll(ComboCounter target) : base(target)
-            {
-            }
-
-            public override void Apply(ComboCounter d) => d.DisplayedCount = CurrentValue;
-            public override void ReadIntoStartValue(ComboCounter d) => StartValue = d.DisplayedCount;
+            this.TransformTo(nameof(DisplayedCount), newValue, getProportionalDuration(currentValue, newValue), RollingEasing);
         }
 
         protected abstract void OnDisplayedCountRolling(int currentValue, int newValue);

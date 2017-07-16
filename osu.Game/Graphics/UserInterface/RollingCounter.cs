@@ -127,7 +127,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual void StopRolling()
         {
-            Flush(false, typeof(TransformRollingCounter));
+            Flush(false, nameof(DisplayedCount));
             DisplayedCount = Current;
         }
 
@@ -174,43 +174,12 @@ namespace osu.Game.Graphics.UserInterface
         /// <seealso cref="TransformType"/>
         protected virtual void TransformCount(T currentValue, T newValue)
         {
-            TransformCount(new TransformRollingCounter(this), currentValue, newValue);
-        }
-
-        /// <summary>
-        /// Intended to be used by TransformCount(T currentValue, T newValue).
-        /// </summary>
-        protected void TransformCount(TransformRollingCounter transform, T currentValue, T newValue)
-        {
             double rollingTotalDuration =
                 IsRollingProportional
                     ? GetProportionalDuration(currentValue, newValue)
                     : RollingDuration;
 
-            this.TransformTo(newValue, rollingTotalDuration, RollingEasing, transform);
-        }
-
-        protected class TransformRollingCounter : Transform<T, RollingCounter<T>>
-        {
-            public TransformRollingCounter(RollingCounter<T> target) : base(target)
-            {
-            }
-
-            public T CurrentValue
-            {
-                get
-                {
-                    double time = Time?.Current ?? 0;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
-
-                    double result = Interpolation.ValueAt(time, Convert.ToDouble(StartValue), Convert.ToDouble(EndValue), StartTime, EndTime, Easing);
-                    return (T)Convert.ChangeType(result, typeof(T), null);
-                }
-            }
-
-            public override void Apply(RollingCounter<T> d) => d.DisplayedCount = CurrentValue;
-            public override void ReadIntoStartValue(RollingCounter<T> d) => StartValue = d.DisplayedCount;
+            this.TransformTo(nameof(DisplayedCount), newValue, rollingTotalDuration, RollingEasing);
         }
     }
 }
