@@ -245,9 +245,8 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (beatIndex < 0) return;
 
-                icon.ScaleTo(1 - 0.1f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
-                using (icon.BeginDelayedSequence(beat_in_time))
-                    icon.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
+                icon.ScaleTo(1 - 0.1f * amplitudeAdjust, beat_in_time, EasingTypes.Out)
+                    .Then().ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
             }
         }
     }

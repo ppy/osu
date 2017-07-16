@@ -237,34 +237,23 @@ namespace osu.Game.Screens.Menu
             if (beatIndex < 0) return;
 
             if (IsHovered)
-            {
-                using (BeginDelayedSequence(early_activation))
-                    Schedule(() => sampleBeat.Play());
-            }
+                this.Delay(early_activation).Schedule(() => sampleBeat.Play());
 
-            logoBeatContainer.ScaleTo(1 - 0.02f * amplitudeAdjust, early_activation, EasingTypes.Out);
-            using (logoBeatContainer.BeginDelayedSequence(early_activation))
-                logoBeatContainer.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
+            logoBeatContainer.ScaleTo(1 - 0.02f * amplitudeAdjust, early_activation, EasingTypes.Out)
+                .Then().ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
 
             ripple.ClearTransforms();
 
-            ripple.ScaleTo(logoAmplitudeContainer.Scale);
-            ripple.Alpha = 0.15f * amplitudeAdjust;
-
-            ripple.ScaleTo(logoAmplitudeContainer.Scale * (1 + 0.04f * amplitudeAdjust), beatLength, EasingTypes.OutQuint);
-            ripple.FadeOut(beatLength, EasingTypes.OutQuint);
+            ripple.ScaleTo(logoAmplitudeContainer.Scale).ScaleTo(logoAmplitudeContainer.Scale * (1 + 0.04f * amplitudeAdjust), beatLength, EasingTypes.OutQuint);
+            ripple.FadeTo(0.15f * amplitudeAdjust).FadeOut(beatLength, EasingTypes.OutQuint);
 
             if (effectPoint.KiaiMode && flashLayer.Alpha < 0.4f)
             {
                 flashLayer.ClearTransforms();
                 visualizer.ClearTransforms();
 
-                flashLayer.FadeTo(0.2f * amplitudeAdjust, early_activation, EasingTypes.Out);
-                visualizer.FadeTo(0.9f * amplitudeAdjust, early_activation, EasingTypes.Out);
-                using (flashLayer.BeginDelayedSequence(early_activation))
-                    flashLayer.FadeOut(beatLength);
-                using (visualizer.BeginDelayedSequence(early_activation))
-                    visualizer.FadeTo(0.5f, beatLength);
+                flashLayer.FadeTo(0.2f * amplitudeAdjust, early_activation, EasingTypes.Out).Then().FadeOut(beatLength);
+                visualizer.FadeTo(0.9f * amplitudeAdjust, early_activation, EasingTypes.Out).Then().FadeTo(0.5f, beatLength);
             }
         }
 

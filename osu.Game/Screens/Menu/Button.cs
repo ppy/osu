@@ -130,14 +130,11 @@ namespace osu.Game.Screens.Menu
 
             icon.RotateTo(rightward ? 10 : -10, duration * 2, EasingTypes.InOutSine);
 
-            icon.MoveToY(-10, duration, EasingTypes.Out);
-            icon.ScaleTo(Vector2.One, duration, EasingTypes.Out);
-
-            using (icon.BeginDelayedSequence(duration))
-            {
-                icon.MoveToY(0, duration, EasingTypes.In);
-                icon.ScaleTo(new Vector2(1, 0.9f), duration, EasingTypes.In);
-            }
+            icon.Animate(
+                i => i.MoveToY(-10, duration, EasingTypes.Out).ScaleTo(1, duration, EasingTypes.Out)
+            ).Then(
+                i => i.MoveToY(0, duration, EasingTypes.In).ScaleTo(new Vector2(1, 0.9f), duration, EasingTypes.In)
+            );
         }
 
         protected override bool OnHover(InputState state)

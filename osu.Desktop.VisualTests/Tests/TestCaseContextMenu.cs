@@ -60,12 +60,12 @@ namespace osu.Desktop.VisualTests.Tests
             base.LoadComplete();
 
             // Move box along a square trajectory
-            container.Loop(b => b
+            container
                 .MoveTo(new Vector2(0, 100), duration)
                 .Then().MoveTo(new Vector2(100, 100), duration)
                 .Then().MoveTo(new Vector2(100, 0), duration)
                 .Then().MoveTo(Vector2.Zero, duration)
-            );
+                .Loop();
         }
 
         private class MyContextMenuContainer : Container, IHasContextMenu

@@ -229,11 +229,7 @@ namespace osu.Game.Screens.Menu
                             buttonAreaBackground.ScaleTo(Vector2.One, 500, EasingTypes.Out);
                             buttonArea.FadeOut(300);
 
-                            using (osuLogo.BeginDelayedSequence(150))
-                            {
-                                osuLogo.MoveTo(Vector2.Zero, 800, EasingTypes.OutExpo);
-                                osuLogo.ScaleTo(1, 800, EasingTypes.OutExpo);
-                            }
+                            osuLogo.Delay(150).ScaleTo(1, 800, EasingTypes.OutExpo).MoveTo(Vector2.Zero, 800, EasingTypes.OutExpo);
 
                             foreach (Button b in buttonsTopLevel)
                                 b.State = ButtonState.Contracted;

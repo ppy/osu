@@ -112,14 +112,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime;
 
-            using (glow.BeginDelayedSequence(duration))
-                glow.FadeOut(400);
+            glow.Delay(duration).FadeOut(400);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    using (BeginDelayedSequence(duration + TIME_PREEMPT))
-                        this.FadeOut(TIME_FADEOUT);
+                    this.Delay(duration + TIME_PREEMPT).FadeOut(TIME_FADEOUT);
                     Expire(true);
                     break;
                 case ArmedState.Miss:
@@ -131,23 +129,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     ApproachCircle.FadeOut(50);
 
                     const double flash_in = 40;
-
-                    flash.FadeTo(0.8f, flash_in);
-                    using (flash.BeginDelayedSequence(flash_in))
-                        flash.FadeOut(100);
-
+                    flash.FadeTo(0.8f, flash_in).Then().FadeOut(100);
                     explode.FadeIn(flash_in);
 
-                    using (BeginDelayedSequence(flash_in, true))
-                    {
-                        //after the flash, we can hide some elements that were behind it
-                        ring.FadeOut();
-                        circle.FadeOut();
-                        number.FadeOut();
-
-                        this.FadeOut(800);
-                        this.ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
-                    }
+                    ring.Delay(flash_in).FadeOut();
+                    circle.Delay(flash_in).FadeOut();
+                    number.Delay(flash_in).FadeOut();
+                    this.Delay(flash_in).FadeOut(800).ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
 
                     Expire();
                     break;
