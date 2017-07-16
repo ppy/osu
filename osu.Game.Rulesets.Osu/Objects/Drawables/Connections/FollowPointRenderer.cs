@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                             fp.MoveTo(pointEndPosition, DrawableOsuHitObject.TIME_FADEIN, EasingTypes.Out);
 
-                            fp.ApplyDelay(fadeOutTime - fadeInTime);
+                            fp.AddDelay(fadeOutTime - fadeInTime);
                             fp.FadeOut(DrawableOsuHitObject.TIME_FADEIN);
                         }
 

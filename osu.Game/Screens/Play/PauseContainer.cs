@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
             {
                 OnResume = delegate
                 {
-                    ApplyDelay(400);
+                    AddDelay(400);
                     Schedule(Resume);
                 },
                 OnRetry = () => OnRetry(),

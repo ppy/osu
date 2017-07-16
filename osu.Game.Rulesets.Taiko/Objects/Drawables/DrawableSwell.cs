@@ -180,13 +180,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             const float preempt = 100;
 
-            ApplyDelay(HitObject.StartTime - Time.Current - preempt, true);
+            AddDelay(HitObject.StartTime - Time.Current - preempt, true);
 
             targetRing.ScaleTo(target_ring_scale, preempt * 4, EasingTypes.OutQuint);
 
-            ApplyDelay(preempt, true);
+            AddDelay(preempt, true);
 
-            ApplyDelay(Judgement.TimeOffset + HitObject.Duration, true);
+            AddDelay(Judgement.TimeOffset + HitObject.Duration, true);
 
             const float out_transition_time = 300;
 
