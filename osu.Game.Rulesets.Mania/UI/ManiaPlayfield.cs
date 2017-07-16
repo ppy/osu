@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, EasingTypes easing = EasingTypes.None)
         {
-            this.TransformTo(newTimeRange, duration, easing, new TransformTimeSpan(this));
+            this.TransformTo(nameof(visibleTimeRange), newTimeRange, duration, easing);
         }
 
         protected override void Update()
@@ -242,16 +242,6 @@ namespace osu.Game.Rulesets.Mania.UI
             // Due to masking differences, it is not possible to get the width of the columns container automatically
             // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
             barLineContainer.Width = columns.Width;
-        }
-
-        private class TransformTimeSpan : TransformDouble<ManiaPlayfield>
-        {
-            public TransformTimeSpan(ManiaPlayfield target) : base(target)
-            {
-            }
-
-            public override void Apply(ManiaPlayfield d) => d.visibleTimeRange.Value = CurrentValue;
-            public override void ReadIntoStartValue(ManiaPlayfield d) => StartValue = d.visibleTimeRange.Value;
         }
     }
 }

@@ -297,7 +297,8 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None) => this.TransformTo(value, duration, easing, new TransformScrollSpeed(this));
+        private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None) =>
+            this.TransformTo(nameof(speed), value, duration, easing);
 
         private enum ScrollState
         {
@@ -306,16 +307,6 @@ namespace osu.Game.Screens.Tournament
             Stopping,
             Stopped,
             Scrolling
-        }
-
-        public class TransformScrollSpeed : TransformFloat<ScrollingTeamContainer>
-        {
-            public TransformScrollSpeed(ScrollingTeamContainer target) : base(target)
-            {
-            }
-
-            public override void Apply(ScrollingTeamContainer d) => d.speed = CurrentValue;
-            public override void ReadIntoStartValue(ScrollingTeamContainer d) => StartValue = d.speed;
         }
 
         public class ScrollingTeam : Container
