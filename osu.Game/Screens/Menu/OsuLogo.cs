@@ -239,21 +239,30 @@ namespace osu.Game.Screens.Menu
             if (IsHovered)
                 this.Delay(early_activation).Schedule(() => sampleBeat.Play());
 
-            logoBeatContainer.ScaleTo(1 - 0.02f * amplitudeAdjust, early_activation, EasingTypes.Out)
-                .Then().ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
+            logoBeatContainer
+                .ScaleTo(1 - 0.02f * amplitudeAdjust, early_activation, EasingTypes.Out)
+                .Then()
+                .ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
 
             ripple.ClearTransforms();
-
-            ripple.ScaleTo(logoAmplitudeContainer.Scale).ScaleTo(logoAmplitudeContainer.Scale * (1 + 0.04f * amplitudeAdjust), beatLength, EasingTypes.OutQuint);
-            ripple.FadeTo(0.15f * amplitudeAdjust).FadeOut(beatLength, EasingTypes.OutQuint);
+            ripple
+                .ScaleTo(logoAmplitudeContainer.Scale)
+                .ScaleTo(logoAmplitudeContainer.Scale * (1 + 0.04f * amplitudeAdjust), beatLength, EasingTypes.OutQuint)
+                .FadeTo(0.15f * amplitudeAdjust).FadeOut(beatLength, EasingTypes.OutQuint);
 
             if (effectPoint.KiaiMode && flashLayer.Alpha < 0.4f)
             {
                 flashLayer.ClearTransforms();
-                visualizer.ClearTransforms();
+                flashLayer
+                    .FadeTo(0.2f * amplitudeAdjust, early_activation, EasingTypes.Out)
+                    .Then()
+                    .FadeOut(beatLength);
 
-                flashLayer.FadeTo(0.2f * amplitudeAdjust, early_activation, EasingTypes.Out).Then().FadeOut(beatLength);
-                visualizer.FadeTo(0.9f * amplitudeAdjust, early_activation, EasingTypes.Out).Then().FadeTo(0.5f, beatLength);
+                visualizer.ClearTransforms();
+                visualizer
+                    .FadeTo(0.9f * amplitudeAdjust, early_activation, EasingTypes.Out)
+                    .Then()
+                    .FadeTo(0.5f, beatLength);
             }
         }
 

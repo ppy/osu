@@ -155,9 +155,11 @@ namespace osu.Game.Overlays
                 textLine3.Text = shortcut.ToUpper();
 
                 box.Animate(
-                    b => b.FadeIn(500, EasingTypes.OutQuint).ResizeHeightTo(height, 500, EasingTypes.OutQuint)
+                    b => b.FadeIn(500, EasingTypes.OutQuint),
+                    b => b.ResizeHeightTo(height, 500, EasingTypes.OutQuint)
                 ).Then(
-                    b => b.FadeOutFromOne(1500, EasingTypes.InQuint).ResizeHeightTo(height_contracted, 1500, EasingTypes.InQuint)
+                    b => b.FadeOutFromOne(1500, EasingTypes.InQuint),
+                    b => b.ResizeHeightTo(height_contracted, 1500, EasingTypes.InQuint)
                 );
 
                 int optionCount = 0;

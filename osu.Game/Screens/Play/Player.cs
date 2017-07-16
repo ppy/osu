@@ -272,8 +272,11 @@ namespace osu.Game.Screens.Play
 
             dimLevel.ValueChanged += newDim => Background?.FadeTo(1 - (float)newDim, 800);
 
-            Content.ScaleTo(0.7f).ScaleTo(1, 750, EasingTypes.OutQuint);
-            Content.Delay(250).FadeIn(250);
+            Content
+                .ScaleTo(0.7f)
+                .ScaleTo(1, 750, EasingTypes.OutQuint)
+                .Delay(250)
+                .FadeIn(250);
 
             this.Delay(750).Schedule(() =>
             {

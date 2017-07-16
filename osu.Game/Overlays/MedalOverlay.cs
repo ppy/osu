@@ -204,7 +204,9 @@ namespace osu.Game.Overlays
 
             using (BeginDelayedSequence(200, true))
             {
-                disc.FadeIn(initial_duration).ScaleTo(1f, initial_duration * 2, EasingTypes.OutElastic);
+                disc.FadeIn(initial_duration)
+                    .ScaleTo(1f, initial_duration * 2, EasingTypes.OutElastic);
+
                 particleContainer.FadeIn(initial_duration);
                 outerSpin.FadeTo(0.1f, initial_duration * 2);
 
