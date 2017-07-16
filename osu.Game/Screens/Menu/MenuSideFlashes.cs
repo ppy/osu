@@ -91,7 +91,8 @@ namespace osu.Game.Screens.Menu
         private void flash(Drawable d, double beatLength, bool kiai, TrackAmplitudes amplitudes)
         {
             d.FadeTo(Math.Max(0, ((d.Equals(leftBox) ? amplitudes.LeftChannel : amplitudes.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time)
-                .Then().FadeOut(beatLength, EasingTypes.In);
+             .Then()
+             .FadeOut(beatLength, EasingTypes.In);
         }
     }
 }

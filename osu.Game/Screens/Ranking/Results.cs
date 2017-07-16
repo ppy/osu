@@ -67,16 +67,23 @@ namespace osu.Game.Screens.Ranking
             modeChangeButtons.FadeOut();
             currentPage.FadeOut();
 
-            circleOuterBackground.FadeIn(transition_time, EasingTypes.OutQuint).ScaleTo(1, transition_time, EasingTypes.OutQuint);
+            circleOuterBackground
+                .FadeIn(transition_time, EasingTypes.OutQuint)
+                .ScaleTo(1, transition_time, EasingTypes.OutQuint);
 
             using (BeginDelayedSequence(transition_time * 0.25f, true))
             {
-                circleOuter.FadeIn(transition_time, EasingTypes.OutQuint).ScaleTo(1, transition_time, EasingTypes.OutQuint);
+                circleOuter
+                    .FadeIn(transition_time, EasingTypes.OutQuint)
+                    .ScaleTo(1, transition_time, EasingTypes.OutQuint);
 
                 using (BeginDelayedSequence(transition_time * 0.3f, true))
                 {
                     backgroundParallax.FadeIn(transition_time, EasingTypes.OutQuint);
-                    circleInner.FadeIn(transition_time, EasingTypes.OutQuint).ScaleTo(1, transition_time, EasingTypes.OutQuint);
+
+                    circleInner
+                        .FadeIn(transition_time, EasingTypes.OutQuint)
+                        .ScaleTo(1, transition_time, EasingTypes.OutQuint);
 
                     using (BeginDelayedSequence(transition_time * 0.4f, true))
                     {

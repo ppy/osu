@@ -129,13 +129,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     ApproachCircle.FadeOut(50);
 
                     const double flash_in = 40;
-                    flash.FadeTo(0.8f, flash_in).Then().FadeOut(100);
+                    flash.FadeTo(0.8f, flash_in)
+                         .Then()
+                         .FadeOut(100);
+
                     explode.FadeIn(flash_in);
 
-                    ring.Delay(flash_in).FadeOut();
-                    circle.Delay(flash_in).FadeOut();
-                    number.Delay(flash_in).FadeOut();
-                    this.Delay(flash_in).FadeOut(800).ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
+                    using (BeginDelayedSequence(flash_in, true))
+                    {
+                        //after the flash, we can hide some elements that were behind it
+                        ring.FadeOut();
+                        circle.FadeOut();
+                        number.FadeOut();
+
+                        this.FadeOut(800)
+                            .ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
+                    }
 
                     Expire();
                     break;

@@ -147,17 +147,23 @@ namespace osu.Game.Overlays.MedalSplash
                     medalContainer.ScaleTo(0);
                     break;
                 case DisplayState.Icon:
-                    medalContainer.FadeIn(duration).ScaleTo(1, duration, EasingTypes.OutElastic);
+                    medalContainer
+                        .FadeIn(duration)
+                        .ScaleTo(1, duration, EasingTypes.OutElastic);
                     break;
                 case DisplayState.MedalUnlocked:
-                    medalContainer.FadeTo(1).ScaleTo(1);
+                    medalContainer
+                        .FadeTo(1)
+                        .ScaleTo(1);
 
                     this.ScaleTo(scale_when_unlocked, duration, EasingTypes.OutExpo);
                     this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 30, duration, EasingTypes.OutExpo);
                     unlocked.FadeInFromZero(duration);
                     break;
                 case DisplayState.Full:
-                    medalContainer.FadeTo(1).ScaleTo(1);
+                    medalContainer
+                        .FadeTo(1)
+                        .ScaleTo(1);
 
                     this.ScaleTo(scale_when_full, duration, EasingTypes.OutExpo);
                     this.MoveToY(MedalOverlay.DISC_SIZE / 2 - 60, duration, EasingTypes.OutExpo);

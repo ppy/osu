@@ -131,9 +131,11 @@ namespace osu.Game.Screens.Menu
             icon.RotateTo(rightward ? 10 : -10, duration * 2, EasingTypes.InOutSine);
 
             icon.Animate(
-                i => i.MoveToY(-10, duration, EasingTypes.Out).ScaleTo(1, duration, EasingTypes.Out)
+                i => i.MoveToY(-10, duration, EasingTypes.Out),
+                i => i.ScaleTo(1, duration, EasingTypes.Out)
             ).Then(
-                i => i.MoveToY(0, duration, EasingTypes.In).ScaleTo(new Vector2(1, 0.9f), duration, EasingTypes.In)
+                i => i.MoveToY(0, duration, EasingTypes.In),
+                i => i.ScaleTo(new Vector2(1, 0.9f), duration, EasingTypes.In)
             );
         }
 
