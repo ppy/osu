@@ -35,8 +35,7 @@ namespace osu.Game.Overlays
             if (v != Visibility.Hidden) return;
 
             //handle the dialog being dismissed.
-            dialog.AddDelay(PopupDialog.EXIT_DURATION);
-            dialog.Expire();
+            dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
 
             if (dialog == currentDialog)
                 State = Visibility.Hidden;

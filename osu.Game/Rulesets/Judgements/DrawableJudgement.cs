@@ -75,15 +75,13 @@ namespace osu.Game.Rulesets.Judgements
                     this.MoveToOffset(new Vector2(0, 100), 800, EasingTypes.InQuint);
                     this.RotateTo(40, 800, EasingTypes.InQuint);
 
-                    AddDelay(600);
-                    this.FadeOut(200);
+                    this.Delay(600).FadeOut(200);
                     break;
                 case HitResult.Hit:
                     this.ScaleTo(0.9f);
                     this.ScaleTo(1, 500, EasingTypes.OutElastic);
 
-                    AddDelay(100);
-                    this.FadeOut(400);
+                    this.Delay(100).FadeOut(400);
                     break;
             }
 

@@ -106,8 +106,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
         private void schedulePopOut()
         {
             popOutDelegate?.Cancel();
-            AddDelay(1000);
-            popOutDelegate = Schedule(Hide);
+            this.Delay(1000).Schedule(Hide, out popOutDelegate);
         }
     }
 }
