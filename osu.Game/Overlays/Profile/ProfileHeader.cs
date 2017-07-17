@@ -30,7 +30,12 @@ namespace osu.Game.Overlays.Profile
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
         private readonly Box colourBar;
 
-        private const float cover_height = 350, info_height = 150, info_width = 220, avatar_size = 110, level_position = 30, level_height = 60;
+        private const float cover_height = 350;
+        private const float info_height = 150;
+        private const float info_width = 220;
+        private const float avatar_size = 110;
+        private const float level_position = 30;
+        private const float level_height = 60;
 
         public ProfileHeader(User user)
         {
