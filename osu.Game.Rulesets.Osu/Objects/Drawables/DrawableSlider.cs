@@ -158,14 +158,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             ball.FadeIn();
 
-            AddDelay(slider.Duration, true);
+            using (BeginDelayedSequence(slider.Duration, true))
+            {
+                body.FadeOut(160);
+                ball.FadeOut(160);
 
-            body.FadeOut(160);
-            ball.FadeOut(160);
-
-            this.FadeOut(800);
-
-            Expire();
+                this.FadeOut(800)
+                    .Expire();
+            }
         }
 
         public Drawable ProxiedLayer => initialCircle.ApproachCircle;
