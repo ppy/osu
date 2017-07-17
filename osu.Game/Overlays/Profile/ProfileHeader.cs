@@ -296,7 +296,23 @@ namespace osu.Game.Overlays.Profile
             levelBadge.Texture = textures.Get(@"Profile/levelbadge");
         }
 
-        public void FillFullData(User user)
+        private User user;
+
+        public User User
+        {
+            get
+            {
+                return user;
+            }
+
+            set
+            {
+                user = value;
+                loadUser();
+            }
+        }
+
+        private void loadUser()
         {
             coverContainer.Add(new AsyncLoadWrapper(new UserCoverBackground(user)
             {
