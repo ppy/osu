@@ -29,6 +29,7 @@ namespace osu.Game.Overlays.Profile
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
         private readonly Box colourBar;
+        private readonly DrawableFlag countryFlag;
 
         private const float cover_height = 350;
         private const float info_height = 150;
@@ -123,7 +124,7 @@ namespace osu.Game.Overlays.Profile
                                             Origin = Anchor.BottomLeft,
                                             Y = -48
                                         },
-                                        new DrawableFlag(user.Country?.FlagName ?? "__")
+                                        countryFlag = new DrawableFlag(user.Country?.FlagName ?? "__")
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
@@ -350,6 +351,7 @@ namespace osu.Game.Overlays.Profile
             {
                 infoTextLeft.AddText("from ");
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
+                countryFlag.FlagName = user.Country.FlagName;
             }
             infoTextLeft.NewParagraph();
 
@@ -390,7 +392,7 @@ namespace osu.Game.Overlays.Profile
                 scoreText.Add(createScoreText("Ranked Score"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.RankedScore.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Accuracy"));
-                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy}%"));
+                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy.ToString("0.##")}%"));
                 scoreText.Add(createScoreText("Play Count"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.PlayCount.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Total Score"));
