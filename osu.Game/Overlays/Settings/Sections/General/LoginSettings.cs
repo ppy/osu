@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -31,6 +32,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private UserPanel panel;
         private UserDropdown dropdown;
 
+        /// <summary>
+        /// Called to request a hide of a parent displaying this container.
+        /// </summary>
+        public Action RequestHide;
+
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
         public bool Bounding
@@ -58,6 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             this.inputManager = inputManager;
             this.colours = colours;
+
             api?.Register(this);
         }
 
@@ -129,7 +136,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                         },
                                     },
                                 },
-                                panel = new UserPanel(api.LocalUser.Value) { RelativeSizeAxes = Axes.X },
+                                panel = new UserPanel(api.LocalUser.Value)
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Action = RequestHide
+                                },
                                 dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
                             },
                         },
