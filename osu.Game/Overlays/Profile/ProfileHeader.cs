@@ -498,7 +498,7 @@ namespace osu.Game.Overlays.Profile
 
             public void AddLink(string text, string url) => AddText(text, link => ((SpriteLink)link).Url = url);
 
-            private class SpriteLink : SpriteText
+            private class SpriteLink : OsuSpriteText
             {
                 public override bool HandleInput => Url != null;
 
@@ -510,7 +510,6 @@ namespace osu.Game.Overlays.Profile
                     return true;
                 }
             }
-
         }
     }
 }
