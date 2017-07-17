@@ -12,16 +12,19 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
+using System.Diagnostics;
 
 namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : Container
     {
-        private readonly OsuTextFlowContainer infoTextLeft, infoTextRight;
+        private readonly OsuTextFlowContainer infoTextLeft;
+        private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
 
         private readonly Container coverContainer, chartContainer, supporterTag;
@@ -159,7 +162,7 @@ namespace osu.Game.Overlays.Profile
                     ParagraphSpacing = 0.8f,
                     LineSpacing = 0.2f
                 },
-                infoTextRight = new OsuTextFlowContainer(t =>
+                infoTextRight = new LinkFlowContainer(t =>
                 {
                     t.TextSize = 14;
                     t.Font = @"Exo2.0-RegularItalic";
@@ -380,9 +383,9 @@ namespace osu.Game.Overlays.Profile
             tryAddInfoRightLine(FontAwesome.fa_suitcase, user.Occupation);
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
-                tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter);
-            tryAddInfoRightLine(FontAwesome.fa_globe, user.Website);
-            tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype);
+                tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, @"http://twitter.com/" + user.Twitter);
+            tryAddInfoRightLine(FontAwesome.fa_globe, user.Website, user.Website);
+            tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
 
             if (user.Statistics != null)
             {
@@ -435,12 +438,12 @@ namespace osu.Game.Overlays.Profile
             Text = text
         };
 
-        private void tryAddInfoRightLine(FontAwesome icon, string str)
+        private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
         {
             if (string.IsNullOrEmpty(str)) return;
 
             infoTextRight.AddIcon(icon);
-            infoTextRight.AddText(" " + str);
+            infoTextRight.AddLink(" " + str, url);
             infoTextRight.NewLine();
         }
 
@@ -480,6 +483,33 @@ namespace osu.Game.Overlays.Profile
             {
                 badge.Texture = textures.Get($"Grades/{grade}");
             }
+        }
+
+        private class LinkFlowContainer : OsuTextFlowContainer
+        {
+            public override bool HandleInput => true;
+
+            public LinkFlowContainer(Action<SpriteText> defaultCreationParameters = null) : base(defaultCreationParameters)
+            {
+            }
+
+            protected override SpriteText CreateSpriteText() => new SpriteLink();
+
+            public void AddLink(string text, string url) => AddText(text, link => ((SpriteLink)link).Url = url);
+
+            private class SpriteLink : SpriteText
+            {
+                public override bool HandleInput => Url != null;
+
+                public string Url;
+
+                protected override bool OnClick(InputState state)
+                {
+                    Process.Start(Url);
+                    return true;
+                }
+            }
+
         }
     }
 }
