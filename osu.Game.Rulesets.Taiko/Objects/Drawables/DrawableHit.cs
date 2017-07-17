@@ -65,45 +65,42 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            AddDelay(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true);
-
             var circlePiece = MainPiece as CirclePiece;
-
             circlePiece?.FlashBox.Flush();
 
-            switch (State)
+            using (BeginDelayedSequence(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true))
             {
-                case ArmedState.Idle:
-                    AddDelay(HitObject.HitWindowMiss);
-                    break;
-                case ArmedState.Miss:
-                    this.FadeOut(100);
-                    break;
-                case ArmedState.Hit:
-                    this.FadeOut(600);
+                switch (State)
+                {
+                    case ArmedState.Idle:
+                        this.Delay(HitObject.HitWindowMiss).Expire();
+                        break;
+                    case ArmedState.Miss:
+                        this.FadeOut(100)
+                            .Expire();
+                        break;
+                    case ArmedState.Hit:
+                        var flash = circlePiece?.FlashBox;
+                        if (flash != null)
+                        {
+                            flash.FadeTo(0.9f);
+                            flash.FadeOut(300);
+                        }
 
-                    var flash = circlePiece?.FlashBox;
-                    if (flash != null)
-                    {
-                        flash.FadeTo(0.9f);
-                        flash.FadeOut(300);
-                    }
+                        const float gravity_time = 300;
+                        const float gravity_travel_height = 200;
 
+                        Content.ScaleTo(0.8f, gravity_time * 2, EasingTypes.OutQuad);
 
-                    this.FadeOut(800);
+                        this.FadeOut(800)
+                            .MoveToY(-gravity_travel_height, gravity_time, EasingTypes.Out)
+                            .Then()
+                            .MoveToY(gravity_travel_height * 2, gravity_time * 2, EasingTypes.In);
 
-                    const float gravity_time = 300;
-                    const float gravity_travel_height = 200;
-
-                    Content.ScaleTo(0.8f, gravity_time * 2, EasingTypes.OutQuad);
-
-                    this.MoveToY(-gravity_travel_height, gravity_time, EasingTypes.Out);
-                    AddDelay(gravity_time, true);
-                    this.MoveToY(gravity_travel_height * 2, gravity_time * 2, EasingTypes.In);
-                    break;
+                        Expire();
+                        break;
+                }
             }
-
-            Expire();
         }
     }
 }
