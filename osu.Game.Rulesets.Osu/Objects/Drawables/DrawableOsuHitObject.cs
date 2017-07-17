@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected sealed override void UpdateState(ArmedState state)
         {
             Flush();
-            ResetDelay(true);
 
             using (BeginAbsoluteSequence(HitObject.StartTime - TIME_PREEMPT, true))
             {
