@@ -153,19 +153,19 @@ namespace osu.Game.Overlays
             if (fetchOnline)
             {
                 userReq = new GetUserRequest(user.Id);
-                userReq.Success += fillData;
+                userReq.Success += userLoadComplete;
                 api.Queue(userReq);
             }
             else
             {
                 userReq = null;
-                fillData(user);
+                userLoadComplete(user);
             }
 
             Show();
         }
 
-        private void fillData(User user)
+        private void userLoadComplete(User user)
         {
             header.User = user;
 
