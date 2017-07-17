@@ -18,6 +18,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -395,7 +396,7 @@ namespace osu.Game.Overlays.Profile
                 scoreText.Add(createScoreText("Ranked Score"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.RankedScore.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Accuracy"));
-                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy.ToString("0.##")}%"));
+                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy.ToString("0.##", CultureInfo.CurrentCulture)}%"));
                 scoreText.Add(createScoreText("Play Count"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.PlayCount.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Total Score"));
