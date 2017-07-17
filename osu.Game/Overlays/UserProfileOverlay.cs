@@ -167,7 +167,7 @@ namespace osu.Game.Overlays
 
         private void fillData(User user)
         {
-            header.FillFullData(user);
+            header.User = user;
 
             for (int i = 0; i < user.ProfileOrder.Length; i++)
             {
