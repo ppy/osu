@@ -62,14 +62,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             var animIn = Math.Min(150, sliderTick.StartTime - FadeInTime);
 
-            this.ScaleTo(0.5f);
-            this.ScaleTo(1.2f, animIn);
-            this.FadeIn(animIn);
-
-            AddDelay(animIn);
-            this.ScaleTo(1, 150, EasingTypes.Out);
-
-            AddDelay(-animIn);
+            this.Animate(
+                d => d.FadeIn(animIn),
+                d => d.ScaleTo(0.5f).ScaleTo(1.2f, animIn)
+            ).Then(
+                d => d.ScaleTo(1, 150, EasingTypes.Out)
+            );
         }
 
         protected override void UpdateCurrentState(ArmedState state)

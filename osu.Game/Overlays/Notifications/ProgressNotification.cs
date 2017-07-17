@@ -78,10 +78,7 @@ namespace osu.Game.Overlays.Notifications
                     {
                         case ProgressNotificationState.Completed:
                             NotificationContent.MoveToY(-DrawSize.Y / 2, 200, EasingTypes.OutQuint);
-                            this.FadeTo(0.01f, 200); //don't completely fade out or our scheduled task won't run.
-
-                            AddDelay(100);
-                            Schedule(Completed);
+                            this.FadeOut(200).Finally(d => Completed());
                             break;
                     }
                 }
