@@ -181,25 +181,20 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void UpdateState(ArmedState state)
         {
             const float preempt = 100;
-
-            AddDelay(HitObject.StartTime - Time.Current - preempt, true);
-
-            targetRing.ScaleTo(target_ring_scale, preempt * 4, EasingTypes.OutQuint);
-
-            AddDelay(preempt, true);
-
-            AddDelay(Judgement.TimeOffset + HitObject.Duration, true);
-
             const float out_transition_time = 300;
+
+            double untilStartTime = HitObject.StartTime - Time.Current;
+            double untilJudgement = untilStartTime + Judgement.TimeOffset + HitObject.Duration;
+
+            targetRing.Delay(untilStartTime - preempt).ScaleTo(target_ring_scale, preempt * 4, EasingTypes.OutQuint);
+            this.Delay(untilJudgement).FadeOut(out_transition_time, EasingTypes.Out);
 
             switch (state)
             {
                 case ArmedState.Hit:
-                    bodyContainer.ScaleTo(1.4f, out_transition_time);
+                    bodyContainer.Delay(untilJudgement).ScaleTo(1.4f, out_transition_time);
                     break;
             }
-
-            this.FadeOut(out_transition_time, EasingTypes.Out);
 
             Expire();
         }

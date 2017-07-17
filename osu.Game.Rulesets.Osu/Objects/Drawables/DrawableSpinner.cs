@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
             }
 
-            sequence.Expire();
+            Expire();
         }
     }
 }
