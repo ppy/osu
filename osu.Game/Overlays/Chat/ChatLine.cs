@@ -8,6 +8,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -68,6 +69,8 @@ namespace osu.Game.Overlays.Chat
         private const float message_padding = 200;
         private const float text_size = 20;
 
+        private UserProfileOverlay profileOverlay;
+
         public ChatLine(Message message)
         {
             Message = message;
@@ -94,15 +97,20 @@ namespace osu.Game.Overlays.Chat
                             TextSize = text_size * 0.75f,
                             Alpha = 0.4f,
                         },
-                        new OsuSpriteText
+                        new ClickableContainer
                         {
-                            Font = @"Exo2.0-BoldItalic",
-                            Text = $@"{Message.Sender.Username}:",
-                            Colour = getUsernameColour(Message),
-                            TextSize = text_size,
+                            AutoSizeAxes = Axes.Both,
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
-                        }
+                            Child = new OsuSpriteText
+                            {
+                                Font = @"Exo2.0-BoldItalic",
+                                Text = $@"{Message.Sender.Username}:",
+                                Colour = getUsernameColour(Message),
+                                TextSize = text_size,
+                            },
+                            Action = () => profileOverlay?.ShowUser(Message.Sender),
+                        },
                     }
                 },
                 new Container
@@ -122,6 +130,12 @@ namespace osu.Game.Overlays.Chat
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(UserProfileOverlay profileOverlay)
+        {
+            this.profileOverlay = profileOverlay;
         }
     }
 }
