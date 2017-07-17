@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
     public class ReplaySliderBar<T> : SettingsSlider<T>
         where T : struct, IEquatable<T>
     {
-        protected override Drawable CreateControl() => new Sliderbar()
+        protected override Drawable CreateControl() => new Sliderbar
         {
             Margin = new MarginPadding { Top = 5, Bottom = 5 },
             RelativeSizeAxes = Axes.X

@@ -6,14 +6,15 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButton : ClickableContainer
+    public class FooterButton : OsuClickableContainer
     {
         private static readonly Vector2 shearing = new Vector2(0.15f, 0);
 

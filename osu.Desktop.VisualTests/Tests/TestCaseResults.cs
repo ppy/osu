@@ -28,9 +28,9 @@ namespace osu.Desktop.VisualTests.Tests
 
         private WorkingBeatmap beatmap;
 
-        public override void Reset()
+        protected override void LoadComplete()
         {
-            base.Reset();
+            base.LoadComplete();
 
             if (beatmap == null)
             {
@@ -39,8 +39,6 @@ namespace osu.Desktop.VisualTests.Tests
                     beatmap = db.GetWorkingBeatmap(beatmapInfo);
             }
 
-            base.Reset();
-
             Add(new Results(new Score
             {
                 TotalScore = 2845370,
@@ -48,7 +46,7 @@ namespace osu.Desktop.VisualTests.Tests
                 MaxCombo = 123,
                 Rank = ScoreRank.A,
                 Date = DateTimeOffset.Now,
-                Statistics = new Dictionary<string, dynamic>()
+                Statistics = new Dictionary<string, dynamic>
                 {
                     { "300", 50 },
                     { "100", 20 },
