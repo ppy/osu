@@ -21,6 +21,7 @@ using OpenTK;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
@@ -98,6 +99,8 @@ namespace osu.Game
             }
 
             Dependencies.Cache(this);
+
+            BeatmapDatabase.DefaultBeatmap = new DummyWorkingBeatmap(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetDatabase.GetRuleset(configRuleset.Value);

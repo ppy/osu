@@ -41,7 +41,7 @@ namespace osu.Game.Screens
 
         private SampleChannel sampleExit;
 
-        private DummyWorkingBeatmap dummyBeatmap;
+        private WorkingBeatmap defaultBeatmap;
 
         public WorkingBeatmap Beatmap
         {
@@ -51,14 +51,14 @@ namespace osu.Game.Screens
             }
             set
             {
-                beatmap.Value = value ?? dummyBeatmap;
+                beatmap.Value = value ?? defaultBeatmap;
             }
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGameBase game, OsuGame osuGame, AudioManager audio)
+        private void load(OsuGameBase game, OsuGame osuGame, AudioManager audio, BeatmapDatabase beatmaps)
         {
-            dummyBeatmap = new DummyWorkingBeatmap(osuGame);
+            defaultBeatmap = beatmaps.DefaultBeatmap;
 
             if (game != null)
             {
