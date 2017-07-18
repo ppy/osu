@@ -7,7 +7,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
@@ -50,7 +49,7 @@ namespace osu.Game.Overlays.Notifications
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 Light = new NotificationLight
                 {
@@ -203,6 +202,8 @@ namespace osu.Game.Overlays.Notifications
                 get { return pulsate; }
                 set
                 {
+                    if (pulsate == value) return;
+
                     pulsate = value;
 
                     pulsateLayer.ClearTransforms();
@@ -211,25 +212,12 @@ namespace osu.Game.Overlays.Notifications
                     if (pulsate)
                     {
                         const float length = 1000;
-                        pulsateLayer.Transforms.Add(new TransformAlpha
+                        using (pulsateLayer.BeginLoopedSequence(length / 2))
                         {
-                            StartTime = Time.Current,
-                            EndTime = Time.Current + length,
-                            StartValue = 1,
-                            EndValue = 0.4f,
-                            Easing = EasingTypes.In
-                        });
-                        pulsateLayer.Transforms.Add(new TransformAlpha
-                        {
-                            StartTime = Time.Current + length,
-                            EndTime = Time.Current + length * 2,
-                            StartValue = 0.4f,
-                            EndValue = 1,
-                            Easing = EasingTypes.Out
-                        });
-
-                        //todo: figure why we can't add arbitrary delays at the end of loop.
-                        pulsateLayer.Loop(length * 2);
+                            pulsateLayer.FadeTo(0.4f, length, EasingTypes.In);
+                            using (pulsateLayer.BeginDelayedSequence(length))
+                                pulsateLayer.FadeTo(1, length, EasingTypes.Out);
+                        }
                     }
                 }
             }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -34,6 +35,8 @@ namespace osu.Game.Overlays
         private SettingsSectionsContainer sectionsContainer;
 
         private SearchTextBox searchTextBox;
+
+        private Func<float> getToolbarHeight;
 
         public SettingsOverlay()
         {
@@ -83,7 +86,7 @@ namespace osu.Game.Overlays
                         },
                         Exit = Hide,
                     },
-                    Sections = sections,
+                    Children = sections,
                     Footer = new SettingsFooter()
                 },
                 sidebar = new Sidebar
@@ -93,7 +96,11 @@ namespace osu.Game.Overlays
                         new SidebarButton
                         {
                             Section = section,
-                            Action = b => sectionsContainer.ScrollContainer.ScrollTo(b),
+                            Action = s =>
+                            {
+                                sectionsContainer.ScrollTo(s);
+                                sidebar.State = ExpandedState.Contracted;
+                            },
                         }
                     ).ToArray()
                 }
@@ -111,7 +118,7 @@ namespace osu.Game.Overlays
 
             searchTextBox.Current.ValueChanged += newValue => sectionsContainer.SearchContainer.SearchTerm = newValue;
 
-            sectionsContainer.Padding = new MarginPadding { Top = game?.Toolbar.DrawHeight ?? 0 };
+            getToolbarHeight = () => game?.ToolbarOffset ?? 0;
         }
 
         protected override void PopIn()
@@ -148,13 +155,20 @@ namespace osu.Game.Overlays
             base.OnFocus(state);
         }
 
-        private class SettingsSectionsContainer : SectionsContainer
+        protected override void UpdateAfterChildren()
         {
-            public SearchContainer SearchContainer;
-            private readonly Box headerBackground;
+            base.UpdateAfterChildren();
 
-            protected override Container<Drawable> CreateScrollContentContainer()
-                => SearchContainer = new SearchContainer
+            sectionsContainer.Margin = new MarginPadding { Left = sidebar.DrawWidth };
+            sectionsContainer.Padding = new MarginPadding { Top = getToolbarHeight() };
+        }
+
+        private class SettingsSectionsContainer : SectionsContainer<SettingsSection>
+        {
+            public SearchContainer<SettingsSection> SearchContainer;
+
+            protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
+                => SearchContainer = new SearchContainer<SettingsSection>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
@@ -163,12 +177,11 @@ namespace osu.Game.Overlays
 
             public SettingsSectionsContainer()
             {
-                ScrollContainer.ScrollbarVisible = false;
-                Add(headerBackground = new Box
+                HeaderBackground = new Box
                 {
                     Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.X
-                });
+                    RelativeSizeAxes = Axes.Both
+                };
             }
 
             protected override void UpdateAfterChildren()
@@ -176,9 +189,7 @@ namespace osu.Game.Overlays
                 base.UpdateAfterChildren();
 
                 // no null check because the usage of this class is strict
-                headerBackground.Height = ExpandableHeader.LayoutSize.Y + FixedHeader.LayoutSize.Y;
-                headerBackground.Y = ExpandableHeader.Y;
-                headerBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
+                HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
             }
         }
     }

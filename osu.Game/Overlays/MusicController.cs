@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays
         private const float bottom_black_area_height = 55;
 
         private Drawable currentBackground;
-        private DragBar progressBar;
+        private ProgressBar progressBar;
 
         private IconButton playButton;
         private IconButton playlistButton;
@@ -59,6 +60,9 @@ namespace osu.Game.Overlays
         {
             Width = 400;
             Margin = new MarginPadding(10);
+
+            // required to let MusicController handle beatmap cycling.
+            AlwaysPresent = true;
         }
 
         protected override bool OnDragStart(InputState state) => true;
@@ -184,13 +188,13 @@ namespace osu.Game.Overlays
                                         },
                                     }
                                 },
-                                progressBar = new DragBar
+                                progressBar = new ProgressBar
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.BottomCentre,
                                     Height = progress_height,
-                                    Colour = colours.Yellow,
-                                    SeekRequested = seek
+                                    FillColour = colours.Yellow,
+                                    OnSeek = progress => current?.Track.Seek(progress)
                                 }
                             },
                         },
@@ -225,7 +229,9 @@ namespace osu.Game.Overlays
             {
                 var track = current.Track;
 
-                progressBar.UpdatePosition(track.Length == 0 ? 0 : (float)(track.CurrentTime / track.Length));
+                progressBar.EndTime = track.Length;
+                progressBar.CurrentTime = track.CurrentTime;
+
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
                 if (track.HasCompleted && !track.Looping) next();
@@ -252,12 +258,16 @@ namespace osu.Game.Overlays
 
         private void prev()
         {
+            if (beatmapBacking.Disabled) return;
+
             queuedDirection = TransformDirection.Prev;
             playlist.PlayPrevious();
         }
 
         private void next()
         {
+            if (beatmapBacking.Disabled) return;
+
             queuedDirection = TransformDirection.Next;
             playlist.PlayNext();
         }
@@ -267,13 +277,11 @@ namespace osu.Game.Overlays
 
         private void beatmapChanged(WorkingBeatmap beatmap)
         {
-            progressBar.IsEnabled = beatmap != null;
-
             TransformDirection direction = TransformDirection.None;
 
             if (current != null)
             {
-                bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
+                bool audioEquals = beatmap?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
 
                 if (audioEquals)
                     direction = TransformDirection.None;
@@ -286,15 +294,18 @@ namespace osu.Game.Overlays
                 {
                     //figure out the best direction based on order in playlist.
                     var last = playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo.ID).Count();
-                    var next = beatmapBacking.Value == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmapBacking.Value.BeatmapSetInfo.ID).Count();
+                    var next = beatmap == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmap.BeatmapSetInfo.ID).Count();
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
             }
 
-            current = beatmapBacking.Value;
+            current = beatmap;
 
-            updateDisplay(beatmapBacking, direction);
+            progressBar.CurrentTime = 0;
+
+            updateDisplay(current, direction);
+
             queuedDirection = null;
         }
 
@@ -353,12 +364,6 @@ namespace osu.Game.Overlays
             });
         }
 
-        private void seek(float position)
-        {
-            var track = current?.Track;
-            track?.Seek(track.Length * position);
-        }
-
         protected override void PopIn()
         {
             base.PopIn();
@@ -398,6 +403,7 @@ namespace osu.Game.Overlays
                 {
                     sprite = new Sprite
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(150),
                         FillMode = FillMode.Fill,
                     },
@@ -417,6 +423,50 @@ namespace osu.Game.Overlays
             {
                 sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
             }
+        }
+
+        private class ProgressBar : SliderBar<double>
+        {
+            public Action<double> OnSeek;
+
+            private readonly Box fill;
+
+            public Color4 FillColour
+            {
+                set { fill.Colour = value; }
+            }
+
+            public double EndTime
+            {
+                set { CurrentNumber.MaxValue = value; }
+            }
+
+            public double CurrentTime
+            {
+                set { CurrentNumber.Value = value; }
+            }
+
+            public ProgressBar()
+            {
+                CurrentNumber.MinValue = 0;
+                CurrentNumber.MaxValue = 1;
+                RelativeSizeAxes = Axes.X;
+
+                Children = new Drawable[]
+                {
+                    fill = new Box
+                    {
+                        RelativeSizeAxes = Axes.Y
+                    }
+                };
+            }
+
+            protected override void UpdateValue(float value)
+            {
+                fill.Width = value * UsableWidth;
+            }
+
+            protected override void OnUserChange() => OnSeek?.Invoke(Current);
         }
     }
 }
