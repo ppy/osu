@@ -379,13 +379,21 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText(string.Join(", ", user.PlayStyle), boldItalic);
             }
 
+            string websiteWithoutProtcol = user.Website;
+            if (!string.IsNullOrEmpty(websiteWithoutProtcol))
+            {
+                int protocolIndex = websiteWithoutProtcol.IndexOf("//", StringComparison.Ordinal);
+                if (protocolIndex >= 0)
+                    websiteWithoutProtcol = websiteWithoutProtcol.Substring(protocolIndex + 2);
+            }
+
             tryAddInfoRightLine(FontAwesome.fa_map_marker, user.Location);
             tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Intrerests);
             tryAddInfoRightLine(FontAwesome.fa_suitcase, user.Occupation);
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
-                tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, @"http://twitter.com/" + user.Twitter);
-            tryAddInfoRightLine(FontAwesome.fa_globe, user.Website, user.Website);
+                tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
+            tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
             tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
 
             if (user.Statistics != null)
