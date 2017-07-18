@@ -178,6 +178,8 @@ namespace osu.Game.Database
 
             if (existing != null)
             {
+                GetChildren(existing);
+
                 if (existing.DeletePending)
                 {
                     existing.DeletePending = false;
