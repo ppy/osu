@@ -16,12 +16,10 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"I handle notifications";
 
-        private NotificationManager manager;
+        private readonly NotificationManager manager;
 
-        public override void Reset()
+        public TestCaseNotificationManager()
         {
-            base.Reset();
-
             progressingNotifications.Clear();
 
             Content.Add(manager = new NotificationManager

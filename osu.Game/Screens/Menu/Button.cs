@@ -9,7 +9,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -17,6 +16,9 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Graphics.Containers;
+using osu.Framework.Audio.Track;
+using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Menu
 {
@@ -24,7 +26,7 @@ namespace osu.Game.Screens.Menu
     /// Button designed specifically for the osu!next main menu.
     /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
     /// </summary>
-    public class Button : Container, IStateful<ButtonState>
+    public class Button : BeatSyncedContainer, IStateful<ButtonState>
     {
         private readonly Container iconText;
         private readonly Container box;
@@ -117,6 +119,27 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+        {
+            base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+            if (!IsHovered) return;
+
+            bool rightward = beatIndex % 2 == 1;
+            double duration = timingPoint.BeatLength / 2;
+
+            icon.RotateTo(rightward ? 10 : -10, duration * 2, EasingTypes.InOutSine);
+
+            icon.MoveToY(-10, duration, EasingTypes.Out);
+            icon.ScaleTo(Vector2.One, duration, EasingTypes.Out);
+
+            using (icon.BeginDelayedSequence(duration))
+            {
+                icon.MoveToY(0, duration, EasingTypes.In);
+                icon.ScaleTo(new Vector2(1, 0.9f), duration, EasingTypes.In);
+            }
+        }
+
         protected override bool OnHover(InputState state)
         {
             if (State != ButtonState.Expanded) return true;
@@ -125,85 +148,11 @@ namespace osu.Game.Screens.Menu
 
             box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
 
-            int duration = 0; //(int)(Game.Audio.BeatLength / 2);
-            if (duration == 0) duration = 250;
+            double duration = TimeUntilNextBeat;
 
             icon.ClearTransforms();
-
-            icon.ScaleTo(1, 500, EasingTypes.OutElasticHalf);
-
-            const double offset = 0; //(1 - Game.Audio.SyncBeatProgress) * duration;
-            double startTime = Time.Current + offset;
-
-            icon.RotateTo(10, offset, EasingTypes.InOutSine);
-            icon.ScaleTo(new Vector2(1, 0.9f), offset, EasingTypes.Out);
-
-            icon.Transforms.Add(new TransformRotation
-            {
-                StartValue = -10,
-                EndValue = 10,
-                StartTime = startTime,
-                EndTime = startTime + duration * 2,
-                Easing = EasingTypes.InOutSine,
-                LoopCount = -1,
-                LoopDelay = duration * 2
-            });
-
-            icon.Transforms.Add(new TransformPosition
-            {
-                StartValue = Vector2.Zero,
-                EndValue = new Vector2(0, -10),
-                StartTime = startTime,
-                EndTime = startTime + duration,
-                Easing = EasingTypes.Out,
-                LoopCount = -1,
-                LoopDelay = duration
-            });
-
-            icon.Transforms.Add(new TransformScale
-            {
-                StartValue = new Vector2(1, 0.9f),
-                EndValue = Vector2.One,
-                StartTime = startTime,
-                EndTime = startTime + duration,
-                Easing = EasingTypes.Out,
-                LoopCount = -1,
-                LoopDelay = duration
-            });
-
-            icon.Transforms.Add(new TransformPosition
-            {
-                StartValue = new Vector2(0, -10),
-                EndValue = Vector2.Zero,
-                StartTime = startTime + duration,
-                EndTime = startTime + duration * 2,
-                Easing = EasingTypes.In,
-                LoopCount = -1,
-                LoopDelay = duration
-            });
-
-            icon.Transforms.Add(new TransformScale
-            {
-                StartValue = Vector2.One,
-                EndValue = new Vector2(1, 0.9f),
-                StartTime = startTime + duration,
-                EndTime = startTime + duration * 2,
-                Easing = EasingTypes.In,
-                LoopCount = -1,
-                LoopDelay = duration
-            });
-
-            icon.Transforms.Add(new TransformRotation
-            {
-                StartValue = 10,
-                EndValue = -10,
-                StartTime = startTime + duration * 2,
-                EndTime = startTime + duration * 4,
-                Easing = EasingTypes.InOutSine,
-                LoopCount = -1,
-                LoopDelay = duration * 2
-            });
-
+            icon.RotateTo(10, duration, EasingTypes.InOutSine);
+            icon.ScaleTo(new Vector2(1, 0.9f), duration, EasingTypes.Out);
             return true;
         }
 
@@ -212,7 +161,6 @@ namespace osu.Game.Screens.Menu
             icon.ClearTransforms();
             icon.RotateTo(0, 500, EasingTypes.Out);
             icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
-            icon.ScaleTo(0.7f, 500, EasingTypes.OutElasticHalf);
             icon.ScaleTo(Vector2.One, 200, EasingTypes.Out);
 
             if (State == ButtonState.Expanded)

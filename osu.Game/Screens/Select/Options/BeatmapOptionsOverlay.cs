@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select.Options
                     Scale = new Vector2(1, 0),
                     Colour = Color4.Black.Opacity(0.5f),
                 },
-                buttonsContainer = new ReverseDepthFillFlowContainer<BeatmapOptionsButton>
+                buttonsContainer = new ReverseChildIDFillFlowContainer<BeatmapOptionsButton>
                 {
                     Height = height,
                     RelativePositionAxes = Axes.X,

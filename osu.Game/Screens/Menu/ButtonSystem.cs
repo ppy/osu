@@ -114,8 +114,8 @@ namespace osu.Game.Screens.Menu
             buttonsTopLevel.Add(new Button(@"osu!direct", string.Empty, FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
             buttonsTopLevel.Add(new Button(@"exit", string.Empty, FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), onExit, 0, Key.Q));
 
-            buttonFlow.Add(buttonsPlay);
-            buttonFlow.Add(buttonsTopLevel);
+            buttonFlow.AddRange(buttonsPlay);
+            buttonFlow.AddRange(buttonsTopLevel);
         }
 
         [BackgroundDependencyLoader(true)]
@@ -213,88 +213,89 @@ namespace osu.Game.Screens.Menu
                 backButton.ContractStyle = 0;
                 settingsButton.ContractStyle = 0;
 
-                switch (state)
+                bool fromInitial = lastState == MenuState.Initial;
+
+                if (state == MenuState.TopLevel)
+                    buttonArea.Flush(true);
+
+                using (buttonArea.BeginDelayedSequence(fromInitial ? 150 : 0, true))
                 {
-                    case MenuState.Exit:
-                    case MenuState.Initial:
-                        toolbar?.Hide();
+                    switch (state)
+                    {
+                        case MenuState.Exit:
+                        case MenuState.Initial:
+                            toolbar?.Hide();
 
-                        buttonAreaBackground.ScaleTo(Vector2.One, 500, EasingTypes.Out);
-                        buttonArea.FadeOut(300);
+                            buttonAreaBackground.ScaleTo(Vector2.One, 500, EasingTypes.Out);
+                            buttonArea.FadeOut(300);
 
-                        osuLogo.Delay(150);
-                        osuLogo.MoveTo(Vector2.Zero, 800, EasingTypes.OutExpo);
-                        osuLogo.ScaleTo(1, 800, EasingTypes.OutExpo);
+                            using (osuLogo.BeginDelayedSequence(150))
+                            {
+                                osuLogo.MoveTo(Vector2.Zero, 800, EasingTypes.OutExpo);
+                                osuLogo.ScaleTo(1, 800, EasingTypes.OutExpo);
+                            }
 
-                        foreach (Button b in buttonsTopLevel)
-                            b.State = ButtonState.Contracted;
+                            foreach (Button b in buttonsTopLevel)
+                                b.State = ButtonState.Contracted;
 
-                        foreach (Button b in buttonsPlay)
-                            b.State = ButtonState.Contracted;
+                            foreach (Button b in buttonsPlay)
+                                b.State = ButtonState.Contracted;
 
-                        if (state == MenuState.Exit)
-                        {
-                            osuLogo.RotateTo(20, EXIT_DELAY * 1.5f);
-                            osuLogo.FadeOut(EXIT_DELAY);
-                        }
-                        else if (lastState == MenuState.TopLevel)
-                            sampleBack?.Play();
-                        break;
-                    case MenuState.TopLevel:
-                        buttonArea.Flush(true);
+                            if (state == MenuState.Exit)
+                            {
+                                osuLogo.RotateTo(20, EXIT_DELAY * 1.5f);
+                                osuLogo.FadeOut(EXIT_DELAY);
+                            }
+                            else if (lastState == MenuState.TopLevel)
+                                sampleBack?.Play();
+                            break;
+                        case MenuState.TopLevel:
+                            buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
 
-                        buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
+                            osuLogo.ClearTransforms();
+                            osuLogo.MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
+                            osuLogo.ScaleTo(0.5f, 200, EasingTypes.In);
 
-                        osuLogo.MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
-                        osuLogo.ScaleTo(0.5f, 200, EasingTypes.In);
+                            buttonArea.FadeIn(300);
 
-                        buttonArea.FadeIn(300);
-
-                        if (lastState == MenuState.Initial)
-                        {
-                            buttonArea.Delay(150, true);
-
-                            if (osuLogo.Scale.X > 0.5f)
+                            if (fromInitial && osuLogo.Scale.X > 0.5f)
                                 using (osuLogo.BeginDelayedSequence(200, true))
                                     osuLogo.Impact();
-                        }
 
-                        Scheduler.AddDelayed(() => toolbar?.Show(), 150);
+                            Scheduler.AddDelayed(() => toolbar?.Show(), 150);
 
-                        foreach (Button b in buttonsTopLevel)
-                            b.State = ButtonState.Expanded;
+                            foreach (Button b in buttonsTopLevel)
+                                b.State = ButtonState.Expanded;
 
-                        foreach (Button b in buttonsPlay)
-                            b.State = ButtonState.Contracted;
-                        break;
-                    case MenuState.Play:
-                        foreach (Button b in buttonsTopLevel)
-                            b.State = ButtonState.Exploded;
+                            foreach (Button b in buttonsPlay)
+                                b.State = ButtonState.Contracted;
+                            break;
+                        case MenuState.Play:
+                            foreach (Button b in buttonsTopLevel)
+                                b.State = ButtonState.Exploded;
 
-                        foreach (Button b in buttonsPlay)
-                            b.State = ButtonState.Expanded;
-                        break;
-                    case MenuState.EnteringMode:
-                        buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, EasingTypes.InSine);
+                            foreach (Button b in buttonsPlay)
+                                b.State = ButtonState.Expanded;
+                            break;
+                        case MenuState.EnteringMode:
+                            buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, EasingTypes.InSine);
 
-                        buttonsTopLevel.ForEach(b => b.ContractStyle = 1);
-                        buttonsPlay.ForEach(b => b.ContractStyle = 1);
-                        backButton.ContractStyle = 1;
-                        settingsButton.ContractStyle = 1;
+                            buttonsTopLevel.ForEach(b => b.ContractStyle = 1);
+                            buttonsPlay.ForEach(b => b.ContractStyle = 1);
+                            backButton.ContractStyle = 1;
+                            settingsButton.ContractStyle = 1;
 
-                        foreach (Button b in buttonsTopLevel)
-                            b.State = ButtonState.Contracted;
+                            foreach (Button b in buttonsTopLevel)
+                                b.State = ButtonState.Contracted;
 
-                        foreach (Button b in buttonsPlay)
-                            b.State = ButtonState.Contracted;
-                        break;
+                            foreach (Button b in buttonsPlay)
+                                b.State = ButtonState.Contracted;
+                            break;
+                    }
+
+                    backButton.State = state == MenuState.Play ? ButtonState.Expanded : ButtonState.Contracted;
+                    settingsButton.State = state == MenuState.TopLevel ? ButtonState.Expanded : ButtonState.Contracted;
                 }
-
-                backButton.State = state == MenuState.Play ? ButtonState.Expanded : ButtonState.Contracted;
-                settingsButton.State = state == MenuState.TopLevel ? ButtonState.Expanded : ButtonState.Contracted;
-
-                if (lastState == MenuState.Initial)
-                    buttonArea.DelayReset();
             }
         }
 
