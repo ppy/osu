@@ -494,20 +494,40 @@ namespace osu.Game.Overlays.Profile
             {
             }
 
-            protected override SpriteText CreateSpriteText() => new SpriteLink();
+            protected override SpriteText CreateSpriteText() => new LinkText();
 
-            public void AddLink(string text, string url) => AddText(text, link => ((SpriteLink)link).Url = url);
+            public void AddLink(string text, string url) => AddText(text, link => ((LinkText)link).Url = url);
 
-            private class SpriteLink : OsuSpriteText
+            private class LinkText : OsuSpriteText
             {
                 public override bool HandleInput => Url != null;
 
                 public string Url;
 
+                private Color4 hoverColour;
+
+                protected override bool OnHover(InputState state)
+                {
+                    FadeColour(hoverColour, 500, EasingTypes.OutQuint);
+                    return base.OnHover(state);
+                }
+
+                protected override void OnHoverLost(InputState state)
+                {
+                    FadeColour(Color4.White, 500, EasingTypes.OutQuint);
+                    base.OnHoverLost(state);
+                }
+
                 protected override bool OnClick(InputState state)
                 {
                     Process.Start(Url);
                     return true;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    hoverColour = colours.Yellow;
                 }
             }
         }
