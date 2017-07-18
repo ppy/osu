@@ -7,9 +7,6 @@ using OpenTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    /// <summary>
-    /// A textbox which holds focus eagerly.
-    /// </summary>
     public class SearchTextBox : FocusedTextBox
     {
         protected virtual bool AllowCommit => false;
