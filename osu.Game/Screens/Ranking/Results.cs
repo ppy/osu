@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Ranking
 
         private ResultModeTabControl modeChangeButtons;
 
-        internal override bool AllowRulesetChange => false;
+        internal override bool AllowBeatmapRulesetChange => false;
 
         private Container currentPage;
 
@@ -163,6 +163,7 @@ namespace osu.Game.Screens.Ranking
                                     {
                                         new Sprite
                                         {
+                                            RelativeSizeAxes = Axes.Both,
                                             Alpha = 0.2f,
                                             Texture = Beatmap?.Background,
                                             Anchor = Anchor.Centre,

@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.Cursor
 {
     public class OsuTooltipContainer : TooltipContainer
     {
-        protected override Tooltip CreateTooltip() => new OsuTooltip();
+        protected override ITooltip CreateTooltip() => new OsuTooltip();
 
         public OsuTooltipContainer(CursorContainer cursor) : base(cursor)
         {

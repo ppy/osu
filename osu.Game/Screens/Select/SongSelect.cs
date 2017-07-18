@@ -281,10 +281,13 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
-            database.BeatmapSetAdded -= onBeatmapSetAdded;
-            database.BeatmapSetRemoved -= onBeatmapSetRemoved;
+            if (database != null)
+            {
+                database.BeatmapSetAdded -= onBeatmapSetAdded;
+                database.BeatmapSetRemoved -= onBeatmapSetRemoved;
+            }
 
-            initialAddSetsTask.Cancel();
+            initialAddSetsTask?.Cancel();
         }
 
         private void changeBackground(WorkingBeatmap beatmap)
@@ -327,21 +330,19 @@ namespace osu.Game.Screens.Select
             if (beatmap.Equals(Beatmap?.BeatmapInfo))
                 return;
 
-            bool beatmapSetChange = false;
+            bool preview = beatmap.BeatmapSetInfoID != Beatmap?.BeatmapInfo.BeatmapSetInfoID;
+
             if (beatmap.BeatmapSetInfoID == selectionChangeNoBounce?.BeatmapSetInfoID)
                 sampleChangeDifficulty.Play();
             else
-            {
                 sampleChangeBeatmap.Play();
-                beatmapSetChange = true;
-            }
 
             selectionChangeNoBounce = beatmap;
 
             selectionChangedDebounce = Scheduler.AddDelayed(delegate
             {
                 Beatmap = database.GetWorkingBeatmap(beatmap, Beatmap);
-                ensurePlayingSelected(beatmapSetChange);
+                ensurePlayingSelected(preview);
             }, 100);
         }
 

@@ -82,6 +82,7 @@ namespace osu.Game.Screens.Tournament
                 },
                 new Sprite
                 {
+                    RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fill,
                     Texture = textures.Get(@"Backgrounds/Drawings/background.png")
                 },

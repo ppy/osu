@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings
                 if (text == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    Add(text = new OsuSpriteText() { Depth = 1 });
+                    Add(text = new OsuSpriteText { Depth = 1 });
                 }
 
                 text.Text = value;

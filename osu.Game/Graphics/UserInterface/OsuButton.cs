@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
             Content.Masking = true;
             Content.CornerRadius = 5;
 
-            Add(new Drawable[]
+            AddRange(new Drawable[]
             {
                 new Triangles
                 {

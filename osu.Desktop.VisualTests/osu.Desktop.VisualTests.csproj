@@ -187,6 +187,7 @@
   <ItemGroup>
     <Compile Include="AutomatedVisualTestGame.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Tests\TestCaseBeatSyncedContainer.cs" />
     <Compile Include="Tests\TestCaseChatDisplay.cs" />
     <Compile Include="Tests\TestCaseBeatmapDetails.cs" />
     <Compile Include="Tests\TestCaseContextMenu.cs" />
@@ -215,6 +216,7 @@
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="Tests\TestCasePlaySongSelect.cs" />
     <Compile Include="Tests\TestCaseTwoLayerButton.cs" />
+    <Compile Include="Tests\TestCaseUserProfile.cs" />
     <Compile Include="VisualTestGame.cs" />
     <Compile Include="Platform\TestStorage.cs" />
     <Compile Include="Tests\TestCaseSettings.cs" />
@@ -230,6 +232,7 @@
     <Compile Include="Tests\TestCaseDirect.cs" />
     <Compile Include="Tests\TestCaseSocial.cs" />
     <Compile Include="Tests\TestCaseBreadcrumbs.cs" />
+    <Compile Include="Tests\TestCaseMedalOverlay.cs" />
     <Compile Include="Tests\TestCaseRoomInspector.cs" />
   </ItemGroup>
   <ItemGroup />
