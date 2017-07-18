@@ -250,15 +250,13 @@ namespace osu.Game.Screens.Menu
                         case MenuState.TopLevel:
                             buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
 
-                            osuLogo.ClearTransforms();
                             osuLogo.MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
-                            osuLogo.ScaleTo(0.5f, 200, EasingTypes.In);
-
-                            buttonArea.FadeIn(300);
+                            var sequence = osuLogo.ScaleTo(0.5f, 200, EasingTypes.In);
 
                             if (fromInitial && osuLogo.Scale.X > 0.5f)
-                                using (osuLogo.BeginDelayedSequence(200, true))
-                                    osuLogo.Impact();
+                                sequence.OnComplete(o => o.Impact());
+
+                            buttonArea.FadeIn(300);
 
                             Scheduler.AddDelayed(() => toolbar?.Show(), 150);
 
