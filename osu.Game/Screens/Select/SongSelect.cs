@@ -230,7 +230,13 @@ namespace osu.Game.Screens.Select
 
         protected override void OnEntering(Screen last)
         {
+            // this catches the case we're playing the theme song, and falls back to a more sane default.
+            // actual selection is done by the carousel when possible.
+            if (Beatmap.BeatmapSetInfo.DeletePending)
+                Beatmap = null;
+
             base.OnEntering(last);
+
             ensurePlayingSelected();
 
             changeBackground(Beatmap);
@@ -350,11 +356,11 @@ namespace osu.Game.Screens.Select
         {
             Track track = Beatmap?.Track;
 
+            trackManager.SetExclusive(track);
+
             if (track != null)
             {
-                trackManager.SetExclusive(track);
-                if (preview)
-                    track.Seek(Beatmap.Metadata.PreviewTime);
+                if (preview) track.Seek(Beatmap.Metadata.PreviewTime);
                 track.Start();
             }
         }
