@@ -28,6 +28,11 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
 
+        /// <summary>
+        /// A default representation of a WorkingBeatmap to use when no beatmap is available.
+        /// </summary>
+        public WorkingBeatmap DefaultBeatmap { get; set; }
+
         public BeatmapDatabase(Storage storage, SQLiteConnection connection, RulesetDatabase rulesets, IIpcHost importHost = null) : base(storage, connection)
         {
             this.rulesets = rulesets;
@@ -268,6 +273,9 @@ namespace osu.Game.Database
 
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null, bool withStoryboard = false)
         {
+            if (beatmapInfo == DefaultBeatmap?.BeatmapInfo)
+                return DefaultBeatmap;
+
             if (beatmapInfo.BeatmapSet == null || beatmapInfo.Ruleset == null)
                 beatmapInfo = GetChildren(beatmapInfo, true);
 

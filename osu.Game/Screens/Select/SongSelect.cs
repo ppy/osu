@@ -230,11 +230,6 @@ namespace osu.Game.Screens.Select
 
         protected override void OnEntering(Screen last)
         {
-            // this catches the case we're playing the theme song, and falls back to a more sane default.
-            // actual selection is done by the carousel when possible.
-            if (Beatmap.BeatmapSetInfo.DeletePending)
-                Beatmap = null;
-
             base.OnEntering(last);
 
             ensurePlayingSelected();
