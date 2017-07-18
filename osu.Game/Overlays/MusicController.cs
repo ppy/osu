@@ -229,7 +229,9 @@ namespace osu.Game.Overlays
             {
                 var track = current.Track;
 
+                progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
+
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
                 if (track.HasCompleted && !track.Looping) next();
@@ -300,18 +302,9 @@ namespace osu.Game.Overlays
 
             current = beatmap;
 
-            var track = current?.Track;
-            if (track != null)
-            {
-                // the track may not be loaded at this point
-                track.OnLoaded += loadedTrack => Schedule(() => progressBar.EndTime = loadedTrack.Length);
+            progressBar.CurrentTime = 0;
 
-                if (track.IsLoaded)
-                    // but it also may be.
-                    progressBar.EndTime = track.Length;
-            }
-
-            updateDisplay(beatmap, direction);
+            updateDisplay(current, direction);
 
             queuedDirection = null;
         }
