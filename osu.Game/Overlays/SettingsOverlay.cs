@@ -86,7 +86,7 @@ namespace osu.Game.Overlays
                         },
                         Exit = Hide,
                     },
-                    Sections = sections,
+                    Children = sections,
                     Footer = new SettingsFooter()
                 },
                 sidebar = new Sidebar
@@ -163,13 +163,12 @@ namespace osu.Game.Overlays
             sectionsContainer.Padding = new MarginPadding { Top = getToolbarHeight() };
         }
 
-        private class SettingsSectionsContainer : SectionsContainer
+        private class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
-            public SearchContainer SearchContainer;
-            private readonly Box headerBackground;
+            public SearchContainer<SettingsSection> SearchContainer;
 
-            protected override Container<Drawable> CreateScrollContentContainer()
-                => SearchContainer = new SearchContainer
+            protected override FlowContainer<SettingsSection> CreateScrollContentContainer()
+                => SearchContainer = new SearchContainer<SettingsSection>
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
@@ -178,12 +177,11 @@ namespace osu.Game.Overlays
 
             public SettingsSectionsContainer()
             {
-                ScrollContainer.ScrollbarVisible = false;
-                Add(headerBackground = new Box
+                HeaderBackground = new Box
                 {
                     Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.X
-                });
+                    RelativeSizeAxes = Axes.Both
+                };
             }
 
             protected override void UpdateAfterChildren()
@@ -191,9 +189,7 @@ namespace osu.Game.Overlays
                 base.UpdateAfterChildren();
 
                 // no null check because the usage of this class is strict
-                headerBackground.Height = ExpandableHeader.LayoutSize.Y + FixedHeader.LayoutSize.Y;
-                headerBackground.Y = ExpandableHeader.Y;
-                headerBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
+                HeaderBackground.Alpha = -ExpandableHeader.Y / ExpandableHeader.LayoutSize.Y * 0.5f;
             }
         }
     }

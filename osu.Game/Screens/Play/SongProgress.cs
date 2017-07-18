@@ -12,7 +12,6 @@ using System.Linq;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-
 namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
@@ -50,6 +49,9 @@ namespace osu.Game.Screens.Play
 
                 info.StartTime = firstHitTime;
                 info.EndTime = lastHitTime;
+
+                bar.StartTime = firstHitTime;
+                bar.EndTime = lastHitTime;
             }
         }
 
@@ -89,10 +91,7 @@ namespace osu.Game.Screens.Play
                     Alpha = 0,
                     Anchor = Anchor.BottomLeft,
                     Origin =  Anchor.BottomLeft,
-                    SeekRequested = delegate (float position)
-                    {
-                        OnSeek?.Invoke(firstHitTime + position * (lastHitTime - firstHitTime));
-                    },
+                    OnSeek = position => OnSeek?.Invoke(position),
                 },
             };
         }
@@ -144,11 +143,12 @@ namespace osu.Game.Screens.Play
             if (objects == null)
                 return;
 
-            double progress = ((audioClock?.CurrentTime ?? Time.Current) - firstHitTime) / (lastHitTime - firstHitTime);
+            double position = audioClock?.CurrentTime ?? Time.Current;
+            double progress = (position - firstHitTime) / (lastHitTime - firstHitTime);
 
             if (progress < 1)
             {
-                bar.UpdatePosition((float)progress);
+                bar.CurrentTime = position;
                 graph.Progress = (int)(graph.ColumnCount * progress);
             }
         }

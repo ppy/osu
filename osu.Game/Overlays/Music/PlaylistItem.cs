@@ -2,15 +2,16 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
-using OpenTK.Graphics;
-using osu.Framework.Localisation;
-using osu.Framework.Graphics.Sprites;
-using System.Collections.Generic;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Music
 {
@@ -77,7 +78,7 @@ namespace osu.Game.Overlays.Music
                     Margin = new MarginPadding { Left = 5 },
                     Padding = new MarginPadding { Top = 2 },
                 },
-                text = new TextFlowContainer
+                text = new OsuTextFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
