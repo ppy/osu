@@ -45,6 +45,8 @@ namespace osu.Game
 
         private SocialOverlay social;
 
+        private UserProfileOverlay userProfile;
+
         private Intro intro
         {
             get
@@ -172,6 +174,7 @@ namespace osu.Game
             LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
+            LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
@@ -206,6 +209,7 @@ namespace osu.Game
             Dependencies.Cache(settings);
             Dependencies.Cache(social);
             Dependencies.Cache(chat);
+            Dependencies.Cache(userProfile);
             Dependencies.Cache(musicController);
             Dependencies.Cache(notificationManager);
             Dependencies.Cache(dialogOverlay);
@@ -321,6 +325,7 @@ namespace osu.Game
                 chat.State = Visibility.Hidden;
                 direct.State = Visibility.Hidden;
                 social.State = Visibility.Hidden;
+                userProfile.State = Visibility.Hidden;
             }
             else
             {

@@ -46,6 +46,7 @@ namespace osu.Game.Overlays
                         settingsSection = new LoginSettings
                         {
                             Padding = new MarginPadding(10),
+                            RequestHide = Hide,
                         },
                         new Box
                         {
