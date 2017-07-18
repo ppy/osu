@@ -3,7 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
 using OpenTK;
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public TaikoPlayfield()
         {
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new ScaleFixContainer
                 {

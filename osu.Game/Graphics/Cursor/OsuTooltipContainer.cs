@@ -8,14 +8,14 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Cursor
 {
     public class OsuTooltipContainer : TooltipContainer
     {
-        protected override Tooltip CreateTooltip() => new OsuTooltip();
+        protected override ITooltip CreateTooltip() => new OsuTooltip();
 
         public OsuTooltipContainer(CursorContainer cursor) : base(cursor)
         {

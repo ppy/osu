@@ -6,6 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
@@ -20,16 +21,15 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => "SpeedAdjustmentContainer/DrawableTimingSection";
 
-        private SpeedAdjustmentCollection adjustmentCollection;
+        private readonly BindableDouble timeRangeBindable;
+        private readonly OsuSpriteText bottomLabel;
+        private readonly SpriteText topTime;
+        private readonly SpriteText bottomTime;
 
-        private BindableDouble timeRangeBindable;
-        private OsuSpriteText timeRangeText;
-        private OsuSpriteText bottomLabel;
-        private SpriteText topTime, bottomTime;
-
-        public override void Reset()
+        public TestCaseScrollingHitObjects()
         {
-            base.Reset();
+            OsuSpriteText timeRangeText;
+            SpeedAdjustmentCollection adjustmentCollection;
 
             timeRangeBindable = new BindableDouble(2000)
             {
@@ -55,7 +55,7 @@ namespace osu.Desktop.VisualTests.Tests
             timeRangeBindable.ValueChanged += v => timeRangeText.Text = $"Visible Range: {v:#,#.#}";
             timeRangeBindable.ValueChanged += v => bottomLabel.Text = $"t minus {v:#,#}";
 
-            Add(new Drawable[]
+            AddRange(new Drawable[]
             {
                 new Container
                 {
@@ -125,6 +125,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private class TestSpeedAdjustmentContainer : SpeedAdjustmentContainer
         {
+            public override bool RemoveWhenNotAlive => false;
+
             public TestSpeedAdjustmentContainer(MultiplierControlPoint controlPoint)
                 : base(controlPoint)
             {
@@ -150,10 +152,12 @@ namespace osu.Desktop.VisualTests.Tests
             }
         }
 
-        private class TestDrawableHitObject : DrawableHitObject
+        private class TestDrawableHitObject : DrawableHitObject, IScrollingHitObject
         {
             private readonly Box background;
             private const float height = 14;
+
+            public BindableDouble LifetimeOffset { get; } = new BindableDouble();
 
             public TestDrawableHitObject(HitObject hitObject)
                 : base(hitObject)
@@ -195,25 +199,11 @@ namespace osu.Desktop.VisualTests.Tests
                 FadeInFromZero(250, EasingTypes.OutQuint);
             }
 
-            private bool hasExpired;
             protected override void Update()
             {
                 base.Update();
                 if (Time.Current >= HitObject.StartTime)
-                {
                     background.Colour = Color4.Red;
-
-                    if (!hasExpired)
-                    {
-                        using (BeginDelayedSequence(200))
-                        {
-                            FadeOut(200);
-                            Expire();
-                        }
-
-                        hasExpired = true;
-                    }
-                }
             }
         }
     }

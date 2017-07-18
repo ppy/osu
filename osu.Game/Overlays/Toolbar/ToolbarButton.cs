@@ -1,10 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,10 +11,12 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarButton : Container
+    public class ToolbarButton : OsuClickableContainer
     {
         public const float WIDTH = Toolbar.HEIGHT * 1.4f;
 
@@ -57,7 +55,6 @@ namespace osu.Game.Overlays.Toolbar
 
         protected virtual Anchor TooltipAnchor => Anchor.TopLeft;
 
-        public Action Action;
         protected TextAwesome DrawableIcon;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
@@ -65,7 +62,6 @@ namespace osu.Game.Overlays.Toolbar
         private readonly SpriteText tooltip1;
         private readonly SpriteText tooltip2;
         protected FillFlowContainer Flow;
-        private SampleChannel sampleClick;
 
         public ToolbarButton()
         {
@@ -135,27 +131,19 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            sampleClick = audio.Sample.Get(@"Menu/menuclick");
-        }
-
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
         protected override bool OnClick(InputState state)
         {
-            Action?.Invoke();
-            sampleClick.Play();
             HoverBackground.FlashColour(Color4.White.Opacity(100), 500, EasingTypes.OutQuint);
-            return true;
+            return base.OnClick(state);
         }
 
         protected override bool OnHover(InputState state)
         {
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
-            return false;
+            return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)

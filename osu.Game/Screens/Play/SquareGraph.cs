@@ -8,9 +8,9 @@ using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
 {
@@ -77,7 +77,12 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             base.Update();
-            layout.Refresh(recreateGraph);
+
+            if (!layout.IsValid)
+            {
+                recreateGraph();
+                layout.Validate();
+            }
         }
 
         /// <summary>

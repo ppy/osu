@@ -12,6 +12,9 @@ namespace osu.Game.Online.Multiplayer
         public Bindable<string> Name = new Bindable<string>();
         public Bindable<User> Host = new Bindable<User>();
         public Bindable<RoomStatus> Status = new Bindable<RoomStatus>();
-        public Bindable<BeatmapMetadata> Beatmap = new Bindable<BeatmapMetadata>();
+        public Bindable<GameType> Type = new Bindable<GameType>();
+        public Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public Bindable<int?> MaxParticipants = new Bindable<int?>();
+        public Bindable<User[]> Participants = new Bindable<User[]>();
     }
 }

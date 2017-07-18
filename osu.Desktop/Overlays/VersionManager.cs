@@ -10,6 +10,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using Squirrel;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
@@ -90,12 +91,6 @@ namespace osu.Desktop.Overlays
 
             if (game.IsDeployedBuild)
                 checkForUpdateAsync();
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            State = Visibility.Visible;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -191,7 +186,7 @@ namespace osu.Desktop.Overlays
         {
             private OsuGame game;
 
-            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification()
+            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification
             {
                 Text = @"Update ready to install. Click to restart!",
                 Activated = () =>
@@ -207,7 +202,7 @@ namespace osu.Desktop.Overlays
             {
                 this.game = game;
 
-                IconContent.Add(new Drawable[]
+                IconContent.AddRange(new Drawable[]
                 {
                     new Box
                     {

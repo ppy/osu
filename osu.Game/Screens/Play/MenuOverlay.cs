@@ -5,15 +5,14 @@ using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
 {
@@ -186,18 +185,11 @@ namespace osu.Game.Screens.Play
 
         protected MenuOverlay()
         {
-            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
         }
 
         public class Button : DialogButton
         {
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
-            {
-                SampleHover = audio.Sample.Get(@"Menu/menuclick");
-                SampleClick = audio.Sample.Get(@"Menu/menuback");
-            }
         }
     }
 }

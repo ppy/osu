@@ -14,6 +14,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -139,7 +140,7 @@ namespace osu.Game.Beatmaps.Drawables
                                 },
                                 starCounter = new StarCounter
                                 {
-                                    Count = (float)beatmap.StarDifficulty,
+                                    CountStars = (float)beatmap.StarDifficulty,
                                     Scale = new Vector2(0.8f),
                                 }
                             }

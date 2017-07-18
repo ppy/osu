@@ -14,10 +14,12 @@ using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialog : FocusedOverlayContainer
+    public class PopupDialog : OsuFocusedOverlayContainer
     {
         public static readonly float ENTER_DURATION = 500;
         public static readonly float EXIT_DURATION = 200;
@@ -55,7 +57,7 @@ namespace osu.Game.Overlays.Dialog
             get { return buttonsContainer.Children; }
             set
             {
-                buttonsContainer.Children = value;
+                buttonsContainer.ChildrenEnumerable = value;
                 foreach (PopupDialogButton b in value)
                 {
                     var action = b.Action;

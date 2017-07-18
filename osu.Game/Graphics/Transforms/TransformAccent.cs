@@ -8,12 +8,12 @@ using osu.Framework.MathUtils;
 
 namespace osu.Game.Graphics.Transforms
 {
-    public class TransformAccent : Transform<Color4>
+    public class TransformAccent : Transform<Color4, Drawable>
     {
         /// <summary>
         /// Current value of the transformed colour in linear colour space.
         /// </summary>
-        public override Color4 CurrentValue
+        public virtual Color4 CurrentValue
         {
             get
             {
@@ -25,13 +25,7 @@ namespace osu.Game.Graphics.Transforms
             }
         }
 
-        public override void Apply(Drawable d)
-        {
-            base.Apply(d);
-
-            var accented = d as IHasAccentColour;
-            if (accented != null)
-                accented.AccentColour = CurrentValue;
-        }
+        public override void Apply(Drawable d) => ((IHasAccentColour)d).AccentColour = CurrentValue;
+        public override void ReadIntoStartValue(Drawable d) => StartValue = ((IHasAccentColour)d).AccentColour;
     }
 }

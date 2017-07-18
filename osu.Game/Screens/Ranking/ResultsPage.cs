@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 fill = new Box
                 {

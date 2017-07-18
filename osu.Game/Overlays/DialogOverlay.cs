@@ -4,13 +4,14 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Dialog;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class DialogOverlay : FocusedOverlayContainer
+    public class DialogOverlay : OsuFocusedOverlayContainer
     {
         private readonly Container dialogContainer;
         private PopupDialog currentDialog;

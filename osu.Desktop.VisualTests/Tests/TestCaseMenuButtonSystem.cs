@@ -3,9 +3,9 @@
 
 using osu.Framework.Testing;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Menu;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -13,10 +13,8 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Main menu button system";
 
-        public override void Reset()
+        public TestCaseMenuButtonSystem()
         {
-            base.Reset();
-
             Add(new Box
             {
                 ColourInfo = ColourInfo.GradientVertical(Color4.Gray, Color4.WhiteSmoke),
