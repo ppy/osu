@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -280,7 +279,7 @@ namespace osu.Game.Overlays
 
             if (current != null)
             {
-                bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
+                bool audioEquals = beatmap?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
 
                 if (audioEquals)
                     direction = TransformDirection.None;
@@ -293,30 +292,28 @@ namespace osu.Game.Overlays
                 {
                     //figure out the best direction based on order in playlist.
                     var last = playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo.ID).Count();
-                    var next = beatmapBacking.Value == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmapBacking.Value.BeatmapSetInfo.ID).Count();
+                    var next = beatmap == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmap.BeatmapSetInfo.ID).Count();
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
             }
 
-            current = beatmapBacking.Value;
+            current = beatmap;
 
-            updateProgressBarLimit(current?.Track);
-            updateDisplay(beatmapBacking, direction);
-            queuedDirection = null;
-        }
-
-        private void updateProgressBarLimit(Track t)
-        {
-            if (t != null)
+            var track = current?.Track;
+            if (track != null)
             {
-                t.OnLoaded += loadedTrack => progressBar.EndTime = loadedTrack.Length;
-                if (t.IsLoaded)
-                {
-                    progressBar.EndTime = t.Length;
-                    t.OnLoaded = null;
-                }
+                // the track may not be loaded at this point
+                track.OnLoaded += loadedTrack => Schedule(() => progressBar.EndTime = loadedTrack.Length);
+
+                if (track.IsLoaded)
+                    // but it also may be.
+                    progressBar.EndTime = track.Length;
             }
+
+            updateDisplay(beatmap, direction);
+
+            queuedDirection = null;
         }
 
         private ScheduledDelegate pendingBeatmapSwitch;
