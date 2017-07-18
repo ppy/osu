@@ -49,7 +49,7 @@ namespace osu.Game.Screens
             }
             set
             {
-                beatmap.Value = value;
+                beatmap.Value = value ?? new DummyWorkingBeatmap();
             }
         }
 

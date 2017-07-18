@@ -20,6 +20,7 @@ namespace osu.Game.Beatmaps
                     Title = "no beatmaps available!",
                     Author = "no one",
                 },
+                BeatmapSet = new BeatmapSetInfo(),
                 Difficulty = new BeatmapDifficulty(),
             })
         {
@@ -32,6 +33,6 @@ namespace osu.Game.Beatmaps
 
         protected override Texture GetBackground() => null;
 
-        protected override Track GetTrack() => null;
+        protected override Track GetTrack() => new TrackVirtual();
     }
 }

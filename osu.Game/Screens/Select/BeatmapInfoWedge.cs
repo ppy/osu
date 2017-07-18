@@ -71,9 +71,6 @@ namespace osu.Game.Screens.Select
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            if (beatmap == null)
-                beatmap = new DummyWorkingBeatmap();
-
             var lastContainer = beatmapInfoContainer;
             float newDepth = lastContainer?.Depth + 1 ?? 0;
 
