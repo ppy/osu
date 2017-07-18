@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Chat
         {
             base.LoadComplete();
 
-            bool hasBackground = !string.IsNullOrEmpty(Message.Sender?.Colour);
+            bool hasBackground = !string.IsNullOrEmpty(Message.Sender.Colour);
             Drawable username = new OsuSpriteText
             {
                 Origin = Anchor.TopRight,
