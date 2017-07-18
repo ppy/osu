@@ -80,8 +80,10 @@
     <Compile Include="Graphics\Containers\OsuFocusedOverlayContainer.cs" />
     <Compile Include="Graphics\Containers\OsuScrollContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuContextMenuContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuTextFlowContainer.cs" />
     <Compile Include="Graphics\UserInterface\IconButton.cs" />
     <Compile Include="Configuration\SelectionRandomType.cs" />
+    <Compile Include="Graphics\UserInterface\LineGraph.cs" />
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
@@ -98,6 +100,18 @@
     <Compile Include="Overlays\Settings\SettingsHeader.cs" />
     <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
+    <Compile Include="Overlays\Profile\Sections\AboutSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\BeatmapsSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\HistoricalSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\KudosuSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\MedalsSection.cs" />
+    <Compile Include="Overlays\Profile\RankChart.cs" />
+    <Compile Include="Overlays\Profile\Sections\RanksSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\RecentSection.cs" />
+    <Compile Include="Users\UserCoverBackground.cs" />
+    <Compile Include="Overlays\UserProfileOverlay.cs" />
+    <Compile Include="Overlays\Profile\ProfileHeader.cs" />
+    <Compile Include="Overlays\Profile\ProfileSection.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarSocialButton.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
@@ -216,7 +230,6 @@
     <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapDetailsRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
-    <Compile Include="Overlays\DragBar.cs" />
     <Compile Include="Overlays\LoginOverlay.cs" />
     <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
@@ -466,6 +479,7 @@
     <Compile Include="Online\Multiplayer\Room.cs" />
     <Compile Include="Online\Multiplayer\RoomStatus.cs" />
     <Compile Include="Users\UserPanel.cs" />
+    <Compile Include="Users\UserStatistics.cs" />
     <Compile Include="Users\UserStatus.cs" />
     <Compile Include="Overlays\DirectOverlay.cs" />
     <Compile Include="Overlays\Direct\FilterControl.cs" />
@@ -516,11 +530,6 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
