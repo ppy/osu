@@ -37,9 +37,9 @@ namespace osu.Game.Graphics.UserInterface
             Current.Value = Current + amount;
         }
 
-        private class TransformCounterCount : Transform<int>
+        private class TransformCounterCount : Transform<int, Drawable>
         {
-            public override int CurrentValue
+            public int CurrentValue
             {
                 get
                 {
@@ -51,11 +51,8 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public override void Apply(Drawable d)
-            {
-                base.Apply(d);
-                ((SimpleComboCounter)d).DisplayedCount = CurrentValue;
-            }
+            public override void Apply(Drawable d) => ((SimpleComboCounter)d).DisplayedCount = CurrentValue;
+            public override void ReadIntoStartValue(Drawable d) => StartValue = ((SimpleComboCounter)d).DisplayedCount;
         }
     }
 }

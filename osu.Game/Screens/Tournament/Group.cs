@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Screens.Tournament.Teams;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -150,9 +151,9 @@ namespace osu.Game.Screens.Tournament
                         {
                             flagSprite = new Sprite
                             {
+                                RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-
                                 FillMode = FillMode.Fit
                             },
                             new OsuSpriteText

@@ -7,6 +7,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -23,11 +24,13 @@ namespace osu.Game.Graphics.UserInterface
             Height = 30;
         }
 
-        private class PageTabItem : TabItem<T>
+        public class PageTabItem : TabItem<T>
         {
             private const float transition_duration = 100;
 
             private readonly Box box;
+
+            protected readonly SpriteText Text;
 
             public PageTabItem(T value) : base(value)
             {
@@ -36,12 +39,12 @@ namespace osu.Game.Graphics.UserInterface
 
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
+                    Text = new OsuSpriteText
                     {
                         Margin = new MarginPadding { Top = 8, Bottom = 8 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                        Text = (value as Enum).GetDescription() ?? value.ToString(),
+                        Text = (value as Enum)?.GetDescription() ?? value.ToString(),
                         TextSize = 14,
                         Font = @"Exo2.0-Bold",
                     },

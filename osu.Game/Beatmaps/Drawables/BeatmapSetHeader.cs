@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -92,6 +93,7 @@ namespace osu.Game.Beatmaps.Drawables
                 {
                     new BeatmapBackgroundSprite(working)
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,

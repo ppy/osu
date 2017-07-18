@@ -21,6 +21,7 @@ using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.IO.Stores;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -81,6 +82,7 @@ namespace osu.Game.Screens.Tournament
                 },
                 new Sprite
                 {
+                    RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fill,
                     Texture = textures.Get(@"Backgrounds/Drawings/background.png")
                 },

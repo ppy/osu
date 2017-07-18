@@ -6,12 +6,13 @@ using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using System;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public abstract class WaveOverlayContainer : FocusedOverlayContainer
+    public abstract class WaveOverlayContainer : OsuFocusedOverlayContainer
     {
         protected const float APPEAR_DURATION = 800;
         protected const float DISAPPEAR_DURATION = 500;
