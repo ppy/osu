@@ -8,6 +8,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
+using System.Collections.Generic;
+using System.Text;
+using System;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -62,6 +65,73 @@ namespace osu.Game.Overlays.Chat
             return username_colours[message.UserId % username_colours.Length];
         }
 
+        [Flags]
+        private enum FontStyles
+        {
+            None = 0,
+            Italic = 1 << 0,
+            Bold = 1 << 1,
+        }
+
+        private struct SplitMarker
+        {
+            public int Index;
+            public int Length;
+            public FontStyles Styles;
+        }
+
+        private static List<SplitMarker> parseSplitMarkers(ref string toParse, string delimiter, FontStyles styles)
+        {
+            List<SplitMarker> escapeMarkers = new List<SplitMarker>();
+            List<SplitMarker> delimiterMarkers = new List<SplitMarker>();
+
+            // The output string will contain toParse with all successfully parsed
+            // delimiters replaced by spaces.
+            StringBuilder outputString = new StringBuilder(toParse);
+
+            // For each char in toParse...
+            for (int i = 0; i < toParse.Length; i++)
+            {
+                // ...check whether delimiter is matched char-by-char.
+                for (int j = 0; j + i < toParse.Length && j < delimiter.Length; j++)
+                {
+                    if (toParse[j + i] != delimiter[j])
+                        break;
+                    else if (j == delimiter.Length - 1)
+                    {
+                        // Were we escaped? In this case put a marker skipping the escape character
+                        if (i > 0 && toParse[i - 1] == '\\')
+                            escapeMarkers.Add(new SplitMarker { Index = i - 1, Styles = FontStyles.None, Length = 1 });
+                        else
+                        {
+                            delimiterMarkers.Add(new SplitMarker { Index = i, Styles = styles, Length = delimiter.Length });
+
+                            // Replace parsed delimiter with spaces such that future delimiters which may be substrings
+                            // do not parse a second time. One specific usecase are ** and * for markdown.
+                            for (int k = i; k < i + delimiter.Length; ++k)
+                                outputString[k] = ' ';
+
+                            // Make sure we advance beyond the end of the discovered delimiter
+                            i += delimiter.Length - 1;
+                        }
+                    }
+                }
+            }
+
+            // Disregard trailing marker if we have an odd amount
+            if (delimiterMarkers.Count % 2 == 1)
+                delimiterMarkers.RemoveAt(delimiterMarkers.Count - 1);
+
+            toParse = outputString.ToString();
+
+            // Return a single list containing all markers
+            escapeMarkers.AddRange(delimiterMarkers);
+            return escapeMarkers;
+        }
+
+        private static string getFont(FontStyles styles) =>
+            "Exo2.0-" + ((styles & FontStyles.Bold) > 0 ? "Bold" : "Regular") + ((styles & FontStyles.Italic) > 0 ? "Italic" : string.Empty);
+
         public const float LEFT_PADDING = message_padding + padding * 2;
 
         private const float padding = 15;
@@ -76,6 +146,8 @@ namespace osu.Game.Overlays.Chat
             AutoSizeAxes = Axes.Y;
 
             Padding = new MarginPadding { Left = padding, Right = padding };
+
+            TextFlowContainer textContainer;
 
             Children = new Drawable[]
             {
@@ -112,16 +184,48 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        textContainer = new TextFlowContainer
                         {
-                            Text = Message.Content,
-                            TextSize = text_size,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                         }
                     }
                 }
             };
+
+            string toParse = message.Content;
+            List<SplitMarker> markers = new List<SplitMarker>();
+            markers.AddRange(parseSplitMarkers(ref toParse, "**", FontStyles.Bold));
+            markers.AddRange(parseSplitMarkers(ref toParse, "*", FontStyles.Italic));
+            markers.AddRange(parseSplitMarkers(ref toParse, "_", FontStyles.Italic));
+
+            // Add a sentinel marker for the end of the string such that the entire string is rendered
+            // without requiring code duplication.
+            markers.Add(new SplitMarker { Index = toParse.Length, Length = 0, Styles = FontStyles.None });
+
+            // Sort markers from earliest to latest
+            markers.Sort((a, b) => a.Index.CompareTo(b.Index));
+
+            // Cut up string into parts according to all found markers
+            int currentStartIndex = 0;
+            FontStyles currentStyles = FontStyles.None;
+            foreach (var marker in markers)
+            {
+                // We do not need to add empty strings if we have 2 consecutive markers
+                if (currentStartIndex < marker.Index)
+                {
+                    string font = getFont(currentStyles);
+                    textContainer.AddText(message.Content.Substring(currentStartIndex, marker.Index - currentStartIndex), spriteText =>
+                    {
+                        spriteText.TextSize = text_size;
+                        spriteText.Font = font;
+                    });
+                }
+
+                // Flip those styles which the marker denotes.
+                currentStyles ^= marker.Styles;
+                currentStartIndex = marker.Index + marker.Length;
+            }
         }
     }
 }
