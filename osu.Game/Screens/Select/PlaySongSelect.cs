@@ -1,14 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
+using System.Linq;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -18,8 +22,10 @@ namespace osu.Game.Screens.Select
     public class PlaySongSelect : SongSelect
     {
         private OsuScreen player;
+        private UserInputManager input;
         private readonly ModSelectOverlay modSelect;
         private readonly BeatmapDetailArea beatmapDetails;
+        private IEnumerable<Mod> originalMods;
 
         public PlaySongSelect()
         {
@@ -40,8 +46,10 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, UserInputManager input)
         {
+            this.input = input;
+
             Footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility, Key.F1, float.MaxValue);
 
             BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
@@ -71,6 +79,9 @@ namespace osu.Game.Screens.Select
         protected override void OnResuming(Screen last)
         {
             player = null;
+
+            modSelect.SelectedMods.Value = originalMods;
+            originalMods = null;
 
             Beatmap.Track.Looping = true;
 
@@ -105,12 +116,36 @@ namespace osu.Game.Screens.Select
         {
             if (player != null) return;
 
+            originalMods = modSelect.SelectedMods.Value;
+            if (input.CurrentState.Keyboard.ControlPressed)
+                if (findAutoMod(originalMods) == null)
+                {
+                    var auto = findAutoMod(Ruleset.Value.CreateInstance().GetModsFor(ModType.Special));
+                    if (auto != null)
+                        modSelect.SelectedMods.Value = originalMods.Concat(new[] { auto });
+                }
+
             Beatmap.Track.Looping = false;
 
             LoadComponentAsync(player = new PlayerLoader(new Player
             {
                 Beatmap = Beatmap, //eagerly set this so it's present before push.
             }), l => Push(player));
+        }
+
+        private Mod findAutoMod(IEnumerable<Mod> mods)
+        {
+            foreach (var mod in mods)
+            {
+                if (mod is ModAutoplay) return mod;
+                var multimod = mod as MultiMod;
+                if (multimod != null)
+                {
+                    var find = findAutoMod(multimod.Mods);
+                    if (find != null) return find;
+                }
+            }
+            return null;
         }
     }
 }

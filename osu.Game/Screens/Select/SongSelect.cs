@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
         private BeatmapDatabase database;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Select
                 database = beatmaps;
 
             if (osu != null)
-                ruleset.BindTo(osu.Ruleset);
+                Ruleset.BindTo(osu.Ruleset);
 
             database.BeatmapSetAdded += onBeatmapSetAdded;
             database.BeatmapSetRemoved += onBeatmapSetRemoved;
