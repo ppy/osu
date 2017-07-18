@@ -122,8 +122,10 @@ namespace osu.Game.Screens.Play
                 audio.Track.SetExclusive(track);
                 adjustableSourceClock = track;
             }
-
-            adjustableSourceClock = (IAdjustableClock)track ?? new StopwatchClock();
+            else
+            {
+                adjustableSourceClock = new StopwatchClock();
+            }
 
             decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
