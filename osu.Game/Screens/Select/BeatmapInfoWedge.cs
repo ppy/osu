@@ -45,6 +45,14 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            State = Visibility.Visible;
+            AlwaysPresent = true;
+        }
+
         protected override bool HideOnEscape => false;
 
         protected override bool BlockPassThroughMouse => false;
@@ -63,17 +71,8 @@ namespace osu.Game.Screens.Select
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            if (beatmap?.BeatmapInfo == null)
-            {
-                State = Visibility.Hidden;
-                beatmapInfoContainer?.FadeOut(250);
-                beatmapInfoContainer?.Expire();
-                beatmapInfoContainer = null;
-                return;
-            }
-
-            State = Visibility.Visible;
-            AlwaysPresent = true;
+            if (beatmap == null)
+                beatmap = new DummyWorkingBeatmap();
 
             var lastContainer = beatmapInfoContainer;
             float newDepth = lastContainer?.Depth + 1 ?? 0;
@@ -124,7 +123,8 @@ namespace osu.Game.Screens.Select
                     }));
 
                     //get statistics from the current ruleset.
-                    labels.AddRange(beatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
+                    if (beatmapInfo.Ruleset != null)
+                        labels.AddRange(beatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
                 }
 
                 PixelSnapping = true;
