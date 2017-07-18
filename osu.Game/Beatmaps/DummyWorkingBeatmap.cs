@@ -11,7 +11,9 @@ namespace osu.Game.Beatmaps
 {
     internal class DummyWorkingBeatmap : WorkingBeatmap
     {
-        public DummyWorkingBeatmap()
+        private readonly OsuGame game;
+
+        public DummyWorkingBeatmap(OsuGame game)
             : base(new BeatmapInfo
             {
                 Metadata = new BeatmapMetadata
@@ -24,6 +26,7 @@ namespace osu.Game.Beatmaps
                 Difficulty = new BeatmapDifficulty(),
             })
         {
+            this.game = game;
         }
 
         protected override Beatmap GetBeatmap() => new Beatmap
@@ -31,7 +34,7 @@ namespace osu.Game.Beatmaps
             HitObjects = new List<HitObject>(),
         };
 
-        protected override Texture GetBackground() => null;
+        protected override Texture GetBackground() => game.Textures.Get(@"Backgrounds/bg4");
 
         protected override Track GetTrack() => new TrackVirtual();
     }

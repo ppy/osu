@@ -41,6 +41,8 @@ namespace osu.Game.Screens
 
         private SampleChannel sampleExit;
 
+        private DummyWorkingBeatmap dummyBeatmap;
+
         public WorkingBeatmap Beatmap
         {
             get
@@ -49,13 +51,15 @@ namespace osu.Game.Screens
             }
             set
             {
-                beatmap.Value = value ?? new DummyWorkingBeatmap();
+                beatmap.Value = value ?? dummyBeatmap;
             }
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGameBase game, OsuGame osuGame, AudioManager audio)
         {
+            dummyBeatmap = new DummyWorkingBeatmap(osuGame);
+
             if (game != null)
             {
                 //if we were given a beatmap at ctor time, we want to pass this on to the game-wide beatmap.
