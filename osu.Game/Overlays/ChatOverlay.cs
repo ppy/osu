@@ -422,6 +422,7 @@ namespace osu.Game.Overlays
         private void postMessage(TextBox textbox, bool newText)
         {
             var postText = textbox.Text;
+            bool postIsAction = false;
 
             if (string.IsNullOrEmpty(postText))
                 return;
@@ -435,12 +436,34 @@ namespace osu.Game.Overlays
 
             if (currentChannel == null) return;
 
-            if (postText[0] == '/')
+            switch (postText.Split(' ')[0])
             {
-                // TODO: handle commands
-                currentChannel.AddNewMessages(new ErrorMessage("Chat commands are not supported yet!"));
-                textbox.Text = string.Empty;
-                return;
+                // TODO: Add more commands
+                case "/me":
+                    if (postText.StartsWith("/me "))
+                    {
+                        postText = postText.Remove(0,4);
+                        postIsAction = true;
+                        break;
+                    }
+                    else
+                    {
+                        currentChannel.AddNewMessages(new ErrorMessage("Usage: /me <action>"));
+                        textbox.Text = string.Empty;
+                        return;
+                    };
+                case "/help":
+                    currentChannel.AddNewMessages(new ErrorMessage("Implemented Commands: /me, /help"));
+                    textbox.Text = string.Empty;
+                    return;
+                default:
+                    if (postText.StartsWith("/"))
+                    {
+                        currentChannel.AddNewMessages(new ErrorMessage("Invalid command! See /help"));
+                        textbox.Text = string.Empty;
+                        return;
+                    }
+                    break;
             }
 
             var message = new Message
@@ -449,7 +472,8 @@ namespace osu.Game.Overlays
                 Timestamp = DateTimeOffset.Now,
                 TargetType = TargetType.Channel, //TODO: read this from currentChannel
                 TargetId = currentChannel.Id,
-                Content = postText
+                Content = postText,
+                IsAction = postIsAction
             };
 
             textbox.ReadOnly = true;

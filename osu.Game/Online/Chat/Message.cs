@@ -29,6 +29,9 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"content")]
         public string Content;
 
+        [JsonProperty(@"is_action")]
+        public bool IsAction;
+
         [JsonProperty(@"sender")]
         public User Sender;
 
