@@ -224,12 +224,11 @@ namespace osu.Game.Screens.Menu
                     {
                         case MenuState.Exit:
                         case MenuState.Initial:
-                            toolbar?.Hide();
-
                             buttonAreaBackground.ScaleTo(Vector2.One, 500, EasingTypes.Out);
                             buttonArea.FadeOut(300);
 
                             osuLogo.Delay(150)
+                                .Schedule(() => toolbar?.Hide())
                                 .ScaleTo(1, 800, EasingTypes.OutExpo)
                                 .MoveTo(Vector2.Zero, 800, EasingTypes.OutExpo);
 
@@ -250,15 +249,18 @@ namespace osu.Game.Screens.Menu
                         case MenuState.TopLevel:
                             buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
 
-                            osuLogo.MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
-                            var sequence = osuLogo.ScaleTo(0.5f, 200, EasingTypes.In);
+                            var sequence = osuLogo
+                                .ScaleTo(0.5f, 200, EasingTypes.In)
+                                .MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
 
                             if (fromInitial && osuLogo.Scale.X > 0.5f)
-                                sequence.OnComplete(o => o.Impact());
+                                sequence.OnComplete(o =>
+                                {
+                                    o.Impact();
+                                    toolbar?.Show();
+                                });
 
                             buttonArea.FadeIn(300);
-
-                            Scheduler.AddDelayed(() => toolbar?.Show(), 150);
 
                             foreach (Button b in buttonsTopLevel)
                                 b.State = ButtonState.Expanded;
