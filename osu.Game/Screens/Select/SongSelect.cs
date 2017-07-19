@@ -219,31 +219,40 @@ namespace osu.Game.Screens.Select
         /// </summary>
         private void carouselSelectionChanged(BeatmapInfo beatmap)
         {
-            selectionChangedDebounce?.Cancel();
-
-            if (beatmap.Equals(beatmapNoDebounce))
-                return;
-
-            bool preview = beatmap.BeatmapSetInfoID != Beatmap.Value.BeatmapInfo.BeatmapSetInfoID;
-
-            if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
-                sampleChangeDifficulty.Play();
-            else
-                sampleChangeBeatmap.Play();
-
-            beatmapNoDebounce = beatmap;
-
             Action performLoad = delegate
             {
+                bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value.BeatmapInfo.BeatmapSetInfoID;
+
                 Beatmap.Value = database.GetWorkingBeatmap(beatmap, Beatmap);
+
                 ensurePlayingSelected(preview);
                 changeBackground(Beatmap.Value);
             };
 
-            if (beatmap == Beatmap.Value.BeatmapInfo)
-                performLoad();
+            if (beatmap == null)
+            {
+                if (!Beatmap.IsDefault)
+                    performLoad();
+            }
             else
-                selectionChangedDebounce = Scheduler.AddDelayed(performLoad, 100);
+            {
+                selectionChangedDebounce?.Cancel();
+
+                if (beatmap.Equals(beatmapNoDebounce))
+                    return;
+
+                if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
+                    sampleChangeDifficulty.Play();
+                else
+                    sampleChangeBeatmap.Play();
+
+                beatmapNoDebounce = beatmap;
+
+                if (beatmap == Beatmap.Value.BeatmapInfo)
+                    performLoad();
+                else
+                    selectionChangedDebounce = Scheduler.AddDelayed(performLoad, 100);
+            }
         }
 
         private void triggerRandom(UserInputManager input)

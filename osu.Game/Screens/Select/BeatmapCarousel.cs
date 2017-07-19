@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Select
             {
                 selectedGroup = null;
                 selectedPanel = null;
-                SelectionChanged?.Invoke(database.DefaultBeatmap.BeatmapInfo);
+                SelectionChanged?.Invoke(null);
                 return;
             }
 
