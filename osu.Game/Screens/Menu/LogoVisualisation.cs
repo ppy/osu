@@ -4,7 +4,6 @@
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.ES30;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
@@ -16,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using System;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Menu
 {
@@ -76,23 +76,24 @@ namespace osu.Game.Screens.Menu
             BlendingMode = BlendingMode.Additive;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(ShaderManager shaders, OsuGame game)
+        [BackgroundDependencyLoader]
+        private void load(ShaderManager shaders, OsuGameBase game)
         {
-            if (game?.Beatmap != null)
-                beatmap.BindTo(game.Beatmap);
-            shader = shaders?.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            beatmap.BindTo(game.Beatmap);
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
         private void updateAmplitudes()
         {
-            float[] temporalAmplitudes = beatmap.Value?.Track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
+            var track = beatmap.Value.Track;
 
-            var effect = beatmap.Value?.Beatmap.ControlPointInfo.EffectPointAt(beatmap.Value.Track?.CurrentTime ?? Time.Current);
+            float[] temporalAmplitudes = track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
+
+            var effect = beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? Time.Current);
 
             for (int i = 0; i < bars_per_visualiser; i++)
             {
-                if (beatmap?.Value?.Track?.IsRunning ?? false)
+                if (track?.IsRunning ?? false)
                 {
                     float targetAmplitude = temporalAmplitudes[(i + indexOffset) % bars_per_visualiser] * (effect?.KiaiMode == true ? 1 : 0.5f);
                     if (targetAmplitude > frequencyAmplitudes[i])
