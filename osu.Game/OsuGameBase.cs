@@ -43,7 +43,7 @@ namespace osu.Game
 
         protected MenuCursor Cursor;
 
-        public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -120,6 +120,10 @@ namespace osu.Game
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
+
+            var defaultBeatmap = new DummyWorkingBeatmap(this);
+            Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+            BeatmapDatabase.DefaultBeatmap = defaultBeatmap;
 
             OszArchiveReader.Register();
 
