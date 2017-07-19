@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             base.ApplyBeatmap();
 
-            PreferredColumns = (int)Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize);
+            PreferredColumns = (int)Math.Max(1, Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize));
         }
 
         protected override void ApplySpeedAdjustments()
