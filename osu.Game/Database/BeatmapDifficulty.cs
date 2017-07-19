@@ -10,7 +10,7 @@ namespace osu.Game.Database
         /// <summary>
         /// The default value used for all difficulty settings except <see cref="SliderMultiplier"/> and <see cref="SliderTickRate"/>.
         /// </summary>
-        public const float DEFAULT_DIFFICULTY = 0;
+        public const float DEFAULT_DIFFICULTY = 5;
 
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
