@@ -21,6 +21,6 @@ namespace osu.Game.Database
         [Indexed]
         public bool Available { get; set; }
 
-        public Ruleset CreateInstance() => (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo));
+        public virtual Ruleset CreateInstance() => (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo));
     }
 }

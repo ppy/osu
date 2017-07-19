@@ -45,6 +45,12 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            AlwaysPresent = true;
+        }
+
         protected override bool HideOnEscape => false;
 
         protected override bool BlockPassThroughMouse => false;
@@ -63,18 +69,6 @@ namespace osu.Game.Screens.Select
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            if (beatmap?.BeatmapInfo == null)
-            {
-                State = Visibility.Hidden;
-                beatmapInfoContainer?.FadeOut(250);
-                beatmapInfoContainer?.Expire();
-                beatmapInfoContainer = null;
-                return;
-            }
-
-            State = Visibility.Visible;
-            AlwaysPresent = true;
-
             var lastContainer = beatmapInfoContainer;
             float newDepth = lastContainer?.Depth + 1 ?? 0;
 

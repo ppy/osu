@@ -137,6 +137,7 @@ namespace osu.Game.Screens.Select
             {
                 selectedGroup = null;
                 selectedPanel = null;
+                SelectionChanged?.Invoke(null);
                 return;
             }
 
@@ -284,6 +285,7 @@ namespace osu.Game.Screens.Select
         private void load(BeatmapDatabase database, OsuConfigManager config)
         {
             this.database = database;
+
             randomType = config.GetBindable<SelectionRandomType>(OsuSetting.SelectionRandomType);
         }
 
