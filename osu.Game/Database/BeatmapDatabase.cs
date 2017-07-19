@@ -31,7 +31,7 @@ namespace osu.Game.Database
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
-        public WorkingBeatmap DefaultBeatmap { get; set; }
+        public WorkingBeatmap DefaultBeatmap { private get; set; }
 
         public BeatmapDatabase(Storage storage, SQLiteConnection connection, RulesetDatabase rulesets, IIpcHost importHost = null) : base(storage, connection)
         {
@@ -273,7 +273,7 @@ namespace osu.Game.Database
 
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null, bool withStoryboard = false)
         {
-            if (beatmapInfo == DefaultBeatmap?.BeatmapInfo)
+            if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
             if (beatmapInfo.BeatmapSet == null || beatmapInfo.Ruleset == null)
