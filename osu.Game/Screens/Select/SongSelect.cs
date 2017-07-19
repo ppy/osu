@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select
     {
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private BeatmapDatabase database;
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
         private readonly BeatmapCarousel carousel;
         private TrackManager trackManager;
