@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Play
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
 
+        private bool loadedSuccessfully => HitRenderer?.Objects.Any() == true;
+
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
         {
@@ -266,6 +268,9 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
+            if (!loadedSuccessfully)
+                return;
+
             (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, EasingTypes.OutQuint);
             Background?.FadeTo(1 - (float)dimLevel, 1500, EasingTypes.OutQuint);
 
@@ -305,7 +310,11 @@ namespace osu.Game.Screens.Play
                 return base.OnExiting(next);
             }
 
-            pauseContainer.Pause();
+            if (loadedSuccessfully)
+            {
+                pauseContainer.Pause();
+            }
+
             return true;
         }
 
