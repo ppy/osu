@@ -111,7 +111,7 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding
                                     {
-                                        Bottom = textbox_height + padding
+                                        Bottom = textbox_height
                                     },
                                 },
                                 new Container
