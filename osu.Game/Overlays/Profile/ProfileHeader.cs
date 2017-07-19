@@ -19,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using System.Diagnostics;
 using System.Globalization;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -119,9 +120,10 @@ namespace osu.Game.Overlays.Profile
                                                 }
                                             }
                                         },
-                                        new OsuSpriteText
+                                        new LinkFlowContainer.LinkText
                                         {
                                             Text = user.Username,
+                                            Url = $@"https://osu.ppy.sh/users/{user.Id}",
                                             TextSize = 30,
                                             Font = @"Exo2.0-RegularItalic",
                                             Anchor = Anchor.BottomLeft,
@@ -506,7 +508,7 @@ namespace osu.Game.Overlays.Profile
 
             public void AddLink(string text, string url) => AddText(text, link => ((LinkText)link).Url = url);
 
-            private class LinkText : OsuSpriteText
+            public class LinkText : OsuSpriteText
             {
                 public override bool HandleInput => Url != null;
 
