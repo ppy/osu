@@ -149,7 +149,11 @@ namespace osu.Game.Database
         public void Import(params string[] paths)
         {
             foreach (string p in paths)
-                Import(p);
+            {
+                //In case the file was imported twice and deleted after the first time
+                if (File.Exists(p))
+                    Import(p);
+            }
         }
 
         /// <summary>
@@ -183,6 +187,8 @@ namespace osu.Game.Database
 
             if (existing != null)
             {
+                GetChildren(existing);
+
                 if (existing.DeletePending)
                 {
                     existing.DeletePending = false;
