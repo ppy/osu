@@ -120,8 +120,7 @@ namespace osu.Game.Screens.Select
                     }));
 
                     //get statistics from the current ruleset.
-                    if (beatmapInfo.Ruleset != null)
-                        labels.AddRange(beatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
+                    labels.AddRange(beatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
                 }
 
                 PixelSnapping = true;
