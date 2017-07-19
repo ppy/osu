@@ -35,7 +35,8 @@ namespace osu.Game.Screens.Play
         {
             this.player = player;
 
-            player.RestartRequested = () => {
+            player.RestartRequested = () =>
+            {
                 showOverlays = false;
                 ValidForResume = true;
             };
@@ -74,7 +75,6 @@ namespace osu.Game.Screens.Play
             {
                 RestartCount = player.RestartCount + 1,
                 RestartRequested = player.RestartRequested,
-                Beatmap = player.Beatmap,
             });
 
             Delay(400);
