@@ -61,9 +61,6 @@ namespace osu.Game.Screens.Select
 
             beatmap.Mods.BindTo(modSelect.SelectedMods);
 
-            if (Beatmap.Value.Track != null)
-                Beatmap.Value.Track.Looping = false;
-
             beatmapDetails.Beatmap = beatmap;
 
             if (beatmap.Track != null)
