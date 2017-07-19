@@ -83,11 +83,12 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>().ToList();
+            list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending).ToList();
 
             beatmapBacking.BindTo(game.Beatmap);
 
-            filter.Search.OnCommit = (sender, newText) => {
+            filter.Search.OnCommit = (sender, newText) =>
+            {
                 var beatmap = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
                 if (beatmap != null) playSpecified(beatmap);
             };
