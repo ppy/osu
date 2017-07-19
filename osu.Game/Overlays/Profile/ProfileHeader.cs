@@ -19,7 +19,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using System.Diagnostics;
 using System.Globalization;
-using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Profile
 {
