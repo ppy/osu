@@ -299,8 +299,6 @@ namespace osu.Game.Screens.Select
                 backgroundModeBeatmap.BlurTo(background_blur, 1000);
                 backgroundModeBeatmap.FadeTo(1, 250);
             }
-
-            beatmapInfoWedge.UpdateBeatmap(beatmap);
         }
 
         /// <summary>
@@ -310,6 +308,7 @@ namespace osu.Game.Screens.Select
         {
             base.OnBeatmapChanged(beatmap);
 
+            beatmapInfoWedge.UpdateBeatmap(beatmap);
             //todo: change background in selectionChanged instead; support per-difficulty backgrounds.
             changeBackground(beatmap);
             carousel.SelectBeatmap(beatmap?.BeatmapInfo);
