@@ -29,7 +29,15 @@ namespace osu.Game.Beatmaps
                     Author = "no one",
                 },
                 BeatmapSet = new BeatmapSetInfo(),
-                Difficulty = new BeatmapDifficulty(),
+                Difficulty = new BeatmapDifficulty
+                {
+                    DrainRate = 0,
+                    CircleSize = 0,
+                    OverallDifficulty = 0,
+                    ApproachRate = 0,
+                    SliderMultiplier = 0,
+                    SliderTickRate = 0,
+                },
                 Ruleset = new DummyRulesetInfo()
             })
         {
