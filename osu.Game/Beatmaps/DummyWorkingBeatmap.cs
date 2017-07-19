@@ -16,9 +16,9 @@ namespace osu.Game.Beatmaps
 {
     internal class DummyWorkingBeatmap : WorkingBeatmap
     {
-        private readonly OsuGame game;
+        private readonly OsuGameBase game;
 
-        public DummyWorkingBeatmap(OsuGame game)
+        public DummyWorkingBeatmap(OsuGameBase game)
             : base(new BeatmapInfo
             {
                 Metadata = new BeatmapMetadata
