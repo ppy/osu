@@ -48,8 +48,6 @@ namespace osu.Game.Screens.Select
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            State = Visibility.Visible;
             AlwaysPresent = true;
         }
 

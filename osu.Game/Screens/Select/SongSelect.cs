@@ -127,7 +127,6 @@ namespace osu.Game.Screens.Select
                     Top = left_area_padding,
                     Right = left_area_padding,
                 },
-                X = -50,
             });
 
             if (ShowFooter)
@@ -232,23 +231,25 @@ namespace osu.Game.Screens.Select
         {
             base.OnEntering(last);
 
-            ensurePlayingSelected();
-
-            changeBackground(Beatmap);
-
-            selectionChangeNoBounce = Beatmap?.BeatmapInfo;
+            //if (Beatmap != null && !Beatmap.BeatmapSetInfo.DeletePending)
+            //{
+            //    OnBeatmapChanged(Beatmap);
+            //    ensurePlayingSelected();
+            //}
 
             Content.FadeInFromZero(250);
-
-            beatmapInfoWedge.State = Visibility.Visible;
 
             FilterControl.Activate();
         }
 
         protected override void OnResuming(Screen last)
         {
-            changeBackground(Beatmap);
-            ensurePlayingSelected();
+            if (Beatmap != null && !Beatmap.BeatmapSetInfo.DeletePending)
+            {
+                changeBackground(Beatmap);
+                ensurePlayingSelected();
+            }
+
             base.OnResuming(last);
 
             Content.FadeIn(250);
@@ -301,6 +302,7 @@ namespace osu.Game.Screens.Select
                 backgroundModeBeatmap.FadeTo(1, 250);
             }
 
+            beatmapInfoWedge.State = Visibility.Visible;
             beatmapInfoWedge.UpdateBeatmap(beatmap);
         }
 
@@ -328,7 +330,7 @@ namespace osu.Game.Screens.Select
         {
             selectionChangedDebounce?.Cancel();
 
-            if (beatmap.Equals(Beatmap?.BeatmapInfo))
+            if (beatmap.Equals(selectionChangeNoBounce))
                 return;
 
             bool preview = beatmap.BeatmapSetInfoID != Beatmap?.BeatmapInfo.BeatmapSetInfoID;
