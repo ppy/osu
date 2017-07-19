@@ -4,7 +4,6 @@
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.ES30;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
@@ -16,6 +15,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using System;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Menu
 {
@@ -76,12 +76,11 @@ namespace osu.Game.Screens.Menu
             BlendingMode = BlendingMode.Additive;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(ShaderManager shaders, OsuGame game)
+        [BackgroundDependencyLoader]
+        private void load(ShaderManager shaders, OsuGameBase game)
         {
-            if (game?.Beatmap != null)
-                beatmap.BindTo(game.Beatmap);
-            shader = shaders?.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
+            beatmap.BindTo(game.Beatmap);
+            shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
         private void updateAmplitudes()
