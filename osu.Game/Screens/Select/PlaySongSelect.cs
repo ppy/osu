@@ -59,14 +59,14 @@ namespace osu.Game.Screens.Select
         {
             if (!IsCurrentScreen) return;
 
-            beatmap?.Mods.BindTo(modSelect.SelectedMods);
+            beatmap.Mods.BindTo(modSelect.SelectedMods);
 
-            if (Beatmap.Value?.Track != null)
+            if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
 
             beatmapDetails.Beatmap = beatmap;
 
-            if (beatmap?.Track != null)
+            if (beatmap.Track != null)
                 beatmap.Track.Looping = true;
         }
 
@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            if (Beatmap.Value?.Track != null)
+            if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
 
             return false;

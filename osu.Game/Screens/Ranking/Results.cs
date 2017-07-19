@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Ranking
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Alpha = 0.2f,
-                                            Texture = Beatmap.Value?.Background,
+                                            Texture = Beatmap.Value.Background,
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             FillMode = FillMode.Fill

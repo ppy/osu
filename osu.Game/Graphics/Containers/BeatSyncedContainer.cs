@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override void Update()
         {
-            var track = Beatmap.Value?.Track;
+            var track = Beatmap.Value.Track;
 
             if (track == null)
                 return;
