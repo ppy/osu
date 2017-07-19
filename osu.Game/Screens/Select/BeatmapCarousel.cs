@@ -301,8 +301,15 @@ namespace osu.Game.Screens.Select
             foreach (var p in group.BeatmapPanels)
                 panels.Remove(p);
 
-            scrollableContent.Remove(group.Header);
-            scrollableContent.RemoveRange(group.BeatmapPanels);
+            //Must check if panels aren't already removed because they're offscreen
+            if (group.Header.Parent != null)
+                scrollableContent.Remove(group.Header);
+
+            foreach (var p in group.BeatmapPanels)
+            {
+                if (p.Parent != null)
+                    scrollableContent.Remove(p);
+            }
 
             if (selectedGroup == group)
                 SelectNext();

@@ -144,7 +144,11 @@ namespace osu.Game.Database
         public void Import(params string[] paths)
         {
             foreach (string p in paths)
-                Import(p);
+            {
+                //In case the file was imported twice and deleted after the first time
+                if (File.Exists(p))
+                    Import(p);
+            }
         }
 
         /// <summary>
@@ -178,14 +182,34 @@ namespace osu.Game.Database
 
             if (existing != null)
             {
-                if (existing.DeletePending)
+                if (!existing.DeletePending)
                 {
-                    existing.DeletePending = false;
-                    Update(existing, false);
-                    BeatmapSetAdded?.Invoke(existing);
+                    //Already exists
+                    return existing;
                 }
 
-                return existing;
+                //Already exists but pending deletion
+                //delete it now and recreate it
+                try
+                {
+                    if (existing.Beatmaps != null)
+                    {
+                        foreach (var i in existing.Beatmaps)
+                        {
+                            if (i.Metadata != null) Connection.Delete(i.Metadata);
+                            if (i.Difficulty != null) Connection.Delete(i.Difficulty);
+
+                            Connection.Delete(i);
+                        }
+                    }
+
+                    if (existing.Metadata != null) Connection.Delete(existing.Metadata);
+                    Connection.Delete(existing);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not delete beatmap {existing}");
+                }
             }
 
             var beatmapSet = new BeatmapSetInfo
