@@ -81,10 +81,11 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                if (Beatmap.Value == null)
+                if (!Beatmap.Value.WithStoryboard)
+                    // we need to ensure the storyboard is loaded.
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
 
-                if (Beatmap.Value?.Beatmap == null)
+                if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
                 ruleset = osu?.Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;

@@ -224,7 +224,7 @@ namespace osu.Game.Screens.Select
             if (beatmap.Equals(beatmapNoDebounce))
                 return;
 
-            bool preview = beatmap.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
+            bool preview = beatmap.BeatmapSetInfoID != Beatmap.Value.BeatmapInfo.BeatmapSetInfoID;
 
             if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
                 sampleChangeDifficulty.Play();
@@ -347,15 +347,12 @@ namespace osu.Game.Screens.Select
 
         private void ensurePlayingSelected(bool preview = false)
         {
-            Track track = Beatmap.Value?.Track;
+            Track track = Beatmap.Value.Track;
 
             trackManager.SetExclusive(track);
 
-            if (track != null)
-            {
-                if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
-                track.Start();
-            }
+            if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
+            track.Start();
         }
 
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
