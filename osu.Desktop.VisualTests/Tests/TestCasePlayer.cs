@@ -81,7 +81,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             return new Player
             {
-                Beatmap = beatmap
+                InitialBeatmap = beatmap
             };
         }
     }
