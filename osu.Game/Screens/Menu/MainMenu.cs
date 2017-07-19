@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Menu
         private readonly BackgroundScreenDefault background;
         private Screen songSelect;
 
-        private MenuSideFlashes sideFlashes;
+        private readonly MenuSideFlashes sideFlashes;
 
         protected override BackgroundScreen CreateBackground() => background;
 
