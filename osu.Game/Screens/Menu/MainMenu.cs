@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Menu
         private readonly BackgroundScreenDefault background;
         private Screen songSelect;
 
+        private readonly MenuSideFlashes sideFlashes;
+
         protected override BackgroundScreen CreateBackground() => background;
 
         public MainMenu()
@@ -49,10 +51,10 @@ namespace osu.Game.Screens.Menu
                             OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnExit = delegate { Exit(); },
-                        },
-                        new MenuSideFlashes(),
+                        }
                     }
-                }
+                },
+                sideFlashes = new MenuSideFlashes(),
             };
         }
 
@@ -112,6 +114,8 @@ namespace osu.Game.Screens.Menu
 
             Content.FadeOut(length, EasingTypes.InSine);
             Content.MoveTo(new Vector2(-800, 0), length, EasingTypes.InSine);
+
+            sideFlashes.FadeOut(length / 4, EasingTypes.OutQuint);
         }
 
         protected override void OnResuming(Screen last)
@@ -129,6 +133,8 @@ namespace osu.Game.Screens.Menu
 
             Content.FadeIn(length, EasingTypes.OutQuint);
             Content.MoveTo(new Vector2(0, 0), length, EasingTypes.OutQuint);
+
+            sideFlashes.FadeIn(length / 4, EasingTypes.InQuint);
         }
 
         protected override bool OnExiting(Screen next)
