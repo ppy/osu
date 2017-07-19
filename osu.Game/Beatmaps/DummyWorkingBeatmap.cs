@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
@@ -54,14 +55,14 @@ namespace osu.Game.Beatmaps
 
                 public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset)
                 {
-                    throw new System.NotImplementedException();
+                    throw new NotImplementedException();
                 }
 
                 public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => null;
 
                 public override ScoreProcessor CreateScoreProcessor()
                 {
-                    throw new System.NotImplementedException();
+                    throw new NotImplementedException();
                 }
 
                 public override string Description => "dummy";
