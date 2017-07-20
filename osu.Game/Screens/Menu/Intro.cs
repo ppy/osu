@@ -121,7 +121,9 @@ namespace osu.Game.Screens.Menu
 
             Scheduler.AddDelayed(delegate
             {
-                track.Start();
+                // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
+                if (menuMusic)
+                    track.Start();
 
                 LoadComponentAsync(mainMenu = new MainMenu());
 
