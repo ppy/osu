@@ -135,10 +135,17 @@ namespace osu.Game
 
             Beatmap.ValueChanged += b =>
             {
-                // this disposal is done to stop the audio track.
-                // it may not be exactly what we want for cases beatmaps are reused, as it will
-                // trigger a fresh load of contained resources.
-                lastBeatmap?.Dispose();
+                // compare to last baetmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
+                if (lastBeatmap?.Track != b.Track)
+                {
+                    // this disposal is done to stop the audio track.
+                    // it may not be exactly what we want for cases beatmaps are reused, as it will
+                    // trigger a fresh load of contained resources.
+                    lastBeatmap?.Dispose();
+
+                    Audio.Track.AddItem(b.Track);
+                }
+
                 lastBeatmap = b;
             };
 
