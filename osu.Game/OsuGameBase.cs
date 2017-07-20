@@ -133,8 +133,26 @@ namespace osu.Game
                 Token = LocalConfig.Get<string>(OsuSetting.Token)
             });
 
+            Beatmap.ValueChanged += b =>
+            {
+                // compare to last baetmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
+                if (lastBeatmap?.Track != b.Track)
+                {
+                    // this disposal is done to stop the audio track.
+                    // it may not be exactly what we want for cases beatmaps are reused, as it will
+                    // trigger a fresh load of contained resources.
+                    lastBeatmap?.Dispose();
+
+                    Audio.Track.AddItem(b.Track);
+                }
+
+                lastBeatmap = b;
+            };
+
             API.Register(this);
         }
+
+        private WorkingBeatmap lastBeatmap;
 
         public void APIStateChanged(APIAccess api, APIState state)
         {
