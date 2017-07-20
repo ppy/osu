@@ -119,10 +119,7 @@ namespace osu.Game.Screens.Play
             Track track = Beatmap.Value.Track;
 
             if (track != null)
-            {
-                audio.Track.AddItem(track);
                 adjustableSourceClock = track;
-            }
 
             adjustableSourceClock = (IAdjustableClock)track ?? new StopwatchClock();
 
