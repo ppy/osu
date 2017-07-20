@@ -275,7 +275,7 @@ namespace osu.Game.Screens.Menu
             const float scale_adjust_cutoff = 0.4f;
             const float velocity_adjust_cutoff = 0.98f;
 
-            var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value?.Track?.CurrentAmplitudes.Maximum ?? 0 : 0;
+            var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track?.CurrentAmplitudes.Maximum ?? 0 : 0;
             logoAmplitudeContainer.ScaleTo(1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 75, EasingTypes.OutQuint);
 
             if (maxAmplitude > velocity_adjust_cutoff)

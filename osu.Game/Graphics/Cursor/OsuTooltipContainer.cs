@@ -83,6 +83,8 @@ namespace osu.Game.Graphics.Cursor
             protected override void PopIn()
             {
                 instantMovement |= !IsPresent;
+
+                ClearTransforms();
                 FadeIn(500, EasingTypes.OutQuint);
             }
 

@@ -59,21 +59,20 @@ namespace osu.Game.Screens.Select
                 ValidForResume = false;
                 Push(new Editor());
             }, Key.Number3);
+
+            Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
-        protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
+        private void beatmap_ValueChanged(WorkingBeatmap beatmap)
         {
-            beatmap?.Mods.BindTo(modSelect.SelectedMods);
+            if (!IsCurrentScreen) return;
 
-            if (Beatmap?.Track != null)
-                Beatmap.Track.Looping = false;
+            beatmap.Mods.BindTo(modSelect.SelectedMods);
 
             beatmapDetails.Beatmap = beatmap;
 
-            if (beatmap?.Track != null)
+            if (beatmap.Track != null)
                 beatmap.Track.Looping = true;
-
-            base.OnBeatmapChanged(beatmap);
         }
 
         protected override void OnResuming(Screen last)
@@ -83,7 +82,7 @@ namespace osu.Game.Screens.Select
             modSelect.SelectedMods.Value = originalMods;
             originalMods = null;
 
-            Beatmap.Track.Looping = true;
+            Beatmap.Value.Track.Looping = true;
 
             base.OnResuming(last);
         }
@@ -106,8 +105,8 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            if (Beatmap?.Track != null)
-                Beatmap.Track.Looping = false;
+            if (Beatmap.Value.Track != null)
+                Beatmap.Value.Track.Looping = false;
 
             return false;
         }
@@ -125,12 +124,9 @@ namespace osu.Game.Screens.Select
                         modSelect.SelectedMods.Value = originalMods.Concat(new[] { auto });
                 }
 
-            Beatmap.Track.Looping = false;
+            Beatmap.Value.Track.Looping = false;
 
-            LoadComponentAsync(player = new PlayerLoader(new Player
-            {
-                Beatmap = Beatmap, //eagerly set this so it's present before push.
-            }), l => Push(player));
+            LoadComponentAsync(player = new PlayerLoader(new Player()), l => Push(player));
         }
 
         private Mod findAutoMod(IEnumerable<Mod> mods)
