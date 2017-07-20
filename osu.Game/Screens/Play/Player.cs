@@ -81,8 +81,8 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                if (!Beatmap.Value.WithStoryboard)
-                    // we need to ensure the storyboard is loaded.
+                if (!Beatmap.Value.FullyLoaded)
+                    // we need to ensure extras like storyboards are loaded.
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, withStoryboard: true);
 
                 if (Beatmap.Value.Beatmap == null)
