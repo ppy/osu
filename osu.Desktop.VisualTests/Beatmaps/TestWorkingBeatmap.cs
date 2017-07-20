@@ -10,7 +10,7 @@ namespace osu.Desktop.VisualTests.Beatmaps
     public class TestWorkingBeatmap : WorkingBeatmap
     {
         public TestWorkingBeatmap(Beatmap beatmap)
-            : base(beatmap.BeatmapInfo)
+            : base(beatmap.BeatmapInfo, true)
         {
             this.beatmap = beatmap;
         }
