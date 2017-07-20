@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Menu
             Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
 
             track = Beatmap.Value.Track;
-            trackManager.SetExclusive(track);
+            trackManager.AddItem(track);
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");

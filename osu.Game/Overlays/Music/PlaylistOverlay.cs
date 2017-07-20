@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Music
             Task.Run(() =>
             {
                 var track = beatmapBacking.Value.Track;
-                trackManager.SetExclusive(track);
+                trackManager.AddItem(track);
                 track.Start();
             }).ContinueWith(task => Schedule(task.ThrowIfFaulted), TaskContinuationOptions.OnlyOnFaulted);
         }
