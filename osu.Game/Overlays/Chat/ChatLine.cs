@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -11,6 +12,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -62,6 +64,8 @@ namespace osu.Game.Overlays.Chat
         private const float message_padding = 200;
         private const float text_size = 20;
 
+        private Action<User> loadProfile;
+
         private Color4 customUsernameColour;
 
         public ChatLine(Message message)
@@ -75,9 +79,10 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, UserProfileOverlay profile)
         {
             customUsernameColour = colours.ChatBlue;
+            loadProfile = u => profile?.ShowUser(u);
         }
 
         protected override void LoadComplete()
@@ -87,8 +92,6 @@ namespace osu.Game.Overlays.Chat
             bool hasBackground = !string.IsNullOrEmpty(Message.Sender.Colour);
             Drawable username = new OsuSpriteText
             {
-                Origin = Anchor.TopRight,
-                Anchor = Anchor.TopRight,
                 Font = @"Exo2.0-BoldItalic",
                 Text = $@"{Message.Sender.Username}" + (hasBackground ? "" : ":"),
                 Colour = hasBackground ? customUsernameColour : username_colours[Message.UserId % username_colours.Length],
@@ -132,7 +135,7 @@ namespace osu.Game.Overlays.Chat
                 new Container
                 {
                     Size = new Vector2(message_padding, text_size),
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         new OsuSpriteText
                         {
@@ -144,7 +147,14 @@ namespace osu.Game.Overlays.Chat
                             TextSize = text_size * 0.75f,
                             Alpha = 0.4f,
                         },
-                        username
+                        new ClickableContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Origin = Anchor.TopRight,
+                            Anchor = Anchor.TopRight,
+                            Child = username,
+                            Action = () => loadProfile(Message.Sender),
+                        },
                     }
                 },
                 new Container

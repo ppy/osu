@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -31,7 +32,7 @@ namespace osu.Game.Screens.Select
         public Action OnBack;
         public Action OnStart;
 
-        private readonly FillFlowContainer buttons;
+        private readonly FillFlowContainer<FooterButton> buttons;
 
         public OsuLogo StartButton;
 
@@ -43,29 +44,21 @@ namespace osu.Game.Screens.Select
         /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
         /// </param>
-        public void AddButton(string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
+        public void AddButton(string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0) => buttons.Add(new FooterButton
         {
-            var button = new FooterButton
-            {
-                Text = text,
-                Height = play_song_select_button_height,
-                Width = play_song_select_button_width,
-                Depth = depth,
-                SelectedColour = colour,
-                DeselectedColour = colour.Opacity(0.5f),
-                Hotkey = hotkey,
-            };
+            Text = text,
+            Height = play_song_select_button_height,
+            Width = play_song_select_button_width,
+            Depth = depth,
+            SelectedColour = colour,
+            DeselectedColour = colour.Opacity(0.5f),
+            Hotkey = hotkey,
+            Hovered = updateModeLight,
+            HoverLost = updateModeLight,
+            Action = action,
+        });
 
-            button.Hovered = () => updateModeLight(button);
-            button.HoverLost = () => updateModeLight();
-            button.Action = action;
-            buttons.Add(button);
-        }
-
-        private void updateModeLight(FooterButton button = null)
-        {
-            modeLight.FadeColour(button?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, EasingTypes.OutQuint);
-        }
+        private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, EasingTypes.OutQuint);
 
         public Footer()
         {
@@ -111,7 +104,7 @@ namespace osu.Game.Screens.Select
                     Spacing = new Vector2(padding, 0),
                     Children = new Drawable[]
                     {
-                        buttons = new FillFlowContainer
+                        buttons = new FillFlowContainer<FooterButton>
                         {
                             Direction = FillDirection.Horizontal,
                             Spacing = new Vector2(0.2f, 0),
