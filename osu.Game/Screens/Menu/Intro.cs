@@ -72,8 +72,6 @@ namespace osu.Game.Screens.Menu
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
-            var trackManager = audio.Track;
-
             BeatmapSetInfo setInfo = null;
 
             if (!menuMusic)
@@ -106,7 +104,6 @@ namespace osu.Game.Screens.Menu
             Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
 
             track = Beatmap.Value.Track;
-            trackManager.SetExclusive(track);
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
