@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.CentreRight,
                 SelectionChanged = carouselSelectionChanged,
                 BeatmapsChanged = carouselBeatmapsLoaded,
-                StartRequested = carouselRaisedStart
+                StartRequested = carouselRaisedStart,
             });
             Add(FilterControl = new FilterControl
             {
@@ -183,6 +183,9 @@ namespace osu.Game.Screens.Select
             carousel.Beatmaps = database.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending);
 
             Beatmap.ValueChanged += beatmap_ValueChanged;
+
+            Beatmap.DisabledChanged += disabled => carousel.AllowSelection = !disabled;
+            carousel.AllowSelection = !Beatmap.Disabled;
         }
 
         private void carouselBeatmapsLoaded()
