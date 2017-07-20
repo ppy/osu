@@ -235,6 +235,13 @@ namespace osu.Game.Screens.Select
                 changeBackground(Beatmap.Value);
             };
 
+            selectionChangedDebounce?.Cancel();
+
+            if (beatmap?.Equals(beatmapNoDebounce) == true)
+                return;
+
+            beatmapNoDebounce = beatmap;
+
             if (beatmap == null)
             {
                 if (!Beatmap.IsDefault)
@@ -242,17 +249,12 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                selectionChangedDebounce?.Cancel();
-
-                if (beatmap.Equals(beatmapNoDebounce))
-                    return;
+                ruleset.Value = beatmap.Ruleset;
 
                 if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
                     sampleChangeDifficulty.Play();
                 else
                     sampleChangeBeatmap.Play();
-
-                beatmapNoDebounce = beatmap;
 
                 if (beatmap == Beatmap.Value.BeatmapInfo)
                     performLoad();
