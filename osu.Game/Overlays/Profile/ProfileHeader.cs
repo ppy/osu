@@ -12,16 +12,20 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace osu.Game.Overlays.Profile
 {
     public class ProfileHeader : Container
     {
-        private readonly OsuTextFlowContainer infoTextLeft, infoTextRight;
+        private readonly OsuTextFlowContainer infoTextLeft;
+        private readonly LinkFlowContainer infoTextRight;
         private readonly FillFlowContainer<SpriteText> scoreText, scoreNumberText;
 
         private readonly Container coverContainer, chartContainer, supporterTag;
@@ -29,6 +33,7 @@ namespace osu.Game.Overlays.Profile
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
         private readonly Box colourBar;
+        private readonly DrawableFlag countryFlag;
 
         private const float cover_height = 350;
         private const float info_height = 150;
@@ -114,16 +119,17 @@ namespace osu.Game.Overlays.Profile
                                                 }
                                             }
                                         },
-                                        new OsuSpriteText
+                                        new LinkFlowContainer.LinkText
                                         {
                                             Text = user.Username,
+                                            Url = $@"https://osu.ppy.sh/users/{user.Id}",
                                             TextSize = 30,
                                             Font = @"Exo2.0-RegularItalic",
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
                                             Y = -48
                                         },
-                                        new DrawableFlag(user.Country?.FlagName ?? "__")
+                                        countryFlag = new DrawableFlag(user.Country?.FlagName ?? "__")
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
@@ -158,7 +164,7 @@ namespace osu.Game.Overlays.Profile
                     ParagraphSpacing = 0.8f,
                     LineSpacing = 0.2f
                 },
-                infoTextRight = new OsuTextFlowContainer(t =>
+                infoTextRight = new LinkFlowContainer(t =>
                 {
                     t.TextSize = 14;
                     t.Font = @"Exo2.0-RegularItalic";
@@ -350,6 +356,7 @@ namespace osu.Game.Overlays.Profile
             {
                 infoTextLeft.AddText("from ");
                 infoTextLeft.AddText(user.Country.FullName, boldItalic);
+                countryFlag.FlagName = user.Country.FlagName;
             }
             infoTextLeft.NewParagraph();
 
@@ -373,14 +380,22 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText(string.Join(", ", user.PlayStyle), boldItalic);
             }
 
+            string websiteWithoutProtcol = user.Website;
+            if (!string.IsNullOrEmpty(websiteWithoutProtcol))
+            {
+                int protocolIndex = websiteWithoutProtcol.IndexOf("//", StringComparison.Ordinal);
+                if (protocolIndex >= 0)
+                    websiteWithoutProtcol = websiteWithoutProtcol.Substring(protocolIndex + 2);
+            }
+
             tryAddInfoRightLine(FontAwesome.fa_map_marker, user.Location);
             tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Intrerests);
             tryAddInfoRightLine(FontAwesome.fa_suitcase, user.Occupation);
             infoTextRight.NewParagraph();
             if (!string.IsNullOrEmpty(user.Twitter))
-                tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter);
-            tryAddInfoRightLine(FontAwesome.fa_globe, user.Website);
-            tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype);
+                tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
+            tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
+            tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
 
             if (user.Statistics != null)
             {
@@ -390,7 +405,7 @@ namespace osu.Game.Overlays.Profile
                 scoreText.Add(createScoreText("Ranked Score"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.RankedScore.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Accuracy"));
-                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy}%"));
+                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy.ToString("0.##", CultureInfo.CurrentCulture)}%"));
                 scoreText.Add(createScoreText("Play Count"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.PlayCount.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Total Score"));
@@ -433,12 +448,12 @@ namespace osu.Game.Overlays.Profile
             Text = text
         };
 
-        private void tryAddInfoRightLine(FontAwesome icon, string str)
+        private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
         {
             if (string.IsNullOrEmpty(str)) return;
 
             infoTextRight.AddIcon(icon);
-            infoTextRight.AddText(" " + str);
+            infoTextRight.AddLink(" " + str, url);
             infoTextRight.NewLine();
         }
 
@@ -477,6 +492,52 @@ namespace osu.Game.Overlays.Profile
             private void load(TextureStore textures)
             {
                 badge.Texture = textures.Get($"Grades/{grade}");
+            }
+        }
+
+        private class LinkFlowContainer : OsuTextFlowContainer
+        {
+            public override bool HandleInput => true;
+
+            public LinkFlowContainer(Action<SpriteText> defaultCreationParameters = null) : base(defaultCreationParameters)
+            {
+            }
+
+            protected override SpriteText CreateSpriteText() => new LinkText();
+
+            public void AddLink(string text, string url) => AddText(text, link => ((LinkText)link).Url = url);
+
+            public class LinkText : OsuSpriteText
+            {
+                public override bool HandleInput => Url != null;
+
+                public string Url;
+
+                private Color4 hoverColour;
+
+                protected override bool OnHover(InputState state)
+                {
+                    FadeColour(hoverColour, 500, EasingTypes.OutQuint);
+                    return base.OnHover(state);
+                }
+
+                protected override void OnHoverLost(InputState state)
+                {
+                    FadeColour(Color4.White, 500, EasingTypes.OutQuint);
+                    base.OnHoverLost(state);
+                }
+
+                protected override bool OnClick(InputState state)
+                {
+                    Process.Start(Url);
+                    return true;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    hoverColour = colours.Yellow;
+                }
             }
         }
     }
