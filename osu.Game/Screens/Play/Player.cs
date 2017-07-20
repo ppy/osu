@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Play
 
         internal override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && HitRenderer.ProvidingUserCursor;
 
-        public BeatmapInfo BeatmapInfo;
-
         public Action RestartRequested;
 
         internal override bool AllowBeatmapRulesetChange => false;
@@ -83,9 +81,9 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                if (!Beatmap.Value.WithStoryboard)
-                    // we need to ensure the storyboard is loaded.
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
+                if (!Beatmap.Value.FullyLoaded)
+                    // we need to ensure extras like storyboards are loaded.
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, withStoryboard: true);
 
                 if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");

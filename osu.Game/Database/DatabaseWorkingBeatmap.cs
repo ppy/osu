@@ -14,8 +14,8 @@ namespace osu.Game.Database
     {
         private readonly BeatmapDatabase database;
 
-        public DatabaseWorkingBeatmap(BeatmapDatabase database, BeatmapInfo beatmapInfo, bool withStoryboard = false)
-            : base(beatmapInfo, withStoryboard)
+        public DatabaseWorkingBeatmap(BeatmapDatabase database, BeatmapInfo beatmapInfo, bool fullyLoaded = false)
+            : base(beatmapInfo, fullyLoaded)
         {
             this.database = database;
         }
@@ -37,7 +37,7 @@ namespace osu.Game.Database
                         beatmap = decoder.Decode(stream);
                     }
 
-                    if (beatmap == null || !WithStoryboard || BeatmapSetInfo.StoryboardFile == null)
+                    if (beatmap == null || !FullyLoaded || BeatmapSetInfo.StoryboardFile == null)
                         return beatmap;
 
                     using (var stream = new StreamReader(reader.GetStream(BeatmapSetInfo.StoryboardFile)))
