@@ -32,7 +32,6 @@ namespace osu.Game.Screens.Select
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
         private readonly BeatmapCarousel carousel;
-        private TrackManager trackManager;
         private DialogOverlay dialogOverlay;
 
         private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
@@ -174,7 +173,6 @@ namespace osu.Game.Screens.Select
             database.BeatmapSetAdded += onBeatmapSetAdded;
             database.BeatmapSetRemoved += onBeatmapSetRemoved;
 
-            trackManager = audio.Track;
             dialogOverlay = dialog;
 
             sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
@@ -360,10 +358,11 @@ namespace osu.Game.Screens.Select
         {
             Track track = Beatmap.Value.Track;
 
-            trackManager.SetExclusive(track);
-
-            if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
-            track.Start();
+            if (!track.IsRunning)
+            {
+                if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
+                track.Start();
+            }
         }
 
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
