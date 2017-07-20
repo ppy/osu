@@ -358,7 +358,7 @@ namespace osu.Game.Screens.Select
         {
             Track track = Beatmap.Value.Track;
 
-            trackManager.SetExclusive(track);
+            trackManager.AddItem(track);
 
             if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
             track.Start();

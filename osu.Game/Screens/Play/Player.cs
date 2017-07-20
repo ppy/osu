@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Play
 
             if (track != null)
             {
-                audio.Track.SetExclusive(track);
+                audio.Track.AddItem(track);
                 adjustableSourceClock = track;
             }
 
