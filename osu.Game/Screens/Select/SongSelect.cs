@@ -223,7 +223,7 @@ namespace osu.Game.Screens.Select
             {
                 // We may be arriving here due to another component changing the bindable Beatmap.
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
-                if (!beatmap.Equals(Beatmap.Value.BeatmapInfo))
+                if (beatmap?.Equals(Beatmap.Value.BeatmapInfo) != true)
                 {
                     bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value.BeatmapInfo.BeatmapSetInfoID;
 
