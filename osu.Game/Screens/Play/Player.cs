@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play
         private bool loadedSuccessfully => HitRenderer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGame osu)
         {
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
@@ -81,10 +81,6 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                if (!Beatmap.Value.FullyLoaded)
-                    // we need to ensure extras like storyboards are loaded.
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(Beatmap.Value.BeatmapInfo, withStoryboard: true);
-
                 if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
