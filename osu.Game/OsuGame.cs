@@ -175,11 +175,11 @@ namespace osu.Game
             LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
-            LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
+            LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
-                Depth = -2,
+                Depth = -3,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -187,14 +187,14 @@ namespace osu.Game
 
             LoadComponentAsync(notificationManager = new NotificationManager
             {
-                Depth = -2,
+                Depth = -3,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
             LoadComponentAsync(dialogOverlay = new DialogOverlay
             {
-                Depth = -4,
+                Depth = -5,
             }, overlayContent.Add);
 
             Logger.NewEntry += entry =>
@@ -221,7 +221,7 @@ namespace osu.Game
 
             LoadComponentAsync(Toolbar = new Toolbar
             {
-                Depth = -3,
+                Depth = -4,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
             }, overlayContent.Add);
 
