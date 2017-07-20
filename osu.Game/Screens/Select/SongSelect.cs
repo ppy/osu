@@ -219,11 +219,16 @@ namespace osu.Game.Screens.Select
         {
             Action performLoad = delegate
             {
-                bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value.BeatmapInfo.BeatmapSetInfoID;
+                // We may be arriving here due to another component changing the bindable Beatmap.
+                // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
+                if (beatmap?.Equals(Beatmap.Value.BeatmapInfo) != true)
+                {
+                    bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value.BeatmapInfo.BeatmapSetInfoID;
 
-                Beatmap.Value = database.GetWorkingBeatmap(beatmap, Beatmap);
+                    Beatmap.Value = database.GetWorkingBeatmap(beatmap, Beatmap);
+                    ensurePlayingSelected(preview);
+                }
 
-                ensurePlayingSelected(preview);
                 changeBackground(Beatmap.Value);
             };
 
