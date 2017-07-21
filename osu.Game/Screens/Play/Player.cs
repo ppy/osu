@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Play
 
         internal override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && HitRenderer.ProvidingUserCursor;
 
-        public BeatmapInfo BeatmapInfo;
-
         public Action RestartRequested;
 
         internal override bool AllowBeatmapRulesetChange => false;
@@ -72,7 +70,7 @@ namespace osu.Game.Screens.Play
         private bool loadedSuccessfully => HitRenderer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGame osu)
         {
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
@@ -83,10 +81,6 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                if (!Beatmap.Value.WithStoryboard)
-                    // we need to ensure the storyboard is loaded.
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
-
                 if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
@@ -121,10 +115,7 @@ namespace osu.Game.Screens.Play
             Track track = Beatmap.Value.Track;
 
             if (track != null)
-            {
-                audio.Track.SetExclusive(track);
                 adjustableSourceClock = track;
-            }
 
             adjustableSourceClock = (IAdjustableClock)track ?? new StopwatchClock();
 
