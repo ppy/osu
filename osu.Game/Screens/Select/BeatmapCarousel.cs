@@ -232,7 +232,11 @@ namespace osu.Game.Screens.Select
 
         public bool AllowSelection = true;
 
-        public bool PendingFilter => filterTask?.Completed == false;
+        public void FlushPendingFilters()
+        {
+            if (filterTask?.Completed == false)
+                Filter(null, false);
+        }
 
         public void Filter(FilterCriteria newCriteria = null, bool debounce = true)
         {
