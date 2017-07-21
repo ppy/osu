@@ -221,8 +221,6 @@ namespace osu.Game.Screens.Play
             {
                 content.ClearTransforms();
 
-                double currentTime = Time.Current;
-
                 content.FadeTo(1);
                 Delay(appear_duration);
                 Schedule(() => content.FadeTo(0));
