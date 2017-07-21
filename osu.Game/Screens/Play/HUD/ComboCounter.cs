@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (!rolling)
             {
-                Flush(false, nameof(DisplayedCount));
+                FinishTransforms(false, nameof(DisplayedCount));
                 IsRolling = false;
                 DisplayedCount = prev;
 

@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void UpdateState(ArmedState state)
         {
             var circlePiece = MainPiece as CirclePiece;
-            circlePiece?.FlashBox.Flush();
+            circlePiece?.FlashBox.FinishTransforms();
 
             using (BeginDelayedSequence(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true))
             {

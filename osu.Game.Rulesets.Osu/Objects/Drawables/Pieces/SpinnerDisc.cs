@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             if (Complete && updateCompleteTick())
             {
-                background.Flush(false, nameof(Alpha));
+                background.FinishTransforms(false, nameof(Alpha));
                 background
                     .FadeTo(tracking_alpha + 0.2f, 60, EasingTypes.OutExpo)
                     .Then()

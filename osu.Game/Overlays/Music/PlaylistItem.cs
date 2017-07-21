@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Music
                 if (value == selected) return;
                 selected = value;
 
-                Flush(true);
+                FinishTransforms(true);
                 foreach (SpriteText s in titleSprites)
                     s.FadeColour(Selected ? hoverColour : Color4.White, fade_duration);
             }
