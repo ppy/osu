@@ -52,6 +52,7 @@ namespace osu.Game.Overlays
         private readonly ChatTabControl channelTabs;
 
         private readonly Container chatContainer;
+        private readonly Container tabsArea;
         private readonly Box chatBackground;
         private readonly Box tabBackground;
 
@@ -144,7 +145,7 @@ namespace osu.Game.Overlays
                                 loading = new LoadingAnimation(),
                             }
                         },
-                        new Container
+                        tabsArea = new Container
                         {
                             Name = @"tabs area",
                             RelativeSizeAxes = Axes.X,
@@ -191,9 +192,12 @@ namespace osu.Game.Overlays
         }
 
         private double startDragChatHeight;
+        private bool canBeDragged;
 
         protected override bool OnDragStart(InputState state)
         {
+            canBeDragged = tabsArea.IsHovered;
+
             if (!channelTabs.IsHovered)
                 return base.OnDragStart(state);
 
@@ -203,10 +207,21 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
-            Trace.Assert(state.Mouse.PositionMouseDown != null);
+            if (canBeDragged)
+            {
+                Trace.Assert(state.Mouse.PositionMouseDown != null);
 
-            chatHeight.Value = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
-            return base.OnDrag(state);
+                chatHeight.Value = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
+                return base.OnDrag(state);
+            }
+
+            return true;
+        }
+
+        protected override bool OnDragEnd(InputState state)
+        {
+            canBeDragged = false;
+            return base.OnDragEnd(state);
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
