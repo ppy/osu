@@ -232,6 +232,12 @@ namespace osu.Game.Screens.Select
 
         public bool AllowSelection = true;
 
+        public void FlushPendingFilters()
+        {
+            if (filterTask?.Completed == false)
+                Filter(null, false);
+        }
+
         public void Filter(FilterCriteria newCriteria = null, bool debounce = true)
         {
             if (newCriteria != null)
@@ -263,6 +269,8 @@ namespace osu.Game.Screens.Select
             };
 
             filterTask?.Cancel();
+            filterTask = null;
+
             if (debounce)
                 filterTask = Scheduler.AddDelayed(perform, 250);
             else

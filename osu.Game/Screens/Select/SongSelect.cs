@@ -198,13 +198,15 @@ namespace osu.Game.Screens.Select
 
         private void carouselRaisedStart()
         {
-            var pendingSelection = selectionChangedDebounce;
-            selectionChangedDebounce = null;
+            // if we have a pending filter operation, we want to run it now.
+            // it could change selection (ie. if the ruleset has been changed).
+            carousel.FlushPendingFilters();
 
-            if (pendingSelection?.Completed == false)
+            if (selectionChangedDebounce?.Completed == false)
             {
-                pendingSelection.RunTask();
-                pendingSelection.Cancel(); // cancel the already scheduled task.
+                selectionChangedDebounce.RunTask();
+                selectionChangedDebounce.Cancel(); // cancel the already scheduled task.
+                selectionChangedDebounce = null;
             }
 
             OnSelected();
