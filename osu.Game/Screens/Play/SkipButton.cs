@@ -277,9 +277,19 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnClick(InputState state)
             {
+                if (!Enabled)
+                    return false;
+
                 box.FlashColour(Color4.White, 500, EasingTypes.OutQuint);
                 aspect.ScaleTo(1.2f, 2000, EasingTypes.OutQuint);
-                return base.OnClick(state);
+
+                bool result = base.OnClick(state);
+
+                // for now, let's disable the skip button after the first press.
+                // this will likely need to be contextual in the future (bound from external components).
+                Enabled.Value = false;
+
+                return result;
             }
         }
     }

@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
@@ -25,9 +26,12 @@ namespace osu.Game.Overlays.Chat
 
             Children = new Drawable[]
             {
-                scroll = new ScrollContainer
+                scroll = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
+                    // Some chat lines have effects that slightly protrude to the bottom,
+                    // which we do not want to mask away, hence the padding.
+                    Padding = new MarginPadding { Bottom = 5 },
                     Children = new Drawable[]
                     {
                         flow = new FillFlowContainer<ChatLine>
@@ -67,7 +71,7 @@ namespace osu.Game.Overlays.Chat
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
             //up to last Channel.MAX_HISTORY messages
-            flow.Add(displayMessages.Select(m => new ChatLine(m)));
+            flow.AddRange(displayMessages.Select(m => new ChatLine(m)));
 
             if (!IsLoaded) return;
 

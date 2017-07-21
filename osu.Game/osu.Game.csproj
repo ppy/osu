@@ -76,11 +76,15 @@
     <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
+    <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
     <Compile Include="Graphics\Containers\OsuClickableContainer.cs" />
     <Compile Include="Graphics\Containers\OsuFocusedOverlayContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuScrollContainer.cs" />
     <Compile Include="Graphics\Cursor\OsuContextMenuContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuTextFlowContainer.cs" />
     <Compile Include="Graphics\UserInterface\IconButton.cs" />
     <Compile Include="Configuration\SelectionRandomType.cs" />
+    <Compile Include="Graphics\UserInterface\LineGraph.cs" />
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
@@ -97,6 +101,18 @@
     <Compile Include="Overlays\Settings\SettingsHeader.cs" />
     <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
+    <Compile Include="Overlays\Profile\Sections\AboutSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\BeatmapsSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\HistoricalSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\KudosuSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\MedalsSection.cs" />
+    <Compile Include="Overlays\Profile\RankChart.cs" />
+    <Compile Include="Overlays\Profile\Sections\RanksSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\RecentSection.cs" />
+    <Compile Include="Users\UserCoverBackground.cs" />
+    <Compile Include="Overlays\UserProfileOverlay.cs" />
+    <Compile Include="Overlays\Profile\ProfileHeader.cs" />
+    <Compile Include="Overlays\Profile\ProfileSection.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarSocialButton.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
     <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
@@ -190,7 +206,6 @@
     <Compile Include="Rulesets\Objects\Drawables\IScrollingHitObject.cs" />
     <Compile Include="Rulesets\Judgements\Judgement.cs" />
     <Compile Include="Rulesets\Objects\HitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\HitObjectStartTimeComparer.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasCombo.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasEndTime.cs" />
     <Compile Include="Rulesets\Objects\Types\IHasDistance.cs" />
@@ -216,7 +231,6 @@
     <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapDetailsRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
-    <Compile Include="Overlays\DragBar.cs" />
     <Compile Include="Overlays\LoginOverlay.cs" />
     <Compile Include="Overlays\MusicController.cs" />
     <Compile Include="Beatmaps\Beatmap.cs" />
@@ -467,6 +481,7 @@
     <Compile Include="Online\Multiplayer\Room.cs" />
     <Compile Include="Online\Multiplayer\RoomStatus.cs" />
     <Compile Include="Users\UserPanel.cs" />
+    <Compile Include="Users\UserStatistics.cs" />
     <Compile Include="Users\UserStatus.cs" />
     <Compile Include="Overlays\DirectOverlay.cs" />
     <Compile Include="Overlays\Direct\FilterControl.cs" />
@@ -475,10 +490,11 @@
     <Compile Include="Overlays\Direct\DirectPanel.cs" />
     <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
     <Compile Include="Overlays\Direct\DirectListPanel.cs" />
-    <Compile Include="Database\OnlineWorkingBeatmap.cs" />
     <Compile Include="Database\BeatmapOnlineInfo.cs" />
-    <Compile Include="Graphics\Containers\ReverseDepthFillFlowContainer.cs" />
+    <Compile Include="Graphics\Containers\ReverseChildIDFillFlowContainer.cs" />
     <Compile Include="Database\RankStatus.cs" />
+    <Compile Include="Database\BeatmapSetOnlineInfo.cs" />
+    <Compile Include="Online\API\Requests\GetBeatmapSetsRequest.cs" />
     <Compile Include="Overlays\SearchableList\SearchableListHeader.cs" />
     <Compile Include="Overlays\SearchableList\HeaderTabControl.cs" />
     <Compile Include="Overlays\Social\FilterControl.cs" />
@@ -490,9 +506,15 @@
     <Compile Include="Overlays\SearchableList\SlimEnumDropdown.cs" />
     <Compile Include="Overlays\SearchableList\DisplayStyleControl.cs" />
     <Compile Include="Graphics\UserInterface\BreadcrumbControl.cs" />
+    <Compile Include="Overlays\MedalOverlay.cs" />
+    <Compile Include="Users\Medal.cs" />
+    <Compile Include="Overlays\MedalSplash\DrawableMedal.cs" />
     <Compile Include="Screens\Multiplayer\RoomInspector.cs" />
     <Compile Include="Online\Multiplayer\GameType.cs" />
     <Compile Include="Screens\Multiplayer\DrawableGameType.cs" />
+    <Compile Include="Screens\Multiplayer\ParticipantInfo.cs" />
+    <Compile Include="Screens\Multiplayer\ModeTypeInfo.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -510,11 +532,6 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play
         private bool showOverlays = true;
         internal override bool ShowOverlays => showOverlays;
 
-        internal override bool AllowRulesetChange => false;
+        internal override bool AllowBeatmapRulesetChange => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
@@ -35,7 +35,8 @@ namespace osu.Game.Screens.Play
         {
             this.player = player;
 
-            player.RestartRequested = () => {
+            player.RestartRequested = () =>
+            {
                 showOverlays = false;
                 ValidForResume = true;
             };
@@ -74,7 +75,6 @@ namespace osu.Game.Screens.Play
             {
                 RestartCount = player.RestartCount + 1,
                 RestartRequested = player.RestartRequested,
-                Beatmap = player.Beatmap,
             });
 
             Delay(400);
@@ -227,6 +227,7 @@ namespace osu.Game.Screens.Play
                                 {
                                     new Sprite
                                     {
+                                        RelativeSizeAxes = Axes.Both,
                                         Texture = beatmap?.Background,
                                         Origin = Anchor.Centre,
                                         Anchor = Anchor.Centre,

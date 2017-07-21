@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.UI
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Add(new Drawable[]
+            AddRange(new Drawable[]
             {
                 connectionLayer = new FollowPointRenderer
                 {

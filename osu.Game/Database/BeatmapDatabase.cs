@@ -28,6 +28,11 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
 
+        /// <summary>
+        /// A default representation of a WorkingBeatmap to use when no beatmap is available.
+        /// </summary>
+        public WorkingBeatmap DefaultBeatmap { private get; set; }
+
         public BeatmapDatabase(Storage storage, SQLiteConnection connection, RulesetDatabase rulesets, IIpcHost importHost = null) : base(storage, connection)
         {
             this.rulesets = rulesets;
@@ -144,7 +149,11 @@ namespace osu.Game.Database
         public void Import(params string[] paths)
         {
             foreach (string p in paths)
-                Import(p);
+            {
+                //In case the file was imported twice and deleted after the first time
+                if (File.Exists(p))
+                    Import(p);
+            }
         }
 
         /// <summary>
@@ -178,6 +187,8 @@ namespace osu.Game.Database
 
             if (existing != null)
             {
+                GetChildren(existing);
+
                 if (existing.DeletePending)
                 {
                     existing.DeletePending = false;
@@ -268,6 +279,9 @@ namespace osu.Game.Database
 
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null, bool withStoryboard = false)
         {
+            if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
+                return DefaultBeatmap;
+
             if (beatmapInfo.BeatmapSet == null || beatmapInfo.Ruleset == null)
                 beatmapInfo = GetChildren(beatmapInfo, true);
 
@@ -277,7 +291,7 @@ namespace osu.Game.Database
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo, withStoryboard);
+            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo);
 
             previous?.TransferTo(working);
 

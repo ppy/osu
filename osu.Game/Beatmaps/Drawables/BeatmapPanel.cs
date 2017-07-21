@@ -140,7 +140,7 @@ namespace osu.Game.Beatmaps.Drawables
                                 },
                                 starCounter = new StarCounter
                                 {
-                                    Count = (float)beatmap.StarDifficulty,
+                                    CountStars = (float)beatmap.StarDifficulty,
                                     Scale = new Vector2(0.8f),
                                 }
                             }

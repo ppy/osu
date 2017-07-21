@@ -12,7 +12,6 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
 using osu.Framework.Input;
 using OpenTK.Input;
-using System.Collections;
 using osu.Framework.MathUtils;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -22,9 +21,11 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Screens.Select
 {
-    internal class BeatmapCarousel : ScrollContainer, IEnumerable<BeatmapGroup>
+    internal class BeatmapCarousel : ScrollContainer
     {
         public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
+
+        public override bool HandleInput => AllowSelection;
 
         public Action BeatmapsChanged;
 
@@ -134,10 +135,11 @@ namespace osu.Game.Screens.Select
 
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            if (groups.Count == 0)
+            if (groups.All(g => g.State == BeatmapGroupState.Hidden))
             {
                 selectedGroup = null;
                 selectedPanel = null;
+                SelectionChanged?.Invoke(null);
                 return;
             }
 
@@ -228,6 +230,8 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate filterTask;
 
+        public bool AllowSelection = true;
+
         public void Filter(FilterCriteria newCriteria = null, bool debounce = true)
         {
             if (newCriteria != null)
@@ -265,10 +269,6 @@ namespace osu.Game.Screens.Select
                 perform();
         }
 
-        public IEnumerator<BeatmapGroup> GetEnumerator() => groups.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
         {
             foreach (var b in beatmapSet.Beatmaps)
@@ -289,6 +289,7 @@ namespace osu.Game.Screens.Select
         private void load(BeatmapDatabase database, OsuConfigManager config)
         {
             this.database = database;
+
             randomType = config.GetBindable<SelectionRandomType>(OsuSetting.SelectionRandomType);
         }
 
@@ -307,7 +308,7 @@ namespace osu.Game.Screens.Select
                 panels.Remove(p);
 
             scrollableContent.Remove(group.Header);
-            scrollableContent.Remove(group.BeatmapPanels);
+            scrollableContent.RemoveRange(group.BeatmapPanels);
 
             if (selectedGroup == group)
                 SelectNext();

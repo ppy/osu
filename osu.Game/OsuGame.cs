@@ -45,6 +45,8 @@ namespace osu.Game
 
         private SocialOverlay social;
 
+        private UserProfileOverlay userProfile;
+
         private Intro intro
         {
             get
@@ -55,6 +57,8 @@ namespace osu.Game
                 return s as Intro;
             }
         }
+
+        public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
 
         private OsuScreen screenStack;
 
@@ -141,7 +145,7 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            Add(new Drawable[] {
+            AddRange(new Drawable[] {
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -172,9 +176,10 @@ namespace osu.Game
             LoadComponentAsync(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
+            LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
-                Depth = -2,
+                Depth = -3,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -182,14 +187,14 @@ namespace osu.Game
 
             LoadComponentAsync(notificationManager = new NotificationManager
             {
-                Depth = -2,
+                Depth = -3,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
             LoadComponentAsync(dialogOverlay = new DialogOverlay
             {
-                Depth = -4,
+                Depth = -5,
             }, overlayContent.Add);
 
             Logger.NewEntry += entry =>
@@ -205,6 +210,7 @@ namespace osu.Game
             Dependencies.Cache(settings);
             Dependencies.Cache(social);
             Dependencies.Cache(chat);
+            Dependencies.Cache(userProfile);
             Dependencies.Cache(musicController);
             Dependencies.Cache(notificationManager);
             Dependencies.Cache(dialogOverlay);
@@ -215,7 +221,7 @@ namespace osu.Game
 
             LoadComponentAsync(Toolbar = new Toolbar
             {
-                Depth = -3,
+                Depth = -4,
                 OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
             }, overlayContent.Add);
 
@@ -320,6 +326,7 @@ namespace osu.Game
                 chat.State = Visibility.Hidden;
                 direct.State = Visibility.Hidden;
                 social.State = Visibility.Hidden;
+                userProfile.State = Visibility.Hidden;
             }
             else
             {
@@ -360,7 +367,7 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            mainContent.Padding = new MarginPadding { Top = Toolbar.Position.Y + Toolbar.DrawHeight };
+            mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             Cursor.State = currentScreen?.HasLocalCursorDisplayed == false ? Visibility.Visible : Visibility.Hidden;
         }

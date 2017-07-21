@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
@@ -29,25 +30,26 @@ namespace osu.Game.Screens
 
         internal virtual bool HasLocalCursorDisplayed => false;
 
-        internal virtual bool AllowRulesetChange => true;
+        /// <summary>
+        /// Whether the beatmap or ruleset should be allowed to be changed by the user or game.
+        /// Used to mark exclusive areas where this is strongly prohibited, like gameplay.
+        /// </summary>
+        internal virtual bool AllowBeatmapRulesetChange => true;
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+        public WorkingBeatmap InitialBeatmap
+        {
+            set
+            {
+                if (IsLoaded) throw new InvalidOperationException($"Cannot set {nameof(InitialBeatmap)} post-load.");
+                Beatmap.Value = value;
+            }
+        }
 
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private SampleChannel sampleExit;
-
-        public WorkingBeatmap Beatmap
-        {
-            get
-            {
-                return beatmap.Value;
-            }
-            set
-            {
-                beatmap.Value = value;
-            }
-        }
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGameBase game, OsuGame osuGame, AudioManager audio)
@@ -55,10 +57,10 @@ namespace osu.Game.Screens
             if (game != null)
             {
                 //if we were given a beatmap at ctor time, we want to pass this on to the game-wide beatmap.
-                var localMap = beatmap.Value;
-                beatmap.BindTo(game.Beatmap);
+                var localMap = Beatmap.Value;
+                Beatmap.BindTo(game.Beatmap);
                 if (localMap != null)
-                    beatmap.Value = localMap;
+                    Beatmap.Value = localMap;
             }
 
             if (osuGame != null)
@@ -67,25 +69,17 @@ namespace osu.Game.Screens
             sampleExit = audio.Sample.Get(@"UI/melodic-1");
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            beatmap.ValueChanged += OnBeatmapChanged;
-        }
-
-        /// <summary>
-        /// The global Beatmap was changed.
-        /// </summary>
-        protected virtual void OnBeatmapChanged(WorkingBeatmap beatmap)
-        {
-        }
-
         protected override void Update()
         {
             if (!IsCurrentScreen) return;
 
-            ruleset.Disabled = !AllowRulesetChange;
+            if (ParentScreen != null)
+            {
+                // we only want to apply these restrictions when we are inside a screen stack.
+                // the use case for not applying is in visual/unit tests.
+                ruleset.Disabled = !AllowBeatmapRulesetChange;
+                Beatmap.Disabled = !AllowBeatmapRulesetChange;
+            }
         }
 
         protected override void OnResuming(Screen last)
@@ -99,8 +93,6 @@ namespace osu.Game.Screens
             OsuScreen lastOsu = last as OsuScreen;
 
             BackgroundScreen bg = CreateBackground();
-
-            OnBeatmapChanged(Beatmap);
 
             if (lastOsu?.Background != null)
             {
@@ -146,11 +138,7 @@ namespace osu.Game.Screens
             if (base.OnExiting(next))
                 return true;
 
-            // while this is not necessary as we are constructing our own bindable, there are cases where
-            // the GC doesn't run as fast as expected and this is triggered post-exit.
-            // added to resolve https://github.com/ppy/osu/issues/829
-            beatmap.ValueChanged -= OnBeatmapChanged;
-
+            Beatmap.UnbindAll();
             return false;
         }
     }

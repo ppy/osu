@@ -50,7 +50,7 @@ namespace osu.Desktop
             {
                 desktopWindow.CursorState |= CursorState.Hidden;
 
-                desktopWindow.Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
+                desktopWindow.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
                 desktopWindow.Title = Name;
 
                 desktopWindow.DragEnter += dragEnter;
