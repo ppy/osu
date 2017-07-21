@@ -94,9 +94,7 @@ namespace osu.Game.Screens.Menu
             {
                 if (!track.IsRunning)
                 {
-                    track.Seek(metadata.PreviewTime);
-                    if (metadata.PreviewTime == -1)
-                        track.Seek(track.Length * 0.4f);
+                    track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * track.Length);
                     track.Start();
                 }
             }
