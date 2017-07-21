@@ -127,7 +127,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual void StopRolling()
         {
-            Flush(false, nameof(DisplayedCount));
+            FinishTransforms(false, nameof(DisplayedCount));
             DisplayedCount = Current;
         }
 

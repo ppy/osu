@@ -247,7 +247,7 @@ namespace osu.Game.Overlays
             {
                 // if we haven't yet, play out the animation fully
                 drawableMedal.State = DisplayState.Full;
-                Flush(true);
+                FinishTransforms(true);
                 return;
             }
 

@@ -260,7 +260,7 @@ namespace osu.Game.Overlays
                 };
 
                 updateGlow();
-                Flush(true);
+                FinishTransforms(true);
             }
         }
     }

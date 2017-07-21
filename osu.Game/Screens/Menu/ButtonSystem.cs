@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Menu
                 bool fromInitial = lastState == MenuState.Initial;
 
                 if (state == MenuState.TopLevel)
-                    buttonArea.Flush(true);
+                    buttonArea.FinishTransforms(true);
 
                 using (buttonArea.BeginDelayedSequence(fromInitial ? 150 : 0, true))
                 {
