@@ -49,8 +49,8 @@ namespace osu.Game.Screens.Play
 
         public List<BreakPeriod> Breaks { set { breaks = value; } }
 
-        public Action BreakIn;
-        public Action BreakOut;
+        public Action OnBreakIn;
+        public Action OnBreakOut;
 
         public BreakPeriodsTrackOverlay(double startTime)
         {
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Play
                         iconHasBeenShown = false;
                         arrowsHasBeenShown = false;
                         iconAppearTime = currentTime + (currentBreak.EndTime - currentBreak.StartTime) / 2;
-                        BreakIn?.Invoke();
+                        OnBreakIn?.Invoke();
                     }
                 }
             }
@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Play
                 if (currentBreak.EndTime - currentTime < fade_duration)
                 {
                     if (currentBreak.HasEffect)
-                        BreakOut?.Invoke();
+                        OnBreakOut?.Invoke();
 
                     currentBreakIndex++;
                     isBreak = false;
