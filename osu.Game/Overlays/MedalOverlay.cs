@@ -199,8 +199,8 @@ namespace osu.Game.Overlays
 
             getSample.Play();
 
-            innerSpin.Spin(20000);
-            outerSpin.Spin(40000);
+            innerSpin.Spin(20000, RotationDirection.Clockwise);
+            outerSpin.Spin(40000, RotationDirection.Clockwise);
 
             using (BeginDelayedSequence(200, true))
             {
