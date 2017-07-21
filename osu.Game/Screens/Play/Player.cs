@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Play
                         new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         breakPeriodsTrackOverlay = new BreakPeriodsTrackOverlay(firstObjectTime)
                         {
-                            Breaks = Beatmap.Beatmap.Breaks,
+                            Breaks = Beatmap.Value.Beatmap.Breaks,
                             AudioClock = decoupledClock,
                             BreakIn = () =>
                             {

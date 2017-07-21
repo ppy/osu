@@ -8,7 +8,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
@@ -224,24 +223,25 @@ namespace osu.Game.Screens.Play
 
                 double currentTime = Time.Current;
 
-                content.Transforms.Add(new TransformAlpha
-                {
-                    StartValue = 0,
-                    EndValue = 1,
-                    StartTime = currentTime,
-                    EndTime = currentTime,
-                    LoopCount = 4,
-                    LoopDelay = appear_duration * 2,
-                });
-                content.Transforms.Add(new TransformAlpha
-                {
-                    StartValue = 1,
-                    EndValue = 0,
-                    StartTime = currentTime + appear_duration,
-                    EndTime = currentTime + appear_duration,
-                    LoopCount = 4,
-                    LoopDelay = appear_duration * 2,
-                });
+                content.FadeTo(1);
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(0));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(1));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(0));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(1));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(0));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(1));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(0));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(1));
+                Delay(appear_duration);
+                Schedule(() => content.FadeTo(0));
             }
         }
     }
