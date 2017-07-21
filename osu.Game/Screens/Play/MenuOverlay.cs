@@ -2,17 +2,18 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
-using osu.Game.Graphics.UserInterface;
-using osu.Framework.Graphics.Shapes;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -31,6 +32,9 @@ namespace osu.Game.Screens.Play
 
         public abstract string Header { get; }
         public abstract string Description { get; }
+
+        protected abstract bool IsExitKey(Key key);
+        protected abstract Action ExitAction { get; }
 
         protected FillFlowContainer<DialogButton> Buttons;
 
@@ -85,6 +89,34 @@ namespace osu.Game.Screens.Play
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
 
         protected override bool OnMouseMove(InputState state) => true;
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (!args.Repeat)
+            {
+                // Trigger the on exit action if necessary
+                if (IsExitKey(args.Key))
+                {
+                    ExitAction();
+                    return true;
+                }
+                else if(args.Key == Key.X || args.Key == Key.Z)
+                {
+
+                    // Trigger any hovered button
+                    foreach (DialogButton button in Buttons.Children)
+                    {
+                        if (button.IsHovered)
+                        {
+                            button.TriggerOnClick();
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return base.OnKeyDown(state, args);
+        }
 
         protected void AddButton(string text, Color4 colour, Action action)
         {
