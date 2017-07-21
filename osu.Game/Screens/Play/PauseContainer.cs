@@ -131,8 +131,8 @@ namespace osu.Game.Screens.Play
             public override string Header => "paused";
             public override string Description => "you're not going to do what i think you're going to do, are ya?";
 
-            protected override bool IsExitKey(Key key) => key == Key.Space || key == Key.KeypadEnter || key == Key.Enter || key == Key.Escape;
-            protected override Action ExitAction => () => Buttons.Children.First().TriggerOnClick();
+            protected override bool IsExitKey(Key key) => key == Key.Space || key == Key.KeypadEnter || key == Key.Enter || base.IsExitKey(key);
+            protected override void ExitAction() => Buttons.Children.First().TriggerOnClick();
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)

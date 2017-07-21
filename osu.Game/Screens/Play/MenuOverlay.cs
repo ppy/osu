@@ -33,8 +33,8 @@ namespace osu.Game.Screens.Play
         public abstract string Header { get; }
         public abstract string Description { get; }
 
-        protected abstract bool IsExitKey(Key key);
-        protected abstract Action ExitAction { get; }
+        protected virtual bool IsExitKey(Key key) => key == Key.Escape;
+        protected virtual void ExitAction() { }
 
         protected FillFlowContainer<DialogButton> Buttons;
 
@@ -92,27 +92,11 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (!args.Repeat)
+            // Trigger the exit action if necessary
+            if (!args.Repeat && IsExitKey(args.Key))
             {
-                // Trigger the on exit action if necessary
-                if (IsExitKey(args.Key))
-                {
-                    ExitAction();
-                    return true;
-                }
-                else if(args.Key == Key.X || args.Key == Key.Z)
-                {
-
-                    // Trigger any hovered button
-                    foreach (DialogButton button in Buttons.Children)
-                    {
-                        if (button.IsHovered)
-                        {
-                            button.TriggerOnClick();
-                            return true;
-                        }
-                    }
-                }
+                ExitAction();
+                return true;
             }
 
             return base.OnKeyDown(state, args);

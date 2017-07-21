@@ -15,8 +15,7 @@ namespace osu.Game.Screens.Play
         public override string Header => "failed";
         public override string Description => "you're dead, try again?";
 
-        protected override bool IsExitKey(Key key) => key == Key.Escape;
-        protected override Action ExitAction => () => Buttons.Children.Last().TriggerOnClick();
+        protected override void ExitAction() => Buttons.Children.Last().TriggerOnClick();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
