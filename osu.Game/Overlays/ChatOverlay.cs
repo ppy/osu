@@ -192,11 +192,11 @@ namespace osu.Game.Overlays
         }
 
         private double startDragChatHeight;
-        private bool canBeDragged;
+        private bool canBeResized;
 
         protected override bool OnDragStart(InputState state)
         {
-            canBeDragged = tabsArea.IsHovered;
+            canBeResized = tabsArea.IsHovered;
 
             if (!channelTabs.IsHovered)
                 return base.OnDragStart(state);
@@ -207,7 +207,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
-            if (canBeDragged)
+            if (canBeResized)
             {
                 Trace.Assert(state.Mouse.PositionMouseDown != null);
 
@@ -220,7 +220,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnDragEnd(InputState state)
         {
-            canBeDragged = false;
+            canBeResized = false;
             return base.OnDragEnd(state);
         }
 
