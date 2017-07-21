@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Select
     {
         public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
 
+        public override bool HandleInput => AllowSelection;
+
         public Action BeatmapsChanged;
 
         public IEnumerable<BeatmapSetInfo> Beatmaps
@@ -133,7 +135,7 @@ namespace osu.Game.Screens.Select
 
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            if (groups.Count == 0)
+            if (groups.All(g => g.State == BeatmapGroupState.Hidden))
             {
                 selectedGroup = null;
                 selectedPanel = null;
@@ -227,6 +229,8 @@ namespace osu.Game.Screens.Select
         private FilterCriteria criteria = new FilterCriteria();
 
         private ScheduledDelegate filterTask;
+
+        public bool AllowSelection = true;
 
         public void Filter(FilterCriteria newCriteria = null, bool debounce = true)
         {
