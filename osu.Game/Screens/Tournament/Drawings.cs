@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Tournament
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, Storage storage, DependencyContainer dependencies)
+        private void load(TextureStore textures, Storage storage)
         {
             this.storage = storage;
 
