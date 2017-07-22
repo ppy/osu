@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Chat
             Padding = new MarginPadding { Left = padding, Right = padding };
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, UserProfileOverlay profile)
         {
             customUsernameColour = colours.ChatBlue;
