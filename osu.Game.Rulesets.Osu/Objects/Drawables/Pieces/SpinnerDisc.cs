@@ -128,12 +128,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 background.FinishTransforms(false, nameof(Alpha));
                 background
-                    .FadeTo(tracking_alpha + 0.2f, 60, EasingTypes.OutExpo)
+                    .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
                     .Then()
-                    .FadeTo(tracking_alpha, 250, EasingTypes.OutQuint);
+                    .FadeTo(tracking_alpha, 250, Easing.OutQuint);
             }
 
-            this.RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, EasingTypes.OutExpo);
+            this.RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, Easing.OutExpo);
         }
     }
 }

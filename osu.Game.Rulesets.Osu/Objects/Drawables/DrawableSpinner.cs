@@ -174,9 +174,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ticks.Rotation = disc.Rotation;
 
             float relativeCircleScale = spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
-            disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, EasingTypes.OutQuint);
+            disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
 
-            symbol.RotateTo(disc.Rotation / 2, 500, EasingTypes.OutQuint);
+            symbol.RotateTo(disc.Rotation / 2, 500, Easing.OutQuint);
         }
 
         protected override void UpdatePreemptState()
@@ -184,16 +184,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdatePreemptState();
 
             circleContainer.ScaleTo(spinner.Scale * 0.3f);
-            circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, EasingTypes.OutQuint);
+            circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);
 
             disc.RotateTo(-720);
             symbol.RotateTo(-720);
 
             mainContainer
                 .ScaleTo(0)
-                .ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, EasingTypes.OutQuint)
+                .ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, Easing.OutQuint)
                 .Then()
-                .ScaleTo(1, 500, EasingTypes.OutQuint);
+                .ScaleTo(1, 500, Easing.OutQuint);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -203,10 +203,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Hit:
-                    sequence.ScaleTo(Scale * 1.2f, 320, EasingTypes.Out);
+                    sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
                 case ArmedState.Miss:
-                    sequence.ScaleTo(Scale * 0.8f, 320, EasingTypes.In);
+                    sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
             }
 

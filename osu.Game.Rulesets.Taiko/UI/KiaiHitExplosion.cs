@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             base.LoadComplete();
 
-            this.ScaleTo(new Vector2(1, 3f), 500, EasingTypes.OutQuint);
+            this.ScaleTo(new Vector2(1, 3f), 500, Easing.OutQuint);
             this.FadeOut(250);
 
             Expire();

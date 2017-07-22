@@ -82,13 +82,13 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            Content.ScaleTo(1, 650, EasingTypes.OutQuint);
+            Content.ScaleTo(1, 650, Easing.OutQuint);
             Content.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
-            Content.ScaleTo(0.7f, 300, EasingTypes.InQuint);
+            Content.ScaleTo(0.7f, 300, Easing.InQuint);
             Content.FadeOut(250);
         }
 
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
-            logo.Delay(500).MoveToOffset(new Vector2(0, -180), 500, EasingTypes.InOutExpo);
+            logo.Delay(500).MoveToOffset(new Vector2(0, -180), 500, Easing.InOutExpo);
             info.Delay(750).FadeIn(500);
             this.Delay(2150).Schedule(pushWhenLoaded);
         }
@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
-            Content.ScaleTo(0.7f, 150, EasingTypes.InQuint);
+            Content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
 
             return base.OnExiting(next);

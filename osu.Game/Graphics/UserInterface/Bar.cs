@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private const int resize_duration = 250;
 
-        private const EasingTypes easing = EasingTypes.InOutCubic;
+        private const Easing easing = Easing.InOutCubic;
 
         private float length;
         /// <summary>
