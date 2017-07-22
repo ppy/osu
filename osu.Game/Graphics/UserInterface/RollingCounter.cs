@@ -5,12 +5,10 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using OpenTK.Graphics;
-using osu.Framework.MathUtils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -170,8 +168,7 @@ namespace osu.Game.Graphics.UserInterface
         /// implement the rollover animation).
         /// </summary>
         /// <param name="currentValue">Count value before modification.</param>
-        /// <param name="newValue">Expected count value after modification-</param>
-        /// <seealso cref="TransformType"/>
+        /// <param name="newValue">Expected count value after modification.</param>
         protected virtual void TransformCount(T currentValue, T newValue)
         {
             double rollingTotalDuration =
