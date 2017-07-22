@@ -83,16 +83,10 @@ namespace osu.Game.Graphics.Cursor
             protected override void PopIn()
             {
                 instantMovement |= !IsPresent;
-
-                ClearTransforms();
-                FadeIn(500, EasingTypes.OutQuint);
+                this.FadeIn(500, EasingTypes.OutQuint);
             }
 
-            protected override void PopOut()
-            {
-                using (BeginDelayedSequence(150))
-                    FadeOut(500, EasingTypes.OutQuint);
-            }
+            protected override void PopOut() => this.Delay(150).FadeOut(500, EasingTypes.OutQuint);
 
             public override void Move(Vector2 pos)
             {
@@ -103,7 +97,7 @@ namespace osu.Game.Graphics.Cursor
                 }
                 else
                 {
-                    MoveTo(pos, 200, EasingTypes.OutQuint);
+                    this.MoveTo(pos, 200, EasingTypes.OutQuint);
                 }
             }
         }

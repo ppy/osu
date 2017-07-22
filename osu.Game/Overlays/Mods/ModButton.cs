@@ -81,11 +81,13 @@ namespace osu.Game.Overlays.Mods
                     backgroundIcon.Icon = modAfter.Icon;
                     using (BeginDelayedSequence(mod_switch_duration, true))
                     {
-                        foregroundIcon.RotateTo(-rotate_angle * direction);
-                        foregroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
+                        foregroundIcon
+                            .RotateTo(-rotate_angle * direction)
+                            .RotateTo(0f, mod_switch_duration, mod_switch_easing);
 
-                        backgroundIcon.RotateTo(rotate_angle * direction);
-                        backgroundIcon.RotateTo(0f, mod_switch_duration, mod_switch_easing);
+                        backgroundIcon
+                            .RotateTo(rotate_angle * direction)
+                            .RotateTo(0f, mod_switch_duration, mod_switch_easing);
 
                         Schedule(() => displayMod(modAfter));
                     }

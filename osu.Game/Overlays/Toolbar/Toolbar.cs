@@ -121,16 +121,16 @@ namespace osu.Game.Overlays.Toolbar
 
         protected override void PopIn()
         {
-            MoveToY(0, transition_time, EasingTypes.OutQuint);
-            FadeIn(transition_time / 2, EasingTypes.OutQuint);
+            this.MoveToY(0, transition_time, EasingTypes.OutQuint);
+            this.FadeIn(transition_time / 2, EasingTypes.OutQuint);
         }
 
         protected override void PopOut()
         {
             userArea?.LoginOverlay.Hide();
 
-            MoveToY(-DrawSize.Y, transition_time, EasingTypes.OutQuint);
-            FadeOut(transition_time);
+            this.MoveToY(-DrawSize.Y, transition_time, EasingTypes.OutQuint);
+            this.FadeOut(transition_time);
         }
     }
 }
