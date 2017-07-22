@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
+using System.Linq;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -220,17 +221,19 @@ namespace osu.Game.Beatmaps.Formats
         /// <param name="line">The line which may contains variables.</param>
         private void decodeVariables(ref string line)
         {
-            while (line.IndexOf('$') >= 0)
+            string[] split = line.Split(',');
+            handleFilenames(ref split);
+            while (split.Any(s => s.StartsWith("$")))
             {
-                string[] split = line.Split(',');
                 for (int i = 0; i < split.Length; i++)
                 {
                     var item = split[i];
                     if (item.StartsWith("$") && variables.ContainsKey(item))
                         split[i] = variables[item];
                 }
-
                 line = string.Join(",", split);
+                split = line.Split('$');
+                handleFilenames(ref split);
             }
         }
 
@@ -239,6 +242,7 @@ namespace osu.Game.Beatmaps.Formats
             decodeVariables(ref line);
 
             string[] split = line.Split(',');
+            handleFilenames(ref split);
 
             EventType type;
             if (!Enum.TryParse(split[0], out type))
@@ -267,6 +271,24 @@ namespace osu.Game.Beatmaps.Formats
 
                     beatmap.Breaks.Add(breakEvent);
                     break;
+            }
+        }
+
+        private void handleFilenames(ref string[] split)
+        {
+            for (int i = 0; i < split.Length; i++)
+            {
+                if (split[i].IndexOf('"') >= 0 && split[i].Count(s => s == '"') == 1)
+                {
+                    List<string> splitRemake = new List<string>(split);
+                    int lastIndex = splitRemake.IndexOf(split.Last(s => s.IndexOf('"') >= 0));
+                    while (lastIndex-- > i)
+                    {
+                        splitRemake[i] += $",{splitRemake[i + 1]}";
+                        splitRemake.Remove(splitRemake[i + 1]);
+                    }
+                    split = splitRemake.ToArray();
+                }
             }
         }
 
