@@ -56,10 +56,7 @@ namespace osu.Desktop.VisualTests.Tests
             }
 
             if (remaining > 0)
-            {
-                Delay(80);
-                Schedule(() => sendBarrage(remaining - 1));
-            }
+                Scheduler.AddDelayed(() => sendBarrage(remaining - 1), 80);
         }
 
         protected override void Update()

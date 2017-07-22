@@ -189,30 +189,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             disc.RotateTo(-720);
             symbol.RotateTo(-720);
 
-            mainContainer.ScaleTo(0);
-            mainContainer.ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, EasingTypes.OutQuint);
-
-            mainContainer.Delay(TIME_PREEMPT - 150);
-            mainContainer.ScaleTo(1, 500, EasingTypes.OutQuint);
+            mainContainer
+                .ScaleTo(0)
+                .ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, EasingTypes.OutQuint)
+                .Then()
+                .ScaleTo(1, 500, EasingTypes.OutQuint);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            Delay(spinner.Duration, true);
-
-            FadeOut(160);
+            var sequence = this.Delay(spinner.Duration).FadeOut(160);
 
             switch (state)
             {
                 case ArmedState.Hit:
-                    ScaleTo(Scale * 1.2f, 320, EasingTypes.Out);
-                    Expire();
+                    sequence.ScaleTo(Scale * 1.2f, 320, EasingTypes.Out);
                     break;
                 case ArmedState.Miss:
-                    ScaleTo(Scale * 0.8f, 320, EasingTypes.In);
-                    Expire();
+                    sequence.ScaleTo(Scale * 0.8f, 320, EasingTypes.In);
                     break;
             }
+
+            Expire();
         }
     }
 }

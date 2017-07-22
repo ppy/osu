@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Chat
 
             private void fadeActive()
             {
-                ResizeTo(new Vector2(Width, 1.1f), transition_length, EasingTypes.OutQuint);
+                this.ResizeTo(new Vector2(Width, 1.1f), transition_length, EasingTypes.OutQuint);
 
                 box.FadeColour(backgroundActive, transition_length, EasingTypes.OutQuint);
                 highlightBox.FadeIn(transition_length, EasingTypes.OutQuint);
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Chat
 
             private void fadeInactive()
             {
-                ResizeTo(new Vector2(Width, 1), transition_length, EasingTypes.OutQuint);
+                this.ResizeTo(new Vector2(Width, 1), transition_length, EasingTypes.OutQuint);
 
                 box.FadeColour(backgroundInactive, transition_length, EasingTypes.OutQuint);
                 highlightBox.FadeOut(transition_length, EasingTypes.OutQuint);

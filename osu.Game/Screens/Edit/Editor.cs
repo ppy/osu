@@ -7,6 +7,7 @@ using OpenTK.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
