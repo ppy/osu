@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Select.Options
         {
             base.PopIn();
 
-            FadeIn(transition_duration, EasingTypes.OutQuint);
+            this.FadeIn(transition_duration, EasingTypes.OutQuint);
 
             if (buttonsContainer.Position.X == 1 || Alpha == 0)
                 buttonsContainer.MoveToX(x_position - x_movement);
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select.Options
             buttonsContainer.MoveToX(x_position + x_movement, transition_duration, EasingTypes.InSine);
             buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, EasingTypes.InSine);
 
-            FadeOut(transition_duration, EasingTypes.InQuint);
+            this.FadeOut(transition_duration, EasingTypes.InQuint);
         }
 
         public BeatmapOptionsOverlay()

@@ -67,6 +67,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         private void changePlayfieldSize(int step)
         {
+            double delay = 0;
+
             // Add new hits
             switch (step)
             {
@@ -84,7 +86,7 @@ namespace osu.Desktop.VisualTests.Tests
                     break;
                 case 5:
                     addSwell(1000);
-                    playfieldContainer.Delay(scroll_time - 100);
+                    delay = scroll_time - 100;
                     break;
             }
 
@@ -92,10 +94,10 @@ namespace osu.Desktop.VisualTests.Tests
             switch (step)
             {
                 default:
-                    playfieldContainer.ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
+                    playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
                     break;
                 case 6:
-                    playfieldContainer.ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT), 500);
+                    playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT), 500);
                     break;
             }
         }

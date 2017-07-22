@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
 using OpenTK;
 using OpenTK.Graphics;
@@ -297,7 +296,8 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None) => TransformTo(value, duration, easing, new TransformScrollSpeed());
+        private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None) =>
+            this.TransformTo(nameof(speed), value, duration, easing);
 
         private enum ScrollState
         {
@@ -306,12 +306,6 @@ namespace osu.Game.Screens.Tournament
             Stopping,
             Stopped,
             Scrolling
-        }
-
-        public class TransformScrollSpeed : TransformFloat<Drawable>
-        {
-            public override void Apply(Drawable d) => ((ScrollingTeamContainer)d).speed = CurrentValue;
-            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ScrollingTeamContainer)d).speed;
         }
 
         public class ScrollingTeam : Container
