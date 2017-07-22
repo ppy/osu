@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Play.HUD
     public class ComboResultCounter : RollingCounter<long>
     {
         protected override double RollingDuration => 500;
-        protected override EasingTypes RollingEasing => EasingTypes.Out;
+        protected override Easing RollingEasing => Easing.Out;
 
         protected override double GetProportionalDuration(long currentValue, long newValue)
         {

@@ -90,12 +90,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         const float gravity_time = 300;
                         const float gravity_travel_height = 200;
 
-                        Content.ScaleTo(0.8f, gravity_time * 2, EasingTypes.OutQuad);
+                        Content.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
                         this.FadeOut(800)
-                            .MoveToY(-gravity_travel_height, gravity_time, EasingTypes.Out)
+                            .MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
                             .Then()
-                            .MoveToY(gravity_travel_height * 2, gravity_time * 2, EasingTypes.In);
+                            .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
 
                         Expire();
                         break;

@@ -62,15 +62,15 @@ namespace osu.Game.Screens.Select.Leaderboards
                         break;
                     case Visibility.Visible:
                         this.FadeIn(200);
-                        content.MoveToY(0, 800, EasingTypes.OutQuint);
+                        content.MoveToY(0, 800, Easing.OutQuint);
 
                         using (BeginDelayedSequence(100, true))
                         {
-                            avatar.FadeIn(300, EasingTypes.OutQuint);
-                            nameLabel.FadeIn(350, EasingTypes.OutQuint);
+                            avatar.FadeIn(300, Easing.OutQuint);
+                            nameLabel.FadeIn(350, Easing.OutQuint);
 
-                            avatar.MoveToX(0, 300, EasingTypes.OutQuint);
-                            nameLabel.MoveToX(0, 350, EasingTypes.OutQuint);
+                            avatar.MoveToX(0, 300, Easing.OutQuint);
+                            nameLabel.MoveToX(0, 350, Easing.OutQuint);
 
                             using (BeginDelayedSequence(250, true))
                             {
@@ -269,13 +269,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            background.FadeTo(0.5f, 300, EasingTypes.OutQuint);
+            background.FadeTo(0.5f, 300, Easing.OutQuint);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(Framework.Input.InputState state)
         {
-            background.FadeTo(background_alpha, 200, EasingTypes.OutQuint);
+            background.FadeTo(background_alpha, 200, Easing.OutQuint);
             base.OnHoverLost(state);
         }
 

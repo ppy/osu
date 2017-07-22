@@ -17,8 +17,8 @@ namespace osu.Game.Overlays
         protected const float APPEAR_DURATION = 800;
         protected const float DISAPPEAR_DURATION = 500;
 
-        private const EasingTypes easing_show = EasingTypes.OutSine;
-        private const EasingTypes easing_hide = EasingTypes.InSine;
+        private const Easing easing_show = Easing.OutSine;
+        private const Easing easing_hide = Easing.InSine;
 
         private readonly Wave firstWave;
         private readonly Wave secondWave;
@@ -137,23 +137,23 @@ namespace osu.Game.Overlays
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Visible;
 
-            this.FadeIn(100, EasingTypes.OutQuint);
-            contentContainer.MoveToY(0, APPEAR_DURATION, EasingTypes.OutQuint);
+            this.FadeIn(100, Easing.OutQuint);
+            contentContainer.MoveToY(0, APPEAR_DURATION, Easing.OutQuint);
 
-            this.FadeIn(100, EasingTypes.OutQuint);
+            this.FadeIn(100, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            this.FadeOut(DISAPPEAR_DURATION, EasingTypes.InQuint);
-            contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, EasingTypes.In);
+            this.FadeOut(DISAPPEAR_DURATION, Easing.InQuint);
+            contentContainer.MoveToY(DrawHeight * 2f, DISAPPEAR_DURATION, Easing.In);
 
             foreach (var w in wavesContainer.Children)
                 w.State = Visibility.Hidden;
 
-            this.FadeOut(DISAPPEAR_DURATION, EasingTypes.InQuint);
+            this.FadeOut(DISAPPEAR_DURATION, Easing.InQuint);
         }
 
         protected override void UpdateAfterChildren()

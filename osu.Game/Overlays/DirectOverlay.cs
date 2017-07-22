@@ -169,7 +169,7 @@ namespace osu.Game.Overlays
 
         private void updateResultCounts()
         {
-            resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, EasingTypes.OutQuint);
+            resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, Easing.OutQuint);
             if (ResultAmounts == null) return;
 
             resultCountsText.Text = pluralize("Artist", ResultAmounts.Artists) + ", " +

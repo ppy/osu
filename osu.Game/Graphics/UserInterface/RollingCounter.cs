@@ -36,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Easing for the counter rollover animation.
         /// </summary>
-        protected virtual EasingTypes RollingEasing => EasingTypes.OutQuint;
+        protected virtual Easing RollingEasing => Easing.OutQuint;
 
         private T displayedCount;
 

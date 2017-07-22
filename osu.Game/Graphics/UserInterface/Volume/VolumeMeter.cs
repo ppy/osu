@@ -82,6 +82,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
             return true;
         }
 
-        private void updateFill() => meterFill.ScaleTo(new Vector2(1, (float)Volume), 300, EasingTypes.OutQuint);
+        private void updateFill() => meterFill.ScaleTo(new Vector2(1, (float)Volume), 300, Easing.OutQuint);
     }
 }

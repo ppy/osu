@@ -296,7 +296,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None) =>
+        private void speedTo(float value, double duration = 0, Easing easing = Easing.None) =>
             this.TransformTo(nameof(speed), value, duration, easing);
 
         private enum ScrollState
