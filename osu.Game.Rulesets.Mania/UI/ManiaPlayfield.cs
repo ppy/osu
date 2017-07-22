@@ -16,7 +16,6 @@ using System.Linq;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Input;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Framework.Configuration;
