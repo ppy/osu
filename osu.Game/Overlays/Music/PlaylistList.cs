@@ -73,6 +73,17 @@ namespace osu.Game.Overlays.Music
             };
         }
 
+        public void AddBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            items.Add(new PlaylistItem(beatmapSet) { OnSelect = itemSelected });
+        }
+
+        public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            PlaylistItem itemToRemove = items.Children.FirstOrDefault(item => item.BeatmapSetInfo == beatmapSet);
+            if (itemToRemove != null) items.Remove(itemToRemove);
+        }
+
         private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
         {
             public string[] FilterTerms => new string[] { };

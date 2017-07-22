@@ -80,6 +80,9 @@ namespace osu.Game.Overlays.Music
 
             list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending).ToList();
 
+            beatmaps.BeatmapSetAdded += onBeatmapSetAdded;
+            beatmaps.BeatmapSetRemoved += onBeatmapSetRemoved;
+
             beatmapBacking.BindTo(game.Beatmap);
 
             filter.Search.OnCommit = (sender, newText) =>
@@ -87,6 +90,17 @@ namespace osu.Game.Overlays.Music
                 var beatmap = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
                 if (beatmap != null) playSpecified(beatmap);
             };
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (beatmaps != null)
+            {
+                beatmaps.BeatmapSetAdded -= onBeatmapSetAdded;
+                beatmaps.BeatmapSetRemoved -= onBeatmapSetRemoved;
+            }
+
+            base.Dispose(isDisposing);
         }
 
         protected override void LoadComplete()
@@ -123,6 +137,10 @@ namespace osu.Game.Overlays.Music
 
             playSpecified(set.Beatmaps[0]);
         }
+
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => list.AddBeatmapSet(s);
+
+        private void onBeatmapSetRemoved(BeatmapSetInfo s) => list.RemoveBeatmapSet(s);
 
         public void PlayPrevious()
         {
