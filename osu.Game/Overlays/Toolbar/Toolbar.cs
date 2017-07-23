@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Toolbar
                         Anchor = Anchor.BottomLeft,
                         Alpha = 0,
                         Height = 90,
-                        ColourInfo = ColourInfo.GradientVertical(
+                        Colour = ColourInfo.GradientVertical(
                             OsuColour.Gray(0.1f).Opacity(0.5f), OsuColour.Gray(0.1f).Opacity(0)),
                     },
                 };
@@ -107,29 +107,29 @@ namespace osu.Game.Overlays.Toolbar
 
             protected override bool OnHover(InputState state)
             {
-                solidBackground.FadeTo(alpha_hovering, transition_time, EasingTypes.OutQuint);
-                gradientBackground.FadeIn(transition_time, EasingTypes.OutQuint);
+                solidBackground.FadeTo(alpha_hovering, transition_time, Easing.OutQuint);
+                gradientBackground.FadeIn(transition_time, Easing.OutQuint);
                 return true;
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                solidBackground.FadeTo(alpha_normal, transition_time, EasingTypes.OutQuint);
-                gradientBackground.FadeOut(transition_time, EasingTypes.OutQuint);
+                solidBackground.FadeTo(alpha_normal, transition_time, Easing.OutQuint);
+                gradientBackground.FadeOut(transition_time, Easing.OutQuint);
             }
         }
 
         protected override void PopIn()
         {
-            this.MoveToY(0, transition_time, EasingTypes.OutQuint);
-            this.FadeIn(transition_time / 2, EasingTypes.OutQuint);
+            this.MoveToY(0, transition_time, Easing.OutQuint);
+            this.FadeIn(transition_time / 2, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             userArea?.LoginOverlay.Hide();
 
-            this.MoveToY(-DrawSize.Y, transition_time, EasingTypes.OutQuint);
+            this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
             this.FadeOut(transition_time);
         }
     }

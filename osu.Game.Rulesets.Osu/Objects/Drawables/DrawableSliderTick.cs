@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 d => d.FadeIn(animIn),
                 d => d.ScaleTo(0.5f).ScaleTo(1.2f, animIn)
             ).Then(
-                d => d.ScaleTo(1, 150, EasingTypes.Out)
+                d => d.ScaleTo(1, 150, Easing.Out)
             );
         }
 
@@ -82,8 +82,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         .FadeColour(Color4.Red, 80);
                     break;
                 case ArmedState.Hit:
-                    this.FadeOut(120, EasingTypes.OutQuint)
-                        .ScaleTo(Scale * 1.5f, 120, EasingTypes.OutQuint);
+                    this.FadeOut(120, Easing.OutQuint)
+                        .ScaleTo(Scale * 1.5f, 120, Easing.OutQuint);
                     break;
             }
         }

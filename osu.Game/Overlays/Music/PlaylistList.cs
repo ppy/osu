@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Music
             public ItemSearchContainer()
             {
                 LayoutDuration = 200;
-                LayoutEasing = EasingTypes.OutQuint;
+                LayoutEasing = Easing.OutQuint;
             }
         }
     }

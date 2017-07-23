@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private void display(Background newBackground)
         {
-            current?.FadeOut(800, EasingTypes.OutQuint);
+            current?.FadeOut(800, Easing.OutQuint);
             current?.Expire();
 
             Add(current = newBackground);

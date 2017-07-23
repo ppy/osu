@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps.Drawables
             }
 
             if (state == PanelSelectedState.Hidden)
-                this.FadeOut(300, EasingTypes.OutQuint);
+                this.FadeOut(300, Easing.OutQuint);
             else
                 this.FadeIn(250);
         }

@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Notifications
                 IconBackgound = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColourInfo = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.6f))
+                    Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.6f))
                 },
                 iconDrawable = new TextAwesome
                 {

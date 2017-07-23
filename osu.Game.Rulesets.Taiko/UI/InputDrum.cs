@@ -149,16 +149,16 @@ namespace osu.Game.Rulesets.Taiko.UI
                     const float down_time = 40;
                     const float up_time = 1000;
 
-                    back.ScaleTo(target.Scale.X - scale_amount, down_time, EasingTypes.OutQuint)
+                    back.ScaleTo(target.Scale.X - scale_amount, down_time, Easing.OutQuint)
                         .Then()
-                        .ScaleTo(1, up_time, EasingTypes.OutQuint);
+                        .ScaleTo(1, up_time, Easing.OutQuint);
 
                     target.Animate(
-                        t => t.ScaleTo(target.Scale.X - scale_amount, down_time, EasingTypes.OutQuint),
-                        t => t.FadeTo(Math.Min(target.Alpha + alpha_amount, 1), down_time, EasingTypes.OutQuint)
+                        t => t.ScaleTo(target.Scale.X - scale_amount, down_time, Easing.OutQuint),
+                        t => t.FadeTo(Math.Min(target.Alpha + alpha_amount, 1), down_time, Easing.OutQuint)
                     ).Then(
-                        t => t.ScaleTo(1, up_time, EasingTypes.OutQuint),
-                        t => t.FadeOut(up_time, EasingTypes.OutQuint)
+                        t => t.ScaleTo(1, up_time, Easing.OutQuint),
+                        t => t.FadeOut(up_time, Easing.OutQuint)
                     );
                 }
 

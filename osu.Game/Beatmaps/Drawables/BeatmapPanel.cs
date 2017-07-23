@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             GainedSelection?.Invoke(this);
 
-            background.ColourInfo = ColourInfo.GradientVertical(
+            background.Colour = ColourInfo.GradientVertical(
                 new Color4(20, 43, 51, 255),
                 new Color4(40, 86, 102, 255));
 

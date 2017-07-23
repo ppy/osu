@@ -73,8 +73,8 @@ namespace osu.Game.Screens.Menu
             Color4 gradientDark = colours.Blue.Opacity(0).ToLinear();
             Color4 gradientLight = colours.Blue.Opacity(0.3f).ToLinear();
 
-            leftBox.ColourInfo = ColourInfo.GradientHorizontal(gradientLight, gradientDark);
-            rightBox.ColourInfo = ColourInfo.GradientHorizontal(gradientDark, gradientLight);
+            leftBox.Colour = ColourInfo.GradientHorizontal(gradientLight, gradientDark);
+            rightBox.Colour = ColourInfo.GradientHorizontal(gradientDark, gradientLight);
         }
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Menu
         {
             d.FadeTo(Math.Max(0, ((d.Equals(leftBox) ? amplitudes.LeftChannel : amplitudes.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time)
              .Then()
-             .FadeOut(beatLength, EasingTypes.In);
+             .FadeOut(beatLength, Easing.In);
         }
     }
 }
