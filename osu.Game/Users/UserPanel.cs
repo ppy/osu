@@ -192,13 +192,13 @@ namespace osu.Game.Users
             {
                 statusBar.ResizeHeightTo(0f, transition_duration, EasingTypes.OutQuint);
                 statusBar.FadeOut(transition_duration, EasingTypes.OutQuint);
-                ResizeHeightTo(height - status_height, transition_duration, EasingTypes.OutQuint);
+                this.ResizeHeightTo(height - status_height, transition_duration, EasingTypes.OutQuint);
             }
             else
             {
                 statusBar.ResizeHeightTo(status_height, transition_duration, EasingTypes.OutQuint);
                 statusBar.FadeIn(transition_duration, EasingTypes.OutQuint);
-                ResizeHeightTo(height, transition_duration, EasingTypes.OutQuint);
+                this.ResizeHeightTo(height, transition_duration, EasingTypes.OutQuint);
 
                 statusMessage.Text = status.Message;
             }

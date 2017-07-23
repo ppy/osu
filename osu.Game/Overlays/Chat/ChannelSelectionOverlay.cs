@@ -158,10 +158,10 @@ namespace osu.Game.Overlays.Chat
 
         protected override void PopIn()
         {
-            if (Alpha == 0) MoveToY(DrawHeight);
+            if (Alpha == 0) this.MoveToY(DrawHeight);
 
-            FadeIn(transition_duration, EasingTypes.OutQuint);
-            MoveToY(0, transition_duration, EasingTypes.OutQuint);
+            this.FadeIn(transition_duration, EasingTypes.OutQuint);
+            this.MoveToY(0, transition_duration, EasingTypes.OutQuint);
 
             search.HoldFocus = true;
             base.PopIn();
@@ -169,8 +169,8 @@ namespace osu.Game.Overlays.Chat
 
         protected override void PopOut()
         {
-            FadeOut(transition_duration, EasingTypes.InSine);
-            MoveToY(DrawHeight, transition_duration, EasingTypes.InSine);
+            this.FadeOut(transition_duration, EasingTypes.InSine);
+            this.MoveToY(DrawHeight, transition_duration, EasingTypes.InSine);
 
             search.HoldFocus = false;
             base.PopOut();

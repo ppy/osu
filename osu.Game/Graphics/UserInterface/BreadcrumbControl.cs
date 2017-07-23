@@ -54,13 +54,13 @@ namespace osu.Game.Graphics.UserInterface
 
                     if (State == Visibility.Visible)
                     {
-                        FadeIn(transition_duration, EasingTypes.OutQuint);
-                        ScaleTo(new Vector2(1f), transition_duration, EasingTypes.OutQuint);
+                        this.FadeIn(transition_duration, EasingTypes.OutQuint);
+                        this.ScaleTo(new Vector2(1f), transition_duration, EasingTypes.OutQuint);
                     }
                     else
                     {
-                        FadeOut(transition_duration, EasingTypes.OutQuint);
-                        ScaleTo(new Vector2(0.8f, 1f), transition_duration, EasingTypes.OutQuint);
+                        this.FadeOut(transition_duration, EasingTypes.OutQuint);
+                        this.ScaleTo(new Vector2(0.8f, 1f), transition_duration, EasingTypes.OutQuint);
                     }
                 }
             }

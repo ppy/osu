@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings
         {
             set
             {
-                FadeTo(value ? 1 : 0);
+                this.FadeTo(value ? 1 : 0);
             }
         }
 

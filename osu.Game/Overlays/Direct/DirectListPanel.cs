@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
 
-            FadeInFromZero(200, EasingTypes.Out);
+            this.FadeInFromZero(200, EasingTypes.Out);
         }
 
         [BackgroundDependencyLoader]

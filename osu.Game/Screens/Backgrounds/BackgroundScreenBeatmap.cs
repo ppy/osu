@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Backgrounds
                         if (background != null)
                         {
                             newDepth = background.Depth + 1;
-                            background.Flush();
+                            background.FinishTransforms();
                             background.FadeOut(250);
                             background.Expire();
                         }

@@ -5,8 +5,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.HUD
@@ -130,7 +128,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected virtual void OnCountRolling(int currentValue, int newValue)
         {
-            transformRoll(new TransformComboRoll(), currentValue, newValue);
+            transformRoll(currentValue, newValue);
         }
 
         protected virtual void OnCountIncrement(int currentValue, int newValue)
@@ -170,7 +168,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (!rolling)
             {
-                Flush(false, typeof(TransformComboRoll));
+                FinishTransforms(false, nameof(DisplayedCount));
                 IsRolling = false;
                 DisplayedCount = prev;
 
@@ -186,40 +184,9 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private void transformRoll(TransformComboRoll transform, int currentValue, int newValue)
+        private void transformRoll(int currentValue, int newValue)
         {
-            Flush(false, typeof(TransformComboRoll));
-
-            if (RollingDuration < 1)
-            {
-                DisplayedCount = Current;
-                return;
-            }
-
-            transform.StartTime = Time.Current;
-            transform.EndTime = Time.Current + getProportionalDuration(currentValue, newValue);
-            transform.EndValue = newValue;
-            transform.Easing = RollingEasing;
-
-            Transforms.Add(transform);
-        }
-
-        protected class TransformComboRoll : Transform<int, Drawable>
-        {
-            public virtual int CurrentValue
-            {
-                get
-                {
-                    double time = Time?.Current ?? 0;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
-
-                    return (int)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-                }
-            }
-
-            public override void Apply(Drawable d) => ((ComboCounter)d).DisplayedCount = CurrentValue;
-            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ComboCounter)d).DisplayedCount;
+            this.TransformTo(nameof(DisplayedCount), newValue, getProportionalDuration(currentValue, newValue), RollingEasing);
         }
 
         protected abstract void OnDisplayedCountRolling(int currentValue, int newValue);
