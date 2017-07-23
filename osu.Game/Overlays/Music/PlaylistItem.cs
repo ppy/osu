@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Game.Database;
 using osu.Game.Graphics;
@@ -31,6 +32,7 @@ namespace osu.Game.Overlays.Music
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         public Action<BeatmapSetInfo> OnSelect;
+        public Action<PlaylistItem> OnReorder;
 
         private bool selected;
         public bool Selected
@@ -130,6 +132,28 @@ namespace osu.Game.Overlays.Music
         {
             OnSelect?.Invoke(BeatmapSetInfo);
             return true;
+        }
+
+        protected override bool OnDragStart(Framework.Input.InputState state)
+        {
+            handle.FadeIn(fade_duration);
+            return true;
+        }
+
+        protected override bool OnDrag(Framework.Input.InputState state)
+        {
+            OpenTK.Vector2 yMovement = state.Mouse.Position;
+            yMovement.X = 0;
+            this.MoveTo(yMovement);
+
+            return true;
+        }
+
+        protected override bool OnDragEnd(Framework.Input.InputState state)
+        {
+            handle.FadeOut(fade_duration);
+            OnReorder?.Invoke(this);
+            return false;
         }
 
         public string[] FilterTerms { get; private set; }

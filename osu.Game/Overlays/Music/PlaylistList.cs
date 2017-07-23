@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Music
         {
             set
             {
-                items.Children = value.Select(item => new PlaylistItem(item) { OnSelect = itemSelected }).ToList();
+                items.Children = value.Select(item => new PlaylistItem(item) { OnSelect = itemSelected, OnReorder = reorderList }).ToList();
             }
         }
 
@@ -31,6 +31,15 @@ namespace osu.Game.Overlays.Music
         }
 
         public Action<BeatmapSetInfo> OnSelect;
+
+        private void reorderList(PlaylistItem item)
+        {
+            for (int ctr = 0; ctr < items.Count; ctr++)
+            {
+                if (items.ElementAt(ctr).IsHovered && items.ElementAt(ctr) != item)
+                    items.ChangeChildDepth(item, ctr);
+            }
+        }
 
         private readonly SearchContainer search;
 
