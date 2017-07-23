@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Select
             Action = action,
         });
 
-        private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, EasingTypes.OutQuint);
+        private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, Easing.OutQuint);
 
         public Footer()
         {

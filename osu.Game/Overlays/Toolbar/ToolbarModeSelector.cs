@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Toolbar
 
             if (!activeMode.IsValid)
             {
-                modeButtonLine.MoveToX(activeButton.DrawPosition.X, 200, EasingTypes.OutQuint);
+                modeButtonLine.MoveToX(activeButton.DrawPosition.X, 200, Easing.OutQuint);
                 activeMode.Validate();
             }
         }

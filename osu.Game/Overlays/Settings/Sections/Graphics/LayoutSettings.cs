@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     AutoSizeDuration = transition_duration,
-                    AutoSizeEasing = EasingTypes.OutQuint,
+                    AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
 
                     Children = new Drawable[]
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 letterboxSettings.AutoSizeAxes = isVisible ? Axes.Y : Axes.None;
 
                 if (!isVisible)
-                    letterboxSettings.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
+                    letterboxSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
             };
             letterboxing.TriggerChange();
         }

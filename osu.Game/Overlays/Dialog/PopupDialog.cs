@@ -115,17 +115,17 @@ namespace osu.Game.Overlays.Dialog
                 ring.ResizeTo(ringMinifiedSize);
             }
 
-            content.FadeIn(ENTER_DURATION, EasingTypes.OutQuint);
-            ring.ResizeTo(ringSize, ENTER_DURATION, EasingTypes.OutQuint);
-            buttonsContainer.TransformSpacingTo(Vector2.Zero, ENTER_DURATION, EasingTypes.OutQuint);
-            buttonsContainer.MoveToY(0, ENTER_DURATION, EasingTypes.OutQuint);
+            content.FadeIn(ENTER_DURATION, Easing.OutQuint);
+            ring.ResizeTo(ringSize, ENTER_DURATION, Easing.OutQuint);
+            buttonsContainer.TransformSpacingTo(Vector2.Zero, ENTER_DURATION, Easing.OutQuint);
+            buttonsContainer.MoveToY(0, ENTER_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            content.FadeOut(EXIT_DURATION, EasingTypes.InSine);
+            content.FadeOut(EXIT_DURATION, Easing.InSine);
         }
 
         public PopupDialog()

@@ -220,10 +220,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 switch (args.Key)
                 {
                     case Key.Minus:
-                        transformVisibleTimeRangeTo(visibleTimeRange + time_span_step, 200, EasingTypes.OutQuint);
+                        transformVisibleTimeRangeTo(visibleTimeRange + time_span_step, 200, Easing.OutQuint);
                         break;
                     case Key.Plus:
-                        transformVisibleTimeRangeTo(visibleTimeRange - time_span_step, 200, EasingTypes.OutQuint);
+                        transformVisibleTimeRangeTo(visibleTimeRange - time_span_step, 200, Easing.OutQuint);
                         break;
                 }
             }
@@ -231,7 +231,7 @@ namespace osu.Game.Rulesets.Mania.UI
             return false;
         }
 
-        private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, EasingTypes easing = EasingTypes.None)
+        private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, Easing easing = Easing.None)
         {
             this.TransformTo(nameof(visibleTimeRange), newTimeRange, duration, easing);
         }

@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
         private double animationDelay => 80;
 
         private double scalingDuration => 1000;
-        private EasingTypes scalingEasing => EasingTypes.OutElasticHalf;
+        private Easing scalingEasing => Easing.OutElasticHalf;
         private float minStarScale => 0.4f;
 
         private double fadingDuration => 100;

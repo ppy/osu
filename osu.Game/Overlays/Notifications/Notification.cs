@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Notifications
             base.LoadComplete();
             this.FadeInFromZero(200);
             NotificationContent.MoveToX(DrawSize.X);
-            NotificationContent.MoveToX(0, 500, EasingTypes.OutQuint);
+            NotificationContent.MoveToX(0, 500, Easing.OutQuint);
         }
 
         private bool wasClosed;
@@ -213,7 +213,7 @@ namespace osu.Game.Overlays.Notifications
                     {
                         const float length = 1000;
                         pulsateLayer.Loop(length / 2,
-                            p => p.FadeTo(0.4f, length, EasingTypes.In).Then().FadeTo(1, length, EasingTypes.Out)
+                            p => p.FadeTo(0.4f, length, Easing.In).Then().FadeTo(1, length, Easing.Out)
                         );
                     }
                 }

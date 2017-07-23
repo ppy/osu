@@ -312,14 +312,14 @@ namespace osu.Game.Screens.Select
 
             Content.FadeIn(250);
 
-            Content.ScaleTo(1, 250, EasingTypes.OutSine);
+            Content.ScaleTo(1, 250, Easing.OutSine);
 
             FilterControl.Activate();
         }
 
         protected override void OnSuspending(Screen next)
         {
-            Content.ScaleTo(1.1f, 250, EasingTypes.InSine);
+            Content.ScaleTo(1.1f, 250, Easing.InSine);
 
             Content.FadeOut(250);
 

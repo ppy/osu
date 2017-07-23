@@ -89,27 +89,27 @@ namespace osu.Game.Screens.Select
         protected override bool OnHover(InputState state)
         {
             Hovered?.Invoke();
-            light.ScaleTo(new Vector2(1, 2), Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
-            light.FadeColour(SelectedColour, Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
+            light.ScaleTo(new Vector2(1, 2), Footer.TRANSITION_LENGTH, Easing.OutQuint);
+            light.FadeColour(SelectedColour, Footer.TRANSITION_LENGTH, Easing.OutQuint);
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             HoverLost?.Invoke();
-            light.ScaleTo(new Vector2(1, 1), Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
-            light.FadeColour(DeselectedColour, Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
+            light.ScaleTo(new Vector2(1, 1), Footer.TRANSITION_LENGTH, Easing.OutQuint);
+            light.FadeColour(DeselectedColour, Footer.TRANSITION_LENGTH, Easing.OutQuint);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            box.FadeTo(0.3f, Footer.TRANSITION_LENGTH * 2, EasingTypes.OutQuint);
+            box.FadeTo(0.3f, Footer.TRANSITION_LENGTH * 2, Easing.OutQuint);
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            box.FadeOut(Footer.TRANSITION_LENGTH, EasingTypes.OutQuint);
+            box.FadeOut(Footer.TRANSITION_LENGTH, Easing.OutQuint);
             return base.OnMouseUp(state, args);
         }
 
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Select
         {
             box.ClearTransforms();
             box.Alpha = 1;
-            box.FadeOut(Footer.TRANSITION_LENGTH * 3, EasingTypes.OutQuint);
+            box.FadeOut(Footer.TRANSITION_LENGTH * 3, Easing.OutQuint);
             return base.OnClick(state);
         }
 

@@ -8,7 +8,7 @@ namespace osu.Game.Graphics.UserInterface
     public class ScoreCounter : RollingCounter<double>
     {
         protected override double RollingDuration => 1000;
-        protected override EasingTypes RollingEasing => EasingTypes.Out;
+        protected override Easing RollingEasing => Easing.Out;
 
         public bool UseCommaSeparator;
 

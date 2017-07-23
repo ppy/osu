@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Mods
 
         public string TooltipText => (SelectedMod?.Description ?? Mods.FirstOrDefault()?.Description) ?? string.Empty;
 
-        private const EasingTypes mod_switch_easing = EasingTypes.InOutSine;
+        private const Easing mod_switch_easing = Easing.InOutSine;
         private const double mod_switch_duration = 120;
 
         // A selected index of -1 means not selected.
@@ -67,8 +67,8 @@ namespace osu.Game.Overlays.Mods
 
                 if (beforeSelected != Selected)
                 {
-                    iconsContainer.RotateTo(Selected ? 5f : 0f, 300, EasingTypes.OutElastic);
-                    iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, EasingTypes.OutElastic);
+                    iconsContainer.RotateTo(Selected ? 5f : 0f, 300, Easing.OutElastic);
+                    iconsContainer.ScaleTo(Selected ? 1.1f : 1f, 300, Easing.OutElastic);
                 }
 
                 if (modBefore != modAfter)

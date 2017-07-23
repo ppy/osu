@@ -88,10 +88,10 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 new OsuContextMenuItem(@"Simple option"),
                 new OsuContextMenuItem(@"Simple very very long option"),
-                new OsuContextMenuItem(@"Change width", MenuItemType.Highlighted) { Action = () => this.ResizeWidthTo(Width * 2, 100, EasingTypes.OutQuint) },
-                new OsuContextMenuItem(@"Change height", MenuItemType.Highlighted) { Action = () => this.ResizeHeightTo(Height * 2, 100, EasingTypes.OutQuint) },
-                new OsuContextMenuItem(@"Change width back", MenuItemType.Destructive) { Action = () => this.ResizeWidthTo(Width / 2, 100, EasingTypes.OutQuint) },
-                new OsuContextMenuItem(@"Change height back", MenuItemType.Destructive) { Action = () => this.ResizeHeightTo(Height / 2, 100, EasingTypes.OutQuint) },
+                new OsuContextMenuItem(@"Change width", MenuItemType.Highlighted) { Action = () => this.ResizeWidthTo(Width * 2, 100, Easing.OutQuint) },
+                new OsuContextMenuItem(@"Change height", MenuItemType.Highlighted) { Action = () => this.ResizeHeightTo(Height * 2, 100, Easing.OutQuint) },
+                new OsuContextMenuItem(@"Change width back", MenuItemType.Destructive) { Action = () => this.ResizeWidthTo(Width / 2, 100, Easing.OutQuint) },
+                new OsuContextMenuItem(@"Change height back", MenuItemType.Destructive) { Action = () => this.ResizeHeightTo(Height / 2, 100, Easing.OutQuint) },
             };
         }
     }
