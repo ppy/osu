@@ -128,13 +128,13 @@ namespace osu.Game.Screens.Play
                         samplePass.Play();
                     }
 
-                    resultIcon.FadeTo(1);
-                    Delay(100);
-                    Schedule(() => resultIcon.FadeTo(0));
-                    Delay(100);
-                    Schedule(() => resultIcon.FadeTo(1));
-                    Delay(1000);
-                    Schedule(() => resultIcon.FadeTo(0, 200));
+                    resultIcon.FadeTo(1).
+                        Then().
+                        Delay(100).FadeTo(0).
+                        Then().
+                        Delay(100).FadeTo(1).
+                        Then().
+                        Delay(1000).FadeTo(0, 200);
 
                     iconHasBeenShown = true;
                 }
@@ -219,27 +219,25 @@ namespace osu.Game.Screens.Play
 
             public void PlayWarning()
             {
-                content.ClearTransforms();
-
-                content.FadeTo(1);
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(0));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(1));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(0));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(1));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(0));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(1));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(0));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(1));
-                Delay(appear_duration);
-                Schedule(() => content.FadeTo(0));
+                content.FadeTo(1).
+                    Then().
+                    Delay(appear_duration).FadeTo(0).
+                    Then().
+                    Delay(appear_duration).FadeTo(1).
+                    Then().
+                    Delay(appear_duration).FadeTo(0).
+                    Then().
+                    Delay(appear_duration).FadeTo(1).
+                    Then().
+                    Delay(appear_duration).FadeTo(0).
+                    Then().
+                    Delay(appear_duration).FadeTo(1).
+                    Then().
+                    Delay(appear_duration).FadeTo(0).
+                    Then().
+                    Delay(appear_duration).FadeTo(1).
+                    Then().
+                    Delay(appear_duration).FadeTo(0);
             }
         }
     }
