@@ -64,22 +64,22 @@ namespace osu.Game.Rulesets.Judgements
         {
             base.LoadComplete();
 
-            this.FadeInFromZero(100, EasingTypes.OutQuint);
+            this.FadeInFromZero(100, Easing.OutQuint);
 
             switch (Judgement.Result)
             {
                 case HitResult.Miss:
                     this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, EasingTypes.In);
+                    this.ScaleTo(1, 100, Easing.In);
 
-                    this.MoveToOffset(new Vector2(0, 100), 800, EasingTypes.InQuint);
-                    this.RotateTo(40, 800, EasingTypes.InQuint);
+                    this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+                    this.RotateTo(40, 800, Easing.InQuint);
 
                     this.Delay(600).FadeOut(200);
                     break;
                 case HitResult.Hit:
                     this.ScaleTo(0.9f);
-                    this.ScaleTo(1, 500, EasingTypes.OutElastic);
+                    this.ScaleTo(1, 500, Easing.OutElastic);
 
                     this.Delay(100).FadeOut(400);
                     break;

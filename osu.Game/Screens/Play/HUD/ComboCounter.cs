@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected virtual double PopOutDuration => 150;
         protected virtual float PopOutScale => 2.0f;
-        protected virtual EasingTypes PopOutEasing => EasingTypes.None;
+        protected virtual Easing PopOutEasing => Easing.None;
         protected virtual float PopOutInitialAlpha => 0.75f;
 
         protected virtual double FadeOutDuration => 100;
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <summary>
         /// Easing for the counter rollover animation.
         /// </summary>
-        protected EasingTypes RollingEasing => EasingTypes.None;
+        protected Easing RollingEasing => Easing.None;
 
         protected SpriteText DisplayedCountSpriteText;
 

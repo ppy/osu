@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         number.FadeOut();
 
                         this.FadeOut(800)
-                            .ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
+                            .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
                     }
 
                     Expire();

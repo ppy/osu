@@ -224,13 +224,13 @@ namespace osu.Game.Screens.Menu
                     {
                         case MenuState.Exit:
                         case MenuState.Initial:
-                            buttonAreaBackground.ScaleTo(Vector2.One, 500, EasingTypes.Out);
+                            buttonAreaBackground.ScaleTo(Vector2.One, 500, Easing.Out);
                             buttonArea.FadeOut(300);
 
                             osuLogo.Delay(150)
                                 .Schedule(() => toolbar?.Hide())
-                                .ScaleTo(1, 800, EasingTypes.OutExpo)
-                                .MoveTo(Vector2.Zero, 800, EasingTypes.OutExpo);
+                                .ScaleTo(1, 800, Easing.OutExpo)
+                                .MoveTo(Vector2.Zero, 800, Easing.OutExpo);
 
                             foreach (Button b in buttonsTopLevel)
                                 b.State = ButtonState.Contracted;
@@ -247,11 +247,11 @@ namespace osu.Game.Screens.Menu
                                 sampleBack?.Play();
                             break;
                         case MenuState.TopLevel:
-                            buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
+                            buttonAreaBackground.ScaleTo(Vector2.One, 200, Easing.Out);
 
                             var sequence = osuLogo
-                                .ScaleTo(0.5f, 200, EasingTypes.In)
-                                .MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
+                                .ScaleTo(0.5f, 200, Easing.In)
+                                .MoveTo(buttonFlow.DrawPosition, 200, Easing.In);
 
                             if (fromInitial && osuLogo.Scale.X > 0.5f)
                                 sequence.OnComplete(o =>
@@ -276,7 +276,7 @@ namespace osu.Game.Screens.Menu
                                 b.State = ButtonState.Expanded;
                             break;
                         case MenuState.EnteringMode:
-                            buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, EasingTypes.InSine);
+                            buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, Easing.InSine);
 
                             buttonsTopLevel.ForEach(b => b.ContractStyle = 1);
                             buttonsPlay.ForEach(b => b.ContractStyle = 1);

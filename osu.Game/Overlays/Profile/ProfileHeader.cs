@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Profile
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ColourInfo = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.75f))
+                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.75f))
                         },
                         new Container
                         {
@@ -517,13 +517,13 @@ namespace osu.Game.Overlays.Profile
 
                 protected override bool OnHover(InputState state)
                 {
-                    this.FadeColour(hoverColour, 500, EasingTypes.OutQuint);
+                    this.FadeColour(hoverColour, 500, Easing.OutQuint);
                     return base.OnHover(state);
                 }
 
                 protected override void OnHoverLost(InputState state)
                 {
-                    this.FadeColour(Color4.White, 500, EasingTypes.OutQuint);
+                    this.FadeColour(Color4.White, 500, Easing.OutQuint);
                     base.OnHoverLost(state);
                 }
 

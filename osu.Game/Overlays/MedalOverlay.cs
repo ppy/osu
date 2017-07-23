@@ -205,7 +205,7 @@ namespace osu.Game.Overlays
             using (BeginDelayedSequence(200, true))
             {
                 disc.FadeIn(initial_duration)
-                    .ScaleTo(1f, initial_duration * 2, EasingTypes.OutElastic);
+                    .ScaleTo(1f, initial_duration * 2, Easing.OutElastic);
 
                 particleContainer.FadeIn(initial_duration);
                 outerSpin.FadeTo(0.1f, initial_duration * 2);
@@ -213,8 +213,8 @@ namespace osu.Game.Overlays
                 using (BeginDelayedSequence(initial_duration + 200, true))
                 {
                     backgroundStrip.FadeIn(step_duration);
-                    leftStrip.ResizeWidthTo(1f, step_duration, EasingTypes.OutQuint);
-                    rightStrip.ResizeWidthTo(1f, step_duration, EasingTypes.OutQuint);
+                    leftStrip.ResizeWidthTo(1f, step_duration, Easing.OutQuint);
+                    rightStrip.ResizeWidthTo(1f, step_duration, Easing.OutQuint);
 
                     this.Animate().Schedule(() =>
                     {
@@ -261,7 +261,7 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.Both;
                 Width = 0f;
-                ColourInfo = ColourInfo.GradientHorizontal(Color4.White.Opacity(start), Color4.White.Opacity(end));
+                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(start), Color4.White.Opacity(end));
                 Masking = true;
 
                 Children = new[]
