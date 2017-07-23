@@ -57,14 +57,14 @@ namespace osu.Game.Screens.Select
 
         protected override void PopIn()
         {
-            this.MoveToX(0, 800, EasingTypes.OutQuint);
-            this.RotateTo(0, 800, EasingTypes.OutQuint);
+            this.MoveToX(0, 800, Easing.OutQuint);
+            this.RotateTo(0, 800, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            this.MoveToX(-100, 800, EasingTypes.InQuint);
-            this.RotateTo(10, 800, EasingTypes.InQuint);
+            this.MoveToX(-100, 800, Easing.InQuint);
+            this.RotateTo(10, 800, Easing.InQuint);
         }
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)

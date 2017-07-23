@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Menu
         {
             d.FadeTo(Math.Max(0, ((d.Equals(leftBox) ? amplitudes.LeftChannel : amplitudes.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time)
              .Then()
-             .FadeOut(beatLength, EasingTypes.In);
+             .FadeOut(beatLength, Easing.In);
         }
     }
 }

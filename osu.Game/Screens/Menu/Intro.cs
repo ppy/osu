@@ -134,8 +134,8 @@ namespace osu.Game.Screens.Menu
             logo.ScaleTo(0.4f);
             logo.FadeOut();
 
-            logo.ScaleTo(1, 4400, EasingTypes.OutQuint);
-            logo.FadeIn(20000, EasingTypes.OutQuint);
+            logo.ScaleTo(1, 4400, Easing.OutQuint);
+            logo.FadeIn(20000, Easing.OutQuint);
         }
 
         protected override void OnSuspending(Screen next)

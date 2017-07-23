@@ -150,11 +150,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 expandingRing
                     .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
                     .Then()
-                    .FadeTo(completion / 8, 2000, EasingTypes.OutQuint);
+                    .FadeTo(completion / 8, 2000, Easing.OutQuint);
 
-                symbol.RotateTo((float)(completion * HitObject.Duration / 8), 4000, EasingTypes.OutQuint);
+                symbol.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
 
-                expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, EasingTypes.OutQuint);
+                expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (userHits == HitObject.RequiredHits)
                 {
@@ -186,8 +186,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             double untilStartTime = HitObject.StartTime - Time.Current;
             double untilJudgement = untilStartTime + Judgement.TimeOffset + HitObject.Duration;
 
-            targetRing.Delay(untilStartTime - preempt).ScaleTo(target_ring_scale, preempt * 4, EasingTypes.OutQuint);
-            this.Delay(untilJudgement).FadeOut(out_transition_time, EasingTypes.Out);
+            targetRing.Delay(untilStartTime - preempt).ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
+            this.Delay(untilJudgement).FadeOut(out_transition_time, Easing.Out);
 
             switch (state)
             {

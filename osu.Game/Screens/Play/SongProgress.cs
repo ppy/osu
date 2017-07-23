@@ -121,14 +121,14 @@ namespace osu.Game.Screens.Play
 
         private void updateBarVisibility()
         {
-            bar.FadeTo(allowSeeking ? 1 : 0, transition_duration, EasingTypes.In);
-            this.MoveTo(new Vector2(0, allowSeeking ? 0 : bottom_bar_height), transition_duration, EasingTypes.In);
+            bar.FadeTo(allowSeeking ? 1 : 0, transition_duration, Easing.In);
+            this.MoveTo(new Vector2(0, allowSeeking ? 0 : bottom_bar_height), transition_duration, Easing.In);
         }
 
         protected override void PopIn()
         {
             updateBarVisibility();
-            this.FadeIn(500, EasingTypes.OutQuint);
+            this.FadeIn(500, Easing.OutQuint);
         }
 
         protected override void PopOut()

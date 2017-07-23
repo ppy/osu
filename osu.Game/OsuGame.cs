@@ -234,10 +234,10 @@ namespace osu.Game
                 switch (settings.State)
                 {
                     case Visibility.Hidden:
-                        intro.MoveToX(0, SettingsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
+                        intro.MoveToX(0, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
                         break;
                     case Visibility.Visible:
-                        intro.MoveToX(SettingsOverlay.SIDEBAR_WIDTH / 2, SettingsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
+                        intro.MoveToX(SettingsOverlay.SIDEBAR_WIDTH / 2, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
                         break;
                 }
             };

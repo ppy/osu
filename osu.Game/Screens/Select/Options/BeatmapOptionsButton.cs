@@ -54,13 +54,13 @@ namespace osu.Game.Screens.Select.Options
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            flash.FadeTo(0.1f, 1000, EasingTypes.OutQuint);
+            flash.FadeTo(0.1f, 1000, Easing.OutQuint);
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            flash.FadeTo(0, 1000, EasingTypes.OutQuint);
+            flash.FadeTo(0, 1000, Easing.OutQuint);
             return base.OnMouseUp(state, args);
         }
 
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Select.Options
         {
             flash.ClearTransforms();
             flash.Alpha = 0.9f;
-            flash.FadeOut(800, EasingTypes.OutExpo);
+            flash.FadeOut(800, Easing.OutExpo);
 
             return base.OnClick(state);
         }
