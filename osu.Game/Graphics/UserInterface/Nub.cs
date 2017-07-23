@@ -43,9 +43,9 @@ namespace osu.Game.Graphics.UserInterface
             Current.ValueChanged += newValue =>
             {
                 if (newValue)
-                    fill.FadeIn(200, EasingTypes.OutQuint);
+                    fill.FadeIn(200, Easing.OutQuint);
                 else
-                    fill.FadeTo(0.01f, 200, EasingTypes.OutQuint); //todo: remove once we figure why containers aren't drawing at all times
+                    fill.FadeTo(0.01f, 200, Easing.OutQuint); //todo: remove once we figure why containers aren't drawing at all times
             };
         }
 
@@ -80,13 +80,13 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (value)
                 {
-                    FadeColour(GlowingAccentColour, 500, EasingTypes.OutQuint);
-                    FadeEdgeEffectTo(1, 500, EasingTypes.OutQuint);
+                    this.FadeColour(GlowingAccentColour, 500, Easing.OutQuint);
+                    FadeEdgeEffectTo(1, 500, Easing.OutQuint);
                 }
                 else
                 {
                     FadeEdgeEffectTo(0, 500);
-                    FadeColour(AccentColour, 500);
+                    this.FadeColour(AccentColour, 500);
                 }
             }
         }
@@ -95,7 +95,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             set
             {
-                ResizeTo(new Vector2(value ? EXPANDED_SIZE : COLLAPSED_SIZE, 12), 500, EasingTypes.OutQuint);
+                this.ResizeTo(new Vector2(value ? EXPANDED_SIZE : COLLAPSED_SIZE, 12), 500, Easing.OutQuint);
             }
         }
 

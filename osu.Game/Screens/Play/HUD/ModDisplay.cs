@@ -76,20 +76,20 @@ namespace osu.Game.Screens.Play.HUD
         private void appearTransform()
         {
             if (mods.Value.Any(m => !m.Ranked))
-                unrankedText.FadeInFromZero(fade_duration, EasingTypes.OutQuint);
+                unrankedText.FadeInFromZero(fade_duration, Easing.OutQuint);
             else
                 unrankedText.Hide();
 
-            iconsContainer.Flush();
-            iconsContainer.FadeInFromZero(fade_duration, EasingTypes.OutQuint);
+            iconsContainer.FinishTransforms();
+            iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
             expand();
             using (iconsContainer.BeginDelayedSequence(1200))
                 contract();
         }
 
-        private void expand() => iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, EasingTypes.OutQuint);
+        private void expand() => iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
 
-        private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, EasingTypes.OutQuint);
+        private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
 
         protected override bool OnHover(InputState state)
         {

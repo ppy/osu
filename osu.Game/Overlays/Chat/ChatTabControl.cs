@@ -86,30 +86,30 @@ namespace osu.Game.Overlays.Chat
 
             private void fadeActive()
             {
-                ResizeTo(new Vector2(Width, 1.1f), transition_length, EasingTypes.OutQuint);
+                this.ResizeTo(new Vector2(Width, 1.1f), transition_length, Easing.OutQuint);
 
-                box.FadeColour(backgroundActive, transition_length, EasingTypes.OutQuint);
-                highlightBox.FadeIn(transition_length, EasingTypes.OutQuint);
+                box.FadeColour(backgroundActive, transition_length, Easing.OutQuint);
+                highlightBox.FadeIn(transition_length, Easing.OutQuint);
 
-                text.FadeOut(transition_length, EasingTypes.OutQuint);
-                textBold.FadeIn(transition_length, EasingTypes.OutQuint);
+                text.FadeOut(transition_length, Easing.OutQuint);
+                textBold.FadeIn(transition_length, Easing.OutQuint);
             }
 
             private void fadeInactive()
             {
-                ResizeTo(new Vector2(Width, 1), transition_length, EasingTypes.OutQuint);
+                this.ResizeTo(new Vector2(Width, 1), transition_length, Easing.OutQuint);
 
-                box.FadeColour(backgroundInactive, transition_length, EasingTypes.OutQuint);
-                highlightBox.FadeOut(transition_length, EasingTypes.OutQuint);
+                box.FadeColour(backgroundInactive, transition_length, Easing.OutQuint);
+                highlightBox.FadeOut(transition_length, Easing.OutQuint);
 
-                text.FadeIn(transition_length, EasingTypes.OutQuint);
-                textBold.FadeOut(transition_length, EasingTypes.OutQuint);
+                text.FadeIn(transition_length, Easing.OutQuint);
+                textBold.FadeOut(transition_length, Easing.OutQuint);
             }
 
             protected override bool OnHover(InputState state)
             {
                 if (!Active)
-                    box.FadeColour(backgroundHover, transition_length, EasingTypes.OutQuint);
+                    box.FadeColour(backgroundHover, transition_length, Easing.OutQuint);
                 return true;
             }
 

@@ -91,13 +91,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            Content.ScaleTo(0.9f, 4000, EasingTypes.OutQuint);
+            Content.ScaleTo(0.9f, 4000, Easing.OutQuint);
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            Content.ScaleTo(1, 1000, EasingTypes.OutElastic);
+            Content.ScaleTo(1, 1000, Easing.OutElastic);
             return base.OnMouseUp(state, args);
         }
     }

@@ -81,21 +81,26 @@ namespace osu.Game
             Name = @"osu!lazer";
         }
 
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Dependencies.Cache(this);
-            Dependencies.Cache(LocalConfig);
+            dependencies.Cache(this);
+            dependencies.Cache(LocalConfig);
 
             SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
 
-            Dependencies.Cache(RulesetDatabase = new RulesetDatabase(Host.Storage, connection));
-            Dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, connection, RulesetDatabase, Host));
-            Dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, connection, Host, BeatmapDatabase));
-            Dependencies.Cache(new OsuColour());
+            dependencies.Cache(RulesetDatabase = new RulesetDatabase(Host.Storage, connection));
+            dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, connection, RulesetDatabase, Host));
+            dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, connection, Host, BeatmapDatabase));
+            dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            Dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 }, true);
+            dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 }, true);
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
@@ -127,7 +132,7 @@ namespace osu.Game
 
             OszArchiveReader.Register();
 
-            Dependencies.Cache(API = new APIAccess
+            dependencies.Cache(API = new APIAccess
             {
                 Username = LocalConfig.Get<string>(OsuSetting.Username),
                 Token = LocalConfig.Get<string>(OsuSetting.Token)

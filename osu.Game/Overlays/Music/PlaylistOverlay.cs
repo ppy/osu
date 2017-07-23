@@ -101,16 +101,16 @@ namespace osu.Game.Overlays.Music
             filter.Search.HoldFocus = true;
             Schedule(() => inputManager.ChangeFocus(filter.Search));
 
-            ResizeTo(new Vector2(1, playlist_height), transition_duration, EasingTypes.OutQuint);
-            FadeIn(transition_duration, EasingTypes.OutQuint);
+            this.ResizeTo(new Vector2(1, playlist_height), transition_duration, Easing.OutQuint);
+            this.FadeIn(transition_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             filter.Search.HoldFocus = false;
 
-            ResizeTo(new Vector2(1, 0), transition_duration, EasingTypes.OutQuint);
-            FadeOut(transition_duration);
+            this.ResizeTo(new Vector2(1, 0), transition_duration, Easing.OutQuint);
+            this.FadeOut(transition_duration);
         }
 
         private void itemSelected(BeatmapSetInfo set)

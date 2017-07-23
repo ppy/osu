@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeDuration = transition_duration,
-                            AutoSizeEasing = EasingTypes.OutQuint,
+                            AutoSizeEasing = Easing.OutQuint,
                             AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding(15),
                             Spacing = new Vector2(0, 15),
@@ -123,10 +123,10 @@ namespace osu.Game.Screens.Play.ReplaySettings
             else
             {
                 content.AutoSizeAxes = Axes.None;
-                content.ResizeHeightTo(0, transition_duration, EasingTypes.OutQuint);
+                content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
             }
 
-            button.FadeColour(expanded ? buttonActiveColour : Color4.White, 200, EasingTypes.OutQuint);
+            button.FadeColour(expanded ? buttonActiveColour : Color4.White, 200, Easing.OutQuint);
         }
     }
 }

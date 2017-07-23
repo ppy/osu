@@ -174,9 +174,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ticks.Rotation = disc.Rotation;
 
             float relativeCircleScale = spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
-            disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, EasingTypes.OutQuint);
+            disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
 
-            symbol.RotateTo(disc.Rotation / 2, 500, EasingTypes.OutQuint);
+            symbol.RotateTo(disc.Rotation / 2, 500, Easing.OutQuint);
         }
 
         protected override void UpdatePreemptState()
@@ -184,35 +184,33 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdatePreemptState();
 
             circleContainer.ScaleTo(spinner.Scale * 0.3f);
-            circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, EasingTypes.OutQuint);
+            circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);
 
             disc.RotateTo(-720);
             symbol.RotateTo(-720);
 
-            mainContainer.ScaleTo(0);
-            mainContainer.ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, EasingTypes.OutQuint);
-
-            mainContainer.Delay(TIME_PREEMPT - 150);
-            mainContainer.ScaleTo(1, 500, EasingTypes.OutQuint);
+            mainContainer
+                .ScaleTo(0)
+                .ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, Easing.OutQuint)
+                .Then()
+                .ScaleTo(1, 500, Easing.OutQuint);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            Delay(spinner.Duration, true);
-
-            FadeOut(160);
+            var sequence = this.Delay(spinner.Duration).FadeOut(160);
 
             switch (state)
             {
                 case ArmedState.Hit:
-                    ScaleTo(Scale * 1.2f, 320, EasingTypes.Out);
-                    Expire();
+                    sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
                 case ArmedState.Miss:
-                    ScaleTo(Scale * 0.8f, 320, EasingTypes.In);
-                    Expire();
+                    sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
             }
+
+            Expire();
         }
     }
 }
