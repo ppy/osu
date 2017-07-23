@@ -61,26 +61,29 @@ namespace osu.Game.Screens.Select.Leaderboards
                         nameLabel.MoveToX(150);
                         break;
                     case Visibility.Visible:
-                        FadeIn(200);
+                        this.FadeIn(200);
                         content.MoveToY(0, 800, EasingTypes.OutQuint);
 
-                        Delay(100, true);
-                        avatar.FadeIn(300, EasingTypes.OutQuint);
-                        nameLabel.FadeIn(350, EasingTypes.OutQuint);
-
-                        avatar.MoveToX(0, 300, EasingTypes.OutQuint);
-                        nameLabel.MoveToX(0, 350, EasingTypes.OutQuint);
-
-                        Delay(250, true);
-                        scoreLabel.FadeIn(200);
-                        scoreRank.FadeIn(200);
-
-                        Delay(50, true);
-                        var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
-
-                        for (int i = 0; i < drawables.Length; i++)
+                        using (BeginDelayedSequence(100, true))
                         {
-                            drawables[i].FadeIn(100 + i * 50);
+                            avatar.FadeIn(300, EasingTypes.OutQuint);
+                            nameLabel.FadeIn(350, EasingTypes.OutQuint);
+
+                            avatar.MoveToX(0, 300, EasingTypes.OutQuint);
+                            nameLabel.MoveToX(0, 350, EasingTypes.OutQuint);
+
+                            using (BeginDelayedSequence(250, true))
+                            {
+                                scoreLabel.FadeIn(200);
+                                scoreRank.FadeIn(200);
+
+                                using (BeginDelayedSequence(50, true))
+                                {
+                                    var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
+                                    for (int i = 0; i < drawables.Length; i++)
+                                        drawables[i].FadeIn(100 + i * 50);
+                                }
+                            }
                         }
 
                         break;

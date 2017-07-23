@@ -127,7 +127,7 @@ namespace osu.Game.Overlays
 
             sectionsContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            FadeTo(1, TRANSITION_LENGTH / 2);
+            this.FadeTo(1, TRANSITION_LENGTH / 2);
 
             searchTextBox.HoldFocus = true;
         }
@@ -138,7 +138,7 @@ namespace osu.Game.Overlays
 
             sectionsContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
             sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            FadeTo(0, TRANSITION_LENGTH / 2);
+            this.FadeTo(0, TRANSITION_LENGTH / 2);
 
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)

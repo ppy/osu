@@ -235,8 +235,8 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            MoveToY(0, transition_length, EasingTypes.OutQuint);
-            FadeIn(transition_length, EasingTypes.OutQuint);
+            this.MoveToY(0, transition_length, EasingTypes.OutQuint);
+            this.FadeIn(transition_length, EasingTypes.OutQuint);
 
             inputTextBox.HoldFocus = true;
             base.PopIn();
@@ -244,8 +244,8 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            MoveToY(Height, transition_length, EasingTypes.InSine);
-            FadeOut(transition_length, EasingTypes.InSine);
+            this.MoveToY(Height, transition_length, EasingTypes.InSine);
+            this.FadeOut(transition_length, EasingTypes.InSine);
 
             inputTextBox.HoldFocus = false;
             base.PopOut();

@@ -100,9 +100,9 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            FadeInFromZero(fade_time);
+            this.FadeInFromZero(fade_time);
             using (BeginAbsoluteSequence(beginFadeTime))
-                FadeOut(fade_time);
+                this.FadeOut(fade_time);
 
             button.Action = () => AudioClock?.Seek(startTime - skip_required_cutoff - fade_time);
 
@@ -154,14 +154,14 @@ namespace osu.Game.Screens.Play
                     {
                         case Visibility.Visible:
                             if (lastState == Visibility.Hidden)
-                                FadeIn(500, EasingTypes.OutExpo);
+                                this.FadeIn(500, EasingTypes.OutExpo);
 
                             if (!IsHovered)
                                 using (BeginDelayedSequence(1000))
                                     scheduledHide = Schedule(() => State = Visibility.Hidden);
                             break;
                         case Visibility.Hidden:
-                            FadeOut(1000, EasingTypes.OutExpo);
+                            this.FadeOut(1000, EasingTypes.OutExpo);
                             break;
                     }
                 }

@@ -368,7 +368,7 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            FadeIn(transition_length, EasingTypes.OutQuint);
+            this.FadeIn(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(1, transition_length, EasingTypes.OutElastic);
         }
 
@@ -376,7 +376,7 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            FadeOut(transition_length, EasingTypes.OutQuint);
+            this.FadeOut(transition_length, EasingTypes.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
         }
 

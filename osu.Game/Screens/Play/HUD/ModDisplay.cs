@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Play.HUD
             else
                 unrankedText.Hide();
 
-            iconsContainer.Flush();
+            iconsContainer.FinishTransforms();
             iconsContainer.FadeInFromZero(fade_duration, EasingTypes.OutQuint);
             expand();
             using (iconsContainer.BeginDelayedSequence(1200))

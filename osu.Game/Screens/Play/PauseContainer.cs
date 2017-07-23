@@ -56,11 +56,7 @@ namespace osu.Game.Screens.Play
 
             AddInternal(pauseOverlay = new PauseOverlay
             {
-                OnResume = delegate
-                {
-                    Delay(400);
-                    Schedule(Resume);
-                },
+                OnResume = () => this.Delay(400).Schedule(Resume),
                 OnRetry = () => OnRetry(),
                 OnQuit = () => OnQuit(),
             });

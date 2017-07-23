@@ -134,7 +134,6 @@
     <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
-    <Compile Include="Graphics\Transforms\TransformAccent.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
     <Compile Include="Graphics\UserInterface\Bar.cs" />
     <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
