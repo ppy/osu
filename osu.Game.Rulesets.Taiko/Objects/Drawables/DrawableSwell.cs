@@ -147,13 +147,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 var completion = (float)userHits / HitObject.RequiredHits;
 
-                expandingRing.FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50);
-                using (expandingRing.BeginDelayedSequence(50))
-                    expandingRing.FadeTo(completion / 8, 2000, EasingTypes.OutQuint);
+                expandingRing
+                    .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
+                    .Then()
+                    .FadeTo(completion / 8, 2000, Easing.OutQuint);
 
-                symbol.RotateTo((float)(completion * HitObject.Duration / 8), 4000, EasingTypes.OutQuint);
+                symbol.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
 
-                expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, EasingTypes.OutQuint);
+                expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (userHits == HitObject.RequiredHits)
                 {
@@ -180,25 +181,20 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void UpdateState(ArmedState state)
         {
             const float preempt = 100;
-
-            Delay(HitObject.StartTime - Time.Current - preempt, true);
-
-            targetRing.ScaleTo(target_ring_scale, preempt * 4, EasingTypes.OutQuint);
-
-            Delay(preempt, true);
-
-            Delay(Judgement.TimeOffset + HitObject.Duration, true);
-
             const float out_transition_time = 300;
+
+            double untilStartTime = HitObject.StartTime - Time.Current;
+            double untilJudgement = untilStartTime + Judgement.TimeOffset + HitObject.Duration;
+
+            targetRing.Delay(untilStartTime - preempt).ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
+            this.Delay(untilJudgement).FadeOut(out_transition_time, Easing.Out);
 
             switch (state)
             {
                 case ArmedState.Hit:
-                    bodyContainer.ScaleTo(1.4f, out_transition_time);
+                    bodyContainer.Delay(untilJudgement).ScaleTo(1.4f, out_transition_time);
                     break;
             }
-
-            FadeOut(out_transition_time, EasingTypes.Out);
 
             Expire();
         }

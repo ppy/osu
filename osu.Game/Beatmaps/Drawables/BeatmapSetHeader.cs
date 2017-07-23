@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps.Drawables
                     new PanelBackground(beatmap)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
+                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
                     }
                 )
                 {

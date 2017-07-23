@@ -93,21 +93,20 @@ namespace osu.Game.Graphics.UserInterface.Volume
         protected override void PopIn()
         {
             ClearTransforms();
-            FadeIn(100);
+            this.FadeIn(100);
 
             schedulePopOut();
         }
 
         protected override void PopOut()
         {
-            FadeOut(100);
+            this.FadeOut(100);
         }
 
         private void schedulePopOut()
         {
             popOutDelegate?.Cancel();
-            Delay(1000);
-            popOutDelegate = Schedule(Hide);
+            this.Delay(1000).Schedule(Hide, out popOutDelegate);
         }
     }
 }

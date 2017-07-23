@@ -77,11 +77,8 @@ namespace osu.Game.Overlays.Notifications
                     switch (state)
                     {
                         case ProgressNotificationState.Completed:
-                            NotificationContent.MoveToY(-DrawSize.Y / 2, 200, EasingTypes.OutQuint);
-                            FadeTo(0.01f, 200); //don't completely fade out or our scheduled task won't run.
-
-                            Delay(100);
-                            Schedule(Completed);
+                            NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
+                            this.FadeOut(200).Finally(d => Completed());
                             break;
                     }
                 }
@@ -184,7 +181,7 @@ namespace osu.Game.Overlays.Notifications
                     if (progress == value) return;
 
                     progress = value;
-                    box.ResizeTo(new Vector2(progress, 1), 100, EasingTypes.OutQuad);
+                    box.ResizeTo(new Vector2(progress, 1), 100, Easing.OutQuad);
                 }
             }
 
@@ -196,7 +193,7 @@ namespace osu.Game.Overlays.Notifications
                 set
                 {
                     active = value;
-                    FadeColour(active ? colourActive : colourInactive, 100);
+                    this.FadeColour(active ? colourActive : colourInactive, 100);
                 }
             }
 

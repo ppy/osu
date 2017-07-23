@@ -118,10 +118,10 @@ namespace osu.Game.Screens.Menu
 
             buttons.State = MenuState.EnteringMode;
 
-            Content.FadeOut(length, EasingTypes.InSine);
-            Content.MoveTo(new Vector2(-800, 0), length, EasingTypes.InSine);
+            Content.FadeOut(length, Easing.InSine);
+            Content.MoveTo(new Vector2(-800, 0), length, Easing.InSine);
 
-            sideFlashes.FadeOut(length / 4, EasingTypes.OutQuint);
+            sideFlashes.FadeOut(length / 4, Easing.OutQuint);
         }
 
         protected override void OnResuming(Screen last)
@@ -137,10 +137,10 @@ namespace osu.Game.Screens.Menu
 
             buttons.State = MenuState.TopLevel;
 
-            Content.FadeIn(length, EasingTypes.OutQuint);
-            Content.MoveTo(new Vector2(0, 0), length, EasingTypes.OutQuint);
+            Content.FadeIn(length, Easing.OutQuint);
+            Content.MoveTo(new Vector2(0, 0), length, Easing.OutQuint);
 
-            sideFlashes.FadeIn(length / 4, EasingTypes.InQuint);
+            sideFlashes.FadeIn(length / 4, Easing.InQuint);
         }
 
         protected override bool OnExiting(Screen next)

@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
                 values = value.ToArray();
                 applyPath();
                 maskingContainer.Width = 0;
-                maskingContainer.ResizeWidthTo(1, transform_duration, EasingTypes.OutQuint);
+                maskingContainer.ResizeWidthTo(1, transform_duration, Easing.OutQuint);
             }
         }
 

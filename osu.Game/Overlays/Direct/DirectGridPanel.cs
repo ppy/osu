@@ -41,9 +41,9 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
 
-            FadeInFromZero(200, EasingTypes.Out);
+            this.FadeInFromZero(200, Easing.Out);
             bottomPanel.LayoutDuration = 200;
-            bottomPanel.LayoutEasing = EasingTypes.Out;
+            bottomPanel.LayoutEasing = Easing.Out;
             bottomPanel.Origin = Anchor.BottomLeft;
         }
 
