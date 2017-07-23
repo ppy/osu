@@ -206,8 +206,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             if (args.Key == Key)
             {
-                background.FadeTo(background.Alpha + 0.2f, 50, EasingTypes.OutQuint);
-                keyIcon.ScaleTo(1.4f, 50, EasingTypes.OutQuint);
+                background.FadeTo(background.Alpha + 0.2f, 50, Easing.OutQuint);
+                keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint);
             }
 
             return false;
@@ -217,8 +217,8 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             if (args.Key == Key)
             {
-                background.FadeTo(0.2f, 800, EasingTypes.OutQuart);
-                keyIcon.ScaleTo(1f, 400, EasingTypes.OutQuart);
+                background.FadeTo(0.2f, 800, Easing.OutQuart);
+                keyIcon.ScaleTo(1f, 400, Easing.OutQuart);
             }
 
             return false;

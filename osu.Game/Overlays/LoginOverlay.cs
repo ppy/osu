@@ -40,7 +40,7 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Y,
                     Masking = true,
                     AutoSizeDuration = transition_time,
-                    AutoSizeEasing = EasingTypes.OutQuint,
+                    AutoSizeEasing = Easing.OutQuint,
                     Children = new Drawable[]
                     {
                         settingsSection = new LoginSettings
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays
             base.PopIn();
 
             settingsSection.Bounding = true;
-            FadeIn(transition_time, EasingTypes.OutQuint);
+            this.FadeIn(transition_time, Easing.OutQuint);
 
             InputManager.ChangeFocus(settingsSection);
         }
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays
             base.PopOut();
 
             settingsSection.Bounding = false;
-            FadeOut(transition_time);
+            this.FadeOut(transition_time);
         }
     }
 }

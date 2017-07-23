@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
         private double animationDelay => 80;
 
         private double scalingDuration => 1000;
-        private EasingTypes scalingEasing => EasingTypes.OutElasticHalf;
+        private Easing scalingEasing => Easing.OutElasticHalf;
         private float minStarScale => 0.4f;
 
         private double fadingDuration => 100;
@@ -122,7 +122,7 @@ namespace osu.Game.Graphics.UserInterface
             if (value <= i)
                 return minStarScale;
 
-            return i + 1 <= value ? 1.0f : (float)Interpolation.ValueAt(value, minStarScale, 1.0f, i, i + 1);
+            return i + 1 <= value ? 1.0f : Interpolation.ValueAt(value, minStarScale, 1.0f, i, i + 1);
         }
 
         private void transformCount(float newValue)
@@ -133,12 +133,8 @@ namespace osu.Game.Graphics.UserInterface
                 star.ClearTransforms(true);
 
                 var delay = (countStars <= newValue ? Math.Max(i - countStars, 0) : Math.Max(countStars - 1 - i, 0)) * animationDelay;
-
-                using (BeginDelayedSequence(delay, true))
-                {
-                    star.FadeTo(i < newValue ? 1.0f : minStarAlpha, fadingDuration);
-                    star.Icon.ScaleTo(getStarScale(i, newValue), scalingDuration, scalingEasing);
-                }
+                star.Delay(delay).FadeTo(i < newValue ? 1.0f : minStarAlpha, fadingDuration);
+                star.Icon.Delay(delay).ScaleTo(getStarScale(i, newValue), scalingDuration, scalingEasing);
 
                 i++;
             }

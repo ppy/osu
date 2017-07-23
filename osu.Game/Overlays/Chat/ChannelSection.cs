@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Chat
         {
             set
             {
-                FadeTo(value ? 1f : 0f, 100);
+                this.FadeTo(value ? 1f : 0f, 100);
             }
         }
 

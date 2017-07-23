@@ -2,9 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -13,8 +10,6 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class SimpleComboCounter : RollingCounter<int>
     {
-        protected override Type TransformType => typeof(TransformCounterCount);
-
         protected override double RollingDuration => 750;
 
         public SimpleComboCounter()
@@ -35,24 +30,6 @@ namespace osu.Game.Graphics.UserInterface
         public override void Increment(int amount)
         {
             Current.Value = Current + amount;
-        }
-
-        private class TransformCounterCount : Transform<int, Drawable>
-        {
-            public int CurrentValue
-            {
-                get
-                {
-                    double time = Time?.Current ?? 0;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
-
-                    return (int)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-                }
-            }
-
-            public override void Apply(Drawable d) => ((SimpleComboCounter)d).DisplayedCount = CurrentValue;
-            public override void ReadIntoStartValue(Drawable d) => StartValue = ((SimpleComboCounter)d).DisplayedCount;
         }
     }
 }
