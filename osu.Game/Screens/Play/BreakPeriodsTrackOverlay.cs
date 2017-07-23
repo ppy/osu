@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Play
 
         private class ArrowsOverlay : Container
         {
-            private const int appear_duration = 140;
+            private const int appear_duration = 100;
             private const int margin_vertical = 120;
             private const int margin_horizontal = 90;
 
@@ -220,6 +220,10 @@ namespace osu.Game.Screens.Play
             public void PlayWarning()
             {
                 content.FadeTo(1).
+                    Then().
+                    Delay(appear_duration).FadeTo(0).
+                    Then().
+                    Delay(appear_duration).FadeTo(1).
                     Then().
                     Delay(appear_duration).FadeTo(0).
                     Then().
