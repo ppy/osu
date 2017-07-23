@@ -112,29 +112,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime;
 
-            using (glow.BeginDelayedSequence(duration))
-                glow.FadeOut(400);
+            glow.Delay(duration).FadeOut(400);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    using (BeginDelayedSequence(duration + TIME_PREEMPT))
-                        FadeOut(TIME_FADEOUT);
+                    this.Delay(duration + TIME_PREEMPT).FadeOut(TIME_FADEOUT);
                     Expire(true);
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
-                    FadeOut(TIME_FADEOUT / 5);
+                    this.FadeOut(TIME_FADEOUT / 5);
                     Expire();
                     break;
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
 
                     const double flash_in = 40;
-
-                    flash.FadeTo(0.8f, flash_in);
-                    using (flash.BeginDelayedSequence(flash_in))
-                        flash.FadeOut(100);
+                    flash.FadeTo(0.8f, flash_in)
+                         .Then()
+                         .FadeOut(100);
 
                     explode.FadeIn(flash_in);
 
@@ -145,8 +142,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         circle.FadeOut();
                         number.FadeOut();
 
-                        FadeOut(800);
-                        ScaleTo(Scale * 1.5f, 400, EasingTypes.OutQuad);
+                        this.FadeOut(800)
+                            .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
                     }
 
                     Expire();

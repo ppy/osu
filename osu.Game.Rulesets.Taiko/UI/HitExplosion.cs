@@ -62,8 +62,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             base.LoadComplete();
 
-            ScaleTo(3f, 1000, EasingTypes.OutQuint);
-            FadeOut(500);
+            this.ScaleTo(3f, 1000, Easing.OutQuint);
+            this.FadeOut(500);
 
             Expire();
         }
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         public void VisualiseSecondHit()
         {
-            ResizeTo(new Vector2(TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER), 50);
+            this.ResizeTo(new Vector2(TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER), 50);
         }
     }
 }

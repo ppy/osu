@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play
 
             if (args.Key == Key.Tilde)
             {
-                overlay.FadeIn(activate_delay, EasingTypes.Out);
+                overlay.FadeIn(activate_delay, Easing.Out);
                 return true;
             }
 
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play
         {
             if (args.Key == Key.Tilde && !fired)
             {
-                overlay.FadeOut(fadeout_delay, EasingTypes.Out);
+                overlay.FadeOut(fadeout_delay, Easing.Out);
                 return true;
             }
 
