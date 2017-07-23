@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Backgrounds
                         if (background != null)
                         {
                             newDepth = background.Depth + 1;
-                            background.Flush();
+                            background.FinishTransforms();
                             background.FadeOut(250);
                             background.Expire();
                         }
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Backgrounds
             Beatmap = beatmap;
         }
 
-        public void BlurTo(Vector2 sigma, double duration, EasingTypes easing = EasingTypes.None)
+        public void BlurTo(Vector2 sigma, double duration, Easing easing = Easing.None)
         {
             background?.BlurTo(sigma, duration, easing);
             blurTarget = sigma;

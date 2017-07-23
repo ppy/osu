@@ -47,10 +47,13 @@ namespace osu.Game.Screens.Tournament
 
         public ITeamList TeamList;
 
-        protected override DependencyContainer CreateLocalDependencies(DependencyContainer parent) => new DependencyContainer(parent);
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, Storage storage, DependencyContainer dependencies)
+        private void load(TextureStore textures, Storage storage)
         {
             this.storage = storage;
 

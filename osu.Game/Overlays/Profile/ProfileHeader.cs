@@ -517,13 +517,13 @@ namespace osu.Game.Overlays.Profile
 
                 protected override bool OnHover(InputState state)
                 {
-                    FadeColour(hoverColour, 500, EasingTypes.OutQuint);
+                    this.FadeColour(hoverColour, 500, Easing.OutQuint);
                     return base.OnHover(state);
                 }
 
                 protected override void OnHoverLost(InputState state)
                 {
-                    FadeColour(Color4.White, 500, EasingTypes.OutQuint);
+                    this.FadeColour(Color4.White, 500, Easing.OutQuint);
                     base.OnHoverLost(state);
                 }
 

@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Chat
         {
             set
             {
-                FadeTo(value ? 1f : 0f, 100);
+                this.FadeTo(value ? 1f : 0f, 100);
             }
         }
 
@@ -156,7 +156,7 @@ namespace osu.Game.Overlays.Chat
         protected override bool OnHover(InputState state)
         {
             if (!channel.Joined.Value)
-                name.FadeColour(hoverColour, 50, EasingTypes.OutQuint);
+                name.FadeColour(hoverColour, 50, Easing.OutQuint);
 
             return base.OnHover(state);
         }
@@ -175,14 +175,14 @@ namespace osu.Game.Overlays.Chat
                 joinedCheckmark.FadeTo(1f, transition_duration);
                 topic.FadeTo(0.8f, transition_duration);
                 topic.FadeColour(Color4.White, transition_duration);
-                FadeColour(joinedColour, transition_duration);
+                this.FadeColour(joinedColour, transition_duration);
             }
             else
             {
                 joinedCheckmark.FadeTo(0f, transition_duration);
                 topic.FadeTo(1f, transition_duration);
                 topic.FadeColour(topicColour, transition_duration);
-                FadeColour(Color4.White, transition_duration);
+                this.FadeColour(Color4.White, transition_duration);
             }
         }
     }

@@ -5,29 +5,20 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public abstract class RollingCounter<T> : Container, IHasAccentColour
+        where T : struct, IEquatable<T>
     {
         /// <summary>
         /// The current value.
         /// </summary>
         public Bindable<T> Current = new Bindable<T>();
-
-        /// <summary>
-        /// Type of the Transform to use.
-        /// </summary>
-        /// <remarks>
-        /// Must be a subclass of Transform(T)
-        /// </remarks>
-        protected virtual Type TransformType => typeof(Transform<T, Drawable>);
 
         protected SpriteText DisplayedCountSpriteText;
 
@@ -45,7 +36,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <summary>
         /// Easing for the counter rollover animation.
         /// </summary>
-        protected virtual EasingTypes RollingEasing => EasingTypes.OutQuint;
+        protected virtual Easing RollingEasing => Easing.OutQuint;
 
         private T displayedCount;
 
@@ -58,7 +49,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 return displayedCount;
             }
-            protected set
+
+            set
             {
                 if (EqualityComparer<T>.Default.Equals(displayedCount, value))
                     return;
@@ -133,7 +125,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual void StopRolling()
         {
-            Flush(false, TransformType);
+            FinishTransforms(false, nameof(DisplayedCount));
             DisplayedCount = Current;
         }
 
@@ -176,44 +168,15 @@ namespace osu.Game.Graphics.UserInterface
         /// implement the rollover animation).
         /// </summary>
         /// <param name="currentValue">Count value before modification.</param>
-        /// <param name="newValue">Expected count value after modification-</param>
-        /// <seealso cref="TransformType"/>
+        /// <param name="newValue">Expected count value after modification.</param>
         protected virtual void TransformCount(T currentValue, T newValue)
         {
-            Debug.Assert(
-                typeof(Transform<T, Drawable>).IsAssignableFrom(TransformType),
-                @"transformType should be a subclass of Transform<T>."
-            );
-
-            TransformCount((Transform<T, Drawable>)Activator.CreateInstance(TransformType), currentValue, newValue);
-        }
-
-        /// <summary>
-        /// Intended to be used by TransformCount(T currentValue, T newValue).
-        /// </summary>
-        protected void TransformCount(Transform<T, Drawable> transform, T currentValue, T newValue)
-        {
-            Type type = transform.GetType();
-
-            Flush(false, type);
-
-            if (RollingDuration < 1)
-            {
-                DisplayedCount = Current;
-                return;
-            }
-
             double rollingTotalDuration =
                 IsRollingProportional
                     ? GetProportionalDuration(currentValue, newValue)
                     : RollingDuration;
 
-            transform.StartTime = TransformStartTime;
-            transform.EndTime = TransformStartTime + rollingTotalDuration;
-            transform.EndValue = newValue;
-            transform.Easing = RollingEasing;
-
-            Transforms.Add(transform);
+            this.TransformTo(nameof(DisplayedCount), newValue, rollingTotalDuration, RollingEasing);
         }
     }
 }
