@@ -28,7 +28,11 @@ namespace osu.Game.Screens.Tournament
 
         private readonly Container tracker;
 
+#pragma warning disable 649
+        // set via reflection.
         private float speed;
+#pragma warning restore 649
+
         private int expiredCount;
 
         private float offset;
