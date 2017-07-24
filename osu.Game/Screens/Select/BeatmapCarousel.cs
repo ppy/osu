@@ -177,6 +177,9 @@ namespace osu.Game.Screens.Select
 
         public void SelectNextRandom()
         {
+            if (groups.Count == 0)
+                return;
+
             randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
 
             var visibleGroups = getVisibleGroups();
