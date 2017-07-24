@@ -73,13 +73,13 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            FadeEdgeEffectTo(0.5f, APPEAR_DURATION, EasingTypes.In);
+            FadeEdgeEffectTo(0.5f, APPEAR_DURATION, Easing.In);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            FadeEdgeEffectTo(0, DISAPPEAR_DURATION, EasingTypes.Out);
+            FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
         }
 
         public void ShowUser(User user, bool fetchOnline = true)

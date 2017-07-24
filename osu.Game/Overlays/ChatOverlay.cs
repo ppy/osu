@@ -177,8 +177,8 @@ namespace osu.Game.Overlays
                     inputTextBox.HoldFocus = false;
                     if (1f - chatHeight.Value < channel_selection_min_height)
                     {
-                        chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, EasingTypes.OutQuint);
-                        channelSelectionContainer.ResizeHeightTo(channel_selection_min_height, 800, EasingTypes.OutQuint);
+                        chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, Easing.OutQuint);
+                        channelSelectionContainer.ResizeHeightTo(channel_selection_min_height, 800, Easing.OutQuint);
                         channelSelection.Show();
                         chatHeight.Value = 1f - channel_selection_min_height;
                     }
@@ -235,8 +235,8 @@ namespace osu.Game.Overlays
 
         protected override void PopIn()
         {
-            MoveToY(0, transition_length, EasingTypes.OutQuint);
-            FadeIn(transition_length, EasingTypes.OutQuint);
+            this.MoveToY(0, transition_length, Easing.OutQuint);
+            this.FadeIn(transition_length, Easing.OutQuint);
 
             inputTextBox.HoldFocus = true;
             base.PopIn();
@@ -244,8 +244,8 @@ namespace osu.Game.Overlays
 
         protected override void PopOut()
         {
-            MoveToY(Height, transition_length, EasingTypes.InSine);
-            FadeOut(transition_length, EasingTypes.InSine);
+            this.MoveToY(Height, transition_length, Easing.InSine);
+            this.FadeOut(transition_length, Easing.InSine);
 
             inputTextBox.HoldFocus = false;
             base.PopOut();
@@ -328,7 +328,7 @@ namespace osu.Game.Overlays
                 var loaded = loadedChannels.Find(d => d.Channel == value);
                 if (loaded == null)
                 {
-                    currentChannelContainer.FadeOut(500, EasingTypes.OutQuint);
+                    currentChannelContainer.FadeOut(500, Easing.OutQuint);
                     loading.Show();
 
                     loaded = new DrawableChannel(currentChannel);
@@ -340,7 +340,7 @@ namespace osu.Game.Overlays
 
                         currentChannelContainer.Clear(false);
                         currentChannelContainer.Add(loaded);
-                        currentChannelContainer.FadeIn(500, EasingTypes.OutQuint);
+                        currentChannelContainer.FadeIn(500, Easing.OutQuint);
                     });
                 }
                 else

@@ -4,7 +4,6 @@
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
-using osu.Game.Graphics.Transforms;
 
 namespace osu.Game.Graphics
 {
@@ -27,10 +26,8 @@ namespace osu.Game.Graphics
         /// <param name="newColour">The new accent colour.</param>
         /// <param name="duration">The tween duration.</param>
         /// <param name="easing">The tween easing.</param>
-        public static void FadeAccent<T>(this T accentedDrawable, Color4 newColour, double duration = 0, EasingTypes easing = EasingTypes.None)
-            where T : Transformable<Drawable>, IHasAccentColour
-        {
-            accentedDrawable.TransformTo(newColour, duration, easing, new TransformAccent());
-        }
+        public static TransformSequence<T> FadeAccent<T>(this T accentedDrawable, Color4 newColour, double duration = 0, Easing easing = Easing.None)
+            where T : IHasAccentColour
+            => accentedDrawable.TransformTo(nameof(accentedDrawable.AccentColour), newColour, duration, easing);
     }
 }

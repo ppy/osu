@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
@@ -127,13 +126,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             if (Complete && updateCompleteTick())
             {
-                background.Flush(flushType: typeof(TransformAlpha));
-                background.FadeTo(tracking_alpha + 0.2f, 60, EasingTypes.OutExpo);
-                background.Delay(60);
-                background.FadeTo(tracking_alpha, 250, EasingTypes.OutQuint);
+                background.FinishTransforms(false, nameof(Alpha));
+                background
+                    .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
+                    .Then()
+                    .FadeTo(tracking_alpha, 250, Easing.OutQuint);
             }
 
-            RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, EasingTypes.OutExpo);
+            this.RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, Easing.OutExpo);
         }
     }
 }

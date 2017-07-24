@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.Profile
 
             public void ResetBall()
             {
-                ball.MoveTo(new Vector2(1, GetYPosition(Values.Last())), ballShown ? transform_duration : 0, EasingTypes.OutQuint);
+                ball.MoveTo(new Vector2(1, GetYPosition(Values.Last())), ballShown ? transform_duration : 0, Easing.OutQuint);
                 ball.Show();
                 BallRelease();
                 ballShown = true;
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Profile
                         float y = GetYPosition(values[i]);
                         if (Math.Abs(y * DrawHeight - position.Y) <= 8f)
                         {
-                            ball.MoveTo(new Vector2(index / (float)(count - 1), y), transform_duration, EasingTypes.OutQuint);
+                            ball.MoveTo(new Vector2(index / (float)(count - 1), y), transform_duration, Easing.OutQuint);
                             BallMove(i);
                         }
                     }

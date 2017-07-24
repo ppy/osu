@@ -154,14 +154,13 @@ namespace osu.Game.Overlays
                 textLine2.Text = settingValue;
                 textLine3.Text = shortcut.ToUpper();
 
-                box.FadeIn(500, EasingTypes.OutQuint);
-                box.ResizeHeightTo(height, 500, EasingTypes.OutQuint);
-
-                using (box.BeginDelayedSequence(500))
-                {
-                    box.FadeOutFromOne(1500, EasingTypes.InQuint);
-                    box.ResizeHeightTo(height_contracted, 1500, EasingTypes.InQuint);
-                }
+                box.Animate(
+                    b => b.FadeIn(500, Easing.OutQuint),
+                    b => b.ResizeHeightTo(height, 500, Easing.OutQuint)
+                ).Then(
+                    b => b.FadeOutFromOne(1500, Easing.InQuint),
+                    b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint)
+                );
 
                 int optionCount = 0;
                 int selectedOption = -1;
@@ -232,13 +231,13 @@ namespace osu.Game.Overlays
             {
                 if (glowing)
                 {
-                    fill.FadeColour(glowingColour, transition_speed, EasingTypes.OutQuint);
-                    FadeEdgeEffectTo(glow_strength, transition_speed, EasingTypes.OutQuint);
+                    fill.FadeColour(glowingColour, transition_speed, Easing.OutQuint);
+                    FadeEdgeEffectTo(glow_strength, transition_speed, Easing.OutQuint);
                 }
                 else
                 {
-                    FadeEdgeEffectTo(0, transition_speed, EasingTypes.OutQuint);
-                    fill.FadeColour(idleColour, transition_speed, EasingTypes.OutQuint);
+                    FadeEdgeEffectTo(0, transition_speed, Easing.OutQuint);
+                    fill.FadeColour(idleColour, transition_speed, Easing.OutQuint);
                 }
             }
 
@@ -261,7 +260,7 @@ namespace osu.Game.Overlays
                 };
 
                 updateGlow();
-                Flush(true);
+                FinishTransforms(true);
             }
         }
     }

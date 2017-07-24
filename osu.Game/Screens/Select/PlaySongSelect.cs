@@ -125,6 +125,7 @@ namespace osu.Game.Screens.Select
                 }
 
             Beatmap.Value.Track.Looping = false;
+            Beatmap.Disabled = true;
 
             LoadComponentAsync(player = new PlayerLoader(new Player()), l => Push(player));
         }

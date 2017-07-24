@@ -62,14 +62,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             var animIn = Math.Min(150, sliderTick.StartTime - FadeInTime);
 
-            ScaleTo(0.5f);
-            ScaleTo(1.2f, animIn);
-            FadeIn(animIn);
-
-            Delay(animIn);
-            ScaleTo(1, 150, EasingTypes.Out);
-
-            Delay(-animIn);
+            this.Animate(
+                d => d.FadeIn(animIn),
+                d => d.ScaleTo(0.5f).ScaleTo(1.2f, animIn)
+            ).Then(
+                d => d.ScaleTo(1, 150, Easing.Out)
+            );
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -77,16 +75,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    Delay(FadeOutTime - sliderTick.StartTime);
-                    FadeOut();
+                    this.Delay(FadeOutTime - sliderTick.StartTime).FadeOut();
                     break;
                 case ArmedState.Miss:
-                    FadeOut(160);
-                    FadeColour(Color4.Red, 80);
+                    this.FadeOut(160)
+                        .FadeColour(Color4.Red, 80);
                     break;
                 case ArmedState.Hit:
-                    FadeOut(120, EasingTypes.OutQuint);
-                    ScaleTo(Scale * 1.5f, 120, EasingTypes.OutQuint);
+                    this.FadeOut(120, Easing.OutQuint)
+                        .ScaleTo(Scale * 1.5f, 120, Easing.OutQuint);
                     break;
             }
         }
