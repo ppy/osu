@@ -313,6 +313,9 @@ namespace osu.Game.Screens.Select
 
         private void removeGroup(BeatmapGroup group)
         {
+            if (group == null)
+                return;
+
             groups.Remove(group);
             panels.Remove(group.Header);
             foreach (var p in group.BeatmapPanels)
