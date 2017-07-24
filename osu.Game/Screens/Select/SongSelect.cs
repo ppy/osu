@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
-        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
         private BeatmapDatabase database;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
@@ -251,7 +250,7 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                ruleset.Value = beatmap.Ruleset;
+                Ruleset.Value = beatmap.Ruleset;
 
                 if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
                     sampleChangeDifficulty.Play();
