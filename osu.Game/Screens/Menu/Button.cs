@@ -128,16 +128,15 @@ namespace osu.Game.Screens.Menu
             bool rightward = beatIndex % 2 == 1;
             double duration = timingPoint.BeatLength / 2;
 
-            icon.RotateTo(rightward ? 10 : -10, duration * 2, EasingTypes.InOutSine);
+            icon.RotateTo(rightward ? 10 : -10, duration * 2, Easing.InOutSine);
 
-            icon.MoveToY(-10, duration, EasingTypes.Out);
-            icon.ScaleTo(Vector2.One, duration, EasingTypes.Out);
-
-            using (icon.BeginDelayedSequence(duration))
-            {
-                icon.MoveToY(0, duration, EasingTypes.In);
-                icon.ScaleTo(new Vector2(1, 0.9f), duration, EasingTypes.In);
-            }
+            icon.Animate(
+                i => i.MoveToY(-10, duration, Easing.Out),
+                i => i.ScaleTo(1, duration, Easing.Out)
+            ).Then(
+                i => i.MoveToY(0, duration, Easing.In),
+                i => i.ScaleTo(new Vector2(1, 0.9f), duration, Easing.In)
+            );
         }
 
         protected override bool OnHover(InputState state)
@@ -146,25 +145,25 @@ namespace osu.Game.Screens.Menu
 
             sampleHover?.Play();
 
-            box.ScaleTo(new Vector2(1.5f, 1), 500, EasingTypes.OutElastic);
+            box.ScaleTo(new Vector2(1.5f, 1), 500, Easing.OutElastic);
 
             double duration = TimeUntilNextBeat;
 
             icon.ClearTransforms();
-            icon.RotateTo(10, duration, EasingTypes.InOutSine);
-            icon.ScaleTo(new Vector2(1, 0.9f), duration, EasingTypes.Out);
+            icon.RotateTo(10, duration, Easing.InOutSine);
+            icon.ScaleTo(new Vector2(1, 0.9f), duration, Easing.Out);
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             icon.ClearTransforms();
-            icon.RotateTo(0, 500, EasingTypes.Out);
-            icon.MoveTo(Vector2.Zero, 500, EasingTypes.Out);
-            icon.ScaleTo(Vector2.One, 200, EasingTypes.Out);
+            icon.RotateTo(0, 500, Easing.Out);
+            icon.MoveTo(Vector2.Zero, 500, Easing.Out);
+            icon.ScaleTo(Vector2.One, 200, Easing.Out);
 
             if (State == ButtonState.Expanded)
-                box.ScaleTo(new Vector2(1, 1), 500, EasingTypes.OutElastic);
+                box.ScaleTo(new Vector2(1, 1), 500, Easing.OutElastic);
         }
 
         [BackgroundDependencyLoader]
@@ -177,13 +176,13 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            boxHoverLayer.FadeTo(0.1f, 1000, EasingTypes.OutQuint);
+            boxHoverLayer.FadeTo(0.1f, 1000, Easing.OutQuint);
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            boxHoverLayer.FadeTo(0, 1000, EasingTypes.OutQuint);
+            boxHoverLayer.FadeTo(0, 1000, Easing.OutQuint);
             return base.OnMouseUp(state, args);
         }
 
@@ -215,7 +214,7 @@ namespace osu.Game.Screens.Menu
 
             boxHoverLayer.ClearTransforms();
             boxHoverLayer.Alpha = 0.9f;
-            boxHoverLayer.FadeOut(800, EasingTypes.OutExpo);
+            boxHoverLayer.FadeOut(800, Easing.OutExpo);
         }
 
         public override bool HandleInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
@@ -247,24 +246,24 @@ namespace osu.Game.Screens.Menu
                         switch (ContractStyle)
                         {
                             default:
-                                box.ScaleTo(new Vector2(0, 1), 500, EasingTypes.OutExpo);
-                                FadeOut(500);
+                                box.ScaleTo(new Vector2(0, 1), 500, Easing.OutExpo);
+                                this.FadeOut(500);
                                 break;
                             case 1:
-                                box.ScaleTo(new Vector2(0, 1), 400, EasingTypes.InSine);
-                                FadeOut(800);
+                                box.ScaleTo(new Vector2(0, 1), 400, Easing.InSine);
+                                this.FadeOut(800);
                                 break;
                         }
                         break;
                     case ButtonState.Expanded:
                         const int expand_duration = 500;
-                        box.ScaleTo(new Vector2(1, 1), expand_duration, EasingTypes.OutExpo);
-                        FadeIn(expand_duration / 6f);
+                        box.ScaleTo(new Vector2(1, 1), expand_duration, Easing.OutExpo);
+                        this.FadeIn(expand_duration / 6f);
                         break;
                     case ButtonState.Exploded:
                         const int explode_duration = 200;
-                        box.ScaleTo(new Vector2(2, 1), explode_duration, EasingTypes.OutExpo);
-                        FadeOut(explode_duration / 4f * 3);
+                        box.ScaleTo(new Vector2(2, 1), explode_duration, Easing.OutExpo);
+                        this.FadeOut(explode_duration / 4f * 3);
                         break;
                 }
             }

@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Notifications
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     LayoutDuration = 150,
-                    LayoutEasing = EasingTypes.OutQuart,
+                    LayoutEasing = Easing.OutQuart,
                     Spacing = new Vector2(3),
                 }
             });

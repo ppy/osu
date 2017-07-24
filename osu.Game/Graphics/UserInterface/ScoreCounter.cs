@@ -2,18 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
-using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class ScoreCounter : RollingCounter<double>
     {
-        protected override Type TransformType => typeof(TransformScore);
-
         protected override double RollingDuration => 1000;
-        protected override EasingTypes RollingEasing => EasingTypes.Out;
+        protected override Easing RollingEasing => Easing.Out;
 
         public bool UseCommaSeparator;
 
@@ -54,24 +49,6 @@ namespace osu.Game.Graphics.UserInterface
         public override void Increment(double amount)
         {
             Current.Value = Current + amount;
-        }
-
-        protected class TransformScore : Transform<double, Drawable>
-        {
-            public virtual double CurrentValue
-            {
-                get
-                {
-                    double time = Time?.Current ?? 0;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
-
-                    return Interpolation.ValueAt(time, (float)StartValue, (float)EndValue, StartTime, EndTime, Easing);
-                }
-            }
-
-            public override void Apply(Drawable d) => ((ScoreCounter)d).DisplayedCount = CurrentValue;
-            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ScoreCounter)d).DisplayedCount;
         }
     }
 }

@@ -77,14 +77,14 @@ namespace osu.Game.Graphics.UserInterface
 
             private void fadeActive()
             {
-                box.FadeIn(transition_length, EasingTypes.OutQuint);
-                Text.FadeColour(Color4.White, transition_length, EasingTypes.OutQuint);
+                box.FadeIn(transition_length, Easing.OutQuint);
+                Text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
             }
 
             private void fadeInactive()
             {
-                box.FadeOut(transition_length, EasingTypes.OutQuint);
-                Text.FadeColour(AccentColour, transition_length, EasingTypes.OutQuint);
+                box.FadeOut(transition_length, Easing.OutQuint);
+                Text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
             }
 
             protected override bool OnHover(InputState state)

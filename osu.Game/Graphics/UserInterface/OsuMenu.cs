@@ -19,14 +19,14 @@ namespace osu.Game.Graphics.UserInterface
             ItemsContainer.Padding = new MarginPadding(5);
         }
 
-        protected override void AnimateOpen() => FadeIn(300, EasingTypes.OutQuint);
+        protected override void AnimateOpen() => this.FadeIn(300, Easing.OutQuint);
 
-        protected override void AnimateClose() => FadeOut(300, EasingTypes.OutQuint);
+        protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
 
         protected override void UpdateContentHeight()
         {
             var actualHeight = (RelativeSizeAxes & Axes.Y) > 0 ? 1 : ContentHeight;
-            ResizeTo(new Vector2(1, State == MenuState.Opened ? actualHeight : 0), 300, EasingTypes.OutQuint);
+            this.ResizeTo(new Vector2(1, State == MenuState.Opened ? actualHeight : 0), 300, Easing.OutQuint);
         }
     }
 }

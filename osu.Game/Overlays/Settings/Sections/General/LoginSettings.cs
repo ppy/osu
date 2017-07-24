@@ -291,7 +291,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     set
                     {
-                        statusIcon.FadeColour(value, 500, EasingTypes.OutQuint);
+                        statusIcon.FadeColour(value, 500, Easing.OutQuint);
                     }
                 }
 

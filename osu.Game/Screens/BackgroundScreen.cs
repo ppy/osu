@@ -56,29 +56,29 @@ namespace osu.Game.Screens
             Content.FadeOut();
             Content.MoveToX(x_movement_amount);
 
-            Content.FadeIn(transition_length, EasingTypes.InOutQuart);
-            Content.MoveToX(0, transition_length, EasingTypes.InOutQuart);
+            Content.FadeIn(transition_length, Easing.InOutQuart);
+            Content.MoveToX(0, transition_length, Easing.InOutQuart);
 
             base.OnEntering(last);
         }
 
         protected override void OnSuspending(Screen next)
         {
-            Content.MoveToX(-x_movement_amount, transition_length, EasingTypes.InOutQuart);
+            Content.MoveToX(-x_movement_amount, transition_length, Easing.InOutQuart);
             base.OnSuspending(next);
         }
 
         protected override bool OnExiting(Screen next)
         {
-            Content.FadeOut(transition_length, EasingTypes.OutExpo);
-            Content.MoveToX(x_movement_amount, transition_length, EasingTypes.OutExpo);
+            Content.FadeOut(transition_length, Easing.OutExpo);
+            Content.MoveToX(x_movement_amount, transition_length, Easing.OutExpo);
 
             return base.OnExiting(next);
         }
 
         protected override void OnResuming(Screen last)
         {
-            Content.MoveToX(0, transition_length, EasingTypes.OutExpo);
+            Content.MoveToX(0, transition_length, Easing.OutExpo);
             base.OnResuming(last);
         }
     }

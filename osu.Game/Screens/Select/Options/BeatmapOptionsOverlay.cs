@@ -29,27 +29,27 @@ namespace osu.Game.Screens.Select.Options
         {
             base.PopIn();
 
-            FadeIn(transition_duration, EasingTypes.OutQuint);
+            this.FadeIn(transition_duration, Easing.OutQuint);
 
             if (buttonsContainer.Position.X == 1 || Alpha == 0)
                 buttonsContainer.MoveToX(x_position - x_movement);
 
-            holder.ScaleTo(new Vector2(1, 1), transition_duration / 2, EasingTypes.OutQuint);
+            holder.ScaleTo(new Vector2(1, 1), transition_duration / 2, Easing.OutQuint);
 
-            buttonsContainer.MoveToX(x_position, transition_duration, EasingTypes.OutQuint);
-            buttonsContainer.TransformSpacingTo(Vector2.Zero, transition_duration, EasingTypes.OutQuint);
+            buttonsContainer.MoveToX(x_position, transition_duration, Easing.OutQuint);
+            buttonsContainer.TransformSpacingTo(Vector2.Zero, transition_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            holder.ScaleTo(new Vector2(1, 0), transition_duration / 2, EasingTypes.InSine);
+            holder.ScaleTo(new Vector2(1, 0), transition_duration / 2, Easing.InSine);
 
-            buttonsContainer.MoveToX(x_position + x_movement, transition_duration, EasingTypes.InSine);
-            buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, EasingTypes.InSine);
+            buttonsContainer.MoveToX(x_position + x_movement, transition_duration, Easing.InSine);
+            buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, Easing.InSine);
 
-            FadeOut(transition_duration, EasingTypes.InQuint);
+            this.FadeOut(transition_duration, Easing.InQuint);
         }
 
         public BeatmapOptionsOverlay()

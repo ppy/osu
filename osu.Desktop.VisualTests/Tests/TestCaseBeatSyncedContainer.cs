@@ -177,9 +177,7 @@ namespace osu.Desktop.VisualTests.Tests
                 beatsPerMinute.Value = 60000 / timingPoint.BeatLength;
                 adjustedBeatLength.Value = timingPoint.BeatLength;
 
-                flashLayer.ClearTransforms();
-                flashLayer.FadeTo(1);
-                flashLayer.FadeTo(0, timingPoint.BeatLength);
+                flashLayer.FadeOutFromOne(timingPoint.BeatLength);
             }
         }
 

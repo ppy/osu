@@ -237,34 +237,32 @@ namespace osu.Game.Screens.Menu
             if (beatIndex < 0) return;
 
             if (IsHovered)
-            {
-                using (BeginDelayedSequence(early_activation))
-                    Schedule(() => sampleBeat.Play());
-            }
+                this.Delay(early_activation).Schedule(() => sampleBeat.Play());
 
-            logoBeatContainer.ScaleTo(1 - 0.02f * amplitudeAdjust, early_activation, EasingTypes.Out);
-            using (logoBeatContainer.BeginDelayedSequence(early_activation))
-                logoBeatContainer.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
+            logoBeatContainer
+                .ScaleTo(1 - 0.02f * amplitudeAdjust, early_activation, Easing.Out)
+                .Then()
+                .ScaleTo(1, beatLength * 2, Easing.OutQuint);
 
             ripple.ClearTransforms();
-
-            ripple.ScaleTo(logoAmplitudeContainer.Scale);
-            ripple.Alpha = 0.15f * amplitudeAdjust;
-
-            ripple.ScaleTo(logoAmplitudeContainer.Scale * (1 + 0.04f * amplitudeAdjust), beatLength, EasingTypes.OutQuint);
-            ripple.FadeOut(beatLength, EasingTypes.OutQuint);
+            ripple
+                .ScaleTo(logoAmplitudeContainer.Scale)
+                .ScaleTo(logoAmplitudeContainer.Scale * (1 + 0.04f * amplitudeAdjust), beatLength, Easing.OutQuint)
+                .FadeTo(0.15f * amplitudeAdjust).FadeOut(beatLength, Easing.OutQuint);
 
             if (effectPoint.KiaiMode && flashLayer.Alpha < 0.4f)
             {
                 flashLayer.ClearTransforms();
-                visualizer.ClearTransforms();
+                flashLayer
+                    .FadeTo(0.2f * amplitudeAdjust, early_activation, Easing.Out)
+                    .Then()
+                    .FadeOut(beatLength);
 
-                flashLayer.FadeTo(0.2f * amplitudeAdjust, early_activation, EasingTypes.Out);
-                visualizer.FadeTo(0.9f * amplitudeAdjust, early_activation, EasingTypes.Out);
-                using (flashLayer.BeginDelayedSequence(early_activation))
-                    flashLayer.FadeOut(beatLength);
-                using (visualizer.BeginDelayedSequence(early_activation))
-                    visualizer.FadeTo(0.5f, beatLength);
+                visualizer.ClearTransforms();
+                visualizer
+                    .FadeTo(0.9f * amplitudeAdjust, early_activation, Easing.Out)
+                    .Then()
+                    .FadeTo(0.5f, beatLength);
             }
         }
 
@@ -276,7 +274,7 @@ namespace osu.Game.Screens.Menu
             const float velocity_adjust_cutoff = 0.98f;
 
             var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track?.CurrentAmplitudes.Maximum ?? 0 : 0;
-            logoAmplitudeContainer.ScaleTo(1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 75, EasingTypes.OutQuint);
+            logoAmplitudeContainer.ScaleTo(1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 75, Easing.OutQuint);
 
             if (maxAmplitude > velocity_adjust_cutoff)
                 triangles.Velocity = 1 + Math.Max(0, maxAmplitude - velocity_adjust_cutoff) * 50;
@@ -288,13 +286,13 @@ namespace osu.Game.Screens.Menu
         {
             if (!Interactive) return false;
 
-            logoBounceContainer.ScaleTo(0.9f, 1000, EasingTypes.Out);
+            logoBounceContainer.ScaleTo(0.9f, 1000, Easing.Out);
             return true;
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            logoBounceContainer.ScaleTo(1f, 500, EasingTypes.OutElastic);
+            logoBounceContainer.ScaleTo(1f, 500, Easing.OutElastic);
             return true;
         }
 
@@ -306,7 +304,7 @@ namespace osu.Game.Screens.Menu
 
             flashLayer.ClearTransforms();
             flashLayer.Alpha = 0.4f;
-            flashLayer.FadeOut(1500, EasingTypes.OutExpo);
+            flashLayer.FadeOut(1500, Easing.OutExpo);
 
             Action?.Invoke();
             return true;
@@ -316,18 +314,18 @@ namespace osu.Game.Screens.Menu
         {
             if (!Interactive) return false;
 
-            logoHoverContainer.ScaleTo(1.1f, 500, EasingTypes.OutElastic);
+            logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            logoHoverContainer.ScaleTo(1, 500, EasingTypes.OutElastic);
+            logoHoverContainer.ScaleTo(1, 500, Easing.OutElastic);
         }
 
         public void Impact()
         {
-            impactContainer.FadeOutFromOne(250, EasingTypes.In);
+            impactContainer.FadeOutFromOne(250, Easing.In);
             impactContainer.ScaleTo(0.96f);
             impactContainer.ScaleTo(1.12f, 250);
         }
