@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Music
 {
     internal class PlaylistList : Container
     {
-        private readonly FillFlowContainer<PlaylistItem> items;
+        private FillFlowContainer<PlaylistItem> items;
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
@@ -35,10 +35,28 @@ namespace osu.Game.Overlays.Music
         private void reorderList(PlaylistItem item)
         {
             for (int ctr = 0; ctr < items.Count; ctr++)
-            {
                 if (items.ElementAt(ctr).IsHovered && items.ElementAt(ctr) != item)
-                    items.ChangeChildDepth(item, ctr);
-            }
+                {
+                    PlaylistItem tempItem;
+                    FillFlowContainer<PlaylistItem> tempItems = new FillFlowContainer<PlaylistItem>();
+
+                    for (int innerCtr = ctr; innerCtr < items.Count; innerCtr++)
+                        if (items.ElementAt(innerCtr) != item)
+                        { 
+                            tempItem = items.ElementAt(innerCtr);
+                            items.Remove(tempItem);
+                            tempItems.Add(tempItem);
+                        }
+
+                    for (int innerCtr = 0; innerCtr < tempItems.Count; innerCtr++)
+                    {
+                        tempItem = tempItems.ElementAt(innerCtr);
+                        tempItems.Remove(tempItem);
+                        items.Add(tempItem);
+                    }
+
+                    break;
+                }
         }
 
         private readonly SearchContainer search;
