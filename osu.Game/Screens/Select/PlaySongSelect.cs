@@ -22,10 +22,10 @@ namespace osu.Game.Screens.Select
     public class PlaySongSelect : SongSelect
     {
         private OsuScreen player;
-        private UserInputManager input;
         private readonly ModSelectOverlay modSelect;
         private readonly BeatmapDetailArea beatmapDetails;
         private IEnumerable<Mod> originalMods;
+        private bool controlPressed;
 
         public PlaySongSelect()
         {
@@ -46,10 +46,8 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, UserInputManager input)
+        private void load(OsuColour colours)
         {
-            this.input = input;
-
             Footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility, Key.F1, float.MaxValue);
 
             BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
@@ -111,12 +109,24 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            controlPressed = state.Keyboard.ControlPressed;
+            return base.OnKeyDown(state, args);
+        }
+
+        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        {
+            controlPressed = state.Keyboard.ControlPressed;
+            return base.OnKeyUp(state, args);
+        }
+
         protected override void OnSelected()
         {
             if (player != null) return;
 
             originalMods = modSelect.SelectedMods.Value;
-            if (input.CurrentState.Keyboard.ControlPressed)
+            if (controlPressed)
                 if (findAutoMod(originalMods) == null)
                 {
                     var auto = findAutoMod(Ruleset.Value.CreateInstance().GetModsFor(ModType.Special));
