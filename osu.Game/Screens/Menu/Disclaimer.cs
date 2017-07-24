@@ -98,18 +98,13 @@ namespace osu.Game.Screens.Menu
         {
             base.OnEntering(last);
 
-            Content.FadeInFromZero(500);
+            icon.Delay(1500).FadeColour(iconColour, 200);
 
-            icon.Delay(1500);
-            icon.FadeColour(iconColour, 200);
-
-            Delay(6000, true);
-
-            Content.FadeOut(250);
-
-            Delay(250);
-
-            Schedule(() => Push(intro));
+            Content
+                .FadeInFromZero(500)
+                .Then(5500)
+                .FadeOut(250)
+                .Finally(d => Push(intro));
         }
     }
 }

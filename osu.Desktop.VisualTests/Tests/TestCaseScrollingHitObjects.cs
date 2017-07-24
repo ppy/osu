@@ -196,7 +196,7 @@ namespace osu.Desktop.VisualTests.Tests
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                FadeInFromZero(250, EasingTypes.OutQuint);
+                this.FadeInFromZero(250, Easing.OutQuint);
             }
 
             protected override void Update()

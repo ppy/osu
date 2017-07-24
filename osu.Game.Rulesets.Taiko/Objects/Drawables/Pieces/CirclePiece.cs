@@ -166,9 +166,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
             double duration = timingPoint.BeatLength * 2;
 
-            background.FadeEdgeEffectTo(1, pre_beat_transition_time, EasingTypes.OutQuint);
-            using (background.BeginDelayedSequence(pre_beat_transition_time))
-                background.FadeEdgeEffectTo(edge_alpha_kiai, duration, EasingTypes.OutQuint);
+            background
+                .FadeEdgeEffectTo(1, pre_beat_transition_time, Easing.OutQuint)
+                .Then()
+                .FadeEdgeEffectTo(edge_alpha_kiai, duration, Easing.OutQuint);
         }
     }
 }

@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Settings
             set
             {
                 // probably needs a better transition.
-                FadeTo(value ? 1 : 0);
+                this.FadeTo(value ? 1 : 0);
             }
         }
 

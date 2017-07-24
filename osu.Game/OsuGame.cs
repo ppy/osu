@@ -80,6 +80,11 @@ namespace osu.Game
 
         public void ToggleDirect() => direct.ToggleVisibility();
 
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
         {
@@ -97,7 +102,7 @@ namespace osu.Game
                 Task.Run(() => BeatmapDatabase.Import(paths.ToArray()));
             }
 
-            Dependencies.Cache(this);
+            dependencies.Cache(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             Ruleset.Value = RulesetDatabase.GetRuleset(configRuleset.Value);
@@ -121,8 +126,7 @@ namespace osu.Game
             if (!menu.IsCurrentScreen)
             {
                 menu.MakeCurrent();
-                Delay(500);
-                scoreLoad = Schedule(() => LoadScore(s));
+                this.Delay(500).Schedule(() => LoadScore(s), out scoreLoad);
                 return;
             }
 
@@ -207,13 +211,13 @@ namespace osu.Game
                 });
             };
 
-            Dependencies.Cache(settings);
-            Dependencies.Cache(social);
-            Dependencies.Cache(chat);
-            Dependencies.Cache(userProfile);
-            Dependencies.Cache(musicController);
-            Dependencies.Cache(notificationManager);
-            Dependencies.Cache(dialogOverlay);
+            dependencies.Cache(settings);
+            dependencies.Cache(social);
+            dependencies.Cache(chat);
+            dependencies.Cache(userProfile);
+            dependencies.Cache(musicController);
+            dependencies.Cache(notificationManager);
+            dependencies.Cache(dialogOverlay);
 
             // ensure both overlays aren't presented at the same time
             chat.StateChanged += (container, state) => social.State = state == Visibility.Visible ? Visibility.Hidden : social.State;
@@ -230,10 +234,10 @@ namespace osu.Game
                 switch (settings.State)
                 {
                     case Visibility.Hidden:
-                        intro.MoveToX(0, SettingsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
+                        intro.MoveToX(0, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
                         break;
                     case Visibility.Visible:
-                        intro.MoveToX(SettingsOverlay.SIDEBAR_WIDTH / 2, SettingsOverlay.TRANSITION_LENGTH, EasingTypes.OutQuint);
+                        intro.MoveToX(SettingsOverlay.SIDEBAR_WIDTH / 2, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
                         break;
                 }
             };

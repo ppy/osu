@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Chat
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
                                     LayoutDuration = 200,
-                                    LayoutEasing = EasingTypes.OutQuint,
+                                    LayoutEasing = Easing.OutQuint,
                                     Spacing = new Vector2(0f, 20f),
                                     Padding = new MarginPadding { Vertical = 20, Left = WIDTH_PADDING },
                                 },
@@ -158,10 +158,10 @@ namespace osu.Game.Overlays.Chat
 
         protected override void PopIn()
         {
-            if (Alpha == 0) MoveToY(DrawHeight);
+            if (Alpha == 0) this.MoveToY(DrawHeight);
 
-            FadeIn(transition_duration, EasingTypes.OutQuint);
-            MoveToY(0, transition_duration, EasingTypes.OutQuint);
+            this.FadeIn(transition_duration, Easing.OutQuint);
+            this.MoveToY(0, transition_duration, Easing.OutQuint);
 
             search.HoldFocus = true;
             base.PopIn();
@@ -169,8 +169,8 @@ namespace osu.Game.Overlays.Chat
 
         protected override void PopOut()
         {
-            FadeOut(transition_duration, EasingTypes.InSine);
-            MoveToY(DrawHeight, transition_duration, EasingTypes.InSine);
+            this.FadeOut(transition_duration, Easing.InSine);
+            this.MoveToY(DrawHeight, transition_duration, Easing.InSine);
 
             search.HoldFocus = false;
             base.PopOut();

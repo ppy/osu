@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected sealed override void UpdateState(ArmedState state)
         {
-            Flush();
+            FinishTransforms();
 
             using (BeginAbsoluteSequence(HitObject.StartTime - TIME_PREEMPT, true))
             {
@@ -44,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void UpdatePreemptState()
         {
-            FadeIn(TIME_FADEIN);
+            this.FadeIn(TIME_FADEIN);
         }
 
         protected virtual void UpdateCurrentState(ArmedState state)
