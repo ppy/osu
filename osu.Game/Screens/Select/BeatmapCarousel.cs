@@ -18,10 +18,11 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
 using osu.Framework.Configuration;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
-    internal class BeatmapCarousel : ScrollContainer
+    internal class BeatmapCarousel : OsuScrollContainer
     {
         public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
 
