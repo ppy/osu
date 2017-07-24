@@ -173,20 +173,20 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            ResizeTo(SIZE_EXTENDED, transform_time, EasingTypes.OutElastic);
-            IconLayer.FadeColour(HoverColour, transform_time, EasingTypes.OutElastic);
+            this.ResizeTo(SIZE_EXTENDED, transform_time, Easing.OutElastic);
+            IconLayer.FadeColour(HoverColour, transform_time, Easing.OutElastic);
 
-            bouncingIcon.ScaleTo(1.1f, transform_time, EasingTypes.OutElastic);
+            bouncingIcon.ScaleTo(1.1f, transform_time, Easing.OutElastic);
 
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            ResizeTo(SIZE_RETRACTED, transform_time, EasingTypes.OutElastic);
-            IconLayer.FadeColour(TextLayer.Colour, transform_time, EasingTypes.OutElastic);
+            this.ResizeTo(SIZE_RETRACTED, transform_time, Easing.OutElastic);
+            IconLayer.FadeColour(TextLayer.Colour, transform_time, Easing.OutElastic);
 
-            bouncingIcon.ScaleTo(1, transform_time, EasingTypes.OutElastic);
+            bouncingIcon.ScaleTo(1, transform_time, Easing.OutElastic);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -205,7 +205,7 @@ namespace osu.Game.Graphics.UserInterface
             Add(flash);
 
             flash.Alpha = 1;
-            flash.FadeOut(500, EasingTypes.OutQuint);
+            flash.FadeOut(500, Easing.OutQuint);
             flash.Expire();
 
             return base.OnClick(state);
@@ -245,9 +245,9 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (beatIndex < 0) return;
 
-                icon.ScaleTo(1 - 0.1f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
-                using (icon.BeginDelayedSequence(beat_in_time))
-                    icon.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
+                icon.ScaleTo(1 - 0.1f * amplitudeAdjust, beat_in_time, Easing.Out)
+                    .Then()
+                    .ScaleTo(1, beatLength * 2, Easing.OutQuint);
             }
         }
     }

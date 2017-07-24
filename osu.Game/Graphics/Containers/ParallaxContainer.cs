@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.Containers
             {
                 if (!parallaxEnabled)
                 {
-                    content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
+                    content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, Easing.OutQuint);
                     content.Scale = new Vector2(1 + ParallaxAmount);
                 }
             };
@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.Containers
             if (parallaxEnabled)
             {
                 Vector2 offset = input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2;
-                content.MoveTo(offset * ParallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
+                content.MoveTo(offset * ParallaxAmount, firstUpdate ? 0 : 1000, Easing.OutQuint);
                 content.Scale = new Vector2(1 + ParallaxAmount);
             }
 

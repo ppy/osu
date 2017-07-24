@@ -76,8 +76,8 @@ namespace osu.Game.Screens.Play
 
         public override bool HandleInput => State == Visibility.Visible;
 
-        protected override void PopIn() => FadeIn(transition_duration, EasingTypes.In);
-        protected override void PopOut() => FadeOut(transition_duration, EasingTypes.In);
+        protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
+        protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);
 
         // Don't let mouse down events through the overlay or people can click circles while paused.
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;

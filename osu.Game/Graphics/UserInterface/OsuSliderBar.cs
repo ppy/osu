@@ -166,7 +166,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void UpdateValue(float value)
         {
-            Nub.MoveToX(RangePadding + UsableWidth * value, 250, EasingTypes.OutQuint);
+            Nub.MoveToX(RangePadding + UsableWidth * value, 250, Easing.OutQuint);
         }
     }
 }
