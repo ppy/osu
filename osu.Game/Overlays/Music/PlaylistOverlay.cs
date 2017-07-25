@@ -65,6 +65,7 @@ namespace osu.Game.Overlays.Music
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
                             OnSelect = itemSelected,
+                            ReorderList = reorderList,
                         },
                         filter = new FilterControl
                         {
@@ -150,6 +151,11 @@ namespace osu.Game.Overlays.Music
         {
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
             beatmapBacking.Value.Track.Start();
+        }
+
+        private void reorderList(IList<BeatmapSetInfo> newList)
+        {
+            BeatmapSets = newList as IEnumerable<BeatmapSetInfo>;
         }
     }
 

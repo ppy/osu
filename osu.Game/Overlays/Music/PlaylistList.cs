@@ -32,31 +32,49 @@ namespace osu.Game.Overlays.Music
 
         public Action<BeatmapSetInfo> OnSelect;
 
+        public Action<IList<BeatmapSetInfo>> ReorderList;
+
         private void reorderList(PlaylistItem item)
         {
+            IList<BeatmapSetInfo> currentList = new List<BeatmapSetInfo>();
+
+            if (item.Position.Y > items.ElementAt(items.Count - 1).Position.Y)
+            {
+                items.Remove(item);
+                items.Add(item);
+            }
+
             for (int ctr = 0; ctr < items.Count; ctr++)
+            {
                 if (items.ElementAt(ctr).IsHovered && items.ElementAt(ctr) != item)
                 {
                     PlaylistItem tempItem;
                     FillFlowContainer<PlaylistItem> tempItems = new FillFlowContainer<PlaylistItem>();
 
+                    items.Remove(item);
+                    tempItems.Add(item);
+
                     for (int innerCtr = ctr; innerCtr < items.Count; innerCtr++)
-                        if (items.ElementAt(innerCtr) != item)
-                        { 
-                            tempItem = items.ElementAt(innerCtr);
-                            items.Remove(tempItem);
-                            tempItems.Add(tempItem);
-                        }
+                    {
+                        tempItem = items.ElementAt(ctr);
+                        items.Remove(tempItem);
+                        tempItems.Add(tempItem);
+                        innerCtr--;                         //Needed because items.Count decreases with every items.Remove()
+                    }
 
                     for (int innerCtr = 0; innerCtr < tempItems.Count; innerCtr++)
                     {
                         tempItem = tempItems.ElementAt(innerCtr);
                         tempItems.Remove(tempItem);
                         items.Add(tempItem);
+                        innerCtr--;                         //Needed because items.Count decreases with every items.Remove()
                     }
-
-                    break;
                 }
+
+                currentList.Add(items.ElementAt(ctr).BeatmapSetInfo);
+            }
+
+            ReorderList.Invoke(currentList);
         }
 
         private readonly SearchContainer search;
