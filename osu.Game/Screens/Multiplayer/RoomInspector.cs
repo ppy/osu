@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Multiplayer
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    ColourInfo = ColourInfo.GradientVertical(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0)),
+                                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.5f), Color4.Black.Opacity(0)),
                                 },
                                 new Container
                                 {
