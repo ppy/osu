@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Profile
                                             Origin = Anchor.BottomLeft,
                                             Y = -48
                                         },
-                                        countryFlag = new DrawableFlag(user.Country?.FlagName ?? "__")
+                                        countryFlag = new DrawableFlag(user.Country?.FlagName)
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
