@@ -22,14 +22,11 @@ namespace osu.Game.Beatmaps
 
         public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
-        public readonly bool WithStoryboard;
-
-        protected WorkingBeatmap(BeatmapInfo beatmapInfo, bool withStoryboard = false)
+        protected WorkingBeatmap(BeatmapInfo beatmapInfo)
         {
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo.Metadata;
-            WithStoryboard = withStoryboard;
 
             Mods.ValueChanged += mods => applyRateAdjustments();
         }

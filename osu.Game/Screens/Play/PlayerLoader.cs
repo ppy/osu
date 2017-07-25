@@ -35,7 +35,8 @@ namespace osu.Game.Screens.Play
         {
             this.player = player;
 
-            player.RestartRequested = () => {
+            player.RestartRequested = () =>
+            {
                 showOverlays = false;
                 ValidForResume = true;
             };
@@ -74,23 +75,20 @@ namespace osu.Game.Screens.Play
             {
                 RestartCount = player.RestartCount + 1,
                 RestartRequested = player.RestartRequested,
-                Beatmap = player.Beatmap,
             });
 
-            Delay(400);
-
-            Schedule(pushWhenLoaded);
+            this.Delay(400).Schedule(pushWhenLoaded);
         }
 
         private void contentIn()
         {
-            Content.ScaleTo(1, 650, EasingTypes.OutQuint);
+            Content.ScaleTo(1, 650, Easing.OutQuint);
             Content.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
-            Content.ScaleTo(0.7f, 300, EasingTypes.InQuint);
+            Content.ScaleTo(0.7f, 300, Easing.InQuint);
             Content.FadeOut(250);
         }
 
@@ -104,16 +102,9 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
-            Delay(500, true);
-
-            logo.MoveToOffset(new Vector2(0, -180), 500, EasingTypes.InOutExpo);
-            Delay(250, true);
-
-            info.FadeIn(500);
-
-            Delay(1400, true);
-
-            Schedule(pushWhenLoaded);
+            logo.Delay(500).MoveToOffset(new Vector2(0, -180), 500, Easing.InOutExpo);
+            info.Delay(750).FadeIn(500);
+            this.Delay(2150).Schedule(pushWhenLoaded);
         }
 
         private void pushWhenLoaded()
@@ -123,9 +114,7 @@ namespace osu.Game.Screens.Play
 
             contentOut();
 
-            Delay(250);
-
-            Schedule(() =>
+            this.Delay(250).Schedule(() =>
             {
                 if (!IsCurrentScreen) return;
 
@@ -142,8 +131,8 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
-            Content.ScaleTo(0.7f, 150, EasingTypes.InQuint);
-            FadeOut(150);
+            Content.ScaleTo(0.7f, 150, Easing.InQuint);
+            this.FadeOut(150);
 
             return base.OnExiting(next);
         }

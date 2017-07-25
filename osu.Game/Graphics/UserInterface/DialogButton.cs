@@ -96,11 +96,10 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(Framework.Input.InputState state)
         {
             didClick = true;
-            colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, EasingTypes.In);
+            colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
             flash();
 
-            Delay(click_duration);
-            Schedule(delegate {
+            this.Delay(click_duration).Schedule(delegate {
                 colourContainer.ResizeTo(new Vector2(0.8f, 1f));
                 spriteText.Spacing = Vector2.Zero;
                 glowContainer.FadeOut();
@@ -111,10 +110,10 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            spriteText.TransformSpacingTo(hoverSpacing, hover_duration, EasingTypes.OutElastic);
+            spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
 
-            colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, EasingTypes.OutElastic);
-            glowContainer.FadeIn(glow_fade_duration, EasingTypes.Out);
+            colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
+            glowContainer.FadeIn(glow_fade_duration, Easing.Out);
             base.OnHover(state);
             return true;
         }
@@ -123,9 +122,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (!didClick)
             {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, EasingTypes.OutElastic);
-                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, EasingTypes.OutElastic);
-                glowContainer.FadeOut(glow_fade_duration, EasingTypes.Out);
+                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, Easing.OutElastic);
+                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
+                glowContainer.FadeOut(glow_fade_duration, Easing.Out);
             }
 
             didClick = false;
@@ -149,9 +148,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateGlow()
         {
-            leftGlow.ColourInfo = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
+            leftGlow.Colour = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
             centerGlow.Colour = ButtonColour;
-            rightGlow.ColourInfo = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
+            rightGlow.Colour = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
         }
 
         public DialogButton()

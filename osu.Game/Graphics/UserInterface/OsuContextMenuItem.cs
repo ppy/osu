@@ -93,15 +93,15 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(InputState state)
         {
             sampleHover.Play();
-            textBold.FadeIn(transition_length, EasingTypes.OutQuint);
-            text.FadeOut(transition_length, EasingTypes.OutQuint);
+            textBold.FadeIn(transition_length, Easing.OutQuint);
+            text.FadeOut(transition_length, Easing.OutQuint);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            textBold.FadeOut(transition_length, EasingTypes.OutQuint);
-            text.FadeIn(transition_length, EasingTypes.OutQuint);
+            textBold.FadeOut(transition_length, Easing.OutQuint);
+            text.FadeIn(transition_length, Easing.OutQuint);
             base.OnHoverLost(state);
         }
 

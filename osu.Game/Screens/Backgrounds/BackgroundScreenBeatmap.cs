@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
@@ -26,11 +27,12 @@ namespace osu.Game.Screens.Backgrounds
             {
                 if (beatmap == value && beatmap != null)
                     return;
+
                 beatmap = value;
 
                 Schedule(() =>
                 {
-                    var newBackground = beatmap == null ? new Background(@"Backgrounds/bg1") : new BeatmapBackground(beatmap);
+                    var newBackground = new BeatmapBackground(beatmap);
 
                     LoadComponentAsync(newBackground, delegate
                     {
@@ -38,7 +40,7 @@ namespace osu.Game.Screens.Backgrounds
                         if (background != null)
                         {
                             newDepth = background.Depth + 1;
-                            background.Flush();
+                            background.FinishTransforms();
                             background.FadeOut(250);
                             background.Expire();
                         }
@@ -51,12 +53,12 @@ namespace osu.Game.Screens.Backgrounds
             }
         }
 
-        public BackgroundScreenBeatmap(WorkingBeatmap beatmap)
+        public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {
             Beatmap = beatmap;
         }
 
-        public void BlurTo(Vector2 sigma, double duration, EasingTypes easing = EasingTypes.None)
+        public void BlurTo(Vector2 sigma, double duration, Easing easing = Easing.None)
         {
             background?.BlurTo(sigma, duration, easing);
             blurTarget = sigma;
@@ -80,9 +82,9 @@ namespace osu.Game.Screens.Backgrounds
             }
 
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(TextureStore textures)
             {
-                Sprite.Texture = beatmap?.Background;
+                Sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg1");
             }
         }
     }

@@ -35,8 +35,6 @@ namespace osu.Game.Screens.Play
 
         internal override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && HitRenderer.ProvidingUserCursor;
 
-        public BeatmapInfo BeatmapInfo;
-
         public Action RestartRequested;
 
         internal override bool AllowBeatmapRulesetChange => false;
@@ -69,8 +67,10 @@ namespace osu.Game.Screens.Play
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
 
+        private bool loadedSuccessfully => HitRenderer?.Objects.Any() == true;
+
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGame osu)
         {
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
@@ -81,24 +81,21 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                if (Beatmap == null)
-                    Beatmap = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
-
-                if (Beatmap?.Beatmap == null)
+                if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                ruleset = osu?.Ruleset.Value ?? Beatmap.BeatmapInfo.Ruleset;
+                ruleset = osu?.Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
                 rulesetInstance = ruleset.CreateInstance();
 
                 try
                 {
-                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, ruleset.ID == Beatmap.BeatmapInfo.Ruleset.ID);
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, ruleset.ID == Beatmap.Value.BeatmapInfo.Ruleset.ID);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
                     // we may fail to create a HitRenderer if the beatmap cannot be loaded with the user's preferred ruleset
                     // let's try again forcing the beatmap's ruleset.
-                    ruleset = Beatmap.BeatmapInfo.Ruleset;
+                    ruleset = Beatmap.Value.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
                     HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, true);
                 }
@@ -115,20 +112,17 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            Track track = Beatmap.Track;
+            Track track = Beatmap.Value.Track;
 
             if (track != null)
-            {
-                audio.Track.SetExclusive(track);
                 adjustableSourceClock = track;
-            }
 
             adjustableSourceClock = (IAdjustableClock)track ?? new StopwatchClock();
 
             decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             var firstObjectTime = HitRenderer.Objects.First().StartTime;
-            decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(Beatmap.Beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, Beatmap.BeatmapInfo.AudioLeadIn)));
+            decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, Beatmap.Value.BeatmapInfo.AudioLeadIn)));
             decoupledClock.ProcessFrame();
 
             offsetClock = new FramedOffsetClock(decoupledClock);
@@ -141,7 +135,7 @@ namespace osu.Game.Screens.Play
             {
                 adjustableSourceClock.Reset();
 
-                foreach (var mod in Beatmap.Mods.Value.OfType<IApplicableToClock>())
+                foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
                     mod.ApplyToClock(adjustableSourceClock);
 
                 decoupledClock.ChangeSource(adjustableSourceClock);
@@ -209,7 +203,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
-            hudOverlay.ModDisplay.Current.BindTo(Beatmap.Mods);
+            hudOverlay.ModDisplay.Current.BindTo(Beatmap.Value.Mods);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
@@ -242,7 +236,7 @@ namespace osu.Game.Screens.Play
                 {
                     var score = new Score
                     {
-                        Beatmap = Beatmap.BeatmapInfo,
+                        Beatmap = Beatmap.Value.BeatmapInfo,
                         Ruleset = ruleset
                     };
                     scoreProcessor.PopulateScore(score);
@@ -265,29 +259,30 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, EasingTypes.OutQuint);
-            Background?.FadeTo(1 - (float)dimLevel, 1500, EasingTypes.OutQuint);
+            if (!loadedSuccessfully)
+                return;
+
+            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, Easing.OutQuint);
+            Background?.FadeTo(1 - (float)dimLevel, 1500, Easing.OutQuint);
 
             Content.Alpha = 0;
 
             dimLevel.ValueChanged += newDim => Background?.FadeTo(1 - (float)newDim, 800);
 
-            Content.ScaleTo(0.7f);
+            Content
+                .ScaleTo(0.7f)
+                .ScaleTo(1, 750, Easing.OutQuint)
+                .Delay(250)
+                .FadeIn(250);
 
-            using (Content.BeginDelayedSequence(250))
-                Content.FadeIn(250);
-
-            Content.ScaleTo(1, 750, EasingTypes.OutQuint);
-
-            using (BeginDelayedSequence(750))
-                Schedule(() =>
-                {
-                    if (!pauseContainer.IsPaused)
-                        decoupledClock.Start();
-                });
+            this.Delay(750).Schedule(() =>
+            {
+                if (!pauseContainer.IsPaused)
+                    decoupledClock.Start();
+            });
 
             pauseContainer.Alpha = 0;
-            pauseContainer.FadeIn(750, EasingTypes.OutQuint);
+            pauseContainer.FadeIn(750, Easing.OutQuint);
         }
 
         protected override void OnSuspending(Screen next)
@@ -304,7 +299,11 @@ namespace osu.Game.Screens.Play
                 return base.OnExiting(next);
             }
 
-            pauseContainer.Pause();
+            if (loadedSuccessfully)
+            {
+                pauseContainer.Pause();
+            }
+
             return true;
         }
 
@@ -315,7 +314,7 @@ namespace osu.Game.Screens.Play
             HitRenderer?.FadeOut(fade_out_duration);
             Content.FadeOut(fade_out_duration);
 
-            hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
+            hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, Easing.In);
 
             Background?.FadeTo(1f, fade_out_duration);
         }

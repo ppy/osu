@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Menu
         private readonly BackgroundScreenDefault background;
         private Screen songSelect;
 
+        private readonly MenuSideFlashes sideFlashes;
+
         protected override BackgroundScreen CreateBackground() => background;
 
         public MainMenu()
@@ -49,10 +51,10 @@ namespace osu.Game.Screens.Menu
                             OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnExit = delegate { Exit(); },
-                        },
-                        new MenuSideFlashes(),
+                        }
                     }
-                }
+                },
+                sideFlashes = new MenuSideFlashes(),
             };
         }
 
@@ -65,12 +67,6 @@ namespace osu.Game.Screens.Menu
             buttons.OnDirect = game.ToggleDirect;
 
             preloadSongSelect();
-        }
-
-        protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
-        {
-            base.OnBeatmapChanged(beatmap);
-            background.Next();
         }
 
         private void preloadSongSelect()
@@ -90,16 +86,28 @@ namespace osu.Game.Screens.Menu
         {
             base.OnEntering(last);
             buttons.FadeInFromZero(500);
-            if (last is Intro && Beatmap != null)
+
+            var track = Beatmap.Value.Track;
+            var metadata = Beatmap.Value.Metadata;
+
+            if (last is Intro && track != null)
             {
-                if (!Beatmap.Track.IsRunning)
+                if (!track.IsRunning)
                 {
-                    Beatmap.Track.Seek(Beatmap.Metadata.PreviewTime);
-                    if (Beatmap.Metadata.PreviewTime == -1)
-                        Beatmap.Track.Seek(Beatmap.Track.Length * 0.4f);
-                    Beatmap.Track.Start();
+                    track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * track.Length);
+                    track.Start();
                 }
             }
+
+            Beatmap.ValueChanged += beatmap_ValueChanged;
+        }
+
+        private void beatmap_ValueChanged(WorkingBeatmap newValue)
+        {
+            if (!IsCurrentScreen)
+                return;
+
+            background.Next();
         }
 
         protected override void OnSuspending(Screen next)
@@ -110,8 +118,10 @@ namespace osu.Game.Screens.Menu
 
             buttons.State = MenuState.EnteringMode;
 
-            Content.FadeOut(length, EasingTypes.InSine);
-            Content.MoveTo(new Vector2(-800, 0), length, EasingTypes.InSine);
+            Content.FadeOut(length, Easing.InSine);
+            Content.MoveTo(new Vector2(-800, 0), length, Easing.InSine);
+
+            sideFlashes.FadeOut(length / 4, Easing.OutQuint);
         }
 
         protected override void OnResuming(Screen last)
@@ -127,8 +137,10 @@ namespace osu.Game.Screens.Menu
 
             buttons.State = MenuState.TopLevel;
 
-            Content.FadeIn(length, EasingTypes.OutQuint);
-            Content.MoveTo(new Vector2(0, 0), length, EasingTypes.OutQuint);
+            Content.FadeIn(length, Easing.OutQuint);
+            Content.MoveTo(new Vector2(0, 0), length, Easing.OutQuint);
+
+            sideFlashes.FadeIn(length / 4, Easing.InQuint);
         }
 
         protected override bool OnExiting(Screen next)

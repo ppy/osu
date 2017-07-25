@@ -3,9 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,7 +13,6 @@ using osu.Game.Database;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Extensions;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
 
@@ -30,7 +27,6 @@ namespace osu.Game.Overlays.Music
         private FilterControl filter;
         private PlaylistList list;
 
-        private TrackManager trackManager;
         private BeatmapDatabase beatmaps;
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
@@ -43,7 +39,6 @@ namespace osu.Game.Overlays.Music
         {
             this.inputManager = inputManager;
             this.beatmaps = beatmaps;
-            trackManager = game.Audio.Track;
 
             Children = new Drawable[]
             {
@@ -83,11 +78,15 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>().ToList();
+            list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending).ToList();
+
+            beatmaps.BeatmapSetAdded += s => list.AddBeatmapSet(s);
+            beatmaps.BeatmapSetRemoved += s => list.RemoveBeatmapSet(s);
 
             beatmapBacking.BindTo(game.Beatmap);
 
-            filter.Search.OnCommit = (sender, newText) => {
+            filter.Search.OnCommit = (sender, newText) =>
+            {
                 var beatmap = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
                 if (beatmap != null) playSpecified(beatmap);
             };
@@ -105,16 +104,16 @@ namespace osu.Game.Overlays.Music
             filter.Search.HoldFocus = true;
             Schedule(() => inputManager.ChangeFocus(filter.Search));
 
-            ResizeTo(new Vector2(1, playlist_height), transition_duration, EasingTypes.OutQuint);
-            FadeIn(transition_duration, EasingTypes.OutQuint);
+            this.ResizeTo(new Vector2(1, playlist_height), transition_duration, Easing.OutQuint);
+            this.FadeIn(transition_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             filter.Search.HoldFocus = false;
 
-            ResizeTo(new Vector2(1, 0), transition_duration, EasingTypes.OutQuint);
-            FadeOut(transition_duration);
+            this.ResizeTo(new Vector2(1, 0), transition_duration, Easing.OutQuint);
+            this.FadeOut(transition_duration);
         }
 
         private void itemSelected(BeatmapSetInfo set)
@@ -153,13 +152,7 @@ namespace osu.Game.Overlays.Music
         private void playSpecified(BeatmapInfo info)
         {
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
-
-            Task.Run(() =>
-            {
-                var track = beatmapBacking.Value.Track;
-                trackManager.SetExclusive(track);
-                track.Start();
-            }).ContinueWith(task => Schedule(task.ThrowIfFaulted), TaskContinuationOptions.OnlyOnFaulted);
+            beatmapBacking.Value.Track.Start();
         }
     }
 

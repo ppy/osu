@@ -194,38 +194,43 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            FadeIn(200);
+            this.FadeIn(200);
             background.FlashColour(Color4.White.Opacity(0.25f), 400);
 
             getSample.Play();
 
-            using (innerSpin.BeginLoopedSequence())
-                innerSpin.RotateTo(360, 20000);
-
-            using (outerSpin.BeginLoopedSequence())
-                outerSpin.RotateTo(360, 40000);
+            innerSpin.Spin(20000, RotationDirection.Clockwise);
+            outerSpin.Spin(40000, RotationDirection.Clockwise);
 
             using (BeginDelayedSequence(200, true))
             {
-                disc.FadeIn(initial_duration);
+                disc.FadeIn(initial_duration)
+                    .ScaleTo(1f, initial_duration * 2, Easing.OutElastic);
+
                 particleContainer.FadeIn(initial_duration);
                 outerSpin.FadeTo(0.1f, initial_duration * 2);
-                disc.ScaleTo(1f, initial_duration * 2, EasingTypes.OutElastic);
 
                 using (BeginDelayedSequence(initial_duration + 200, true))
                 {
                     backgroundStrip.FadeIn(step_duration);
-                    leftStrip.ResizeWidthTo(1f, step_duration, EasingTypes.OutQuint);
-                    rightStrip.ResizeWidthTo(1f, step_duration, EasingTypes.OutQuint);
-                    Schedule(() => { if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.Icon; });
+                    leftStrip.ResizeWidthTo(1f, step_duration, Easing.OutQuint);
+                    rightStrip.ResizeWidthTo(1f, step_duration, Easing.OutQuint);
 
-                    using (BeginDelayedSequence(step_duration, true))
+                    this.Animate().Schedule(() =>
                     {
-                        Schedule(() => { if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.MedalUnlocked; });
-
-                        using (BeginDelayedSequence(step_duration, true))
-                            Schedule(() => { if (drawableMedal.State != DisplayState.Full) drawableMedal.State = DisplayState.Full; });
-                    }
+                        if (drawableMedal.State != DisplayState.Full)
+                            drawableMedal.State = DisplayState.Icon;
+                    })
+                    .Delay(step_duration).Schedule(() =>
+                    {
+                        if (drawableMedal.State != DisplayState.Full)
+                            drawableMedal.State = DisplayState.MedalUnlocked;
+                    })
+                    .Delay(step_duration).Schedule(() =>
+                    {
+                        if (drawableMedal.State != DisplayState.Full)
+                            drawableMedal.State = DisplayState.Full;
+                    });
                 }
             }
         }
@@ -233,7 +238,7 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
-            FadeOut(200);
+            this.FadeOut(200);
         }
 
         private void dismiss()
@@ -242,7 +247,7 @@ namespace osu.Game.Overlays
             {
                 // if we haven't yet, play out the animation fully
                 drawableMedal.State = DisplayState.Full;
-                Flush(true);
+                FinishTransforms(true);
                 return;
             }
 
@@ -256,7 +261,7 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.Both;
                 Width = 0f;
-                ColourInfo = ColourInfo.GradientHorizontal(Color4.White.Opacity(start), Color4.White.Opacity(end));
+                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(start), Color4.White.Opacity(end));
                 Masking = true;
 
                 Children = new[]
@@ -295,8 +300,8 @@ namespace osu.Game.Overlays
                     Radius = 5,
                 };
 
-                MoveTo(positionForOffset(DISC_SIZE / 2 + 200), 500);
-                FadeOut(500);
+                this.MoveTo(positionForOffset(DISC_SIZE / 2 + 200), 500);
+                this.FadeOut(500);
                 Expire();
             }
         }

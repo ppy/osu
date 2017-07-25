@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.Cursor
                 if (diff > 180) diff -= 360;
                 degrees = ActiveCursor.Rotation + diff;
 
-                ActiveCursor.RotateTo(degrees, 600, EasingTypes.OutQuint);
+                ActiveCursor.RotateTo(degrees, 600, Easing.OutQuint);
             }
 
             return base.OnMouseMove(state);
@@ -49,10 +49,10 @@ namespace osu.Game.Graphics.Cursor
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             ActiveCursor.Scale = new Vector2(1);
-            ActiveCursor.ScaleTo(0.90f, 800, EasingTypes.OutQuint);
+            ActiveCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
 
             ((Cursor)ActiveCursor).AdditiveLayer.Alpha = 0;
-            ((Cursor)ActiveCursor).AdditiveLayer.FadeInFromZero(800, EasingTypes.OutQuint);
+            ((Cursor)ActiveCursor).AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
             return base.OnMouseDown(state, args);
         }
 
@@ -62,9 +62,9 @@ namespace osu.Game.Graphics.Cursor
             {
                 dragging = false;
 
-                ((Cursor)ActiveCursor).AdditiveLayer.FadeOut(500, EasingTypes.OutQuint);
-                ActiveCursor.RotateTo(0, 600 * (1 + Math.Abs(ActiveCursor.Rotation / 720)), EasingTypes.OutElasticHalf);
-                ActiveCursor.ScaleTo(1, 500, EasingTypes.OutElastic);
+                ((Cursor)ActiveCursor).AdditiveLayer.FadeOut(500, Easing.OutQuint);
+                ActiveCursor.RotateTo(0, 600 * (1 + Math.Abs(ActiveCursor.Rotation / 720)), Easing.OutElasticHalf);
+                ActiveCursor.ScaleTo(1, 500, Easing.OutElastic);
             }
 
             return base.OnMouseUp(state, args);
@@ -72,21 +72,21 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnClick(InputState state)
         {
-            ((Cursor)ActiveCursor).AdditiveLayer.FadeOutFromOne(500, EasingTypes.OutQuint);
+            ((Cursor)ActiveCursor).AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
 
             return base.OnClick(state);
         }
 
         protected override void PopIn()
         {
-            ActiveCursor.FadeTo(1, 250, EasingTypes.OutQuint);
-            ActiveCursor.ScaleTo(1, 400, EasingTypes.OutQuint);
+            ActiveCursor.FadeTo(1, 250, Easing.OutQuint);
+            ActiveCursor.ScaleTo(1, 400, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            ActiveCursor.FadeTo(0, 900, EasingTypes.OutQuint);
-            ActiveCursor.ScaleTo(0, 500, EasingTypes.In);
+            ActiveCursor.FadeTo(0, 900, Easing.OutQuint);
+            ActiveCursor.ScaleTo(0, 500, Easing.In);
         }
 
         public class Cursor : Container

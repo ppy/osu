@@ -175,7 +175,7 @@ namespace osu.Desktop.Overlays
 
         protected override void PopIn()
         {
-            FadeIn(1000);
+            this.FadeIn(1000);
         }
 
         protected override void PopOut()
@@ -207,7 +207,7 @@ namespace osu.Desktop.Overlays
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        ColourInfo = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
+                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
                     },
                     new TextAwesome
                     {

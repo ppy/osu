@@ -18,12 +18,15 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
 using osu.Framework.Configuration;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
-    internal class BeatmapCarousel : ScrollContainer
+    internal class BeatmapCarousel : OsuScrollContainer
     {
         public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
+
+        public override bool HandleInput => AllowSelection;
 
         public Action BeatmapsChanged;
 
@@ -133,10 +136,11 @@ namespace osu.Game.Screens.Select
 
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
-            if (groups.Count == 0)
+            if (groups.All(g => g.State == BeatmapGroupState.Hidden))
             {
                 selectedGroup = null;
                 selectedPanel = null;
+                SelectionChanged?.Invoke(null);
                 return;
             }
 
@@ -174,6 +178,9 @@ namespace osu.Game.Screens.Select
 
         public void SelectNextRandom()
         {
+            if (groups.Count == 0)
+                return;
+
             randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
 
             var visibleGroups = getVisibleGroups();
@@ -227,6 +234,14 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate filterTask;
 
+        public bool AllowSelection = true;
+
+        public void FlushPendingFilters()
+        {
+            if (filterTask?.Completed == false)
+                Filter(null, false);
+        }
+
         public void Filter(FilterCriteria newCriteria = null, bool debounce = true)
         {
             if (newCriteria != null)
@@ -258,6 +273,8 @@ namespace osu.Game.Screens.Select
             };
 
             filterTask?.Cancel();
+            filterTask = null;
+
             if (debounce)
                 filterTask = Scheduler.AddDelayed(perform, 250);
             else
@@ -284,6 +301,7 @@ namespace osu.Game.Screens.Select
         private void load(BeatmapDatabase database, OsuConfigManager config)
         {
             this.database = database;
+
             randomType = config.GetBindable<SelectionRandomType>(OsuSetting.SelectionRandomType);
         }
 
@@ -296,6 +314,9 @@ namespace osu.Game.Screens.Select
 
         private void removeGroup(BeatmapGroup group)
         {
+            if (group == null)
+                return;
+
             groups.Remove(group);
             panels.Remove(group.Header);
             foreach (var p in group.BeatmapPanels)
@@ -327,7 +348,7 @@ namespace osu.Game.Screens.Select
 
                 if (group.State == BeatmapGroupState.Expanded)
                 {
-                    group.Header.MoveToX(-100, 500, EasingTypes.OutExpo);
+                    group.Header.MoveToX(-100, 500, Easing.OutExpo);
                     var headerY = group.Header.Position.Y;
 
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
@@ -335,7 +356,7 @@ namespace osu.Game.Screens.Select
                         if (panel == selectedPanel)
                             selectedY = currentY + panel.DrawHeight / 2 - DrawHeight / 2;
 
-                        panel.MoveToX(-50, 500, EasingTypes.OutExpo);
+                        panel.MoveToX(-50, 500, Easing.OutExpo);
 
                         //on first display we want to begin hidden under our group's header.
                         if (panel.Alpha == 0)
@@ -346,11 +367,11 @@ namespace osu.Game.Screens.Select
                 }
                 else
                 {
-                    group.Header.MoveToX(0, 500, EasingTypes.OutExpo);
+                    group.Header.MoveToX(0, 500, Easing.OutExpo);
 
                     foreach (BeatmapPanel panel in group.BeatmapPanels)
                     {
-                        panel.MoveToX(0, 500, EasingTypes.OutExpo);
+                        panel.MoveToX(0, 500, Easing.OutExpo);
                         movePanel(panel, false, animated, ref currentY);
                     }
                 }
@@ -365,7 +386,7 @@ namespace osu.Game.Screens.Select
         private void movePanel(Panel panel, bool advance, bool animated, ref float currentY)
         {
             yPositions.Add(currentY);
-            panel.MoveToY(currentY, animated ? 750 : 0, EasingTypes.OutExpo);
+            panel.MoveToY(currentY, animated ? 750 : 0, Easing.OutExpo);
 
             if (advance)
                 currentY += panel.DrawHeight + 5;

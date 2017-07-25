@@ -59,7 +59,7 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             })
             {
-                Beatmap = beatmap
+                InitialBeatmap = beatmap
             });
         }
     }

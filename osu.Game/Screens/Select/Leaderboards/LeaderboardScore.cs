@@ -61,26 +61,29 @@ namespace osu.Game.Screens.Select.Leaderboards
                         nameLabel.MoveToX(150);
                         break;
                     case Visibility.Visible:
-                        FadeIn(200);
-                        content.MoveToY(0, 800, EasingTypes.OutQuint);
+                        this.FadeIn(200);
+                        content.MoveToY(0, 800, Easing.OutQuint);
 
-                        Delay(100, true);
-                        avatar.FadeIn(300, EasingTypes.OutQuint);
-                        nameLabel.FadeIn(350, EasingTypes.OutQuint);
-
-                        avatar.MoveToX(0, 300, EasingTypes.OutQuint);
-                        nameLabel.MoveToX(0, 350, EasingTypes.OutQuint);
-
-                        Delay(250, true);
-                        scoreLabel.FadeIn(200);
-                        scoreRank.FadeIn(200);
-
-                        Delay(50, true);
-                        var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
-
-                        for (int i = 0; i < drawables.Length; i++)
+                        using (BeginDelayedSequence(100, true))
                         {
-                            drawables[i].FadeIn(100 + i * 50);
+                            avatar.FadeIn(300, Easing.OutQuint);
+                            nameLabel.FadeIn(350, Easing.OutQuint);
+
+                            avatar.MoveToX(0, 300, Easing.OutQuint);
+                            nameLabel.MoveToX(0, 350, Easing.OutQuint);
+
+                            using (BeginDelayedSequence(250, true))
+                            {
+                                scoreLabel.FadeIn(200);
+                                scoreRank.FadeIn(200);
+
+                                using (BeginDelayedSequence(50, true))
+                                {
+                                    var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
+                                    for (int i = 0; i < drawables.Length; i++)
+                                        drawables[i].FadeIn(100 + i * 50);
+                                }
+                            }
                         }
 
                         break;
@@ -188,7 +191,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        new DrawableFlag(Score.User?.Country?.FlagName ?? "__")
+                                                        new DrawableFlag(Score.User?.Country?.FlagName)
                                                         {
                                                             Width = 30,
                                                             RelativeSizeAxes = Axes.Y,
@@ -266,13 +269,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            background.FadeTo(0.5f, 300, EasingTypes.OutQuint);
+            background.FadeTo(0.5f, 300, Easing.OutQuint);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(Framework.Input.InputState state)
         {
-            background.FadeTo(background_alpha, 200, EasingTypes.OutQuint);
+            background.FadeTo(background_alpha, 200, Easing.OutQuint);
             base.OnHoverLost(state);
         }
 

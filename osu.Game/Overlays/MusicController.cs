@@ -82,7 +82,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnDragEnd(InputState state)
         {
-            dragContainer.MoveTo(Vector2.Zero, 800, EasingTypes.OutElastic);
+            dragContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
             return base.OnDragEnd(state);
         }
 
@@ -204,7 +204,7 @@ namespace osu.Game.Overlays
 
             beatmapBacking.BindTo(game.Beatmap);
 
-            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, EasingTypes.OutQuint);
+            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
         protected override void LoadComplete()
@@ -345,13 +345,13 @@ namespace osu.Game.Overlays
                         {
                             case TransformDirection.Next:
                                 d.Position = new Vector2(400, 0);
-                                d.MoveToX(0, 500, EasingTypes.OutCubic);
-                                currentBackground.MoveToX(-400, 500, EasingTypes.OutCubic);
+                                d.MoveToX(0, 500, Easing.OutCubic);
+                                currentBackground.MoveToX(-400, 500, Easing.OutCubic);
                                 break;
                             case TransformDirection.Prev:
                                 d.Position = new Vector2(-400, 0);
-                                d.MoveToX(0, 500, EasingTypes.OutCubic);
-                                currentBackground.MoveToX(400, 500, EasingTypes.OutCubic);
+                                d.MoveToX(0, 500, Easing.OutCubic);
+                                currentBackground.MoveToX(400, 500, Easing.OutCubic);
                                 break;
                         }
                         currentBackground.Expire();
@@ -368,16 +368,16 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            FadeIn(transition_length, EasingTypes.OutQuint);
-            dragContainer.ScaleTo(1, transition_length, EasingTypes.OutElastic);
+            this.FadeIn(transition_length, Easing.OutQuint);
+            dragContainer.ScaleTo(1, transition_length, Easing.OutElastic);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            FadeOut(transition_length, EasingTypes.OutQuint);
-            dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
+            this.FadeOut(transition_length, Easing.OutQuint);
+            dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
         }
 
         private enum TransformDirection

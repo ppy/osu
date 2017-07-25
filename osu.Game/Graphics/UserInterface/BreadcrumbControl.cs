@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
                     var tabIndex = TabContainer.IndexOf(TabMap[tab]);
 
                     t.State = tIndex < tabIndex ? Visibility.Hidden : Visibility.Visible;
-                    t.Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, EasingTypes.OutQuint);
+                    t.Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, Easing.OutQuint);
                 }
             };
         }
@@ -54,13 +54,13 @@ namespace osu.Game.Graphics.UserInterface
 
                     if (State == Visibility.Visible)
                     {
-                        FadeIn(transition_duration, EasingTypes.OutQuint);
-                        ScaleTo(new Vector2(1f), transition_duration, EasingTypes.OutQuint);
+                        this.FadeIn(transition_duration, Easing.OutQuint);
+                        this.ScaleTo(new Vector2(1f), transition_duration, Easing.OutQuint);
                     }
                     else
                     {
-                        FadeOut(transition_duration, EasingTypes.OutQuint);
-                        ScaleTo(new Vector2(0.8f, 1f), transition_duration, EasingTypes.OutQuint);
+                        this.FadeOut(transition_duration, Easing.OutQuint);
+                        this.ScaleTo(new Vector2(0.8f, 1f), transition_duration, Easing.OutQuint);
                     }
                 }
             }

@@ -216,7 +216,7 @@ namespace osu.Game.Screens.Menu
                 bool fromInitial = lastState == MenuState.Initial;
 
                 if (state == MenuState.TopLevel)
-                    buttonArea.Flush(true);
+                    buttonArea.FinishTransforms(true);
 
                 using (buttonArea.BeginDelayedSequence(fromInitial ? 150 : 0, true))
                 {
@@ -224,16 +224,13 @@ namespace osu.Game.Screens.Menu
                     {
                         case MenuState.Exit:
                         case MenuState.Initial:
-                            toolbar?.Hide();
-
-                            buttonAreaBackground.ScaleTo(Vector2.One, 500, EasingTypes.Out);
+                            buttonAreaBackground.ScaleTo(Vector2.One, 500, Easing.Out);
                             buttonArea.FadeOut(300);
 
-                            using (osuLogo.BeginDelayedSequence(150))
-                            {
-                                osuLogo.MoveTo(Vector2.Zero, 800, EasingTypes.OutExpo);
-                                osuLogo.ScaleTo(1, 800, EasingTypes.OutExpo);
-                            }
+                            osuLogo.Delay(150)
+                                .Schedule(() => toolbar?.Hide())
+                                .ScaleTo(1, 800, Easing.OutExpo)
+                                .MoveTo(Vector2.Zero, 800, Easing.OutExpo);
 
                             foreach (Button b in buttonsTopLevel)
                                 b.State = ButtonState.Contracted;
@@ -250,19 +247,20 @@ namespace osu.Game.Screens.Menu
                                 sampleBack?.Play();
                             break;
                         case MenuState.TopLevel:
-                            buttonAreaBackground.ScaleTo(Vector2.One, 200, EasingTypes.Out);
+                            buttonAreaBackground.ScaleTo(Vector2.One, 200, Easing.Out);
 
-                            osuLogo.ClearTransforms();
-                            osuLogo.MoveTo(buttonFlow.DrawPosition, 200, EasingTypes.In);
-                            osuLogo.ScaleTo(0.5f, 200, EasingTypes.In);
-
-                            buttonArea.FadeIn(300);
+                            var sequence = osuLogo
+                                .ScaleTo(0.5f, 200, Easing.In)
+                                .MoveTo(buttonFlow.DrawPosition, 200, Easing.In);
 
                             if (fromInitial && osuLogo.Scale.X > 0.5f)
-                                using (osuLogo.BeginDelayedSequence(200, true))
-                                    osuLogo.Impact();
+                                sequence.OnComplete(o =>
+                                {
+                                    o.Impact();
+                                    toolbar?.Show();
+                                });
 
-                            Scheduler.AddDelayed(() => toolbar?.Show(), 150);
+                            buttonArea.FadeIn(300);
 
                             foreach (Button b in buttonsTopLevel)
                                 b.State = ButtonState.Expanded;
@@ -278,7 +276,7 @@ namespace osu.Game.Screens.Menu
                                 b.State = ButtonState.Expanded;
                             break;
                         case MenuState.EnteringMode:
-                            buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, EasingTypes.InSine);
+                            buttonAreaBackground.ScaleTo(new Vector2(2, 0), 300, Easing.InSine);
 
                             buttonsTopLevel.ForEach(b => b.ContractStyle = 1);
                             buttonsPlay.ForEach(b => b.ContractStyle = 1);

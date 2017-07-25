@@ -72,8 +72,6 @@ namespace osu.Game.Screens.Menu
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
-            var trackManager = audio.Track;
-
             BeatmapSetInfo setInfo = null;
 
             if (!menuMusic)
@@ -103,10 +101,9 @@ namespace osu.Game.Screens.Menu
             }
 
             beatmaps.GetChildren(setInfo);
-            Beatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
 
-            track = Beatmap.Track;
-            trackManager.SetExclusive(track);
+            track = Beatmap.Value.Track;
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
@@ -121,7 +118,9 @@ namespace osu.Game.Screens.Menu
 
             Scheduler.AddDelayed(delegate
             {
-                track.Start();
+                // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
+                if (menuMusic)
+                    track.Start();
 
                 LoadComponentAsync(mainMenu = new MainMenu());
 
@@ -135,8 +134,8 @@ namespace osu.Game.Screens.Menu
             logo.ScaleTo(0.4f);
             logo.FadeOut();
 
-            logo.ScaleTo(1, 4400, EasingTypes.OutQuint);
-            logo.FadeIn(20000, EasingTypes.OutQuint);
+            logo.ScaleTo(1, 4400, Easing.OutQuint);
+            logo.FadeIn(20000, Easing.OutQuint);
         }
 
         protected override void OnSuspending(Screen next)

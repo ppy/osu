@@ -151,6 +151,8 @@ namespace osu.Desktop.VisualTests.Tests
 
             private int calculateBeatCount(TimingControlPoint current)
             {
+                if (timingPoints.Count == 0) return 0;
+
                 if (timingPoints[timingPoints.Count - 1] == current)
                     return (int)Math.Ceiling((Beatmap.Value.Track.Length - current.Time) / current.BeatLength);
 
@@ -175,9 +177,7 @@ namespace osu.Desktop.VisualTests.Tests
                 beatsPerMinute.Value = 60000 / timingPoint.BeatLength;
                 adjustedBeatLength.Value = timingPoint.BeatLength;
 
-                flashLayer.ClearTransforms();
-                flashLayer.FadeTo(1);
-                flashLayer.FadeTo(0, timingPoint.BeatLength);
+                flashLayer.FadeOutFromOne(timingPoint.BeatLength);
             }
         }
 
