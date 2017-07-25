@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Profile
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            ColourInfo = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.75f))
+                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.75f))
                         },
                         new Container
                         {
