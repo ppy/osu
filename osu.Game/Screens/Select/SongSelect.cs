@@ -384,7 +384,7 @@ namespace osu.Game.Screens.Select
 
         private void promptDelete()
         {
-            if (Beatmap != null)
+            if (Beatmap != null && !Beatmap.IsDefault)
                 dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap));
         }
 

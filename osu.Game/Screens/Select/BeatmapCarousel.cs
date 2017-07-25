@@ -18,10 +18,11 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
 using osu.Framework.Configuration;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
-    internal class BeatmapCarousel : ScrollContainer
+    internal class BeatmapCarousel : OsuScrollContainer
     {
         public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
 
@@ -177,6 +178,9 @@ namespace osu.Game.Screens.Select
 
         public void SelectNextRandom()
         {
+            if (groups.Count == 0)
+                return;
+
             randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
 
             var visibleGroups = getVisibleGroups();
@@ -310,6 +314,9 @@ namespace osu.Game.Screens.Select
 
         private void removeGroup(BeatmapGroup group)
         {
+            if (group == null)
+                return;
+
             groups.Remove(group);
             panels.Remove(group.Header);
             foreach (var p in group.BeatmapPanels)
