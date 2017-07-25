@@ -178,6 +178,9 @@ namespace osu.Game.Screens.Select
 
         public void SelectNextRandom()
         {
+            if (groups.Count == 0)
+                return;
+
             randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
 
             var visibleGroups = getVisibleGroups();
@@ -311,6 +314,9 @@ namespace osu.Game.Screens.Select
 
         private void removeGroup(BeatmapGroup group)
         {
+            if (group == null)
+                return;
+
             groups.Remove(group);
             panels.Remove(group.Header);
             foreach (var p in group.BeatmapPanels)
