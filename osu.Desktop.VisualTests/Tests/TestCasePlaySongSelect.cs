@@ -31,7 +31,7 @@ namespace osu.Desktop.VisualTests.Tests
                 var backingDatabase = storage.GetDatabase(@"client");
 
                 rulesets = new RulesetDatabase(backingDatabase);
-                store = new BeatmapStore(storage, backingDatabase, rulesets);
+                store = new BeatmapStore(storage, null, backingDatabase, rulesets);
 
                 var sets = new List<BeatmapSetInfo>();
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.IO;
@@ -13,12 +14,6 @@ namespace osu.Game.Tests.Beatmaps.IO
     [TestFixture]
     public class OszArchiveReaderTest
     {
-        [OneTimeSetUpAttribute]
-        public void SetUp()
-        {
-            OszArchiveReader.Register();
-        }
-
         [Test]
         public void TestReadBeatmaps()
         {
@@ -40,7 +35,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     "Soleily - Renatus (MMzz) [Muzukashii].osu",
                     "Soleily - Renatus (MMzz) [Oni].osu"
                 };
-                var maps = reader.BeatmapFilenames;
+                var maps = reader.Filenames.ToArray();
                 foreach (var map in expected)
                     Assert.Contains(map, maps);
             }

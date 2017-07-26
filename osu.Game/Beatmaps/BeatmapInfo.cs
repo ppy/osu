@@ -95,11 +95,11 @@ namespace osu.Game.Beatmaps
         }
 
         public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                      BeatmapSet.Path == other.BeatmapSet.Path &&
+                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
                                                       (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
 
         public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                      BeatmapSet.Path == other.BeatmapSet.Path &&
+                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
                                                       (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
     }
 }

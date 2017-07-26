@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
@@ -19,6 +18,7 @@ using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 using SQLite.Net;
 using osu.Framework.Graphics.Performance;
+using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 
@@ -31,6 +31,8 @@ namespace osu.Game
         protected BeatmapStore BeatmapStore;
 
         protected RulesetDatabase RulesetDatabase;
+
+        protected FileDatabase FileDatabase;
 
         protected ScoreDatabase ScoreDatabase;
 
@@ -96,7 +98,8 @@ namespace osu.Game
             SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
 
             dependencies.Cache(RulesetDatabase = new RulesetDatabase(connection));
-            dependencies.Cache(BeatmapStore = new BeatmapStore(Host.Storage, connection, RulesetDatabase, Host));
+            dependencies.Cache(FileDatabase = new FileDatabase(connection, Host.Storage));
+            dependencies.Cache(BeatmapStore = new BeatmapStore(Host.Storage, FileDatabase, connection, RulesetDatabase, Host));
             dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, connection, Host, BeatmapStore));
             dependencies.Cache(new OsuColour());
 
@@ -130,8 +133,6 @@ namespace osu.Game
             var defaultBeatmap = new DummyWorkingBeatmap(this);
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
             BeatmapStore.DefaultBeatmap = defaultBeatmap;
-
-            OszArchiveReader.Register();
 
             dependencies.Cache(API = new APIAccess
             {

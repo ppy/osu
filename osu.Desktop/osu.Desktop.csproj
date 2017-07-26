@@ -228,7 +228,6 @@
     <Compile Include="OsuGameDesktop.cs" />
     <Compile Include="Overlays\VersionManager.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

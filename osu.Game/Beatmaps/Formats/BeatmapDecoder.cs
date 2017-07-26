@@ -12,6 +12,11 @@ namespace osu.Game.Beatmaps.Formats
     {
         private static readonly Dictionary<string, Type> decoders = new Dictionary<string, Type>();
 
+        static BeatmapDecoder()
+        {
+            OsuLegacyDecoder.Register();
+        }
+
         public static BeatmapDecoder GetDecoder(StreamReader stream)
         {
             string line = stream.ReadLine()?.Trim();

@@ -75,9 +75,11 @@
     <Compile Include="Audio\SampleInfo.cs" />
     <Compile Include="Audio\SampleInfoList.cs" />
     <Compile Include="Beatmaps\BeatmapDatabase.cs" />
+    <Compile Include="Beatmaps\BeatmapSetFileInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
+    <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
     <Compile Include="Graphics\Containers\OsuClickableContainer.cs" />
     <Compile Include="Graphics\Containers\OsuFocusedOverlayContainer.cs" />
     <Compile Include="Graphics\Containers\OsuScrollContainer.cs" />
@@ -89,6 +91,8 @@
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
+    <Compile Include="IO\FileDatabase.cs" />
+    <Compile Include="IO\FileInfo.cs" />
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
