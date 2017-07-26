@@ -109,7 +109,7 @@ namespace osu.Game.Beatmaps
 
             //If we have an ID then we already exist in the database.
             if (set.ID == 0)
-                Database.Import(new[] { set });
+                Database.Add(set);
 
             return set;
         }

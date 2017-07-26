@@ -48,38 +48,40 @@ namespace osu.Game.Beatmaps
             Connection.CreateTable<BeatmapSetFileInfo>();
             Connection.CreateTable<BeatmapInfo>();
 
-            deletePending();
+            cleanupPendingDeletions();
         }
 
-        public void Update(BeatmapSetInfo setInfo) => Connection.Update(setInfo);
-
-        public void Import(IEnumerable<BeatmapSetInfo> beatmapSets)
+        /// <summary>
+        /// Add a <see cref="BeatmapSetInfo"/> to the database.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap to add.</param>
+        public void Add(BeatmapSetInfo beatmapSet)
         {
-            lock (Connection)
-            {
-                Connection.BeginTransaction();
-
-                foreach (var s in beatmapSets)
-                {
-                    Connection.InsertOrReplaceWithChildren(s, true);
-                    BeatmapSetAdded?.Invoke(s);
-                }
-
-                Connection.Commit();
-            }
+            Connection.InsertOrReplaceWithChildren(beatmapSet, true);
+            BeatmapSetAdded?.Invoke(beatmapSet);
         }
 
-        public bool Delete(BeatmapSetInfo set)
+        /// <summary>
+        /// Delete a <see cref="BeatmapSetInfo"/> to the database.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap to delete.</param>
+        /// <returns>Whether the beatmap's <see cref="BeatmapSetInfo.DeletePending"/> was changed.</returns>
+        public bool Delete(BeatmapSetInfo beatmapSet)
         {
-            if (set.DeletePending) return false;
+            if (beatmapSet.DeletePending) return false;
 
-            set.DeletePending = true;
-            Connection.Update(set);
+            beatmapSet.DeletePending = true;
+            Connection.Update(beatmapSet);
 
-            BeatmapSetRemoved?.Invoke(set);
+            BeatmapSetRemoved?.Invoke(beatmapSet);
             return true;
         }
 
+        /// <summary>
+        /// Restore a previously deleted <see cref="BeatmapSetInfo"/>.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap to restore.</param>
+        /// <returns>Whether the beatmap's <see cref="BeatmapSetInfo.DeletePending"/> was changed.</returns>
         public bool Undelete(BeatmapSetInfo set)
         {
             if (!set.DeletePending) return false;
@@ -91,7 +93,7 @@ namespace osu.Game.Beatmaps
             return true;
         }
 
-        private void deletePending()
+        private void cleanupPendingDeletions()
         {
             foreach (var b in GetAllWithChildren<BeatmapSetInfo>(b => b.DeletePending && !b.Protected))
             {
