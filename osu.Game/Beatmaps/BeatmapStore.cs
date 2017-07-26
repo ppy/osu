@@ -27,21 +27,29 @@ namespace osu.Game.Beatmaps
         // todo: make this private
         public readonly BeatmapDatabase Database;
 
-        private readonly Storage storage;
-        private readonly FileDatabase files;
-
-        private readonly RulesetDatabase rulesets;
-
+        /// <summary>
+        /// Fired when a new <see cref="BeatmapSetInfo"/> becomes available in the database.
+        /// </summary>
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
-        public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
-        // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
-        private BeatmapIPCChannel ipc;
+        /// <summary>
+        /// Fired when a <see cref="BeatmapSetInfo"/> is removed from the database.
+        /// </summary>
+        public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
         public WorkingBeatmap DefaultBeatmap { private get; set; }
+
+        private readonly Storage storage;
+
+        private readonly FileDatabase files;
+
+        private readonly RulesetDatabase rulesets;
+
+        // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
+        private BeatmapIPCChannel ipc;
 
         public BeatmapStore(Storage storage, FileDatabase files, SQLiteConnection connection, RulesetDatabase rulesets, IIpcHost importHost = null)
         {
@@ -168,6 +176,21 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
+        /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>The first result for the provided query, or null if no results were found.</returns>
+        public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query)
+        {
+            BeatmapSetInfo set = Database.Query<BeatmapSetInfo>().FirstOrDefault(query);
+
+            if (set != null)
+                Database.GetChildren(set, true);
+
+            return set;
+        }
+
+        /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
         /// </summary>
         /// <param name="path">A file or folder path resolving the beatmap content.</param>
@@ -256,16 +279,6 @@ namespace osu.Game.Beatmaps
             }
 
             return beatmapSet;
-        }
-
-        public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> func)
-        {
-            BeatmapSetInfo set = Database.Query<BeatmapSetInfo>().FirstOrDefault(func);
-
-            if (set != null)
-                Database.GetChildren(set, true);
-
-            return set;
         }
     }
 }
