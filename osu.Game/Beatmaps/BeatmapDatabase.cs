@@ -32,11 +32,6 @@ namespace osu.Game.Beatmaps
 
         protected override void Prepare(bool reset = false)
         {
-            Connection.CreateTable<BeatmapMetadata>();
-            Connection.CreateTable<BeatmapDifficulty>();
-            Connection.CreateTable<BeatmapSetInfo>();
-            Connection.CreateTable<BeatmapInfo>();
-
             if (reset)
             {
                 Connection.DropTable<BeatmapMetadata>();
@@ -44,6 +39,11 @@ namespace osu.Game.Beatmaps
                 Connection.DropTable<BeatmapSetInfo>();
                 Connection.DropTable<BeatmapInfo>();
             }
+
+            Connection.CreateTable<BeatmapMetadata>();
+            Connection.CreateTable<BeatmapDifficulty>();
+            Connection.CreateTable<BeatmapSetInfo>();
+            Connection.CreateTable<BeatmapInfo>();
 
             deletePending();
         }
