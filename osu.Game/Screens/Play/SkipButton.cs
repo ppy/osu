@@ -124,8 +124,16 @@ namespace osu.Game.Screens.Play
             switch (args.Key)
             {
                 case Key.Space:
-                    button.TriggerOnClick();
+                   button.TriggerOnClick();
+                   return true;
+
+                case Key.X:
+                case Key.Z:
+                    if (IsHovered) {
+                        button.TriggerOnClick();
+                    }
                     return true;
+                        
             }
 
             return base.OnKeyDown(state, args);
