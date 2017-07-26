@@ -108,6 +108,7 @@ namespace osu.Game.Beatmaps
 
         /// <summary>
         /// Delete a beatmap from the store.
+        /// Is a no-op for already deleted beatmaps.
         /// </summary>
         /// <param name="beatmapSet">The beatmap to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
@@ -118,6 +119,11 @@ namespace osu.Game.Beatmaps
                 files.Dereference(beatmapSet.Files);
         }
 
+        /// <summary>
+        /// Returns a <see cref="BeatmapSetInfo"/> to a usable state if it has previously been deleted but not yet purged.
+        /// Is a no-op for already usable beatmaps.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmap to restore.</param>
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
             if (!Database.Undelete(beatmapSet)) return;
@@ -125,6 +131,12 @@ namespace osu.Game.Beatmaps
             files.Reference(beatmapSet.Files);
         }
 
+        /// <summary>
+        /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
+        /// </summary>
+        /// <param name="beatmapInfo">The beatmap to lookup.</param>
+        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap.</param>
+        /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
             if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
@@ -155,6 +167,11 @@ namespace osu.Game.Beatmaps
             Database.Reset();
         }
 
+        /// <summary>
+        /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
+        /// </summary>
+        /// <param name="path">A file or folder path resolving the beatmap content.</param>
+        /// <returns>A reader giving access to the beatmap's content.</returns>
         private ArchiveReader getReaderFrom(string path)
         {
             if (ZipFile.IsZipFile(path))
@@ -163,20 +180,26 @@ namespace osu.Game.Beatmaps
                 return new LegacyFilesystemReader(path);
         }
 
-        private BeatmapSetInfo importToStorage(ArchiveReader archiveReader)
+        /// <summary>
+        /// Import a beamap into our local <see cref="FileDatabase"/> storage.
+        /// If the beatmap is already imported, the existing instance will be returned.
+        /// </summary>
+        /// <param name="reader">The beatmap archive to be read.</param>
+        /// <returns>The imported beatmap, or an existing instance if it is already present.</returns>
+        private BeatmapSetInfo importToStorage(ArchiveReader reader)
         {
             BeatmapMetadata metadata;
 
-            using (var stream = new StreamReader(archiveReader.GetStream(archiveReader.Filenames.First(f => f.EndsWith(".osu")))))
+            using (var stream = new StreamReader(reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu")))))
                 metadata = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
 
             MemoryStream hashable = new MemoryStream();
 
             List<FileInfo> fileInfos = new List<FileInfo>();
 
-            foreach (string file in archiveReader.Filenames)
+            foreach (string file in reader.Filenames)
             {
-                using (Stream s = archiveReader.GetStream(file))
+                using (Stream s = reader.GetStream(file))
                 {
                     fileInfos.Add(files.Add(s, file));
                     s.CopyTo(hashable);
@@ -190,9 +213,7 @@ namespace osu.Game.Beatmaps
             if (existing != null)
             {
                 Database.GetChildren(existing);
-
                 Undelete(existing);
-
                 return existing;
             }
 
@@ -205,11 +226,11 @@ namespace osu.Game.Beatmaps
                 Metadata = metadata
             };
 
-            var mapNames = archiveReader.Filenames.Where(f => f.EndsWith(".osu"));
+            var mapNames = reader.Filenames.Where(f => f.EndsWith(".osu"));
 
             foreach (var name in mapNames)
             {
-                using (var raw = archiveReader.GetStream(name))
+                using (var raw = reader.GetStream(name))
                 using (var ms = new MemoryStream()) //we need a memory stream so we can seek and shit
                 using (var sr = new StreamReader(ms))
                 {
