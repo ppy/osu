@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Music
         private FilterControl filter;
         private PlaylistList list;
 
-        private BeatmapDatabase beatmaps;
+        private BeatmapStore beatmaps;
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Music
         private InputManager inputManager;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, BeatmapDatabase beatmaps, OsuColour colours, UserInputManager inputManager)
+        private void load(OsuGameBase game, BeatmapStore beatmaps, OsuColour colours, UserInputManager inputManager)
         {
             this.inputManager = inputManager;
             this.beatmaps = beatmaps;
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending).ToList();
+            list.BeatmapSets = BeatmapSets = beatmaps.Database.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending).ToList();
 
             beatmaps.BeatmapSetAdded += s => list.AddBeatmapSet(s);
             beatmaps.BeatmapSetRemoved += s => list.RemoveBeatmapSet(s);

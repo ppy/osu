@@ -6,16 +6,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Platform;
+using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.IO.Legacy;
 using osu.Game.IPC;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Scoring;
 using SharpCompress.Compressors.LZMA;
 using SQLite.Net;
 
-namespace osu.Game.Database
+namespace osu.Game.Rulesets.Scoring
 {
-    public class ScoreDatabase : DatabaseBacking
+    public class ScoreDatabase : DatabaseStore
     {
         private readonly Storage storage;
 
@@ -27,7 +28,7 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
-        public ScoreDatabase(Storage storage, SQLiteConnection connection, IIpcHost importHost = null, BeatmapStore beatmaps = null, RulesetDatabase rulesets = null) : base(storage, connection)
+        public ScoreDatabase(Storage storage, SQLiteConnection connection, IIpcHost importHost = null, BeatmapStore beatmaps = null, RulesetDatabase rulesets = null) : base(connection)
         {
             this.storage = storage;
             this.beatmaps = beatmaps;
@@ -53,7 +54,7 @@ namespace osu.Game.Database
                 var version = sr.ReadInt32();
                 /* score.FileChecksum = */
                 var beatmapHash = sr.ReadString();
-                score.Beatmap = beatmaps.Query<BeatmapInfo>().FirstOrDefault(b => b.Hash == beatmapHash);
+                score.Beatmap = beatmaps.Database.Query<BeatmapInfo>().FirstOrDefault(b => b.Hash == beatmapHash);
                 /* score.PlayerName = */
                 sr.ReadString();
                 /* var localScoreChecksum = */

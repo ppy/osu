@@ -15,12 +15,12 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseResults : TestCase
     {
-        private BeatmapDatabase db;
+        private BeatmapStore db;
 
         public override string Description => @"Results after playing.";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDatabase db)
+        private void load(BeatmapStore db)
         {
             this.db = db;
         }
@@ -33,7 +33,7 @@ namespace osu.Desktop.VisualTests.Tests
 
             if (beatmap == null)
             {
-                var beatmapInfo = db.Query<BeatmapInfo>().FirstOrDefault(b => b.RulesetID == 0);
+                var beatmapInfo = db.Database.Query<BeatmapInfo>().FirstOrDefault(b => b.RulesetID == 0);
                 if (beatmapInfo != null)
                     beatmap = db.GetWorkingBeatmap(beatmapInfo);
             }

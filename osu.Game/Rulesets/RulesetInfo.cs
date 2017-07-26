@@ -2,10 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Game.Rulesets;
 using SQLite.Net.Attributes;
 
-namespace osu.Game.Database
+namespace osu.Game.Rulesets
 {
     public class RulesetInfo
     {

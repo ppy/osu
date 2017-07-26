@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 Assert.IsTrue(File.Exists(temp));
 
-                osu.Dependencies.Get<BeatmapDatabase>().Import(temp);
+                osu.Dependencies.Get<BeatmapStore>().Import(temp);
 
                 ensureLoaded(osu);
 
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 Assert.IsTrue(File.Exists(temp), "Temporary file copy never substantiated");
 
                 using (File.OpenRead(temp))
-                    osu.Dependencies.Get<BeatmapDatabase>().Import(temp);
+                    osu.Dependencies.Get<BeatmapStore>().Import(temp);
 
                 ensureLoaded(osu);
 
@@ -106,7 +106,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             //reset beatmap database (sqlite and storage backing)
             osu.Dependencies.Get<RulesetDatabase>().Reset();
-            osu.Dependencies.Get<BeatmapDatabase>().Reset();
+            osu.Dependencies.Get<BeatmapStore>().Reset();
 
             return osu;
         }
@@ -117,8 +117,8 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Action waitAction = () =>
             {
-                while (!(resultSets = osu.Dependencies.Get<BeatmapDatabase>()
-                    .Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Any())
+                while (!(resultSets = osu.Dependencies.Get<BeatmapStore>().Database.
+                    Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Any())
                     Thread.Sleep(50);
             };
 
@@ -134,15 +134,15 @@ namespace osu.Game.Tests.Beatmaps.IO
             //if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
             waitAction = () =>
             {
-                while ((resultBeatmaps = osu.Dependencies.Get<BeatmapDatabase>()
-                    .GetAllWithChildren<BeatmapInfo>(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
+                while ((resultBeatmaps = osu.Dependencies.Get<BeatmapStore>().Database.
+                    GetAllWithChildren<BeatmapInfo>(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
                     Thread.Sleep(50);
             };
 
             Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
                 @"Beatmaps did not import to the database in allocated time");
 
-            var set = osu.Dependencies.Get<BeatmapDatabase>().GetChildren(resultSets.First());
+            var set = osu.Dependencies.Get<BeatmapStore>().Database.GetChildren(resultSets.First());
 
             Assert.IsTrue(set.Beatmaps.Count == resultBeatmaps.Count(),
                 $@"Incorrect database beatmap count post-import ({resultBeatmaps.Count()} but should be {set.Beatmaps.Count}).");
@@ -152,16 +152,16 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Assert.IsTrue(set.Beatmaps.Count > 0);
 
-            var beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
+            var beatmap = osu.Dependencies.Get<BeatmapStore>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
 
-            beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 1))?.Beatmap;
+            beatmap = osu.Dependencies.Get<BeatmapStore>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 1))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
 
-            beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 2))?.Beatmap;
+            beatmap = osu.Dependencies.Get<BeatmapStore>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 2))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
 
-            beatmap = osu.Dependencies.Get<BeatmapDatabase>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 3))?.Beatmap;
+            beatmap = osu.Dependencies.Get<BeatmapStore>().GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 3))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
         }
     }

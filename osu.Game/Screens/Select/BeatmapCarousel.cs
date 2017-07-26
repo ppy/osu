@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Required for now unfortunately.
         /// </summary>
-        private BeatmapDatabase database;
+        private BeatmapStore store;
 
         private readonly Container<Panel> scrollableContent;
 
@@ -289,7 +289,7 @@ namespace osu.Game.Screens.Select
                     b.Metadata = beatmapSet.Metadata;
             }
 
-            return new BeatmapGroup(beatmapSet, database)
+            return new BeatmapGroup(beatmapSet, store)
             {
                 SelectionChanged = (g, p) => selectGroup(g, p),
                 StartRequested = b => StartRequested?.Invoke(),
@@ -298,9 +298,9 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase database, OsuConfigManager config)
+        private void load(BeatmapStore store, OsuConfigManager config)
         {
-            this.database = database;
+            this.store = store;
 
             randomType = config.GetBindable<SelectionRandomType>(OsuSetting.SelectionRandomType);
         }

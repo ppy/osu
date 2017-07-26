@@ -99,7 +99,7 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                Task.Run(() => BeatmapDatabase.Import(paths.ToArray()));
+                Task.Run(() => BeatmapStore.Import(paths.ToArray()));
             }
 
             dependencies.Cache(this);
@@ -140,7 +140,7 @@ namespace osu.Game
                 return;
             }
 
-            Beatmap.Value = BeatmapDatabase.GetWorkingBeatmap(s.Beatmap);
+            Beatmap.Value = BeatmapStore.GetWorkingBeatmap(s.Beatmap);
 
             menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
         }

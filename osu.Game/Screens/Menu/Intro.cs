@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Menu
         private Track track;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, BeatmapDatabase beatmaps, Framework.Game game)
+        private void load(AudioManager audio, OsuConfigManager config, BeatmapStore beatmaps, Framework.Game game)
         {
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Menu
 
             if (!menuMusic)
             {
-                var query = beatmaps.Query<BeatmapSetInfo>().Where(b => !b.DeletePending);
+                var query = beatmaps.Database.Query<BeatmapSetInfo>().Where(b => !b.DeletePending);
                 int count = query.Count();
                 if (count > 0)
                     setInfo = query.ElementAt(RNG.Next(0, count - 1));
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Menu
 
             if (setInfo == null)
             {
-                var query = beatmaps.Query<BeatmapSetInfo>().Where(b => b.Hash == MENU_MUSIC_BEATMAP_HASH);
+                var query = beatmaps.Database.Query<BeatmapSetInfo>().Where(b => b.Hash == MENU_MUSIC_BEATMAP_HASH);
 
                 setInfo = query.FirstOrDefault();
 
@@ -96,11 +96,11 @@ namespace osu.Game.Screens.Menu
                     setInfo = query.First();
 
                     setInfo.DeletePending = true;
-                    beatmaps.Update(setInfo, false);
+                    beatmaps.Database.Update(setInfo, false);
                 }
             }
 
-            beatmaps.GetChildren(setInfo);
+            beatmaps.Database.GetChildren(setInfo);
             Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
 
             track = Beatmap.Value.Track;
