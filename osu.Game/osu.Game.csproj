@@ -98,6 +98,8 @@
     <Compile Include="Overlays\Music\PlaylistList.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
     <Compile Include="Graphics\Containers\SectionsContainer.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\DrawablePlay.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\Play.cs" />
     <Compile Include="Overlays\Settings\SettingsHeader.cs" />
     <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
