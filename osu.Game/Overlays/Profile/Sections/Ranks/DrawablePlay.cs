@@ -16,6 +16,7 @@ using OpenTK.Graphics;
 using System.Diagnostics;
 using osu.Framework.Input;
 using osu.Framework.Localisation;
+using System.Globalization;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -89,7 +90,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             {
                 stats.Add(new OsuSpriteText
                 {
-                    Text = $"weighted: {(int)(play.PerformancePoints * weight)}pp ({weight.ToString("0%")})",
+                    Text = $"weighted: {(int)(play.PerformancePoints * weight)}pp ({weight.ToString("0%", CultureInfo.CurrentCulture)})",
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,
