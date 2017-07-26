@@ -4,8 +4,9 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 
 namespace osu.Desktop.VisualTests.Tests
 {

@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Containers;
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;

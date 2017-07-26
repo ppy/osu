@@ -10,17 +10,17 @@ using osu.Game.Beatmaps.IO;
 
 namespace osu.Game.Database
 {
-    internal class DatabaseWorkingBeatmap : WorkingBeatmap
+    internal class BeatmapDatabaseWorkingBeatmap : WorkingBeatmap
     {
-        private readonly BeatmapDatabase database;
+        private readonly BeatmapStore store;
 
-        public DatabaseWorkingBeatmap(BeatmapDatabase database, BeatmapInfo beatmapInfo)
+        public BeatmapDatabaseWorkingBeatmap(BeatmapStore store, BeatmapInfo beatmapInfo)
             : base(beatmapInfo)
         {
-            this.database = database;
+            this.store = store;
         }
 
-        private ArchiveReader getReader() => database?.GetReader(BeatmapSetInfo);
+        private ArchiveReader getReader() => store?.GetReader(BeatmapSetInfo);
 
         protected override Beatmap GetBeatmap()
         {

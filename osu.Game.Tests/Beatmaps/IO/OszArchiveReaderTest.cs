@@ -3,10 +3,10 @@
 
 using System.IO;
 using NUnit.Framework;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Tests.Resources;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Database;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {

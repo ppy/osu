@@ -13,7 +13,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCasePlaySongSelect : TestCase
     {
-        private readonly BeatmapDatabase db;
+        private readonly BeatmapStore db;
 
         public override string Description => @"with fake data";
 
@@ -30,7 +30,7 @@ namespace osu.Desktop.VisualTests.Tests
                 var backingDatabase = storage.GetDatabase(@"client");
 
                 rulesets = new RulesetDatabase(storage, backingDatabase);
-                db = new BeatmapDatabase(storage, backingDatabase, rulesets);
+                db = new BeatmapStore(storage, backingDatabase, rulesets);
 
                 var sets = new List<BeatmapSetInfo>();
 

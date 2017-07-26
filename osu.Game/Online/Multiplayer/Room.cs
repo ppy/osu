@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Multiplayer

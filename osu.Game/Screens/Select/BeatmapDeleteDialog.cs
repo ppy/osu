@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Dialog;
 

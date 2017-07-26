@@ -18,7 +18,7 @@ using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
-    public class BeatmapDatabase : Database
+    public class BeatmapStore : DatabaseBacking
     {
         private readonly RulesetDatabase rulesets;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Database
         /// </summary>
         public WorkingBeatmap DefaultBeatmap { private get; set; }
 
-        public BeatmapDatabase(Storage storage, SQLiteConnection connection, RulesetDatabase rulesets, IIpcHost importHost = null) : base(storage, connection)
+        public BeatmapStore(Storage storage, SQLiteConnection connection, RulesetDatabase rulesets, IIpcHost importHost = null) : base(storage, connection)
         {
             this.rulesets = rulesets;
             if (importHost != null)
@@ -291,7 +291,7 @@ namespace osu.Game.Database
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-            WorkingBeatmap working = new DatabaseWorkingBeatmap(this, beatmapInfo);
+            WorkingBeatmap working = new BeatmapStoreWorkingBeatmap(this, beatmapInfo);
 
             previous?.TransferTo(working);
 

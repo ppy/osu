@@ -4,7 +4,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Platform;
-using osu.Game.Database;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.IPC
 {

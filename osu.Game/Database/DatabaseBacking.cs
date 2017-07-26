@@ -12,12 +12,12 @@ using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
-    public abstract class Database
+    public abstract class DatabaseBacking
     {
         protected SQLiteConnection Connection { get; }
         protected Storage Storage { get; }
 
-        protected Database(Storage storage, SQLiteConnection connection)
+        protected DatabaseBacking(Storage storage, SQLiteConnection connection)
         {
             Storage = storage;
             Connection = connection;
