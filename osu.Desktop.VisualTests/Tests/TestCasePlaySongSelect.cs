@@ -33,12 +33,8 @@ namespace osu.Desktop.VisualTests.Tests
                 rulesets = new RulesetDatabase(backingDatabase);
                 store = new BeatmapStore(storage, null, backingDatabase, rulesets);
 
-                var sets = new List<BeatmapSetInfo>();
-
                 for (int i = 0; i < 100; i += 10)
-                    sets.Add(createTestBeatmapSet(i));
-
-                store.Database.Import(sets);
+                    store.Database.Add(createTestBeatmapSet(i));
             }
 
             Add(songSelect = new PlaySongSelect());
