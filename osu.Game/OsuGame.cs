@@ -21,10 +21,10 @@ using OpenTK;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 
 namespace osu.Game

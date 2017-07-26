@@ -6,7 +6,7 @@ using System.Linq;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 
-namespace osu.Game.Database
+namespace osu.Game.Beatmaps
 {
     public class BeatmapSetInfo
     {

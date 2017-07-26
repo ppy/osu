@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Mods;
 using osu.Framework.Testing;
-using osu.Game.Database;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
 using OpenTK;
 

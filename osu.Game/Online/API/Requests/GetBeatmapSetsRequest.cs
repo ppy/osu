@@ -4,9 +4,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Direct;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {

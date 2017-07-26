@@ -10,9 +10,10 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Desktop.Platform;
 using osu.Framework.Platform;
-using osu.Game.Database;
 using osu.Game.IPC;
 using osu.Framework.Allocation;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {

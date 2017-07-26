@@ -1,14 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using Newtonsoft.Json;
-using osu.Game.IO.Serialization;
-using SQLite.Net.Attributes;
-using SQLiteNetExtensions.Attributes;
 using System;
 using System.Linq;
+using Newtonsoft.Json;
+using osu.Game.IO.Serialization;
+using osu.Game.Rulesets;
+using SQLite.Net.Attributes;
+using SQLiteNetExtensions.Attributes;
 
-namespace osu.Game.Database
+namespace osu.Game.Beatmaps
 {
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable
     {

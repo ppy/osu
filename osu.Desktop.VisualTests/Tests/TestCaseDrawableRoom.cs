@@ -7,8 +7,9 @@ using osu.Framework.Testing;
 using osu.Game.Screens.Multiplayer;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
-using osu.Game.Database;
 using osu.Framework.Allocation;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 
 namespace osu.Desktop.VisualTests.Tests
 {
