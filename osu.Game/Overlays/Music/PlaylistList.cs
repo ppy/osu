@@ -15,6 +15,12 @@ namespace osu.Game.Overlays.Music
     {
         private FillFlowContainer<PlaylistItem> items;
 
+        public Action<BeatmapSetInfo> OnSelect;
+
+        public Action<IList<BeatmapSetInfo>> ReorderList;
+
+        private readonly SearchContainer search;
+
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
             set
@@ -29,10 +35,6 @@ namespace osu.Game.Overlays.Music
         {
             OnSelect?.Invoke(b);
         }
-
-        public Action<BeatmapSetInfo> OnSelect;
-
-        public Action<IList<BeatmapSetInfo>> ReorderList;
 
         private void reorderList(PlaylistItem item)
         {
@@ -69,15 +71,17 @@ namespace osu.Game.Overlays.Music
                         items.Add(tempItem);
                         innerCtr--;                         //Needed because items.Count decreases with every items.Remove()
                     }
+
+                    break;
                 }
 
-                currentList.Add(items.ElementAt(ctr).BeatmapSetInfo);
             }
+
+            foreach (var playlistItem in items)
+                currentList.Add(playlistItem.BeatmapSetInfo);
 
             ReorderList.Invoke(currentList);
         }
-
-        private readonly SearchContainer search;
 
         public void Filter(string searchTerm) => search.SearchTerm = searchTerm;
 
