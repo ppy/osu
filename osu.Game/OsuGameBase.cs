@@ -28,7 +28,7 @@ namespace osu.Game
     {
         protected OsuConfigManager LocalConfig;
 
-        protected BeatmapDatabase BeatmapDatabase;
+        protected BeatmapStore BeatmapStore;
 
         protected RulesetDatabase RulesetDatabase;
 
@@ -95,9 +95,9 @@ namespace osu.Game
 
             SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
 
-            dependencies.Cache(RulesetDatabase = new RulesetDatabase(Host.Storage, connection));
-            dependencies.Cache(BeatmapDatabase = new BeatmapDatabase(Host.Storage, connection, RulesetDatabase, Host));
-            dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, connection, Host, BeatmapDatabase));
+            dependencies.Cache(RulesetDatabase = new RulesetDatabase(connection));
+            dependencies.Cache(BeatmapStore = new BeatmapStore(Host.Storage, connection, RulesetDatabase, Host));
+            dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, connection, Host, BeatmapStore));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
@@ -129,7 +129,7 @@ namespace osu.Game
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
-            BeatmapDatabase.DefaultBeatmap = defaultBeatmap;
+            BeatmapStore.DefaultBeatmap = defaultBeatmap;
 
             OszArchiveReader.Register();
 

@@ -6,20 +6,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using SQLite.Net;
 using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
-    public abstract class DatabaseBacking
+    public abstract class DatabaseStore
     {
         protected SQLiteConnection Connection { get; }
-        protected Storage Storage { get; }
 
-        protected DatabaseBacking(Storage storage, SQLiteConnection connection)
+        protected DatabaseStore(SQLiteConnection connection)
         {
-            Storage = storage;
             Connection = connection;
 
             try

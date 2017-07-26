@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select
     public abstract class SongSelect : OsuScreen
     {
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
-        private BeatmapDatabase database;
+        private BeatmapStore store;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
         private readonly BeatmapCarousel carousel;
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, UserInputManager input)
+        private void load(BeatmapStore beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, UserInputManager input)
         {
             if (Footer != null)
             {
@@ -164,14 +164,14 @@ namespace osu.Game.Screens.Select
                 BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
             }
 
-            if (database == null)
-                database = beatmaps;
+            if (store == null)
+                store = beatmaps;
 
             if (osu != null)
                 ruleset.BindTo(osu.Ruleset);
 
-            database.BeatmapSetAdded += onBeatmapSetAdded;
-            database.BeatmapSetRemoved += onBeatmapSetRemoved;
+            store.BeatmapSetAdded += onBeatmapSetAdded;
+            store.BeatmapSetRemoved += onBeatmapSetRemoved;
 
             dialogOverlay = dialog;
 
@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Select
 
             initialAddSetsTask = new CancellationTokenSource();
 
-            carousel.Beatmaps = database.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending);
+            carousel.Beatmaps = store.Database.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending);
 
             Beatmap.ValueChanged += beatmap_ValueChanged;
 
@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Select
                 {
                     bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value.BeatmapInfo.BeatmapSetInfoID;
 
-                    Beatmap.Value = database.GetWorkingBeatmap(beatmap, Beatmap);
+                    Beatmap.Value = store.GetWorkingBeatmap(beatmap, Beatmap);
                     ensurePlayingSelected(preview);
                 }
 
@@ -341,10 +341,10 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
-            if (database != null)
+            if (store != null)
             {
-                database.BeatmapSetAdded -= onBeatmapSetAdded;
-                database.BeatmapSetRemoved -= onBeatmapSetRemoved;
+                store.BeatmapSetAdded -= onBeatmapSetAdded;
+                store.BeatmapSetRemoved -= onBeatmapSetRemoved;
             }
 
             initialAddSetsTask?.Cancel();

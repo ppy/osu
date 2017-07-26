@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -59,10 +58,10 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapDatabase database)
+        public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapStore store)
         {
             BeatmapSet = beatmapSet;
-            WorkingBeatmap beatmap = database.GetWorkingBeatmap(BeatmapSet.Beatmaps.FirstOrDefault());
+            WorkingBeatmap beatmap = store.GetWorkingBeatmap(BeatmapSet.Beatmaps.FirstOrDefault());
 
             Header = new BeatmapSetHeader(beatmap)
             {
