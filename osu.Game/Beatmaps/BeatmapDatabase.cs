@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Logging;
 using osu.Game.Database;
 using SQLite.Net;
@@ -82,14 +81,14 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapSet">The beatmap to restore.</param>
         /// <returns>Whether the beatmap's <see cref="BeatmapSetInfo.DeletePending"/> was changed.</returns>
-        public bool Undelete(BeatmapSetInfo set)
+        public bool Undelete(BeatmapSetInfo beatmapSet)
         {
-            if (!set.DeletePending) return false;
+            if (!beatmapSet.DeletePending) return false;
 
-            set.DeletePending = false;
-            Connection.Update(set);
+            beatmapSet.DeletePending = false;
+            Connection.Update(beatmapSet);
 
-            BeatmapSetAdded?.Invoke(set);
+            BeatmapSetAdded?.Invoke(beatmapSet);
             return true;
         }
 
