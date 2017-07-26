@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Logging;
 using osu.Game.Database;
-using osu.Game.Screens.Menu;
 using SQLite.Net;
 using SQLiteNetExtensions.Extensions;
 
@@ -19,11 +18,13 @@ namespace osu.Game.Beatmaps
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
-        public BeatmapDatabase(SQLiteConnection connection) : base(connection)
+        public BeatmapDatabase(SQLiteConnection connection)
+            : base(connection)
         {
         }
 
-        protected override Type[] ValidTypes => new[] {
+        protected override Type[] ValidTypes => new[]
+        {
             typeof(BeatmapSetInfo),
             typeof(BeatmapInfo),
             typeof(BeatmapMetadata),
@@ -37,16 +38,20 @@ namespace osu.Game.Beatmaps
                 Connection.DropTable<BeatmapMetadata>();
                 Connection.DropTable<BeatmapDifficulty>();
                 Connection.DropTable<BeatmapSetInfo>();
+                Connection.DropTable<BeatmapSetFileInfo>();
                 Connection.DropTable<BeatmapInfo>();
             }
 
             Connection.CreateTable<BeatmapMetadata>();
             Connection.CreateTable<BeatmapDifficulty>();
             Connection.CreateTable<BeatmapSetInfo>();
+            Connection.CreateTable<BeatmapSetFileInfo>();
             Connection.CreateTable<BeatmapInfo>();
 
             deletePending();
         }
+
+        public void Update(BeatmapSetInfo setInfo) => Connection.Update(setInfo);
 
         public void Import(IEnumerable<BeatmapSetInfo> beatmapSets)
         {
@@ -64,24 +69,32 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        public void Delete(IEnumerable<BeatmapSetInfo> beatmapSets)
+        public bool Delete(BeatmapSetInfo set)
         {
-            foreach (var s in beatmapSets)
-            {
-                s.DeletePending = true;
-                Update(s, false);
-                BeatmapSetRemoved?.Invoke(s);
-            }
+            if (set.DeletePending) return false;
+
+            set.DeletePending = true;
+            Connection.Update(set);
+
+            BeatmapSetRemoved?.Invoke(set);
+            return true;
+        }
+
+        public bool Undelete(BeatmapSetInfo set)
+        {
+            if (!set.DeletePending) return false;
+
+            set.DeletePending = false;
+            Connection.Update(set);
+
+            BeatmapSetAdded?.Invoke(set);
+            return true;
         }
 
         private void deletePending()
         {
-            foreach (var b in GetAllWithChildren<BeatmapSetInfo>(b => b.DeletePending))
+            foreach (var b in GetAllWithChildren<BeatmapSetInfo>(b => b.DeletePending && !b.Protected))
             {
-                if (b.Hash == Intro.MENU_MUSIC_BEATMAP_HASH)
-                    // this is a bit hacky, but will do for now.
-                    continue;
-
                 try
                 {
                     foreach (var i in b.Beatmaps)

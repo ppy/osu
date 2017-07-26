@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Menu
     {
         private readonly OsuLogo logo;
 
-        public const string MENU_MUSIC_BEATMAP_HASH = "21c1271b91234385978b5418881fdd88";
+        private const string menu_music_beatmap_hash = "715a09144f885d746644c1983e285044";
 
         /// <summary>
         /// Whether we have loaded the menu previously.
@@ -84,23 +84,18 @@ namespace osu.Game.Screens.Menu
 
             if (setInfo == null)
             {
-                var query = beatmaps.Database.Query<BeatmapSetInfo>().Where(b => b.Hash == MENU_MUSIC_BEATMAP_HASH);
-
-                setInfo = query.FirstOrDefault();
+                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == menu_music_beatmap_hash);
 
                 if (setInfo == null)
                 {
                     // we need to import the default menu background beatmap
-                    beatmaps.Import(new OszArchiveReader(game.Resources.GetStream(@"Tracks/circles.osz")));
+                    setInfo = beatmaps.Import(new OszArchiveReader(game.Resources.GetStream(@"Tracks/circles.osz")));
 
-                    setInfo = query.First();
-
-                    setInfo.DeletePending = true;
-                    beatmaps.Database.Update(setInfo, false);
+                    setInfo.Protected = true;
+                    beatmaps.Delete(setInfo);
                 }
             }
 
-            beatmaps.Database.GetChildren(setInfo);
             Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
 
             track = Beatmap.Value.Track;

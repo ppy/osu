@@ -3,9 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using SQLite.Net;
 using SQLiteNetExtensions.Extensions;
 
@@ -13,10 +13,12 @@ namespace osu.Game.Database
 {
     public abstract class DatabaseStore
     {
-        protected SQLiteConnection Connection { get; }
+        protected readonly Storage Storage;
+        protected readonly SQLiteConnection Connection;
 
-        protected DatabaseStore(SQLiteConnection connection)
+        protected DatabaseStore(SQLiteConnection connection, Storage storage = null)
         {
+            Storage = storage;
             Connection = connection;
 
             try
@@ -63,15 +65,5 @@ namespace osu.Game.Database
         }
 
         protected abstract Type[] ValidTypes { get; }
-
-        public void Update<T>(T record, bool cascade = true) where T : class
-        {
-            if (ValidTypes.All(t => t != typeof(T)))
-                throw new ArgumentException("Must be a type managed by BeatmapDatabase", nameof(T));
-            if (cascade)
-                Connection.UpdateWithChildren(record);
-            else
-                Connection.Update(record);
-        }
     }
 }
