@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Music
 {
     internal class PlaylistList : Container
     {
-        private FillFlowContainer<PlaylistItem> items;
+        private ScrollContainer<PlaylistItem> items;
 
         public Action<BeatmapSetInfo> OnSelect;
 
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Music
                 if (items.ElementAt(ctr).IsHovered && items.ElementAt(ctr) != item)
                 {
                     PlaylistItem tempItem;
-                    FillFlowContainer<PlaylistItem> tempItems = new FillFlowContainer<PlaylistItem>();
+                    ScrollContainer<PlaylistItem> tempItems = new ScrollContainer<PlaylistItem>();
 
                     items.Remove(item);
                     tempItems.Add(item);
@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Music
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                items = new ItemSearchContainer
+                                items = new ScrollContainer<PlaylistItem>
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -122,7 +122,8 @@ namespace osu.Game.Overlays.Music
             };
         }
 
-        private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
+        /*
+        private class ItemSearchContainer : ScrollContainer<PlaylistItem>, IHasFilterableChildren
         {
             public string[] FilterTerms => new string[] { };
             public bool MatchingFilter
@@ -141,6 +142,6 @@ namespace osu.Game.Overlays.Music
                 LayoutDuration = 200;
                 LayoutEasing = Easing.OutQuint;
             }
-        }
+        } */
     }
 }
