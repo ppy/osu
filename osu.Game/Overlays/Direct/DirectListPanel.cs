@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Direct
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColourInfo = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.25f), Color4.Black.Opacity(0.75f)),
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.25f), Color4.Black.Opacity(0.75f)),
                 },
                 new Container
                 {
