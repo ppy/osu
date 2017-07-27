@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets, OsuGame game)
+        private void load(RulesetStore rulesets, OsuGame game)
         {
             foreach (var r in rulesets.AllRulesets)
             {

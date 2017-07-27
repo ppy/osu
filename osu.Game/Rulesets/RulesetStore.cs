@@ -12,13 +12,13 @@ using SQLite.Net;
 namespace osu.Game.Rulesets
 {
     /// <summary>
-    /// Todo: All of this needs to be moved to a RulesetDatabase.
+    /// Todo: All of this needs to be moved to a RulesetStore.
     /// </summary>
-    public class RulesetDatabase : DatabaseStore
+    public class RulesetStore : DatabaseBackedStore
     {
         public IEnumerable<RulesetInfo> AllRulesets => Query<RulesetInfo>().Where(r => r.Available);
 
-        public RulesetDatabase(SQLiteConnection connection) : base(connection)
+        public RulesetStore(SQLiteConnection connection) : base(connection)
         {
         }
 

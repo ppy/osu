@@ -11,12 +11,12 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapDeleteDialog : PopupDialog
     {
-        private BeatmapStore store;
+        private BeatmapManager manager;
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapStore beatmapStore)
+        private void load(BeatmapManager beatmapManager)
         {
-            store = beatmapStore;
+            manager = beatmapManager;
         }
 
         public BeatmapDeleteDialog(WorkingBeatmap beatmap)
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select
                     Action = () =>
                     {
                         beatmap.Dispose();
-                        store.Delete(beatmap.BeatmapSetInfo);
+                        manager.Delete(beatmap.BeatmapSetInfo);
                     },
                 },
                 new PopupDialogCancelButton

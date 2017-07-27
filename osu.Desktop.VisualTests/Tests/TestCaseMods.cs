@@ -18,11 +18,11 @@ namespace osu.Desktop.VisualTests.Tests
         private ModSelectOverlay modSelect;
         private ModDisplay modDisplay;
 
-        private RulesetDatabase rulesets;
+        private RulesetStore rulesets;
 
 
         [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets)
+        private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
         }

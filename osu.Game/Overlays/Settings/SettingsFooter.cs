@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Settings
     public class SettingsFooter : FillFlowContainer
     {
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuColour colours, RulesetDatabase rulesets)
+        private void load(OsuGameBase game, OsuColour colours, RulesetStore rulesets)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

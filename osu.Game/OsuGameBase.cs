@@ -28,13 +28,13 @@ namespace osu.Game
     {
         protected OsuConfigManager LocalConfig;
 
-        protected BeatmapStore BeatmapStore;
+        protected BeatmapManager BeatmapManager;
 
-        protected RulesetDatabase RulesetDatabase;
+        protected RulesetStore RulesetStore;
 
-        protected FileDatabase FileDatabase;
+        protected FileStore FileStore;
 
-        protected ScoreDatabase ScoreDatabase;
+        protected ScoreStore ScoreStore;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -97,10 +97,10 @@ namespace osu.Game
 
             SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
 
-            dependencies.Cache(RulesetDatabase = new RulesetDatabase(connection));
-            dependencies.Cache(FileDatabase = new FileDatabase(connection, Host.Storage));
-            dependencies.Cache(BeatmapStore = new BeatmapStore(Host.Storage, FileDatabase, connection, RulesetDatabase, Host));
-            dependencies.Cache(ScoreDatabase = new ScoreDatabase(Host.Storage, connection, Host, BeatmapStore));
+            dependencies.Cache(RulesetStore = new RulesetStore(connection));
+            dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, Host));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
@@ -132,7 +132,7 @@ namespace osu.Game
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
-            BeatmapStore.DefaultBeatmap = defaultBeatmap;
+            BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
             dependencies.Cache(API = new APIAccess
             {

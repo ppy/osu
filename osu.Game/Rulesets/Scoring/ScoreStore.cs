@@ -15,19 +15,19 @@ using SQLite.Net;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public class ScoreDatabase : DatabaseStore
+    public class ScoreStore : DatabaseBackedStore
     {
         private readonly Storage storage;
 
-        private readonly BeatmapStore beatmaps;
-        private readonly RulesetDatabase rulesets;
+        private readonly BeatmapManager beatmaps;
+        private readonly RulesetStore rulesets;
 
         private const string replay_folder = @"replays";
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
-        public ScoreDatabase(Storage storage, SQLiteConnection connection, IIpcHost importHost = null, BeatmapStore beatmaps = null, RulesetDatabase rulesets = null) : base(connection)
+        public ScoreStore(Storage storage, SQLiteConnection connection, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(connection)
         {
             this.storage = storage;
             this.beatmaps = beatmaps;

@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 Assert.IsTrue(File.Exists(temp));
 
-                osu.Dependencies.Get<BeatmapStore>().Import(temp);
+                osu.Dependencies.Get<BeatmapManager>().Import(temp);
 
                 ensureLoaded(osu);
 
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 Assert.IsTrue(File.Exists(temp), "Temporary file copy never substantiated");
 
                 using (File.OpenRead(temp))
-                    osu.Dependencies.Get<BeatmapStore>().Import(temp);
+                    osu.Dependencies.Get<BeatmapManager>().Import(temp);
 
                 ensureLoaded(osu);
 
@@ -105,8 +105,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                 Thread.Sleep(1);
 
             //reset beatmap database (sqlite and storage backing)
-            osu.Dependencies.Get<RulesetDatabase>().Reset();
-            osu.Dependencies.Get<BeatmapStore>().Reset();
+            osu.Dependencies.Get<RulesetStore>().Reset();
+            osu.Dependencies.Get<BeatmapManager>().Reset();
 
             return osu;
         }
@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         {
             IEnumerable<BeatmapSetInfo> resultSets = null;
 
-            var store = osu.Dependencies.Get<BeatmapStore>();
+            var store = osu.Dependencies.Get<BeatmapManager>();
 
             Action waitAction = () =>
             {

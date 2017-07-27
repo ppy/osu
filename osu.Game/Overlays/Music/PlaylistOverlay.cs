@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Music
         private FilterControl filter;
         private PlaylistList list;
 
-        private BeatmapStore beatmaps;
+        private BeatmapManager beatmaps;
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Music
         private InputManager inputManager;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, BeatmapStore beatmaps, OsuColour colours, UserInputManager inputManager)
+        private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours, UserInputManager inputManager)
         {
             this.inputManager = inputManager;
             this.beatmaps = beatmaps;

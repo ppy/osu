@@ -24,12 +24,12 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseGamefield : TestCase
     {
-        private RulesetDatabase rulesets;
+        private RulesetStore rulesets;
 
         public override string Description => @"Showing hitobjects and what not.";
 
         [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets)
+        private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
         }

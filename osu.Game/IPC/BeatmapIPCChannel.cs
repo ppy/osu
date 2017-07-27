@@ -10,9 +10,9 @@ namespace osu.Game.IPC
 {
     public class BeatmapIPCChannel : IpcChannel<BeatmapImportMessage>
     {
-        private readonly BeatmapStore beatmaps;
+        private readonly BeatmapManager beatmaps;
 
-        public BeatmapIPCChannel(IIpcHost host, BeatmapStore beatmaps = null)
+        public BeatmapIPCChannel(IIpcHost host, BeatmapManager beatmaps = null)
             : base(host)
         {
             this.beatmaps = beatmaps;

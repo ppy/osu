@@ -20,12 +20,12 @@ namespace osu.Desktop.VisualTests.Tests
     internal class TestCasePlayer : TestCase
     {
         protected Player Player;
-        private RulesetDatabase rulesets;
+        private RulesetStore rulesets;
 
         public override string Description => @"Showing everything to play the game.";
 
         [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets)
+        private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
         }

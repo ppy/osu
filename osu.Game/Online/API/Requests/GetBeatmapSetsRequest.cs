@@ -49,7 +49,7 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty(@"beatmaps")]
         private IEnumerable<GetBeatmapSetsBeatmapResponse> beatmaps { get; set; }
 
-        public BeatmapSetInfo ToBeatmapSet(RulesetDatabase rulesets)
+        public BeatmapSetInfo ToBeatmapSet(RulesetStore rulesets)
         {
             return new BeatmapSetInfo
             {
@@ -79,7 +79,7 @@ namespace osu.Game.Online.API.Requests
             [JsonProperty(@"difficulty_rating")]
             private double starDifficulty { get; set; }
 
-            public BeatmapInfo ToBeatmap(RulesetDatabase rulesets)
+            public BeatmapInfo ToBeatmap(RulesetStore rulesets)
             {
                 return new BeatmapInfo
                 {

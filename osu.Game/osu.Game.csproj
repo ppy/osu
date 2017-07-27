@@ -74,7 +74,7 @@
   <ItemGroup>
     <Compile Include="Audio\SampleInfo.cs" />
     <Compile Include="Audio\SampleInfoList.cs" />
-    <Compile Include="Beatmaps\BeatmapDatabase.cs" />
+    <Compile Include="Beatmaps\BeatmapStore.cs" />
     <Compile Include="Beatmaps\BeatmapSetFileInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
@@ -91,7 +91,7 @@
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
-    <Compile Include="IO\FileDatabase.cs" />
+    <Compile Include="IO\FileStore.cs" />
     <Compile Include="IO\FileInfo.cs" />
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
@@ -131,9 +131,9 @@
     <Compile Include="Beatmaps\Timing\BreakPeriod.cs" />
     <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
     <Compile Include="Beatmaps\BeatmapMetrics.cs" />
-    <Compile Include="Database\DatabaseStore.cs" />
+    <Compile Include="Database\DatabaseBackedStore.cs" />
     <Compile Include="Rulesets\RulesetInfo.cs" />
-    <Compile Include="Rulesets\Scoring\ScoreDatabase.cs" />
+    <Compile Include="Rulesets\Scoring\ScoreStore.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
     <Compile Include="Graphics\Cursor\CursorTrail.cs" />
     <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
@@ -220,7 +220,7 @@
     <Compile Include="Rulesets\Objects\Legacy\ConvertHitObjectType.cs" />
     <Compile Include="Rulesets\Replays\ReplayButtonState.cs" />
     <Compile Include="Rulesets\Replays\ReplayFrame.cs" />
-    <Compile Include="Rulesets\RulesetDatabase.cs" />
+    <Compile Include="Rulesets\RulesetStore.cs" />
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
     <Compile Include="Rulesets\Timing\SpeedAdjustmentContainer.cs" />
@@ -389,7 +389,7 @@
     <Compile Include="Users\UpdateableAvatar.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
-    <Compile Include="Beatmaps\BeatmapStore.cs" />
+    <Compile Include="Beatmaps\BeatmapManager.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
@@ -399,7 +399,6 @@
     <Compile Include="Beatmaps\BeatmapMetadata.cs" />
     <Compile Include="Beatmaps\BeatmapInfo.cs" />
     <Compile Include="Beatmaps\BeatmapDifficulty.cs" />
-    <Compile Include="Beatmaps\BeatmapStoreWorkingBeatmap.cs" />
     <Compile Include="Graphics\UserInterface\OsuButton.cs" />
     <Compile Include="Overlays\Settings\Sections\MaintenanceSection.cs" />
     <Compile Include="Overlays\Settings\SettingsSection.cs" />

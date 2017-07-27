@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
         private const float panel_padding = 10f;
 
         private APIAccess api;
-        private RulesetDatabase rulesets;
+        private RulesetStore rulesets;
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
@@ -161,7 +161,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, RulesetDatabase rulesets)
+        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets)
         {
             this.api = api;
             this.rulesets = rulesets;

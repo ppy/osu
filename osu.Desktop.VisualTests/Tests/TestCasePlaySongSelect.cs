@@ -14,27 +14,27 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCasePlaySongSelect : TestCase
     {
-        private readonly BeatmapStore store;
+        private readonly BeatmapManager manager;
 
         public override string Description => @"with fake data";
 
-        private readonly RulesetDatabase rulesets;
+        private readonly RulesetStore rulesets;
 
         public TestCasePlaySongSelect()
         {
             PlaySongSelect songSelect;
 
-            if (store == null)
+            if (manager == null)
             {
                 var storage = new TestStorage(@"TestCasePlaySongSelect");
 
                 var backingDatabase = storage.GetDatabase(@"client");
 
-                rulesets = new RulesetDatabase(backingDatabase);
-                store = new BeatmapStore(storage, null, backingDatabase, rulesets);
+                rulesets = new RulesetStore(backingDatabase);
+                manager = new BeatmapManager(storage, null, backingDatabase, rulesets);
 
                 for (int i = 0; i < 100; i += 10)
-                    store.Import(createTestBeatmapSet(i));
+                    manager.Import(createTestBeatmapSet(i));
             }
 
             Add(songSelect = new PlaySongSelect());
