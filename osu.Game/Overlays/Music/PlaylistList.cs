@@ -131,19 +131,21 @@ namespace osu.Game.Overlays.Music
                     return;
                 List<PlaylistItem> childrenList = Children.ToList();
                 item.MoveTo(new Vector2(0, (mousePosition - item.DragStartOffset).Y));
-                int targetIndex = (int)Math.Floor(item.Position.Y / item.Size.Y);
+
+                int targetIndex = Children.Count(i => i.Position.Y - (item.Size.Y / 2f) < item.Position.Y - (i.Size.Y / 2f));
+
                 if (targetIndex == childrenList.IndexOf(item))
                     return;
                 bool hasFindItem = false;
                 for (int i = 0; i < childrenList.Count; i++)
                 {
-                    if (childrenList[i] != item)
-                        ChangeChildDepth(childrenList[i], childrenList.Count - i + (hasFindItem ? 1 : 0));
-                    else
+                    if (childrenList[i] == item)
                     {
                         ChangeChildDepth(item, childrenList.Count - targetIndex);
                         hasFindItem = true;
                     }
+                    else
+                        ChangeChildDepth(childrenList[i], childrenList.Count - i + (hasFindItem ? 1 : -1));
                 }
                 TriggerBeatmapSetsChange();
             }
@@ -151,10 +153,7 @@ namespace osu.Game.Overlays.Music
             public void TriggerBeatmapSetsChange()
             {
                 beatmapSets = Children.Select(b => b.BeatmapSetInfo).ToList();
-                foreach (var b in Children)
-                    beatmapSets.Add(b.BeatmapSetInfo);
-                    UpdateBeatmapSets?.Invoke(beatmapSets);
-                    beatmapSets = new List<BeatmapSetInfo>();
+                UpdateBeatmapSets?.Invoke(beatmapSets);
             }
         }
     }
