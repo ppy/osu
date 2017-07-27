@@ -261,7 +261,7 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.Both;
                 Width = 0f;
-                ColourInfo = ColourInfo.GradientHorizontal(Color4.White.Opacity(start), Color4.White.Opacity(end));
+                Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(start), Color4.White.Opacity(end));
                 Masking = true;
 
                 Children = new[]

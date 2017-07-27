@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Settings
     public class SettingsFooter : FillFlowContainer
     {
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, OsuColour colours, RulesetDatabase rulesets)
+        private void load(OsuGameBase game, OsuColour colours, RulesetStore rulesets)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;

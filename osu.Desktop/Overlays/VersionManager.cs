@@ -207,7 +207,7 @@ namespace osu.Desktop.Overlays
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        ColourInfo = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
+                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
                     },
                     new TextAwesome
                     {

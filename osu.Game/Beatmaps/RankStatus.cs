@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 
-namespace osu.Game.Database
+namespace osu.Game.Beatmaps
 {
     public enum RankStatus
     {

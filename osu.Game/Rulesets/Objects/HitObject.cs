@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Database;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects

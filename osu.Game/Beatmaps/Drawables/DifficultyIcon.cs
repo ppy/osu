@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;

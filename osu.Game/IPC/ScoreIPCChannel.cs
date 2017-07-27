@@ -4,15 +4,15 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Platform;
-using osu.Game.Database;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.IPC
 {
     public class ScoreIPCChannel : IpcChannel<ScoreImportMessage>
     {
-        private readonly ScoreDatabase scores;
+        private readonly ScoreStore scores;
 
-        public ScoreIPCChannel(IIpcHost host, ScoreDatabase scores = null)
+        public ScoreIPCChannel(IIpcHost host, ScoreStore scores = null)
             : base(host)
         {
             this.scores = scores;
