@@ -3,7 +3,7 @@
 
 using Newtonsoft.Json;
 
-namespace osu.Game.Database
+namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// Beatmap info retrieved for previewing locally without having the beatmap downloaded.

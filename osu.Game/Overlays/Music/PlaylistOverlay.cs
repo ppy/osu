@@ -9,7 +9,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
@@ -27,7 +26,7 @@ namespace osu.Game.Overlays.Music
         private FilterControl filter;
         private PlaylistList list;
 
-        private BeatmapDatabase beatmaps;
+        private BeatmapManager beatmaps;
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
@@ -35,7 +34,7 @@ namespace osu.Game.Overlays.Music
         private InputManager inputManager;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, BeatmapDatabase beatmaps, OsuColour colours, UserInputManager inputManager)
+        private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours, UserInputManager inputManager)
         {
             this.inputManager = inputManager;
             this.beatmaps = beatmaps;
@@ -78,8 +77,9 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            list.BeatmapSets = BeatmapSets = beatmaps.GetAllWithChildren<BeatmapSetInfo>(b => !b.DeletePending).ToList();
+            list.BeatmapSets = BeatmapSets = beatmaps.GetAllUsableBeatmapSets();
 
+            // todo: these should probably be above the query.
             beatmaps.BeatmapSetAdded += s => list.AddBeatmapSet(s);
             beatmaps.BeatmapSetRemoved += s => list.RemoveBeatmapSet(s);
 
