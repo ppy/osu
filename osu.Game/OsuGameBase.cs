@@ -18,6 +18,7 @@ using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 using SQLite.Net;
 using osu.Framework.Graphics.Performance;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
@@ -96,6 +97,8 @@ namespace osu.Game
             dependencies.Cache(LocalConfig);
 
             SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
+
+            connection.CreateTable<StoreVersion>();
 
             dependencies.Cache(RulesetStore = new RulesetStore(connection));
             dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
