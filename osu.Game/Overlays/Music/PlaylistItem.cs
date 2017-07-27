@@ -143,9 +143,7 @@ namespace osu.Game.Overlays.Music
 
         protected override bool OnDrag(Framework.Input.InputState state)
         {
-            OpenTK.Vector2 yMovement = state.Mouse.Position;
-            yMovement.X = 0;
-            this.MoveTo(yMovement);
+            this.MoveToY(state.Mouse.Position.Y);
 
             return true;
         }

@@ -13,6 +13,8 @@ namespace osu.Game.Overlays.Music
 {
     internal class PlaylistList : Container
     {
+        private const int itemSpacing = 22;
+
         private ScrollContainer<PlaylistItem> items;
 
         public Action<BeatmapSetInfo> OnSelect;
@@ -21,11 +23,14 @@ namespace osu.Game.Overlays.Music
 
         private readonly SearchContainer search;
 
-        public IEnumerable<BeatmapSetInfo> BeatmapSets
+        public IList<BeatmapSetInfo> BeatmapSets
         {
             set
             {
                 items.Children = value.Select(item => new PlaylistItem(item) { OnSelect = itemSelected, OnReorder = reorderList }).ToList();
+
+                for (int ctr = 0; ctr < items.Count; ctr++)
+                    items.ElementAt(ctr).Position = new OpenTK.Vector2(0, ctr * itemSpacing);
             }
         }
 
