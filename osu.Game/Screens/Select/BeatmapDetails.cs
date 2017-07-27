@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Select
                     requestedBeatmap.Metrics = res;
                     Schedule(() => updateMetrics(res));
                 };
-                lookup.Failure += e => updateMetrics(null);
+                lookup.Failure += e => Schedule(() => updateMetrics(null));
 
                 api.Queue(lookup);
                 loading.Show();
