@@ -212,7 +212,6 @@ namespace osu.Game.Overlays
                 Trace.Assert(state.Mouse.PositionMouseDown != null);
 
                 chatHeight.Value = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
-                return base.OnDrag(state);
             }
 
             return true;
