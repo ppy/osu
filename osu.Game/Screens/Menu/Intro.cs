@@ -76,13 +76,9 @@ namespace osu.Game.Screens.Menu
 
             if (!menuMusic)
             {
-                var query = beatmaps.Database.Query<BeatmapSetInfo>(b => !b.DeletePending);
-                int count = query.Count();
-                if (count > 0)
-                {
-                    setInfo = query.ElementAt(RNG.Next(0, count - 1));
-                    beatmaps.Database.Populate(setInfo);
-                }
+                var sets = beatmaps.GetAllUsableBeatmapSets(false);
+                if (sets.Count > 0)
+                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
             }
 
             if (setInfo == null)
