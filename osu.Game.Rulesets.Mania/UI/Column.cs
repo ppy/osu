@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             Name = "Key gradient",
                             RelativeSizeAxes = Axes.Both,
-                            ColourInfo = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0)),
+                            Colour = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0)),
                             Alpha = 0.5f
                         },
                         keyIcon = new Container
