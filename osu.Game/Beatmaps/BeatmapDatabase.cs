@@ -98,19 +98,9 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    foreach (var i in b.Beatmaps)
-                    {
-                        if (i.Metadata != null) Connection.Delete(i.Metadata);
-                        if (i.Difficulty != null) Connection.Delete(i.Difficulty);
-
-                        Connection.Delete(i);
-                    }
-
-                    if (b.Metadata != null) Connection.Delete(b.Metadata);
-
                     // many-to-many join table entries are not automatically tidied.
                     Connection.Table<BeatmapSetFileInfo>().Delete(f => f.BeatmapSetInfoID == b.ID);
-                    Connection.Delete(b);
+                    Connection.Delete(b, true);
                 }
                 catch (Exception e)
                 {
