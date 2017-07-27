@@ -37,7 +37,7 @@ namespace osu.Game.Beatmaps
 
         public string StoryboardFile => Files.FirstOrDefault(f => f.Filename.EndsWith(".osb"))?.Filename;
 
-        [ManyToMany(typeof(BeatmapSetFileInfo))]
+        [ManyToMany(typeof(BeatmapSetFileInfo), CascadeOperations = CascadeOperation.CascadeRead)]
         public List<FileInfo> Files { get; set; }
 
         public bool Protected { get; set; }
