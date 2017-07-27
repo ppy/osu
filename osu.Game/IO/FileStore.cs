@@ -44,7 +44,7 @@ namespace osu.Game.IO
 
         public FileInfo Add(Stream data, string filename = null)
         {
-            string hash = data.GetSHA2Hash();
+            string hash = data.ComputeSHA2Hash();
 
             var info = new FileInfo
             {
