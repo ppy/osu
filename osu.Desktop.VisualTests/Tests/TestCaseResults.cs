@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -15,14 +14,14 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseResults : TestCase
     {
-        private BeatmapStore db;
+        private BeatmapStore beatmaps;
 
         public override string Description => @"Results after playing.";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapStore db)
+        private void load(BeatmapStore beatmaps)
         {
-            this.db = db;
+            this.beatmaps = beatmaps;
         }
 
         private WorkingBeatmap beatmap;
@@ -33,9 +32,9 @@ namespace osu.Desktop.VisualTests.Tests
 
             if (beatmap == null)
             {
-                var beatmapInfo = db.Database.Query<BeatmapInfo>().FirstOrDefault(b => b.RulesetID == 0);
+                var beatmapInfo = beatmaps.QueryBeatmap(b => b.RulesetID == 0);
                 if (beatmapInfo != null)
-                    beatmap = db.GetWorkingBeatmap(beatmapInfo);
+                    beatmap = beatmaps.GetWorkingBeatmap(beatmapInfo);
             }
 
             Add(new Results(new Score

@@ -34,7 +34,7 @@ namespace osu.Desktop.VisualTests.Tests
                 store = new BeatmapStore(storage, null, backingDatabase, rulesets);
 
                 for (int i = 0; i < 100; i += 10)
-                    store.Database.Add(createTestBeatmapSet(i));
+                    store.Import(createTestBeatmapSet(i));
             }
 
             Add(songSelect = new PlaySongSelect());

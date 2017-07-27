@@ -119,8 +119,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Action waitAction = () =>
             {
-                while (!(resultSets = store.Database.
-                    Query<BeatmapSetInfo>().Where(s => s.OnlineBeatmapSetID == 241526)).Any())
+                while (!(resultSets = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526)).Any())
                     Thread.Sleep(50);
             };
 
@@ -136,16 +135,14 @@ namespace osu.Game.Tests.Beatmaps.IO
             //if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
             waitAction = () =>
             {
-                while ((resultBeatmaps = store.Database.
-                    QueryAndPopulate<BeatmapInfo>(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
+                while ((resultBeatmaps = store.QueryBeatmaps(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
                     Thread.Sleep(50);
             };
 
             Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
                 @"Beatmaps did not import to the database in allocated time");
 
-            var set = resultSets.First();
-            store.Database.Populate(set);
+            var set = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526).First();
 
             Assert.IsTrue(set.Beatmaps.Count == resultBeatmaps.Count(),
                 $@"Incorrect database beatmap count post-import ({resultBeatmaps.Count()} but should be {set.Beatmaps.Count}).");
