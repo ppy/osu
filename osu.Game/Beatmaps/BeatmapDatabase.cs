@@ -107,6 +107,9 @@ namespace osu.Game.Beatmaps
                     }
 
                     if (b.Metadata != null) Connection.Delete(b.Metadata);
+
+                    // many-to-many join table entries are not automatically tidied.
+                    Connection.Table<BeatmapSetFileInfo>().Delete(f => f.BeatmapSetInfoID == b.ID);
                     Connection.Delete(b);
                 }
                 catch (Exception e)
