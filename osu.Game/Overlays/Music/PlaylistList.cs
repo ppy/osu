@@ -13,13 +13,13 @@ namespace osu.Game.Overlays.Music
 {
     internal class PlaylistList : Container
     {
-        private const int itemSpacing = 22;
+        private const float itemSpacing = 22f;
 
         private ScrollContainer<PlaylistItem> items;
 
         public Action<BeatmapSetInfo> OnSelect;
 
-        public Action<IList<BeatmapSetInfo>> ReorderList;
+        public Action<IList<PlaylistItem>> ReorderList;
 
         private readonly SearchContainer search;
 
@@ -43,21 +43,46 @@ namespace osu.Game.Overlays.Music
 
         private void reorderList(PlaylistItem item)
         {
-            IList<BeatmapSetInfo> currentList = new List<BeatmapSetInfo>();
+            bool alreadySorted = false;
 
             if (item.Position.Y > items.ElementAt(items.Count - 1).Position.Y)
             {
+                int index = items.IndexOf(item);
                 items.Remove(item);
                 items.Add(item);
+
+                for (int ctr = index; ctr < items.Count; ctr++)
+                    items.ElementAt(ctr).Position = new OpenTK.Vector2(0, items.ElementAt(ctr - 1).Position.Y + itemSpacing);
+
+                alreadySorted = true;
             }
+
+            float itemPosition = item.Position.Y;
+            PlaylistItem tempItem;
+            ScrollContainer<PlaylistItem> tempItems = new ScrollContainer<PlaylistItem>();
 
             for (int ctr = 0; ctr < items.Count; ctr++)
             {
-                if (items.ElementAt(ctr).IsHovered && items.ElementAt(ctr) != item)
-                {
-                    PlaylistItem tempItem;
-                    ScrollContainer<PlaylistItem> tempItems = new ScrollContainer<PlaylistItem>();
+                if (alreadySorted)
+                    break;
 
+                if (items.ElementAt(ctr).Position.Y >= itemPosition)
+                {
+                    if (!tempItems.Contains(item))
+                    {
+                        item.Position = new OpenTK.Vector2(0, items.ElementAt(ctr).Position.Y);
+                        items.Remove(item);
+                        tempItems.Add(item);
+                    }
+
+                    tempItem = items.ElementAt(ctr);
+                    tempItem.Position = new OpenTK.Vector2(0, tempItem.Position.Y + itemSpacing);
+                    items.Remove(tempItem);
+                    tempItems.Add(tempItem);
+
+                    ctr--;
+
+                    /*
                     items.Remove(item);
                     tempItems.Add(item);
 
@@ -76,16 +101,21 @@ namespace osu.Game.Overlays.Music
                         items.Add(tempItem);
                         innerCtr--;                         //Needed because items.Count decreases with every items.Remove()
                     }
-
+                    
                     break;
+                    */
                 }
-
             }
 
-            foreach (var playlistItem in items)
-                currentList.Add(playlistItem.BeatmapSetInfo);
+            for (int ctr = 0; ctr < tempItems.Count; ctr++)
+            {
+                tempItem = tempItems.ElementAt(ctr);
+                tempItems.Remove(tempItem);
+                items.Add(tempItem);
+                ctr--;
+            }
 
-            ReorderList.Invoke(currentList);
+            ReorderList.Invoke(items.Children.ToList());
         }
 
         public void Filter(string searchTerm) => search.SearchTerm = searchTerm;

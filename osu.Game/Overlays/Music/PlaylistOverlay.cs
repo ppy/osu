@@ -154,12 +154,12 @@ namespace osu.Game.Overlays.Music
             beatmapBacking.Value.Track.Start();
         }
 
-        private void reorderSets(IList<BeatmapSetInfo> newList)
+        private void reorderSets(IList<PlaylistItem> newList)
         {
             BeatmapSets.Clear();
 
             foreach (var set in newList)
-                BeatmapSets.Add(set);
+                BeatmapSets.Add(set.BeatmapSetInfo);
         }
     }
 
