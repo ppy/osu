@@ -7,8 +7,9 @@ using osu.Framework.Testing;
 using osu.Game.Screens.Multiplayer;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
-using osu.Game.Database;
 using osu.Framework.Allocation;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -16,7 +17,7 @@ namespace osu.Desktop.VisualTests.Tests
     {
         public override string Description => @"Select your favourite room";
 
-        private RulesetDatabase rulesets;
+        private RulesetStore rulesets;
 
         protected override void LoadComplete()
         {
@@ -124,7 +125,7 @@ namespace osu.Desktop.VisualTests.Tests
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets)
+        private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
         }

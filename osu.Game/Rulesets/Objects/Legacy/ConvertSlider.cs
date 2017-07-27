@@ -6,8 +6,8 @@ using System;
 using System.Collections.Generic;
 using OpenTK;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Database;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {

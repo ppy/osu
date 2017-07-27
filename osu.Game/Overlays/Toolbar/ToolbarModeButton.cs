@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
+using osu.Game.Rulesets;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar

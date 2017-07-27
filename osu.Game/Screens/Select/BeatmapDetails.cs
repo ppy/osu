@@ -6,7 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -16,6 +15,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Threading;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Select
                     requestedBeatmap.Metrics = res;
                     Schedule(() => updateMetrics(res));
                 };
-                lookup.Failure += e => updateMetrics(null);
+                lookup.Failure += e => Schedule(() => updateMetrics(null));
 
                 api.Queue(lookup);
                 loading.Show();
