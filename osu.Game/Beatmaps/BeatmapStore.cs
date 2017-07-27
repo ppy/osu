@@ -246,40 +246,39 @@ namespace osu.Game.Beatmaps
         /// <returns>The imported beatmap, or an existing instance if it is already present.</returns>
         private BeatmapSetInfo importToStorage(ArchiveReader reader)
         {
+            // for now, concatenate all .osu files in the set to create a unique hash.
+            MemoryStream hashable = new MemoryStream();
+            foreach (string file in reader.Filenames.Where(f => f.EndsWith(".osu")))
+                using (Stream s = reader.GetStream(file))
+                    s.CopyTo(hashable);
+
+            var hash = hashable.GetMd5Hash();
+
+            // check if this beatmap has already been imported and exit early if so.
+            var beatmapSet = beatmaps.QueryAndPopulate<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
+            if (beatmapSet != null)
+            {
+                Undelete(beatmapSet);
+                return beatmapSet;
+            }
+
+            List<FileInfo> fileInfos = new List<FileInfo>();
+
+            // import files to store
+            foreach (string file in reader.Filenames)
+                using (Stream s = reader.GetStream(file))
+                    fileInfos.Add(files.Add(s, file));
+
             BeatmapMetadata metadata;
 
             using (var stream = new StreamReader(reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu")))))
                 metadata = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
 
-            MemoryStream hashable = new MemoryStream();
-
-            List<FileInfo> fileInfos = new List<FileInfo>();
-
-            foreach (string file in reader.Filenames)
-            {
-                using (Stream s = reader.GetStream(file))
-                {
-                    fileInfos.Add(files.Add(s, file));
-                    s.CopyTo(hashable);
-                }
-            }
-
-            var overallHash = hashable.GetMd5Hash();
-
-            var existing = beatmaps.Query<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == overallHash);
-
-            if (existing != null)
-            {
-                beatmaps.Populate(existing);
-                Undelete(existing);
-                return existing;
-            }
-
-            var beatmapSet = new BeatmapSetInfo
+            beatmapSet = new BeatmapSetInfo
             {
                 OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
-                Hash = overallHash,
+                Hash = hash,
                 Files = fileInfos,
                 Metadata = metadata
             };
