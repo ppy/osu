@@ -99,13 +99,13 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                Task.Run(() => BeatmapStore.Import(paths.ToArray()));
+                Task.Run(() => BeatmapManager.Import(paths.ToArray()));
             }
 
             dependencies.Cache(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
-            Ruleset.Value = RulesetDatabase.GetRuleset(configRuleset.Value);
+            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value);
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
         }
 
@@ -140,7 +140,7 @@ namespace osu.Game
                 return;
             }
 
-            Beatmap.Value = BeatmapStore.GetWorkingBeatmap(s.Beatmap);
+            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(s.Beatmap);
 
             menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
         }

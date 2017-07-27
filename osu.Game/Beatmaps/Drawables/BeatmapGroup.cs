@@ -58,10 +58,10 @@ namespace osu.Game.Beatmaps.Drawables
             }
         }
 
-        public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapStore store)
+        public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapManager manager)
         {
             BeatmapSet = beatmapSet;
-            WorkingBeatmap beatmap = store.GetWorkingBeatmap(BeatmapSet.Beatmaps.FirstOrDefault());
+            WorkingBeatmap beatmap = manager.GetWorkingBeatmap(BeatmapSet.Beatmaps.FirstOrDefault());
 
             Header = new BeatmapSetHeader(beatmap)
             {

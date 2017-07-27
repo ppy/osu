@@ -12,12 +12,12 @@ using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
 {
-    public abstract class DatabaseStore
+    public abstract class DatabaseBackedStore
     {
         protected readonly Storage Storage;
         protected readonly SQLiteConnection Connection;
 
-        protected DatabaseStore(SQLiteConnection connection, Storage storage = null)
+        protected DatabaseBackedStore(SQLiteConnection connection, Storage storage = null)
         {
             Storage = storage;
             Connection = connection;
@@ -84,7 +84,7 @@ namespace osu.Game.Database
         private void checkType(Type type)
         {
             if (!ValidTypes.Contains(type))
-                throw new InvalidOperationException($"The requested operation specified a type of {type}, which is invalid for this {nameof(DatabaseStore)}.");
+                throw new InvalidOperationException($"The requested operation specified a type of {type}, which is invalid for this {nameof(DatabaseBackedStore)}.");
         }
 
         protected abstract Type[] ValidTypes { get; }

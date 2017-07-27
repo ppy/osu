@@ -14,12 +14,12 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseResults : TestCase
     {
-        private BeatmapStore beatmaps;
+        private BeatmapManager beatmaps;
 
         public override string Description => @"Results after playing.";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapStore beatmaps)
+        private void load(BeatmapManager beatmaps)
         {
             this.beatmaps = beatmaps;
         }

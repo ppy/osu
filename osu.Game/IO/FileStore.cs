@@ -17,13 +17,13 @@ namespace osu.Game.IO
     /// <summary>
     /// Handles the Store and retrieval of Files/FileSets to the database backing
     /// </summary>
-    public class FileDatabase : DatabaseStore
+    public class FileStore : DatabaseBackedStore
     {
         private const string prefix = "files";
 
         public readonly ResourceStore<byte[]> Store;
 
-        public FileDatabase(SQLiteConnection connection, Storage storage) : base(connection, storage)
+        public FileStore(SQLiteConnection connection, Storage storage) : base(connection, storage)
         {
             Store = new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), prefix);
         }

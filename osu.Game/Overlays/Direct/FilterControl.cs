@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, RulesetDatabase rulesets, OsuColour colours)
+        private void load(OsuGame game, RulesetStore rulesets, OsuColour colours)
         {
             DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 

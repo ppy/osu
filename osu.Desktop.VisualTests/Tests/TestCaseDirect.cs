@@ -15,7 +15,7 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Description => @"osu!direct overlay";
 
         private DirectOverlay direct;
-        private RulesetDatabase rulesets;
+        private RulesetStore rulesets;
 
         protected override void LoadComplete()
         {
@@ -29,7 +29,7 @@ namespace osu.Desktop.VisualTests.Tests
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets)
+        private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
         }
