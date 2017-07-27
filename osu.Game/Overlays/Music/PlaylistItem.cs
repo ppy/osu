@@ -33,7 +33,6 @@ namespace osu.Game.Overlays.Music
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         public Action<BeatmapSetInfo> OnSelect;
-        
         public Vector2 DragStartOffset = Vector2.Zero;
 
         private bool selected;
