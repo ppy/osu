@@ -61,7 +61,7 @@ namespace osu.Game.Beatmaps
         [ForeignKey(typeof(RulesetInfo))]
         public int RulesetID { get; set; }
 
-        [OneToOne(CascadeOperations = CascadeOperation.All)]
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead)]
         public RulesetInfo Ruleset { get; set; }
 
         public bool LetterboxInBreaks { get; set; }
