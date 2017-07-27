@@ -255,7 +255,7 @@ namespace osu.Game.Beatmaps
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
 
-            var hash = hashable.GetMd5Hash();
+            var hash = hashable.ComputeSHA2Hash();
 
             // check if this beatmap has already been imported and exit early if so.
             var beatmapSet = beatmaps.QueryAndPopulate<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
@@ -301,7 +301,7 @@ namespace osu.Game.Beatmaps
                     Beatmap beatmap = decoder.Decode(sr);
 
                     beatmap.BeatmapInfo.Path = name;
-                    beatmap.BeatmapInfo.Hash = ms.GetMd5Hash();
+                    beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
 
                     // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                     beatmap.BeatmapInfo.Metadata = null;
