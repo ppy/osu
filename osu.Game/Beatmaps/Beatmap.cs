@@ -3,7 +3,6 @@
 
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Database;
 using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
 using System.Linq;

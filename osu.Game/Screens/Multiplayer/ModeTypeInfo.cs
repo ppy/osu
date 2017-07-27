@@ -4,8 +4,8 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Database;
 using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.Multiplayer

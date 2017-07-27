@@ -16,12 +16,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
     [TestFixture]
     public class OsuLegacyDecoderTest
     {
-        [OneTimeSetUpAttribute]
-        public void SetUp()
-        {
-            OsuLegacyDecoder.Register();
-        }
-
         [Test]
         public void TestDecodeMetadata()
         {
