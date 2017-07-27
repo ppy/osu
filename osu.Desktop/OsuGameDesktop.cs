@@ -65,11 +65,11 @@ namespace osu.Desktop
             var filePaths = dropData.Select(f => f.ToString()).ToArray();
 
             if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
-                Task.Run(() => BeatmapDatabase.Import(filePaths));
+                Task.Run(() => BeatmapManager.Import(filePaths));
             else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
                 Task.Run(() =>
                 {
-                    var score = ScoreDatabase.ReadReplayFile(filePaths.First());
+                    var score = ScoreStore.ReadReplayFile(filePaths.First());
                     Schedule(() => LoadScore(score));
                 });
         }

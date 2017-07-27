@@ -9,11 +9,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Direct
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColourInfo = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.25f), Color4.Black.Opacity(0.75f)),
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.25f), Color4.Black.Opacity(0.75f)),
                 },
                 new Container
                 {

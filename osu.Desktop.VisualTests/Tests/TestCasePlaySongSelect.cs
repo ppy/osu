@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using osu.Desktop.VisualTests.Platform;
 using osu.Framework.Testing;
 using osu.Framework.MathUtils;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
 
@@ -13,31 +14,27 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCasePlaySongSelect : TestCase
     {
-        private readonly BeatmapDatabase db;
+        private readonly BeatmapManager manager;
 
         public override string Description => @"with fake data";
 
-        private readonly RulesetDatabase rulesets;
+        private readonly RulesetStore rulesets;
 
         public TestCasePlaySongSelect()
         {
             PlaySongSelect songSelect;
 
-            if (db == null)
+            if (manager == null)
             {
                 var storage = new TestStorage(@"TestCasePlaySongSelect");
 
                 var backingDatabase = storage.GetDatabase(@"client");
 
-                rulesets = new RulesetDatabase(storage, backingDatabase);
-                db = new BeatmapDatabase(storage, backingDatabase, rulesets);
-
-                var sets = new List<BeatmapSetInfo>();
+                rulesets = new RulesetStore(backingDatabase);
+                manager = new BeatmapManager(storage, null, backingDatabase, rulesets);
 
                 for (int i = 0; i < 100; i += 10)
-                    sets.Add(createTestBeatmapSet(i));
-
-                db.Import(sets);
+                    manager.Import(createTestBeatmapSet(i));
             }
 
             Add(songSelect = new PlaySongSelect());
@@ -48,21 +45,12 @@ namespace osu.Desktop.VisualTests.Tests
             AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
         }
 
-        //protected override void Dispose(bool isDisposing)
-        //{
-        //    if (oldDb != null)
-        //        db = null;
-
-        //    base.Dispose(isDisposing);
-        //}
-
         private BeatmapSetInfo createTestBeatmapSet(int i)
         {
             return new BeatmapSetInfo
             {
                 OnlineBeatmapSetID = 1234 + i,
                 Hash = "d8e8fca2dc0f896fd7cb4cb0031ba249",
-                Path = string.Empty,
                 Metadata = new BeatmapMetadata
                 {
                     OnlineBeatmapSetID = 1234 + i,
