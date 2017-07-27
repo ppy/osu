@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Music
                 List<PlaylistItem> childrenList = Children.ToList();
                 item.MoveTo(new Vector2(0, (mousePosition - item.DragStartOffset).Y));
 
-                int targetIndex = Children.Count(i => i.Position.Y - (item.Size.Y / 2f) < item.Position.Y - (i.Size.Y / 2f));
+                int targetIndex = Children.Count(i => i.Position.Y - item.Size.Y / 2 < item.Position.Y - i.Size.Y / 2);
 
                 if (targetIndex == childrenList.IndexOf(item))
                     return;
