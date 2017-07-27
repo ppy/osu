@@ -150,9 +150,7 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
-            beatmapInfo = Database.GetChildren(beatmapInfo, true);
-
-            Database.GetChildren(beatmapInfo.BeatmapSet, true);
+            Database.Populate(beatmapInfo);
 
             if (beatmapInfo.BeatmapSet == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
@@ -185,7 +183,7 @@ namespace osu.Game.Beatmaps
             BeatmapSetInfo set = Database.Query<BeatmapSetInfo>().FirstOrDefault(query);
 
             if (set != null)
-                Database.GetChildren(set, true);
+                Database.Populate(set);
 
             return set;
         }
@@ -235,7 +233,7 @@ namespace osu.Game.Beatmaps
 
             if (existing != null)
             {
-                Database.GetChildren(existing);
+                Database.Populate(existing);
                 Undelete(existing);
                 return existing;
             }

@@ -94,7 +94,7 @@ namespace osu.Game.Beatmaps
 
         private void cleanupPendingDeletions()
         {
-            foreach (var b in GetAllWithChildren<BeatmapSetInfo>(b => b.DeletePending && !b.Protected))
+            foreach (var b in QueryAndPopulate<BeatmapSetInfo>(b => b.DeletePending && !b.Protected))
             {
                 try
                 {

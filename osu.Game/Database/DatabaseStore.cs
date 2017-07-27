@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -42,26 +43,48 @@ namespace osu.Game.Database
         /// </summary>
         public void Reset() => Prepare(true);
 
-        public TableQuery<T> Query<T>() where T : class
+
+        public TableQuery<T> Query<T>(Expression<Func<T, bool>> filter = null) where T : class
         {
-            return Connection.Table<T>();
+            checkType(typeof(T));
+
+            var query = Connection.Table<T>();
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            return query;
         }
 
         /// <summary>
-        /// This is expensive. Use with caution.
+        /// Query and populate results.
         /// </summary>
-        public List<T> GetAllWithChildren<T>(Expression<Func<T, bool>> filter = null, bool recursive = true)
+        /// <param name="filter">An optional filter to refine results.</param>
+        /// <returns></returns>
+        public List<T> QueryAndPopulate<T>(Expression<Func<T, bool>> filter = null)
             where T : class
         {
-            return Connection.GetAllWithChildren(filter, recursive);
+            checkType(typeof(T));
+
+            return Connection.GetAllWithChildren(filter, true);
         }
 
-        public T GetChildren<T>(T item, bool recursive = false)
+        /// <summary>
+        /// Populate a database-backed item.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="recursive">Whether population should recurse beyond a single level.</param>
+        public void Populate<T>(T item, bool recursive = true)
         {
-            if (item == null) return default(T);
+            checkType(item.GetType());
 
             Connection.GetChildren(item, recursive);
-            return item;
+        }
+
+        private void checkType(Type type)
+        {
+            if (!ValidTypes.Contains(type))
+                throw new InvalidOperationException($"The requested operation specified a type of {type}, which is invalid for this {nameof(DatabaseStore)}.");
         }
 
         protected abstract Type[] ValidTypes { get; }

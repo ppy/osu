@@ -97,7 +97,7 @@ namespace osu.Game.IO
 
         private void deletePending()
         {
-            foreach (var f in GetAllWithChildren<FileInfo>(f => f.ReferenceCount < 1))
+            foreach (var f in QueryAndPopulate<FileInfo>(f => f.ReferenceCount < 1))
             {
                 try
                 {
