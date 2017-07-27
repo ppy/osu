@@ -156,10 +156,7 @@ namespace osu.Game.Overlays.Music
 
         private void reorderSets(IList<PlaylistItem> newList)
         {
-            BeatmapSets.Clear();
-
-            foreach (var set in newList)
-                BeatmapSets.Add(set.BeatmapSetInfo);
+            BeatmapSets = newList.Select(items => items.BeatmapSetInfo).ToList();
         }
     }
 

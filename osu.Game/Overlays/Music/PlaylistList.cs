@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Music
     {
         private const float itemSpacing = 22f;
 
-        private ScrollContainer<PlaylistItem> items;
+        private readonly ItemSearchContainer items;
 
         public Action<BeatmapSetInfo> OnSelect;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Music
                 items.Children = value.Select(item => new PlaylistItem(item) { OnSelect = itemSelected, OnReorder = reorderList }).ToList();
 
                 for (int ctr = 0; ctr < items.Count; ctr++)
-                    items.ElementAt(ctr).Position = new OpenTK.Vector2(0, ctr * itemSpacing);
+                    items.ChangeChildDepth(items.ElementAt(ctr), ctr);
             }
         }
 
@@ -81,29 +81,6 @@ namespace osu.Game.Overlays.Music
                     tempItems.Add(tempItem);
 
                     ctr--;
-
-                    /*
-                    items.Remove(item);
-                    tempItems.Add(item);
-
-                    for (int innerCtr = ctr; innerCtr < items.Count; innerCtr++)
-                    {
-                        tempItem = items.ElementAt(ctr);
-                        items.Remove(tempItem);
-                        tempItems.Add(tempItem);
-                        innerCtr--;                         //Needed because items.Count decreases with every items.Remove()
-                    }
-
-                    for (int innerCtr = 0; innerCtr < tempItems.Count; innerCtr++)
-                    {
-                        tempItem = tempItems.ElementAt(innerCtr);
-                        tempItems.Remove(tempItem);
-                        items.Add(tempItem);
-                        innerCtr--;                         //Needed because items.Count decreases with every items.Remove()
-                    }
-                    
-                    break;
-                    */
                 }
             }
 
@@ -145,7 +122,7 @@ namespace osu.Game.Overlays.Music
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                items = new ScrollContainer<PlaylistItem>
+                                items = new ItemSearchContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -156,9 +133,8 @@ namespace osu.Game.Overlays.Music
                 },
             };
         }
-
-        /*
-        private class ItemSearchContainer : ScrollContainer<PlaylistItem>, IHasFilterableChildren
+        
+        private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
         {
             public string[] FilterTerms => new string[] { };
             public bool MatchingFilter
@@ -177,6 +153,6 @@ namespace osu.Game.Overlays.Music
                 LayoutDuration = 200;
                 LayoutEasing = Easing.OutQuint;
             }
-        } */
+        }
     }
 }
