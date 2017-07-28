@@ -108,9 +108,13 @@ namespace osu.Game.Beatmaps
         /// <param name="archiveReader">The beatmap to be imported.</param>
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
-            BeatmapSetInfo set = importToStorage(archiveReader);
-            Import(set);
-            return set;
+            // let's only allow one concurrent import at a time for now.
+            lock (this)
+            {
+                BeatmapSetInfo set = importToStorage(archiveReader);
+                Import(set);
+                return set;
+            }
         }
 
         /// <summary>
@@ -132,10 +136,13 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            if (!beatmaps.Delete(beatmapSet)) return;
+            lock (this)
+            {
+                if (!beatmaps.Delete(beatmapSet)) return;
 
-            if (!beatmapSet.Protected)
-                files.Dereference(beatmapSet.Files);
+                if (!beatmapSet.Protected)
+                    files.Dereference(beatmapSet.Files);
+            }
         }
 
         /// <summary>
@@ -145,9 +152,12 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to restore.</param>
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
-            if (!beatmaps.Undelete(beatmapSet)) return;
+            lock (this)
+            {
+                if (!beatmaps.Undelete(beatmapSet)) return;
 
-            files.Reference(beatmapSet.Files);
+                files.Reference(beatmapSet.Files);
+            }
         }
 
         /// <summary>
@@ -158,22 +168,25 @@ namespace osu.Game.Beatmaps
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
-            if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
-                return DefaultBeatmap;
+            lock (this)
+            {
+                if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
+                    return DefaultBeatmap;
 
-            beatmaps.Populate(beatmapInfo);
+                beatmaps.Populate(beatmapInfo);
 
-            if (beatmapInfo.BeatmapSet == null)
-                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
+                if (beatmapInfo.BeatmapSet == null)
+                    throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
 
-            if (beatmapInfo.Metadata == null)
-                beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
+                if (beatmapInfo.Metadata == null)
+                    beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(files.Store, beatmapInfo);
+                WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(files.Store, beatmapInfo);
 
-            previous?.TransferTo(working);
+                previous?.TransferTo(working);
 
-            return working;
+                return working;
+            }
         }
 
         /// <summary>
@@ -325,10 +338,13 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets(bool populate = true)
         {
-            if (populate)
-                return beatmaps.QueryAndPopulate<BeatmapSetInfo>(b => !b.DeletePending).ToList();
-            else
-                return beatmaps.Query<BeatmapSetInfo>(b => !b.DeletePending).ToList();
+            lock (this)
+            {
+                if (populate)
+                    return beatmaps.QueryAndPopulate<BeatmapSetInfo>(b => !b.DeletePending).ToList();
+                else
+                    return beatmaps.Query<BeatmapSetInfo>(b => !b.DeletePending).ToList();
+            }
         }
 
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
