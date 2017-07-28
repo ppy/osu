@@ -56,7 +56,11 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to add.</param>
         public void Add(BeatmapSetInfo beatmapSet)
         {
-            Connection.InsertOrReplaceWithChildren(beatmapSet, true);
+            Connection.RunInTransaction(() =>
+            {
+                Connection.InsertOrReplaceWithChildren(beatmapSet, true);
+            });
+
             BeatmapSetAdded?.Invoke(beatmapSet);
         }
 
