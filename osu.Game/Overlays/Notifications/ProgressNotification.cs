@@ -6,9 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -18,10 +16,9 @@ namespace osu.Game.Overlays.Notifications
     {
         public string Text
         {
-            get { return textDrawable.Text; }
             set
             {
-                textDrawable.Text = value;
+                Schedule(() => textDrawable.Text = value);
             }
         }
 
@@ -90,7 +87,7 @@ namespace osu.Game.Overlays.Notifications
         protected virtual Notification CreateCompletionNotification() => new ProgressCompletionNotification
         {
             Activated = CompletionClickAction,
-            Text = $"Task \"{Text}\" has completed!"
+            Text = "Task has completed!"
         };
 
         protected virtual void Completed()
@@ -106,7 +103,7 @@ namespace osu.Game.Overlays.Notifications
         private Color4 colourActive;
         private Color4 colourCancelled;
 
-        private readonly SpriteText textDrawable;
+        private readonly TextFlowContainer textDrawable;
 
         public ProgressNotification()
         {
@@ -115,9 +112,11 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.Both,
             });
 
-            Content.Add(textDrawable = new OsuSpriteText
+            Content.Add(textDrawable = new TextFlowContainer(t =>
             {
-                TextSize = 16,
+                t.TextSize = 16;
+            })
+            {
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
