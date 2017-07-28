@@ -87,11 +87,12 @@ namespace osu.Game.Beatmaps
                     // TODO: Add a check to prevent files from storage to be deleted.
                     try
                     {
-                        File.Delete(path);
+                        if (File.Exists(path))
+                            File.Delete(path);
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, $@"Could not delete file at {path}");
+                        Logger.Error(e, $@"Could not delete original file after import ({Path.GetFileName(path)})");
                     }
                 }
                 catch (Exception e)
