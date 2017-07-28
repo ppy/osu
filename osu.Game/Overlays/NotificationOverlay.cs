@@ -13,7 +13,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class NotificationManager : OsuFocusedOverlayContainer
+    public class NotificationOverlay : OsuFocusedOverlayContainer
     {
         private const float width = 320;
 
