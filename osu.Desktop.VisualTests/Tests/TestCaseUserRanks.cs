@@ -41,12 +41,11 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            AddStep("Add First Place", () => ranks.FirstPlacePlays = new[]
+            AddStep("Add First Place", () => ranks.FirstPlaceScores = new[]
             {
-                new Play
+                new Score
                 {
                     Rank = ScoreRank.A,
-                    PerformancePoints = 666,
                     Accuracy = 0.735,
                     Date = DateTimeOffset.UtcNow,
                     Mods = new Mod[] { new ModAutoplay(), new ModDoubleTime() },
@@ -65,18 +64,17 @@ namespace osu.Desktop.VisualTests.Tests
 
             AddStep("Add Best Performances", () =>
             {
-                List<Play> plays = new List<Play>();
+                List<Score> scores = new List<Score>();
                 Mod[] availableMods = { new OsuModHidden(), new OsuModFlashlight(), new OsuModHardRock(), new OsuModDoubleTime(), new OsuModPerfect() };
                 List<Mod> selectedMods = new List<Mod>(availableMods);
                 for (int i = 0; i <= availableMods.Length; i++)
                 {
-                    plays.Add(new Play
+                    scores.Add(new Score
                     {
                         Rank = (ScoreRank) Enum.GetValues(typeof(ScoreRank)).GetValue(Enum.GetValues(typeof(ScoreRank)).Length - 1 - i),
-                        PerformancePoints = (int)(Math.Pow(0.50, i) * 800),
                         Accuracy = Math.Pow(0.99, i),
                         Date = DateTimeOffset.UtcNow.AddDays(-Math.Pow(i, 2)),
-                        Mods = selectedMods.ToList(),
+                        Mods = selectedMods.ToArray(),
                         Beatmap = new BeatmapInfo
                         {
                             Metadata = new BeatmapMetadata
@@ -91,7 +89,7 @@ namespace osu.Desktop.VisualTests.Tests
                     if(i < availableMods.Length)
                         selectedMods.Remove(availableMods[i]);
                 }
-                ranks.BestPlays = plays;
+                ranks.BestScores = scores;
             });
         }
     }
