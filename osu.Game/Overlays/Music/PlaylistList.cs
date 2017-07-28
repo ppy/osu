@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Music
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            PlaylistItem itemToRemove = items.Children.FirstOrDefault(item => item.BeatmapSetInfo == beatmapSet);
+            PlaylistItem itemToRemove = items.Children.FirstOrDefault(item => item.BeatmapSetInfo.ID == beatmapSet.ID);
             if (itemToRemove != null) items.Remove(itemToRemove);
         }
 
