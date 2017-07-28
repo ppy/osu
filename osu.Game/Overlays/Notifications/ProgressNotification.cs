@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.Notifications
 
         private class ProgressBar : Container
         {
-            private Box box;
+            private readonly Box box;
 
             private Color4 colourActive;
             private Color4 colourInactive;
@@ -196,15 +196,8 @@ namespace osu.Game.Overlays.Notifications
                 }
             }
 
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            public ProgressBar()
             {
-                colourActive = colours.Blue;
-                Colour = colourInactive = OsuColour.Gray(0.5f);
-
-                Height = 5;
-
                 Children = new[]
                 {
                     box = new Box
@@ -213,6 +206,15 @@ namespace osu.Game.Overlays.Notifications
                         Width = 0,
                     }
                 };
+            }
+
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                colourActive = colours.Blue;
+                Colour = colourInactive = OsuColour.Gray(0.5f);
+                Height = 5;
             }
         }
     }
