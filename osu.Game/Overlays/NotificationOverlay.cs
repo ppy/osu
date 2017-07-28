@@ -28,6 +28,8 @@ namespace osu.Game.Overlays
             Width = width;
             RelativeSizeAxes = Axes.Y;
 
+            AlwaysPresent = true;
+
             Children = new Drawable[]
             {
                 new Box
