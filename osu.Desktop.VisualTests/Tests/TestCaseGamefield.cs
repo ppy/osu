@@ -8,7 +8,6 @@ using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects;
@@ -19,17 +18,18 @@ using System.Collections.Generic;
 using osu.Desktop.VisualTests.Beatmaps;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets;
 
 namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseGamefield : TestCase
     {
-        private RulesetDatabase rulesets;
+        private RulesetStore rulesets;
 
         public override string Description => @"Showing hitobjects and what not.";
 
         [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets)
+        private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
         }

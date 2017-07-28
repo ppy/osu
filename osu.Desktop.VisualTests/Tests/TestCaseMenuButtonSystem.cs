@@ -17,7 +17,7 @@ namespace osu.Desktop.VisualTests.Tests
         {
             Add(new Box
             {
-                ColourInfo = ColourInfo.GradientVertical(Color4.Gray, Color4.WhiteSmoke),
+                Colour = ColourInfo.GradientVertical(Color4.Gray, Color4.WhiteSmoke),
                 RelativeSizeAxes = Framework.Graphics.Axes.Both,
             });
             Add(new ButtonSystem());

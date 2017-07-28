@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Taiko.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Beatmaps;
