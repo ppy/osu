@@ -5,13 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Formats
 {
     public abstract class BeatmapDecoder
     {
         private static readonly Dictionary<string, Type> decoders = new Dictionary<string, Type>();
+
+        static BeatmapDecoder()
+        {
+            OsuLegacyDecoder.Register();
+        }
 
         public static BeatmapDecoder GetDecoder(StreamReader stream)
         {

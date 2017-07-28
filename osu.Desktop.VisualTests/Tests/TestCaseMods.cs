@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Mods;
 using osu.Framework.Testing;
-using osu.Game.Database;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Play.HUD;
 using OpenTK;
 
@@ -18,11 +18,11 @@ namespace osu.Desktop.VisualTests.Tests
         private ModSelectOverlay modSelect;
         private ModDisplay modDisplay;
 
-        private RulesetDatabase rulesets;
+        private RulesetStore rulesets;
 
 
         [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets)
+        private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
         }
