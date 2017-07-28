@@ -130,6 +130,9 @@ namespace osu.Game.Overlays.Notifications
             });
 
             State = ProgressNotificationState.Queued;
+
+            // don't close on click by default.
+            Activated = () => false;
         }
 
         [BackgroundDependencyLoader]
