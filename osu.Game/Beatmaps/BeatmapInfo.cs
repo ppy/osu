@@ -1,14 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using Newtonsoft.Json;
-using osu.Game.IO.Serialization;
-using SQLite.Net.Attributes;
-using SQLiteNetExtensions.Attributes;
 using System;
 using System.Linq;
+using Newtonsoft.Json;
+using osu.Game.IO.Serialization;
+using osu.Game.Rulesets;
+using SQLite.Net.Attributes;
+using SQLiteNetExtensions.Attributes;
 
-namespace osu.Game.Database
+namespace osu.Game.Beatmaps
 {
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable
     {
@@ -60,7 +61,7 @@ namespace osu.Game.Database
         [ForeignKey(typeof(RulesetInfo))]
         public int RulesetID { get; set; }
 
-        [OneToOne(CascadeOperations = CascadeOperation.All)]
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead)]
         public RulesetInfo Ruleset { get; set; }
 
         public bool LetterboxInBreaks { get; set; }
@@ -94,11 +95,11 @@ namespace osu.Game.Database
         }
 
         public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                      BeatmapSet.Path == other.BeatmapSet.Path &&
+                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
                                                       (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
 
         public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                      BeatmapSet.Path == other.BeatmapSet.Path &&
+                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
                                                       (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
     }
 }
