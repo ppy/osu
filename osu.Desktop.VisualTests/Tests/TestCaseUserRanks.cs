@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Testing;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Overlays.Profile.Sections.Ranks;
@@ -47,6 +47,7 @@ namespace osu.Desktop.VisualTests.Tests
                 {
                     Rank = ScoreRank.A,
                     Accuracy = 0.735,
+                    PP = 666,
                     Date = DateTimeOffset.UtcNow,
                     Mods = new Mod[] { new ModAutoplay(), new ModDoubleTime() },
                     Beatmap = new BeatmapInfo
@@ -73,6 +74,7 @@ namespace osu.Desktop.VisualTests.Tests
                     {
                         Rank = (ScoreRank) Enum.GetValues(typeof(ScoreRank)).GetValue(Enum.GetValues(typeof(ScoreRank)).Length - 1 - i),
                         Accuracy = Math.Pow(0.99, i),
+                        PP = Math.Pow(0.5, i) * 800,
                         Date = DateTimeOffset.UtcNow.AddDays(-Math.Pow(i, 2)),
                         Mods = selectedMods.ToArray(),
                         Beatmap = new BeatmapInfo
