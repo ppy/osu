@@ -17,6 +17,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.IO;
 using osu.Game.IPC;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using SQLite.Net;
 using FileInfo = osu.Game.IO.FileInfo;
@@ -48,13 +49,14 @@ namespace osu.Game.Beatmaps
         private readonly FileStore files;
 
         private readonly RulesetStore rulesets;
+        private readonly Action<Notification> postNotification;
 
         private readonly BeatmapStore beatmaps;
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
 
-        public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, IIpcHost importHost = null)
+        public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, IIpcHost importHost = null, Action<Notification> postNotification = null)
         {
             beatmaps = new BeatmapStore(connection);
             beatmaps.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
@@ -63,23 +65,42 @@ namespace osu.Game.Beatmaps
             this.storage = storage;
             this.files = files;
             this.rulesets = rulesets;
+            this.postNotification = postNotification;
 
             if (importHost != null)
                 ipc = new BeatmapIPCChannel(importHost, this);
         }
 
         /// <summary>
-        /// Import multiple <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
+        /// Import one or more <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
+        /// This will post a notification tracking import progress.
         /// </summary>
-        /// <param name="paths">Multiple locations on disk.</param>
+        /// <param name="paths">One or more beatmap locations on disk.</param>
         public void Import(params string[] paths)
         {
+            var notification = new ProgressNotification
+            {
+                Text = "Beatmap import is initialising...",
+                Progress = 0,
+                State = ProgressNotificationState.Active,
+            };
+
+            postNotification?.Invoke(notification);
+
+            int i = 0;
             foreach (string path in paths)
             {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
                 try
                 {
+                    notification.Text = $"Importing ({i} of {paths.Length})\n{Path.GetFileName(path)}";
                     using (ArchiveReader reader = getReaderFrom(path))
                         Import(reader);
+
+                    notification.Progress = (float)++i / paths.Length;
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with beatmaps from default storage.
@@ -101,6 +122,8 @@ namespace osu.Game.Beatmaps
                     Logger.Error(e, @"Could not import beatmap set");
                 }
             }
+
+            notification.State = ProgressNotificationState.Completed;
         }
 
         private readonly object importLock = new object();
