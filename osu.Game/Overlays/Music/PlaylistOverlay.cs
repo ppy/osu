@@ -25,6 +25,7 @@ namespace osu.Game.Overlays.Music
         private const float playlist_height = 510;
 
         private FilterControl filter;
+
         private PlaylistList list;
 
         private BeatmapManager beatmaps;
@@ -32,6 +33,7 @@ namespace osu.Game.Overlays.Music
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
         public IList<BeatmapSetInfo> BeatmapSets;
+
         private InputManager inputManager;
         
         [BackgroundDependencyLoader]
@@ -157,7 +159,7 @@ namespace osu.Game.Overlays.Music
             beatmapBacking.Value.Track.Start();
         }
 
-        private void reorderSets(IList<PlaylistItem> newList)
+        private void reorderSets(IEnumerable<PlaylistItem> newList)
         {
             BeatmapSets = newList.Select(items => items.BeatmapSetInfo).ToList();
         }

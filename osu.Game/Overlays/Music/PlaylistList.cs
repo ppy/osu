@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 
@@ -13,9 +14,7 @@ namespace osu.Game.Overlays.Music
 {
     internal class PlaylistList : Container
     {
-        private const float itemSpacing = 22f;
-
-        private readonly ItemSearchContainer items;
+        protected readonly ItemSearchContainer items;
 
         public Action<BeatmapSetInfo> OnSelect;
 
@@ -27,10 +26,11 @@ namespace osu.Game.Overlays.Music
         {
             set
             {
-                items.Children = value.Select(item => new PlaylistItem(item) { OnSelect = itemSelected, OnReorder = reorderList }).ToList();
-
-                for (int ctr = 0; ctr < items.Count; ctr++)
-                    items.ChangeChildDepth(items.ElementAt(ctr), ctr);
+                items.Children = value.Select(item => new PlaylistItem(item) {
+                    OnSelect = itemSelected,
+                    DragStart = items.OnChildDragStart,
+                    Drag = items.OnChildDrag,
+                    DragEnd = items.OnChildDragEnd }).ToList();
             }
         }
 
@@ -39,60 +39,6 @@ namespace osu.Game.Overlays.Music
         private void itemSelected(BeatmapSetInfo b)
         {
             OnSelect?.Invoke(b);
-        }
-
-        private void reorderList(PlaylistItem item)
-        {
-            bool alreadySorted = false;
-
-            if (item.Position.Y > items.ElementAt(items.Count - 1).Position.Y)
-            {
-                int index = items.IndexOf(item);
-                items.Remove(item);
-                items.Add(item);
-
-                for (int ctr = index; ctr < items.Count; ctr++)
-                    items.ElementAt(ctr).Position = new OpenTK.Vector2(0, items.ElementAt(ctr - 1).Position.Y + itemSpacing);
-
-                alreadySorted = true;
-            }
-
-            float itemPosition = item.Position.Y;
-            PlaylistItem tempItem;
-            ScrollContainer<PlaylistItem> tempItems = new ScrollContainer<PlaylistItem>();
-
-            for (int ctr = 0; ctr < items.Count; ctr++)
-            {
-                if (alreadySorted)
-                    break;
-
-                if (items.ElementAt(ctr).Position.Y >= itemPosition)
-                {
-                    if (!tempItems.Contains(item))
-                    {
-                        item.Position = new OpenTK.Vector2(0, items.ElementAt(ctr).Position.Y);
-                        items.Remove(item);
-                        tempItems.Add(item);
-                    }
-
-                    tempItem = items.ElementAt(ctr);
-                    tempItem.Position = new OpenTK.Vector2(0, tempItem.Position.Y + itemSpacing);
-                    items.Remove(tempItem);
-                    tempItems.Add(tempItem);
-
-                    ctr--;
-                }
-            }
-
-            for (int ctr = 0; ctr < tempItems.Count; ctr++)
-            {
-                tempItem = tempItems.ElementAt(ctr);
-                tempItems.Remove(tempItem);
-                items.Add(tempItem);
-                ctr--;
-            }
-
-            ReorderList.Invoke(items.Children.ToList());
         }
 
         public void Filter(string searchTerm) => search.SearchTerm = searchTerm;
@@ -126,6 +72,7 @@ namespace osu.Game.Overlays.Music
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
+                                    ReorderList = this.ReorderList
                                 },
                             }
                         }
@@ -145,9 +92,10 @@ namespace osu.Game.Overlays.Music
             if (itemToRemove != null) items.Remove(itemToRemove);
         }
 
-        private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
+        protected class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren, IHasDraggableChildren
         {
             public string[] FilterTerms => new string[] { };
+
             public bool MatchingFilter
             {
                 set
@@ -163,6 +111,86 @@ namespace osu.Game.Overlays.Music
             {
                 LayoutDuration = 200;
                 LayoutEasing = Easing.OutQuint;
+            }
+
+            public Action<IList<PlaylistItem>> ReorderList;
+
+            private bool isItemBeingDragged;
+
+            private PlaylistItem itemBeingDragged;
+
+            private InputState stateDuringDrag;
+
+            public void OnChildDragStart(Drawable child, InputState state)
+            {
+                isItemBeingDragged = true;
+                itemBeingDragged = child as PlaylistItem;
+                stateDuringDrag = state;
+                return;
+            }
+
+            public void OnChildDrag(Drawable child, InputState state)
+            {
+                stateDuringDrag = state;
+                return;
+            }
+
+            public void OnChildDragEnd(Drawable child, InputState state)
+            {
+                isItemBeingDragged = false;
+                itemBeingDragged = null;
+                stateDuringDrag = null;
+                reorderList(child as PlaylistItem);
+                return;
+            }
+
+            protected override void UpdateAfterChildren()
+            {
+                base.UpdateAfterChildren();
+
+                if (isItemBeingDragged)
+                    itemBeingDragged.MoveToY(stateDuringDrag.Mouse.Position.Y);
+
+                return;
+            }
+
+            private void reorderList(PlaylistItem item)
+            {
+                int newPosition = (int) Math.Floor(item.Position.Y / item.Height);
+                int currentPosition = IndexOf(item);
+
+                IList<PlaylistItem> newList = new List<PlaylistItem>();
+
+                if (newPosition < currentPosition)
+                    for (int ctr = 0; ctr < Children.Count; ctr++)
+                    {
+                        if (ctr == newPosition)
+                        {
+                            Remove(item);
+                            newList.Add(item);
+                        }
+
+                        else
+                        {
+                            Remove(Children.ElementAt(ctr));
+                            newList.Add(Children.ElementAt(ctr));
+                        }
+
+                        ctr--;
+                    }
+
+                else if (newPosition > currentPosition)
+                {
+                    for (int ctr = newPosition; ctr < Children.Count; ctr++)
+                    { }
+                }
+
+                else
+                    return;
+
+                Children = newList.ToList();
+
+                ReorderList.Invoke(newList);
             }
         }
     }

@@ -8,7 +8,7 @@ namespace osu.Desktop.VisualTests.Tests
     {
         private PlaylistOverlay testOverlay;
 
-        public override string Description => @"Testing a PlaylistItem.";
+        public override string Description => @"Testing playlist reordering.";
 
         public TestCasePlaylistItem()
         {
