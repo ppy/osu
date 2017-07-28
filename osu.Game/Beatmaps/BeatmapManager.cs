@@ -102,6 +102,8 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        private object ImportLock = new object();
+
         /// <summary>
         /// Import a beatmap from an <see cref="ArchiveReader"/>.
         /// </summary>
@@ -109,7 +111,7 @@ namespace osu.Game.Beatmaps
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
             // let's only allow one concurrent import at a time for now.
-            lock (this)
+            lock (ImportLock)
             {
                 BeatmapSetInfo set = importToStorage(archiveReader);
                 Import(set);
@@ -126,7 +128,8 @@ namespace osu.Game.Beatmaps
             // If we have an ID then we already exist in the database.
             if (beatmapSetInfo.ID != 0) return;
 
-            beatmaps.Add(beatmapSetInfo);
+            lock (beatmaps)
+                beatmaps.Add(beatmapSetInfo);
         }
 
         /// <summary>
@@ -136,13 +139,11 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            lock (this)
-            {
+            lock (beatmaps)
                 if (!beatmaps.Delete(beatmapSet)) return;
 
-                if (!beatmapSet.Protected)
-                    files.Dereference(beatmapSet.Files);
-            }
+            if (!beatmapSet.Protected)
+                files.Dereference(beatmapSet.Files);
         }
 
         /// <summary>
@@ -152,12 +153,10 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to restore.</param>
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
-            lock (this)
-            {
+            lock (beatmaps)
                 if (!beatmaps.Undelete(beatmapSet)) return;
 
-                files.Reference(beatmapSet.Files);
-            }
+            files.Reference(beatmapSet.Files);
         }
 
         /// <summary>
@@ -168,25 +167,23 @@ namespace osu.Game.Beatmaps
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
-            lock (this)
-            {
-                if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
-                    return DefaultBeatmap;
+            if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
+                return DefaultBeatmap;
 
+            lock (beatmaps)
                 beatmaps.Populate(beatmapInfo);
 
-                if (beatmapInfo.BeatmapSet == null)
-                    throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
+            if (beatmapInfo.BeatmapSet == null)
+                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
 
-                if (beatmapInfo.Metadata == null)
-                    beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
+            if (beatmapInfo.Metadata == null)
+                beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-                WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(files.Store, beatmapInfo);
+            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(files.Store, beatmapInfo);
 
-                previous?.TransferTo(working);
+            previous?.TransferTo(working);
 
-                return working;
-            }
+            return working;
         }
 
         /// <summary>
