@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Music
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         public Action<BeatmapSetInfo> OnSelect;
+        public Action<PlaylistItem>   OnReorder;
 
         private bool selected;
         public bool Selected
@@ -91,6 +92,7 @@ namespace osu.Game.Overlays.Music
             artistBind = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
 
             artistBind.ValueChanged += newText => recreateText();
+            titleBind.ValueChanged  += newText => recreateText();
             artistBind.TriggerChange();
         }
 
@@ -130,6 +132,27 @@ namespace osu.Game.Overlays.Music
         {
             OnSelect?.Invoke(BeatmapSetInfo);
             return true;
+        }
+
+        protected override bool OnDragStart(Framework.Input.InputState state)
+        {
+            handle.FadeIn(fade_duration);
+            return true;
+        }
+
+        protected override bool OnDrag(Framework.Input.InputState state)
+        {
+            this.MoveToY(state.Mouse.Position.Y);
+
+            return true;
+        }
+
+        protected override bool OnDragEnd(Framework.Input.InputState state)
+        {
+            handle.FadeOut(fade_duration);
+
+            OnReorder?.Invoke(this);
+            return false;
         }
 
         public string[] FilterTerms { get; private set; }

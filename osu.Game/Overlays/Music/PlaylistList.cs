@@ -13,13 +13,24 @@ namespace osu.Game.Overlays.Music
 {
     internal class PlaylistList : Container
     {
-        private readonly FillFlowContainer<PlaylistItem> items;
+        private const float itemSpacing = 22f;
 
-        public IEnumerable<BeatmapSetInfo> BeatmapSets
+        private readonly ItemSearchContainer items;
+
+        public Action<BeatmapSetInfo> OnSelect;
+
+        public Action<IList<PlaylistItem>> ReorderList;
+
+        private readonly SearchContainer search;
+
+        public IList<BeatmapSetInfo> BeatmapSets
         {
             set
             {
-                items.Children = value.Select(item => new PlaylistItem(item) { OnSelect = itemSelected }).ToList();
+                items.Children = value.Select(item => new PlaylistItem(item) { OnSelect = itemSelected, OnReorder = reorderList }).ToList();
+
+                for (int ctr = 0; ctr < items.Count; ctr++)
+                    items.ChangeChildDepth(items.ElementAt(ctr), ctr);
             }
         }
 
@@ -30,9 +41,59 @@ namespace osu.Game.Overlays.Music
             OnSelect?.Invoke(b);
         }
 
-        public Action<BeatmapSetInfo> OnSelect;
+        private void reorderList(PlaylistItem item)
+        {
+            bool alreadySorted = false;
 
-        private readonly SearchContainer search;
+            if (item.Position.Y > items.ElementAt(items.Count - 1).Position.Y)
+            {
+                int index = items.IndexOf(item);
+                items.Remove(item);
+                items.Add(item);
+
+                for (int ctr = index; ctr < items.Count; ctr++)
+                    items.ElementAt(ctr).Position = new OpenTK.Vector2(0, items.ElementAt(ctr - 1).Position.Y + itemSpacing);
+
+                alreadySorted = true;
+            }
+
+            float itemPosition = item.Position.Y;
+            PlaylistItem tempItem;
+            ScrollContainer<PlaylistItem> tempItems = new ScrollContainer<PlaylistItem>();
+
+            for (int ctr = 0; ctr < items.Count; ctr++)
+            {
+                if (alreadySorted)
+                    break;
+
+                if (items.ElementAt(ctr).Position.Y >= itemPosition)
+                {
+                    if (!tempItems.Contains(item))
+                    {
+                        item.Position = new OpenTK.Vector2(0, items.ElementAt(ctr).Position.Y);
+                        items.Remove(item);
+                        tempItems.Add(item);
+                    }
+
+                    tempItem = items.ElementAt(ctr);
+                    tempItem.Position = new OpenTK.Vector2(0, tempItem.Position.Y + itemSpacing);
+                    items.Remove(tempItem);
+                    tempItems.Add(tempItem);
+
+                    ctr--;
+                }
+            }
+
+            for (int ctr = 0; ctr < tempItems.Count; ctr++)
+            {
+                tempItem = tempItems.ElementAt(ctr);
+                tempItems.Remove(tempItem);
+                items.Add(tempItem);
+                ctr--;
+            }
+
+            ReorderList.Invoke(items.Children.ToList());
+        }
 
         public void Filter(string searchTerm) => search.SearchTerm = searchTerm;
 
@@ -72,7 +133,7 @@ namespace osu.Game.Overlays.Music
                 },
             };
         }
-
+        
         public void AddBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             items.Add(new PlaylistItem(beatmapSet) { OnSelect = itemSelected });
