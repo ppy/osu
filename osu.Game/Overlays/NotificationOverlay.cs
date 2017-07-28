@@ -72,17 +72,20 @@ namespace osu.Game.Overlays
 
         public void Post(Notification notification)
         {
-            State = Visibility.Visible;
+            Schedule(() =>
+            {
+                State = Visibility.Visible;
 
-            ++runningDepth;
-            notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
+                ++runningDepth;
+                notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
 
-            var hasCompletionTarget = notification as IHasCompletionTarget;
-            if (hasCompletionTarget != null)
-                hasCompletionTarget.CompletionTarget = Post;
+                var hasCompletionTarget = notification as IHasCompletionTarget;
+                if (hasCompletionTarget != null)
+                    hasCompletionTarget.CompletionTarget = Post;
 
-            var ourType = notification.GetType();
-            sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
+                var ourType = notification.GetType();
+                sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)))?.Add(notification);
+            });
         }
 
         protected override void PopIn()
