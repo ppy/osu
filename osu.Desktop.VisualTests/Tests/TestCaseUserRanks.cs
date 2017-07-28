@@ -8,13 +8,11 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Sections;
-using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Desktop.VisualTests.Tests
 {
