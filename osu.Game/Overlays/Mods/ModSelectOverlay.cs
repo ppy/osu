@@ -15,8 +15,8 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Database;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, RulesetDatabase rulesets)
+        private void load(OsuColour colours, OsuGame osu, RulesetStore rulesets)
         {
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;

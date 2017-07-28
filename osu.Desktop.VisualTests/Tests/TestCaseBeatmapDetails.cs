@@ -3,9 +3,9 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Testing;
-using osu.Game.Database;
 using osu.Game.Screens.Select;
 using System.Linq;
+using osu.Game.Beatmaps;
 
 namespace osu.Desktop.VisualTests.Tests
 {

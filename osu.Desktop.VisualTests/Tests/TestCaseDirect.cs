@@ -4,8 +4,9 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -14,7 +15,7 @@ namespace osu.Desktop.VisualTests.Tests
         public override string Description => @"osu!direct overlay";
 
         private DirectOverlay direct;
-        private RulesetDatabase rulesets;
+        private RulesetStore rulesets;
 
         protected override void LoadComplete()
         {
@@ -28,7 +29,7 @@ namespace osu.Desktop.VisualTests.Tests
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets)
+        private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
         }

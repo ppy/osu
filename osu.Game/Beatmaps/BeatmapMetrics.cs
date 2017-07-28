@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace osu.Game.Database
+namespace osu.Game.Beatmaps
 {
     /// <summary>
     /// Beatmap metrics based on acculumated online data from community plays.
