@@ -17,6 +17,8 @@ namespace osu.Game.Database
         protected readonly Storage Storage;
         protected readonly SQLiteConnection Connection;
 
+        protected virtual int StoreVersion => 1;
+
         protected DatabaseBackedStore(SQLiteConnection connection, Storage storage = null)
         {
             Storage = storage;
@@ -31,6 +33,28 @@ namespace osu.Game.Database
                 Logger.Error(e, $@"Failed to initialise the {GetType()}! Trying again with a clean database...");
                 Prepare(true);
             }
+
+            checkMigrations();
+        }
+
+        private void checkMigrations()
+        {
+            var storeName = GetType().Name;
+
+            var reportedVersion = Connection.Table<StoreVersion>().FirstOrDefault(s => s.StoreName == storeName) ?? new StoreVersion
+            {
+                StoreName = storeName,
+                Version = 0
+            };
+
+            if (reportedVersion.Version != StoreVersion)
+                PerformMigration(reportedVersion.Version, reportedVersion.Version = StoreVersion);
+
+            Connection.InsertOrReplace(reportedVersion);
+        }
+
+        protected virtual void PerformMigration(int currentVersion, int newVersion)
+        {
         }
 
         /// <summary>
