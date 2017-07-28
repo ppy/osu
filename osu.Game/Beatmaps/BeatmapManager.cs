@@ -390,5 +390,21 @@ namespace osu.Game.Beatmaps
                 catch { return new TrackVirtual(); }
             }
         }
+
+        public void ImportFromStable()
+        {
+
+            string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!", "Songs");
+            if (!Directory.Exists(stableInstallPath))
+                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu", "Songs");
+
+            if (!Directory.Exists(stableInstallPath))
+            {
+                Logger.Log("Couldn't find an osu!stable installation!", LoggingTarget.Information, LogLevel.Error);
+                return;
+            }
+
+            Import(Directory.GetDirectories(stableInstallPath));
+        }
     }
 }
