@@ -103,7 +103,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        private object ImportLock = new object();
+        private readonly object importLock = new object();
 
         /// <summary>
         /// Import a beatmap from an <see cref="ArchiveReader"/>.
@@ -112,7 +112,7 @@ namespace osu.Game.Beatmaps
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
             // let's only allow one concurrent import at a time for now.
-            lock (ImportLock)
+            lock (importLock)
             {
                 BeatmapSetInfo set = importToStorage(archiveReader);
                 Import(set);
@@ -192,7 +192,8 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public void Reset()
         {
-            beatmaps.Reset();
+            lock (beatmaps)
+                beatmaps.Reset();
         }
 
         /// <summary>
@@ -202,12 +203,15 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query)
         {
-            BeatmapSetInfo set = beatmaps.Query<BeatmapSetInfo>().FirstOrDefault(query);
+            lock (beatmaps)
+            {
+                BeatmapSetInfo set = beatmaps.Query<BeatmapSetInfo>().FirstOrDefault(query);
 
-            if (set != null)
-                beatmaps.Populate(set);
+                if (set != null)
+                    beatmaps.Populate(set);
 
-            return set;
+                return set;
+            }
         }
 
         /// <summary>
@@ -215,7 +219,10 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.QueryAndPopulate(query);
+        public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
+        {
+            lock (beatmaps) return beatmaps.QueryAndPopulate(query);
+        }
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
@@ -224,12 +231,15 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
         {
-            BeatmapInfo set = beatmaps.Query<BeatmapInfo>().FirstOrDefault(query);
+            lock (beatmaps)
+            {
+                BeatmapInfo set = beatmaps.Query<BeatmapInfo>().FirstOrDefault(query);
 
-            if (set != null)
-                beatmaps.Populate(set);
+                if (set != null)
+                    beatmaps.Populate(set);
 
-            return set;
+                return set;
+            }
         }
 
         /// <summary>
@@ -237,7 +247,10 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.QueryAndPopulate(query);
+        public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
+        {
+            lock (beatmaps) return beatmaps.QueryAndPopulate(query);
+        }
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
@@ -336,7 +349,7 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets(bool populate = true)
         {
-            lock (this)
+            lock (beatmaps)
             {
                 if (populate)
                     return beatmaps.QueryAndPopulate<BeatmapSetInfo>(b => !b.DeletePending).ToList();
