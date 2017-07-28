@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Scoring
 
         public double Health { get; set; } = 1;
 
+        public double PP { get; set; }
+
         [JsonProperty(@"max_combo")]
         public int MaxCombo { get; set; }
 

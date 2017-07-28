@@ -17,25 +17,26 @@ using System.Diagnostics;
 using osu.Framework.Input;
 using osu.Framework.Localisation;
 using System.Globalization;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawablePlay : Container
+    public class DrawableScore : Container
     {
         private readonly FillFlowContainer<OsuSpriteText> stats;
         private readonly FillFlowContainer metadata;
         private readonly ModContainer modContainer;
-        private readonly Play play;
+        private readonly Score score;
         private readonly double weight;
 
-        public DrawablePlay(Play play, double weight = -1)
+        public DrawableScore(Score score, double weight = -1)
         {
-            this.play = play;
+            this.score = score;
             this.weight = weight;
 
             Children = new Drawable[]
             {
-                new DrawableRank(play.Rank)
+                new DrawableRank(score.Rank)
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = 60,
@@ -59,7 +60,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Direction = FillDirection.Vertical,
                     Child = new OsuSpriteText
                     {
-                        Text = play.Date.LocalDateTime.ToShortDateString(),
+                        Text = score.Date.LocalDateTime.ToShortDateString(),
                         TextSize = 11,
                         Colour = OsuColour.Gray(0xAA),
                         Depth = -1,
@@ -80,7 +81,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private void load(OsuColour colour, LocalisationEngine locale)
         {
             stats.Add(new OsuSpriteText {
-                Text = play.PerformancePoints + "pp",
+                Text = score.PP + "pp",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 TextSize = 18,
@@ -90,7 +91,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             {
                 stats.Add(new OsuSpriteText
                 {
-                    Text = $"weighted: {(int)(play.PerformancePoints * weight)}pp ({weight.ToString("0%", CultureInfo.CurrentCulture)})",
+                    Text = $"weighted: {(int)(score.PP * weight)}pp ({weight.ToString("0%", CultureInfo.CurrentCulture)})",
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,
@@ -99,7 +100,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             });
             }
             stats.Add(new OsuSpriteText {
-                Text = "accuracy: " + play.Accuracy.ToString("0.00%"),
+                Text = "accuracy: " + score.Accuracy.ToString("0.00%"),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Colour = colour.GrayA,
@@ -110,7 +111,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             metadata.Add(new LinkContainer
             {
                 AutoSizeAxes = Axes.Both,
-                Url = $"https://osu.ppy.sh/beatmaps/{play.Beatmap.OnlineBeatmapID}",
+                Url = $"https://osu.ppy.sh/beatmaps/{score.Beatmap.OnlineBeatmapID}",
                 Child = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -118,13 +119,13 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     {
                         new OsuSpriteText
                         {
-                            Current = locale.GetUnicodePreference($"{play.Beatmap.Metadata.TitleUnicode ?? play.Beatmap.Metadata.Title} [{play.Beatmap.Version}] ", $"{play.Beatmap.Metadata.Title ?? play.Beatmap.Metadata.TitleUnicode} [{play.Beatmap.Version}] "),
+                            Current = locale.GetUnicodePreference($"{score.Beatmap.Metadata.TitleUnicode ?? score.Beatmap.Metadata.Title} [{score.Beatmap.Version}] ", $"{score.Beatmap.Metadata.Title ?? score.Beatmap.Metadata.TitleUnicode} [{score.Beatmap.Version}] "),
                             TextSize = 15,
                             Font = "Exo2.0-SemiBoldItalic",
                         },
                         new OsuSpriteText
                         {
-                            Current = locale.GetUnicodePreference(play.Beatmap.Metadata.ArtistUnicode, play.Beatmap.Metadata.Artist),
+                            Current = locale.GetUnicodePreference(score.Beatmap.Metadata.ArtistUnicode, score.Beatmap.Metadata.Artist),
                             TextSize = 12,
                             Padding = new MarginPadding { Top = 3 },
                             Font = "Exo2.0-RegularItalic",
@@ -133,7 +134,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 },
             });
 
-            foreach (Mod mod in play.Mods)
+            foreach (Mod mod in score.Mods)
                 modContainer.Add(new ModIcon(mod.Icon, colour.Yellow));
         }
 
