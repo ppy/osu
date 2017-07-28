@@ -117,7 +117,7 @@ namespace osu.Game.Online.API
                         if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(Username, Password))
                         {
                             //todo: this fails even on network-related issues. we should probably handle those differently.
-                            //NotificationManager.ShowMessage("Login failed!");
+                            //NotificationOverlay.ShowMessage("Login failed!");
                             log.Add(@"Login failed!");
                             Password = null;
                             continue;
@@ -254,7 +254,7 @@ namespace osu.Game.Online.API
                 {
                     //OsuGame.Scheduler.Add(delegate
                     {
-                        //NotificationManager.ShowMessage($@"We just went {newState}!", newState == APIState.Online ? Color4.YellowGreen : Color4.OrangeRed, 5000);
+                        //NotificationOverlay.ShowMessage($@"We just went {newState}!", newState == APIState.Online ? Color4.YellowGreen : Color4.OrangeRed, 5000);
                         log.Add($@"We just went {newState}!");
                         Scheduler.Add(delegate
                         {
