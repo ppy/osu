@@ -31,6 +31,7 @@ namespace osu.Game.Screens.Select
         private BeatmapManager manager;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
+        private readonly ActionContainer actionContainer;
         private readonly BeatmapCarousel carousel;
         private DialogOverlay dialogOverlay;
 
@@ -128,6 +129,12 @@ namespace osu.Game.Screens.Select
                     Top = left_area_padding,
                     Right = left_area_padding,
                 },
+            });
+            Add(actionContainer = new ActionContainer
+            {
+                RelativeSizeAxes = Axes.Y,
+                Width = 250,
+                OnHoverAction = () => carousel.ScrollToSelected(),
             });
 
             if (ShowFooter)
@@ -408,6 +415,17 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(state, args);
+        }
+
+        private class ActionContainer : Container
+        {
+            public Action OnHoverAction;
+
+            protected override bool OnHover(InputState state)
+            {
+                OnHoverAction?.Invoke();
+                return base.OnHover(state);
+            }
         }
     }
 }
