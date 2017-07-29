@@ -13,7 +13,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;

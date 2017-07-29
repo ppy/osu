@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,10 +17,12 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
 using osu.Framework.Configuration;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
-    internal class BeatmapCarousel : ScrollContainer
+    internal class BeatmapCarousel : OsuScrollContainer
     {
         public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
 
@@ -67,7 +68,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Required for now unfortunately.
         /// </summary>
-        private BeatmapDatabase database;
+        private BeatmapManager manager;
 
         private readonly Container<Panel> scrollableContent;
 
@@ -177,6 +178,9 @@ namespace osu.Game.Screens.Select
 
         public void SelectNextRandom()
         {
+            if (groups.Count == 0)
+                return;
+
             randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
 
             var visibleGroups = getVisibleGroups();
@@ -285,7 +289,7 @@ namespace osu.Game.Screens.Select
                     b.Metadata = beatmapSet.Metadata;
             }
 
-            return new BeatmapGroup(beatmapSet, database)
+            return new BeatmapGroup(beatmapSet, manager)
             {
                 SelectionChanged = (g, p) => selectGroup(g, p),
                 StartRequested = b => StartRequested?.Invoke(),
@@ -294,9 +298,9 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapDatabase database, OsuConfigManager config)
+        private void load(BeatmapManager manager, OsuConfigManager config)
         {
-            this.database = database;
+            this.manager = manager;
 
             randomType = config.GetBindable<SelectionRandomType>(OsuSetting.SelectionRandomType);
         }
@@ -310,6 +314,9 @@ namespace osu.Game.Screens.Select
 
         private void removeGroup(BeatmapGroup group)
         {
+            if (group == null)
+                return;
+
             groups.Remove(group);
             panels.Remove(group.Header);
             foreach (var p in group.BeatmapPanels)

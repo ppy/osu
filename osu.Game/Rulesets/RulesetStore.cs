@@ -6,21 +6,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using osu.Framework.Platform;
-using osu.Game.Rulesets;
+using osu.Game.Database;
 using SQLite.Net;
 
-namespace osu.Game.Database
+namespace osu.Game.Rulesets
 {
     /// <summary>
-    /// Todo: All of this needs to be moved to a RulesetDatabase.
+    /// Todo: All of this needs to be moved to a RulesetStore.
     /// </summary>
-    public class RulesetDatabase : Database
+    public class RulesetStore : DatabaseBackedStore
     {
         public IEnumerable<RulesetInfo> AllRulesets => Query<RulesetInfo>().Where(r => r.Available);
 
-        public RulesetDatabase(Storage storage, SQLiteConnection connection)
-            : base(storage, connection)
+        public RulesetStore(SQLiteConnection connection) : base(connection)
         {
         }
 

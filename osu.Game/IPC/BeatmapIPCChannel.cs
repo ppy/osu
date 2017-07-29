@@ -4,15 +4,15 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using osu.Framework.Platform;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.IPC
 {
     public class BeatmapIPCChannel : IpcChannel<BeatmapImportMessage>
     {
-        private readonly BeatmapDatabase beatmaps;
+        private readonly BeatmapManager beatmaps;
 
-        public BeatmapIPCChannel(IIpcHost host, BeatmapDatabase beatmaps = null)
+        public BeatmapIPCChannel(IIpcHost host, BeatmapManager beatmaps = null)
             : base(host)
         {
             this.beatmaps = beatmaps;

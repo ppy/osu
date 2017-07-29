@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Music
@@ -71,6 +71,17 @@ namespace osu.Game.Overlays.Music
                     },
                 },
             };
+        }
+
+        public void AddBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            items.Add(new PlaylistItem(beatmapSet) { OnSelect = itemSelected });
+        }
+
+        public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            PlaylistItem itemToRemove = items.Children.FirstOrDefault(item => item.BeatmapSetInfo == beatmapSet);
+            if (itemToRemove != null) items.Remove(itemToRemove);
         }
 
         private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren

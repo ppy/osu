@@ -6,11 +6,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetDatabase rulesets, OsuGame game)
+        private void load(RulesetStore rulesets, OsuGame game)
         {
             foreach (var r in rulesets.AllRulesets)
             {
