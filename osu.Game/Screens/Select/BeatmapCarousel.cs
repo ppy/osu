@@ -281,6 +281,12 @@ namespace osu.Game.Screens.Select
                 perform();
         }
 
+        public void ScrollToSelected(bool animated = true)
+        {
+            float selectedY = computeYPositions(animated);
+            ScrollTo(selectedY, animated);
+        }
+
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
         {
             foreach (var b in beatmapSet.Beatmaps)
@@ -420,8 +426,7 @@ namespace osu.Game.Screens.Select
             }
             finally
             {
-                float selectedY = computeYPositions(animated);
-                ScrollTo(selectedY, animated);
+                ScrollToSelected(animated);
             }
         }
 
