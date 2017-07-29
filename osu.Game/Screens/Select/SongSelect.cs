@@ -31,7 +31,6 @@ namespace osu.Game.Screens.Select
         private BeatmapManager manager;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
-        private readonly ActionContainer actionContainer;
         private readonly BeatmapCarousel carousel;
         private DialogOverlay dialogOverlay;
 
@@ -130,7 +129,7 @@ namespace osu.Game.Screens.Select
                     Right = left_area_padding,
                 },
             });
-            Add(actionContainer = new ActionContainer
+            Add(new ActionContainer
             {
                 RelativeSizeAxes = Axes.Y,
                 Width = 250,
