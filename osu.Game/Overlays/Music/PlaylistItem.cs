@@ -16,7 +16,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Music
 {
-    internal class PlaylistItem : Container, IFilterable, IDraggable
+    internal class PlaylistItem : Container, IFilterable, IDraggable, IComparable
     {
         private const float fade_duration = 100;
 
@@ -26,12 +26,12 @@ namespace osu.Game.Overlays.Music
         private TextAwesome handle;
         private TextFlowContainer text;
         private IEnumerable<SpriteText> titleSprites;
-        public UnicodeBindableString titleBind;
+        private UnicodeBindableString titleBind;
         private UnicodeBindableString artistBind;
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
-        public Action<BeatmapSetInfo> OnSelect;
+        public Action<PlaylistItem> OnSelect;
 
         public Action<Drawable, InputState> DragStart { get; set; }
         public Action<Drawable, InputState> Drag { get; set; }
@@ -134,7 +134,8 @@ namespace osu.Game.Overlays.Music
 
         protected override bool OnClick(InputState state)
         {
-            OnSelect?.Invoke(BeatmapSetInfo);
+            if (!selected)
+                OnSelect?.Invoke(this);
             return true;
         }
 
@@ -154,6 +155,12 @@ namespace osu.Game.Overlays.Music
         {
             DragEnd.Invoke(this, state);
             return base.OnDragEnd(state);
+        }
+
+        public int CompareTo(object obj)
+        {
+            string objTitle = (obj as PlaylistItem).BeatmapSetInfo.Metadata.Title;
+            return BeatmapSetInfo.Metadata.Title.CompareTo(objTitle);
         }
 
         public string[] FilterTerms { get; private set; }
