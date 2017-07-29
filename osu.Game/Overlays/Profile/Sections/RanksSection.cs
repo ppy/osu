@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        scores = new FillFlowContainer<DrawableScore>()
+                        scores = new FillFlowContainer<DrawableScore>
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
