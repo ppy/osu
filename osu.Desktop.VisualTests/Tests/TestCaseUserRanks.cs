@@ -39,7 +39,7 @@ namespace osu.Desktop.VisualTests.Tests
                 }
             });
 
-            AddStep("Add First Place", () => ranks.FirstPlaceScores = new[]
+            AddStep("Add First Place", () => ranks.ScoresFirst = new[]
             {
                 new Score
                 {
@@ -89,7 +89,7 @@ namespace osu.Desktop.VisualTests.Tests
                     if(i < availableMods.Length)
                         selectedMods.Remove(availableMods[i]);
                 }
-                ranks.BestScores = scores;
+                ranks.ScoresBest = scores.ToArray();
             });
         }
     }
