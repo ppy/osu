@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Music
         {
             set
             {
-                items.AddRange(value.Select(item => new PlaylistItem(item) {
+                items.AddRangeToList(value.Select(item => new PlaylistItem(item) {
                     OnSelect = itemSelected,
                     DragStart = items.OnChildDragStart,
                     Drag = items.OnChildDrag,
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Music
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    ReorderList = this.ReorderList
+                                    ReorderList = reorderList,
                                 },
                             }
                         }
@@ -97,6 +97,11 @@ namespace osu.Game.Overlays.Music
             if (itemToRemove != null) items.Remove(itemToRemove);
         }
 
+        private void reorderList(IList<PlaylistItem> list)
+        {
+            ReorderList.Invoke(list);
+        }
+
         private class PlaylistListContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren, IHasDraggableChildren<PlaylistItem>
         {
             public string[] FilterTerms => new string[] { };
@@ -116,7 +121,7 @@ namespace osu.Game.Overlays.Music
             {
                 LayoutDuration = 200;
                 LayoutEasing = Easing.OutQuint;
-                privateList = new PlaylistLinkedList();
+                privateList = new SortedList<PlaylistItem>(Comparer<PlaylistItem>.Default);
             }
 
             public Action<IList<PlaylistItem>> ReorderList;
@@ -127,7 +132,7 @@ namespace osu.Game.Overlays.Music
 
             private InputState stateDuringDrag;
 
-            private PlaylistLinkedList privateList;
+            private SortedList<PlaylistItem> privateList;
 
             public void OnChildDragStart(Drawable child, InputState state)
             {
@@ -164,60 +169,39 @@ namespace osu.Game.Overlays.Music
 
             private void reorderList(PlaylistItem item, InputState state)
             {
-                PlaylistItem pivot;
-                bool addToEnd = false;
-                int newPosition = (int) Math.Round(state.Mouse.Position.Y / item.Height);
+                if (item == null)
+                    return;
 
-                if (newPosition >= privateList.Count)
-                {
-                    pivot = privateList[privateList.Count - 1];
-                    addToEnd = true;
-                }
-                else if (newPosition <= 0)
-                {
-                    pivot = privateList[0];
-                }
+                int newPosition = (int)Math.Min(Math.Max(Math.Round(state.Mouse.Position.Y / item.Height), 0d), privateList.Count);
+                int currentPosition = privateList.FindIndex(x => x.BeatmapSetInfo.Equals(item.BeatmapSetInfo));
+                privateList.RemoveAt(currentPosition);
+
+                //To account for the remove(item)
+                if (newPosition > currentPosition)
+                    newPosition--;
+                
+                if (newPosition == privateList.Count)
+                    item.Position = new OpenTK.Vector2(item.Position.X, privateList.ElementAt(newPosition - 1).Position.Y + item.Height);
                 else
-                    pivot = privateList[newPosition];
+                    item.Position = new OpenTK.Vector2(item.Position.X, privateList.ElementAt(newPosition).Position.Y);
 
-                privateList.Remove(item);
+                privateList.Add(item);
 
-                if (addToEnd)
-                    privateList.AddAfter(privateList.Find(pivot), item);
-                else
-                    privateList.AddBefore(privateList.Find(pivot), item);
-
-                UpdateChildren(privateList);
+                updateChildren(privateList);
             }
 
-            public override void Add(PlaylistItem drawable)
+            public void AddRangeToList(IEnumerable<PlaylistItem> range)
             {
-                privateList.AddLast(drawable);
-                UpdateChildren(drawable);
+                foreach (PlaylistItem item in range)
+                    privateList.Add(item);
+                updateChildren(privateList);
             }
 
-            private void UpdateChildren(PlaylistItem item)
+            private void updateChildren(SortedList<PlaylistItem> list)
             {
-                if (base.IndexOfInternal(item) > 0)
-                    base.Remove(item);
-                base.AddInternal(item);
-            }
-
-            private void UpdateChildren(PlaylistLinkedList list)
-            {
-                base.RemoveRange(list);
-                base.AddRangeInternal(list.ToList());
-            }
-
-            private class PlaylistLinkedList : LinkedList<PlaylistItem>, IReadOnlyList<PlaylistItem>
-            {
-                public PlaylistItem this[int index]
-                {
-                    get
-                    {
-                        return this.ElementAt(index);
-                    }
-                }
+                RemoveRange(list);
+                AddRange(list);
+                ReorderList.Invoke(list.ToList());
             }
         }
     }

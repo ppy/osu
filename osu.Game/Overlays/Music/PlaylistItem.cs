@@ -159,8 +159,9 @@ namespace osu.Game.Overlays.Music
 
         public int CompareTo(object obj)
         {
-            string objTitle = (obj as PlaylistItem).BeatmapSetInfo.Metadata.Title;
-            return BeatmapSetInfo.Metadata.Title.CompareTo(objTitle);
+            PlaylistItem arg = obj as PlaylistItem;
+            int result = this.Position.Y.CompareTo(arg.Position.Y);
+            return result;
         }
 
         public string[] FilterTerms { get; private set; }
