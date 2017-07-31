@@ -8,10 +8,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
@@ -22,7 +24,7 @@ namespace osu.Game.Overlays.Music
         private Color4 hoverColour;
         private Color4 artistColour;
 
-        private TextAwesome handle;
+        private Container handle;
         private TextFlowContainer text;
         private IEnumerable<SpriteText> titleSprites;
         private UnicodeBindableString titleBind;
@@ -31,6 +33,7 @@ namespace osu.Game.Overlays.Music
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         public Action<BeatmapSetInfo> OnSelect;
+        public Vector2 DragStartOffset = Vector2.Zero;
 
         private bool selected;
         public bool Selected
@@ -67,16 +70,10 @@ namespace osu.Game.Overlays.Music
 
             Children = new Drawable[]
             {
-                handle = new TextAwesome
+                handle = new Handle
                 {
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                    TextSize = 12,
+                    OnReorder = o => DragStartOffset = ToSpaceOfOtherDrawable(o, this),
                     Colour = colours.Gray5,
-                    Icon = FontAwesome.fa_bars,
-                    Alpha = 0f,
-                    Margin = new MarginPadding { Left = 5 },
-                    Padding = new MarginPadding { Top = 2 },
                 },
                 text = new OsuTextFlowContainer
                 {
@@ -114,21 +111,22 @@ namespace osu.Game.Overlays.Music
             });
         }
 
-        protected override bool OnHover(Framework.Input.InputState state)
+        protected override bool OnHover(InputState state)
         {
             handle.FadeIn(fade_duration);
 
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(Framework.Input.InputState state)
+        protected override void OnHoverLost(InputState state)
         {
             handle.FadeOut(fade_duration);
         }
 
-        protected override bool OnClick(Framework.Input.InputState state)
+        protected override bool OnClick(InputState state)
         {
-            OnSelect?.Invoke(BeatmapSetInfo);
+            if (DragStartOffset == Vector2.Zero)
+                OnSelect?.Invoke(BeatmapSetInfo);
             return true;
         }
 
@@ -146,6 +144,40 @@ namespace osu.Game.Overlays.Music
                 matching = value;
 
                 this.FadeTo(matching ? 1 : 0, 200);
+            }
+        }
+
+        private class Handle : Container
+        {
+            public Action<Vector2> OnReorder;
+
+            public Handle()
+            {
+                Masking = true;
+                Anchor = Anchor.TopLeft;
+                Origin = Anchor.TopLeft;
+                AutoSizeAxes = Axes.Both;
+                Alpha = 0f;
+                CornerRadius = 3;
+                Margin = new MarginPadding { Left = 5 };
+                Padding = new MarginPadding { Top = 2 };
+                Child = new TextAwesome
+                {
+                    TextSize = 12,
+                    Icon = FontAwesome.fa_bars
+                };
+            }
+
+            protected override bool OnDragStart(InputState state)
+            {
+                OnReorder?.Invoke(state.Mouse.Position);
+                return true;
+            }
+
+            protected override bool OnDragEnd(InputState state)
+            {
+                OnReorder?.Invoke(Vector2.Zero);
+                return base.OnDragEnd(state);
             }
         }
     }

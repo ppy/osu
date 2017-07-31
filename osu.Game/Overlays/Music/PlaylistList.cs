@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +9,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Music
 {
     internal class PlaylistList : Container
     {
-        private readonly FillFlowContainer<PlaylistItem> items;
+        private readonly ItemSearchContainer items;
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
@@ -31,6 +33,8 @@ namespace osu.Game.Overlays.Music
         }
 
         public Action<BeatmapSetInfo> OnSelect;
+
+        public Action<IEnumerable<BeatmapSetInfo>> OnBeatmapSetsReorder;
 
         private readonly SearchContainer search;
 
@@ -65,6 +69,7 @@ namespace osu.Game.Overlays.Music
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
+                                    UpdateBeatmapSets = b => OnBeatmapSetsReorder?.Invoke(b),
                                 },
                             }
                         }
@@ -76,12 +81,15 @@ namespace osu.Game.Overlays.Music
         public void AddBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             items.Add(new PlaylistItem(beatmapSet) { OnSelect = itemSelected });
+            items.TriggerBeatmapSetsChange();
         }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            PlaylistItem itemToRemove = items.Children.FirstOrDefault(item => item.BeatmapSetInfo == beatmapSet);
-            if (itemToRemove != null) items.Remove(itemToRemove);
+            PlaylistItem itemToRemove = items.Children.FirstOrDefault(item => item.BeatmapSetInfo.Hash == beatmapSet.Hash);
+            if (itemToRemove != null)
+                items.Remove(itemToRemove);
+            items.TriggerBeatmapSetsChange();
         }
 
         private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
@@ -102,6 +110,50 @@ namespace osu.Game.Overlays.Music
             {
                 LayoutDuration = 200;
                 LayoutEasing = Easing.OutQuint;
+            }
+
+            public Action<List<BeatmapSetInfo>> UpdateBeatmapSets;
+            private List<BeatmapSetInfo> beatmapSets = new List<BeatmapSetInfo>();
+
+            private Vector2 mousePosition;
+
+            protected override bool OnMouseMove(InputState state)
+            {
+                mousePosition = state.Mouse.Position;
+                return base.OnMouseMove(state);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+                PlaylistItem item = Children.FirstOrDefault(i => i.DragStartOffset != Vector2.Zero);
+                if (item == default(PlaylistItem))
+                    return;
+                List<PlaylistItem> childrenList = Children.ToList();
+                item.MoveTo(new Vector2(0, (mousePosition - item.DragStartOffset).Y));
+
+                int targetIndex = Children.Count(i => i.Position.Y - item.Size.Y / 2 < item.Position.Y - i.Size.Y / 2);
+
+                if (targetIndex == childrenList.IndexOf(item))
+                    return;
+                bool hasFindItem = false;
+                for (int i = 0; i < childrenList.Count; i++)
+                {
+                    if (childrenList[i] == item)
+                    {
+                        ChangeChildDepth(item, childrenList.Count - targetIndex);
+                        hasFindItem = true;
+                    }
+                    else
+                        ChangeChildDepth(childrenList[i], childrenList.Count - i + (hasFindItem ? 1 : -1));
+                }
+                TriggerBeatmapSetsChange();
+            }
+
+            public void TriggerBeatmapSetsChange()
+            {
+                beatmapSets = Children.Select(b => b.BeatmapSetInfo).ToList();
+                UpdateBeatmapSets?.Invoke(beatmapSets);
             }
         }
     }
