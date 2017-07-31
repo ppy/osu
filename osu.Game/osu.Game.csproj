@@ -250,7 +250,7 @@
     <Compile Include="Configuration\OsuConfigManager.cs" />
     <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
     <Compile Include="Overlays\Notifications\Notification.cs" />
-    <Compile Include="Overlays\NotificationManager.cs" />
+    <Compile Include="Overlays\NotificationOverlay.cs" />
     <Compile Include="Overlays\Notifications\NotificationSection.cs" />
     <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
