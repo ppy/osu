@@ -149,6 +149,9 @@ namespace osu.Game
         {
             base.LoadComplete();
 
+            // hook up notifications to components.
+            BeatmapManager.PostNotification = n => notificationOverlay?.Post(n);
+
             AddRange(new Drawable[] {
                 new VolumeControlReceptor
                 {
