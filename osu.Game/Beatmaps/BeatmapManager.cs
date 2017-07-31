@@ -49,14 +49,18 @@ namespace osu.Game.Beatmaps
         private readonly FileStore files;
 
         private readonly RulesetStore rulesets;
-        private readonly Action<Notification> postNotification;
 
         private readonly BeatmapStore beatmaps;
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
 
-        public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, IIpcHost importHost = null, Action<Notification> postNotification = null)
+        /// <summary>
+        /// Set an endpoint for notifications to be posted to.
+        /// </summary>
+        public Action<Notification> PostNotification { private get; set; }
+
+        public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, IIpcHost importHost = null)
         {
             beatmaps = new BeatmapStore(connection);
             beatmaps.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
@@ -65,7 +69,6 @@ namespace osu.Game.Beatmaps
             this.storage = storage;
             this.files = files;
             this.rulesets = rulesets;
-            this.postNotification = postNotification;
 
             if (importHost != null)
                 ipc = new BeatmapIPCChannel(importHost, this);
@@ -85,7 +88,7 @@ namespace osu.Game.Beatmaps
                 State = ProgressNotificationState.Active,
             };
 
-            postNotification?.Invoke(notification);
+            PostNotification?.Invoke(notification);
 
             int i = 0;
             foreach (string path in paths)
