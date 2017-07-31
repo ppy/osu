@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Drawables
 {

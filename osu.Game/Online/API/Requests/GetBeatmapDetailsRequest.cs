@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using Newtonsoft.Json;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Online.API.Requests
 {

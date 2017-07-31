@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Dialog;
 
@@ -12,12 +11,12 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapDeleteDialog : PopupDialog
     {
-        private BeatmapDatabase database;
+        private BeatmapManager manager;
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapDatabase beatmapDatabase)
+        private void load(BeatmapManager beatmapManager)
         {
-            database = beatmapDatabase;
+            manager = beatmapManager;
         }
 
         public BeatmapDeleteDialog(WorkingBeatmap beatmap)
@@ -35,7 +34,7 @@ namespace osu.Game.Screens.Select
                     Action = () =>
                     {
                         beatmap.Dispose();
-                        database.Delete(beatmap.BeatmapSetInfo);
+                        manager.Delete(beatmap.BeatmapSetInfo);
                     },
                 },
                 new PopupDialogCancelButton

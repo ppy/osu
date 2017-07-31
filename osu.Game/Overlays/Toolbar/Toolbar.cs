@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Toolbar
                         Anchor = Anchor.BottomLeft,
                         Alpha = 0,
                         Height = 90,
-                        ColourInfo = ColourInfo.GradientVertical(
+                        Colour = ColourInfo.GradientVertical(
                             OsuColour.Gray(0.1f).Opacity(0.5f), OsuColour.Gray(0.1f).Opacity(0)),
                     },
                 };
