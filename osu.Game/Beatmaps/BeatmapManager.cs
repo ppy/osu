@@ -308,7 +308,7 @@ namespace osu.Game.Beatmaps
             var hash = hashable.ComputeSHA2Hash();
 
             // check if this beatmap has already been imported and exit early if so.
-            var beatmapSet = beatmaps.QueryAndPopulate<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
+            var beatmapSet = beatmaps.QueryAndPopulate<BeatmapSetInfo>(b => b.Hash == hash).FirstOrDefault();
             if (beatmapSet != null)
             {
                 Undelete(beatmapSet);
