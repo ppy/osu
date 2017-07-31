@@ -6,6 +6,7 @@ using osu.Desktop.VisualTests.Platform;
 using osu.Framework.Testing;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -29,6 +30,7 @@ namespace osu.Desktop.VisualTests.Tests
                 var storage = new TestStorage(@"TestCasePlaySongSelect");
 
                 var backingDatabase = storage.GetDatabase(@"client");
+                backingDatabase.CreateTable<StoreVersion>();
 
                 rulesets = new RulesetStore(backingDatabase);
                 manager = new BeatmapManager(storage, null, backingDatabase, rulesets);
