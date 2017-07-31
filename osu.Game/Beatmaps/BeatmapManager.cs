@@ -459,5 +459,35 @@ namespace osu.Game.Beatmaps
 
             Import(Directory.GetDirectories(stableInstallPath));
         }
+
+        public void DeleteAll()
+        {
+            var maps = GetAllUsableBeatmapSets().ToArray();
+
+            if (maps.Length == 0) return;
+
+            var notification = new ProgressNotification
+            {
+                Progress = 0,
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 0;
+
+            foreach (var b in maps)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                notification.Text = $"Deleting ({i} of {maps.Length})";
+                notification.Progress = (float)++i / maps.Length;
+                Delete(b);
+            }
+
+            notification.State = ProgressNotificationState.Completed;
+        }
     }
 }

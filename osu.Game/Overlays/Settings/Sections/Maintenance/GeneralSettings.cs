@@ -38,11 +38,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         deleteButton.Enabled.Value = false;
-                        Task.Run(() =>
-                        {
-                            foreach (var b in beatmaps.GetAllUsableBeatmapSets())
-                                beatmaps.Delete(b);
-                        }).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
+                        Task.Run(() => beatmaps.DeleteAll()).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
                     }
                 },
             };
