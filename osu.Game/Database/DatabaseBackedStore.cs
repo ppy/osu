@@ -101,7 +101,6 @@ namespace osu.Game.Database
         public void Populate<T>(T item, bool recursive = true)
         {
             checkType(item.GetType());
-
             Connection.GetChildren(item, recursive);
         }
 
