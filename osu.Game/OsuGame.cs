@@ -37,7 +37,7 @@ namespace osu.Game
 
         private MusicController musicController;
 
-        private NotificationManager notificationManager;
+        private NotificationOverlay notificationOverlay;
 
         private DialogOverlay dialogOverlay;
 
@@ -132,7 +132,7 @@ namespace osu.Game
 
             if (s.Beatmap == null)
             {
-                notificationManager.Post(new SimpleNotification
+                notificationOverlay.Post(new SimpleNotification
                 {
                     Text = @"Tried to load a score for a beatmap we don't have!",
                     Icon = FontAwesome.fa_life_saver,
@@ -189,7 +189,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
-            LoadComponentAsync(notificationManager = new NotificationManager
+            LoadComponentAsync(notificationOverlay = new NotificationOverlay
             {
                 Depth = -3,
                 Anchor = Anchor.TopRight,
@@ -205,7 +205,7 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important) return;
 
-                notificationManager.Post(new SimpleNotification
+                notificationOverlay.Post(new SimpleNotification
                 {
                     Text = $@"{entry.Level}: {entry.Message}"
                 });
@@ -216,7 +216,7 @@ namespace osu.Game
             dependencies.Cache(chat);
             dependencies.Cache(userProfile);
             dependencies.Cache(musicController);
-            dependencies.Cache(notificationManager);
+            dependencies.Cache(notificationOverlay);
             dependencies.Cache(dialogOverlay);
 
             // ensure both overlays aren't presented at the same time
