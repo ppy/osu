@@ -129,11 +129,10 @@ namespace osu.Game.Screens.Select
                     Right = left_area_padding,
                 },
             });
-            Add(new ActionContainer
+            Add(new ResetScrollContainer(() => carousel.ScrollToSelected())
             {
                 RelativeSizeAxes = Axes.Y,
                 Width = 250,
-                OnHoverAction = () => carousel.ScrollToSelected(),
             });
 
             if (ShowFooter)
@@ -416,13 +415,18 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(state, args);
         }
 
-        private class ActionContainer : Container
+        private class ResetScrollContainer : Container
         {
-            public Action OnHoverAction;
+            private readonly Action onHoverAction;
+
+            public ResetScrollContainer(Action onHoverAction)
+            {
+                this.onHoverAction = onHoverAction;
+            }
 
             protected override bool OnHover(InputState state)
             {
-                OnHoverAction?.Invoke();
+                onHoverAction?.Invoke();
                 return base.OnHover(state);
             }
         }
