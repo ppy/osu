@@ -83,9 +83,9 @@ namespace osu.Game.Database
         /// <summary>
         /// Query and populate results.
         /// </summary>
-        /// <param name="filter">An optional filter to refine results.</param>
+        /// <param name="filter">An filter to refine results.</param>
         /// <returns></returns>
-        public List<T> QueryAndPopulate<T>(Expression<Func<T, bool>> filter = null)
+        public List<T> QueryAndPopulate<T>(Expression<Func<T, bool>> filter)
             where T : class
         {
             checkType(typeof(T));
