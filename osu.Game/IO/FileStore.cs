@@ -42,15 +42,11 @@ namespace osu.Game.IO
             deletePending();
         }
 
-        public FileInfo Add(Stream data, string filename = null)
+        public FileInfo Add(Stream data)
         {
             string hash = data.ComputeSHA2Hash();
 
-            var info = new FileInfo
-            {
-                Filename = filename,
-                Hash = hash,
-            };
+            var info = new FileInfo { Hash = hash };
 
             var existing = Connection.Table<FileInfo>().FirstOrDefault(f => f.Hash == info.Hash);
 
@@ -79,20 +75,32 @@ namespace osu.Game.IO
 
         public void Reference(IEnumerable<FileInfo> files)
         {
-            foreach (var f in files)
+            Connection.RunInTransaction(() =>
             {
-                f.ReferenceCount++;
-                Connection.Update(f);
-            }
+                var incrementedFiles = files.GroupBy(f => f.ID).Select(f =>
+                {
+                    var accurateRefCount = Connection.Get<FileInfo>(f.First().ID);
+                    accurateRefCount.ReferenceCount += f.Count();
+                    return accurateRefCount;
+                });
+
+                Connection.UpdateAll(incrementedFiles);
+            });
         }
 
         public void Dereference(IEnumerable<FileInfo> files)
         {
-            foreach (var f in files)
+            Connection.RunInTransaction(() =>
             {
-                f.ReferenceCount--;
-                Connection.Update(f);
-            }
+                var incrementedFiles = files.GroupBy(f => f.ID).Select(f =>
+                {
+                    var accurateRefCount = Connection.Get<FileInfo>(f.First().ID);
+                    accurateRefCount.ReferenceCount -= f.Count();
+                    return accurateRefCount;
+                });
+
+                Connection.UpdateAll(incrementedFiles);
+            });
         }
 
         private void deletePending()

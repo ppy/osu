@@ -19,7 +19,6 @@ using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Rulesets;
 using SQLite.Net;
-using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Beatmaps
 {
@@ -135,7 +134,7 @@ namespace osu.Game.Beatmaps
             if (!beatmaps.Delete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
-                files.Dereference(beatmapSet.Files);
+                files.Dereference(beatmapSet.Files.Select(f => f.FileInfo));
         }
 
         /// <summary>
@@ -147,7 +146,8 @@ namespace osu.Game.Beatmaps
         {
             if (!beatmaps.Undelete(beatmapSet)) return;
 
-            files.Reference(beatmapSet.Files);
+            if (!beatmapSet.Protected)
+                files.Reference(beatmapSet.Files.Select(f => f.FileInfo));
         }
 
         /// <summary>
@@ -265,12 +265,16 @@ namespace osu.Game.Beatmaps
                 return beatmapSet;
             }
 
-            List<FileInfo> fileInfos = new List<FileInfo>();
+            List<BeatmapSetFileInfo> fileInfos = new List<BeatmapSetFileInfo>();
 
             // import files to manager
             foreach (string file in reader.Filenames)
                 using (Stream s = reader.GetStream(file))
-                    fileInfos.Add(files.Add(s, file));
+                    fileInfos.Add(new BeatmapSetFileInfo
+                    {
+                        Filename = file,
+                        FileInfo = files.Add(s)
+                    });
 
             BeatmapMetadata metadata;
 
@@ -366,7 +370,7 @@ namespace osu.Game.Beatmaps
                 catch { return null; }
             }
 
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => f.Filename == filename).StoragePath;
+            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => f.Filename == filename).FileInfo.StoragePath;
 
             protected override Texture GetBackground()
             {
