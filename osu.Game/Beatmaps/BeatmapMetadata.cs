@@ -5,7 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using SQLite.Net.Attributes;
 
-namespace osu.Game.Database
+namespace osu.Game.Beatmaps
 {
     public class BeatmapMetadata
     {

@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, NotificationManager notificationManager, OsuColour colours)
+        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay, OsuColour colours)
         {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
             showHud.ValueChanged += hudVisibility => content.FadeTo(hudVisibility ? 1 : 0, duration);
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play
             {
                 hasShownNotificationOnce = true;
 
-                notificationManager?.Post(new SimpleNotification
+                notificationOverlay?.Post(new SimpleNotification
                 {
                     Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
                 });

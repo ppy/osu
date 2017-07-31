@@ -21,10 +21,10 @@ using OpenTK;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Threading;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 
 namespace osu.Game
@@ -37,7 +37,7 @@ namespace osu.Game
 
         private MusicController musicController;
 
-        private NotificationManager notificationManager;
+        private NotificationOverlay notificationOverlay;
 
         private DialogOverlay dialogOverlay;
 
@@ -99,13 +99,13 @@ namespace osu.Game
             if (args?.Length > 0)
             {
                 var paths = args.Where(a => !a.StartsWith(@"-"));
-                Task.Run(() => BeatmapDatabase.Import(paths.ToArray()));
+                Task.Run(() => BeatmapManager.Import(paths.ToArray()));
             }
 
             dependencies.Cache(this);
 
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
-            Ruleset.Value = RulesetDatabase.GetRuleset(configRuleset.Value);
+            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value);
             Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
         }
 
@@ -132,7 +132,7 @@ namespace osu.Game
 
             if (s.Beatmap == null)
             {
-                notificationManager.Post(new SimpleNotification
+                notificationOverlay.Post(new SimpleNotification
                 {
                     Text = @"Tried to load a score for a beatmap we don't have!",
                     Icon = FontAwesome.fa_life_saver,
@@ -140,7 +140,7 @@ namespace osu.Game
                 return;
             }
 
-            Beatmap.Value = BeatmapDatabase.GetWorkingBeatmap(s.Beatmap);
+            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(s.Beatmap);
 
             menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
         }
@@ -190,7 +190,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
-            LoadComponentAsync(notificationManager = new NotificationManager
+            LoadComponentAsync(notificationOverlay = new NotificationOverlay
             {
                 Depth = -2,
                 Anchor = Anchor.TopRight,
@@ -206,7 +206,7 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important) return;
 
-                notificationManager.Post(new SimpleNotification
+                notificationOverlay.Post(new SimpleNotification
                 {
                     Text = $@"{entry.Level}: {entry.Message}"
                 });
@@ -217,7 +217,7 @@ namespace osu.Game
             dependencies.Cache(chat);
             dependencies.Cache(userProfile);
             dependencies.Cache(musicController);
-            dependencies.Cache(notificationManager);
+            dependencies.Cache(notificationOverlay);
             dependencies.Cache(dialogOverlay);
 
             // ensure both overlays aren't presented at the same time

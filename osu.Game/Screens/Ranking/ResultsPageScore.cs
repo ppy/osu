@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -133,7 +132,7 @@ namespace osu.Game.Screens.Ranking
                             {
                                 new Box
                                 {
-                                    ColourInfo = ColourInfo.GradientHorizontal(
+                                    Colour = ColourInfo.GradientHorizontal(
                                         colours.GrayC.Opacity(0),
                                         colours.GrayC.Opacity(0.9f)),
                                     RelativeSizeAxes = Axes.Both,
@@ -143,7 +142,7 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    ColourInfo = ColourInfo.GradientHorizontal(
+                                    Colour = ColourInfo.GradientHorizontal(
                                         colours.GrayC.Opacity(0.9f),
                                         colours.GrayC.Opacity(0)),
                                     RelativeSizeAxes = Axes.Both,
