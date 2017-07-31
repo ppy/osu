@@ -68,6 +68,14 @@ namespace osu.Game.Graphics.UserInterface
 
             sampleClick = audio.Sample.Get(@"UI/generic-click");
             sampleHover = audio.Sample.Get(@"UI/generic-hover");
+
+            Enabled.ValueChanged += enabled_ValueChanged;
+            Enabled.TriggerChange();
+        }
+
+        private void enabled_ValueChanged(bool enabled)
+        {
+            this.FadeColour(enabled ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
         }
 
         protected override bool OnClick(InputState state)
