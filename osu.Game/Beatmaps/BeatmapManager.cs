@@ -446,7 +446,6 @@ namespace osu.Game.Beatmaps
 
         public void ImportFromStable()
         {
-
             string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!", "Songs");
             if (!Directory.Exists(stableInstallPath))
                 stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu", "Songs");
