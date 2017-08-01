@@ -107,6 +107,14 @@ namespace osu.Game.Screens.Select
             });
         }
 
+        public void RemoveBeatmap(BeatmapSetInfo beatmapSet)
+        {
+            Schedule(delegate
+            {
+                removeGroup(groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID));
+            });
+        }
+
         public void SelectBeatmap(BeatmapInfo beatmap, bool animated = true)
         {
             if (beatmap == null)
@@ -127,8 +135,6 @@ namespace osu.Game.Screens.Select
                 }
             }
         }
-
-        public void RemoveBeatmap(BeatmapSetInfo info) => removeGroup(groups.Find(b => b.BeatmapSet.ID == info.ID));
 
         public Action<BeatmapInfo> SelectionChanged;
 
