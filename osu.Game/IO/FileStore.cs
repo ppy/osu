@@ -140,18 +140,21 @@ namespace osu.Game.IO
 
         private void deletePending()
         {
-            foreach (var f in QueryAndPopulate<FileInfo>(f => f.ReferenceCount < 1))
+            Connection.RunInTransaction(() =>
             {
-                try
+                foreach (var f in Query<FileInfo>(f => f.ReferenceCount < 1))
                 {
-                    Connection.Delete(f);
-                    Storage.Delete(Path.Combine(prefix, f.StoragePath));
+                    try
+                    {
+                        Storage.Delete(Path.Combine(prefix, f.StoragePath));
+                        Connection.Delete(f);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not delete beatmap {f}");
+                    }
                 }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not delete beatmap {f}");
-                }
-            }
+            });
         }
     }
 }

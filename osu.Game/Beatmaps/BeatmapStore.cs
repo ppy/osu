@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Logging;
 using osu.Game.Database;
 using SQLite.Net;
 using SQLiteNetExtensions.Extensions;
@@ -130,23 +129,11 @@ namespace osu.Game.Beatmaps
 
         private void cleanupPendingDeletions()
         {
-            foreach (var b in QueryAndPopulate<BeatmapSetInfo>(b => b.DeletePending && !b.Protected))
+            Connection.RunInTransaction(() =>
             {
-                try
-                {
-                    // many-to-many join table entries are not automatically tidied.
-                    Connection.Table<BeatmapSetFileInfo>().Delete(f => f.BeatmapSetInfoID == b.ID);
+                foreach (var b in QueryAndPopulate<BeatmapSetInfo>(b => b.DeletePending && !b.Protected))
                     Connection.Delete(b, true);
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not delete beatmap {b}");
-                }
-            }
-
-            //this is required because sqlite migrations don't work, initially inserting nulls into this field.
-            //see https://github.com/praeclarum/sqlite-net/issues/326
-            Connection.Query<BeatmapSetInfo>("UPDATE BeatmapSetInfo SET DeletePending = 0 WHERE DeletePending IS NULL");
+            });
         }
     }
 }
