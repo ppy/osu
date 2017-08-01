@@ -77,11 +77,11 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
+            beatmaps.BeatmapSetAdded += s => Schedule(() => list.AddBeatmapSet(s));
+            beatmaps.BeatmapSetRemoved += s => Schedule(() => list.RemoveBeatmapSet(s));
+
             list.BeatmapSets = BeatmapSets = beatmaps.GetAllUsableBeatmapSets();
 
-            // todo: these should probably be above the query.
-            beatmaps.BeatmapSetAdded += s => list.AddBeatmapSet(s);
-            beatmaps.BeatmapSetRemoved += s => list.RemoveBeatmapSet(s);
 
             beatmapBacking.BindTo(game.Beatmap);
 
