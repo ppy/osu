@@ -38,15 +38,12 @@ namespace osu.Game.IO
         {
             if (reset)
             {
-                try
-                {
-                    foreach (var f in Query<FileInfo>())
-                        Storage.Delete(Path.Combine(prefix, f.StoragePath));
-                }
-                catch
-                {
-                    // we don't want to ever crash as a result of a reset operation.
-                }
+                // in earlier versions we stored beatmaps as solid archives, but not any more.
+                if (Storage.ExistsDirectory("beatmaps"))
+                    Storage.DeleteDirectory("beatmaps");
+
+                if (Storage.ExistsDirectory(prefix))
+                    Storage.DeleteDirectory(prefix);
 
                 Connection.DropTable<FileInfo>();
             }
