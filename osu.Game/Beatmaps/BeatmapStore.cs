@@ -52,7 +52,11 @@ namespace osu.Game.Beatmaps
             Connection.CreateTable<BeatmapSetInfo>();
             Connection.CreateTable<BeatmapSetFileInfo>();
             Connection.CreateTable<BeatmapInfo>();
+        }
 
+        protected override void StartupTasks()
+        {
+            base.StartupTasks();
             cleanupPendingDeletions();
         }
 
@@ -60,12 +64,12 @@ namespace osu.Game.Beatmaps
         /// Perform migrations between two store versions.
         /// </summary>
         /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
-        /// <param name="newVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
-        protected override void PerformMigration(int currentVersion, int newVersion)
+        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
+        protected override void PerformMigration(int currentVersion, int targetVersion)
         {
-            base.PerformMigration(currentVersion, newVersion);
+            base.PerformMigration(currentVersion, targetVersion);
 
-            while (currentVersion++ < newVersion)
+            while (currentVersion++ < targetVersion)
             {
                 switch (currentVersion)
                 {
