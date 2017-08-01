@@ -187,11 +187,11 @@ namespace osu.Game.Screens.Select
             if (groups.Count == 0)
                 return;
 
-            randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
-
             var visibleGroups = getVisibleGroups();
             if (!visibleGroups.Any())
                 return;
+
+            randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
 
             BeatmapGroup group;
 
@@ -285,6 +285,12 @@ namespace osu.Game.Screens.Select
                 filterTask = Scheduler.AddDelayed(perform, 250);
             else
                 perform();
+        }
+
+        public void ScrollToSelected(bool animated = true)
+        {
+            float selectedY = computeYPositions(animated);
+            ScrollTo(selectedY, animated);
         }
 
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
@@ -426,8 +432,7 @@ namespace osu.Game.Screens.Select
             }
             finally
             {
-                float selectedY = computeYPositions(animated);
-                ScrollTo(selectedY, animated);
+                ScrollToSelected(animated);
             }
         }
 
