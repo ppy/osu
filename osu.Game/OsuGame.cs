@@ -334,6 +334,7 @@ namespace osu.Game
                 direct.State = Visibility.Hidden;
                 social.State = Visibility.Hidden;
                 userProfile.State = Visibility.Hidden;
+                notificationOverlay.State = Visibility.Hidden;
             }
             else
             {
