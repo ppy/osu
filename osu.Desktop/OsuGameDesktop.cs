@@ -51,6 +51,8 @@ namespace osu.Desktop
         {
             protected override string LocateBasePath()
             {
+                Func<string, bool> checkExists = p => Directory.Exists(Path.Combine(p, "Songs"));
+
                 string stableInstallPath;
 
                 try
@@ -58,19 +60,19 @@ namespace osu.Desktop
                     using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
                         stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(String.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
 
-                    if (Directory.Exists(stableInstallPath))
+                    if (checkExists(stableInstallPath))
                         return stableInstallPath;
                 }
                 catch
                 {
                 }
 
-                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!", "Songs");
-                if (Directory.Exists(stableInstallPath))
+                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
+                if (checkExists(stableInstallPath))
                     return stableInstallPath;
 
-                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu", "Songs");
-                if (Directory.Exists(stableInstallPath))
+                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
+                if (checkExists(stableInstallPath))
                     return stableInstallPath;
 
                 return null;
