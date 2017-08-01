@@ -5,8 +5,8 @@ using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Database;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Taiko.Objects

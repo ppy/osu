@@ -100,9 +100,9 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            FadeInFromZero(fade_time);
+            this.FadeInFromZero(fade_time);
             using (BeginAbsoluteSequence(beginFadeTime))
-                FadeOut(fade_time);
+                this.FadeOut(fade_time);
 
             button.Action = () => AudioClock?.Seek(startTime - skip_required_cutoff - fade_time);
 
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             base.Update();
-            remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, EasingTypes.OutQuint);
+            remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -154,14 +154,14 @@ namespace osu.Game.Screens.Play
                     {
                         case Visibility.Visible:
                             if (lastState == Visibility.Hidden)
-                                FadeIn(500, EasingTypes.OutExpo);
+                                this.FadeIn(500, Easing.OutExpo);
 
                             if (!IsHovered)
                                 using (BeginDelayedSequence(1000))
                                     scheduledHide = Schedule(() => State = Visibility.Hidden);
                             break;
                         case Visibility.Hidden:
-                            FadeOut(1000, EasingTypes.OutExpo);
+                            this.FadeOut(1000, Easing.OutExpo);
                             break;
                     }
                 }
@@ -249,29 +249,29 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnHover(InputState state)
             {
-                flow.TransformSpacingTo(new Vector2(5), 500, EasingTypes.OutQuint);
-                box.FadeColour(colourHover, 500, EasingTypes.OutQuint);
-                background.FadeTo(0.4f, 500, EasingTypes.OutQuint);
+                flow.TransformSpacingTo(new Vector2(5), 500, Easing.OutQuint);
+                box.FadeColour(colourHover, 500, Easing.OutQuint);
+                background.FadeTo(0.4f, 500, Easing.OutQuint);
                 return base.OnHover(state);
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                flow.TransformSpacingTo(new Vector2(0), 500, EasingTypes.OutQuint);
-                box.FadeColour(colourNormal, 500, EasingTypes.OutQuint);
-                background.FadeTo(0.2f, 500, EasingTypes.OutQuint);
+                flow.TransformSpacingTo(new Vector2(0), 500, Easing.OutQuint);
+                box.FadeColour(colourNormal, 500, Easing.OutQuint);
+                background.FadeTo(0.2f, 500, Easing.OutQuint);
                 base.OnHoverLost(state);
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                aspect.ScaleTo(0.75f, 2000, EasingTypes.OutQuint);
+                aspect.ScaleTo(0.75f, 2000, Easing.OutQuint);
                 return base.OnMouseDown(state, args);
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                aspect.ScaleTo(1, 1000, EasingTypes.OutElastic);
+                aspect.ScaleTo(1, 1000, Easing.OutElastic);
                 return base.OnMouseUp(state, args);
             }
 
@@ -280,8 +280,8 @@ namespace osu.Game.Screens.Play
                 if (!Enabled)
                     return false;
 
-                box.FlashColour(Color4.White, 500, EasingTypes.OutQuint);
-                aspect.ScaleTo(1.2f, 2000, EasingTypes.OutQuint);
+                box.FlashColour(Color4.White, 500, Easing.OutQuint);
+                aspect.ScaleTo(1.2f, 2000, Easing.OutQuint);
 
                 bool result = base.OnClick(state);
 

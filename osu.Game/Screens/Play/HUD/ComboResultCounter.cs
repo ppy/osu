@@ -1,10 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.HUD
@@ -12,44 +9,24 @@ namespace osu.Game.Screens.Play.HUD
     /// <summary>
     /// Used to display combo with a roll-up animation in results screen.
     /// </summary>
-    public class ComboResultCounter : RollingCounter<ulong>
+    public class ComboResultCounter : RollingCounter<long>
     {
-        protected override Type TransformType => typeof(TransformComboResult);
-
         protected override double RollingDuration => 500;
-        protected override EasingTypes RollingEasing => EasingTypes.Out;
+        protected override Easing RollingEasing => Easing.Out;
 
-        protected override double GetProportionalDuration(ulong currentValue, ulong newValue)
+        protected override double GetProportionalDuration(long currentValue, long newValue)
         {
             return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
         }
 
-        protected override string FormatCount(ulong count)
+        protected override string FormatCount(long count)
         {
             return $@"{count}x";
         }
 
-        public override void Increment(ulong amount)
+        public override void Increment(long amount)
         {
             Current.Value = Current + amount;
-        }
-
-        protected class TransformComboResult : Transform<ulong, Drawable>
-        {
-            public virtual ulong CurrentValue
-            {
-                get
-                {
-                    double time = Time?.Current ?? 0;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
-
-                    return (ulong)Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-                }
-            }
-
-            public override void Apply(Drawable d) => ((ComboResultCounter)d).DisplayedCount = CurrentValue;
-            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ComboResultCounter)d).DisplayedCount;
         }
     }
 }

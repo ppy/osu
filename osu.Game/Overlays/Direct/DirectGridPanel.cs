@@ -8,10 +8,10 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -41,9 +41,9 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
 
-            FadeInFromZero(200, EasingTypes.Out);
+            this.FadeInFromZero(200, Easing.Out);
             bottomPanel.LayoutDuration = 200;
-            bottomPanel.LayoutEasing = EasingTypes.Out;
+            bottomPanel.LayoutEasing = Easing.Out;
             bottomPanel.Origin = Anchor.BottomLeft;
         }
 

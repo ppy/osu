@@ -16,8 +16,6 @@ using System.Linq;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Input;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Framework.Configuration;
@@ -222,10 +220,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 switch (args.Key)
                 {
                     case Key.Minus:
-                        transformVisibleTimeRangeTo(visibleTimeRange + time_span_step, 200, EasingTypes.OutQuint);
+                        transformVisibleTimeRangeTo(visibleTimeRange + time_span_step, 200, Easing.OutQuint);
                         break;
                     case Key.Plus:
-                        transformVisibleTimeRangeTo(visibleTimeRange - time_span_step, 200, EasingTypes.OutQuint);
+                        transformVisibleTimeRangeTo(visibleTimeRange - time_span_step, 200, Easing.OutQuint);
                         break;
                 }
             }
@@ -233,9 +231,9 @@ namespace osu.Game.Rulesets.Mania.UI
             return false;
         }
 
-        private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, EasingTypes easing = EasingTypes.None)
+        private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, Easing easing = Easing.None)
         {
-            TransformTo(newTimeRange, duration, easing, new TransformTimeSpan());
+            this.TransformTo(nameof(visibleTimeRange), newTimeRange, duration, easing);
         }
 
         protected override void Update()
@@ -243,24 +241,6 @@ namespace osu.Game.Rulesets.Mania.UI
             // Due to masking differences, it is not possible to get the width of the columns container automatically
             // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
             barLineContainer.Width = columns.Width;
-        }
-
-        private class TransformTimeSpan : Transform<double, Drawable>
-        {
-            public double CurrentValue
-            {
-                get
-                {
-                    double time = Time?.Current ?? 0;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
-
-                    return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-                }
-            }
-
-            public override void Apply(Drawable d) => ((ManiaPlayfield)d).visibleTimeRange.Value = (float)CurrentValue;
-            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ManiaPlayfield)d).visibleTimeRange.Value;
         }
     }
 }

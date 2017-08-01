@@ -15,8 +15,8 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Database;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, RulesetDatabase rulesets)
+        private void load(OsuColour colours, OsuGame osu, RulesetStore rulesets)
         {
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
@@ -66,14 +66,14 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopOut();
 
-            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, APPEAR_DURATION, EasingTypes.InSine);
-            rankedMultiplerContainer.FadeOut(APPEAR_DURATION, EasingTypes.InSine);
+            rankedMultiplerContainer.MoveToX(rankedMultiplerContainer.DrawSize.X, APPEAR_DURATION, Easing.InSine);
+            rankedMultiplerContainer.FadeOut(APPEAR_DURATION, Easing.InSine);
 
             foreach (ModSection section in modSectionsContainer.Children)
             {
-                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), APPEAR_DURATION, EasingTypes.InSine);
-                section.ButtonsContainer.MoveToX(100f, APPEAR_DURATION, EasingTypes.InSine);
-                section.ButtonsContainer.FadeOut(APPEAR_DURATION, EasingTypes.InSine);
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(100f, 0f), APPEAR_DURATION, Easing.InSine);
+                section.ButtonsContainer.MoveToX(100f, APPEAR_DURATION, Easing.InSine);
+                section.ButtonsContainer.FadeOut(APPEAR_DURATION, Easing.InSine);
             }
         }
 
@@ -81,14 +81,14 @@ namespace osu.Game.Overlays.Mods
         {
             base.PopIn();
 
-            rankedMultiplerContainer.MoveToX(0, ranked_multiplier_duration, EasingTypes.OutQuint);
-            rankedMultiplerContainer.FadeIn(ranked_multiplier_duration, EasingTypes.OutQuint);
+            rankedMultiplerContainer.MoveToX(0, ranked_multiplier_duration, Easing.OutQuint);
+            rankedMultiplerContainer.FadeIn(ranked_multiplier_duration, Easing.OutQuint);
 
             foreach (ModSection section in modSectionsContainer.Children)
             {
-                section.ButtonsContainer.TransformSpacingTo(new Vector2(50f, 0f), button_duration, EasingTypes.OutQuint);
-                section.ButtonsContainer.MoveToX(0, button_duration, EasingTypes.OutQuint);
-                section.ButtonsContainer.FadeIn(button_duration, EasingTypes.OutQuint);
+                section.ButtonsContainer.TransformSpacingTo(new Vector2(50f, 0f), button_duration, Easing.OutQuint);
+                section.ButtonsContainer.MoveToX(0, button_duration, Easing.OutQuint);
+                section.ButtonsContainer.FadeIn(button_duration, Easing.OutQuint);
             }
         }
 

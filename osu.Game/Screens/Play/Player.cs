@@ -13,7 +13,6 @@ using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
-using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
@@ -34,8 +33,6 @@ namespace osu.Game.Screens.Play
         internal override bool ShowOverlays => false;
 
         internal override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && HitRenderer.ProvidingUserCursor;
-
-        public BeatmapInfo BeatmapInfo;
 
         public Action RestartRequested;
 
@@ -72,7 +69,7 @@ namespace osu.Game.Screens.Play
         private bool loadedSuccessfully => HitRenderer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(AudioManager audio, BeatmapDatabase beatmaps, OsuConfigManager config, OsuGame osu)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGame osu)
         {
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
@@ -83,10 +80,6 @@ namespace osu.Game.Screens.Play
 
             try
             {
-                if (!Beatmap.Value.WithStoryboard)
-                    // we need to ensure the storyboard is loaded.
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(BeatmapInfo, withStoryboard: true);
-
                 if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
@@ -121,10 +114,7 @@ namespace osu.Game.Screens.Play
             Track track = Beatmap.Value.Track;
 
             if (track != null)
-            {
-                audio.Track.SetExclusive(track);
                 adjustableSourceClock = track;
-            }
 
             adjustableSourceClock = (IAdjustableClock)track ?? new StopwatchClock();
 
@@ -271,29 +261,27 @@ namespace osu.Game.Screens.Play
             if (!loadedSuccessfully)
                 return;
 
-            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, EasingTypes.OutQuint);
-            Background?.FadeTo(1 - (float)dimLevel, 1500, EasingTypes.OutQuint);
+            (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, Easing.OutQuint);
+            Background?.FadeTo(1 - (float)dimLevel, 1500, Easing.OutQuint);
 
             Content.Alpha = 0;
 
             dimLevel.ValueChanged += newDim => Background?.FadeTo(1 - (float)newDim, 800);
 
-            Content.ScaleTo(0.7f);
+            Content
+                .ScaleTo(0.7f)
+                .ScaleTo(1, 750, Easing.OutQuint)
+                .Delay(250)
+                .FadeIn(250);
 
-            using (Content.BeginDelayedSequence(250))
-                Content.FadeIn(250);
-
-            Content.ScaleTo(1, 750, EasingTypes.OutQuint);
-
-            using (BeginDelayedSequence(750))
-                Schedule(() =>
-                {
-                    if (!pauseContainer.IsPaused)
-                        decoupledClock.Start();
-                });
+            this.Delay(750).Schedule(() =>
+            {
+                if (!pauseContainer.IsPaused)
+                    decoupledClock.Start();
+            });
 
             pauseContainer.Alpha = 0;
-            pauseContainer.FadeIn(750, EasingTypes.OutQuint);
+            pauseContainer.FadeIn(750, Easing.OutQuint);
         }
 
         protected override void OnSuspending(Screen next)
@@ -325,7 +313,7 @@ namespace osu.Game.Screens.Play
             HitRenderer?.FadeOut(fade_out_duration);
             Content.FadeOut(fade_out_duration);
 
-            hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, EasingTypes.In);
+            hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, Easing.In);
 
             Background?.FadeTo(1f, fade_out_duration);
         }

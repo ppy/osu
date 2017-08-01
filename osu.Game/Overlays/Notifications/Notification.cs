@@ -63,6 +63,8 @@ namespace osu.Game.Overlays.Notifications
                     Masking = true,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    AutoSizeDuration = 400,
+                    AutoSizeEasing = Easing.OutQuint,
                     Children = new Drawable[]
                     {
                         new Box
@@ -74,7 +76,7 @@ namespace osu.Game.Overlays.Notifications
                         {
                             RelativeSizeAxes = Axes.X,
                             Padding = new MarginPadding(5),
-                            Height = 60,
+                            AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
                                 IconContent = new Container
@@ -135,9 +137,9 @@ namespace osu.Game.Overlays.Notifications
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            FadeInFromZero(200);
+            this.FadeInFromZero(200);
             NotificationContent.MoveToX(DrawSize.X);
-            NotificationContent.MoveToX(0, 500, EasingTypes.OutQuint);
+            NotificationContent.MoveToX(0, 500, Easing.OutQuint);
         }
 
         private bool wasClosed;
@@ -148,7 +150,7 @@ namespace osu.Game.Overlays.Notifications
             wasClosed = true;
 
             Closed?.Invoke();
-            FadeOut(100);
+            this.FadeOut(100);
             Expire();
         }
 
@@ -181,13 +183,13 @@ namespace osu.Game.Overlays.Notifications
 
             protected override bool OnHover(InputState state)
             {
-                FadeColour(hoverColour, 200);
+                this.FadeColour(hoverColour, 200);
                 return base.OnHover(state);
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                FadeColour(OsuColour.Gray(0.2f), 200);
+                this.FadeColour(OsuColour.Gray(0.2f), 200);
                 base.OnHoverLost(state);
             }
         }
@@ -212,12 +214,9 @@ namespace osu.Game.Overlays.Notifications
                     if (pulsate)
                     {
                         const float length = 1000;
-                        using (pulsateLayer.BeginLoopedSequence(length / 2))
-                        {
-                            pulsateLayer.FadeTo(0.4f, length, EasingTypes.In);
-                            using (pulsateLayer.BeginDelayedSequence(length))
-                                pulsateLayer.FadeTo(1, length, EasingTypes.Out);
-                        }
+                        pulsateLayer.Loop(length / 2,
+                            p => p.FadeTo(0.4f, length, Easing.In).Then().FadeTo(1, length, Easing.Out)
+                        );
                     }
                 }
             }

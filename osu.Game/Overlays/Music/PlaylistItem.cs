@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Music
                 if (value == selected) return;
                 selected = value;
 
-                Flush(true);
+                FinishTransforms(true);
                 foreach (SpriteText s in titleSprites)
                     s.FadeColour(Selected ? hoverColour : Color4.White, fade_duration);
             }
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Music
 
                 matching = value;
 
-                FadeTo(matching ? 1 : 0, 200);
+                this.FadeTo(matching ? 1 : 0, 200);
             }
         }
     }

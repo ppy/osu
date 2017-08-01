@@ -14,7 +14,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -57,14 +56,14 @@ namespace osu.Game.Screens.Select
 
         protected override void PopIn()
         {
-            MoveToX(0, 800, EasingTypes.OutQuint);
-            RotateTo(0, 800, EasingTypes.OutQuint);
+            this.MoveToX(0, 800, Easing.OutQuint);
+            this.RotateTo(0, 800, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            MoveToX(-100, 800, EasingTypes.InQuint);
-            RotateTo(10, 800, EasingTypes.InQuint);
+            this.MoveToX(-100, 800, Easing.InQuint);
+            this.RotateTo(10, 800, Easing.InQuint);
         }
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
@@ -78,7 +77,7 @@ namespace osu.Game.Screens.Select
                     Shear = -Shear,
                     OnLoadComplete = d =>
                     {
-                        FadeIn(250);
+                        this.FadeIn(250);
 
                         lastContainer?.FadeOut(250);
                         lastContainer?.Expire();
@@ -140,7 +139,7 @@ namespace osu.Game.Screens.Select
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
+                        Colour = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
                         Children = new[]
                         {
                             // Zoomed-in and cropped beatmap background

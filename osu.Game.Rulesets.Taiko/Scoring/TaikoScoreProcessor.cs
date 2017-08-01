@@ -3,7 +3,6 @@
 
 using System;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;

@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Multiplayer
             set
             {
                 host.Text = value.Username;
-                flagContainer.Children = new[] { new DrawableFlag(value.Country?.FlagName ?? @"__") { RelativeSizeAxes = Axes.Both } };
+                flagContainer.Children = new[] { new DrawableFlag(value.Country?.FlagName) { RelativeSizeAxes = Axes.Both } };
             }
         }
 

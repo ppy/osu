@@ -25,16 +25,16 @@ namespace osu.Desktop.Overlays
     public class VersionManager : OverlayContainer
     {
         private UpdateManager updateManager;
-        private NotificationManager notificationManager;
+        private NotificationOverlay notificationOverlay;
 
         protected override bool HideOnEscape => false;
 
         public override bool HandleInput => false;
 
         [BackgroundDependencyLoader]
-        private void load(NotificationManager notification, OsuColour colours, TextureStore textures, OsuGameBase game)
+        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game)
         {
-            notificationManager = notification;
+            notificationOverlay = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
@@ -116,7 +116,7 @@ namespace osu.Desktop.Overlays
                 if (notification == null)
                 {
                     notification = new UpdateProgressNotification { State = ProgressNotificationState.Active };
-                    Schedule(() => notificationManager.Post(notification));
+                    Schedule(() => notificationOverlay.Post(notification));
                 }
 
                 Schedule(() =>
@@ -175,7 +175,7 @@ namespace osu.Desktop.Overlays
 
         protected override void PopIn()
         {
-            FadeIn(1000);
+            this.FadeIn(1000);
         }
 
         protected override void PopOut()
@@ -207,7 +207,7 @@ namespace osu.Desktop.Overlays
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        ColourInfo = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
+                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
                     },
                     new TextAwesome
                     {

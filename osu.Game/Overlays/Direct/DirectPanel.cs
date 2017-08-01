@@ -6,8 +6,8 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Direct
             Origin = Anchor.Centre,
             RelativeSizeAxes = Axes.Both,
             FillMode = FillMode.Fill,
-            OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
+            OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
         })
         {
             RelativeSizeAxes = Axes.Both,

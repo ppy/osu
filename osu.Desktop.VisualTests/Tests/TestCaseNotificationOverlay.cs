@@ -12,17 +12,17 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Desktop.VisualTests.Tests
 {
-    internal class TestCaseNotificationManager : TestCase
+    internal class TestCaseNotificationOverlay : TestCase
     {
         public override string Description => @"I handle notifications";
 
-        private readonly NotificationManager manager;
+        private readonly NotificationOverlay manager;
 
-        public TestCaseNotificationManager()
+        public TestCaseNotificationOverlay()
         {
             progressingNotifications.Clear();
 
-            Content.Add(manager = new NotificationManager
+            Content.Add(manager = new NotificationOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -56,10 +56,7 @@ namespace osu.Desktop.VisualTests.Tests
             }
 
             if (remaining > 0)
-            {
-                Delay(80);
-                Schedule(() => sendBarrage(remaining - 1));
-            }
+                Scheduler.AddDelayed(() => sendBarrage(remaining - 1), 80);
         }
 
         protected override void Update()

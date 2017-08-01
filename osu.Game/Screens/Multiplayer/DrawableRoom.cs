@@ -10,8 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -235,7 +235,7 @@ namespace osu.Game.Screens.Multiplayer
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
+                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
                     }) { RelativeSizeAxes = Axes.Both },
                 };
 

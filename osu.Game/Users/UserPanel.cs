@@ -102,7 +102,7 @@ namespace osu.Game.Users
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        new DrawableFlag(user.Country?.FlagName ?? @"__")
+                                        new DrawableFlag(user.Country?.FlagName)
                                         {
                                             Width = 30f,
                                             RelativeSizeAxes = Axes.Y,
@@ -169,7 +169,7 @@ namespace osu.Game.Users
         private void load(OsuColour colours, UserProfileOverlay profile)
         {
             Status.ValueChanged += displayStatus;
-            Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, EasingTypes.OutQuint);
+            Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
 
             base.Action = () =>
             {
@@ -190,15 +190,15 @@ namespace osu.Game.Users
 
             if (status == null)
             {
-                statusBar.ResizeHeightTo(0f, transition_duration, EasingTypes.OutQuint);
-                statusBar.FadeOut(transition_duration, EasingTypes.OutQuint);
-                ResizeHeightTo(height - status_height, transition_duration, EasingTypes.OutQuint);
+                statusBar.ResizeHeightTo(0f, transition_duration, Easing.OutQuint);
+                statusBar.FadeOut(transition_duration, Easing.OutQuint);
+                this.ResizeHeightTo(height - status_height, transition_duration, Easing.OutQuint);
             }
             else
             {
-                statusBar.ResizeHeightTo(status_height, transition_duration, EasingTypes.OutQuint);
-                statusBar.FadeIn(transition_duration, EasingTypes.OutQuint);
-                ResizeHeightTo(height, transition_duration, EasingTypes.OutQuint);
+                statusBar.ResizeHeightTo(status_height, transition_duration, Easing.OutQuint);
+                statusBar.FadeIn(transition_duration, Easing.OutQuint);
+                this.ResizeHeightTo(height, transition_duration, Easing.OutQuint);
 
                 statusMessage.Text = status.Message;
             }

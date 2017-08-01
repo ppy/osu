@@ -34,14 +34,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            using (spinner.BeginLoopedSequence())
-                spinner.RotateTo(360, 2000);
+            spinner.Spin(2000, RotationDirection.Clockwise);
         }
 
         private const float transition_duration = 500;
 
-        protected override void PopIn() => FadeIn(transition_duration * 5, EasingTypes.OutQuint);
+        protected override void PopIn() => this.FadeIn(transition_duration * 5, Easing.OutQuint);
 
-        protected override void PopOut() => FadeOut(transition_duration, EasingTypes.OutQuint);
+        protected override void PopOut() => this.FadeOut(transition_duration, Easing.OutQuint);
     }
 }

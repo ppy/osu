@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Settings.Sections.Maintenance;
 using OpenTK;
 
 namespace osu.Game.Overlays.Settings.Sections
@@ -17,6 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
+                new GeneralSettings()
             };
         }
     }
