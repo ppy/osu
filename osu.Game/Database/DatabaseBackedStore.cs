@@ -17,6 +17,8 @@ namespace osu.Game.Database
         protected readonly Storage Storage;
         protected readonly SQLiteConnection Connection;
 
+        protected virtual int StoreVersion => 1;
+
         protected DatabaseBackedStore(SQLiteConnection connection, Storage storage = null)
         {
             Storage = storage;
@@ -31,10 +33,48 @@ namespace osu.Game.Database
                 Logger.Error(e, $@"Failed to initialise the {GetType()}! Trying again with a clean database...");
                 Prepare(true);
             }
+
+            checkMigrations();
+        }
+
+        private void checkMigrations()
+        {
+            var storeName = GetType().Name;
+
+            var reportedVersion = Connection.Table<StoreVersion>().FirstOrDefault(s => s.StoreName == storeName) ?? new StoreVersion
+            {
+                StoreName = storeName,
+                Version = 0
+            };
+
+            if (reportedVersion.Version != StoreVersion)
+                PerformMigration(reportedVersion.Version, reportedVersion.Version = StoreVersion);
+
+            Connection.InsertOrReplace(reportedVersion);
+
+            StartupTasks();
         }
 
         /// <summary>
-        /// Prepare this database for use.
+        /// Called when the database version of this store doesn't match the local version.
+        /// Any manual migration operations should be performed in this.
+        /// </summary>
+        /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
+        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
+        protected virtual void PerformMigration(int currentVersion, int targetVersion)
+        {
+        }
+
+        /// <summary>
+        /// Perform any common startup tasks. Runs after <see cref="Prepare(bool)"/> and <see cref="PerformMigration(int, int)"/>.
+        /// </summary>
+        protected virtual void StartupTasks()
+        {
+
+        }
+
+        /// <summary>
+        /// Prepare this database for use. Tables should be created here.
         /// </summary>
         protected abstract void Prepare(bool reset = false);
 
@@ -59,9 +99,9 @@ namespace osu.Game.Database
         /// <summary>
         /// Query and populate results.
         /// </summary>
-        /// <param name="filter">An optional filter to refine results.</param>
+        /// <param name="filter">An filter to refine results.</param>
         /// <returns></returns>
-        public List<T> QueryAndPopulate<T>(Expression<Func<T, bool>> filter = null)
+        public List<T> QueryAndPopulate<T>(Expression<Func<T, bool>> filter)
             where T : class
         {
             checkType(typeof(T));
@@ -77,7 +117,6 @@ namespace osu.Game.Database
         public void Populate<T>(T item, bool recursive = true)
         {
             checkType(item.GetType());
-
             Connection.GetChildren(item, recursive);
         }
 

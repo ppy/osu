@@ -129,6 +129,11 @@ namespace osu.Game.Screens.Select
                     Right = left_area_padding,
                 },
             });
+            Add(new ResetScrollContainer(() => carousel.ScrollToSelected())
+            {
+                RelativeSizeAxes = Axes.Y,
+                Width = 250,
+            });
 
             if (ShowFooter)
             {
@@ -280,7 +285,7 @@ namespace osu.Game.Screens.Select
             carousel.Filter(criteria, debounce);
         }
 
-        private void onBeatmapSetAdded(BeatmapSetInfo s) => carousel.AddBeatmap(s);
+        private void onBeatmapSetAdded(BeatmapSetInfo s) => Schedule(() => addBeatmapSet(s));
 
         private void onBeatmapSetRemoved(BeatmapSetInfo s) => Schedule(() => removeBeatmapSet(s));
 
@@ -375,6 +380,11 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet)
+        {
+            carousel.AddBeatmap(beatmapSet);
+        }
+
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
         {
             carousel.RemoveBeatmap(beatmapSet);
@@ -408,6 +418,22 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(state, args);
+        }
+
+        private class ResetScrollContainer : Container
+        {
+            private readonly Action onHoverAction;
+
+            public ResetScrollContainer(Action onHoverAction)
+            {
+                this.onHoverAction = onHoverAction;
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                onHoverAction?.Invoke();
+                return base.OnHover(state);
+            }
         }
     }
 }

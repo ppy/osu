@@ -17,6 +17,12 @@ namespace osu.Game.Beatmaps
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
+        /// <summary>
+        /// The current version of this store. Used for migrations (see <see cref="PerformMigration(int, int)"/>).
+        /// The initial version is 1.
+        /// </summary>
+        protected override int StoreVersion => 2;
+
         public BeatmapStore(SQLiteConnection connection)
             : base(connection)
         {
@@ -46,8 +52,34 @@ namespace osu.Game.Beatmaps
             Connection.CreateTable<BeatmapSetInfo>();
             Connection.CreateTable<BeatmapSetFileInfo>();
             Connection.CreateTable<BeatmapInfo>();
+        }
 
+        protected override void StartupTasks()
+        {
+            base.StartupTasks();
             cleanupPendingDeletions();
+        }
+
+        /// <summary>
+        /// Perform migrations between two store versions.
+        /// </summary>
+        /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
+        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
+        protected override void PerformMigration(int currentVersion, int targetVersion)
+        {
+            base.PerformMigration(currentVersion, targetVersion);
+
+            while (currentVersion++ < targetVersion)
+            {
+                switch (currentVersion)
+                {
+                    case 1:
+                    case 2:
+                        // cannot migrate; breaking underlying changes.
+                        Reset();
+                        break;
+                }
+            }
         }
 
         /// <summary>
@@ -56,7 +88,11 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to add.</param>
         public void Add(BeatmapSetInfo beatmapSet)
         {
-            Connection.InsertOrReplaceWithChildren(beatmapSet, true);
+            Connection.RunInTransaction(() =>
+            {
+                Connection.InsertOrReplaceWithChildren(beatmapSet, true);
+            });
+
             BeatmapSetAdded?.Invoke(beatmapSet);
         }
 
