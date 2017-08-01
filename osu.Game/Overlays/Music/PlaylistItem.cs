@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -15,7 +16,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Music
 {
-    internal class PlaylistItem : Container, IFilterable
+    internal class PlaylistItem : Container, IFilterable, IDraggable, IComparable
     {
         private const float fade_duration = 100;
 
@@ -30,7 +31,11 @@ namespace osu.Game.Overlays.Music
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
-        public Action<BeatmapSetInfo> OnSelect;
+        public Action<PlaylistItem> OnSelect;
+
+        public Action<Drawable, InputState> DragStart { get; set; }
+        public Action<Drawable, InputState> Drag { get; set; }
+        public Action<Drawable, InputState> DragEnd { get; set; }
 
         private bool selected;
         public bool Selected
@@ -91,6 +96,7 @@ namespace osu.Game.Overlays.Music
             artistBind = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
 
             artistBind.ValueChanged += newText => recreateText();
+            titleBind.ValueChanged  += newText => recreateText();
             artistBind.TriggerChange();
         }
 
@@ -114,22 +120,48 @@ namespace osu.Game.Overlays.Music
             });
         }
 
-        protected override bool OnHover(Framework.Input.InputState state)
+        protected override bool OnHover(InputState state)
         {
             handle.FadeIn(fade_duration);
 
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(Framework.Input.InputState state)
+        protected override void OnHoverLost(InputState state)
         {
             handle.FadeOut(fade_duration);
         }
 
-        protected override bool OnClick(Framework.Input.InputState state)
+        protected override bool OnClick(InputState state)
         {
-            OnSelect?.Invoke(BeatmapSetInfo);
+            if (!selected)
+                OnSelect?.Invoke(this);
             return true;
+        }
+
+        protected override bool OnDragStart(InputState state)
+        {
+            DragStart.Invoke(this, state);
+            return true;
+        }
+
+        protected override bool OnDrag(InputState state)
+        {
+            Drag.Invoke(this, state);
+            return base.OnDrag(state);
+        }
+
+        protected override bool OnDragEnd(InputState state)
+        {
+            DragEnd.Invoke(this, state);
+            return base.OnDragEnd(state);
+        }
+
+        public int CompareTo(object obj)
+        {
+            PlaylistItem arg = obj as PlaylistItem;
+            int result = this.Position.Y.CompareTo(arg.Position.Y);
+            return result;
         }
 
         public string[] FilterTerms { get; private set; }

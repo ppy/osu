@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -24,15 +25,17 @@ namespace osu.Game.Overlays.Music
         private const float playlist_height = 510;
 
         private FilterControl filter;
+
         private PlaylistList list;
 
         private BeatmapManager beatmaps;
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-        public IEnumerable<BeatmapSetInfo> BeatmapSets;
-        private InputManager inputManager;
+        public IList<BeatmapSetInfo> BeatmapSets;
 
+        private InputManager inputManager;
+        
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours, UserInputManager inputManager)
         {
@@ -64,6 +67,7 @@ namespace osu.Game.Overlays.Music
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
                             OnSelect = itemSelected,
+                            ReorderList = reorderSets,
                         },
                         filter = new FilterControl
                         {
@@ -153,6 +157,11 @@ namespace osu.Game.Overlays.Music
         {
             beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
             beatmapBacking.Value.Track.Start();
+        }
+
+        private void reorderSets(IEnumerable<PlaylistItem> newList)
+        {
+            BeatmapSets = newList.Select(items => items.BeatmapSetInfo).ToList();
         }
     }
 

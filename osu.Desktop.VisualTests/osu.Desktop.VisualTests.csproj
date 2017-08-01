@@ -200,6 +200,7 @@
     <Compile Include="Tests\TestCaseMusicController.cs" />
     <Compile Include="Tests\TestCaseNotificationOverlay.cs" />
     <Compile Include="Tests\TestCaseOnScreenDisplay.cs" />
+    <Compile Include="Tests\TestCasePlaylistItem.cs" />
     <Compile Include="Tests\TestCaseReplaySettingsOverlay.cs" />
     <Compile Include="Tests\TestCasePlayer.cs" />
     <Compile Include="Tests\TestCaseHitObjects.cs" />
