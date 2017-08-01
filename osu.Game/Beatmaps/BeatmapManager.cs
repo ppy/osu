@@ -59,6 +59,11 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Action<Notification> PostNotification { private get; set; }
 
+        /// <summary>
+        /// Set a storage with access to an osu-stable install for import purposes.
+        /// </summary>
+        public Func<Storage> GetStableStorage { private get; set; }
+
         public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, IIpcHost importHost = null)
         {
             beatmaps = new BeatmapStore(connection);
@@ -451,19 +456,20 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        /// <summary>
+        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
+        /// </summary>
         public void ImportFromStable()
         {
-            string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!", "Songs");
-            if (!Directory.Exists(stableInstallPath))
-                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu", "Songs");
+            var stable = GetStableStorage?.Invoke();
 
-            if (!Directory.Exists(stableInstallPath))
+            if (stable == null)
             {
-                Logger.Log("Couldn't find an osu!stable installation!", LoggingTarget.Information, LogLevel.Error);
+                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
                 return;
             }
 
-            Import(Directory.GetDirectories(stableInstallPath));
+            Import(stable.GetDirectories("Songs"));
         }
 
         public void DeleteAll()
