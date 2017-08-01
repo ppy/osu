@@ -38,7 +38,11 @@ namespace osu.Game.IO
                 Connection.DropTable<FileInfo>();
 
             Connection.CreateTable<FileInfo>();
+        }
 
+        protected override void StartupTasks()
+        {
+            base.StartupTasks();
             deletePending();
         }
 
