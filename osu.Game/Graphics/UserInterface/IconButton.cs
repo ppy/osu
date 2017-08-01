@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
             hover.Colour = colours.Yellow.Opacity(0.6f);
             flashColour = colours.Yellow;
 
-            Enabled.ValueChanged += newEnabled => FadeColour(newEnabled ? Color4.White : colours.Gray9, 200, EasingTypes.OutQuint);
+            Enabled.ValueChanged += newEnabled => this.FadeColour(newEnabled ? Color4.White : colours.Gray9, 200, Easing.OutQuint);
         }
 
         protected override bool OnHover(InputState state)
