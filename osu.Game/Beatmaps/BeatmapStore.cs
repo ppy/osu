@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps
         /// The current version of this store. Used for migrations (see <see cref="PerformMigration(int, int)"/>).
         /// The initial version is 1.
         /// </summary>
-        protected override int StoreVersion => 1;
+        protected override int StoreVersion => 2;
 
         public BeatmapStore(SQLiteConnection connection)
             : base(connection)
@@ -74,14 +74,9 @@ namespace osu.Game.Beatmaps
                 switch (currentVersion)
                 {
                     case 1:
-                        // initialising from a version before we had versioning (or a fresh install).
-
-                        // force adding of Protected column (not automatically migrated).
-                        Connection.MigrateTable<BeatmapSetInfo>();
-
-                        // remove all existing beatmaps.
-                        foreach (var b in Connection.GetAllWithChildren<BeatmapSetInfo>(null, true))
-                            Connection.Delete(b, true);
+                    case 2:
+                        // cannot migrate; breaking underlying changes.
+                        Reset();
                         break;
                 }
             }

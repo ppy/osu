@@ -23,6 +23,8 @@ namespace osu.Game.IO
 
         public readonly ResourceStore<byte[]> Store;
 
+        protected override int StoreVersion => 2;
+
         public FileStore(SQLiteConnection connection, Storage storage) : base(connection, storage)
         {
             Store = new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), prefix);
@@ -35,7 +37,19 @@ namespace osu.Game.IO
         protected override void Prepare(bool reset = false)
         {
             if (reset)
+            {
+                try
+                {
+                    foreach (var f in Query<FileInfo>())
+                        Storage.Delete(Path.Combine(prefix, f.Hash));
+                }
+                catch
+                {
+                    // we don't want to ever crash as a result of a reset operation.
+                }
+
                 Connection.DropTable<FileInfo>();
+            }
 
             Connection.CreateTable<FileInfo>();
         }
@@ -44,6 +58,28 @@ namespace osu.Game.IO
         {
             base.StartupTasks();
             deletePending();
+        }
+
+        /// <summary>
+        /// Perform migrations between two store versions.
+        /// </summary>
+        /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
+        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
+        protected override void PerformMigration(int currentVersion, int targetVersion)
+        {
+            base.PerformMigration(currentVersion, targetVersion);
+
+            while (currentVersion++ < targetVersion)
+            {
+                switch (currentVersion)
+                {
+                    case 1:
+                    case 2:
+                        // cannot migrate; breaking underlying changes.
+                        Reset();
+                        break;
+                }
+            }
         }
 
         public FileInfo Add(Stream data)
