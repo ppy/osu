@@ -41,7 +41,7 @@ namespace osu.Game.IO
                 try
                 {
                     foreach (var f in Query<FileInfo>())
-                        Storage.Delete(Path.Combine(prefix, f.Hash));
+                        Storage.Delete(Path.Combine(prefix, f.StoragePath));
                 }
                 catch
                 {
@@ -150,7 +150,7 @@ namespace osu.Game.IO
                 try
                 {
                     Connection.Delete(f);
-                    Storage.Delete(Path.Combine(prefix, f.Hash));
+                    Storage.Delete(Path.Combine(prefix, f.StoragePath));
                 }
                 catch (Exception e)
                 {
