@@ -4,7 +4,6 @@
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Database;
 using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
@@ -22,14 +21,11 @@ namespace osu.Game.Beatmaps
 
         public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
-        public readonly bool WithStoryboard;
-
-        protected WorkingBeatmap(BeatmapInfo beatmapInfo, bool withStoryboard = false)
+        protected WorkingBeatmap(BeatmapInfo beatmapInfo)
         {
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo.Metadata;
-            WithStoryboard = withStoryboard;
 
             Mods.ValueChanged += mods => applyRateAdjustments();
         }

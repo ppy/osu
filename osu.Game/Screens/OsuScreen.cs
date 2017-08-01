@@ -6,11 +6,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using OpenTK;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens
 {

@@ -9,11 +9,11 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
 
-            FadeInFromZero(200, EasingTypes.Out);
+            this.FadeInFromZero(200, Easing.Out);
         }
 
         [BackgroundDependencyLoader]
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Direct
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColourInfo = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.25f), Color4.Black.Opacity(0.75f)),
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.25f), Color4.Black.Opacity(0.75f)),
                 },
                 new Container
                 {
@@ -171,25 +171,25 @@ namespace osu.Game.Overlays.Direct
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                icon.ScaleTo(0.9f, 1000, EasingTypes.Out);
+                icon.ScaleTo(0.9f, 1000, Easing.Out);
                 return base.OnMouseDown(state, args);
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                icon.ScaleTo(1f, 500, EasingTypes.OutElastic);
+                icon.ScaleTo(1f, 500, Easing.OutElastic);
                 return base.OnMouseUp(state, args);
             }
 
             protected override bool OnHover(InputState state)
             {
-                icon.ScaleTo(1.1f, 500, EasingTypes.OutElastic);
+                icon.ScaleTo(1.1f, 500, Easing.OutElastic);
                 return base.OnHover(state);
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                icon.ScaleTo(1f, 500, EasingTypes.OutElastic);
+                icon.ScaleTo(1f, 500, Easing.OutElastic);
             }
         }
     }

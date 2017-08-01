@@ -9,13 +9,14 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Rulesets;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays
         private const float panel_padding = 10f;
 
         private APIAccess api;
-        private RulesetDatabase rulesets;
+        private RulesetStore rulesets;
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
@@ -160,7 +161,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, RulesetDatabase rulesets)
+        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets)
         {
             this.api = api;
             this.rulesets = rulesets;
@@ -169,7 +170,7 @@ namespace osu.Game.Overlays
 
         private void updateResultCounts()
         {
-            resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, EasingTypes.OutQuint);
+            resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, Easing.OutQuint);
             if (ResultAmounts == null) return;
 
             resultCountsText.Text = pluralize("Artist", ResultAmounts.Artists) + ", " +

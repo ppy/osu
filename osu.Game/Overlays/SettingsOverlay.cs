@@ -125,9 +125,9 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            sectionsContainer.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            sidebar.MoveToX(0, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            FadeTo(1, TRANSITION_LENGTH / 2);
+            sectionsContainer.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
+            sidebar.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
+            this.FadeTo(1, TRANSITION_LENGTH / 2);
 
             searchTextBox.HoldFocus = true;
         }
@@ -136,9 +136,9 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            sectionsContainer.MoveToX(-width, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, EasingTypes.OutQuint);
-            FadeTo(0, TRANSITION_LENGTH / 2);
+            sectionsContainer.MoveToX(-width, TRANSITION_LENGTH, Easing.OutQuint);
+            sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
+            this.FadeTo(0, TRANSITION_LENGTH / 2);
 
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)

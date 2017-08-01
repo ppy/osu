@@ -6,7 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -16,6 +15,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Threading;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Select
                     requestedBeatmap.Metrics = res;
                     Schedule(() => updateMetrics(res));
                 };
-                lookup.Failure += e => updateMetrics(null);
+                lookup.Failure += e => Schedule(() => updateMetrics(null));
 
                 api.Queue(lookup);
                 loading.Show();
@@ -119,12 +119,12 @@ namespace osu.Game.Screens.Select
 
                 ratingsGraph.Values = ratings.Select(rating => (float)rating);
 
-                ratingsContainer.FadeColour(Color4.White, 500, EasingTypes.Out);
+                ratingsContainer.FadeColour(Color4.White, 500, Easing.Out);
             }
             else if (failOnMissing)
                 ratingsGraph.Values = new float[10];
             else
-                ratingsContainer.FadeColour(Color4.Gray, 500, EasingTypes.Out);
+                ratingsContainer.FadeColour(Color4.Gray, 500, Easing.Out);
 
             if (hasRetriesFails)
             {
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Select
                 failGraph.Values = fails.Select(fail => (float)fail);
                 retryGraph.Values = retries.Zip(fails, (retry, fail) => retry + MathHelper.Clamp(fail, 0, maxValue));
 
-                retryFailContainer.FadeColour(Color4.White, 500, EasingTypes.Out);
+                retryFailContainer.FadeColour(Color4.White, 500, Easing.Out);
             }
             else if (failOnMissing)
             {
@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Select
                 retryGraph.Values = new float[100];
             }
             else
-                retryFailContainer.FadeColour(Color4.Gray, 500, EasingTypes.Out);
+                retryFailContainer.FadeColour(Color4.Gray, 500, Easing.Out);
         }
 
         public BeatmapDetails()
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Select
                     Width = 0.4f,
                     Direction = FillDirection.Vertical,
                     LayoutDuration = 200,
-                    LayoutEasing = EasingTypes.OutQuint,
+                    LayoutEasing = Easing.OutQuint,
                     Children = new[]
                     {
                         description = new MetadataSegment("Description"),

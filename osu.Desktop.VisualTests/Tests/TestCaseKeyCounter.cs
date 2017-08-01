@@ -96,7 +96,7 @@ namespace osu.Desktop.VisualTests.Tests
             {
                 SelectionBox.ScaleTo(
                     new Vector2(value, 1),
-                    300, EasingTypes.OutQuint);
+                    300, Easing.OutQuint);
             }
         }
     }

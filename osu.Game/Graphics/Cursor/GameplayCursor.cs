@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Database;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -29,14 +28,14 @@ namespace osu.Game.Graphics.Cursor
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             ActiveCursor.Scale = new Vector2(1);
-            ActiveCursor.ScaleTo(1.2f, 100, EasingTypes.OutQuad);
+            ActiveCursor.ScaleTo(1.2f, 100, Easing.OutQuad);
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             if (!state.Mouse.HasMainButtonPressed)
-                ActiveCursor.ScaleTo(1, 200, EasingTypes.OutQuad);
+                ActiveCursor.ScaleTo(1, 200, Easing.OutQuad);
             return base.OnMouseUp(state, args);
         }
 

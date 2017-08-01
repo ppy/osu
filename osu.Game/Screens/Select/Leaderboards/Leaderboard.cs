@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Containers;
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
@@ -63,8 +63,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                     };
                     scrollFlow.Add(ls);
 
-                    ls.Delay(i++ * 50, true);
-                    ls.Show();
+                    using (BeginDelayedSequence(i++ * 50, true))
+                        ls.Show();
                 }
 
                 scrollContainer.ScrollTo(0f, false);
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     c.Colour = Color4.Transparent;
                 else
                 {
-                    c.ColourInfo = ColourInfo.GradientVertical(
+                    c.Colour = ColourInfo.GradientVertical(
                         Color4.White.Opacity(Math.Min(1 - (topY - fadeStart) / LeaderboardScore.HEIGHT, 1)),
                         Color4.White.Opacity(Math.Min(1 - (bottomY - fadeStart) / LeaderboardScore.HEIGHT, 1)));
                 }

@@ -6,7 +6,7 @@ using System.Linq;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 
-namespace osu.Game.Database
+namespace osu.Game.Beatmaps
 {
     public class BeatmapSetInfo
     {
@@ -34,8 +34,11 @@ namespace osu.Game.Database
 
         public string Hash { get; set; }
 
-        public string Path { get; set; }
+        public string StoryboardFile => Files.FirstOrDefault(f => f.Filename.EndsWith(".osb"))?.Filename;
 
-        public string StoryboardFile { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<BeatmapSetFileInfo> Files { get; set; }
+
+        public bool Protected { get; set; }
     }
 }

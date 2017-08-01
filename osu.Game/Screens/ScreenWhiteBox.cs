@@ -44,19 +44,20 @@ namespace osu.Game.Screens
             boxContainer.ScaleTo(0.2f);
             boxContainer.RotateTo(-20);
 
-            Content.Delay(300, true);
+            using (Content.BeginDelayedSequence(300, true))
+            {
+                boxContainer.ScaleTo(1, transition_time, Easing.OutElastic);
+                boxContainer.RotateTo(0, transition_time / 2, Easing.OutQuint);
 
-            boxContainer.ScaleTo(1, transition_time, EasingTypes.OutElastic);
-            boxContainer.RotateTo(0, transition_time / 2, EasingTypes.OutQuint);
-
-            textContainer.MoveTo(Vector2.Zero, transition_time, EasingTypes.OutExpo);
-            Content.FadeIn(transition_time, EasingTypes.OutExpo);
+                textContainer.MoveTo(Vector2.Zero, transition_time, Easing.OutExpo);
+                Content.FadeIn(transition_time, Easing.OutExpo);
+            }
         }
 
         protected override bool OnExiting(Screen next)
         {
-            textContainer.MoveTo(new Vector2(DrawSize.X / 16, 0), transition_time, EasingTypes.OutExpo);
-            Content.FadeOut(transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(DrawSize.X / 16, 0), transition_time, Easing.OutExpo);
+            Content.FadeOut(transition_time, Easing.OutExpo);
 
             return base.OnExiting(next);
         }
@@ -65,16 +66,16 @@ namespace osu.Game.Screens
         {
             base.OnSuspending(next);
 
-            textContainer.MoveTo(new Vector2(-(DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
-            Content.FadeOut(transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(-(DrawSize.X / 16), 0), transition_time, Easing.OutExpo);
+            Content.FadeOut(transition_time, Easing.OutExpo);
         }
 
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
 
-            textContainer.MoveTo(Vector2.Zero, transition_time, EasingTypes.OutExpo);
-            Content.FadeIn(transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(Vector2.Zero, transition_time, Easing.OutExpo);
+            Content.FadeIn(transition_time, Easing.OutExpo);
         }
 
         public ScreenWhiteBox()

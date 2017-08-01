@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
 using OpenTK;
 using OpenTK.Graphics;
@@ -29,7 +28,11 @@ namespace osu.Game.Screens.Tournament
 
         private readonly Container tracker;
 
+#pragma warning disable 649
+        // set via reflection.
         private float speed;
+#pragma warning restore 649
+
         private int expiredCount;
 
         private float offset;
@@ -65,7 +68,7 @@ namespace osu.Game.Screens.Tournament
                             Origin = Anchor.BottomCentre,
                             Size = new Vector2(2, 55),
 
-                            ColourInfo = ColourInfo.GradientVertical(Color4.Transparent, Color4.White)
+                            Colour = ColourInfo.GradientVertical(Color4.Transparent, Color4.White)
                         },
                         new Box
                         {
@@ -73,7 +76,7 @@ namespace osu.Game.Screens.Tournament
                             Origin = Anchor.TopCentre,
                             Size = new Vector2(2, 55),
 
-                            ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.Transparent)
+                            Colour = ColourInfo.GradientVertical(Color4.White, Color4.Transparent)
                         }
                     }
                 }
@@ -297,7 +300,8 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        private void speedTo(float value, double duration = 0, EasingTypes easing = EasingTypes.None) => TransformTo(value, duration, easing, new TransformScrollSpeed());
+        private void speedTo(float value, double duration = 0, Easing easing = Easing.None) =>
+            this.TransformTo(nameof(speed), value, duration, easing);
 
         private enum ScrollState
         {
@@ -306,12 +310,6 @@ namespace osu.Game.Screens.Tournament
             Stopping,
             Stopped,
             Scrolling
-        }
-
-        public class TransformScrollSpeed : TransformFloat<Drawable>
-        {
-            public override void Apply(Drawable d) => ((ScrollingTeamContainer)d).speed = CurrentValue;
-            public override void ReadIntoStartValue(Drawable d) => StartValue = ((ScrollingTeamContainer)d).speed;
         }
 
         public class ScrollingTeam : Container

@@ -6,9 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -18,10 +16,9 @@ namespace osu.Game.Overlays.Notifications
     {
         public string Text
         {
-            get { return textDrawable.Text; }
             set
             {
-                textDrawable.Text = value;
+                Schedule(() => textDrawable.Text = value);
             }
         }
 
@@ -77,11 +74,8 @@ namespace osu.Game.Overlays.Notifications
                     switch (state)
                     {
                         case ProgressNotificationState.Completed:
-                            NotificationContent.MoveToY(-DrawSize.Y / 2, 200, EasingTypes.OutQuint);
-                            FadeTo(0.01f, 200); //don't completely fade out or our scheduled task won't run.
-
-                            Delay(100);
-                            Schedule(Completed);
+                            NotificationContent.MoveToY(-DrawSize.Y / 2, 200, Easing.OutQuint);
+                            this.FadeOut(200).Finally(d => Completed());
                             break;
                     }
                 }
@@ -93,7 +87,7 @@ namespace osu.Game.Overlays.Notifications
         protected virtual Notification CreateCompletionNotification() => new ProgressCompletionNotification
         {
             Activated = CompletionClickAction,
-            Text = $"Task \"{Text}\" has completed!"
+            Text = "Task has completed!"
         };
 
         protected virtual void Completed()
@@ -109,7 +103,7 @@ namespace osu.Game.Overlays.Notifications
         private Color4 colourActive;
         private Color4 colourCancelled;
 
-        private readonly SpriteText textDrawable;
+        private readonly TextFlowContainer textDrawable;
 
         public ProgressNotification()
         {
@@ -118,9 +112,11 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.Both,
             });
 
-            Content.Add(textDrawable = new OsuSpriteText
+            Content.Add(textDrawable = new TextFlowContainer(t =>
             {
-                TextSize = 16,
+                t.TextSize = 16;
+            })
+            {
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
@@ -134,6 +130,9 @@ namespace osu.Game.Overlays.Notifications
             });
 
             State = ProgressNotificationState.Queued;
+
+            // don't close on click by default.
+            Activated = () => false;
         }
 
         [BackgroundDependencyLoader]
@@ -170,7 +169,7 @@ namespace osu.Game.Overlays.Notifications
 
         private class ProgressBar : Container
         {
-            private Box box;
+            private readonly Box box;
 
             private Color4 colourActive;
             private Color4 colourInactive;
@@ -184,7 +183,7 @@ namespace osu.Game.Overlays.Notifications
                     if (progress == value) return;
 
                     progress = value;
-                    box.ResizeTo(new Vector2(progress, 1), 100, EasingTypes.OutQuad);
+                    box.ResizeTo(new Vector2(progress, 1), 100, Easing.OutQuad);
                 }
             }
 
@@ -196,19 +195,12 @@ namespace osu.Game.Overlays.Notifications
                 set
                 {
                     active = value;
-                    FadeColour(active ? colourActive : colourInactive, 100);
+                    this.FadeColour(active ? colourActive : colourInactive, 100);
                 }
             }
 
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            public ProgressBar()
             {
-                colourActive = colours.Blue;
-                Colour = colourInactive = OsuColour.Gray(0.5f);
-
-                Height = 5;
-
                 Children = new[]
                 {
                     box = new Box
@@ -217,6 +209,15 @@ namespace osu.Game.Overlays.Notifications
                         Width = 0,
                     }
                 };
+            }
+
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                colourActive = colours.Blue;
+                Colour = colourInactive = OsuColour.Gray(0.5f);
+                Height = 5;
             }
         }
     }

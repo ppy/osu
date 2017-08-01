@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using osu.Desktop.Beatmaps.IO;
 using osu.Framework.Desktop;
 using osu.Framework.Desktop.Platform;
 using osu.Game.IPC;
@@ -15,8 +14,6 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
-            LegacyFilesystemReader.Register();
-
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
 
