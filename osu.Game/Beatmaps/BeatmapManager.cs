@@ -174,7 +174,7 @@ namespace osu.Game.Beatmaps
                 if (!beatmaps.Delete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
-                files.Dereference(beatmapSet.Files.Select(f => f.FileInfo));
+                files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace osu.Game.Beatmaps
                 if (!beatmaps.Undelete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
-                files.Reference(beatmapSet.Files.Select(f => f.FileInfo));
+                files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
         }
 
         /// <summary>

@@ -41,7 +41,7 @@ namespace osu.Game.Database
         {
             var storeName = GetType().Name;
 
-            var reportedVersion = Connection.Table<StoreVersion>().FirstOrDefault(s => s.StoreName == storeName) ?? new StoreVersion
+            var reportedVersion = Connection.Table<StoreVersion>().Where(s => s.StoreName == storeName).FirstOrDefault() ?? new StoreVersion
             {
                 StoreName = storeName,
                 Version = 0
