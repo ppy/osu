@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 this.MoveToY(-0.1f).FadeOut();
 
                 // animation
-                this.FadeIn(200).MoveToY(0.9f, preempt);
+                this.FadeIn(200).MoveToY(1, preempt);
             }
 
             Expire(true);
