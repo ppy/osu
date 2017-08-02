@@ -2,17 +2,37 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     internal class DrawableFruit : DrawableHitObject<CatchBaseHit, CatchJudgement>
     {
+        private class Pulp : Circle, IHasAccentColour
+        {
+            public Pulp()
+            {
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 5,
+                    Colour = AccentColour.Opacity(0.5f),
+                };
+            }
+
+            public Color4 AccentColour { get; set; } = Color4.White;
+        }
+
+
         public DrawableFruit(CatchBaseHit h) : base(h)
         {
             Origin = Anchor.Centre;
@@ -29,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             Children = new Framework.Graphics.Drawable[]
             {
-                new Circle
+                new Pulp
                 {
                     RelativePositionAxes = Axes.Both,
                     RelativeSizeAxes = Axes.Both,
@@ -38,7 +58,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     Scale = new Vector2(0.12f),
                     Y  = 0.08f,
                 },
-                new Circle
+                new Pulp
                 {
                     RelativePositionAxes = Axes.Both,
                     RelativeSizeAxes = Axes.Both,
@@ -47,7 +67,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     Scale = new Vector2(0.32f),
                     Position = new Vector2(-0.16f, 0.3f),
                 },
-                new Circle
+                new Pulp
                 {
                     RelativePositionAxes = Axes.Both,
                     RelativeSizeAxes = Axes.Both,
@@ -56,7 +76,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     Scale = new Vector2(0.32f),
                     Position = new Vector2(0.16f, 0.3f),
                 },
-                new Circle
+                new Pulp
                 {
                     RelativePositionAxes = Axes.Both,
                     RelativeSizeAxes = Axes.Both,
