@@ -47,6 +47,8 @@ namespace osu.Game.Beatmaps
 
         private readonly FileStore files;
 
+        private readonly SQLiteConnection connection;
+
         private readonly RulesetStore rulesets;
 
         private readonly BeatmapStore beatmaps;
@@ -59,6 +61,11 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Action<Notification> PostNotification { private get; set; }
 
+        /// <summary>
+        /// Set a storage with access to an osu-stable install for import purposes.
+        /// </summary>
+        public Func<Storage> GetStableStorage { private get; set; }
+
         public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, IIpcHost importHost = null)
         {
             beatmaps = new BeatmapStore(connection);
@@ -67,6 +74,7 @@ namespace osu.Game.Beatmaps
 
             this.storage = storage;
             this.files = files;
+            this.connection = connection;
             this.rulesets = rulesets;
 
             if (importHost != null)
@@ -136,13 +144,13 @@ namespace osu.Game.Beatmaps
         /// <param name="archiveReader">The beatmap to be imported.</param>
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
+            BeatmapSetInfo set = null;
+
             // let's only allow one concurrent import at a time for now.
             lock (importLock)
-            {
-                BeatmapSetInfo set = importToStorage(archiveReader);
-                Import(set);
-                return set;
-            }
+                connection.RunInTransaction(() => Import(set = importToStorage(archiveReader)));
+
+            return set;
         }
 
         /// <summary>
@@ -169,7 +177,7 @@ namespace osu.Game.Beatmaps
                 if (!beatmaps.Delete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
-                files.Dereference(beatmapSet.Files.Select(f => f.FileInfo));
+                files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
         }
 
         /// <summary>
@@ -183,7 +191,7 @@ namespace osu.Game.Beatmaps
                 if (!beatmaps.Undelete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
-                files.Reference(beatmapSet.Files.Select(f => f.FileInfo));
+                files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
         }
 
         /// <summary>
@@ -451,19 +459,20 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        /// <summary>
+        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
+        /// </summary>
         public void ImportFromStable()
         {
-            string stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!", "Songs");
-            if (!Directory.Exists(stableInstallPath))
-                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu", "Songs");
+            var stable = GetStableStorage?.Invoke();
 
-            if (!Directory.Exists(stableInstallPath))
+            if (stable == null)
             {
-                Logger.Log("Couldn't find an osu!stable installation!", LoggingTarget.Information, LogLevel.Error);
+                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
                 return;
             }
 
-            Import(Directory.GetDirectories(stableInstallPath));
+            Import(stable.GetDirectories("Songs"));
         }
 
         public void DeleteAll()

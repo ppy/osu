@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
@@ -83,10 +82,9 @@ namespace osu.Game.IO
         {
             string hash = data.ComputeSHA2Hash();
 
-            var info = new FileInfo { Hash = hash };
+            var existing = Connection.Table<FileInfo>().Where(f => f.Hash == hash).FirstOrDefault();
 
-            var existing = Connection.Table<FileInfo>().FirstOrDefault(f => f.Hash == info.Hash);
-
+            var info = existing ?? new FileInfo { Hash = hash };
             if (existing != null)
             {
                 info = existing;
@@ -106,11 +104,11 @@ namespace osu.Game.IO
                 Connection.Insert(info);
             }
 
-            Reference(new[] { info });
+            Reference(info);
             return info;
         }
 
-        public void Reference(IEnumerable<FileInfo> files)
+        public void Reference(params FileInfo[] files)
         {
             Connection.RunInTransaction(() =>
             {
@@ -125,7 +123,7 @@ namespace osu.Game.IO
             });
         }
 
-        public void Dereference(IEnumerable<FileInfo> files)
+        public void Dereference(params FileInfo[] files)
         {
             Connection.RunInTransaction(() =>
             {
@@ -142,18 +140,21 @@ namespace osu.Game.IO
 
         private void deletePending()
         {
-            foreach (var f in QueryAndPopulate<FileInfo>(f => f.ReferenceCount < 1))
+            Connection.RunInTransaction(() =>
             {
-                try
+                foreach (var f in Query<FileInfo>(f => f.ReferenceCount < 1))
                 {
-                    Connection.Delete(f);
-                    Storage.Delete(Path.Combine(prefix, f.StoragePath));
+                    try
+                    {
+                        Storage.Delete(Path.Combine(prefix, f.StoragePath));
+                        Connection.Delete(f);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not delete beatmap {f}");
+                    }
                 }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not delete beatmap {f}");
-                }
-            }
+            });
         }
     }
 }
