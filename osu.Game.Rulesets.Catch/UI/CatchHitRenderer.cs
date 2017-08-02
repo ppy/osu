@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -26,6 +27,12 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override Playfield<CatchBaseHit, CatchJudgement> CreatePlayfield() => new CatchPlayfield();
 
-        protected override DrawableHitObject<CatchBaseHit, CatchJudgement> GetVisualRepresentation(CatchBaseHit h) => null;
+        protected override DrawableHitObject<CatchBaseHit, CatchJudgement> GetVisualRepresentation(CatchBaseHit h)
+        {
+            if (h is Fruit)
+                return new DrawableFruit(h);
+
+            return null;
+        }
     }
 }
