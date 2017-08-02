@@ -18,7 +18,23 @@ namespace osu.Game.Rulesets.Catch.UI
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
 
-            Add(new Box { RelativeSizeAxes = Axes.Both, Alpha = 0.5f });
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.5f
+                },
+                new Catcher
+                {
+                    RelativePositionAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
+                    Scale = new Vector2(0.2f),
+                    FillMode = FillMode.Fit,
+                    Origin = Anchor.TopCentre,
+                    Position = new Vector2(0.5f, 0.9f),
+                }
+            };
         }
     }
 }
