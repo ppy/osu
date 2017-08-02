@@ -142,11 +142,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                         },
                         new InputDrum
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativePositionAxes = Axes.X,
-                            Position = new Vector2(0.10f, 0),
-                            Scale = new Vector2(0.9f)
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Scale = new Vector2(0.9f),
+                            Margin = new MarginPadding { Right = 20 }
                         },
                         new Box
                         {
