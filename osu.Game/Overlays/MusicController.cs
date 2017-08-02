@@ -12,18 +12,18 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Threading;
 using osu.Game.Overlays.Music;
 using osu.Game.Graphics.UserInterface;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
@@ -41,7 +41,9 @@ namespace osu.Game.Overlays
         private Drawable currentBackground;
         private ProgressBar progressBar;
 
+        private IconButton prevButton;
         private IconButton playButton;
+        private IconButton nextButton;
         private IconButton playlistButton;
 
         private SpriteText title, artist;
@@ -158,7 +160,7 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.Centre,
                                             Children = new[]
                                             {
-                                                new IconButton
+                                                prevButton = new IconButton
                                                 {
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
@@ -170,7 +172,7 @@ namespace osu.Game.Overlays
                                                     Action = play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
-                                                new IconButton
+                                                nextButton = new IconButton
                                                 {
                                                     Action = next,
                                                     Icon = FontAwesome.fa_step_forward,
@@ -209,9 +211,20 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             beatmapBacking.ValueChanged += beatmapChanged;
+            beatmapBacking.DisabledChanged += beatmapDisabledChanged;
             beatmapBacking.TriggerChange();
 
             base.LoadComplete();
+        }
+
+        private void beatmapDisabledChanged(bool disabled)
+        {
+            if (disabled)
+                playlist.Hide();
+
+            prevButton.Enabled.Value = !disabled;
+            nextButton.Enabled.Value = !disabled;
+            playlistButton.Enabled.Value = !disabled;
         }
 
         protected override void UpdateAfterChildren()
@@ -233,7 +246,8 @@ namespace osu.Game.Overlays
 
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping) next();
+                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled)
+                    next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
@@ -245,7 +259,8 @@ namespace osu.Game.Overlays
 
             if (track == null)
             {
-                playlist.PlayNext();
+                if (!beatmapBacking.Disabled)
+                    playlist.PlayNext();
                 return;
             }
 
@@ -257,16 +272,12 @@ namespace osu.Game.Overlays
 
         private void prev()
         {
-            if (beatmapBacking.Disabled) return;
-
             queuedDirection = TransformDirection.Prev;
             playlist.PlayPrevious();
         }
 
         private void next()
         {
-            if (beatmapBacking.Disabled) return;
-
             queuedDirection = TransformDirection.Next;
             playlist.PlayNext();
         }
