@@ -458,7 +458,7 @@ namespace osu.Game.Beatmaps.Formats
                     case Section.HitObjects:
 
                         // If the ruleset wasn't specified, assume the osu!standard ruleset.
-                        if(parser == null)
+                        if (parser == null)
                             parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser();
 
                         var obj = parser.Parse(line);
