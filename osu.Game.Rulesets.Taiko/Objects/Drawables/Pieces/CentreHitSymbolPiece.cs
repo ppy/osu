@@ -17,15 +17,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+
             Size = new Vector2(CirclePiece.SYMBOL_INNER_SIZE);
             Masking = true;
-            Children = new[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both
-                }
-            };
+
+            Children = new[] { new Box { RelativeSizeAxes = Axes.Both } };
         }
     }
 }

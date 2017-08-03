@@ -18,8 +18,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         /// </summary>
         public float Length;
 
-        public ElongatedCirclePiece(bool isStrong = false) : base(isStrong)
+        public ElongatedCirclePiece(bool isStrong = false)
+            : base(isStrong)
         {
+            RelativeSizeAxes = Axes.Y;
         }
 
         protected override void Update()
