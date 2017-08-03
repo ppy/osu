@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Menu
         private readonly Container iconText;
         private readonly Container box;
         private readonly Box boxHoverLayer;
-        private readonly TextAwesome icon;
+        private readonly SpriteIcon icon;
         private readonly string sampleName;
         private readonly Action clickAction;
         private readonly Key triggerKey;
@@ -95,12 +95,12 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        icon = new TextAwesome
+                        icon = new SpriteIcon
                         {
                             Shadow = true,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            TextSize = 30,
+                            Size = new Vector2(30),
                             Position = new Vector2(0, 0),
                             Icon = symbol
                         },

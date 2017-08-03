@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Select.Options
 
         private readonly Box background;
         private readonly Box flash;
-        private readonly TextAwesome iconText;
+        private readonly SpriteIcon iconText;
         private readonly OsuSpriteText firstLine;
         private readonly OsuSpriteText secondLine;
         private readonly Container box;
@@ -134,11 +134,11 @@ namespace osu.Game.Screens.Select.Options
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        iconText = new TextAwesome
+                        iconText = new SpriteIcon
                         {
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            TextSize = 30,
+                            Size = new Vector2(30),
                             Shadow = true,
                             Icon = FontAwesome.fa_close,
                             Margin = new MarginPadding

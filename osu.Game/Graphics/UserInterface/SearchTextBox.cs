@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using OpenTK;
 using OpenTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -19,13 +20,13 @@ namespace osu.Game.Graphics.UserInterface
             Height = 35;
             AddRange(new Drawable[]
             {
-                new TextAwesome
+                new SpriteIcon
                 {
                     Icon = FontAwesome.fa_search,
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 10 },
-                    TextSize = 20
+                    Size = new Vector2(20),
                 }
             });
 

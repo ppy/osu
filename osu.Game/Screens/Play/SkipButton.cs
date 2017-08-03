@@ -227,9 +227,9 @@ namespace osu.Game.Screens.Play
                                 Direction = FillDirection.Horizontal,
                                 Children = new[]
                                 {
-                                    new TextAwesome { Icon = FontAwesome.fa_chevron_right },
-                                    new TextAwesome { Icon = FontAwesome.fa_chevron_right },
-                                    new TextAwesome { Icon = FontAwesome.fa_chevron_right },
+                                    new SpriteIcon { Icon = FontAwesome.fa_chevron_right },
+                                    new SpriteIcon { Icon = FontAwesome.fa_chevron_right },
+                                    new SpriteIcon { Icon = FontAwesome.fa_chevron_right },
                                 }
                             },
                             new OsuSpriteText

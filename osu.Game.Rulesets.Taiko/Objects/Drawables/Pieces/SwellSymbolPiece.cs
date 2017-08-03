@@ -6,6 +6,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
@@ -14,8 +15,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
     /// </summary>
     public class SwellSymbolPiece : Container
     {
-        private readonly TextAwesome symbol;
-
         public SwellSymbolPiece()
         {
             Anchor = Anchor.Centre;
@@ -27,19 +26,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
             Children = new[]
             {
-                symbol = new TextAwesome
+                new SpriteIcon
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Icon = FontAwesome.fa_asterisk,
-                    UseFullGlyphHeight = true,
                     Shadow = false
                 }
             };
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            symbol.TextSize = Math.Min(ChildSize.X, ChildSize.Y);
         }
     }
 }

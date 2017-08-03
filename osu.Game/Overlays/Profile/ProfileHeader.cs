@@ -110,12 +110,12 @@ namespace osu.Game.Overlays.Profile
                                                     Alpha = 0,
                                                     AlwaysPresent = true
                                                 },
-                                                new TextAwesome
+                                                new SpriteIcon
                                                 {
                                                     Icon = FontAwesome.fa_heart,
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    TextSize = 12
+                                                    Size = new Vector2(12),
                                                 }
                                             }
                                         },
