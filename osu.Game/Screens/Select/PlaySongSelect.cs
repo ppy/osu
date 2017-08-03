@@ -25,7 +25,6 @@ namespace osu.Game.Screens.Select
         private readonly ModSelectOverlay modSelect;
         private readonly BeatmapDetailArea beatmapDetails;
         private IEnumerable<Mod> originalMods;
-        private bool controlPressed;
 
         public PlaySongSelect()
         {
@@ -109,24 +108,12 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            controlPressed = state.Keyboard.ControlPressed;
-            return base.OnKeyDown(state, args);
-        }
-
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
-        {
-            controlPressed = state.Keyboard.ControlPressed;
-            return base.OnKeyUp(state, args);
-        }
-
-        protected override void OnSelected()
+        protected override void OnSelected(InputState state)
         {
             if (player != null) return;
 
             originalMods = modSelect.SelectedMods.Value;
-            if (controlPressed)
+            if (state?.Keyboard.ControlPressed == true)
                 if (findAutoMod(originalMods) == null)
                 {
                     var auto = findAutoMod(Ruleset.Value.CreateInstance().GetModsFor(ModType.Special));
