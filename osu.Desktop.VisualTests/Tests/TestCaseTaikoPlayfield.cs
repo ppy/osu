@@ -18,7 +18,7 @@ namespace osu.Desktop.VisualTests.Tests
 {
     internal class TestCaseTaikoPlayfield : TestCase
     {
-        private const double default_duration = 300;
+        private const double default_duration = 1000;
         private const float scroll_time = 1000;
 
         public override string Description => "Taiko playfield";
@@ -180,7 +180,8 @@ namespace osu.Desktop.VisualTests.Tests
             Hit h = new Hit
             {
                 StartTime = playfield.Time.Current + scroll_time,
-                ScrollTime = scroll_time
+                ScrollTime = scroll_time,
+                IsStrong = strong
             };
 
             if (strong)
@@ -194,7 +195,8 @@ namespace osu.Desktop.VisualTests.Tests
             Hit h = new Hit
             {
                 StartTime = playfield.Time.Current + scroll_time,
-                ScrollTime = scroll_time
+                ScrollTime = scroll_time,
+                IsStrong = strong
             };
 
             if (strong)
