@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly CirclePiece circle;
         private readonly GlowPiece glow;
 
-        private readonly TextAwesome symbol;
+        private readonly SpriteIcon symbol;
 
         private readonly Color4 baseColour = OsuColour.FromHex(@"002c3c");
         private readonly Color4 fillColour = OsuColour.FromHex(@"005b7c");
@@ -64,12 +64,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             Anchor = Anchor.Centre,
                         },
                         new RingPiece(),
-                        symbol = new TextAwesome
+                        symbol = new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            UseFullGlyphHeight = true,
-                            TextSize = 48,
+                            Size = new Vector2(48),
                             Icon = FontAwesome.fa_asterisk,
                             Shadow = false,
                         },

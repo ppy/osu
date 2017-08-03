@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Music
             {
                 CornerRadius = 5;
                 Height = 30;
-                Icon.TextSize = 14;
+                Icon.Size = new Vector2(14);
                 Icon.Margin = new MarginPadding(0);
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 10, Right = 10 };
                 EdgeEffect = new EdgeEffectParameters

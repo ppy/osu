@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Scoring;
 
@@ -85,7 +86,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override string Description => "osu!catch";
 
-        public override FontAwesome Icon => FontAwesome.fa_osu_fruits_o;
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_fruits_o };
 
         public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[]
         {
