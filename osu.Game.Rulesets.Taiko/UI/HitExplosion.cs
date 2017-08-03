@@ -30,10 +30,11 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             Judgement = judgement;
 
-            Anchor = Anchor.Centre;
+            Anchor = Anchor.CentreLeft;
             Origin = Anchor.Centre;
 
-            Size = new Vector2(TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_CIRCLE_DIAMETER);
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(TaikoHitObject.DEFAULT_SIZE);
 
             RelativePositionAxes = Axes.Both;
 
@@ -73,7 +74,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         public void VisualiseSecondHit()
         {
-            this.ResizeTo(new Vector2(TaikoPlayfield.HIT_TARGET_OFFSET + TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER), 50);
+            this.ResizeTo(new Vector2(TaikoHitObject.DEFAULT_STRONG_SIZE), 50);
         }
     }
 }
