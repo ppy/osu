@@ -104,6 +104,8 @@ namespace osu.Game.Rulesets.Mania
             }
         }
 
+        public override Mod GetAutoplayMod() => new ModAutoplay();
+
         public override string Description => "osu!mania";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_mania_o;

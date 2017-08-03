@@ -83,6 +83,8 @@ namespace osu.Game.Rulesets.Catch
             }
         }
 
+        public override Mod GetAutoplayMod() => new ModAutoplay();
+
         public override string Description => "osu!catch";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_fruits_o;

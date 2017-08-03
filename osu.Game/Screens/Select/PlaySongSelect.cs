@@ -114,32 +114,18 @@ namespace osu.Game.Screens.Select
 
             originalMods = modSelect.SelectedMods.Value;
             if (state?.Keyboard.ControlPressed == true)
-                if (findAutoMod(originalMods) == null)
-                {
-                    var auto = findAutoMod(Ruleset.Value.CreateInstance().GetModsFor(ModType.Special));
-                    if (auto != null)
-                        modSelect.SelectedMods.Value = originalMods.Concat(new[] { auto });
-                }
+            {
+                var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
+                var autoType = auto.GetType();
+
+                if (originalMods.All(m => m.GetType() != autoType))
+                    modSelect.SelectedMods.Value = originalMods.Concat(new[] { auto });
+            }
 
             Beatmap.Value.Track.Looping = false;
             Beatmap.Disabled = true;
 
             LoadComponentAsync(player = new PlayerLoader(new Player()), l => Push(player));
-        }
-
-        private Mod findAutoMod(IEnumerable<Mod> mods)
-        {
-            foreach (var mod in mods)
-            {
-                if (mod is ModAutoplay) return mod;
-                var multimod = mod as MultiMod;
-                if (multimod != null)
-                {
-                    var find = findAutoMod(multimod.Mods);
-                    if (find != null) return find;
-                }
-            }
-            return null;
         }
     }
 }

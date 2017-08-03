@@ -83,6 +83,8 @@ namespace osu.Game.Rulesets.Taiko
             }
         }
 
+        public override Mod GetAutoplayMod() => new TaikoModAutoplay();
+
         public override string Description => "osu!taiko";
 
         public override FontAwesome Icon => FontAwesome.fa_osu_taiko_o;
