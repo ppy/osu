@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
     /// </summary>
     public class CirclePiece : TaikoPiece
     {
-        public const float SYMBOL_SIZE = 0.35f;
+        public const float SYMBOL_SIZE = 0.45f;
         public const float SYMBOL_BORDER = 8;
         private const double pre_beat_transition_time = 80;
 
@@ -126,12 +126,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
                     RelativeSizeAxes = Axes.Both,
                 }
             });
-
-            if (isStrong)
-            {
-                content.Scale = new Vector2(TaikoHitObject.STRONG_SCALE);
-                content.Width = 1 / TaikoHitObject.STRONG_SCALE;
-            }
         }
 
         private const float edge_alpha_kiai = 0.5f;
