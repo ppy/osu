@@ -16,14 +16,15 @@ using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
+using System;
 
 namespace osu.Game.Overlays.Chat
 {
     public class ChatTabControl : OsuTabControl<Channel>
     {
-        protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value);
-
         private const float shear_width = 10;
+
+        public Action<Channel> OnRequestLeave;
 
         public readonly Bindable<bool> ChannelSelectorActive = new Bindable<bool>();
 
@@ -49,6 +50,14 @@ namespace osu.Game.Overlays.Chat
             ChannelSelectorActive.BindTo(selectorTab.Active);
         }
 
+        protected override TabItem<Channel> CreateTabItem(Channel value)
+        {
+             ChannelTabItem tab = new ChannelTabItem(value);
+             tab.OnRequestClose = () => OnRequestLeave?.Invoke(value);
+
+             return tab;
+        }
+
         protected override void SelectTab(TabItem<Channel> tab)
         {
             if (tab is ChannelTabItem.ChannelSelectorTabItem)
@@ -68,11 +77,16 @@ namespace osu.Game.Overlays.Chat
             private Color4 backgroundHover;
             private Color4 backgroundActive;
 
+            protected override bool isClosable => !Pinned;
+
             private readonly SpriteText text;
             private readonly SpriteText textBold;
+            private readonly Button closeButton;
             private readonly Box box;
             private readonly Box highlightBox;
             private readonly SpriteIcon icon;
+
+            public Action OnRequestClose;
 
             private void updateState()
             {
@@ -88,6 +102,7 @@ namespace osu.Game.Overlays.Chat
             {
                 this.ResizeTo(new Vector2(Width, 1.1f), transition_length, Easing.OutQuint);
 
+                closeButton?.MoveToX(-5f, 0.5f, EasingTypes.OutElastic);
                 box.FadeColour(backgroundActive, transition_length, Easing.OutQuint);
                 highlightBox.FadeIn(transition_length, Easing.OutQuint);
 
@@ -99,6 +114,7 @@ namespace osu.Game.Overlays.Chat
             {
                 this.ResizeTo(new Vector2(Width, 1), transition_length, Easing.OutQuint);
 
+                closeButton?.MoveToX(5f, 0.5f, EasingTypes.InElastic);
                 box.FadeColour(backgroundInactive, transition_length, Easing.OutQuint);
                 highlightBox.FadeOut(transition_length, Easing.OutQuint);
 
@@ -108,6 +124,8 @@ namespace osu.Game.Overlays.Chat
 
             protected override bool OnHover(InputState state)
             {
+                closeButton?.FadeIn(1f, EasingTypes.InBounce);
+                
                 if (!Active)
                     box.FadeColour(backgroundHover, transition_length, Easing.OutQuint);
                 return true;
@@ -115,6 +133,7 @@ namespace osu.Game.Overlays.Chat
 
             protected override void OnHoverLost(InputState state)
             {
+                closeButton?.FadeOut(1f, EasingTypes.OutBounce);
                 updateState();
             }
 
@@ -204,13 +223,31 @@ namespace osu.Game.Overlays.Chat
                                 Font = @"Exo2.0-Bold",
                                 TextSize = 18,
                             },
-                        }
-                    }
+                        },
+                    },
                 };
+
+                if (isClosable)
+                {
+                    Add(closeButton  = new Button
+                    {
+                        Alpha = 0,
+                        Width = 20,
+                        Height = 20,
+                        Margin = new MarginPadding { Right = 10 },
+                        Origin = Anchor.CentreRight,
+                        Anchor = Anchor.CentreRight,
+                        Text = @"x",
+                        BackgroundColour = Color4.Transparent,
+                        Action = () => OnRequestClose?.Invoke(),
+                    });
+                }
             }
 
             public class ChannelSelectorTabItem : ChannelTabItem
             {
+                protected override bool isClosable => false;
+
                 public ChannelSelectorTabItem(Channel value) : base(value)
                 {
                     Depth = float.MaxValue;
