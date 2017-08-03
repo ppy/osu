@@ -88,7 +88,7 @@ namespace osu.Desktop.VisualTests.Tests
                     addDrumRoll(true);
                     break;
                 case 5:
-                    addSwell(1000);
+                    addSwell();
                     delay = scroll_time - 100;
                     break;
             }
