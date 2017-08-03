@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override TaikoJudgement CreateJudgement() => new TaikoJudgement { SecondHit = HitObject.IsStrong };
 
-        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece(HitObject.IsStrong)
+        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece
         {
             Length = (float)(HitObject.Duration / HitObject.ScrollTime),
             PlayfieldLengthReference = () => Parent.DrawSize.X

@@ -9,7 +9,6 @@ using osu.Game.Graphics.Backgrounds;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
@@ -64,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
         public Box FlashBox;
 
-        public CirclePiece(bool isStrong = false)
+        public CirclePiece()
         {
             EarlyActivationMilliseconds = pre_beat_transition_time;
 
