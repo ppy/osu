@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected DrawableHit(Hit hit)
             : base(hit)
         {
+            FillMode = FillMode.Fit;
         }
 
         protected override void CheckJudgement(bool userTriggered)

@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Input;
+using System;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -24,11 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
-        protected override Container<Drawable> Content => bodyContainer;
-
         protected readonly TaikoPiece MainPiece;
-
-        private readonly Container bodyContainer;
 
         public new TaikoHitType HitObject;
 
@@ -40,19 +37,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Custom;
 
-            AutoSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
             RelativePositionAxes = Axes.X;
 
-            AddInternal(bodyContainer = new Container
-            {
-                AutoSizeAxes = Axes.Both,
-                Children = new[]
-                {
-                    MainPiece = CreateMainPiece()
-                }
-            });
-
+            Add(MainPiece = CreateMainPiece());
             MainPiece.KiaiMode = HitObject.Kiai;
 
             LifetimeStart = HitObject.StartTime - HitObject.ScrollTime * 2;
