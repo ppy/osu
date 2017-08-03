@@ -142,15 +142,15 @@ namespace osu.Game.Users
                             Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(5f, 0f),
-                            Children = new[]
+                            Children = new Drawable[]
                             {
-                                new TextAwesome
+                                new SpriteIcon
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Icon = FontAwesome.fa_circle_o,
                                     Shadow = true,
-                                    TextSize = 14,
+                                    Size = new Vector2(14),
                                 },
                                 statusMessage = new OsuSpriteText
                                 {

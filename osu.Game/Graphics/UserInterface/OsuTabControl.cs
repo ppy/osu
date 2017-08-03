@@ -209,10 +209,10 @@ namespace osu.Game.Graphics.UserInterface
 
                     Foreground.Children = new Drawable[]
                     {
-                        new TextAwesome
+                        new SpriteIcon
                         {
                             Icon = FontAwesome.fa_ellipsis_h,
-                            TextSize = 14,
+                            Size = new Vector2(14),
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                         }

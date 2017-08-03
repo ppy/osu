@@ -31,10 +31,10 @@ namespace osu.Desktop.VisualTests.Tests
             int i = 50;
             foreach (FontAwesome fa in Enum.GetValues(typeof(FontAwesome)))
             {
-                flow.Add(new TextAwesome
+                flow.Add(new SpriteIcon
                 {
                     Icon = fa,
-                    TextSize = 60,
+                    Size = new Vector2(60),
                     Colour = new Color4(
                         Math.Max(0.5f, RNG.NextSingle()),
                         Math.Max(0.5f, RNG.NextSingle()),

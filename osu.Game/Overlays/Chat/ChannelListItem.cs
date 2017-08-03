@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Chat
         private readonly Bindable<bool> joinedBind = new Bindable<bool>();
         private readonly OsuSpriteText name;
         private readonly OsuSpriteText topic;
-        private readonly TextAwesome joinedCheckmark;
+        private readonly SpriteIcon joinedCheckmark;
 
         private Color4 joinedColour;
         private Color4 topicColour;
@@ -68,12 +68,12 @@ namespace osu.Game.Overlays.Chat
                         {
                             Children = new[]
                             {
-                                joinedCheckmark = new TextAwesome
+                                joinedCheckmark = new SpriteIcon
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Icon = FontAwesome.fa_check_circle,
-                                    TextSize = text_size,
+                                    Size = new Vector2(text_size),
                                     Shadow = false,
                                     Margin = new MarginPadding { Right = 10f },
                                     Alpha = 0f,
@@ -121,10 +121,10 @@ namespace osu.Game.Overlays.Chat
                             Spacing = new Vector2(3f, 0f),
                             Children = new Drawable[]
                             {
-                                new TextAwesome
+                                new SpriteIcon
                                 {
                                     Icon = FontAwesome.fa_user,
-                                    TextSize = text_size - 2,
+                                    Size = new Vector2(text_size - 2),
                                     Shadow = false,
                                     Margin = new MarginPadding { Top = 1 },
                                 },
