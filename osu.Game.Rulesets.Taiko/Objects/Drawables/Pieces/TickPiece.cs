@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         /// <summary>
         /// The size of a tick.
         /// </summary>
-        private const float tick_size = 14;
+        private const float tick_size = 0.35f;
 
         private bool filled;
         public bool Filled
@@ -40,7 +40,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            RelativeSizeAxes = Axes.None;
+            RelativeSizeAxes = Axes.Both;
+            FillMode = FillMode.Fit;
             Size = new Vector2(tick_size);
 
             Add(new CircularContainer

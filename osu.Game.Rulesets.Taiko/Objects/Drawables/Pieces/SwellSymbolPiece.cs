@@ -6,7 +6,6 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
