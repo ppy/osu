@@ -93,12 +93,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                         Content.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
-                        this.FadeOut(800)
-                            .MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
+                        this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
                             .Then()
                             .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
 
-                        Expire();
+                        this.FadeOut(800)
+                            .Expire();
+
                         break;
                 }
             }
