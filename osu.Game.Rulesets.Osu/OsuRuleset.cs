@@ -104,6 +104,8 @@ namespace osu.Game.Rulesets.Osu
             }
         }
 
+        public override Mod GetAutoplayMod() => new OsuModAutoplay();
+
         public override FontAwesome Icon => FontAwesome.fa_osu_osu_o;
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);

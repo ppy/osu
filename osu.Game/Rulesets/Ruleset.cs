@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
+        public abstract Mod GetAutoplayMod();
+
         /// <summary>
         /// Attempt to create a hit renderer for a beatmap
         /// </summary>
