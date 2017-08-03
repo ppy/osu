@@ -8,13 +8,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
+using OpenTK;
 
 namespace osu.Game.Rulesets.UI
 {
     public class ModIcon : Container
     {
-        private readonly TextAwesome modIcon;
-        private readonly TextAwesome background;
+        private readonly SpriteIcon modIcon;
+        private readonly SpriteIcon background;
 
         private const float icon_size = 80;
 
@@ -34,20 +35,20 @@ namespace osu.Game.Rulesets.UI
 
             Children = new Drawable[]
             {
-                background = new TextAwesome
+                background = new SpriteIcon
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    TextSize = icon_size,
+                    Size = new Vector2(icon_size),
                     Icon = FontAwesome.fa_osu_mod_bg,
                     Shadow = true,
                 },
-                modIcon = new TextAwesome
+                modIcon = new SpriteIcon
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Colour = OsuColour.Gray(84),
-                    TextSize = icon_size - 35,
+                    Size = new Vector2(icon_size - 35),
                     Icon = mod.Icon
                 },
             };

@@ -21,15 +21,14 @@ namespace osu.Game.Online.Multiplayer
         public override string Name => "Tag";
         public override Drawable GetIcon(OsuColour colours, float size)
         {
-            return new TextAwesome
+            return new SpriteIcon
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Icon = FontAwesome.fa_refresh,
-                TextSize = size,
+                Size = new Vector2(size),
                 Colour = colours.Blue,
                 Shadow = false,
-                UseFullGlyphHeight = false,
             };
         }
     }
@@ -61,21 +60,19 @@ namespace osu.Game.Online.Multiplayer
                 Spacing = new Vector2(2f),
                 Children = new[]
                 {
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Icon = FontAwesome.fa_refresh,
-                        TextSize = size * 0.75f,
+                        Size = new Vector2(size * 0.75f),
                         Colour = colours.Blue,
                         Shadow = false,
-                        UseFullGlyphHeight = false,
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Icon = FontAwesome.fa_refresh,
-                        TextSize = size * 0.75f,
+                        Size = new Vector2(size * 0.75f),
                         Colour = colours.Pink,
                         Shadow = false,
-                        UseFullGlyphHeight = false,
                     },
                 },
             };

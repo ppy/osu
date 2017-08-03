@@ -209,13 +209,13 @@ namespace osu.Desktop.Overlays
                         RelativeSizeAxes = Axes.Both,
                         Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_upload,
                         Colour = Color4.White,
-                        TextSize = 20
+                        Size = new Vector2(20),
                     }
                 });
             }

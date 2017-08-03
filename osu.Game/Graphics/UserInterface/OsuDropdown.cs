@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
+using OpenTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -60,14 +61,13 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
-                        Chevron = new TextAwesome
+                        Chevron = new SpriteIcon
                         {
                             AlwaysPresent = true,
                             Icon = FontAwesome.fa_chevron_right,
-                            UseFullGlyphHeight = false,
                             Colour = Color4.Black,
                             Alpha = 0.5f,
-                            TextSize = 8,
+                            Size = new Vector2(8),
                             Margin = new MarginPadding { Left = 3, Right = 3 },
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
@@ -84,7 +84,7 @@ namespace osu.Game.Graphics.UserInterface
 
             private Color4? accentColour;
 
-            protected readonly TextAwesome Chevron;
+            protected readonly SpriteIcon Chevron;
             protected readonly OsuSpriteText Label;
 
             protected override void FormatForeground(bool hover = false)
@@ -123,7 +123,7 @@ namespace osu.Game.Graphics.UserInterface
                 set { Text.Text = value; }
             }
 
-            protected readonly TextAwesome Icon;
+            protected readonly SpriteIcon Icon;
 
             private Color4? accentColour;
             public virtual Color4 AccentColour
@@ -152,13 +152,13 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                     },
-                    Icon = new TextAwesome
+                    Icon = new SpriteIcon
                     {
                         Icon = FontAwesome.fa_chevron_down,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
                         Margin = new MarginPadding { Right = 4 },
-                        TextSize = 20
+                        Size = new Vector2(20),
                     }
                 };
             }

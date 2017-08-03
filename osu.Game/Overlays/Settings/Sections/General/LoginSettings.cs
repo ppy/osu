@@ -286,7 +286,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 public const float LABEL_LEFT_MARGIN = 20;
 
-                private readonly TextAwesome statusIcon;
+                private readonly SpriteIcon statusIcon;
                 public Color4 StatusColour
                 {
                     set
@@ -308,15 +308,15 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         Radius = 4,
                     };
 
-                    Icon.TextSize = 14;
+                    Icon.Size = new Vector2(14);
                     Icon.Margin = new MarginPadding(0);
 
-                    Foreground.Add(statusIcon = new TextAwesome
+                    Foreground.Add(statusIcon = new SpriteIcon
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Icon = FontAwesome.fa_circle_o,
-                        TextSize = 14,
+                        Size = new Vector2(14),
                     });
 
                     Text.Margin = new MarginPadding { Left = LABEL_LEFT_MARGIN };

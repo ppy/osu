@@ -35,13 +35,13 @@ namespace osu.Game.Overlays.Chat
             TabContainer.Spacing = new Vector2(-shear_width, 0);
             TabContainer.Masking = false;
 
-            AddInternal(new TextAwesome
+            AddInternal(new SpriteIcon
             {
                 Icon = FontAwesome.fa_comments,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                TextSize = 20,
-                Padding = new MarginPadding(10),
+                Size = new Vector2(20),
+                Margin = new MarginPadding(10),
             });
 
             AddTabItem(selectorTab = new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }));
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Chat
             private readonly SpriteText textBold;
             private readonly Box box;
             private readonly Box highlightBox;
-            private readonly TextAwesome icon;
+            private readonly SpriteIcon icon;
 
             private void updateState()
             {
@@ -176,7 +176,7 @@ namespace osu.Game.Overlays.Chat
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            icon = new TextAwesome
+                            icon = new SpriteIcon
                             {
                                 Icon = FontAwesome.fa_hashtag,
                                 Anchor = Anchor.CentreLeft,
@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Chat
                                 Colour = Color4.Black,
                                 X = -10,
                                 Alpha = 0.2f,
-                                TextSize = ChatOverlay.TAB_AREA_HEIGHT,
+                                Size = new Vector2(ChatOverlay.TAB_AREA_HEIGHT),
                             },
                             text = new OsuSpriteText
                             {
