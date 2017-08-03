@@ -100,7 +100,7 @@ namespace osu.Desktop.VisualTests.Tests
                     playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
                     break;
                 case 6:
-                    playfieldContainer.Delay(delay).ResizeTo(new Vector2(TaikoPlayfield.DEFAULT_HEIGHT), 500);
+                    playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_HEIGHT), 500);
                     break;
             }
         }
