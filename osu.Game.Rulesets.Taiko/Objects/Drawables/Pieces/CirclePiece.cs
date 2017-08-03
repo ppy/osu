@@ -22,9 +22,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
     /// </summary>
     public class CirclePiece : TaikoPiece
     {
-        public const float SYMBOL_SIZE = 36;
+        public const float SYMBOL_SIZE = 0.35f;
         public const float SYMBOL_BORDER = 8;
-        public const float SYMBOL_INNER_SIZE = SYMBOL_SIZE - 2 * SYMBOL_BORDER;
         private const double pre_beat_transition_time = 80;
 
         /// <summary>
