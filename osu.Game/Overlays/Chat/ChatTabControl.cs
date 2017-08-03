@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Chat
             private Color4 backgroundHover;
             private Color4 backgroundActive;
 
-            protected override bool isClosable => !Pinned;
+            protected override bool IsRemovable => !Pinned;
 
             private readonly SpriteText text;
             private readonly SpriteText textBold;
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Chat
             {
                 this.ResizeTo(new Vector2(Width, 1.1f), transition_length, Easing.OutQuint);
 
-                closeButton?.MoveToX(-5f, 0.5f, EasingTypes.OutElastic);
+                closeButton?.MoveToX(-5f, 0.5f, Easing.OutElastic);
                 box.FadeColour(backgroundActive, transition_length, Easing.OutQuint);
                 highlightBox.FadeIn(transition_length, Easing.OutQuint);
 
@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Chat
             {
                 this.ResizeTo(new Vector2(Width, 1), transition_length, Easing.OutQuint);
 
-                closeButton?.MoveToX(5f, 0.5f, EasingTypes.InElastic);
+                closeButton?.MoveToX(5f, 0.5f, Easing.InElastic);
                 box.FadeColour(backgroundInactive, transition_length, Easing.OutQuint);
                 highlightBox.FadeOut(transition_length, Easing.OutQuint);
 
@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Chat
 
             protected override bool OnHover(InputState state)
             {
-                closeButton?.FadeIn(1f, EasingTypes.InBounce);
+                closeButton?.FadeIn(1f, Easing.InBounce);
                 
                 if (!Active)
                     box.FadeColour(backgroundHover, transition_length, Easing.OutQuint);
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Chat
 
             protected override void OnHoverLost(InputState state)
             {
-                closeButton?.FadeOut(1f, EasingTypes.OutBounce);
+                closeButton?.FadeOut(1f, Easing.OutBounce);
                 updateState();
             }
 
@@ -227,7 +227,7 @@ namespace osu.Game.Overlays.Chat
                     },
                 };
 
-                if (isClosable)
+                if (IsRemovable)
                 {
                     Add(closeButton  = new Button
                     {
@@ -246,7 +246,7 @@ namespace osu.Game.Overlays.Chat
 
             public class ChannelSelectorTabItem : ChannelTabItem
             {
-                protected override bool isClosable => false;
+                protected override bool IsRemovable => false;
 
                 public ChannelSelectorTabItem(Channel value) : base(value)
                 {
