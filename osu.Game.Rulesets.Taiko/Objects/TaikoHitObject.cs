@@ -4,24 +4,23 @@
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Taiko.UI;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
     public abstract class TaikoHitObject : HitObject
     {
         /// <summary>
-        /// Default size of a <see cref="DrawableTaikoHitObject"/>.
+        /// Default size of a drawable taiko hit object.
         /// </summary>
         public const float DEFAULT_SIZE = 0.45f;
 
         /// <summary>
-        /// Scale multiplier for a strong <see cref="DrawableTaikoHitObject"/>.
+        /// Scale multiplier for a strong drawable taiko hit object.
         /// </summary>
         public const float STRONG_SCALE = 1.4f;
 
         /// <summary>
-        /// Default size of a strong <see cref="DrawableTaikoHitObject"/>.
+        /// Default size of a strong drawable taiko hit object.
         /// </summary>
         public const float DEFAULT_STRONG_SIZE = DEFAULT_SIZE * STRONG_SCALE;
 

@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
 using System.Linq;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
-using System;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
