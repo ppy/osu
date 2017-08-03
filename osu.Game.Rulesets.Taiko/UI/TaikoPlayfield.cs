@@ -22,14 +22,14 @@ namespace osu.Game.Rulesets.Taiko.UI
     public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgement>
     {
         /// <summary>
-        /// The default play field height.
+        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoHitRenderer"/>.
         /// </summary>
-        public const float DEFAULT_PLAYFIELD_HEIGHT = 178f;
+        public const float DEFAULT_HEIGHT = 178;
 
         /// <summary>
         /// The offset from <see cref="left_area_size"/> which the center of the hit target lies at.
         /// </summary>
-        public const float HIT_TARGET_OFFSET = TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER / 2f + 40;
+        public const float HIT_TARGET_OFFSET = 100;
 
         /// <summary>
         /// The size of the left area of the playfield. This area contains the input drum.
@@ -60,7 +60,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 {
                     Name = "Transparent playfield background",
                     RelativeSizeAxes = Axes.Both,
-                    BorderThickness = 2,
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
                     {
@@ -81,7 +80,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 {
                     Name = "Right area",
                     RelativeSizeAxes = Axes.Both,
-                    Margin = new MarginPadding { Left = left_area_size },
+                    Padding = new MarginPadding { Left = left_area_size },
                     Children = new Drawable[]
                     {
                         new Container
@@ -94,7 +93,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                             {
                                 hitExplosionContainer = new Container<HitExplosion>
                                 {
-                                    RelativeSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.Both,
+                                    FillMode = FillMode.Fit,
                                     BlendingMode = BlendingMode.Additive,
                                 },
                                 barLineContainer = new Container<DrawableBarLine>
@@ -105,6 +105,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    FillMode = FillMode.Fit
                                 },
                                 hitObjectContainer = new Container
                                 {
@@ -115,7 +117,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                         kiaiExplosionContainer = new Container<KiaiHitExplosion>
                         {
                             Name = "Kiai hit explosions",
-                            RelativeSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fit,
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
                             BlendingMode = BlendingMode.Additive
                         },
@@ -133,7 +136,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Name = "Left overlay",
                     RelativeSizeAxes = Axes.Y,
                     Size = new Vector2(left_area_size, 1),
-                    BorderThickness = 1,
                     Children = new Drawable[]
                     {
                         overlayBackground = new Box
@@ -154,6 +156,24 @@ namespace osu.Game.Rulesets.Taiko.UI
                             Width = 10,
                             Colour = Framework.Graphics.Colour.ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.6f), Color4.Black.Opacity(0)),
                         },
+                    }
+                },
+                new Container
+                {
+                    Name = "Border",
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    MaskingSmoothness = 0,
+                    BorderThickness = 2,
+                    AlwaysPresent = true,
+                    Children = new[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0,
+                            AlwaysPresent = true
+                        }
                     }
                 },
                 topLevelHitContainer = new Container
