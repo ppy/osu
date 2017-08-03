@@ -9,7 +9,7 @@ using OpenTK;
 namespace osu.Game.Graphics.Containers
 {
     /// <summary>
-    /// Display an icon that is constrained to a physical region on screen.
+    /// Display an icon that is forced to scale to the size of this container.
     /// </summary>
     public class ConstrainedIconContainer : CompositeDrawable
     {
