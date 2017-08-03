@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings
 {
     public class SidebarButton : Container
     {
-        private readonly TextAwesome drawableIcon;
+        private readonly SpriteIcon drawableIcon;
         private readonly SpriteText headerText;
         private readonly Box backgroundBox;
         private readonly Box selectionIndicator;
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Settings
                     Width = Sidebar.DEFAULT_WIDTH,
                     RelativeSizeAxes = Axes.Y,
                     Colour = OsuColour.Gray(0.6f),
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         headerText = new OsuSpriteText
                         {
@@ -85,11 +85,11 @@ namespace osu.Game.Overlays.Settings
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
-                        drawableIcon = new TextAwesome
+                        drawableIcon = new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            TextSize = 20
+                            Size = new Vector2(20),
                         },
                     }
                 },

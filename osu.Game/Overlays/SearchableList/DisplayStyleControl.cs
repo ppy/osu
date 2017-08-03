@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.SearchableList
 
         private class DisplayStyleToggleButton : OsuClickableContainer
         {
-            private readonly TextAwesome icon;
+            private readonly SpriteIcon icon;
             private readonly PanelDisplayStyle style;
             private readonly Bindable<PanelDisplayStyle> bindable;
 
@@ -67,13 +67,12 @@ namespace osu.Game.Overlays.SearchableList
 
                 Children = new Drawable[]
                 {
-                    this.icon = new TextAwesome
+                    this.icon = new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = icon,
-                        TextSize = 18,
-                        UseFullGlyphHeight = false,
+                        Size = new Vector2(18),
                         Alpha = 0.5f,
                     },
                 };

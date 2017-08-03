@@ -75,11 +75,11 @@ namespace osu.Game.Overlays.Direct
                     {
                         Font = @"Exo2.0-SemiBoldItalic",
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Icon = icon,
                         Shadow = true,
-                        TextSize = 14,
+                        Size = new Vector2(14),
                         Margin = new MarginPadding { Top = 1 },
                     },
                 };

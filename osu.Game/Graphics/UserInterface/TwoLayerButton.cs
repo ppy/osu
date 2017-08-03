@@ -215,7 +215,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             private const double beat_in_time = 60;
 
-            private readonly TextAwesome icon;
+            private readonly SpriteIcon icon;
 
             public FontAwesome Icon { set { icon.Icon = value; } }
 
@@ -226,11 +226,11 @@ namespace osu.Game.Graphics.UserInterface
 
                 Children = new Drawable[]
                 {
-                    icon = new TextAwesome
+                    icon = new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        TextSize = 25
+                        Size = new Vector2(25),
                     }
                 };
             }

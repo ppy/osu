@@ -35,7 +35,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
-            public readonly TextAwesome Chevron;
+            public readonly SpriteIcon Chevron;
 
             //don't allow clicking between transitions and don't make the chevron clickable
             public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Alpha == 1f && Text.ReceiveMouseInputAt(screenSpacePos);
@@ -69,11 +69,11 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Text.TextSize = 16;
                 Padding = new MarginPadding { Right = padding + 8 }; //padding + chevron width
-                Add(Chevron = new TextAwesome
+                Add(Chevron = new SpriteIcon
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
-                    TextSize = 12,
+                    Size = new Vector2(12),
                     Icon = FontAwesome.fa_chevron_right,
                     Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,
