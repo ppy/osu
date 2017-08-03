@@ -12,6 +12,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.Music
         private Color4 hoverColour;
         private Color4 artistColour;
 
-        private TextAwesome handle;
+        private SpriteIcon handle;
         private TextFlowContainer text;
         private IEnumerable<SpriteText> titleSprites;
         private UnicodeBindableString titleBind;
@@ -67,16 +68,15 @@ namespace osu.Game.Overlays.Music
 
             Children = new Drawable[]
             {
-                handle = new TextAwesome
+                handle = new SpriteIcon
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    TextSize = 12,
+                    Size = new Vector2(12),
                     Colour = colours.Gray5,
                     Icon = FontAwesome.fa_bars,
                     Alpha = 0f,
-                    Margin = new MarginPadding { Left = 5 },
-                    Padding = new MarginPadding { Top = 2 },
+                    Margin = new MarginPadding { Left = 5, Top = 2 },
                 },
                 text = new OsuTextFlowContainer
                 {

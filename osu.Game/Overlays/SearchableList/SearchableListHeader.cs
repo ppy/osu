@@ -55,9 +55,9 @@ namespace osu.Game.Overlays.SearchableList
                             Spacing = new Vector2(10f, 0f),
                             Children = new[]
                             {
-                                new TextAwesome
+                                new SpriteIcon
                                 {
-                                    TextSize = 25,
+                                    Size = new Vector2(25),
                                     Icon = Icon,
                                 },
                                 CreateHeaderText(),
