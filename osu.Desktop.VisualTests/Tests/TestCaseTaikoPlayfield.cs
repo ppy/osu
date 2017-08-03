@@ -13,6 +13,8 @@ using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using System;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -31,7 +33,8 @@ namespace osu.Desktop.VisualTests.Tests
 
         public TestCaseTaikoPlayfield()
         {
-            AddStep("Hit!", addHitJudgement);
+            AddStep("Hit!", () => addHitJudgement(false));
+            AddStep("Kiai hit", () => addHitJudgement(true));
             AddStep("Miss :(", addMissJudgement);
             AddStep("DrumRoll", () => addDrumRoll(false));
             AddStep("Strong DrumRoll", () => addDrumRoll(true));
@@ -102,11 +105,20 @@ namespace osu.Desktop.VisualTests.Tests
             }
         }
 
-        private void addHitJudgement()
+        private void addHitJudgement(bool kiai)
         {
             TaikoHitResult hitResult = RNG.Next(2) == 0 ? TaikoHitResult.Good : TaikoHitResult.Great;
 
-            var h = new DrawableTestHit(new Hit())
+            var cpi = new ControlPointInfo();
+            cpi.EffectPoints.Add(new EffectControlPoint
+            {
+                KiaiMode = kiai
+            });
+
+            Hit hit = new Hit();
+            hit.ApplyDefaults(cpi, new BeatmapDifficulty());
+
+            var h = new DrawableTestHit(hit)
             {
                 X = RNG.NextSingle(hitResult == TaikoHitResult.Good ? -0.1f : -0.05f, hitResult == TaikoHitResult.Good ? 0.1f : 0.05f),
                 Judgement = new TaikoJudgement
