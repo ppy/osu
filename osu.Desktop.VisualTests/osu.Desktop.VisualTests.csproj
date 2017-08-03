@@ -211,7 +211,6 @@
     <Compile Include="Tests\TestCaseScrollingHitObjects.cs" />
     <Compile Include="Tests\TestCaseSkipButton.cs" />
     <Compile Include="Tests\TestCaseTabControl.cs" />
-    <Compile Include="Tests\TestCaseTaikoHitObjects.cs" />
     <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
     <Compile Include="Tests\TestCaseTextAwesome.cs" />
     <Compile Include="Tests\TestCasePlaySongSelect.cs" />
