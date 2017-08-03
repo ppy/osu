@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override TaikoJudgement CreateJudgement() => new TaikoJudgement();
 
-        protected virtual TaikoPiece CreateMainPiece() => new CirclePiece(HitObject.IsStrong);
+        protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
 
         /// <summary>
         /// Sets the scroll position of the DrawableHitObject relative to the offset between
