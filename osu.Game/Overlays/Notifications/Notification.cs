@@ -165,12 +165,12 @@ namespace osu.Game.Overlays.Notifications
 
                 Children = new[]
                 {
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_times_circle,
-                        TextSize = 20
+                        Size = new Vector2(20),
                     }
                 };
             }

@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Toolbar
 
                 TooltipMain = rInstance.Description;
                 TooltipSub = $"Play some {rInstance.Description}";
-                Icon = rInstance.Icon;
+                SetIcon(rInstance.CreateIcon());
             }
         }
 
@@ -31,9 +31,8 @@ namespace osu.Game.Overlays.Toolbar
             {
                 if (value)
                 {
-                    DrawableIcon.Colour = Color4.White;
-                    DrawableIcon.Masking = true;
-                    DrawableIcon.EdgeEffect = new EdgeEffectParameters
+                    IconContainer.Colour = Color4.White;
+                    IconContainer.EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Colour = new Color4(255, 194, 224, 100),
@@ -43,8 +42,8 @@ namespace osu.Game.Overlays.Toolbar
                 }
                 else
                 {
-                    DrawableIcon.Masking = false;
-                    DrawableIcon.Colour = new Color4(255, 194, 224, 255);
+                    IconContainer.Colour = new Color4(255, 194, 224, 255);
+                    IconContainer.EdgeEffect = new EdgeEffectParameters();
                 }
             }
         }
@@ -52,7 +51,7 @@ namespace osu.Game.Overlays.Toolbar
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            DrawableIcon.TextSize *= 1.4f;
+            IconContainer.Scale *= 1.4f;
         }
     }
 }
