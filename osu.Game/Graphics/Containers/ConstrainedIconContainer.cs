@@ -42,6 +42,11 @@ namespace osu.Game.Graphics.Containers
             base.Update();
             if (InternalChildren.Count > 0 && InternalChild.DrawSize.X > 0)
             {
+                // We're modifying scale here for a few reasons
+                // - Guarantees correctness if BorderWidth is being used
+                // - If we were to use RelativeSize/FillMode, we'd need to set the Icon's RelativeSizeAxes directly.
+                //   We can't do this because we would need access to AutoSizeAxes to set it to none.
+                //   Other issues come up along the way too, so it's not a good solution.
                 var fitScale = Math.Min(DrawSize.X / InternalChild.DrawSize.X, DrawSize.Y / InternalChild.DrawSize.Y);
                 InternalChild.Scale = new Vector2(fitScale);
                 InternalChild.Anchor = Anchor.Centre;
