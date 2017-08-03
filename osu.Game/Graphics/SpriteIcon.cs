@@ -49,12 +49,6 @@ namespace osu.Game.Graphics
             updateTexture();
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            if (Size.X == 0) throw new System.Exception("size required");
-        }
-
         private void updateTexture()
         {
             var texture = store?.Get(((char)icon).ToString());
