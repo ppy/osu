@@ -11,7 +11,7 @@ namespace osu.Game.Graphics.Containers
     /// <summary>
     /// Display an icon that is constrained to a physical region on screen.
     /// </summary>
-    public class ConstrainedIconContainer : Container
+    public class ConstrainedIconContainer : CompositeDrawable
     {
         public Drawable Icon
         {
@@ -24,6 +24,17 @@ namespace osu.Game.Graphics.Containers
             {
                 InternalChild = value;
             }
+        }
+
+        /// <summary>
+        /// Determines an edge effect of this <see cref="Container"/>.
+        /// Edge effects are e.g. glow or a shadow.
+        /// Only has an effect when <see cref="CompositeDrawable.Masking"/> is true.
+        /// </summary>
+        public new EdgeEffectParameters EdgeEffect
+        {
+            get { return base.EdgeEffect; }
+            set { base.EdgeEffect = value; }
         }
 
         protected override void Update()
