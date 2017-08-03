@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
+using OpenTK;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -19,7 +20,7 @@ namespace osu.Game.Overlays.SearchableList
             public SlimDropdownHeader()
             {
                 Height = 25;
-                Icon.TextSize = 16;
+                Icon.Size = new Vector2(16);
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 8, Right = 4 };
             }
 
