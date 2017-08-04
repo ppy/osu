@@ -90,6 +90,20 @@
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'VisualTests|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\VisualTests\</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningLevel>0</WarningLevel>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <LangVersion>6</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DeltaCompressionDotNet, Version=1.1.0.0, Culture=neutral, PublicKeyToken=1d14d6e5194e7f4a, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\DeltaCompressionDotNet.1.1.0\lib\net20\DeltaCompressionDotNet.dll</HintPath>
@@ -195,6 +209,10 @@
       <Project>{65dc628f-a640-4111-ab35-3a5652bc1e17}</Project>
       <Name>osu.Framework.Desktop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\osu-framework\osu.Framework.Testing\osu.Framework.Testing.csproj">
+      <Project>{007B2356-AB6F-4BD9-96D5-116FC2DCE69A}</Project>
+      <Name>osu.Framework.Testing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
       <Project>{c76bf5b3-985e-4d39-95fe-97c9c879b83a}</Project>
       <Name>osu.Framework</Name>
@@ -202,6 +220,10 @@
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
       <Project>{d9a367c9-4c1a-489f-9b05-a0cea2b53b58}</Project>
       <Name>osu.Game.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Desktop.Tests\osu.Desktop.Tests.csproj">
+      <Project>{230ac4f3-7783-49fb-9aec-b83cda3b9f3d}</Project>
+      <Name>osu.Desktop.Tests</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
       <Project>{c92a607b-1fdd-4954-9f92-03ff547d9080}</Project>
@@ -226,6 +248,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OsuGameDesktop.cs" />
+    <Compile Include="OsuTestBrowser.cs" />
     <Compile Include="Overlays\VersionManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
