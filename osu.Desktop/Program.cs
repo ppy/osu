@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using osu.Framework.Desktop;
 using osu.Framework.Desktop.Platform;
 using osu.Game.IPC;
@@ -33,7 +34,16 @@ namespace osu.Desktop
                 }
                 else
                 {
-                    host.Run(new OsuGameDesktop(args));
+                    switch (args.FirstOrDefault() ?? string.Empty)
+                    {
+                        case "--tests":
+                            host.Run(new OsuTestBrowser());
+                            break;
+                        default:
+                            host.Run(new OsuGameDesktop(args));
+                            break;
+                    }
+
                 }
                 return 0;
             }
