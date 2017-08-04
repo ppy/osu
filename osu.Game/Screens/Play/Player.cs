@@ -4,7 +4,6 @@
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -111,13 +110,7 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            Track track = Beatmap.Value.Track;
-
-            if (track != null)
-                adjustableSourceClock = track;
-
-            adjustableSourceClock = (IAdjustableClock)track ?? new StopwatchClock();
-
+            adjustableSourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
             decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             var firstObjectTime = HitRenderer.Objects.First().StartTime;

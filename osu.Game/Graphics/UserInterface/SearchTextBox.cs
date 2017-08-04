@@ -8,9 +8,6 @@ using OpenTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    /// <summary>
-    /// A textbox which holds focus eagerly.
-    /// </summary>
     public class SearchTextBox : FocusedTextBox
     {
         protected virtual bool AllowCommit => false;
@@ -46,10 +43,16 @@ namespace osu.Game.Graphics.UserInterface
                     case Key.Up:
                     case Key.Down:
                         return false;
+                }
+            }
+
+            if (!AllowCommit)
+            {
+                switch (args.Key)
+                {
                     case Key.KeypadEnter:
                     case Key.Enter:
-                        if (!AllowCommit) return false;
-                        break;
+                        return false;
                 }
             }
 

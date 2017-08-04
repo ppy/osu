@@ -10,6 +10,9 @@ using System.Linq;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    /// <summary>
+    /// A textbox which holds focus eagerly.
+    /// </summary>
     public class FocusedTextBox : OsuTextBox
     {
         protected override Color4 BackgroundUnfocused => new Color4(10, 10, 10, 255);
