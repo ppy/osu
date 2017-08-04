@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using OpenTK;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Overlays.Notifications
         }
 
         private readonly SpriteText textDrawable;
-        private readonly TextAwesome iconDrawable;
+        private readonly SpriteIcon iconDrawable;
 
         protected Box IconBackgound;
 
@@ -49,12 +50,12 @@ namespace osu.Game.Overlays.Notifications
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.6f))
                 },
-                iconDrawable = new TextAwesome
+                iconDrawable = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Icon = icon,
-                    TextSize = 20
+                    Size = new Vector2(20),
                 }
             });
 

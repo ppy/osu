@@ -20,6 +20,7 @@ using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
@@ -46,6 +47,8 @@ namespace osu.Game
         private SocialOverlay social;
 
         private UserProfileOverlay userProfile;
+
+        public virtual Storage GetStorageForStableInstall() => null;
 
         private Intro intro
         {
@@ -148,6 +151,10 @@ namespace osu.Game
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            // hook up notifications to components.
+            BeatmapManager.PostNotification = n => notificationOverlay?.Post(n);
+            BeatmapManager.GetStableStorage = GetStorageForStableInstall;
 
             AddRange(new Drawable[] {
                 new VolumeControlReceptor
@@ -332,6 +339,7 @@ namespace osu.Game
                 direct.State = Visibility.Hidden;
                 social.State = Visibility.Hidden;
                 userProfile.State = Visibility.Hidden;
+                notificationOverlay.State = Visibility.Hidden;
             }
             else
             {
