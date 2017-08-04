@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.UI
     public abstract class SpeedAdjustedHitRenderer<TPlayfield, TObject, TJudgement> : HitRenderer<TPlayfield, TObject, TJudgement>
         where TObject : HitObject
         where TJudgement : Judgement
-        where TPlayfield : SpeedAdjustedPlayfield<TObject, TJudgement>
+        where TPlayfield : ScrollingPlayfield<TObject, TJudgement>
     {
         protected readonly SortedList<MultiplierControlPoint> DefaultControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            ApplySpeedAdjustments();
+            DefaultControlPoints.ForEach(c => ApplySpeedAdjustment(c));
         }
 
         protected override void ApplyBeatmap()
@@ -98,9 +99,11 @@ namespace osu.Game.Rulesets.UI
             return new MultiplierControlPoint(time, DefaultControlPoints[index].DeepClone());
         }
 
-        /// <summary>
-        /// Applies speed changes to the playfield.
-        /// </summary>
-        protected abstract void ApplySpeedAdjustments();
+        protected virtual void ApplySpeedAdjustment(MultiplierControlPoint controlPoint)
+        {
+            Playfield.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint));
+        }
+
+        protected abstract SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint);
     }
 }

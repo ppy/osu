@@ -39,24 +39,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<DrawableBarLine> BarLines;
 
-        /// <summary>
-        /// Per-column timing changes.
-        /// </summary>
-        private readonly List<SpeedAdjustmentContainer>[] hitObjectSpeedAdjustments;
-
-        /// <summary>
-        /// Bar line timing changes.
-        /// </summary>
-        private readonly List<SpeedAdjustmentContainer> barLineSpeedAdjustments = new List<SpeedAdjustmentContainer>();
-
         public ManiaHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(beatmap, isForCurrentRuleset)
         {
-            // Generate the speed adjustment container lists
-            hitObjectSpeedAdjustments = new List<SpeedAdjustmentContainer>[PreferredColumns];
-            for (int i = 0; i < PreferredColumns; i++)
-                hitObjectSpeedAdjustments[i] = new List<SpeedAdjustmentContainer>();
-
             // Generate the bar lines
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
@@ -83,30 +68,12 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             BarLines = barLines;
-
-            // Generate speed adjustments from mods first
-            bool useDefaultSpeedAdjustments = true;
-
-            if (Mods != null)
-            {
-                foreach (var speedAdjustmentMod in Mods.OfType<IGenerateSpeedAdjustments>())
-                {
-                    useDefaultSpeedAdjustments = false;
-                    speedAdjustmentMod.ApplyToHitRenderer(this, ref hitObjectSpeedAdjustments, ref barLineSpeedAdjustments);
-                }
-            }
-
-            // Generate the default speed adjustments
-            if (useDefaultSpeedAdjustments)
-                generateDefaultSpeedAdjustments();
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var maniaPlayfield = (ManiaPlayfield)Playfield;
-
-            BarLines.ForEach(maniaPlayfield.Add);
+            BarLines.ForEach(Playfield.Add);
         }
 
         protected override void ApplyBeatmap()
@@ -114,28 +81,6 @@ namespace osu.Game.Rulesets.Mania.UI
             base.ApplyBeatmap();
 
             PreferredColumns = (int)Math.Max(1, Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize));
-        }
-
-        protected override void ApplySpeedAdjustments()
-        {
-            var maniaPlayfield = (ManiaPlayfield)Playfield;
-
-            for (int i = 0; i < PreferredColumns; i++)
-                foreach (var change in hitObjectSpeedAdjustments[i])
-                    maniaPlayfield.Columns.ElementAt(i).Add(change);
-
-            foreach (var change in barLineSpeedAdjustments)
-                maniaPlayfield.Add(change);
-        }
-
-        private void generateDefaultSpeedAdjustments()
-        {
-            DefaultControlPoints.ForEach(c =>
-            {
-                foreach (List<SpeedAdjustmentContainer> t in hitObjectSpeedAdjustments)
-                    t.Add(new ManiaSpeedAdjustmentContainer(c, ScrollingAlgorithm.Basic));
-                barLineSpeedAdjustments.Add(new ManiaSpeedAdjustmentContainer(c, ScrollingAlgorithm.Basic));
-            });
         }
 
         protected sealed override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(PreferredColumns)
@@ -168,5 +113,13 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(1, 0.8f);
+
+        protected override void ApplySpeedAdjustment(MultiplierControlPoint controlPoint)
+        {
+            base.ApplySpeedAdjustment(controlPoint);
+            Playfield.Columns.ForEach(c => c.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint)));
+        }
+
+        protected override SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint) => new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Basic);
     }
 }
