@@ -84,6 +84,8 @@ namespace osu.Game.Rulesets.Taiko
             }
         }
 
+        public override Mod GetAutoplayMod() => new TaikoModAutoplay();
+
         public override string Description => "osu!taiko";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_taiko_o };

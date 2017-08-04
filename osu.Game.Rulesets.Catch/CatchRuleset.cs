@@ -84,6 +84,8 @@ namespace osu.Game.Rulesets.Catch
             }
         }
 
+        public override Mod GetAutoplayMod() => new ModAutoplay();
+
         public override string Description => "osu!catch";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_fruits_o };
