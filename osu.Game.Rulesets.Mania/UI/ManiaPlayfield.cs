@@ -23,7 +23,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : Playfield<ManiaHitObject, ManiaJudgement>
+    public class ManiaPlayfield : SpeedAdjustedPlayfield<ManiaHitObject, ManiaJudgement>
     {
         public const float HIT_TARGET_POSITION = 50;
 

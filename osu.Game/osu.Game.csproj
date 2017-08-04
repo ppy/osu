@@ -340,6 +340,7 @@
     <Compile Include="Rulesets\UI\HitRenderer.cs" />
     <Compile Include="Rulesets\UI\Playfield.cs" />
     <Compile Include="Rulesets\UI\SpeedAdjustedHitRenderer.cs" />
+    <Compile Include="Rulesets\UI\SpeedAdjustedPlayfield.cs" />
     <Compile Include="Screens\Select\EditSongSelect.cs" />
     <Compile Include="Screens\Play\HUD\ComboCounter.cs" />
     <Compile Include="Screens\Play\HUD\ComboResultCounter.cs" />
