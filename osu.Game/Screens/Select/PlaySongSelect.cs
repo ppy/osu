@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -12,7 +11,6 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Mods;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -24,7 +22,7 @@ namespace osu.Game.Screens.Select
         private OsuScreen player;
         private readonly ModSelectOverlay modSelect;
         private readonly BeatmapDetailArea beatmapDetails;
-        private IEnumerable<Mod> originalMods;
+        private bool removeAutoModOnResume;
 
         public PlaySongSelect()
         {
@@ -76,8 +74,12 @@ namespace osu.Game.Screens.Select
         {
             player = null;
 
-            modSelect.SelectedMods.Value = originalMods;
-            originalMods = null;
+            if (removeAutoModOnResume)
+            {
+                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
+                modSelect.SelectedMods.Value = modSelect.SelectedMods.Value.Where(m => m.GetType() != autoType).ToArray();
+            }
+            removeAutoModOnResume = false;
 
             Beatmap.Value.Track.Looping = true;
 
@@ -112,14 +114,17 @@ namespace osu.Game.Screens.Select
         {
             if (player != null) return;
 
-            originalMods = modSelect.SelectedMods.Value;
             if (state?.Keyboard.ControlPressed == true)
             {
                 var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
                 var autoType = auto.GetType();
 
-                if (originalMods.All(m => m.GetType() != autoType))
-                    modSelect.SelectedMods.Value = originalMods.Concat(new[] { auto });
+                var mods = modSelect.SelectedMods.Value;
+                if (mods.All(m => m.GetType() != autoType))
+                {
+                    modSelect.SelectedMods.Value = mods.Concat(new[] { auto });
+                    removeAutoModOnResume = true;
+                }
             }
 
             Beatmap.Value.Track.Looping = false;
