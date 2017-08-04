@@ -78,8 +78,8 @@ namespace osu.Game.Screens.Select
             {
                 var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
                 modSelect.SelectedMods.Value = modSelect.SelectedMods.Value.Where(m => m.GetType() != autoType).ToArray();
+                removeAutoModOnResume = false;
             }
-            removeAutoModOnResume = false;
 
             Beatmap.Value.Track.Looping = true;
 
