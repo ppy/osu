@@ -1,18 +1,19 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.Mania.Timing
 {
     /// <summary>
-    /// A <see cref="DrawableTimingSection"/> that emulates a form of gravity where hit objects speed up over time.
+    /// A <see cref="ScrollingContainer"/> that emulates a form of gravity where hit objects speed up over time.
     /// </summary>
-    internal class GravityScrollingDrawableTimingSection : DrawableTimingSection
+    internal class GravityScrollingContainer : ScrollingContainer
     {
         private readonly MultiplierControlPoint controlPoint;
 
-        public GravityScrollingDrawableTimingSection(MultiplierControlPoint controlPoint)
+        public GravityScrollingContainer(MultiplierControlPoint controlPoint)
         {
             this.controlPoint = controlPoint;
         }
@@ -51,10 +52,10 @@ namespace osu.Game.Rulesets.Mania.Timing
         private double acceleration => 1 / VisibleTimeRange;
 
         /// <summary>
-        /// Computes the current time relative to <paramref name="time"/>, accounting for <see cref="DrawableTimingSection.VisibleTimeRange"/>.
+        /// Computes the current time relative to <paramref name="time"/>, accounting for <see cref="ScrollingContainer.VisibleTimeRange"/>.
         /// </summary>
         /// <param name="time">The non-offset time.</param>
-        /// <returns>The current time relative to <paramref name="time"/> - <see cref="DrawableTimingSection.VisibleTimeRange"/>. </returns>
+        /// <returns>The current time relative to <paramref name="time"/> - <see cref="ScrollingContainer.VisibleTimeRange"/>. </returns>
         private double relativeTimeAt(double time) => Time.Current - time + VisibleTimeRange;
     }
 }

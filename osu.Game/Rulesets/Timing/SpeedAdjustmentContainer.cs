@@ -12,14 +12,14 @@ namespace osu.Game.Rulesets.Timing
 {
     /// <summary>
     /// A container for hit objects which applies applies the speed adjustments defined by the properties of a <see cref="Timing.MultiplierControlPoint"/>
-    /// to affect the scroll speed of the contained <see cref="DrawableTimingSection"/>.
+    /// to affect the scroll speed of the contained <see cref="ScrollingContainer"/>.
     ///
     /// <para>
     /// This container must always be relatively-sized to its parent to provide the speed adjustments. This container will provide the speed adjustments
     /// by modifying its size while maintaining a constant <see cref="Container{T}.RelativeChildSize"/> for its children
     /// </para>
     /// </summary>
-    public abstract class SpeedAdjustmentContainer : Container<DrawableHitObject>
+    public class SpeedAdjustmentContainer : Container<DrawableHitObject>
     {
         private readonly Bindable<double> visibleTimeRange = new Bindable<double>();
         /// <summary>
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Timing
 
         public readonly MultiplierControlPoint ControlPoint;
 
-        private DrawableTimingSection timingSection;
+        private ScrollingContainer scrollingContainer;
 
         /// <summary>
         /// Creates a new <see cref="SpeedAdjustmentContainer"/>.
@@ -58,14 +58,14 @@ namespace osu.Game.Rulesets.Timing
         [BackgroundDependencyLoader]
         private void load()
         {
-            timingSection = CreateTimingSection();
+            scrollingContainer = CreateScrollingContainer();
 
-            timingSection.ScrollingAxes = ScrollingAxes;
-            timingSection.ControlPoint = ControlPoint;
-            timingSection.VisibleTimeRange.BindTo(VisibleTimeRange);
-            timingSection.RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
+            scrollingContainer.ScrollingAxes = ScrollingAxes;
+            scrollingContainer.ControlPoint = ControlPoint;
+            scrollingContainer.VisibleTimeRange.BindTo(VisibleTimeRange);
+            scrollingContainer.RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
 
-            AddInternal(content = timingSection);
+            AddInternal(content = scrollingContainer);
         }
 
         protected override void Update()
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Timing
         }
 
         public override double LifetimeStart => ControlPoint.StartTime - VisibleTimeRange;
-        public override double LifetimeEnd => ControlPoint.StartTime + timingSection.Duration + VisibleTimeRange;
+        public override double LifetimeEnd => ControlPoint.StartTime + scrollingContainer.Duration + VisibleTimeRange;
 
         public override void Add(DrawableHitObject drawable)
         {
@@ -99,9 +99,9 @@ namespace osu.Game.Rulesets.Timing
         public bool CanContain(double startTime) => ControlPoint.StartTime <= startTime;
 
         /// <summary>
-        /// Creates the container which handles the movement of a collection of hit objects.
+        /// Creates the container which contains a collection of hit objects and scrolls through this SpeedAdjustmentContainer.
         /// </summary>
-        /// <returns>The <see cref="DrawableTimingSection"/>.</returns>
-        protected abstract DrawableTimingSection CreateTimingSection();
+        /// <returns>The <see cref="ScrollingContainer"/>.</returns>
+        protected virtual ScrollingContainer CreateScrollingContainer() => new LinearScrollingContainer(ScrollingAxes, ControlPoint);
     }
 }
