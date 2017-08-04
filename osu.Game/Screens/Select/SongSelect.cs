@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -19,7 +18,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
-using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select.Options;
 
@@ -27,7 +25,6 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private BeatmapManager manager;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
@@ -109,7 +106,7 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.CentreRight,
                 SelectionChanged = carouselSelectionChanged,
                 BeatmapsChanged = carouselBeatmapsLoaded,
-                StartRequested = carouselRaisedStart,
+                StartRequested = () => carouselRaisedStart(),
             });
             Add(FilterControl = new FilterControl
             {
@@ -151,7 +148,7 @@ namespace osu.Game.Screens.Select
                 Add(Footer = new Footer
                 {
                     OnBack = Exit,
-                    OnStart = carouselRaisedStart,
+                    OnStart = () => carouselRaisedStart(),
                 });
 
                 FooterPanels.Add(BeatmapOptions = new BeatmapOptionsOverlay());
@@ -173,7 +170,7 @@ namespace osu.Game.Screens.Select
                 manager = beatmaps;
 
             if (osu != null)
-                ruleset.BindTo(osu.Ruleset);
+                Ruleset.BindTo(osu.Ruleset);
 
             manager.BeatmapSetAdded += onBeatmapSetAdded;
             manager.BeatmapSetRemoved += onBeatmapSetRemoved;
@@ -201,7 +198,7 @@ namespace osu.Game.Screens.Select
                 carousel.SelectNext();
         }
 
-        private void carouselRaisedStart()
+        private void carouselRaisedStart(InputState state = null)
         {
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
@@ -214,7 +211,7 @@ namespace osu.Game.Screens.Select
                 selectionChangedDebounce = null;
             }
 
-            OnSelected();
+            OnSelected(state);
         }
 
         private ScheduledDelegate selectionChangedDebounce;
@@ -256,7 +253,7 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                ruleset.Value = beatmap.Ruleset;
+                Ruleset.Value = beatmap.Ruleset;
 
                 if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
                     sampleChangeDifficulty.Play();
@@ -278,7 +275,7 @@ namespace osu.Game.Screens.Select
                 carousel.SelectNextRandom();
         }
 
-        protected abstract void OnSelected();
+        protected abstract void OnSelected(InputState state);
 
         private void filterChanged(FilterCriteria criteria, bool debounce = true)
         {
@@ -406,7 +403,7 @@ namespace osu.Game.Screens.Select
             {
                 case Key.KeypadEnter:
                 case Key.Enter:
-                    carouselRaisedStart();
+                    carouselRaisedStart(state);
                     return true;
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
