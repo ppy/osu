@@ -18,7 +18,7 @@ namespace osu.Desktop.Tests.Visual
 {
     public class TestCaseScrollingHitObjects : OsuTestCase
     {
-        public override string Description => "SpeedAdjustmentContainer/DrawableTimingSection";
+        public override string Description => "SpeedAdjustmentContainer/ScrollingContainer";
 
         private readonly BindableDouble timeRangeBindable;
         private readonly OsuSpriteText bottomLabel;
@@ -131,13 +131,13 @@ namespace osu.Desktop.Tests.Visual
             {
             }
 
-            protected override DrawableTimingSection CreateTimingSection() => new TestDrawableTimingSection(ControlPoint);
+            protected override ScrollingContainer CreateScrollingContainer() => new TestScrollingContainer(ControlPoint);
 
-            private class TestDrawableTimingSection : DrawableTimingSection
+            private class TestScrollingContainer : ScrollingContainer
             {
                 private readonly MultiplierControlPoint controlPoint;
 
-                public TestDrawableTimingSection(MultiplierControlPoint controlPoint)
+                public TestScrollingContainer(MultiplierControlPoint controlPoint)
                 {
                     this.controlPoint = controlPoint;
                 }

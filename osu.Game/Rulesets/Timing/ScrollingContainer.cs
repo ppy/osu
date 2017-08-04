@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Timing
     /// and <see cref="Container{T}.RelativeChildOffset"/> to apply further time offsets to this collection of hit objects.
     /// </para>
     /// </summary>
-    public abstract class DrawableTimingSection : Container<DrawableHitObject>
+    public abstract class ScrollingContainer : Container<DrawableHitObject>
     {
         private readonly BindableDouble visibleTimeRange = new BindableDouble();
         /// <summary>
@@ -71,9 +71,9 @@ namespace osu.Game.Rulesets.Timing
         }
 
         /// <summary>
-        /// Creates a new <see cref="DrawableTimingSection"/>.
+        /// Creates a new <see cref="ScrollingContainer"/>.
         /// </summary>
-        protected DrawableTimingSection()
+        protected ScrollingContainer()
         {
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
@@ -128,8 +128,8 @@ namespace osu.Game.Rulesets.Timing
         }
 
         /// <summary>
-        /// The maximum duration of any one hit object inside this <see cref="DrawableTimingSection"/>. This is calculated as the maximum
-        /// end time between all hit objects relative to this <see cref="DrawableTimingSection"/>'s <see cref="MultiplierControlPoint.StartTime"/>.
+        /// The maximum duration of any one hit object inside this <see cref="ScrollingContainer"/>. This is calculated as the maximum
+        /// end time between all hit objects relative to this <see cref="ScrollingContainer"/>'s <see cref="MultiplierControlPoint.StartTime"/>.
         /// </summary>
         public double Duration => durationBacking.IsValid ? durationBacking : (durationBacking.Value = computeDuration());
 
