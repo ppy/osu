@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Graphics;
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
@@ -35,8 +35,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
         public TaikoPiece()
         {
-            //just a default
-            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER);
+            RelativeSizeAxes = Axes.Both;
         }
     }
 }

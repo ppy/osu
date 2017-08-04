@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -104,7 +104,6 @@
     <Compile Include="Visual\TestCaseSocial.cs" />
     <Compile Include="Visual\TestCaseSongProgress.cs" />
     <Compile Include="Visual\TestCaseTabControl.cs" />
-    <Compile Include="Visual\TestCaseTaikoHitObjects.cs" />
     <Compile Include="Visual\TestCaseTaikoPlayfield.cs" />
     <Compile Include="Visual\TestCaseTextAwesome.cs" />
     <Compile Include="Visual\TestCaseTwoLayerButton.cs" />

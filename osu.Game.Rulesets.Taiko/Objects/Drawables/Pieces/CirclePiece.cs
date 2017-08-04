@@ -21,9 +21,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
     /// </summary>
     public class CirclePiece : TaikoPiece
     {
-        public const float SYMBOL_SIZE = TaikoHitObject.DEFAULT_CIRCLE_DIAMETER * 0.45f;
+        public const float SYMBOL_SIZE = 0.45f;
         public const float SYMBOL_BORDER = 8;
-        public const float SYMBOL_INNER_SIZE = SYMBOL_SIZE - 2 * SYMBOL_BORDER;
         private const double pre_beat_transition_time = 80;
 
         /// <summary>
@@ -64,7 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
         public Box FlashBox;
 
-        public CirclePiece(bool isStrong = false)
+        public CirclePiece()
         {
             EarlyActivationMilliseconds = pre_beat_transition_time;
 
@@ -120,28 +119,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
                 },
                 content = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
                     Name = "Content",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
                 }
             });
-
-            if (isStrong)
-            {
-                Size *= TaikoHitObject.STRONG_CIRCLE_DIAMETER_SCALE;
-
-                //default for symbols etc.
-                Content.Scale *= TaikoHitObject.STRONG_CIRCLE_DIAMETER_SCALE;
-            }
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            //we want to allow for width of content to remain mapped to the area inside us, regardless of the scale applied above.
-            Content.Width = 1 / Content.Scale.X;
         }
 
         private const float edge_alpha_kiai = 0.5f;
