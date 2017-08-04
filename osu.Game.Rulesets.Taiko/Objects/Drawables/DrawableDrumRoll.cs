@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Taiko.Judgements;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -30,6 +31,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
+            RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
+
             foreach (var tick in drumRoll.Ticks)
             {
                 var newTick = new DrawableDrumRollTick(tick)
@@ -46,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override TaikoJudgement CreateJudgement() => new TaikoJudgement { SecondHit = HitObject.IsStrong };
 
-        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece(HitObject.IsStrong)
+        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece
         {
             Length = (float)(HitObject.Duration / HitObject.ScrollTime),
             PlayfieldLengthReference = () => Parent.DrawSize.X

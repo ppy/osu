@@ -155,10 +155,6 @@
       <Project>{007b2356-ab6f-4bd9-96d5-116fc2dce69a}</Project>
       <Name>osu.Framework.Testing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu-framework\osu.Framework.VisualTestBrowser\osu.Framework.VisualTestBrowser.csproj">
-      <Project>{1f02f11c-2c66-4d25-bbb5-5c752aad3e62}</Project>
-      <Name>osu.Framework.VisualTestBrowser</Name>
-    </ProjectReference>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
       <Project>{c76bf5b3-985e-4d39-95fe-97c9c879b83a}</Project>
       <Name>osu.Framework</Name>
