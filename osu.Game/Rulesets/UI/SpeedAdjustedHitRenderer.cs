@@ -16,11 +16,13 @@ using osu.Game.Rulesets.Timing;
 namespace osu.Game.Rulesets.UI
 {
     /// <summary>
-    /// A type of <see cref="HitRenderer{TObject, TJudgement}"/> that supports speed adjustments in some capacity.
+    /// A type of <see cref="HitRenderer{TObject, TJudgement}"/> that exposes <see cref="MultiplierControlPoint"/>s to be used
+    /// in <see cref="SpeedAdjustmentCollection"/>s.
     /// </summary>
-    public abstract class SpeedAdjustedHitRenderer<TObject, TJudgement> : HitRenderer<TObject, TJudgement>
+    public abstract class SpeedAdjustedHitRenderer<TPlayfield, TObject, TJudgement> : HitRenderer<TPlayfield, TObject, TJudgement>
         where TObject : HitObject
         where TJudgement : Judgement
+        where TPlayfield : SpeedAdjustedPlayfield<TObject, TJudgement>
     {
         protected readonly SortedList<MultiplierControlPoint> DefaultControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 

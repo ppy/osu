@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The playfield.
         /// </summary>
-        protected Playfield<TObject, TJudgement> Playfield;
+        protected Playfield<TObject, TJudgement> Playfield { get; private set; }
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -317,6 +317,32 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <returns>The Playfield.</returns>
         protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
+    }
+
+    /// <summary>
+    /// A derivable HitRenderer that manages the Playfield and HitObjects.
+    /// </summary>
+    /// <typeparam name="TObject">The type of HitObject contained by this HitRenderer.</typeparam>
+    /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this HitRenderer.</typeparam>
+    public abstract class HitRenderer<TPlayfield, TObject, TJudgement> : HitRenderer<TObject, TJudgement>
+        where TObject : HitObject
+        where TJudgement : Judgement
+        where TPlayfield : Playfield<TObject, TJudgement>
+    {
+        /// <summary>
+        /// The playfield.
+        /// </summary>
+        protected new TPlayfield Playfield => (TPlayfield)base.Playfield;
+
+        /// <summary>
+        /// Creates a hit renderer for a beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
+        protected HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(beatmap, isForCurrentRuleset)
+        {
+        }
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException
