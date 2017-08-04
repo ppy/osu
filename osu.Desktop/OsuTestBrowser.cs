@@ -2,13 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Platform;
-using osu.Framework.VisualTests;
+using osu.Framework.Testing;
 using osu.Game;
 using osu.Game.Screens.Backgrounds;
 
-namespace osu.Desktop.VisualTests
+namespace osu.Desktop
 {
-    internal class VisualTestGame : OsuGameBase
+    internal class OsuTestBrowser : OsuGameBase
     {
         protected override void LoadComplete()
         {
