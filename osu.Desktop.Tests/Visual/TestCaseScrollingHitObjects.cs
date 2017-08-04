@@ -13,6 +13,9 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Judgements;
+using System;
 
 namespace osu.Desktop.Tests.Visual
 {
@@ -28,7 +31,7 @@ namespace osu.Desktop.Tests.Visual
         public TestCaseScrollingHitObjects()
         {
             OsuSpriteText timeRangeText;
-            SpeedAdjustmentCollection adjustmentCollection;
+            ScrollingPlayfield<HitObject, Judgement>.ScrollingHitObjectContainer scrollingHitObjectContainer;
 
             timeRangeBindable = new BindableDouble(2000)
             {
@@ -68,7 +71,7 @@ namespace osu.Desktop.Tests.Visual
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0.25f
                         },
-                        adjustmentCollection = new SpeedAdjustmentCollection(Axes.Y)
+                        scrollingHitObjectContainer = new ScrollingPlayfield<HitObject, Judgement>.ScrollingHitObjectContainer(Axes.Y)
                         {
                             RelativeSizeAxes = Axes.Both,
                             VisibleTimeRange = timeRangeBindable,
@@ -109,9 +112,9 @@ namespace osu.Desktop.Tests.Visual
 
             timeRangeBindable.TriggerChange();
 
-            adjustmentCollection.Add(new TestSpeedAdjustmentContainer(new MultiplierControlPoint()));
+            scrollingHitObjectContainer.AddSpeedAdjustment(new TestSpeedAdjustmentContainer(new MultiplierControlPoint()));
 
-            AddStep("Add hit object", () => adjustmentCollection.Add(new TestDrawableHitObject(new HitObject { StartTime = Time.Current + 2000 })));
+            AddStep("Add hit object", () => scrollingHitObjectContainer.Add(new TestDrawableHitObject(new HitObject { StartTime = Time.Current + 2000 })));
         }
 
         protected override void Update()
@@ -151,7 +154,7 @@ namespace osu.Desktop.Tests.Visual
             }
         }
 
-        private class TestDrawableHitObject : DrawableHitObject, IScrollingHitObject
+        private class TestDrawableHitObject : DrawableHitObject<HitObject, Judgement>, IScrollingHitObject
         {
             private readonly Box background;
             private const float height = 14;
@@ -203,6 +206,18 @@ namespace osu.Desktop.Tests.Visual
                 base.Update();
                 if (Time.Current >= HitObject.StartTime)
                     background.Colour = Color4.Red;
+            }
+
+            protected override Judgement CreateJudgement() => new TestJudgement();
+
+            protected override void UpdateState(ArmedState state)
+            {
+            }
+
+            private class TestJudgement : Judgement
+            {
+                public override string ResultString { get { throw new NotImplementedException(); } }
+                public override string MaxResultString { get { throw new NotImplementedException(); } }
             }
         }
     }

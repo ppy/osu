@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Timing
     /// </summary>
     public class SpeedAdjustmentContainer : Container<DrawableHitObject>
     {
-        private readonly Bindable<double> visibleTimeRange = new Bindable<double>();
+        private readonly Bindable<double> visibleTimeRange = new Bindable<double> { Default = 1000 };
         /// <summary>
         /// Gets or sets the range of time that is visible by the length of this container.
         /// </summary>

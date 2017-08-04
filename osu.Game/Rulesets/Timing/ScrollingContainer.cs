@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Timing
     /// </summary>
     public abstract class ScrollingContainer : Container<DrawableHitObject>
     {
-        private readonly BindableDouble visibleTimeRange = new BindableDouble();
+        private readonly BindableDouble visibleTimeRange = new BindableDouble { Default = 1000 };
         /// <summary>
         /// Gets or sets the range of time that is visible by the length of this container.
         /// </summary>

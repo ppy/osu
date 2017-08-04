@@ -230,7 +230,6 @@
     <Compile Include="Rulesets\Timing\LinearScrollingContainer.cs" />
     <Compile Include="Rulesets\Timing\ScrollingContainer.cs" />
     <Compile Include="Rulesets\Timing\MultiplierControlPoint.cs" />
-    <Compile Include="Rulesets\Timing\SpeedAdjustmentCollection.cs" />
     <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
     <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />
     <Compile Include="Screens\Play\HUDOverlay.cs" />
@@ -341,7 +340,7 @@
     <Compile Include="Rulesets\UI\HitRenderer.cs" />
     <Compile Include="Rulesets\UI\Playfield.cs" />
     <Compile Include="Rulesets\UI\SpeedAdjustedHitRenderer.cs" />
-    <Compile Include="Rulesets\UI\SpeedAdjustedPlayfield.cs" />
+    <Compile Include="Rulesets\UI\ScrollingPlayfield.cs" />
     <Compile Include="Screens\Select\EditSongSelect.cs" />
     <Compile Include="Screens\Play\HUD\ComboCounter.cs" />
     <Compile Include="Screens\Play\HUD\ComboResultCounter.cs" />

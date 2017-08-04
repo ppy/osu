@@ -20,17 +20,13 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : SpeedAdjustedPlayfield<ManiaHitObject, ManiaJudgement>
+    public class ManiaPlayfield : ScrollingPlayfield<ManiaHitObject, ManiaJudgement>
     {
         public const float HIT_TARGET_POSITION = 50;
-
-        private const double time_span_default = 1500;
-        private const double time_span_min = 50;
-        private const double time_span_max = 10000;
-        private const double time_span_step = 50;
 
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.
@@ -56,13 +52,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
-        private readonly BindableDouble visibleTimeRange = new BindableDouble(time_span_default)
-        {
-            MinValue = time_span_min,
-            MaxValue = time_span_max
-        };
-
-        private readonly SpeedAdjustmentCollection barLineContainer;
+        private readonly ScrollingHitObjectContainer barLineContainer;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
@@ -70,6 +60,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly int columnCount;
 
         public ManiaPlayfield(int columnCount)
+            : base(Axes.Y)
         {
             this.columnCount = columnCount;
 
@@ -120,13 +111,13 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
                             {
-                                barLineContainer = new SpeedAdjustmentCollection(Axes.Y)
+                                barLineContainer = new ScrollingHitObjectContainer(Axes.Y)
                                 {
                                     Name = "Bar lines",
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.Y,
-                                    VisibleTimeRange = visibleTimeRange
+                                    VisibleTimeRange = VisibleTimeRange
                                     // Width is set in the Update method
                                 }
                             }
@@ -136,7 +127,7 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < columnCount; i++)
-                columns.Add(new Column { VisibleTimeRange = visibleTimeRange });
+                columns.Add(new Column { VisibleTimeRange = VisibleTimeRange });
         }
 
         [BackgroundDependencyLoader]
@@ -211,30 +202,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
         public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
-        public void Add(SpeedAdjustmentContainer speedAdjustment) => barLineContainer.Add(speedAdjustment);
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (state.Keyboard.ControlPressed)
-            {
-                switch (args.Key)
-                {
-                    case Key.Minus:
-                        transformVisibleTimeRangeTo(visibleTimeRange + time_span_step, 200, Easing.OutQuint);
-                        break;
-                    case Key.Plus:
-                        transformVisibleTimeRangeTo(visibleTimeRange - time_span_step, 200, Easing.OutQuint);
-                        break;
-                }
-            }
-
-            return false;
-        }
-
-        private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, Easing easing = Easing.None)
-        {
-            this.TransformTo(nameof(visibleTimeRange), newTimeRange, duration, easing);
-        }
+        public void Add(SpeedAdjustmentContainer speedAdjustment) => barLineContainer.AddSpeedAdjustment(speedAdjustment);
 
         protected override void Update()
         {
