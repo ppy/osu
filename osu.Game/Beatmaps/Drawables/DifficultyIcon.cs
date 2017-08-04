@@ -4,8 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -22,23 +22,20 @@ namespace osu.Game.Beatmaps.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new[]
+            Children = new Drawable[]
             {
-                new TextAwesome
+                new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = Size.X,
+                    RelativeSizeAxes = Axes.Both,
                     Colour = AccentColour,
                     Icon = FontAwesome.fa_circle
                 },
-                new TextAwesome
+                new ConstrainedIconContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    TextSize = Size.X,
-                    Colour = Color4.White,
-                    Icon = beatmap.Ruleset.CreateInstance().Icon
+                    RelativeSizeAxes = Axes.Both,
+                    Icon = beatmap.Ruleset.CreateInstance().CreateIcon()
                 }
             };
         }

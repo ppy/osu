@@ -41,7 +41,7 @@ namespace osu.Game.Database
         {
             var storeName = GetType().Name;
 
-            var reportedVersion = Connection.Table<StoreVersion>().FirstOrDefault(s => s.StoreName == storeName) ?? new StoreVersion
+            var reportedVersion = Connection.Table<StoreVersion>().Where(s => s.StoreName == storeName).FirstOrDefault() ?? new StoreVersion
             {
                 StoreName = storeName,
                 Version = 0
@@ -51,14 +51,30 @@ namespace osu.Game.Database
                 PerformMigration(reportedVersion.Version, reportedVersion.Version = StoreVersion);
 
             Connection.InsertOrReplace(reportedVersion);
+
+            StartupTasks();
         }
 
-        protected virtual void PerformMigration(int currentVersion, int newVersion)
+        /// <summary>
+        /// Called when the database version of this store doesn't match the local version.
+        /// Any manual migration operations should be performed in this.
+        /// </summary>
+        /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
+        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
+        protected virtual void PerformMigration(int currentVersion, int targetVersion)
         {
         }
 
         /// <summary>
-        /// Prepare this database for use.
+        /// Perform any common startup tasks. Runs after <see cref="Prepare(bool)"/> and <see cref="PerformMigration(int, int)"/>.
+        /// </summary>
+        protected virtual void StartupTasks()
+        {
+
+        }
+
+        /// <summary>
+        /// Prepare this database for use. Tables should be created here.
         /// </summary>
         protected abstract void Prepare(bool reset = false);
 
@@ -83,9 +99,9 @@ namespace osu.Game.Database
         /// <summary>
         /// Query and populate results.
         /// </summary>
-        /// <param name="filter">An optional filter to refine results.</param>
+        /// <param name="filter">An filter to refine results.</param>
         /// <returns></returns>
-        public List<T> QueryAndPopulate<T>(Expression<Func<T, bool>> filter = null)
+        public List<T> QueryAndPopulate<T>(Expression<Func<T, bool>> filter)
             where T : class
         {
             checkType(typeof(T));
@@ -101,7 +117,6 @@ namespace osu.Game.Database
         public void Populate<T>(T item, bool recursive = true)
         {
             checkType(item.GetType());
-
             Connection.GetChildren(item, recursive);
         }
 

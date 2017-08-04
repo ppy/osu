@@ -11,8 +11,6 @@ namespace osu.Game.IO
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
 
-        public string Filename { get; set; }
-
         [Indexed(Unique = true)]
         public string Hash { get; set; }
 

@@ -104,6 +104,7 @@
     <Compile Include="Overlays\Music\PlaylistList.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
     <Compile Include="Graphics\Containers\SectionsContainer.cs" />
+    <Compile Include="Overlays\Settings\Sections\Maintenance\GeneralSettings.cs" />
     <Compile Include="Overlays\Settings\SettingsHeader.cs" />
     <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
     <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Overlays\Profile\RankChart.cs" />
     <Compile Include="Overlays\Profile\Sections\RanksSection.cs" />
     <Compile Include="Overlays\Profile\Sections\RecentSection.cs" />
+    <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />
@@ -348,7 +350,7 @@
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Cursor\MenuCursor.cs" />
     <Compile Include="Graphics\Processing\RatioAdjust.cs" />
-    <Compile Include="Graphics\TextAwesome.cs" />
+    <Compile Include="Graphics\SpriteIcon.cs" />
     <Compile Include="Screens\Play\KeyCounter.cs" />
     <Compile Include="Screens\Play\KeyCounterKeyboard.cs" />
     <Compile Include="Screens\Play\KeyCounterCollection.cs" />

@@ -152,18 +152,17 @@ namespace osu.Game.Overlays.Direct
 
         private class DownloadButton : OsuClickableContainer
         {
-            private readonly TextAwesome icon;
+            private readonly SpriteIcon icon;
 
             public DownloadButton()
             {
                 Children = new Drawable[]
                 {
-                    icon = new TextAwesome
+                    icon = new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        UseFullGlyphHeight = false,
-                        TextSize = 30,
+                        Size = new Vector2(30),
                         Icon = FontAwesome.fa_osu_chevron_down_o,
                     },
                 };

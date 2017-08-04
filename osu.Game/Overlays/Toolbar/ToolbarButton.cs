@@ -20,10 +20,21 @@ namespace osu.Game.Overlays.Toolbar
     {
         public const float WIDTH = Toolbar.HEIGHT * 1.4f;
 
+        public void SetIcon(Drawable icon)
+        {
+            IconContainer.Icon = icon;
+            IconContainer.Show();
+        }
+
+        public void SetIcon(FontAwesome icon) => SetIcon(new SpriteIcon
+        {
+            Size = new Vector2(20),
+            Icon = icon
+        });
+
         public FontAwesome Icon
         {
-            get { return DrawableIcon.Icon; }
-            set { DrawableIcon.Icon = value; }
+            set { SetIcon(value); }
         }
 
         public string Text
@@ -55,7 +66,7 @@ namespace osu.Game.Overlays.Toolbar
 
         protected virtual Anchor TooltipAnchor => Anchor.TopLeft;
 
-        protected TextAwesome DrawableIcon;
+        protected ConstrainedIconContainer IconContainer;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
         private readonly FillFlowContainer tooltipContainer;
@@ -88,11 +99,12 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        DrawableIcon = new TextAwesome
+                        IconContainer = new ConstrainedIconContainer
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            TextSize = 20
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Size = new Vector2(20),
+                            Alpha = 0,
                         },
                         DrawableText = new OsuSpriteText
                         {

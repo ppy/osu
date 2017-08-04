@@ -17,9 +17,9 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
 using osu.Game.IO;
 using osu.Game.IPC;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using SQLite.Net;
-using FileInfo = osu.Game.IO.FileInfo;
 
 namespace osu.Game.Beatmaps
 {
@@ -47,12 +47,24 @@ namespace osu.Game.Beatmaps
 
         private readonly FileStore files;
 
+        private readonly SQLiteConnection connection;
+
         private readonly RulesetStore rulesets;
 
         private readonly BeatmapStore beatmaps;
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
+
+        /// <summary>
+        /// Set an endpoint for notifications to be posted to.
+        /// </summary>
+        public Action<Notification> PostNotification { private get; set; }
+
+        /// <summary>
+        /// Set a storage with access to an osu-stable install for import purposes.
+        /// </summary>
+        public Func<Storage> GetStableStorage { private get; set; }
 
         public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, IIpcHost importHost = null)
         {
@@ -62,6 +74,7 @@ namespace osu.Game.Beatmaps
 
             this.storage = storage;
             this.files = files;
+            this.connection = connection;
             this.rulesets = rulesets;
 
             if (importHost != null)
@@ -69,17 +82,35 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Import multiple <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
+        /// Import one or more <see cref="BeatmapSetInfo"/> from filesystem <paramref name="paths"/>.
+        /// This will post a notification tracking import progress.
         /// </summary>
-        /// <param name="paths">Multiple locations on disk.</param>
+        /// <param name="paths">One or more beatmap locations on disk.</param>
         public void Import(params string[] paths)
         {
+            var notification = new ProgressNotification
+            {
+                Text = "Beatmap import is initialising...",
+                Progress = 0,
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 0;
             foreach (string path in paths)
             {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
                 try
                 {
+                    notification.Text = $"Importing ({i} of {paths.Length})\n{Path.GetFileName(path)}";
                     using (ArchiveReader reader = getReaderFrom(path))
                         Import(reader);
+
+                    notification.Progress = (float)++i / paths.Length;
 
                     // We may or may not want to delete the file depending on where it is stored.
                     //  e.g. reconstructing/repairing database with beatmaps from default storage.
@@ -87,11 +118,12 @@ namespace osu.Game.Beatmaps
                     // TODO: Add a check to prevent files from storage to be deleted.
                     try
                     {
-                        File.Delete(path);
+                        if (File.Exists(path))
+                            File.Delete(path);
                     }
                     catch (Exception e)
                     {
-                        Logger.Error(e, $@"Could not delete file at {path}");
+                        Logger.Error(e, $@"Could not delete original file after import ({Path.GetFileName(path)})");
                     }
                 }
                 catch (Exception e)
@@ -100,7 +132,11 @@ namespace osu.Game.Beatmaps
                     Logger.Error(e, @"Could not import beatmap set");
                 }
             }
+
+            notification.State = ProgressNotificationState.Completed;
         }
+
+        private readonly object importLock = new object();
 
         /// <summary>
         /// Import a beatmap from an <see cref="ArchiveReader"/>.
@@ -108,8 +144,12 @@ namespace osu.Game.Beatmaps
         /// <param name="archiveReader">The beatmap to be imported.</param>
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
-            BeatmapSetInfo set = importToStorage(archiveReader);
-            Import(set);
+            BeatmapSetInfo set = null;
+
+            // let's only allow one concurrent import at a time for now.
+            lock (importLock)
+                connection.RunInTransaction(() => Import(set = importToStorage(archiveReader)));
+
             return set;
         }
 
@@ -122,7 +162,8 @@ namespace osu.Game.Beatmaps
             // If we have an ID then we already exist in the database.
             if (beatmapSetInfo.ID != 0) return;
 
-            beatmaps.Add(beatmapSetInfo);
+            lock (beatmaps)
+                beatmaps.Add(beatmapSetInfo);
         }
 
         /// <summary>
@@ -132,10 +173,11 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            if (!beatmaps.Delete(beatmapSet)) return;
+            lock (beatmaps)
+                if (!beatmaps.Delete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
-                files.Dereference(beatmapSet.Files);
+                files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
         }
 
         /// <summary>
@@ -145,9 +187,11 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to restore.</param>
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
-            if (!beatmaps.Undelete(beatmapSet)) return;
+            lock (beatmaps)
+                if (!beatmaps.Undelete(beatmapSet)) return;
 
-            files.Reference(beatmapSet.Files);
+            if (!beatmapSet.Protected)
+                files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
         }
 
         /// <summary>
@@ -161,7 +205,8 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
-            beatmaps.Populate(beatmapInfo);
+            lock (beatmaps)
+                beatmaps.Populate(beatmapInfo);
 
             if (beatmapInfo.BeatmapSet == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
@@ -181,7 +226,8 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public void Reset()
         {
-            beatmaps.Reset();
+            lock (beatmaps)
+                beatmaps.Reset();
         }
 
         /// <summary>
@@ -191,12 +237,15 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query)
         {
-            BeatmapSetInfo set = beatmaps.Query<BeatmapSetInfo>().FirstOrDefault(query);
+            lock (beatmaps)
+            {
+                BeatmapSetInfo set = beatmaps.Query<BeatmapSetInfo>().FirstOrDefault(query);
 
-            if (set != null)
-                beatmaps.Populate(set);
+                if (set != null)
+                    beatmaps.Populate(set);
 
-            return set;
+                return set;
+            }
         }
 
         /// <summary>
@@ -204,7 +253,10 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.QueryAndPopulate(query);
+        public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
+        {
+            lock (beatmaps) return beatmaps.QueryAndPopulate(query);
+        }
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
@@ -213,12 +265,15 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
         {
-            BeatmapInfo set = beatmaps.Query<BeatmapInfo>().FirstOrDefault(query);
+            lock (beatmaps)
+            {
+                BeatmapInfo set = beatmaps.Query<BeatmapInfo>().FirstOrDefault(query);
 
-            if (set != null)
-                beatmaps.Populate(set);
+                if (set != null)
+                    beatmaps.Populate(set);
 
-            return set;
+                return set;
+            }
         }
 
         /// <summary>
@@ -226,7 +281,10 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.QueryAndPopulate(query);
+        public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
+        {
+            lock (beatmaps) return beatmaps.QueryAndPopulate(query);
+        }
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
@@ -258,19 +316,26 @@ namespace osu.Game.Beatmaps
             var hash = hashable.ComputeSHA2Hash();
 
             // check if this beatmap has already been imported and exit early if so.
-            var beatmapSet = beatmaps.QueryAndPopulate<BeatmapSetInfo>().FirstOrDefault(b => b.Hash == hash);
+            BeatmapSetInfo beatmapSet;
+            lock (beatmaps)
+                beatmapSet = beatmaps.QueryAndPopulate<BeatmapSetInfo>(b => b.Hash == hash).FirstOrDefault();
+
             if (beatmapSet != null)
             {
                 Undelete(beatmapSet);
                 return beatmapSet;
             }
 
-            List<FileInfo> fileInfos = new List<FileInfo>();
+            List<BeatmapSetFileInfo> fileInfos = new List<BeatmapSetFileInfo>();
 
             // import files to manager
             foreach (string file in reader.Filenames)
                 using (Stream s = reader.GetStream(file))
-                    fileInfos.Add(files.Add(s, file));
+                    fileInfos.Add(new BeatmapSetFileInfo
+                    {
+                        Filename = file,
+                        FileInfo = files.Add(s)
+                    });
 
             BeatmapMetadata metadata;
 
@@ -325,10 +390,13 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets(bool populate = true)
         {
-            if (populate)
-                return beatmaps.QueryAndPopulate<BeatmapSetInfo>(b => !b.DeletePending).ToList();
-            else
-                return beatmaps.Query<BeatmapSetInfo>(b => !b.DeletePending).ToList();
+            lock (beatmaps)
+            {
+                if (populate)
+                    return beatmaps.QueryAndPopulate<BeatmapSetInfo>(b => !b.DeletePending).ToList();
+                else
+                    return beatmaps.Query<BeatmapSetInfo>(b => !b.DeletePending).ToList();
+            }
         }
 
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
@@ -366,7 +434,7 @@ namespace osu.Game.Beatmaps
                 catch { return null; }
             }
 
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => f.Filename == filename).StoragePath;
+            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => f.Filename == filename).FileInfo.StoragePath;
 
             protected override Texture GetBackground()
             {
@@ -389,6 +457,52 @@ namespace osu.Game.Beatmaps
                 }
                 catch { return new TrackVirtual(); }
             }
+        }
+
+        /// <summary>
+        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
+        /// </summary>
+        public void ImportFromStable()
+        {
+            var stable = GetStableStorage?.Invoke();
+
+            if (stable == null)
+            {
+                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
+                return;
+            }
+
+            Import(stable.GetDirectories("Songs"));
+        }
+
+        public void DeleteAll()
+        {
+            var maps = GetAllUsableBeatmapSets().ToArray();
+
+            if (maps.Length == 0) return;
+
+            var notification = new ProgressNotification
+            {
+                Progress = 0,
+                State = ProgressNotificationState.Active,
+            };
+
+            PostNotification?.Invoke(notification);
+
+            int i = 0;
+
+            foreach (var b in maps)
+            {
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
+
+                notification.Text = $"Deleting ({i} of {maps.Length})";
+                notification.Progress = (float)++i / maps.Length;
+                Delete(b);
+            }
+
+            notification.State = ProgressNotificationState.Completed;
         }
     }
 }

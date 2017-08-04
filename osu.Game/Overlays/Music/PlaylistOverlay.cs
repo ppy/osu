@@ -6,14 +6,14 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Input;
-using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.Music
 {
@@ -77,11 +77,11 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
+            beatmaps.BeatmapSetAdded += s => Schedule(() => list.AddBeatmapSet(s));
+            beatmaps.BeatmapSetRemoved += s => Schedule(() => list.RemoveBeatmapSet(s));
+
             list.BeatmapSets = BeatmapSets = beatmaps.GetAllUsableBeatmapSets();
 
-            // todo: these should probably be above the query.
-            beatmaps.BeatmapSetAdded += s => list.AddBeatmapSet(s);
-            beatmaps.BeatmapSetRemoved += s => list.RemoveBeatmapSet(s);
 
             beatmapBacking.BindTo(game.Beatmap);
 

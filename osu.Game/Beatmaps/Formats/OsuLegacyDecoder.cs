@@ -456,6 +456,11 @@ namespace osu.Game.Beatmaps.Formats
                         handleColours(beatmap, line, ref hasCustomColours);
                         break;
                     case Section.HitObjects:
+
+                        // If the ruleset wasn't specified, assume the osu!standard ruleset.
+                        if (parser == null)
+                            parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser();
+
                         var obj = parser.Parse(line);
 
                         if (obj != null)

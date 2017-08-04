@@ -334,25 +334,23 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 Children = new[]
                 {
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         Icon = FontAwesome.fa_osu_mod_bg,
                         Colour = colour,
                         Shadow = true,
-                        TextSize = 30,
-                        UseFullGlyphHeight = false,
+                        Size = new Vector2(30),
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         Icon = icon,
                         Colour = OsuColour.Gray(84),
-                        TextSize = 18,
+                        Size = new Vector2(18),
                         Position = new Vector2(0f, 2f),
-                        UseFullGlyphHeight = false,
                     },
                 };
             }
@@ -369,7 +367,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 Children = new Drawable[]
                 {
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_square,
@@ -377,7 +375,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         Rotation = 45,
                         Shadow = true,
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Origin = Anchor.Centre,
                         Icon = icon,

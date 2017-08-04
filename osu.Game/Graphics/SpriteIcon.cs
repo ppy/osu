@@ -1,13 +1,70 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Graphics.Sprites;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics;
+using osu.Framework.IO.Stores;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Graphics
 {
-    public class TextAwesome : OsuSpriteText
+    public class SpriteIcon : CompositeDrawable
     {
-        //public override FontFace FontFace => (int)Icon < 0xf000 ? FontFace.OsuFont : FontFace.FontAwesome;
+        private readonly Sprite spriteShadow;
+        private readonly Sprite spriteMain;
+
+        public SpriteIcon()
+        {
+            InternalChildren = new[]
+            {
+                spriteShadow = new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fit,
+                    Position = new Vector2(0, 0.06f),
+                    Colour = new Color4(0f, 0f, 0f, 0.2f),
+                    Alpha = 0
+                },
+                spriteMain = new Sprite
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fit
+                },
+            };
+        }
+
+        private FontStore store;
+
+        [BackgroundDependencyLoader]
+        private void load(FontStore store)
+        {
+            this.store = store;
+            updateTexture();
+        }
+
+        private void updateTexture()
+        {
+            var texture = store?.Get(((char)icon).ToString());
+
+            spriteMain.Texture = texture;
+            spriteShadow.Texture = texture;
+
+            if (Size == Vector2.Zero)
+                Size = new Vector2(texture?.DisplayWidth ?? 0, texture?.DisplayHeight ?? 0);
+        }
+
+        public bool Shadow
+        {
+            get { return spriteShadow.IsPresent; }
+            set { spriteShadow.Alpha = value ? 1 : 0; }
+        }
 
         private FontAwesome icon;
 
@@ -23,7 +80,8 @@ namespace osu.Game.Graphics
                 if (icon == value) return;
 
                 icon = value;
-                Text = ((char)icon).ToString();
+                if (IsLoaded)
+                    updateTexture();
             }
         }
     }

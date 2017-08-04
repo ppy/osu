@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly Box box;
         private readonly SpriteText text;
-        private readonly TextAwesome icon;
+        private readonly SpriteIcon icon;
 
         private Color4? accentColour;
         public Color4 AccentColour
@@ -99,9 +99,9 @@ namespace osu.Game.Graphics.UserInterface
                             TextSize = 14,
                             Font = @"Exo2.0-Bold",
                         },
-                        icon = new TextAwesome
+                        icon = new SpriteIcon
                         {
-                            TextSize = 14,
+                            Size = new Vector2(14),
                             Icon = FontAwesome.fa_circle_o,
                             Shadow = true,
                         },
