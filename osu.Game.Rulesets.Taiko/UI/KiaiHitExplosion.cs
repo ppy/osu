@@ -24,11 +24,11 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             Judgement = judgement;
 
-            Anchor = Anchor.Centre;
+            Anchor = Anchor.CentreLeft;
             Origin = Anchor.Centre;
 
-            RelativeSizeAxes = Axes.Y;
-            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER, 1);
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(TaikoHitObject.DEFAULT_SIZE, 1);
 
             Masking = true;
             Alpha = 0.25f;

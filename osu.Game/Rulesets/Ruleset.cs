@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Settings;
 
@@ -17,6 +18,8 @@ namespace osu.Game.Rulesets
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
+
+        public abstract Mod GetAutoplayMod();
 
         /// <summary>
         /// Attempt to create a hit renderer for a beatmap
@@ -31,7 +34,7 @@ namespace osu.Game.Rulesets
 
         public abstract ScoreProcessor CreateScoreProcessor();
 
-        public virtual FontAwesome Icon => FontAwesome.fa_question_circle;
+        public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_question_circle };
 
         public abstract string Description { get; }
 

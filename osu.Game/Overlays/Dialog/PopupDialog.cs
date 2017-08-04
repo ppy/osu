@@ -30,14 +30,14 @@ namespace osu.Game.Overlays.Dialog
         private readonly Container content;
         private readonly Container ring;
         private readonly FillFlowContainer<PopupDialogButton> buttonsContainer;
-        private readonly TextAwesome iconText;
+        private readonly SpriteIcon icon;
         private readonly SpriteText header;
         private readonly SpriteText body;
 
         public FontAwesome Icon
         {
-            get { return iconText.Icon; }
-            set { iconText.Icon = value; }
+            get { return icon.Icon; }
+            set { icon.Icon = value; }
         }
 
         public string HeaderText
@@ -205,12 +205,12 @@ namespace osu.Game.Overlays.Dialog
                                                     RelativeSizeAxes = Axes.Both,
                                                     Colour = Color4.Black.Opacity(0),
                                                 },
-                                                iconText = new TextAwesome
+                                                icon = new SpriteIcon
                                                 {
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
                                                     Icon = FontAwesome.fa_close,
-                                                    TextSize = 50,
+                                                    Size = new Vector2(50),
                                                 },
                                             },
                                         },
