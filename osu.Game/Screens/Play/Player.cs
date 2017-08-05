@@ -22,6 +22,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Play
 {
@@ -77,23 +78,28 @@ namespace osu.Game.Screens.Play
 
             Ruleset rulesetInstance;
 
+            WorkingBeatmap working = Beatmap.Value;
+            Beatmap beatmap;
+
             try
             {
-                if (Beatmap.Value.Beatmap == null)
+                beatmap = working.Beatmap;
+
+                if (beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                ruleset = osu?.Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
+                ruleset = osu?.Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
                 rulesetInstance = ruleset.CreateInstance();
 
                 try
                 {
-                    HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, ruleset.ID == Beatmap.Value.BeatmapInfo.Ruleset.ID);
+                    HitRenderer = rulesetInstance.CreateHitRendererWith(working, ruleset.ID == beatmap.BeatmapInfo.Ruleset.ID);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
                     // we may fail to create a HitRenderer if the beatmap cannot be loaded with the user's preferred ruleset
                     // let's try again forcing the beatmap's ruleset.
-                    ruleset = Beatmap.Value.BeatmapInfo.Ruleset;
+                    ruleset = beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
                     HitRenderer = rulesetInstance.CreateHitRendererWith(Beatmap, true);
                 }
@@ -110,11 +116,11 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            adjustableSourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
+            adjustableSourceClock = (IAdjustableClock)working.Track ?? new StopwatchClock();
             decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             var firstObjectTime = HitRenderer.Objects.First().StartTime;
-            decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, Beatmap.Value.BeatmapInfo.AudioLeadIn)));
+            decoupledClock.Seek(Math.Min(0, firstObjectTime - Math.Max(beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, beatmap.BeatmapInfo.AudioLeadIn)));
             decoupledClock.ProcessFrame();
 
             offsetClock = new FramedOffsetClock(decoupledClock);
@@ -127,7 +133,7 @@ namespace osu.Game.Screens.Play
             {
                 adjustableSourceClock.Reset();
 
-                foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
+                foreach (var mod in working.Mods.Value.OfType<IApplicableToClock>())
                     mod.ApplyToClock(adjustableSourceClock);
 
                 decoupledClock.ChangeSource(adjustableSourceClock);
@@ -195,7 +201,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.AllowSeeking = HitRenderer.HasReplayLoaded;
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
-            hudOverlay.ModDisplay.Current.BindTo(Beatmap.Value.Mods);
+            hudOverlay.ModDisplay.Current.BindTo(working.Mods);
 
             //bind HitRenderer to ScoreProcessor and ourselves (for a pass situation)
             HitRenderer.OnAllJudged += onCompletion;
