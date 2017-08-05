@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Chat
         protected override TabItem<Channel> CreateTabItem(Channel value)
         {
              ChannelTabItem tab = new ChannelTabItem(value);
-             tab.OnRequestClose = () => OnRequestLeave?.Invoke(value);
+             tab.OnRequestClose = () => onTabClose(tab);
 
              return tab;
         }
@@ -71,13 +71,28 @@ namespace osu.Game.Overlays.Chat
             base.SelectTab(tab);
         }
 
+        private void onTabClose(TabItem<Channel> tab)
+        {
+            int totalTabs = TabContainer.Children.Count - 1; // account for selectorTab
+            int currentIndex = MathHelper.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);
+
+            if (tab == SelectedTab && totalTabs > 1)
+                // Select the tab after tab-to-be-removed's index, or the tab before if current == last
+                SelectTab(TabContainer.Children[currentIndex == totalTabs ? currentIndex - 1 : currentIndex + 1]);
+            else if (totalTabs == 1 && !selectorTab.Active)
+                // Open channel selection overlay if all channel tabs will be closed after removing this tab
+                SelectTab(selectorTab);
+
+            OnRequestLeave?.Invoke(tab.Value);
+        }
+
         private class ChannelTabItem : TabItem<Channel>
         {
             private Color4 backgroundInactive;
             private Color4 backgroundHover;
             private Color4 backgroundActive;
 
-            protected override bool IsRemovable => !Pinned;
+            public override bool IsRemovable => !Pinned;
 
             private readonly SpriteText text;
             private readonly SpriteText textBold;
@@ -246,7 +261,7 @@ namespace osu.Game.Overlays.Chat
 
             public class ChannelSelectorTabItem : ChannelTabItem
             {
-                protected override bool IsRemovable => false;
+                public override bool IsRemovable => false;
 
                 public ChannelSelectorTabItem(Channel value) : base(value)
                 {
