@@ -13,7 +13,7 @@ namespace osu.Game.IO.Serialization
     {
         public static string Serialize(this IJsonSerializable obj)
         {
-            return JsonConvert.SerializeObject(obj);
+            return JsonConvert.SerializeObject(obj, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
         }
 
         public static T Deserialize<T>(this string objString)
