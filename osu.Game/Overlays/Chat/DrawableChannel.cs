@@ -46,7 +46,6 @@ namespace osu.Game.Overlays.Chat
             };
 
             channel.NewMessagesArrived += newMessagesArrived;
-            channel.Joined.ValueChanged += channelJoinStatusChanged;
         }
 
         [BackgroundDependencyLoader]
@@ -65,7 +64,6 @@ namespace osu.Game.Overlays.Chat
         {
             base.Dispose(isDisposing);
             Channel.NewMessagesArrived -= newMessagesArrived;
-            Channel.Joined.ValueChanged -= channelJoinStatusChanged;
         }
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)
@@ -90,11 +88,6 @@ namespace osu.Game.Overlays.Chat
                     scroll.OffsetScrollPosition(-d.DrawHeight);
                 d.Expire();
             }
-        }
-
-        private void channelJoinStatusChanged(bool joined)
-        {
-            if (!joined) flow.Clear();
         }
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
