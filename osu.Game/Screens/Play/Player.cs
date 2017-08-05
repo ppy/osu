@@ -238,13 +238,17 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private void onFail()
+        private bool onFail()
         {
+            if (Beatmap.Value.Mods.Value.Any(m => !m.AllowFail))
+                return false;
+
             decoupledClock.Stop();
 
             HasFailed = true;
             failOverlay.Retries = RestartCount;
             failOverlay.Show();
+            return true;
         }
 
         protected override void OnEntering(Screen last)
