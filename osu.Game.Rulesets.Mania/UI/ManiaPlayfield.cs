@@ -48,8 +48,8 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
-        protected override Container<Drawable> Content => barLineContainer;
-        private readonly Container<Drawable> barLineContainer;
+        protected override Container<Drawable> Content => content;
+        private readonly Container<Drawable> content;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
                             {
-                                barLineContainer = new Container
+                                content = new Container
                                 {
                                     Name = "Bar lines",
                                     Anchor = Anchor.TopCentre,
@@ -201,13 +201,13 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
-        public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
+        public void Add(DrawableBarLine barline) => HitObjects.Add(barline);
 
         protected override void Update()
         {
             // Due to masking differences, it is not possible to get the width of the columns container automatically
             // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
-            barLineContainer.Width = columns.Width;
+            content.Width = columns.Width;
         }
     }
 }
