@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -16,19 +17,27 @@ namespace osu.Game.Graphics
         private readonly Sprite spriteShadow;
         private readonly Sprite spriteMain;
 
+        private readonly Container shadowVisibility;
+
         public SpriteIcon()
         {
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
-                spriteShadow = new Sprite
+                shadowVisibility = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fit,
-                    Position = new Vector2(0, 0.06f),
-                    Colour = new Color4(0f, 0f, 0f, 0.2f),
-                    Alpha = 0
+                    Child = spriteShadow = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        FillMode = FillMode.Fit,
+                        Y = 2,
+                        Colour = new Color4(0f, 0f, 0f, 0.2f),
+                    },
+                    Alpha = 0,
                 },
                 spriteMain = new Sprite
                 {
@@ -60,10 +69,27 @@ namespace osu.Game.Graphics
                 Size = new Vector2(texture?.DisplayWidth ?? 0, texture?.DisplayHeight ?? 0);
         }
 
+        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+        {
+            if ((invalidation & Invalidation.Colour) > 0)
+            {
+                //adjust shadow alpha based on highest component intensity to avoid muddy display of darker text.
+                //squared result for quadratic fall-off seems to give the best result.
+                var avgColour = (Color4)DrawInfo.Colour.AverageColour;
+
+                spriteShadow.Alpha = (float)Math.Pow(Math.Max(Math.Max(avgColour.R, avgColour.G), avgColour.B), 2);
+            }
+
+            return base.Invalidate(invalidation, source, shallPropagate);
+        }
+
         public bool Shadow
         {
             get { return spriteShadow.IsPresent; }
-            set { spriteShadow.Alpha = value ? 1 : 0; }
+            set
+            {
+                shadowVisibility.Alpha = value ? 1 : 0;
+            }
         }
 
         private FontAwesome icon;

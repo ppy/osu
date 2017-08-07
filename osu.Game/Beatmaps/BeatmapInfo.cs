@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
-        public string StoredBookmarks { get; internal set; }
+        public string StoredBookmarks { get; set; }
 
         [Ignore]
         [JsonIgnore]
