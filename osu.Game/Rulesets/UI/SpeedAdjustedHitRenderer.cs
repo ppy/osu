@@ -35,7 +35,13 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            DefaultControlPoints.ForEach(c => ApplySpeedAdjustment(c));
+            DefaultControlPoints.ForEach(c => applySpeedAdjustment(c, Playfield));
+        }
+
+        private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield<TObject, TJudgement> playfield)
+        {
+            playfield.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint));
+            playfield.NestedPlayfields.ForEach(p => applySpeedAdjustment(controlPoint, p));
         }
 
         protected override void ApplyBeatmap()
@@ -97,11 +103,6 @@ namespace osu.Game.Rulesets.UI
                 return new MultiplierControlPoint(time);
 
             return new MultiplierControlPoint(time, DefaultControlPoints[index].DeepClone());
-        }
-
-        protected virtual void ApplySpeedAdjustment(MultiplierControlPoint controlPoint)
-        {
-            Playfield.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint));
         }
 
         protected abstract SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint);

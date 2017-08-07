@@ -53,6 +53,17 @@ namespace osu.Game.Rulesets.UI
             };
         }
 
+        private List<ScrollingPlayfield<TObject, TJudgement>> nestedPlayfields;
+        public IEnumerable<ScrollingPlayfield<TObject, TJudgement>> NestedPlayfields => nestedPlayfields;
+
+        protected void AddNested(ScrollingPlayfield<TObject, TJudgement> otherPlayfield)
+        {
+            if (nestedPlayfields == null)
+                nestedPlayfields = new List<ScrollingPlayfield<TObject, TJudgement>>();
+
+            nestedPlayfields.Add(otherPlayfield);
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (state.Keyboard.ControlPressed)
