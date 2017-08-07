@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Timing
         /// Creates a new <see cref="SpeedAdjustmentContainer"/>.
         /// </summary>
         /// <param name="controlPoint">The <see cref="MultiplierControlPoint"/> which provides the speed adjustments for this container.</param>
-        protected SpeedAdjustmentContainer(MultiplierControlPoint controlPoint)
+        public SpeedAdjustmentContainer(MultiplierControlPoint controlPoint)
         {
             ControlPoint = controlPoint;
 
