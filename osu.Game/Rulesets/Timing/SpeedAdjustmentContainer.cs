@@ -37,7 +37,6 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// Axes which the content of this container will scroll through.
         /// </summary>
-        /// <returns></returns>
         public Axes ScrollingAxes { get; internal set; }
 
         public readonly MultiplierControlPoint ControlPoint;
@@ -83,7 +82,12 @@ namespace osu.Game.Rulesets.Timing
         public override void Add(DrawableHitObject drawable)
         {
             var scrollingHitObject = drawable as IScrollingHitObject;
-            scrollingHitObject?.LifetimeOffset.BindTo(VisibleTimeRange);
+
+            if (scrollingHitObject != null)
+            {
+                scrollingHitObject.LifetimeOffset.BindTo(VisibleTimeRange);
+                scrollingHitObject.ScrollingAxes = ScrollingAxes;
+            }
 
             base.Add(drawable);
         }

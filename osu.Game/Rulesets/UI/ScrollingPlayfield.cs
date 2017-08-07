@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.UI
             set { visibleTimeRange.BindTo(value); }
         }
 
-        public new readonly ScrollingHitObjectContainer HitObjects;
+        internal new readonly ScrollingHitObjectContainer HitObjects;
 
         protected ScrollingPlayfield(Axes scrollingAxes, float? customWidth = null)
             : base(customWidth)
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.UI
         /// necessary <see cref="VisibleTimeRange"/> for the contained <see cref="SpeedAdjustmentContainer"/>s.
         /// </para>
         /// </summary>
-        public class ScrollingHitObjectContainer : HitObjectContainer<DrawableHitObject<TObject, TJudgement>>
+        internal class ScrollingHitObjectContainer : HitObjectContainer<DrawableHitObject<TObject, TJudgement>>
         {
             private readonly BindableDouble visibleTimeRange = new BindableDouble { Default = 1000 };
             /// <summary>
