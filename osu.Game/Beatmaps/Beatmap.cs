@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.IO.Serialization;
 
 namespace osu.Game.Beatmaps
 {
@@ -45,7 +46,7 @@ namespace osu.Game.Beatmaps
         /// <param name="original">The original beatmap to use the parameters of.</param>
         public Beatmap(Beatmap original = null)
         {
-            BeatmapInfo = original?.BeatmapInfo ?? BeatmapInfo;
+            BeatmapInfo = original?.BeatmapInfo.DeepClone() ?? BeatmapInfo;
             ControlPointInfo = original?.ControlPointInfo ?? ControlPointInfo;
             Breaks = original?.Breaks ?? Breaks;
             ComboColors = original?.ComboColors ?? ComboColors;

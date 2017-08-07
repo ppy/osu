@@ -12,12 +12,14 @@ using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using OpenTK;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps;
 
 namespace osu.Desktop.Tests.Visual
 {
     internal class TestCaseTaikoPlayfield : OsuTestCase
     {
-        private const double default_duration = 300;
+        private const double default_duration = 1000;
         private const float scroll_time = 1000;
 
         public override string Description => "Taiko playfield";
@@ -30,7 +32,8 @@ namespace osu.Desktop.Tests.Visual
 
         public TestCaseTaikoPlayfield()
         {
-            AddStep("Hit!", addHitJudgement);
+            AddStep("Hit!", () => addHitJudgement(false));
+            AddStep("Kiai hit", () => addHitJudgement(true));
             AddStep("Miss :(", addMissJudgement);
             AddStep("DrumRoll", () => addDrumRoll(false));
             AddStep("Strong DrumRoll", () => addDrumRoll(true));
@@ -55,7 +58,7 @@ namespace osu.Desktop.Tests.Visual
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
-                Height = TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT,
+                Height = TaikoPlayfield.DEFAULT_HEIGHT,
                 Clock = new FramedClock(rateAdjustClock),
                 Children = new[]
                 {
@@ -84,7 +87,7 @@ namespace osu.Desktop.Tests.Visual
                     addDrumRoll(true);
                     break;
                 case 5:
-                    addSwell(1000);
+                    addSwell();
                     delay = scroll_time - 100;
                     break;
             }
@@ -96,16 +99,25 @@ namespace osu.Desktop.Tests.Visual
                     playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, rng.Next(25, 400)), 500);
                     break;
                 case 6:
-                    playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT), 500);
+                    playfieldContainer.Delay(delay).ResizeTo(new Vector2(1, TaikoPlayfield.DEFAULT_HEIGHT), 500);
                     break;
             }
         }
 
-        private void addHitJudgement()
+        private void addHitJudgement(bool kiai)
         {
             TaikoHitResult hitResult = RNG.Next(2) == 0 ? TaikoHitResult.Good : TaikoHitResult.Great;
 
-            var h = new DrawableTestHit(new Hit())
+            var cpi = new ControlPointInfo();
+            cpi.EffectPoints.Add(new EffectControlPoint
+            {
+                KiaiMode = kiai
+            });
+
+            Hit hit = new Hit();
+            hit.ApplyDefaults(cpi, new BeatmapDifficulty());
+
+            var h = new DrawableTestHit(hit)
             {
                 X = RNG.NextSingle(hitResult == TaikoHitResult.Good ? -0.1f : -0.05f, hitResult == TaikoHitResult.Good ? 0.1f : 0.05f),
                 Judgement = new TaikoJudgement
@@ -179,7 +191,8 @@ namespace osu.Desktop.Tests.Visual
             Hit h = new Hit
             {
                 StartTime = playfield.Time.Current + scroll_time,
-                ScrollTime = scroll_time
+                ScrollTime = scroll_time,
+                IsStrong = strong
             };
 
             if (strong)
@@ -193,7 +206,8 @@ namespace osu.Desktop.Tests.Visual
             Hit h = new Hit
             {
                 StartTime = playfield.Time.Current + scroll_time,
-                ScrollTime = scroll_time
+                ScrollTime = scroll_time,
+                IsStrong = strong
             };
 
             if (strong)
