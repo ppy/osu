@@ -18,7 +18,7 @@ namespace osu.Game.Graphics
         private readonly Sprite spriteShadow;
         private readonly Sprite spriteMain;
 
-        private readonly Cached layout = new Cached();
+        private Cached layout = new Cached();
         private readonly Container shadowVisibility;
 
         public SpriteIcon()
