@@ -86,6 +86,9 @@ namespace osu.Game.Rulesets.UI
                 .GroupBy(s => s.TimingPoint.BeatLength * s.DifficultyPoint.SpeedMultiplier).Select(g => g.First());
 
             DefaultControlPoints.AddRange(timingChanges);
+
+            if (DefaultControlPoints.Count == 0)
+                DefaultControlPoints.Add(new MultiplierControlPoint());
         }
 
         /// <summary>
@@ -105,6 +108,6 @@ namespace osu.Game.Rulesets.UI
             return new MultiplierControlPoint(time, DefaultControlPoints[index].DeepClone());
         }
 
-        protected abstract SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint);
+        protected virtual SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint) => new SpeedAdjustmentContainer(controlPoint);
     }
 }
