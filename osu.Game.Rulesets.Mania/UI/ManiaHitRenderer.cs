@@ -17,7 +17,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Scoring;
@@ -97,9 +96,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
         {
-            var maniaPlayfield = (ManiaPlayfield)Playfield;
-
-            Bindable<Key> key = maniaPlayfield.Columns.ElementAt(h.Column).Key;
+            Bindable<Key> key = Playfield.Columns.ElementAt(h.Column).Key;
 
             var holdNote = h as HoldNote;
             if (holdNote != null)

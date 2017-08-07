@@ -15,12 +15,8 @@ using OpenTK.Input;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Framework.Input;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
-using osu.Game.Rulesets.Timing;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Mania.UI
 {

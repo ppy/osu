@@ -4,7 +4,6 @@
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
