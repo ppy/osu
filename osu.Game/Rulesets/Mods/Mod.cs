@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mods
         public virtual Type[] IncompatibleMods => new Type[] { };
 
         /// <summary>
-        /// Whether we should allow fails at the 
+        /// Whether we should allow failing at the current point in time.
         /// </summary>
         public virtual bool AllowFail => true;
     }
