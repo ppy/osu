@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 {
     /// <summary>
     /// A basic class that overrides <see cref="DrawableHitObject{TObject, TJudgement}"/> and implements <see cref="IScrollingHitObject"/>.
+    /// This object does not need to have its <see cref="Drawable.RelativePositionAxes"/> set to be able to scroll, as this will
+    /// will be set by the scrolling container that contains it.
     /// </summary>
     public abstract class DrawableScrollingHitObject<TObject, TJudgement> : DrawableHitObject<TObject, TJudgement>, IScrollingHitObject
         where TObject : HitObject

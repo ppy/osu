@@ -46,12 +46,7 @@ namespace osu.Desktop.Tests.Visual
                 BeatmapInfo = new BeatmapInfo
                 {
                     Difficulty = new BeatmapDifficulty(),
-                    Metadata = new BeatmapMetadata
-                    {
-                        Artist = @"Unknown",
-                        Title = @"Sample Beatmap",
-                        Author = @"peppy",
-                    }
+                    Metadata = new BeatmapMetadata()
                 }
             };
 
@@ -60,7 +55,7 @@ namespace osu.Desktop.Tests.Visual
             Add(new TestHitRenderer(beatmap, true));
         }
 
-        private class TestHitRenderer : SpeedAdjustedHitRenderer<TestPlayfield, TestHitObject, TestJudgement>
+        private class TestHitRenderer : ScrollingHitRenderer<TestPlayfield, TestHitObject, TestJudgement>
         {
             public TestHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
                 : base(beatmap, isForCurrentRuleset)
