@@ -117,6 +117,7 @@
     <Compile Include="Overlays\Profile\Sections\RanksSection.cs" />
     <Compile Include="Overlays\Profile\Sections\RecentSection.cs" />
     <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />

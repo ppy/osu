@@ -169,13 +169,11 @@ namespace osu.Game.Overlays
         {
             header.User = user;
 
-            for (int i = 0; i < user.ProfileOrder.Length; i++)
+            foreach (string id in user.ProfileOrder)
             {
-                string id = user.ProfileOrder[i];
                 var sec = sections.FirstOrDefault(s => s.Identifier == id);
                 if (sec != null)
                 {
-                    sec.Depth = -i;
                     sectionsContainer.Add(sec);
                     tabs.AddItem(sec);
                 }

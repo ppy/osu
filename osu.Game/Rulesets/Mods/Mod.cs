@@ -45,5 +45,10 @@ namespace osu.Game.Rulesets.Mods
         /// The mods this mod cannot be enabled with.
         /// </summary>
         public virtual Type[] IncompatibleMods => new Type[] { };
+
+        /// <summary>
+        /// Whether we should allow failing at the current point in time.
+        /// </summary>
+        public virtual bool AllowFail => true;
     }
 }

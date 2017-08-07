@@ -16,19 +16,12 @@ namespace osu.Game.Rulesets.Taiko.UI
     internal class HitTarget : Container
     {
         /// <summary>
-        /// The 1px inner border of the taiko playfield.
-        /// </summary>
-        private const float border_offset = 1;
-
-        /// <summary>
         /// Thickness of all drawn line pieces.
         /// </summary>
         private const float border_thickness = 2.5f;
 
         public HitTarget()
         {
-            Size = new Vector2(TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT);
-
             Children = new Drawable[]
             {
                 new Box
@@ -36,8 +29,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Name = "Bar Upper",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Y = border_offset,
-                    Size = new Vector2(border_thickness, (TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT - TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER) / 2f - border_offset),
+                    RelativeSizeAxes = Axes.Y,
+                    Size = new Vector2(border_thickness, (1 - TaikoHitObject.DEFAULT_STRONG_SIZE) / 2f),
                     Alpha = 0.1f
                 },
                 new CircularContainer
@@ -45,7 +38,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Name = "Strong Hit Ring",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER),
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fit,
+                    Scale = new Vector2(TaikoHitObject.DEFAULT_STRONG_SIZE),
                     Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = border_thickness,
@@ -65,7 +60,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Name = "Normal Hit Ring",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER),
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fit,
+                    Scale = new Vector2(TaikoHitObject.DEFAULT_SIZE),
                     Masking = true,
                     BorderColour = Color4.White,
                     BorderThickness = border_thickness,
@@ -85,8 +82,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Name = "Bar Lower",
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Y = -border_offset,
-                    Size = new Vector2(border_thickness, (TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT - TaikoHitObject.DEFAULT_STRONG_CIRCLE_DIAMETER) / 2f - border_offset),
+                    RelativeSizeAxes = Axes.Y,
+                    Size = new Vector2(border_thickness, (1 - TaikoHitObject.DEFAULT_STRONG_SIZE) / 2f),
                     Alpha = 0.1f
                 },
             };

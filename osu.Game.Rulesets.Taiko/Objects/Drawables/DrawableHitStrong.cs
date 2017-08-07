@@ -7,7 +7,6 @@ using osu.Framework.Input;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using OpenTK.Input;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -27,8 +26,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hit)
         {
         }
-
-        protected override TaikoPiece CreateMainPiece() => new CirclePiece(true);
 
         protected override TaikoJudgement CreateJudgement() => new TaikoStrongHitJudgement();
 

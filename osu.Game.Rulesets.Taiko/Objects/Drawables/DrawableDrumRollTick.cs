@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
+            FillMode = FillMode.Fit;
         }
 
         protected override TaikoPiece CreateMainPiece() => new TickPiece

@@ -128,13 +128,11 @@ namespace osu.Game.Graphics.Containers
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
                 ScrollbarVisible = false,
-                Children = new Drawable[] { scrollContentContainer = CreateScrollContentContainer() },
-                Depth = float.MaxValue
+                Children = new Drawable[] { scrollContentContainer = CreateScrollContentContainer() }
             });
             AddInternal(headerBackgroundContainer = new Container
             {
-                RelativeSizeAxes = Axes.X,
-                Depth = float.MaxValue / 2
+                RelativeSizeAxes = Axes.X
             });
             originalSectionsMargin = scrollContentContainer.Margin;
         }
