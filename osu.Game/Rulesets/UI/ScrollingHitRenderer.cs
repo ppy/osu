@@ -20,14 +20,14 @@ namespace osu.Game.Rulesets.UI
     /// A type of <see cref="HitRenderer{TObject, TJudgement}"/> that exposes <see cref="MultiplierControlPoint"/>s to be used
     /// in <see cref="SpeedAdjustmentCollection"/>s.
     /// </summary>
-    public abstract class SpeedAdjustedHitRenderer<TPlayfield, TObject, TJudgement> : HitRenderer<TPlayfield, TObject, TJudgement>
+    public abstract class ScrollingHitRenderer<TPlayfield, TObject, TJudgement> : HitRenderer<TPlayfield, TObject, TJudgement>
         where TObject : HitObject
         where TJudgement : Judgement
         where TPlayfield : ScrollingPlayfield<TObject, TJudgement>
     {
         protected readonly SortedList<MultiplierControlPoint> DefaultControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
-        protected SpeedAdjustedHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+        protected ScrollingHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(beatmap, isForCurrentRuleset)
         {
         }

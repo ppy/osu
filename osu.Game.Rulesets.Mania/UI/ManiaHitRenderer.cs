@@ -30,7 +30,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaHitRenderer : SpeedAdjustedHitRenderer<ManiaPlayfield, ManiaHitObject, ManiaJudgement>
+    public class ManiaHitRenderer : ScrollingHitRenderer<ManiaPlayfield, ManiaHitObject, ManiaJudgement>
     {
         /// <summary>
         /// Preferred column count. This will only have an effect during the initialization of the play field.
