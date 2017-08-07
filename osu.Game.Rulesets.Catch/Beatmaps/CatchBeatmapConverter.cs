@@ -16,14 +16,17 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     {
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
-        protected override IEnumerable<CatchBaseHit> ConvertHitObject(HitObject original, Beatmap beatmap)
+        protected override IEnumerable<CatchBaseHit> ConvertHitObject(HitObject obj, Beatmap beatmap)
         {
-            var catchHit = original as CatchBaseHit;
+            var distanceData = obj as IHasDistance;
+            var repeatsData = obj as IHasRepeats;
+            var endTimeData = obj as IHasEndTime;
+            var curveData = obj as IHasCurve;
 
-            yield return catchHit ?? new Fruit
+            yield return new Fruit
             {
-                StartTime = original.StartTime,
-                Position = ((IHasXPosition)original).X / OsuPlayfield.BASE_SIZE.X
+                StartTime = obj.StartTime,
+                Position = ((IHasXPosition)obj).X / OsuPlayfield.BASE_SIZE.X
             };
         }
     }

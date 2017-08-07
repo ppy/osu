@@ -49,6 +49,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             Children = new Framework.Graphics.Drawable[]
             {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Red,
+                },
                 new Pulp
                 {
                     RelativePositionAxes = Axes.Both,
