@@ -7,8 +7,7 @@ using osu.Game.Rulesets.Timing;
 namespace osu.Game.Rulesets.Timing
 {
     /// <summary>
-    /// A <see cref="ScrollingContainer"/> which scrolls relative to the control point start time.
-    /// This is the default <see cref="ScrollingContainer"/> returned by the base <see cref="SpeedAdjustmentContainer"/>.
+    /// A <see cref="ScrollingContainer"/> which scrolls linearly relative to the <see cref="MultiplierControlPoint"/> start time.
     /// </summary>
     internal class LinearScrollingContainer : ScrollingContainer
     {

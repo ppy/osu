@@ -15,17 +15,33 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.UI
 {
+    /// <summary>
+    /// A type of <see cref="Playfield{TObject, TJudgement}"/> specialized towards scrolling <see cref="DrawableHitObjects"/>.
+    /// </summary>
     public class ScrollingPlayfield<TObject, TJudgement> : Playfield<TObject, TJudgement>
         where TObject : HitObject
         where TJudgement : Judgement
     {
+        /// <summary>
+        /// The default span of time visible by the length of the scrolling axes.
+        /// This is clamped between <see cref="time_span_min"/> and <see cref="time_span_max"/>.
+        /// </summary>
         private const double time_span_default = 1500;
+        /// <summary>
+        /// The minimum span of time that may be visible by the length of the scrolling axes.
+        /// </summary>
         private const double time_span_min = 50;
+        /// <summary>
+        /// The maximum span of time that may be visible by the length of the scrolling axes.
+        /// </summary>
         private const double time_span_max = 10000;
+        /// <summary>
+        /// The step increase/decrease of the span of time visible by the length of the scrolling axes.
+        /// </summary>
         private const double time_span_step = 50;
 
         /// <summary>
-        /// Gets or sets the range of time that is visible by the length of this playfield the scrolling axis direction.
+        /// Gets or sets the range of time that is visible by the length of the scrolling axes.
         /// For example, only hit objects with start time less than or equal to 1000 will be visible with <see cref="VisibleTimeRange"/> = 1000.
         /// </summary>
         private readonly BindableDouble visibleTimeRange = new BindableDouble(time_span_default)
@@ -35,14 +51,26 @@ namespace osu.Game.Rulesets.UI
             MaxValue = time_span_max
         };
 
+        /// <summary>
+        /// The span of time visible by the length of the scrolling axes.
+        /// </summary>
+        /// <returns></returns>
         public BindableDouble VisibleTimeRange
         {
             get { return visibleTimeRange; }
             set { visibleTimeRange.BindTo(value); }
         }
 
+        /// <summary>
+        /// The container that contains the <see cref="SpeedAdjustmentContainer"/>s and <see cref="DrawableHitObject"/>s.
+        /// </summary>
         internal new readonly ScrollingHitObjectContainer HitObjects;
 
+        /// <summary>
+        /// Creates a new <see cref="ScrollingPlayfield{TObject, TJudgement}"/>.
+        /// </summary>
+        /// <param name="scrollingAxes">The axes on which <see cref="DrawableHitObject"/>s in this container should scroll.</param>
+        /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width</param>
         protected ScrollingPlayfield(Axes scrollingAxes, float? customWidth = null)
             : base(customWidth)
         {
@@ -54,8 +82,16 @@ namespace osu.Game.Rulesets.UI
         }
 
         private List<ScrollingPlayfield<TObject, TJudgement>> nestedPlayfields;
+        /// <summary>
+        /// All the <see cref="ScrollingPlayfield{TObject, TJudgement}"/>s nested inside this playfield.
+        /// </summary>
         public IEnumerable<ScrollingPlayfield<TObject, TJudgement>> NestedPlayfields => nestedPlayfields;
 
+        /// <summary>
+        /// Adds a <see cref="ScrollingPlayfield{TObject, TJudgement}"/> to this playfield. The nested <see cref="ScrollingPlayfield{TObject, TJudgement}"/>
+        /// will be given all of the same speed adjustments as this playfield.
+        /// </summary>
+        /// <param name="otherPlayfield">The <see cref="ScrollingPlayfield{TObject, TJudgement}"/> to add.</param>
         protected void AddNested(ScrollingPlayfield<TObject, TJudgement> otherPlayfield)
         {
             if (nestedPlayfields == null)
@@ -104,19 +140,13 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// A collection of <see cref="SpeedAdjustmentContainer"/>s.
-        ///
-        /// <para>
-        /// This container redirects any <see cref="DrawableHitObject"/>'s added to it to the <see cref="SpeedAdjustmentContainer"/>
-        /// which provides the speed adjustment active at the start time of the hit object. Furthermore, this container provides the
-        /// necessary <see cref="VisibleTimeRange"/> for the contained <see cref="SpeedAdjustmentContainer"/>s.
-        /// </para>
+        /// A container that provides the foundation for sorting <see cref="DrawableHitObject"/>s into <see cref="SpeedAdjustmentContainer"/>s.
         /// </summary>
         internal class ScrollingHitObjectContainer : HitObjectContainer<DrawableHitObject<TObject, TJudgement>>
         {
             private readonly BindableDouble visibleTimeRange = new BindableDouble { Default = 1000 };
             /// <summary>
-            /// Gets or sets the range of time that is visible by the length of this container.
+            /// Gets or sets the range of time that is visible by the length of the scrolling axes.
             /// For example, only hit objects with start time less than or equal to 1000 will be visible with <see cref="VisibleTimeRange"/> = 1000.
             /// </summary>
             public Bindable<double> VisibleTimeRange
@@ -126,9 +156,6 @@ namespace osu.Game.Rulesets.UI
             }
 
             protected override Container<DrawableHitObject<TObject, TJudgement>> Content => content;
-            /// <summary>
-            /// The following is never used - it only exists for the purpose of being able to use AddInternal below.
-            /// </summary>
             private Container<DrawableHitObject<TObject, TJudgement>> content;
 
             /// <summary>
@@ -146,9 +173,14 @@ namespace osu.Game.Rulesets.UI
             {
                 this.scrollingAxes = scrollingAxes;
 
+                // The following is never used - it only exists for the purpose of being able to use AddInternal below.
                 content = new Container<DrawableHitObject<TObject, TJudgement>>();
             }
 
+            /// <summary>
+            /// Adds a <see cref="SpeedAdjustmentContainer"/> to this container.
+            /// </summary>
+            /// <param name="speedAdjustment">The <see cref="SpeedAdjustmentContainer"/>.</param>
             public void AddSpeedAdjustment(SpeedAdjustmentContainer speedAdjustment)
             {
                 speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
@@ -157,8 +189,8 @@ namespace osu.Game.Rulesets.UI
             }
 
             /// <summary>
-            /// Adds a hit object to this <see cref="ScrollingHitObjectContainer"/>. The hit objects will be kept in a queue
-            /// and will be processed when new <see cref="SpeedAdjustmentContainer"/>s are added to this <see cref="ScrollingHitObjectContainer"/>.
+            /// Adds a hit object to this <see cref="ScrollingHitObjectContainer"/>. The hit objects will be queued to be processed
+            /// new <see cref="SpeedAdjustmentContainer"/>s are added to this <see cref="ScrollingHitObjectContainer"/>.
             /// </summary>
             /// <param name="hitObject">The hit object to add.</param>
             public override void Add(DrawableHitObject<TObject, TJudgement> hitObject)

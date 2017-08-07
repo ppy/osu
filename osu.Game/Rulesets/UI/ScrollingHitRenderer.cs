@@ -17,14 +17,19 @@ using osu.Game.Rulesets.Timing;
 namespace osu.Game.Rulesets.UI
 {
     /// <summary>
-    /// A type of <see cref="HitRenderer{TObject, TJudgement}"/> that exposes <see cref="MultiplierControlPoint"/>s to be used
-    /// in <see cref="SpeedAdjustmentCollection"/>s.
+    /// A type of <see cref="HitRenderer{TPlayfield, TObject, TJudgement}"/> that supports a <see cref="ScrollingPlayfield{TObject, TJudgement}"/>.
+    /// <see cref="HitObject"/>s inside this <see cref="HitRenderer{TPlayfield, TObject, TJudgement}"/> will scroll within the playfield.
     /// </summary>
     public abstract class ScrollingHitRenderer<TPlayfield, TObject, TJudgement> : HitRenderer<TPlayfield, TObject, TJudgement>
         where TObject : HitObject
         where TJudgement : Judgement
         where TPlayfield : ScrollingPlayfield<TObject, TJudgement>
     {
+        /// <summary>
+        /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
+        /// inside this <see cref="HitRenderer{TPlayfield, TObject, TJudgement}"/>.
+        /// </summary>
+        /// <returns></returns>
         protected readonly SortedList<MultiplierControlPoint> DefaultControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
         protected ScrollingHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
@@ -87,15 +92,16 @@ namespace osu.Game.Rulesets.UI
 
             DefaultControlPoints.AddRange(timingChanges);
 
+            // If we have no control points, add a default one
             if (DefaultControlPoints.Count == 0)
                 DefaultControlPoints.Add(new MultiplierControlPoint());
         }
 
         /// <summary>
-        /// Generates a control point with the default timing change/difficulty change from the beatmap at a time.
+        /// Generates a <see cref="MultiplierControlPoint"/> with the default timing change/difficulty change from the beatmap at a time.
         /// </summary>
         /// <param name="time">The time to create the control point at.</param>
-        /// <returns>The <see cref="MultiplierControlPoint"/> at <paramref name="time"/>.</returns>
+        /// <returns>The default <see cref="MultiplierControlPoint"/> at <paramref name="time"/>.</returns>
         public MultiplierControlPoint CreateControlPointAt(double time)
         {
             if (DefaultControlPoints.Count == 0)
@@ -108,6 +114,11 @@ namespace osu.Game.Rulesets.UI
             return new MultiplierControlPoint(time, DefaultControlPoints[index].DeepClone());
         }
 
+        /// <summary>
+        /// Creates a <see cref="SpeedAdjustmentContainer"/> that facilitates the movement of hit objects.
+        /// </summary>
+        /// <param name="controlPoint">The <see cref="MultiplierControlPoint"/> that provides the speed adjustments for the hitobjects.</param>
+        /// <returns>The <see cref="SpeedAdjustmentContainer"/>.</returns>
         protected virtual SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint) => new SpeedAdjustmentContainer(controlPoint);
     }
 }
