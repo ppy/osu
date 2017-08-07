@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The HitObjects contained in this Playfield.
         /// </summary>
-        protected HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects;
+        public HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects { get; protected set; }
 
         internal Container<Drawable> ScaledContent;
 
@@ -99,7 +99,8 @@ namespace osu.Game.Rulesets.UI
             protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
         }
 
-        public class HitObjectContainer<U> : Container<U> where U : Drawable
+        public class HitObjectContainer<U> : Container<U>
+            where U : Drawable
         {
         }
     }
