@@ -18,10 +18,10 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         protected override IEnumerable<CatchBaseHit> ConvertHitObject(HitObject obj, Beatmap beatmap)
         {
-            var distanceData = obj as IHasDistance;
+            /*var distanceData = obj as IHasDistance;
             var repeatsData = obj as IHasRepeats;
             var endTimeData = obj as IHasEndTime;
-            var curveData = obj as IHasCurve;
+            var curveData = obj as IHasCurve;*/
 
             yield return new Fruit
             {
