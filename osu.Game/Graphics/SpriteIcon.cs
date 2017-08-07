@@ -17,21 +17,28 @@ namespace osu.Game.Graphics
         private readonly Sprite spriteShadow;
         private readonly Sprite spriteMain;
 
+        private readonly Container shadowVisibility;
+
         public SpriteIcon()
         {
-            spriteShadow = new Sprite
+            InternalChildren = new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit,
-                Depth = 2,
-                Y = 2,
-                Colour = new Color4(0f, 0f, 0f, 0.2f),
-            };
-
-            InternalChildren = new[]
-            {
+                shadowVisibility = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Child = spriteShadow = new Sprite
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        FillMode = FillMode.Fit,
+                        Y = 2,
+                        Colour = new Color4(0f, 0f, 0f, 0.2f),
+                    },
+                    Alpha = 0,
+                },
                 spriteMain = new Sprite
                 {
                     Anchor = Anchor.Centre,
@@ -81,12 +88,7 @@ namespace osu.Game.Graphics
             get { return spriteShadow.IsPresent; }
             set
             {
-                if (value == (spriteShadow.IsAlive && spriteShadow.IsLoaded)) return;
-
-                if (value)
-                    AddInternal(spriteShadow);
-                else
-                    RemoveInternal(spriteShadow);
+                shadowVisibility.Alpha = value ? 1 : 0;
             }
         }
 
