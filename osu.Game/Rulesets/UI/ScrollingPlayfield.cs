@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Timing;
 namespace osu.Game.Rulesets.UI
 {
     /// <summary>
-    /// A type of <see cref="Playfield{TObject, TJudgement}"/> specialized towards scrolling <see cref="DrawableHitObjects"/>.
+    /// A type of <see cref="Playfield{TObject, TJudgement}"/> specialized towards scrolling <see cref="DrawableHitObject"/>s.
     /// </summary>
     public class ScrollingPlayfield<TObject, TJudgement> : Playfield<TObject, TJudgement>
         where TObject : HitObject
@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.UI
             }
 
             protected override Container<DrawableHitObject<TObject, TJudgement>> Content => content;
-            private Container<DrawableHitObject<TObject, TJudgement>> content;
+            private readonly Container<DrawableHitObject<TObject, TJudgement>> content;
 
             /// <summary>
             /// Hit objects that are to be re-processed on the next update.

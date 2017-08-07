@@ -322,6 +322,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// A derivable HitRenderer that manages the Playfield and HitObjects.
     /// </summary>
+    /// <typeparam name="TPlayfield">The type of Playfield contained by this HitRenderer.</typeparam>
     /// <typeparam name="TObject">The type of HitObject contained by this HitRenderer.</typeparam>
     /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this HitRenderer.</typeparam>
     public abstract class HitRenderer<TPlayfield, TObject, TJudgement> : HitRenderer<TObject, TJudgement>

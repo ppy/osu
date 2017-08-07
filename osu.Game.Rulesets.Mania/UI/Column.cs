@@ -14,12 +14,9 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using osu.Framework.Configuration;
-using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Judgements;
-using osu.Framework.Allocation;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -195,7 +192,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
-        /// <param name="h">The DrawableHitObject to add.</param>
+        /// <param name="hitObject">The DrawableHitObject to add.</param>
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject)
         {
             hitObject.AccentColour = AccentColour;
