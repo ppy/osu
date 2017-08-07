@@ -22,20 +22,22 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
         }
 
+        private double? lifetimeStart;
         public override double LifetimeStart
         {
-            get { return Math.Min(HitObject.StartTime - LifetimeOffset, base.LifetimeStart); }
-            set { base.LifetimeStart = value; }
+            get { return lifetimeStart ?? HitObject.StartTime - LifetimeOffset; }
+            set { lifetimeStart = value; }
         }
 
+        private double? lifetimeEnd;
         public override double LifetimeEnd
         {
             get
             {
                 var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-                return Math.Max(endTime + LifetimeOffset, base.LifetimeEnd);
+                return lifetimeEnd ?? endTime + LifetimeOffset;
             }
-            set { base.LifetimeEnd = value; }
+            set { lifetimeEnd = value; }
         }
 
         protected override void AddNested(DrawableHitObject<TObject, TJudgement> h)
