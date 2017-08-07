@@ -20,14 +20,12 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Children = new Drawable[]
             {
-                new Catcher
+                new CatcherArea
                 {
-                    RelativePositionAxes = Axes.Both,
                     RelativeSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.2f),
-                    FillMode = FillMode.Fit,
-                    Origin = Anchor.TopCentre,
-                    Position = new Vector2(0.5f, 1),
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.TopLeft,
+                    Height = 0.3f
                 }
             };
         }
