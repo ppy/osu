@@ -31,7 +31,6 @@ namespace osu.Desktop.Tests.Visual
         public TestCaseScrollingHitObjects()
         {
             OsuSpriteText timeRangeText;
-            ScrollingPlayfield<HitObject, Judgement>.ScrollingHitObjectContainer scrollingHitObjectContainer;
 
             timeRangeBindable = new BindableDouble(2000)
             {
@@ -71,12 +70,6 @@ namespace osu.Desktop.Tests.Visual
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0.25f
                         },
-                        scrollingHitObjectContainer = new ScrollingPlayfield<HitObject, Judgement>.ScrollingHitObjectContainer(Axes.Y)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            VisibleTimeRange = timeRangeBindable,
-                            Masking = true,
-                        },
                         new OsuSpriteText
                         {
                             Text = "t minus 0",
@@ -111,17 +104,12 @@ namespace osu.Desktop.Tests.Visual
             });
 
             timeRangeBindable.TriggerChange();
-
-            scrollingHitObjectContainer.AddSpeedAdjustment(new TestSpeedAdjustmentContainer(new MultiplierControlPoint()));
-
-            AddStep("Add hit object", () => scrollingHitObjectContainer.Add(new TestDrawableHitObject(new HitObject { StartTime = Time.Current + 2000 })));
         }
 
         protected override void Update()
         {
             base.Update();
 
-            topTime.Text = Time.Current.ToString("#,#");
             bottomTime.Text = (Time.Current + timeRangeBindable.Value).ToString("#,#");
         }
 
@@ -154,12 +142,10 @@ namespace osu.Desktop.Tests.Visual
             }
         }
 
-        private class TestDrawableHitObject : DrawableHitObject<HitObject, Judgement>, IScrollingHitObject
+        private class TestDrawableHitObject : DrawableScrollingHitObject<HitObject, Judgement>
         {
             private readonly Box background;
             private const float height = 14;
-
-            public BindableDouble LifetimeOffset { get; } = new BindableDouble();
 
             public TestDrawableHitObject(HitObject hitObject)
                 : base(hitObject)

@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -16,6 +17,19 @@ namespace osu.Game.Rulesets.Objects.Drawables
         where TJudgement : Judgement
     {
         public BindableDouble LifetimeOffset { get; } = new BindableDouble();
+
+        Axes IScrollingHitObject.ScrollingAxes
+        {
+            set
+            {
+                RelativePositionAxes = value;
+
+                if ((value & Axes.X) > 0)
+                    X = (float)HitObject.StartTime;
+                if ((value & Axes.Y) > 0)
+                    Y = (float)HitObject.StartTime;
+            }
+        }
 
         protected DrawableScrollingHitObject(TObject hitObject)
             : base(hitObject)

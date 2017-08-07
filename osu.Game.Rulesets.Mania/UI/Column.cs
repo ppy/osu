@@ -192,8 +192,6 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public void Add(SpeedAdjustmentContainer speedAdjustment) => HitObjects.AddSpeedAdjustment(speedAdjustment);
-
         /// <summary>
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>

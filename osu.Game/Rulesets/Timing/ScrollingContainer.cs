@@ -53,6 +53,8 @@ namespace osu.Game.Rulesets.Timing
         /// </summary>
         internal MultiplierControlPoint ControlPoint;
 
+        private Cached<double> durationBacking;
+
         protected override int Compare(Drawable x, Drawable y)
         {
             var xHitObject = x as DrawableHitObject;
@@ -92,8 +94,6 @@ namespace osu.Game.Rulesets.Timing
 
             base.InvalidateFromChild(invalidation);
         }
-
-        private Cached<double> durationBacking;
 
         private double computeDuration()
         {
