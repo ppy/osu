@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Caching;
 
 namespace osu.Game.Graphics
 {
@@ -17,6 +18,7 @@ namespace osu.Game.Graphics
         private readonly Sprite spriteShadow;
         private readonly Sprite spriteMain;
 
+        private Cached layout = new Cached();
         private readonly Container shadowVisibility;
 
         public SpriteIcon()
@@ -71,16 +73,23 @@ namespace osu.Game.Graphics
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {
-            if ((invalidation & Invalidation.Colour) > 0)
+            if ((invalidation & Invalidation.Colour) > 0 && Shadow)
+                layout.Invalidate();
+            return base.Invalidate(invalidation, source, shallPropagate);
+        }
+
+        protected override void Update()
+        {
+            if (!layout.IsValid)
             {
                 //adjust shadow alpha based on highest component intensity to avoid muddy display of darker text.
                 //squared result for quadratic fall-off seems to give the best result.
                 var avgColour = (Color4)DrawInfo.Colour.AverageColour;
 
                 spriteShadow.Alpha = (float)Math.Pow(Math.Max(Math.Max(avgColour.R, avgColour.G), avgColour.B), 2);
-            }
 
-            return base.Invalidate(invalidation, source, shallPropagate);
+                layout.Validate();
+            }
         }
 
         public bool Shadow
