@@ -8,7 +8,6 @@ using osu.Desktop.Tests.Beatmaps;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Beatmaps;
@@ -23,7 +22,7 @@ namespace osu.Desktop.Tests.Visual
     /// <summary>
     /// The most minimal implementation of a playfield with scrolling hit objects.
     /// </summary>
-    public class TestCaseScrollingPlayfield : TestCase
+    public class TestCaseScrollingPlayfield : OsuTestCase
     {
         public TestCaseScrollingPlayfield()
         {
