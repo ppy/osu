@@ -45,10 +45,11 @@ namespace osu.Game.Rulesets.UI
                 },
                 modIcon = new SpriteIcon
                 {
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.TopCentre,
                     Colour = OsuColour.Gray(84),
                     Size = new Vector2(icon_size - 35),
+                    Y = 25,
                     Icon = mod.Icon
                 },
             };
