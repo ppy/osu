@@ -52,7 +52,8 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
-        private readonly ScrollingHitObjectContainer barLineContainer;
+        protected override Container<Drawable> Content => barLineContainer;
+        private readonly Container<Drawable> barLineContainer;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
@@ -67,7 +68,7 @@ namespace osu.Game.Rulesets.Mania.UI
             if (columnCount <= 0)
                 throw new ArgumentException("Can't have zero or fewer columns.");
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Container
                 {
@@ -111,13 +112,12 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
                             {
-                                barLineContainer = new ScrollingHitObjectContainer(Axes.Y)
+                                barLineContainer = new Container
                                 {
                                     Name = "Bar lines",
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.Y,
-                                    VisibleTimeRange = VisibleTimeRange
                                     // Width is set in the Update method
                                 }
                             }
@@ -127,7 +127,11 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < columnCount; i++)
-                columns.Add(new Column { VisibleTimeRange = VisibleTimeRange });
+            {
+                var c = new Column { VisibleTimeRange = VisibleTimeRange };
+                columns.Add(c);
+                AddNested(c);
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -202,7 +206,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
         public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
-        public void Add(SpeedAdjustmentContainer speedAdjustment) => barLineContainer.AddSpeedAdjustment(speedAdjustment);
 
         protected override void Update()
         {

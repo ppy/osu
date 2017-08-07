@@ -114,12 +114,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(1, 0.8f);
 
-        protected override void ApplySpeedAdjustment(MultiplierControlPoint controlPoint)
-        {
-            base.ApplySpeedAdjustment(controlPoint);
-            Playfield.Columns.ForEach(c => c.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint)));
-        }
-
         protected override SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint) => new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Basic);
     }
 }
