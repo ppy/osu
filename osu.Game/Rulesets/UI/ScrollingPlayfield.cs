@@ -191,9 +191,6 @@ namespace osu.Game.Rulesets.UI
                         continue;
                     }
 
-                    if (hitObject.RelativePositionAxes != target.ScrollingAxes)
-                        throw new InvalidOperationException($"Make sure to set all {nameof(DrawableHitObject)}'s {nameof(RelativePositionAxes)} are equal to the correct axes of scrolling ({target.ScrollingAxes}).");
-
                     target.Add(hitObject);
                 }
             }
