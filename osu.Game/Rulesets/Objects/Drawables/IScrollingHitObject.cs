@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
     /// <summary>
     /// An interface that exposes properties required for scrolling hit objects to be properly displayed.
     /// </summary>
-    public interface IScrollingHitObject : IDrawable
+    internal interface IScrollingHitObject : IDrawable
     {
         /// <summary>
         /// Time offset before the hit object start time at which this <see cref="IScrollingHitObject"/> becomes visible and the time offset
@@ -21,5 +21,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </para>
         /// </summary>
         BindableDouble LifetimeOffset { get; }
+
+        /// <summary>
+        /// Axes which this <see cref="IScrollingHitObject"/> will scroll through.
+        /// This is set by the container which this scrolls through.
+        /// </summary>
+        Axes ScrollingAxes { set; }
     }
 }

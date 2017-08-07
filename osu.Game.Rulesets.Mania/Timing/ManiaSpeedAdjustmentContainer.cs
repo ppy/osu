@@ -15,15 +15,14 @@ namespace osu.Game.Rulesets.Mania.Timing
             this.scrollingAlgorithm = scrollingAlgorithm;
         }
 
-        protected override DrawableTimingSection CreateTimingSection()
+        protected override ScrollingContainer CreateScrollingContainer()
         {
             switch (scrollingAlgorithm)
             {
                 default:
-                case ScrollingAlgorithm.Basic:
-                    return new BasicScrollingDrawableTimingSection(ControlPoint);
+                    return base.CreateScrollingContainer();
                 case ScrollingAlgorithm.Gravity:
-                    return new GravityScrollingDrawableTimingSection(ControlPoint);
+                    return new GravityScrollingContainer(ControlPoint);
             }
         }
     }
