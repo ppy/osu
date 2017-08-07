@@ -5,7 +5,9 @@ using OpenTK.Input;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -71,7 +73,23 @@ namespace osu.Game.Rulesets.UI
 
         private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, Easing easing = Easing.None)
         {
-            this.TransformTo(nameof(VisibleTimeRange), newTimeRange, duration, easing);
+            this.TransformTo(this.PopulateTransform(new TransformVisibleTimeRange(), newTimeRange, duration, easing));
+        }
+
+        private class TransformVisibleTimeRange : Transform<double, ScrollingPlayfield<TObject, TJudgement>>
+        {
+            private double valueAt(double time)
+            {
+                if (time < StartTime) return StartValue;
+                if (time >= EndTime) return EndValue;
+
+                return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+            }
+
+            public override string TargetMember => "VisibleTimeRange.Value";
+
+            protected override void Apply(ScrollingPlayfield<TObject, TJudgement> d, double time) => d.VisibleTimeRange.Value = valueAt(time);
+            protected override void ReadIntoStartValue(ScrollingPlayfield<TObject, TJudgement> d) => StartValue = d.VisibleTimeRange.Value;
         }
 
         /// <summary>
