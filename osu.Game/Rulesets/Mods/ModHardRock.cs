@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             const float ratio = 1.4f;
-            difficulty.CircleSize *= ratio;
+            difficulty.CircleSize *= 1.3f; // CS uses a custom 1.3 ratio.
             difficulty.ApproachRate *= ratio;
             difficulty.DrainRate *= ratio;
             difficulty.OverallDifficulty *= ratio;
