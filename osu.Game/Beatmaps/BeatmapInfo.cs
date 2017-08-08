@@ -52,6 +52,8 @@ namespace osu.Game.Beatmaps
         [JsonProperty("file_md5")]
         public string Hash { get; set; }
 
+        public string MD5Hash { get; set; }
+
         // General
         public int AudioLeadIn { get; set; }
         public bool Countdown { get; set; }
