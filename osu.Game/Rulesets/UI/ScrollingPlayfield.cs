@@ -44,10 +44,10 @@ namespace osu.Game.Rulesets.UI
         private const double time_span_step = 50;
 
         /// <summary>
-        /// Gets or sets the range of time that is visible by the length of the scrolling axes.
+        /// The span of time that is visible by the length of the scrolling axes.
         /// For example, only hit objects with start time less than or equal to 1000 will be visible with <see cref="VisibleTimeRange"/> = 1000.
         /// </summary>
-        private readonly BindableDouble visibleTimeRange = new BindableDouble(time_span_default)
+        public readonly BindableDouble VisibleTimeRange = new BindableDouble(time_span_default)
         {
             Default = time_span_default,
             MinValue = time_span_min,
@@ -55,14 +55,9 @@ namespace osu.Game.Rulesets.UI
         };
 
         /// <summary>
-        /// The span of time visible by the length of the scrolling axes.
+        /// Whether to reverse the scrolling direction is reversed.
         /// </summary>
-        /// <returns></returns>
-        public BindableDouble VisibleTimeRange
-        {
-            get { return visibleTimeRange; }
-            set { visibleTimeRange.BindTo(value); }
-        }
+        public readonly BindableBool Reversed = new BindableBool();
 
         /// <summary>
         /// The container that contains the <see cref="SpeedAdjustmentContainer"/>s and <see cref="DrawableHitObject"/>s.
@@ -80,7 +75,8 @@ namespace osu.Game.Rulesets.UI
             base.HitObjects = HitObjects = new ScrollingHitObjectContainer(scrollingAxes)
             {
                 RelativeSizeAxes = Axes.Both,
-                VisibleTimeRange = VisibleTimeRange
+                VisibleTimeRange = VisibleTimeRange,
+                Reversed = Reversed
             };
         }
 
@@ -158,6 +154,16 @@ namespace osu.Game.Rulesets.UI
                 set { visibleTimeRange.BindTo(value); }
             }
 
+            private readonly BindableBool reversed = new BindableBool();
+            /// <summary>
+            /// Whether to reverse the scrolling direction is reversed.
+            /// </summary>
+            public BindableBool Reversed
+            {
+                get { return reversed; }
+                set { reversed.BindTo(value); }
+            }
+
             protected override Container<DrawableHitObject<TObject, TJudgement>> Content => content;
             private readonly Container<DrawableHitObject<TObject, TJudgement>> content;
 
@@ -188,6 +194,7 @@ namespace osu.Game.Rulesets.UI
             {
                 speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
                 speedAdjustment.ScrollingAxes = scrollingAxes;
+                speedAdjustment.Reversed = Reversed;
                 AddInternal(speedAdjustment);
             }
 
