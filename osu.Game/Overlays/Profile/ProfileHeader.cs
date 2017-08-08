@@ -19,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using System.Diagnostics;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -509,34 +510,29 @@ namespace osu.Game.Overlays.Profile
 
             public class LinkText : OsuSpriteText
             {
-                public override bool HandleInput => Url != null;
+                private readonly OsuHoverContainer content;
 
-                public string Url;
+                public override bool HandleInput => content.Action != null;
 
-                private Color4 hoverColour;
+                protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
 
-                protected override bool OnHover(InputState state)
+                protected override IEnumerable<Drawable> FlowingChildren => Children;
+
+                public string Url
                 {
-                    this.FadeColour(hoverColour, 500, Easing.OutQuint);
-                    return base.OnHover(state);
+                    set
+                    {
+                        if(value != null)
+                            content.Action = () => Process.Start(value);
+                    }
                 }
 
-                protected override void OnHoverLost(InputState state)
+                public LinkText()
                 {
-                    this.FadeColour(Color4.White, 500, Easing.OutQuint);
-                    base.OnHoverLost(state);
-                }
-
-                protected override bool OnClick(InputState state)
-                {
-                    Process.Start(Url);
-                    return true;
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
-                {
-                    hoverColour = colours.Yellow;
+                    AddInternal(content = new OsuHoverContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                    });
                 }
             }
         }
