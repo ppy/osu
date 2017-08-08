@@ -17,12 +17,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     internal class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit, CatchJudgement>
     {
-        private Box box;
+        const float pulp_size = 30;
 
         private class Pulp : Circle, IHasAccentColour
         {
             public Pulp()
             {
+                Size = new Vector2(pulp_size);
+
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
@@ -38,10 +40,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         public DrawableFruit(CatchBaseHit h) : base(h)
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(50);
+            Size = new Vector2(pulp_size * 2, pulp_size * 2.6f);
 
             RelativePositionAxes = Axes.Both;
             X = h.Position;
+
+            Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1);
 
             Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
         }
@@ -51,47 +55,42 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             Children = new Framework.Graphics.Drawable[]
             {
-                box = new Box
+                //todo: share this more
+                new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Blue,
-                },
-                new Pulp
-                {
-                    RelativePositionAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.12f),
-                    Y  = 0.08f,
-                },
-                new Pulp
-                {
-                    RelativePositionAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.32f),
-                    Position = new Vector2(-0.16f, 0.3f),
-                },
-                new Pulp
-                {
-                    RelativePositionAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.32f),
-                    Position = new Vector2(0.16f, 0.3f),
-                },
-                new Pulp
-                {
-                    RelativePositionAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.32f),
-                    Position = new Vector2(0, 0.6f),
-                },
+                    CacheDrawnFrameBuffer = true,
+                    Children = new Framework.Graphics.Drawable[]
+                    {
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Scale = new Vector2(0.6f),
+                        },
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Y = -0.08f
+                        },
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Y = -0.08f
+                        },
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                        },
+                    }
+                }
             };
         }
 
@@ -117,10 +116,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             {
                 case ArmedState.Miss:
                     using (BeginAbsoluteSequence(HitObject.StartTime, true))
-                    {
                         this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out);
-                        box.FadeColour(Color4.OrangeRed);
-                    }
                     break;
             }
         }
