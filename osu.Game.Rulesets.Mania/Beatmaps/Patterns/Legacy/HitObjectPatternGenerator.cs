@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 // More than 111 BPM stream
                 convertType |= PatternType.Cycle | PatternType.KeepSingle;
             }
-            else if (timeSeparation <= 150 & positionSeparation < 20)
+            else if (timeSeparation <= 150 && positionSeparation < 20)
             {
                 // More than 100 BPM stream
                 convertType |= PatternType.ForceStack | PatternType.LowProbability;
