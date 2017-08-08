@@ -21,7 +21,7 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoHitRenderer : HitRenderer<TaikoHitObject, TaikoJudgement>
+    public class TaikoHitRenderer : ScrollingHitRenderer<TaikoPlayfield, TaikoHitObject, TaikoJudgement>
     {
         public TaikoHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(beatmap, isForCurrentRuleset)
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 barLine.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.Difficulty);
 
                 bool isMajor = currentBeat % (int)currentPoint.TimeSignature == 0;
-                taikoPlayfield.AddBarLine(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));
+                taikoPlayfield.Add(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));
 
                 double bl = currentPoint.BeatLength;
                 if (bl < 800)

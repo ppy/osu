@@ -47,11 +47,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override void UpdateScrollPosition(double time)
-        {
-            // Ticks don't move
-        }
-
         protected override bool HandleKeyPress(Key key)
         {
             return Judgement.Result == HitResult.None && UpdateJudgement(true);

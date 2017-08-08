@@ -118,7 +118,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             });
 
             MainPiece.Add(symbol = new SwellSymbolPiece());
-
         }
 
         [BackgroundDependencyLoader]
@@ -189,19 +188,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Expire();
         }
 
-        protected override void UpdateScrollPosition(double time)
+        protected override void Update()
         {
-            // Make the swell stop at the hit target
-            double t = Math.Min(HitObject.StartTime, time);
+            base.Update();
 
+            // Make the swell stop at the hit target
+            X = (float)Math.Max(Time.Current, HitObject.StartTime);
+
+            double t = Math.Min(HitObject.StartTime, Time.Current);
             if (t == HitObject.StartTime && !hasStarted)
             {
                 OnStart?.Invoke();
                 hasStarted = true;
             }
-
-            base.UpdateScrollPosition(t);
         }
+
 
         protected override bool HandleKeyPress(Key key)
         {
