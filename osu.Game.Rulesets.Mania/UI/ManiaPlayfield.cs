@@ -124,7 +124,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < columnCount; i++)
             {
-                var c = new Column { VisibleTimeRange = VisibleTimeRange };
+                var c = new Column();
+                c.VisibleTimeRange.BindTo(VisibleTimeRange);
+
                 columns.Add(c);
                 AddNested(c);
             }

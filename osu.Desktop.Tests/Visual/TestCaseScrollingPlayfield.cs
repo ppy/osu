@@ -24,6 +24,8 @@ namespace osu.Desktop.Tests.Visual
     /// </summary>
     public class TestCaseScrollingPlayfield : OsuTestCase
     {
+        private readonly TestHitRenderer hitRenderer;
+
         public TestCaseScrollingPlayfield()
         {
             Clock = new FramedClock();
@@ -50,7 +52,9 @@ namespace osu.Desktop.Tests.Visual
 
             WorkingBeatmap beatmap = new TestWorkingBeatmap(b);
 
-            Add(new TestHitRenderer(beatmap, true));
+            Add(hitRenderer = new TestHitRenderer(beatmap, true));
+
+            AddStep("Reverse direction", () => hitRenderer.Playfield.Reversed.Value = !hitRenderer.Playfield.Reversed);
         }
 
         private class TestHitRenderer : ScrollingHitRenderer<TestPlayfield, TestHitObject, TestJudgement>
@@ -59,6 +63,8 @@ namespace osu.Desktop.Tests.Visual
                 : base(beatmap, isForCurrentRuleset)
             {
             }
+
+            public new TestPlayfield Playfield => base.Playfield;
 
             public override ScoreProcessor CreateScoreProcessor() => new TestScoreProcessor();
 
