@@ -26,6 +26,16 @@ namespace osu.Game.Rulesets.Timing
             set { visibleTimeRange.BindTo(value); }
         }
 
+        private readonly BindableBool reversed = new BindableBool();
+        /// <summary>
+        /// Whether to reverse the scrolling direction is reversed.
+        /// </summary>
+        public BindableBool Reversed
+        {
+            get { return reversed; }
+            set { reversed.BindTo(value); }
+        }
+
         protected override Container<DrawableHitObject> Content => content;
         private Container<DrawableHitObject> content;
 
@@ -70,7 +80,14 @@ namespace osu.Game.Rulesets.Timing
 
             // The speed adjustment happens by modifying our size by the multiplier while maintaining the visible time range as the relatve size for our children
             Size = new Vector2((ScrollingAxes & Axes.X) > 0 ? multiplier : 1, (ScrollingAxes & Axes.Y) > 0 ? multiplier : 1);
-            RelativeChildSize = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 1, (ScrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 1);
+
+            if (Reversed)
+            {
+                RelativeChildSize = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)-VisibleTimeRange : 1, (ScrollingAxes & Axes.Y) > 0 ? (float)-VisibleTimeRange : 1);
+                RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 0);
+            }
+            else
+                RelativeChildSize = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 1, (ScrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 1);
         }
 
         public override double LifetimeStart => ControlPoint.StartTime - VisibleTimeRange;
