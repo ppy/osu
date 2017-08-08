@@ -6,20 +6,31 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.UI;
 using OpenTK;
 using osu.Game.Rulesets.Catch.Judgements;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchPlayfield : Playfield<CatchBaseHit, CatchJudgement>
+    public class CatchPlayfield : ScrollingPlayfield<CatchBaseHit, CatchJudgement>
     {
+        protected override Container<Drawable> Content => content;
+        private readonly Container<Drawable> content;
+
         public CatchPlayfield()
+            : base(Axes.Y)
         {
             Size = new Vector2(1);
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
+                content = new Container<Drawable>
+                {
+                    Scale = new Vector2(1, -1),
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.BottomLeft
+                },
                 new CatcherArea
                 {
                     RelativeSizeAxes = Axes.Both,
