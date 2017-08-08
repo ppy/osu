@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The HitObjects contained in this Playfield.
         /// </summary>
-        protected HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects;
+        public HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects { get; protected set; }
 
         internal Container<Drawable> ScaledContent;
 
@@ -83,6 +83,12 @@ namespace osu.Game.Rulesets.UI
         public virtual void Add(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Add(h);
 
         /// <summary>
+        /// Remove a DrawableHitObject from this Playfield.
+        /// </summary>
+        /// <param name="h">The DrawableHitObject to remove.</param>
+        public virtual void Remove(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Remove(h);
+
+        /// <summary>
         /// Triggered when an object's Judgement is updated.
         /// </summary>
         /// <param name="judgedObject">The object that Judgement has been updated for.</param>
@@ -99,7 +105,8 @@ namespace osu.Game.Rulesets.UI
             protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
         }
 
-        public class HitObjectContainer<U> : Container<U> where U : Drawable
+        public class HitObjectContainer<U> : Container<U>
+            where U : Drawable
         {
         }
     }
