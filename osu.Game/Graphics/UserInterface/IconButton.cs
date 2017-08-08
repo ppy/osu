@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class IconButton : OsuClickableContainer
     {
-        private readonly TextAwesome icon;
+        private readonly SpriteIcon icon;
         private readonly Box hover;
         private readonly Container content;
 
@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Size = new Vector2 (button_size),
+                    Size = new Vector2(button_size),
 
                     CornerRadius = 5,
                     Masking = true,
@@ -64,11 +64,11 @@ namespace osu.Game.Graphics.UserInterface
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
                         },
-                        icon = new TextAwesome
+                        icon = new SpriteIcon
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            TextSize = 18,
+                            Size = new Vector2(18),
                         }
                     }
                 }
@@ -80,6 +80,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             hover.Colour = colours.Yellow.Opacity(0.6f);
             flashColour = colours.Yellow;
+
+            Enabled.ValueChanged += enabled => this.FadeColour(enabled ? Color4.White : colours.Gray9, 200, Easing.OutQuint);
         }
 
         protected override bool OnHover(InputState state)

@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Select
                                 //{
                                 //    Font = @"Exo2.0-Bold",
                                 //    Text = "Sort results by",
-                                //    TextSize = 14,
+                                //    Size = 14,
                                 //    Margin = new MarginPadding
                                 //    {
                                 //        Top = 5,

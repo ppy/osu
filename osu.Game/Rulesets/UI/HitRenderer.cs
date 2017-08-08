@@ -153,6 +153,10 @@ namespace osu.Game.Rulesets.UI
             // Convert the beatmap
             Beatmap = converter.Convert(beatmap.Beatmap, isForCurrentRuleset);
 
+            // Apply difficulty adjustments from mods before using Difficulty.
+            foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(Beatmap.BeatmapInfo.Difficulty);
+
             // Apply defaults
             foreach (var h in Beatmap.HitObjects)
                 h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.Difficulty);
@@ -163,7 +167,7 @@ namespace osu.Game.Rulesets.UI
             ApplyBeatmap();
 
             // Add mods, should always be the last thing applied to give full control to mods
-            applyMods(beatmap.Mods.Value);
+            applyMods(Mods);
         }
 
         /// <summary>

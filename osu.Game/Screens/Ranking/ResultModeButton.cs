@@ -78,14 +78,14 @@ namespace osu.Game.Screens.Ranking
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Transparent,
                         },
-                        new TextAwesome
+                        new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Shadow = false,
                             Colour = OsuColour.Gray(0.95f),
                             Icon = icon,
-                            TextSize = 20,
+                            Size = new Vector2(20),
                         }
                     }
                 }

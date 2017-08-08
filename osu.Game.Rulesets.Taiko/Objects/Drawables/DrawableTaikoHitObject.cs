@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -24,11 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
-        protected override Container<Drawable> Content => bodyContainer;
-
         protected readonly TaikoPiece MainPiece;
-
-        private readonly Container bodyContainer;
 
         public new TaikoHitType HitObject;
 
@@ -40,19 +35,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Custom;
 
-            AutoSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
             RelativePositionAxes = Axes.X;
 
-            AddInternal(bodyContainer = new Container
-            {
-                AutoSizeAxes = Axes.Both,
-                Children = new[]
-                {
-                    MainPiece = CreateMainPiece()
-                }
-            });
-
+            Add(MainPiece = CreateMainPiece());
             MainPiece.KiaiMode = HitObject.Kiai;
 
             LifetimeStart = HitObject.StartTime - HitObject.ScrollTime * 2;
@@ -60,7 +48,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override TaikoJudgement CreateJudgement() => new TaikoJudgement();
 
-        protected virtual TaikoPiece CreateMainPiece() => new CirclePiece(HitObject.IsStrong);
+        protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
 
         /// <summary>
         /// Sets the scroll position of the DrawableHitObject relative to the offset between

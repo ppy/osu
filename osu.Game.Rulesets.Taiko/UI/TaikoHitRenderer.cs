@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override Vector2 GetPlayfieldAspectAdjust()
         {
-            const float default_relative_height = TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT / 768;
+            const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
             const float default_aspect = 16f / 9f;
 
             float aspectAdjust = MathHelper.Clamp(DrawWidth / DrawHeight, 0.4f, 4) / default_aspect;

@@ -25,16 +25,16 @@ namespace osu.Desktop.Overlays
     public class VersionManager : OverlayContainer
     {
         private UpdateManager updateManager;
-        private NotificationManager notificationManager;
+        private NotificationOverlay notificationOverlay;
 
         protected override bool HideOnEscape => false;
 
         public override bool HandleInput => false;
 
         [BackgroundDependencyLoader]
-        private void load(NotificationManager notification, OsuColour colours, TextureStore textures, OsuGameBase game)
+        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game)
         {
-            notificationManager = notification;
+            notificationOverlay = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
@@ -116,7 +116,7 @@ namespace osu.Desktop.Overlays
                 if (notification == null)
                 {
                     notification = new UpdateProgressNotification { State = ProgressNotificationState.Active };
-                    Schedule(() => notificationManager.Post(notification));
+                    Schedule(() => notificationOverlay.Post(notification));
                 }
 
                 Schedule(() =>
@@ -209,13 +209,13 @@ namespace osu.Desktop.Overlays
                         RelativeSizeAxes = Axes.Both,
                         Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_upload,
                         Colour = Color4.White,
-                        TextSize = 20
+                        Size = new Vector2(20),
                     }
                 });
             }

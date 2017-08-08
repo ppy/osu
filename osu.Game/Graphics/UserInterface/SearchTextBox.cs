@@ -3,13 +3,11 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using OpenTK;
 using OpenTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    /// <summary>
-    /// A textbox which holds focus eagerly.
-    /// </summary>
     public class SearchTextBox : FocusedTextBox
     {
         protected virtual bool AllowCommit => false;
@@ -19,13 +17,13 @@ namespace osu.Game.Graphics.UserInterface
             Height = 35;
             AddRange(new Drawable[]
             {
-                new TextAwesome
+                new SpriteIcon
                 {
                     Icon = FontAwesome.fa_search,
                     Origin = Anchor.CentreRight,
                     Anchor = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 10 },
-                    TextSize = 20
+                    Size = new Vector2(20),
                 }
             });
 
@@ -45,10 +43,16 @@ namespace osu.Game.Graphics.UserInterface
                     case Key.Up:
                     case Key.Down:
                         return false;
+                }
+            }
+
+            if (!AllowCommit)
+            {
+                switch (args.Key)
+                {
                     case Key.KeypadEnter:
                     case Key.Enter:
-                        if (!AllowCommit) return false;
-                        break;
+                        return false;
                 }
             }
 

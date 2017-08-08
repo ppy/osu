@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using osu.Framework.Extensions;
@@ -23,6 +22,8 @@ namespace osu.Game.IO
 
         public readonly ResourceStore<byte[]> Store;
 
+        protected override int StoreVersion => 2;
+
         public FileStore(SQLiteConnection connection, Storage storage) : base(connection, storage)
         {
             Store = new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), prefix);
@@ -35,25 +36,55 @@ namespace osu.Game.IO
         protected override void Prepare(bool reset = false)
         {
             if (reset)
+            {
+                // in earlier versions we stored beatmaps as solid archives, but not any more.
+                if (Storage.ExistsDirectory("beatmaps"))
+                    Storage.DeleteDirectory("beatmaps");
+
+                if (Storage.ExistsDirectory(prefix))
+                    Storage.DeleteDirectory(prefix);
+
                 Connection.DropTable<FileInfo>();
+            }
 
             Connection.CreateTable<FileInfo>();
+        }
 
+        protected override void StartupTasks()
+        {
+            base.StartupTasks();
             deletePending();
         }
 
-        public FileInfo Add(Stream data, string filename = null)
+        /// <summary>
+        /// Perform migrations between two store versions.
+        /// </summary>
+        /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
+        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
+        protected override void PerformMigration(int currentVersion, int targetVersion)
+        {
+            base.PerformMigration(currentVersion, targetVersion);
+
+            while (currentVersion++ < targetVersion)
+            {
+                switch (currentVersion)
+                {
+                    case 1:
+                    case 2:
+                        // cannot migrate; breaking underlying changes.
+                        Reset();
+                        break;
+                }
+            }
+        }
+
+        public FileInfo Add(Stream data)
         {
             string hash = data.ComputeSHA2Hash();
 
-            var info = new FileInfo
-            {
-                Filename = filename,
-                Hash = hash,
-            };
+            var existing = Connection.Table<FileInfo>().Where(f => f.Hash == hash).FirstOrDefault();
 
-            var existing = Connection.Table<FileInfo>().FirstOrDefault(f => f.Hash == info.Hash);
-
+            var info = existing ?? new FileInfo { Hash = hash };
             if (existing != null)
             {
                 info = existing;
@@ -73,42 +104,57 @@ namespace osu.Game.IO
                 Connection.Insert(info);
             }
 
-            Reference(new[] { info });
+            Reference(info);
             return info;
         }
 
-        public void Reference(IEnumerable<FileInfo> files)
+        public void Reference(params FileInfo[] files)
         {
-            foreach (var f in files)
+            Connection.RunInTransaction(() =>
             {
-                f.ReferenceCount++;
-                Connection.Update(f);
-            }
+                var incrementedFiles = files.GroupBy(f => f.ID).Select(f =>
+                {
+                    var accurateRefCount = Connection.Get<FileInfo>(f.First().ID);
+                    accurateRefCount.ReferenceCount += f.Count();
+                    return accurateRefCount;
+                });
+
+                Connection.UpdateAll(incrementedFiles);
+            });
         }
 
-        public void Dereference(IEnumerable<FileInfo> files)
+        public void Dereference(params FileInfo[] files)
         {
-            foreach (var f in files)
+            Connection.RunInTransaction(() =>
             {
-                f.ReferenceCount--;
-                Connection.Update(f);
-            }
+                var incrementedFiles = files.GroupBy(f => f.ID).Select(f =>
+                {
+                    var accurateRefCount = Connection.Get<FileInfo>(f.First().ID);
+                    accurateRefCount.ReferenceCount -= f.Count();
+                    return accurateRefCount;
+                });
+
+                Connection.UpdateAll(incrementedFiles);
+            });
         }
 
         private void deletePending()
         {
-            foreach (var f in QueryAndPopulate<FileInfo>(f => f.ReferenceCount < 1))
+            Connection.RunInTransaction(() =>
             {
-                try
+                foreach (var f in Query<FileInfo>(f => f.ReferenceCount < 1))
                 {
-                    Connection.Delete(f);
-                    Storage.Delete(Path.Combine(prefix, f.Hash));
+                    try
+                    {
+                        Storage.Delete(Path.Combine(prefix, f.StoragePath));
+                        Connection.Delete(f);
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error(e, $@"Could not delete beatmap {f}");
+                    }
                 }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $@"Could not delete beatmap {f}");
-                }
-            }
+            });
         }
     }
 }

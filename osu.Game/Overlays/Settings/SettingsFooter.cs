@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using OpenTK;
@@ -27,12 +28,14 @@ namespace osu.Game.Overlays.Settings
 
             foreach (var ruleset in rulesets.AllRulesets)
             {
-                modes.Add(new TextAwesome
+                var icon = new ConstrainedIconContainer
                 {
-                    Icon = ruleset.CreateInstance().Icon,
+                    Icon = ruleset.CreateInstance().CreateIcon(),
                     Colour = Color4.Gray,
-                    TextSize = 20
-                });
+                    Size = new Vector2(20),
+                };
+
+                modes.Add(icon);
             }
 
             Children = new Drawable[]

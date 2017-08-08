@@ -63,6 +63,8 @@ namespace osu.Game.Overlays.Notifications
                     Masking = true,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    AutoSizeDuration = 400,
+                    AutoSizeEasing = Easing.OutQuint,
                     Children = new Drawable[]
                     {
                         new Box
@@ -74,7 +76,7 @@ namespace osu.Game.Overlays.Notifications
                         {
                             RelativeSizeAxes = Axes.X,
                             Padding = new MarginPadding(5),
-                            Height = 60,
+                            AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
                                 IconContent = new Container
@@ -163,12 +165,12 @@ namespace osu.Game.Overlays.Notifications
 
                 Children = new[]
                 {
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_times_circle,
-                        TextSize = 20
+                        Size = new Vector2(20),
                     }
                 };
             }
