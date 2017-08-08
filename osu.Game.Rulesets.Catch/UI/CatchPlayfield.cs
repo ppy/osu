@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Catch.UI
         public CatchPlayfield()
             : base(Axes.Y)
         {
+            Reversed.Value = true;
+
             Size = new Vector2(1);
 
             Anchor = Anchor.TopCentre;
@@ -30,9 +32,7 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 content = new Container<Drawable>
                 {
-                    Scale = new Vector2(1, -1),
                     RelativeSizeAxes = Axes.Both,
-                    Origin = Anchor.BottomLeft
                 },
                 catcherArea = new CatcherArea
                 {
