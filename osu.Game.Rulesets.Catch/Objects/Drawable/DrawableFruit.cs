@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     internal class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit, CatchJudgement>
     {
+        private Box box;
+
         private class Pulp : Circle, IHasAccentColour
         {
             public Pulp()
@@ -49,10 +51,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             Children = new Framework.Graphics.Drawable[]
             {
-                new Box
+                box = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Red,
+                    Colour = Color4.Blue,
                 },
                 new Pulp
                 {
@@ -97,12 +99,29 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         private const float preempt = 1000;
 
+        protected override void CheckJudgement(bool userTriggered)
+        {
+            if (Judgement.TimeOffset > 0)
+                Judgement.Result = HitResult.Miss;
+        }
+
         protected override void UpdateState(ArmedState state)
         {
             using (BeginAbsoluteSequence(HitObject.StartTime - preempt))
             {
                 // animation
                 this.FadeIn(200);
+            }
+
+            switch (state)
+            {
+                case ArmedState.Miss:
+                    using (BeginAbsoluteSequence(HitObject.StartTime, true))
+                    {
+                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out);
+                        box.FadeColour(Color4.OrangeRed);
+                    }
+                    break;
             }
         }
     }
