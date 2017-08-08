@@ -85,11 +85,13 @@ namespace osu.Game.Rulesets.Timing
             {
                 RelativeChildSize = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)-VisibleTimeRange : 1, (ScrollingAxes & Axes.Y) > 0 ? (float)-VisibleTimeRange : 1);
                 RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 0);
+                Origin = Anchor = Anchor.BottomLeft;
             }
             else
             {
                 RelativeChildSize = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 1, (ScrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 1);
                 RelativeChildOffset = Vector2.Zero;
+                Anchor = Anchor = Anchor.TopLeft;
             }
         }
 
