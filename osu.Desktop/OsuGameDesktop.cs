@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Game;
 using System.Linq;
 using System.Windows.Forms;
@@ -11,6 +12,7 @@ using System.Reflection;
 using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Menu;
 
@@ -28,6 +30,58 @@ namespace osu.Desktop
                 Depth = int.MinValue,
                 State = Visibility.Hidden
             };
+        }
+
+        public override Storage GetStorageForStableInstall()
+        {
+            try
+            {
+                return new StableStorage();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// A method of accessing an osu-stable install in a controlled fashion.
+        /// </summary>
+        private class StableStorage : DesktopStorage
+        {
+            protected override string LocateBasePath()
+            {
+                Func<string, bool> checkExists = p => Directory.Exists(Path.Combine(p, "Songs"));
+
+                string stableInstallPath;
+
+                try
+                {
+                    using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
+                        stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(String.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
+
+                    if (checkExists(stableInstallPath))
+                        return stableInstallPath;
+                }
+                catch
+                {
+                }
+
+                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
+                if (checkExists(stableInstallPath))
+                    return stableInstallPath;
+
+                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
+                if (checkExists(stableInstallPath))
+                    return stableInstallPath;
+
+                return null;
+            }
+
+            public StableStorage()
+                : base(string.Empty)
+            {
+            }
         }
 
         protected override void LoadComplete()

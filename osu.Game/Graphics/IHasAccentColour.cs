@@ -20,14 +20,19 @@ namespace osu.Game.Graphics
     public static class AccentedColourExtensions
     {
         /// <summary>
-        /// Tweens the accent colour of a drawable to another colour.
+        /// Smoothly adjusts <see cref="IHasAccentColour.AccentColour"/> over time.
         /// </summary>
-        /// <param name="accentedDrawable">The drawable to apply the accent colour to.</param>
-        /// <param name="newColour">The new accent colour.</param>
-        /// <param name="duration">The tween duration.</param>
-        /// <param name="easing">The tween easing.</param>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
         public static TransformSequence<T> FadeAccent<T>(this T accentedDrawable, Color4 newColour, double duration = 0, Easing easing = Easing.None)
             where T : IHasAccentColour
             => accentedDrawable.TransformTo(nameof(accentedDrawable.AccentColour), newColour, duration, easing);
+
+        /// <summary>
+        /// Smoothly adjusts <see cref="IHasAccentColour.AccentColour"/> over time.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public static TransformSequence<T> FadeAccent<T>(this TransformSequence<T> t, Color4 newColour, double duration = 0, Easing easing = Easing.None)
+            where T : Drawable, IHasAccentColour
+            => t.Append(o => o.FadeAccent(newColour, duration, easing));
     }
 }

@@ -20,6 +20,7 @@ using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
@@ -37,7 +38,7 @@ namespace osu.Game
 
         private MusicController musicController;
 
-        private NotificationManager notificationManager;
+        private NotificationOverlay notificationOverlay;
 
         private DialogOverlay dialogOverlay;
 
@@ -46,6 +47,8 @@ namespace osu.Game
         private SocialOverlay social;
 
         private UserProfileOverlay userProfile;
+
+        public virtual Storage GetStorageForStableInstall() => null;
 
         private Intro intro
         {
@@ -132,7 +135,7 @@ namespace osu.Game
 
             if (s.Beatmap == null)
             {
-                notificationManager.Post(new SimpleNotification
+                notificationOverlay.Post(new SimpleNotification
                 {
                     Text = @"Tried to load a score for a beatmap we don't have!",
                     Icon = FontAwesome.fa_life_saver,
@@ -148,6 +151,10 @@ namespace osu.Game
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            // hook up notifications to components.
+            BeatmapManager.PostNotification = n => notificationOverlay?.Post(n);
+            BeatmapManager.GetStableStorage = GetStorageForStableInstall;
 
             AddRange(new Drawable[] {
                 new VolumeControlReceptor
@@ -189,7 +196,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
-            LoadComponentAsync(notificationManager = new NotificationManager
+            LoadComponentAsync(notificationOverlay = new NotificationOverlay
             {
                 Depth = -3,
                 Anchor = Anchor.TopRight,
@@ -205,7 +212,7 @@ namespace osu.Game
             {
                 if (entry.Level < LogLevel.Important) return;
 
-                notificationManager.Post(new SimpleNotification
+                notificationOverlay.Post(new SimpleNotification
                 {
                     Text = $@"{entry.Level}: {entry.Message}"
                 });
@@ -216,7 +223,7 @@ namespace osu.Game
             dependencies.Cache(chat);
             dependencies.Cache(userProfile);
             dependencies.Cache(musicController);
-            dependencies.Cache(notificationManager);
+            dependencies.Cache(notificationOverlay);
             dependencies.Cache(dialogOverlay);
 
             // ensure both overlays aren't presented at the same time
@@ -331,6 +338,7 @@ namespace osu.Game
                 direct.State = Visibility.Hidden;
                 social.State = Visibility.Hidden;
                 userProfile.State = Visibility.Hidden;
+                notificationOverlay.State = Visibility.Hidden;
             }
             else
             {

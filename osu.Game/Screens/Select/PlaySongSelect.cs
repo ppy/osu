@@ -1,10 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -20,6 +22,7 @@ namespace osu.Game.Screens.Select
         private OsuScreen player;
         private readonly ModSelectOverlay modSelect;
         private readonly BeatmapDetailArea beatmapDetails;
+        private bool removeAutoModOnResume;
 
         public PlaySongSelect()
         {
@@ -71,6 +74,13 @@ namespace osu.Game.Screens.Select
         {
             player = null;
 
+            if (removeAutoModOnResume)
+            {
+                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
+                modSelect.SelectedMods.Value = modSelect.SelectedMods.Value.Where(m => m.GetType() != autoType).ToArray();
+                removeAutoModOnResume = false;
+            }
+
             Beatmap.Value.Track.Looping = true;
 
             base.OnResuming(last);
@@ -100,9 +110,22 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        protected override void OnSelected()
+        protected override void OnSelected(InputState state)
         {
             if (player != null) return;
+
+            if (state?.Keyboard.ControlPressed == true)
+            {
+                var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
+                var autoType = auto.GetType();
+
+                var mods = modSelect.SelectedMods.Value;
+                if (mods.All(m => m.GetType() != autoType))
+                {
+                    modSelect.SelectedMods.Value = mods.Concat(new[] { auto });
+                    removeAutoModOnResume = true;
+                }
+            }
 
             Beatmap.Value.Track.Looping = false;
             Beatmap.Disabled = true;

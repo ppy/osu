@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         /// Any tick that is not the first for a drumroll is not filled, but is instead displayed
         /// as a hollow circle. This is what controls the border width of that circle.
         /// </summary>
-        private const float tick_border_width = TaikoHitObject.DEFAULT_CIRCLE_DIAMETER / 16;
+        private const float tick_border_width = 5;
 
         /// <summary>
         /// The size of a tick.
         /// </summary>
-        private const float tick_size = TaikoHitObject.DEFAULT_CIRCLE_DIAMETER / 6;
+        private const float tick_size = 0.35f;
 
         private bool filled;
         public bool Filled
@@ -37,6 +37,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 
         public TickPiece()
         {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
+            RelativeSizeAxes = Axes.Both;
+            FillMode = FillMode.Fit;
             Size = new Vector2(tick_size);
 
             Add(new CircularContainer
