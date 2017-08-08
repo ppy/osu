@@ -7,6 +7,8 @@ using osu.Game.Rulesets.UI;
 using OpenTK;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Catch.Objects.Drawable;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -14,6 +16,7 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
+        private readonly CatcherArea catcherArea;
 
         public CatchPlayfield()
             : base(Axes.Y)
@@ -31,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.BottomLeft
                 },
-                new CatcherArea
+                catcherArea = new CatcherArea
                 {
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomLeft,
@@ -39,6 +42,25 @@ namespace osu.Game.Rulesets.Catch.UI
                     Height = 0.3f
                 }
             };
+        }
+
+        public override void Add(DrawableHitObject<CatchBaseHit, CatchJudgement> h)
+        {
+            base.Add(h);
+
+            var fruit = (DrawableFruit)h;
+            fruit.CheckPosition = catcherArea.CheckIfWeCanCatch;
+            fruit.OnJudgement += Fruit_OnJudgement;
+        }
+
+        private void Fruit_OnJudgement(DrawableHitObject<CatchBaseHit, CatchJudgement> obj)
+        {
+            if (obj.Judgement.Result == HitResult.Hit)
+            {
+                Vector2 screenPosition = obj.ScreenSpaceDrawQuad.Centre;
+                Remove(obj);
+                catcherArea.Add(obj, screenPosition);
+            }
         }
     }
 }
