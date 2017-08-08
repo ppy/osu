@@ -83,6 +83,12 @@ namespace osu.Game.Rulesets.UI
         public virtual void Add(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Add(h);
 
         /// <summary>
+        /// Remove a DrawableHitObject from this Playfield.
+        /// </summary>
+        /// <param name="h">The DrawableHitObject to remove.</param>
+        public virtual void Remove(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Remove(h);
+
+        /// <summary>
         /// Triggered when an object's Judgement is updated.
         /// </summary>
         /// <param name="judgedObject">The object that Judgement has been updated for.</param>
