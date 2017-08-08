@@ -33,12 +33,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             float positionSeparation = ((positionData?.Position ?? Vector2.Zero) - previousPosition).Length;
             double timeSeparation = hitObject.StartTime - previousTime;
 
-            if (timeSeparation <= 125)
-            {
-                // More than 120 BPM
-                convertType |= PatternType.ForceNotStack;
-            }
-
             if (timeSeparation <= 80)
             {
                 // More than 187 BPM
