@@ -186,7 +186,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
-    <Compile Include="Tests\TestCaseUserRanks.cs" />
     <Compile Include="VisualTestGame.cs" />
   </ItemGroup>
   <ItemGroup />
