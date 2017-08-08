@@ -109,6 +109,7 @@
     <Compile Include="Visual\TestCaseTwoLayerButton.cs" />
     <Compile Include="Visual\TestCaseUserPanel.cs" />
     <Compile Include="Visual\TestCaseUserProfile.cs" />
+    <Compile Include="Visual\TestCaseUserRanks.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework.Desktop\osu.Framework.Desktop.csproj">

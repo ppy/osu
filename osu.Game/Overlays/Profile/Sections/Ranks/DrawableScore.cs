@@ -156,25 +156,21 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
                 Children = new[]
                 {
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         Icon = FontAwesome.fa_osu_mod_bg,
                         Colour = colour,
                         Shadow = true,
-                        TextSize = 30,
-                        UseFullGlyphHeight = false,
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         Icon = icon,
                         Colour = OsuColour.Gray(84),
-                        TextSize = 18,
                         Position = new Vector2(0f, 2f),
-                        UseFullGlyphHeight = false,
                     },
                 };
             }
