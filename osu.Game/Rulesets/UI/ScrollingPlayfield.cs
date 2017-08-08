@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.UI
             /// <summary>
             /// Hit objects that are to be re-processed on the next update.
             /// </summary>
-            private readonly Queue<DrawableHitObject<TObject, TJudgement>> queuedHitObjects = new Queue<DrawableHitObject<TObject, TJudgement>>();
+            private readonly List<DrawableHitObject<TObject, TJudgement>> queuedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
             private readonly Axes scrollingAxes;
 
@@ -208,14 +208,15 @@ namespace osu.Game.Rulesets.UI
                 if (!(hitObject is IScrollingHitObject))
                     throw new InvalidOperationException($"Hit objects added to a {nameof(ScrollingHitObjectContainer)} must implement {nameof(IScrollingHitObject)}.");
 
-                queuedHitObjects.Enqueue(hitObject);
+                queuedHitObjects.Add(hitObject);
             }
 
             public override bool Remove(DrawableHitObject<TObject, TJudgement> hitObject)
             {
-                foreach (var c in InternalChildren.OfType<SpeedAdjustmentContainer>())
-                    c.Remove(hitObject);
-                return true;
+                bool removed = InternalChildren.OfType<SpeedAdjustmentContainer>().Any(c => c.Remove(hitObject));
+                removed = removed || queuedHitObjects.Remove(hitObject);
+
+                return removed;
             }
 
             protected override void Update()
@@ -225,22 +226,16 @@ namespace osu.Game.Rulesets.UI
                 // Todo: At the moment this is going to re-process every single Update, however this will only be a null-op
                 // when there are no SpeedAdjustmentContainers available. This should probably error or something, but it's okay for now.
 
-                // An external count is kept because hit objects that can't be added are re-queued
-                int count = queuedHitObjects.Count;
-                while (count-- > 0)
+                for (int i = queuedHitObjects.Count - 1; i >= 0; i--)
                 {
-                    var hitObject = queuedHitObjects.Dequeue();
+                    var hitObject = queuedHitObjects[i];
 
                     var target = adjustmentContainerFor(hitObject);
-                    if (target == null)
+                    if (target != null)
                     {
-                        // We can't add this hit object to a speed adjustment container yet, so re-queue it
-                        // for re-processing when the layout next invalidated
-                        queuedHitObjects.Enqueue(hitObject);
-                        continue;
+                        target.Add(hitObject);
+                        queuedHitObjects.RemoveAt(i);
                     }
-
-                    target.Add(hitObject);
                 }
             }
 
