@@ -25,16 +25,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public const float DEFAULT_STRONG_SIZE = DEFAULT_SIZE * STRONG_SCALE;
 
         /// <summary>
-        /// The time taken from the initial (off-screen) spawn position to the centre of the hit target for a <see cref="TimingControlPoint.BeatLength"/> of 1000ms.
-        /// </summary>
-        private const double scroll_time = 6000;
-
-        /// <summary>
-        /// Our adjusted <see cref="scroll_time"/> taking into consideration local <see cref="TimingControlPoint.BeatLength"/> and other speed multipliers.
-        /// </summary>
-        public double ScrollTime;
-
-        /// <summary>
         /// Whether this HitObject is a "strong" type.
         /// Strong hit objects give more points for hitting the hit object with both keys.
         /// </summary>
@@ -49,11 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         {
             base.ApplyDefaults(controlPointInfo, difficulty);
 
-            TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
-            DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
             EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
-
-            ScrollTime = scroll_time * (timingPoint.BeatLength * difficultyPoint.SpeedMultiplier / 1000) / difficulty.SliderMultiplier;
 
             Kiai |= effectPoint.KiaiMode;
         }

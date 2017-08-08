@@ -151,13 +151,9 @@ namespace osu.Desktop.Tests.Visual
 
         private void addBarLine(bool major, double delay = scroll_time)
         {
-            BarLine bl = new BarLine
-            {
-                StartTime = playfield.Time.Current + delay,
-                ScrollTime = scroll_time
-            };
+            BarLine bl = new BarLine { StartTime = playfield.Time.Current + delay };
 
-            playfield.AddBarLine(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
+            playfield.Add(major ? new DrawableBarLineMajor(bl) : new DrawableBarLine(bl));
         }
 
         private void addSwell(double duration = default_duration)
@@ -166,7 +162,6 @@ namespace osu.Desktop.Tests.Visual
             {
                 StartTime = playfield.Time.Current + scroll_time,
                 Duration = duration,
-                ScrollTime = scroll_time
             }));
         }
 
@@ -180,7 +175,6 @@ namespace osu.Desktop.Tests.Visual
                 StartTime = playfield.Time.Current + scroll_time,
                 IsStrong = strong,
                 Duration = duration,
-                ScrollTime = scroll_time,
             };
 
             playfield.Add(new DrawableDrumRoll(d));
@@ -191,7 +185,6 @@ namespace osu.Desktop.Tests.Visual
             Hit h = new Hit
             {
                 StartTime = playfield.Time.Current + scroll_time,
-                ScrollTime = scroll_time,
                 IsStrong = strong
             };
 
@@ -206,7 +199,6 @@ namespace osu.Desktop.Tests.Visual
             Hit h = new Hit
             {
                 StartTime = playfield.Time.Current + scroll_time,
-                ScrollTime = scroll_time,
                 IsStrong = strong
             };
 

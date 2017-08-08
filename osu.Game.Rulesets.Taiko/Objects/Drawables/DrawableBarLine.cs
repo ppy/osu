@@ -5,13 +5,16 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using OpenTK;
+using osu.Game.Rulesets.Objects.Drawables;
+using System;
+using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     /// <summary>
     /// A line that scrolls alongside hit objects in the playfield and visualises control points.
     /// </summary>
-    public class DrawableBarLine : Container
+    public class DrawableBarLine : DrawableTaikoHitObject<BarLine>
     {
         /// <summary>
         /// The width of the line tracker.
@@ -34,15 +37,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected readonly BarLine BarLine;
 
         public DrawableBarLine(BarLine barLine)
+            : base(barLine)
         {
             BarLine = barLine;
 
-            Anchor = Anchor.CentreLeft;
-            Origin = Anchor.Centre;
-
-            RelativePositionAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
-
             Width = tracker_width;
 
             Children = new[]
@@ -56,24 +55,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     Alpha = 0.75f
                 }
             };
-
-            LifetimeStart = BarLine.StartTime - BarLine.ScrollTime * 2;
-            LifetimeEnd = BarLine.StartTime + BarLine.ScrollTime;
         }
 
-        protected override void LoadComplete()
+        protected override TaikoPiece CreateMainPiece() => new TaikoPiece();
+
+        protected override void UpdateState(ArmedState state)
         {
-            base.LoadComplete();
-            this.Delay(BarLine.StartTime - Time.Current).FadeOut(base_fadeout_time * BarLine.ScrollTime / 1000);
-        }
-
-        private void updateScrollPosition(double time) => this.MoveToX((float)((BarLine.StartTime - time) / BarLine.ScrollTime));
-
-        protected override void Update()
-        {
-            base.Update();
-
-            updateScrollPosition(Time.Current);
         }
     }
 }

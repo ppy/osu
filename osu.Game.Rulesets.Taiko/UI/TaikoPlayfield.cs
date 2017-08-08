@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgement>
+    public class TaikoPlayfield : ScrollingPlayfield<TaikoHitObject, TaikoJudgement>
     {
         /// <summary>
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoHitRenderer"/>.
@@ -35,14 +35,14 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         private const float left_area_size = 240;
 
-        protected override Container<Drawable> Content => hitObjectContainer;
 
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
-        private readonly Container<DrawableBarLine> barLineContainer;
         private readonly Container<DrawableTaikoJudgement> judgementContainer;
 
-        private readonly Container hitObjectContainer;
+        protected override Container<Drawable> Content => content;
+        private readonly Container content;
+
         private readonly Container topLevelHitContainer;
 
         private readonly Container overlayBackgroundContainer;
@@ -52,6 +52,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         public TaikoPlayfield()
+            : base(Axes.X)
         {
             AddRangeInternal(new Drawable[]
             {
@@ -96,10 +97,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     FillMode = FillMode.Fit,
                                     BlendingMode = BlendingMode.Additive,
                                 },
-                                barLineContainer = new Container<DrawableBarLine>
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
                                 new HitTarget
                                 {
                                     Anchor = Anchor.CentreLeft,
@@ -107,7 +104,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit
                                 },
-                                hitObjectContainer = new Container
+                                content = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
@@ -203,11 +200,6 @@ namespace osu.Game.Rulesets.Taiko.UI
             var swell = h as DrawableSwell;
             if (swell != null)
                 swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
-        }
-
-        public void AddBarLine(DrawableBarLine barLine)
-        {
-            barLineContainer.Add(barLine);
         }
 
         public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> judgedObject)
