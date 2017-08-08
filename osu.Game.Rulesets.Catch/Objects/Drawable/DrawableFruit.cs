@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,7 +16,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
-    internal class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit, CatchJudgement>
+    public class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit, CatchJudgement>
     {
         const float pulp_size = 30;
 
@@ -37,7 +38,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         }
 
 
-        public DrawableFruit(CatchBaseHit h) : base(h)
+        public DrawableFruit(CatchBaseHit h)
+            : base(h)
         {
             Origin = Anchor.Centre;
             Size = new Vector2(pulp_size * 2, pulp_size * 2.6f);
@@ -49,6 +51,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
         }
+
+        public Func<CatchBaseHit, bool> CheckPosition;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -101,7 +105,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         protected override void CheckJudgement(bool userTriggered)
         {
             if (Judgement.TimeOffset > 0)
-                Judgement.Result = HitResult.Miss;
+                Judgement.Result = CheckPosition?.Invoke(HitObject) ?? false ? HitResult.Hit : HitResult.Miss;
         }
 
         protected override void UpdateState(ArmedState state)

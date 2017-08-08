@@ -2,12 +2,18 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
+using osu.Game.Rulesets.Catch.Judgements;
+using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Catch.Objects.Drawable;
+using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Input;
 
@@ -15,132 +21,170 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherArea : Container
     {
-        public override bool HandleInput => true;
+        private Catcher catcher;
 
-        private Sprite catcher;
+        public void Add(DrawableHitObject<CatchBaseHit, CatchJudgement> fruit, Vector2 screenPosition) => catcher.AddToStack(fruit, screenPosition);
 
-        private Drawable createAdditiveFrame() => new Sprite
-        {
-            RelativePositionAxes = Axes.Both,
-            Anchor = Anchor.TopLeft,
-            Origin = Anchor.TopCentre,
-            RelativeSizeAxes = Axes.Both,
-            FillMode = FillMode.Fit,
-
-            Texture = catcher.Texture,
-            BlendingMode = BlendingMode.Additive,
-            Position = catcher.Position,
-            Scale = catcher.Scale,
-        };
+        public bool CheckIfWeCanCatch(CatchBaseHit obj) => Math.Abs(catcher.Position.X - obj.Position) < catcher.DrawSize.X / DrawSize.X / 2;
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load()
         {
             Children = new Drawable[]
             {
-                catcher = new Sprite
+                catcher = new Catcher
                 {
                     RelativePositionAxes = Axes.Both,
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fit,
-
                     X = 0.5f,
-                    Texture = textures.Get(@"Play/Catch/fruit-catcher-idle"),
-                },
+                }
             };
-        }
-
-        private bool leftPressed;
-        private bool rightPressed;
-
-        private int currentDirection;
-
-        private bool dashing;
-
-        protected bool Dashing
-        {
-            get
-            {
-                return dashing;
-            }
-            set
-            {
-                if (value == dashing) return;
-
-                dashing = value;
-
-                if (dashing)
-                    Schedule(addAdditiveSprite);
-            }
-        }
-
-        private void addAdditiveSprite()
-        {
-            if (!dashing) return;
-
-            var additive = createAdditiveFrame();
-
-            Add(additive);
-
-            additive.FadeTo(0.4f).FadeOut(800, Easing.OutQuint).Expire();
-
-            Scheduler.AddDelayed(addAdditiveSprite, 50);
-        }
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (args.Repeat) return true;
-
-            switch (args.Key)
-            {
-                case Key.Left:
-                    currentDirection = -1;
-                    leftPressed = true;
-                    return true;
-                case Key.Right:
-                    currentDirection = 1;
-                    rightPressed = true;
-                    return true;
-                case Key.ShiftLeft:
-                    Dashing = true;
-                    return true;
-            }
-
-            return base.OnKeyDown(state, args);
-        }
-
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
-        {
-            switch (args.Key)
-            {
-                case Key.Left:
-                    currentDirection = rightPressed ? 1 : 0;
-                    leftPressed = false;
-                    return true;
-                case Key.Right:
-                    currentDirection = leftPressed ? -1 : 0;
-                    rightPressed = false;
-                    return true;
-                case Key.ShiftLeft:
-                    Dashing = false;
-                    return true;
-            }
-
-            return base.OnKeyUp(state, args);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (currentDirection == 0) return;
+            catcher.Size = new Vector2(DrawSize.Y);
+        }
 
-            float speed = Dashing ? 1.5f : 1;
+        private class Catcher : Container
+        {
+            public override bool HandleInput => true;
 
-            catcher.Scale = new Vector2(Math.Sign(currentDirection), 1);
-            catcher.X = (float)MathHelper.Clamp(catcher.X + currentDirection * Clock.ElapsedFrameTime / 1800 * speed, 0, 1);
+            private Texture texture;
+
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                texture = textures.Get(@"Play/Catch/fruit-catcher-idle");
+
+                Child = createCatcherSprite();
+            }
+
+            private bool leftPressed;
+            private bool rightPressed;
+
+            private int currentDirection;
+
+            private bool dashing;
+
+            protected bool Dashing
+            {
+                get { return dashing; }
+                set
+                {
+                    if (value == dashing) return;
+
+                    dashing = value;
+
+                    if (dashing)
+                        Schedule(addAdditiveSprite);
+                }
+            }
+
+            private void addAdditiveSprite()
+            {
+                if (!dashing) return;
+
+                var additive = createCatcherSprite();
+
+                additive.RelativePositionAxes = Axes.Both;
+                additive.BlendingMode = BlendingMode.Additive;
+                additive.Position = Position;
+                additive.Scale = Scale;
+
+                ((CatcherArea)Parent).Add(additive);
+
+                additive.FadeTo(0.4f).FadeOut(800, Easing.OutQuint).Expire();
+
+                Scheduler.AddDelayed(addAdditiveSprite, 50);
+            }
+
+            private Sprite createCatcherSprite() => new Sprite
+            {
+                RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fit,
+                Texture = texture,
+                OriginPosition = new Vector2(DrawWidth / 2, 10) //temporary until the sprite is aligned correctly.
+            };
+
+            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            {
+                if (args.Repeat) return true;
+
+                switch (args.Key)
+                {
+                    case Key.Left:
+                        currentDirection = -1;
+                        leftPressed = true;
+                        return true;
+                    case Key.Right:
+                        currentDirection = 1;
+                        rightPressed = true;
+                        return true;
+                    case Key.ShiftLeft:
+                        Dashing = true;
+                        return true;
+                }
+
+                return base.OnKeyDown(state, args);
+            }
+
+            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+            {
+                switch (args.Key)
+                {
+                    case Key.Left:
+                        currentDirection = rightPressed ? 1 : 0;
+                        leftPressed = false;
+                        return true;
+                    case Key.Right:
+                        currentDirection = leftPressed ? -1 : 0;
+                        rightPressed = false;
+                        return true;
+                    case Key.ShiftLeft:
+                        Dashing = false;
+                        return true;
+                }
+
+                return base.OnKeyUp(state, args);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (currentDirection == 0) return;
+
+                float speed = Dashing ? 1.5f : 1;
+
+                Scale = new Vector2(Math.Sign(currentDirection), 1);
+                X = (float)MathHelper.Clamp(X + currentDirection * Clock.ElapsedFrameTime / 1800 * speed, 0, 1);
+            }
+
+            public void AddToStack(DrawableHitObject<CatchBaseHit, CatchJudgement> fruit, Vector2 absolutePosition)
+            {
+                fruit.RelativePositionAxes = Axes.None;
+                fruit.Position = new Vector2(ToLocalSpace(absolutePosition).X - DrawSize.X / 2, 0);
+
+                fruit.Anchor = Anchor.TopCentre;
+                fruit.Origin = Anchor.BottomCentre;
+                fruit.Scale *= 0.7f;
+                fruit.LifetimeEnd = double.MaxValue;
+                fruit.Depth = (float)Time.Current;
+
+                float distance = fruit.DrawSize.X / 2 * fruit.Scale.X;
+
+                while (Children.OfType<DrawableFruit>().Any(f => Vector2.DistanceSquared(f.Position, fruit.Position) < distance * distance))
+                {
+                    fruit.X += RNG.Next(-5, 5);
+                    fruit.Y -= RNG.Next(0, 5);
+                }
+
+                Add(fruit);
+            }
         }
     }
 }
