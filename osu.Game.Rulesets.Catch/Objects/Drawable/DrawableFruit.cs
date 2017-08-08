@@ -15,7 +15,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
-    internal class DrawableFruit : DrawableHitObject<CatchBaseHit, CatchJudgement>
+    internal class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit, CatchJudgement>
     {
         private class Pulp : Circle, IHasAccentColour
         {
@@ -37,11 +37,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             Origin = Anchor.Centre;
             Size = new Vector2(50);
-            RelativePositionAxes = Axes.Both;
-            Position = new Vector2(h.Position, -0.1f);
-            Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
 
-            Alpha = 0;
+            RelativePositionAxes = Axes.Both;
+            X = h.Position;
+
+            Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
         }
 
         [BackgroundDependencyLoader]
@@ -91,8 +91,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     Position = new Vector2(0, 0.6f),
                 },
             };
-
-            Alpha = 0;
         }
 
         protected override CatchJudgement CreateJudgement() => new CatchJudgement();
@@ -103,14 +101,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             using (BeginAbsoluteSequence(HitObject.StartTime - preempt))
             {
-                // default state
-                this.MoveToY(-0.1f).FadeOut();
-
                 // animation
-                this.FadeIn(200).MoveToY(1, preempt);
+                this.FadeIn(200);
             }
-
-            Expire(true);
         }
     }
 }
