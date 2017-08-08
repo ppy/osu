@@ -44,10 +44,10 @@ namespace osu.Game.Rulesets.UI
         private const double time_span_step = 50;
 
         /// <summary>
-        /// Gets or sets the range of time that is visible by the length of the scrolling axes.
+        /// The span of time that is visible by the length of the scrolling axes.
         /// For example, only hit objects with start time less than or equal to 1000 will be visible with <see cref="VisibleTimeRange"/> = 1000.
         /// </summary>
-        private readonly BindableDouble visibleTimeRange = new BindableDouble(time_span_default)
+        public readonly BindableDouble VisibleTimeRange = new BindableDouble(time_span_default)
         {
             Default = time_span_default,
             MinValue = time_span_min,
@@ -55,14 +55,9 @@ namespace osu.Game.Rulesets.UI
         };
 
         /// <summary>
-        /// The span of time visible by the length of the scrolling axes.
+        /// Whether to reverse the scrolling direction is reversed.
         /// </summary>
-        /// <returns></returns>
-        public BindableDouble VisibleTimeRange
-        {
-            get { return visibleTimeRange; }
-            set { visibleTimeRange.BindTo(value); }
-        }
+        public readonly BindableBool Reversed = new BindableBool();
 
         /// <summary>
         /// The container that contains the <see cref="SpeedAdjustmentContainer"/>s and <see cref="DrawableHitObject"/>s.
@@ -80,7 +75,8 @@ namespace osu.Game.Rulesets.UI
             base.HitObjects = HitObjects = new ScrollingHitObjectContainer(scrollingAxes)
             {
                 RelativeSizeAxes = Axes.Both,
-                VisibleTimeRange = VisibleTimeRange
+                VisibleTimeRange = VisibleTimeRange,
+                Reversed = Reversed
             };
         }
 
@@ -158,13 +154,23 @@ namespace osu.Game.Rulesets.UI
                 set { visibleTimeRange.BindTo(value); }
             }
 
+            private readonly BindableBool reversed = new BindableBool();
+            /// <summary>
+            /// Whether to reverse the scrolling direction is reversed.
+            /// </summary>
+            public BindableBool Reversed
+            {
+                get { return reversed; }
+                set { reversed.BindTo(value); }
+            }
+
             protected override Container<DrawableHitObject<TObject, TJudgement>> Content => content;
             private readonly Container<DrawableHitObject<TObject, TJudgement>> content;
 
             /// <summary>
             /// Hit objects that are to be re-processed on the next update.
             /// </summary>
-            private readonly Queue<DrawableHitObject<TObject, TJudgement>> queuedHitObjects = new Queue<DrawableHitObject<TObject, TJudgement>>();
+            private readonly List<DrawableHitObject<TObject, TJudgement>> queuedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
             private readonly Axes scrollingAxes;
 
@@ -188,6 +194,7 @@ namespace osu.Game.Rulesets.UI
             {
                 speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
                 speedAdjustment.ScrollingAxes = scrollingAxes;
+                speedAdjustment.Reversed = Reversed;
                 AddInternal(speedAdjustment);
             }
 
@@ -201,7 +208,15 @@ namespace osu.Game.Rulesets.UI
                 if (!(hitObject is IScrollingHitObject))
                     throw new InvalidOperationException($"Hit objects added to a {nameof(ScrollingHitObjectContainer)} must implement {nameof(IScrollingHitObject)}.");
 
-                queuedHitObjects.Enqueue(hitObject);
+                queuedHitObjects.Add(hitObject);
+            }
+
+            public override bool Remove(DrawableHitObject<TObject, TJudgement> hitObject)
+            {
+                bool removed = InternalChildren.OfType<SpeedAdjustmentContainer>().Any(c => c.Remove(hitObject));
+                removed = removed || queuedHitObjects.Remove(hitObject);
+
+                return removed;
             }
 
             public override bool Remove(DrawableHitObject<TObject, TJudgement> hitObject)
@@ -218,22 +233,16 @@ namespace osu.Game.Rulesets.UI
                 // Todo: At the moment this is going to re-process every single Update, however this will only be a null-op
                 // when there are no SpeedAdjustmentContainers available. This should probably error or something, but it's okay for now.
 
-                // An external count is kept because hit objects that can't be added are re-queued
-                int count = queuedHitObjects.Count;
-                while (count-- > 0)
+                for (int i = queuedHitObjects.Count - 1; i >= 0; i--)
                 {
-                    var hitObject = queuedHitObjects.Dequeue();
+                    var hitObject = queuedHitObjects[i];
 
                     var target = adjustmentContainerFor(hitObject);
-                    if (target == null)
+                    if (target != null)
                     {
-                        // We can't add this hit object to a speed adjustment container yet, so re-queue it
-                        // for re-processing when the layout next invalidated
-                        queuedHitObjects.Enqueue(hitObject);
-                        continue;
+                        target.Add(hitObject);
+                        queuedHitObjects.RemoveAt(i);
                     }
-
-                    target.Add(hitObject);
                 }
             }
 
