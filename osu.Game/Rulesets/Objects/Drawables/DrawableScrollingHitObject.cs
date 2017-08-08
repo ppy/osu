@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             set
             {
-                RelativePositionAxes = value;
+                RelativePositionAxes |= value;
 
                 if ((value & Axes.X) > 0)
                     X = (float)HitObject.StartTime;
