@@ -219,13 +219,6 @@ namespace osu.Game.Rulesets.UI
                 return removed;
             }
 
-            public override bool Remove(DrawableHitObject<TObject, TJudgement> hitObject)
-            {
-                foreach (var c in InternalChildren.OfType<SpeedAdjustmentContainer>())
-                    c.Remove(hitObject);
-                return true;
-            }
-
             protected override void Update()
             {
                 base.Update();
