@@ -20,8 +20,9 @@ namespace osu.Desktop.Tests.Visual
     {
         public override string Description => "showing your latest achievements";
 
-        public TestCaseUserRanks()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
             RanksSection ranks;
 
             Add(new Container
