@@ -50,25 +50,25 @@ namespace osu.Desktop.Tests.Visual
 
             WorkingBeatmap beatmap = new TestWorkingBeatmap(b);
 
-            TestHitRenderer horizontalHitRenderer;
-            Add(horizontalHitRenderer = new TestHitRenderer(Axes.X, beatmap, true));
+            TestRulesetContainer horizontalRulesetContainer;
+            Add(horizontalRulesetContainer = new TestRulesetContainer(Axes.X, beatmap, true));
 
-            TestHitRenderer verticalHitRenderer;
-            Add(verticalHitRenderer = new TestHitRenderer(Axes.Y, beatmap, true));
+            TestRulesetContainer verticalRulesetContainer;
+            Add(verticalRulesetContainer = new TestRulesetContainer(Axes.Y, beatmap, true));
 
             AddStep("Reverse direction", () =>
             {
-                horizontalHitRenderer.Playfield.Reversed.Toggle();
-                verticalHitRenderer.Playfield.Reversed.Toggle();
+                horizontalRulesetContainer.Playfield.Reversed.Toggle();
+                verticalRulesetContainer.Playfield.Reversed.Toggle();
             });
         }
 
-        private class TestHitRenderer : ScrollingHitRenderer<TestPlayfield, TestHitObject, TestJudgement>
+        private class TestRulesetContainer : ScrollingRulesetContainer<TestPlayfield, TestHitObject, TestJudgement>
         {
             private readonly Axes scrollingAxes;
 
-            public TestHitRenderer(Axes scrollingAxes, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-                : base(beatmap, isForCurrentRuleset)
+            public TestRulesetContainer(Axes scrollingAxes, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+                : base(null, beatmap, isForCurrentRuleset)
             {
                 this.scrollingAxes = scrollingAxes;
             }
