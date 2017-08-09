@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,12 +16,16 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
-    internal class DrawableFruit : DrawableHitObject<CatchBaseHit, CatchJudgement>
+    public class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit, CatchJudgement>
     {
+        private const float pulp_size = 30;
+
         private class Pulp : Circle, IHasAccentColour
         {
             public Pulp()
             {
+                Size = new Vector2(pulp_size);
+
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
@@ -33,84 +38,91 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         }
 
 
-        public DrawableFruit(CatchBaseHit h) : base(h)
+        public DrawableFruit(CatchBaseHit h)
+            : base(h)
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(50);
-            RelativePositionAxes = Axes.Both;
-            Position = new Vector2(h.Position, -0.1f);
-            Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
+            Size = new Vector2(pulp_size * 2, pulp_size * 2.6f);
 
-            Alpha = 0;
+            RelativePositionAxes = Axes.Both;
+            X = h.Position;
+
+            Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1);
+
+            Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
         }
+
+        public Func<CatchBaseHit, bool> CheckPosition;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Children = new Framework.Graphics.Drawable[]
             {
-                new Box
+                //todo: share this more
+                new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Red,
-                },
-                new Pulp
-                {
-                    RelativePositionAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.12f),
-                    Y  = 0.08f,
-                },
-                new Pulp
-                {
-                    RelativePositionAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.32f),
-                    Position = new Vector2(-0.16f, 0.3f),
-                },
-                new Pulp
-                {
-                    RelativePositionAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.32f),
-                    Position = new Vector2(0.16f, 0.3f),
-                },
-                new Pulp
-                {
-                    RelativePositionAxes = Axes.Both,
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.Centre,
-                    Scale = new Vector2(0.32f),
-                    Position = new Vector2(0, 0.6f),
-                },
+                    CacheDrawnFrameBuffer = true,
+                    Children = new Framework.Graphics.Drawable[]
+                    {
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Scale = new Vector2(0.6f),
+                        },
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Y = -0.08f
+                        },
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Y = -0.08f
+                        },
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                        },
+                    }
+                }
             };
-
-            Alpha = 0;
         }
 
         protected override CatchJudgement CreateJudgement() => new CatchJudgement();
 
         private const float preempt = 1000;
 
+        protected override void CheckJudgement(bool userTriggered)
+        {
+            if (Judgement.TimeOffset > 0)
+                Judgement.Result = CheckPosition?.Invoke(HitObject) ?? false ? HitResult.Hit : HitResult.Miss;
+        }
+
         protected override void UpdateState(ArmedState state)
         {
             using (BeginAbsoluteSequence(HitObject.StartTime - preempt))
             {
-                // default state
-                this.MoveToY(-0.1f).FadeOut();
-
                 // animation
-                this.FadeIn(200).MoveToY(1, preempt);
+                this.FadeIn(200);
             }
 
-            Expire(true);
+            switch (state)
+            {
+                case ArmedState.Miss:
+                    using (BeginAbsoluteSequence(HitObject.StartTime, true))
+                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out);
+                    break;
+            }
         }
     }
 }

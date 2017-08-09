@@ -29,7 +29,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaHitRenderer : ScrollingHitRenderer<ManiaPlayfield, ManiaHitObject, ManiaJudgement>
+    public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject, ManiaJudgement>
     {
         /// <summary>
         /// Preferred column count. This will only have an effect during the initialization of the play field.
@@ -38,8 +38,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<DrawableBarLine> BarLines;
 
-        public ManiaHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(beatmap, isForCurrentRuleset)
+        public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(ruleset, beatmap, isForCurrentRuleset)
         {
             // Generate the bar lines
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;

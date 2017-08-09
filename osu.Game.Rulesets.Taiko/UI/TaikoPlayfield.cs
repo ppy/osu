@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgement>
     {
         /// <summary>
-        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoHitRenderer"/>.
+        /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoRulesetContainer"/>.
         /// </summary>
         public const float DEFAULT_HEIGHT = 178;
 

@@ -15,11 +15,18 @@ namespace osu.Game.Rulesets
 {
     public abstract class Ruleset
     {
+        public readonly RulesetInfo RulesetInfo;
+
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         public abstract Mod GetAutoplayMod();
+
+        protected Ruleset(RulesetInfo rulesetInfo)
+        {
+            RulesetInfo = rulesetInfo;
+        }
 
         /// <summary>
         /// Attempt to create a hit renderer for a beatmap
@@ -28,7 +35,7 @@ namespace osu.Game.Rulesets
         /// <param name="isForCurrentRuleset">Whether the hit renderer should assume the beatmap is for the current ruleset.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
-        public abstract HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
+        public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap);
 

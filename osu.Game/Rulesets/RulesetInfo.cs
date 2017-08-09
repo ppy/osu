@@ -20,6 +20,6 @@ namespace osu.Game.Rulesets
         [Indexed]
         public bool Available { get; set; }
 
-        public virtual Ruleset CreateInstance() => (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo));
+        public virtual Ruleset CreateInstance() => (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo), this);
     }
 }

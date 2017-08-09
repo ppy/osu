@@ -7,16 +7,16 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
-    /// An interface for mods that are applied to a HitRenderer.
+    /// An interface for mods that are applied to a RulesetContainer.
     /// </summary>
-    /// <typeparam name="TObject">The type of HitObject the HitRenderer contains.</typeparam>
+    /// <typeparam name="TObject">The type of HitObject the RulesetContainer contains.</typeparam>
     public interface IApplicableMod<TObject>
         where TObject : HitObject
     {
         /// <summary>
-        /// Applies the mod to a HitRenderer.
+        /// Applies the mod to a RulesetContainer.
         /// </summary>
-        /// <param name="hitRenderer">The HitRenderer to apply the mod to.</param>
-        void ApplyToHitRenderer(HitRenderer<TObject> hitRenderer);
+        /// <param name="rulesetContainer">The RulesetContainer to apply the mod to.</param>
+        void ApplyToRulesetContainer(RulesetContainer<TObject> rulesetContainer);
     }
 }
