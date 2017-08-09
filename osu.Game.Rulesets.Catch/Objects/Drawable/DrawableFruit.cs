@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit, CatchJudgement>
     {
-        const float pulp_size = 30;
+        private const float pulp_size = 30;
 
         private class Pulp : Circle, IHasAccentColour
         {
