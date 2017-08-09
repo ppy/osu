@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Mania.Mods
         /// <summary>
         /// Applies this mod to a hit renderer.
         /// </summary>
-        /// <param name="hitRenderer">The hit renderer to apply to.</param>
+        /// <param name="rulesetContainer">The hit renderer to apply to.</param>
         /// <param name="hitObjectTimingChanges">The per-column list of speed adjustments for hit objects.</param>
         /// <param name="barlineTimingChanges">The list of speed adjustments for bar lines.</param>
-        void ApplyToHitRenderer(ManiaHitRenderer hitRenderer, ref List<SpeedAdjustmentContainer>[] hitObjectTimingChanges, ref List<SpeedAdjustmentContainer> barlineTimingChanges);
+        void ApplyToRulesetContainer(ManiaRulesetContainer rulesetContainer, ref List<SpeedAdjustmentContainer>[] hitObjectTimingChanges, ref List<SpeedAdjustmentContainer> barlineTimingChanges);
     }
 }

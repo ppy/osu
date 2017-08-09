@@ -150,13 +150,13 @@ namespace osu.Game.Rulesets.Scoring
         {
         }
 
-        protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
+        protected ScoreProcessor(RulesetContainer<TObject, TJudgement> rulesetContainer)
         {
-            Judgements.Capacity = hitRenderer.Beatmap.HitObjects.Count;
+            Judgements.Capacity = rulesetContainer.Beatmap.HitObjects.Count;
 
-            hitRenderer.OnJudgement += AddJudgement;
+            rulesetContainer.OnJudgement += AddJudgement;
 
-            ComputeTargets(hitRenderer.Beatmap);
+            ComputeTargets(rulesetContainer.Beatmap);
 
             Reset();
         }
