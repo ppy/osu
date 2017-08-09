@@ -13,7 +13,6 @@ using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
-using osu.Framework.Timing;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
@@ -27,6 +26,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
+using osu.Game.Input;
 
 namespace osu.Game
 {
