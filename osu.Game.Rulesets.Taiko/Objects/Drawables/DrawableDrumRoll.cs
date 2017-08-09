@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             foreach (var tick in drumRoll.Ticks)
             {
-                var newTick = new DrawableDrumRollTick(tick) { X = (float)tick.StartTime };
+                var newTick = new DrawableDrumRollTick(tick);
                 newTick.OnJudgement += onTickJudgement;
 
                 AddNested(newTick);

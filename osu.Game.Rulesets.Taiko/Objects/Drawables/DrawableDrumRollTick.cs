@@ -15,6 +15,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
+            // Because ticks aren't added by the ScrollingPlayfield, we need to set the following properties ourselves
+            RelativePositionAxes = Axes.X;
+            X = (float)tick.StartTime;
+
             FillMode = FillMode.Fit;
         }
 
