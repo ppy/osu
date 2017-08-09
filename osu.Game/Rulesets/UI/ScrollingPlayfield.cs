@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.UI
             /// Hit objects that are to be re-processed on the next update.
             /// </summary>
             private readonly List<DrawableHitObject> queuedHitObjects = new List<DrawableHitObject>();
-            private readonly Container<SpeedAdjustmentContainer> speedAdjustments;
+            private readonly List<SpeedAdjustmentContainer> speedAdjustments = new List<SpeedAdjustmentContainer>();
 
             private readonly Axes scrollingAxes;
 
@@ -179,8 +179,6 @@ namespace osu.Game.Rulesets.UI
             public ScrollingHitObjectContainer(Axes scrollingAxes)
             {
                 this.scrollingAxes = scrollingAxes;
-
-                AddInternal(speedAdjustments = new Container<SpeedAdjustmentContainer> { RelativeSizeAxes = Axes.Both });
             }
 
             /// <summary>
@@ -193,6 +191,8 @@ namespace osu.Game.Rulesets.UI
                 speedAdjustment.ScrollingAxes = scrollingAxes;
                 speedAdjustment.Reversed = Reversed;
                 speedAdjustments.Add(speedAdjustment);
+
+                AddInternal(speedAdjustment);
             }
 
             public override IEnumerable<DrawableHitObject> Objects => speedAdjustments.SelectMany(s => s.Children);
