@@ -50,8 +50,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private class Catcher : Container
         {
-            public override bool HandleInput => true;
-
             private Texture texture;
 
             [BackgroundDependencyLoader]
