@@ -116,12 +116,12 @@ namespace osu.Game.Overlays.Profile.Sections
 
         public class ScoreFlowContainer : Container<DrawableScore>
         {
-            private readonly FillFlowContainer<DrawableScore> scores;
-            private readonly OsuClickableContainer showMoreText;
+            private FillFlowContainer<DrawableScore> scores;
+            private OsuClickableContainer showMoreText;
 
             protected override Container<DrawableScore> Content => scores;
 
-            public ScoreFlowContainer()
+            protected override void LoadComplete()
             {
                 InternalChild = new FillFlowContainer
                 {
