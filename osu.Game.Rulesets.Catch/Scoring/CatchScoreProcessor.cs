@@ -14,8 +14,8 @@ namespace osu.Game.Rulesets.Catch.Scoring
         {
         }
 
-        public CatchScoreProcessor(HitRenderer<CatchBaseHit, CatchJudgement> hitRenderer)
-            : base(hitRenderer)
+        public CatchScoreProcessor(RulesetContainer<CatchBaseHit, CatchJudgement> rulesetContainer)
+            : base(rulesetContainer)
         {
         }
 

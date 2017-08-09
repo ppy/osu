@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets
         /// <param name="isForCurrentRuleset">Whether the hit renderer should assume the beatmap is for the current ruleset.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
-        public abstract HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
+        public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset);
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap);
 

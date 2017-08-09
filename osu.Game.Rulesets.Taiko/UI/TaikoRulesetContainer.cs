@@ -21,9 +21,9 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoHitRenderer : HitRenderer<TaikoHitObject, TaikoJudgement>
+    public class TaikoRulesetContainer : RulesetContainer<TaikoHitObject, TaikoJudgement>
     {
-        public TaikoHitRenderer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+        public TaikoRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
         {
         }

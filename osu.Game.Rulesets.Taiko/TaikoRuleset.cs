@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
-        public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new TaikoHitRenderer(this, beatmap, isForCurrentRuleset);
+        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new TaikoRulesetContainer(this, beatmap, isForCurrentRuleset);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {

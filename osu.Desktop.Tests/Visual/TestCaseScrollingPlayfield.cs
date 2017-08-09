@@ -50,15 +50,15 @@ namespace osu.Desktop.Tests.Visual
 
             WorkingBeatmap beatmap = new TestWorkingBeatmap(b);
 
-            TestHitRenderer hitRenderer;
-            Add(hitRenderer = new TestHitRenderer(beatmap, true));
+            TestRulesetContainer rulesetContainer;
+            Add(rulesetContainer = new TestRulesetContainer(beatmap, true));
 
-            AddStep("Reverse direction", () => hitRenderer.Playfield.Reversed.Value = !hitRenderer.Playfield.Reversed);
+            AddStep("Reverse direction", () => rulesetContainer.Playfield.Reversed.Value = !rulesetContainer.Playfield.Reversed);
         }
 
-        private class TestHitRenderer : ScrollingHitRenderer<TestPlayfield, TestHitObject, TestJudgement>
+        private class TestRulesetContainer : ScrollingRulesetContainer<TestPlayfield, TestHitObject, TestJudgement>
         {
-            public TestHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            public TestRulesetContainer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
                 : base(null, beatmap, isForCurrentRuleset)
             {
             }
