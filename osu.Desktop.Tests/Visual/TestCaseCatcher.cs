@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.UI;
 using OpenTK;
@@ -10,13 +12,12 @@ namespace osu.Desktop.Tests.Visual
 {
     internal class TestCaseCatcher : OsuTestCase
     {
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
         {
-            base.LoadComplete();
-
             Children = new Drawable[]
             {
-                new CatchInputManager
+                new CatchInputManager(rulesets.GetRuleset(2))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = new CatcherArea

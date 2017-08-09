@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class TaikoHitRenderer : HitRenderer<TaikoHitObject, TaikoJudgement>
     {
-        public TaikoHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(beatmap, isForCurrentRuleset)
+        public TaikoHitRenderer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(ruleset, beatmap, isForCurrentRuleset)
         {
         }
 
@@ -92,7 +92,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             return new Vector2(1, default_relative_height * aspectAdjust);
         }
-
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 

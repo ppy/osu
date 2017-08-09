@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuHitRenderer : HitRenderer<OsuHitObject, OsuJudgement>
     {
-        public OsuHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(beatmap, isForCurrentRuleset)
+        public OsuHitRenderer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(ruleset, beatmap, isForCurrentRuleset)
         {
         }
 
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override Playfield<OsuHitObject, OsuJudgement> CreatePlayfield() => new OsuPlayfield();
 
-        protected override PassThroughInputManager CreateKeyConversionInputManager() => new OsuKeyConversionInputManager();
+        protected override PassThroughInputManager CreateActionMappingInputManager() => new OsuKeyConversionInputManager();
 
         protected override DrawableHitObject<OsuHitObject, OsuJudgement> GetVisualRepresentation(OsuHitObject h)
         {

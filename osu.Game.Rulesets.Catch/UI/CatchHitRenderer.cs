@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchHitRenderer : ScrollingHitRenderer<CatchPlayfield, CatchBaseHit, CatchJudgement>
     {
-        public CatchHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(beatmap, isForCurrentRuleset)
+        public CatchHitRenderer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(ruleset, beatmap, isForCurrentRuleset)
         {
         }
 
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override Playfield<CatchBaseHit, CatchJudgement> CreatePlayfield() => new CatchPlayfield();
 
-        protected override PassThroughInputManager CreateKeyConversionInputManager() => new CatchInputManager();
+        protected override PassThroughInputManager CreateActionMappingInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
         protected override DrawableHitObject<CatchBaseHit, CatchJudgement> GetVisualRepresentation(CatchBaseHit h)
         {

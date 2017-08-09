@@ -59,7 +59,7 @@ namespace osu.Desktop.Tests.Visual
         private class TestHitRenderer : ScrollingHitRenderer<TestPlayfield, TestHitObject, TestJudgement>
         {
             public TestHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
-                : base(beatmap, isForCurrentRuleset)
+                : base(null, beatmap, isForCurrentRuleset)
             {
             }
 

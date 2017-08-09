@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
 
         private class DummyRulesetInfo : RulesetInfo
         {
-            public override Ruleset CreateInstance() => new DummyRuleset();
+            public override Ruleset CreateInstance() => new DummyRuleset(this);
 
             private class DummyRuleset : Ruleset
             {
@@ -77,6 +77,11 @@ namespace osu.Game.Beatmaps
                 public override string Description => "dummy";
 
                 public override IEnumerable<KeyCounter> CreateGameplayKeys() => new List<KeyCounter>();
+
+                public DummyRuleset(RulesetInfo rulesetInfo)
+                    : base(rulesetInfo)
+                {
+                }
             }
         }
     }

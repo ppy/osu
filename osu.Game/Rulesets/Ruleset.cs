@@ -15,11 +15,18 @@ namespace osu.Game.Rulesets
 {
     public abstract class Ruleset
     {
+        public readonly RulesetInfo RulesetInfo;
+
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         public abstract Mod GetAutoplayMod();
+
+        protected Ruleset(RulesetInfo rulesetInfo)
+        {
+            RulesetInfo = rulesetInfo;
+        }
 
         /// <summary>
         /// Attempt to create a hit renderer for a beatmap

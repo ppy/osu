@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch
 {
     public class CatchRuleset : Ruleset
     {
-        public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new CatchHitRenderer(beatmap, isForCurrentRuleset);
+        public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new CatchHitRenderer(this, beatmap, isForCurrentRuleset);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
@@ -102,5 +102,10 @@ namespace osu.Game.Rulesets.Catch
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
 
         public override int LegacyID => 2;
+
+        public CatchRuleset(RulesetInfo rulesetInfo)
+            : base(rulesetInfo)
+        {
+        }
     }
 }
