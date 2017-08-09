@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Scoring;
 using System;
 using System.Collections.Generic;
 
-namespace osu.Desktop.VisualTests.Tests
+namespace osu.Desktop.Tests.Visual
 {
     public class TestCaseUserRanks : TestCase
     {
