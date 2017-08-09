@@ -7,6 +7,7 @@ using System.Linq;
 using OpenTK.Input;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
@@ -154,7 +155,7 @@ namespace osu.Game.Rulesets.UI
             /// Hit objects that are to be re-processed on the next update.
             /// </summary>
             private readonly List<DrawableHitObject> queuedHitObjects = new List<DrawableHitObject>();
-            private readonly List<SpeedAdjustmentContainer> speedAdjustments = new List<SpeedAdjustmentContainer>();
+            private readonly Container<SpeedAdjustmentContainer> speedAdjustments;
 
             private readonly Axes scrollingAxes;
 
@@ -165,6 +166,8 @@ namespace osu.Game.Rulesets.UI
             public ScrollingHitObjectContainer(Axes scrollingAxes)
             {
                 this.scrollingAxes = scrollingAxes;
+
+                AddInternal(speedAdjustments = new Container<SpeedAdjustmentContainer> { RelativeSizeAxes = Axes.Both });
             }
 
             /// <summary>
@@ -176,9 +179,7 @@ namespace osu.Game.Rulesets.UI
                 speedAdjustment.ScrollingAxes = scrollingAxes;
                 speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
                 speedAdjustment.Reversed.BindTo(Reversed);
-
                 speedAdjustments.Add(speedAdjustment);
-                AddInternal(speedAdjustment);
             }
 
             public override IEnumerable<DrawableHitObject> Objects => speedAdjustments.SelectMany(s => s.Children);
@@ -210,11 +211,11 @@ namespace osu.Game.Rulesets.UI
                     var hitObject = queuedHitObjects[i];
 
                     var target = adjustmentContainerFor(hitObject);
-                    if (target != null)
-                    {
-                        target.Add(hitObject);
-                        queuedHitObjects.RemoveAt(i);
-                    }
+                    if (target == null)
+                        continue;
+
+                    target.Add(hitObject);
+                    queuedHitObjects.RemoveAt(i);
                 }
             }
 
