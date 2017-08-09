@@ -5,13 +5,8 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Input;
-using osu.Framework.Platform;
-using osu.Game.Database;
 using osu.Game.Rulesets;
 using OpenTK.Input;
-using SQLite.Net;
-using SQLite.Net.Attributes;
-using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Input
 {
