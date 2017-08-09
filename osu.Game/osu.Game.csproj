@@ -92,6 +92,8 @@
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
+    <Compile Include="Input\Binding.cs" />
+    <Compile Include="Input\BindingStore.cs" />
     <Compile Include="IO\FileStore.cs" />
     <Compile Include="IO\FileInfo.cs" />
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
