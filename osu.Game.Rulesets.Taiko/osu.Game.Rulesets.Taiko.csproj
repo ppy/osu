@@ -91,7 +91,7 @@
     <Compile Include="UI\KiaiHitExplosion.cs" />
     <Compile Include="UI\DrawableTaikoJudgement.cs" />
     <Compile Include="UI\HitExplosion.cs" />
-    <Compile Include="UI\TaikoHitRenderer.cs" />
+    <Compile Include="UI\TaikoRulesetContainer.cs" />
     <Compile Include="UI\TaikoPlayfield.cs" />
     <Compile Include="TaikoRuleset.cs" />
     <Compile Include="Mods\TaikoMod.cs" />
