@@ -11,11 +11,15 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Taiko.UI;
 using OpenTK;
 
@@ -84,25 +88,25 @@ namespace osu.Desktop.Tests.Visual
                     Clock = new FramedClock(),
                     Children = new Drawable[]
                     {
-                        new OsuHitRenderer(beatmap, false)
+                        new OsuRulesetContainer(new OsuRuleset(new RulesetInfo()), beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft
                         },
-                        new TaikoHitRenderer(beatmap, false)
+                        new TaikoRulesetContainer(new TaikoRuleset(new RulesetInfo()),beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight
                         },
-                        new CatchHitRenderer(beatmap, false)
+                        new CatchRulesetContainer(new CatchRuleset(new RulesetInfo()),beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft
                         },
-                        new ManiaHitRenderer(beatmap, false)
+                        new ManiaRulesetContainer(new ManiaRuleset(new RulesetInfo()),beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomRight,

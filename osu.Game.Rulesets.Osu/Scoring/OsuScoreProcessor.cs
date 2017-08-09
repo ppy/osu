@@ -18,8 +18,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
-        public OsuScoreProcessor(HitRenderer<OsuHitObject, OsuJudgement> hitRenderer)
-            : base(hitRenderer)
+        public OsuScoreProcessor(RulesetContainer<OsuHitObject, OsuJudgement> rulesetContainer)
+            : base(rulesetContainer)
         {
         }
 

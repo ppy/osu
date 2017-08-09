@@ -3,14 +3,13 @@
 
 using System.Linq;
 using osu.Framework.Input;
-using osu.Game.Screens.Play;
 using OpenTK.Input;
 using KeyboardState = osu.Framework.Input.KeyboardState;
 using MouseState = osu.Framework.Input.MouseState;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuKeyConversionInputManager : KeyConversionInputManager
+    public class OsuKeyConversionInputManager : PassThroughInputManager
     {
         private bool leftViaKeyboard;
         private bool rightViaKeyboard;

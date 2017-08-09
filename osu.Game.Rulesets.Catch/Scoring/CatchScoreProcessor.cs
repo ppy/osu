@@ -14,9 +14,17 @@ namespace osu.Game.Rulesets.Catch.Scoring
         {
         }
 
-        public CatchScoreProcessor(HitRenderer<CatchBaseHit, CatchJudgement> hitRenderer)
-            : base(hitRenderer)
+        public CatchScoreProcessor(RulesetContainer<CatchBaseHit, CatchJudgement> rulesetContainer)
+            : base(rulesetContainer)
         {
+        }
+
+        protected override void Reset()
+        {
+            base.Reset();
+
+            Health.Value = 1;
+            Accuracy.Value = 1;
         }
 
         protected override void OnNewJudgement(CatchJudgement judgement)

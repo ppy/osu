@@ -92,6 +92,8 @@
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
+    <Compile Include="Input\Binding.cs" />
+    <Compile Include="Input\BindingStore.cs" />
     <Compile Include="IO\FileStore.cs" />
     <Compile Include="IO\FileInfo.cs" />
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
@@ -118,6 +120,7 @@
     <Compile Include="Overlays\Profile\Sections\RecentSection.cs" />
     <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
+    <Compile Include="Input\ActionMappingInputManager.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />
@@ -228,9 +231,9 @@
     <Compile Include="Rulesets\Scoring\Score.cs" />
     <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
     <Compile Include="Rulesets\Timing\SpeedAdjustmentContainer.cs" />
-    <Compile Include="Rulesets\Timing\DrawableTimingSection.cs" />
+    <Compile Include="Rulesets\Timing\LinearScrollingContainer.cs" />
+    <Compile Include="Rulesets\Timing\ScrollingContainer.cs" />
     <Compile Include="Rulesets\Timing\MultiplierControlPoint.cs" />
-    <Compile Include="Rulesets\Timing\SpeedAdjustmentCollection.cs" />
     <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
     <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />
     <Compile Include="Screens\Play\HUDOverlay.cs" />
@@ -309,7 +312,6 @@
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
     <Compile Include="Screens\Play\FailOverlay.cs" />
     <Compile Include="Screens\Play\MenuOverlay.cs" />
-    <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\ReplayPlayer.cs" />
@@ -338,9 +340,10 @@
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
     <Compile Include="Screens\Select\PlaySongSelect.cs" />
     <Compile Include="Screens\Select\SongSelect.cs" />
-    <Compile Include="Rulesets\UI\HitRenderer.cs" />
+    <Compile Include="Rulesets\UI\RulesetContainer.cs" />
     <Compile Include="Rulesets\UI\Playfield.cs" />
-    <Compile Include="Rulesets\UI\SpeedAdjustedHitRenderer.cs" />
+    <Compile Include="Rulesets\UI\ScrollingRulesetContainer.cs" />
+    <Compile Include="Rulesets\UI\ScrollingPlayfield.cs" />
     <Compile Include="Screens\Select\EditSongSelect.cs" />
     <Compile Include="Screens\Play\HUD\ComboCounter.cs" />
     <Compile Include="Screens\Play\HUD\ComboResultCounter.cs" />
