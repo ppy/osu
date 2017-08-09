@@ -1,8 +1,8 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -10,6 +10,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 {
     /// <summary>
     /// A basic class that overrides <see cref="DrawableHitObject{TObject, TJudgement}"/> and implements <see cref="IScrollingHitObject"/>.
+    /// This object does not need to have its <see cref="Drawable.RelativePositionAxes"/> set to be able to scroll, as this will
+    /// will be set by the scrolling container that contains it.
     /// </summary>
     public abstract class DrawableScrollingHitObject<TObject, TJudgement> : DrawableHitObject<TObject, TJudgement>, IScrollingHitObject
         where TObject : HitObject
@@ -17,25 +19,40 @@ namespace osu.Game.Rulesets.Objects.Drawables
     {
         public BindableDouble LifetimeOffset { get; } = new BindableDouble();
 
+        Axes IScrollingHitObject.ScrollingAxes
+        {
+            set
+            {
+                RelativePositionAxes |= value;
+
+                if ((value & Axes.X) > 0)
+                    X = (float)HitObject.StartTime;
+                if ((value & Axes.Y) > 0)
+                    Y = (float)HitObject.StartTime;
+            }
+        }
+
         protected DrawableScrollingHitObject(TObject hitObject)
             : base(hitObject)
         {
         }
 
+        private double? lifetimeStart;
         public override double LifetimeStart
         {
-            get { return Math.Min(HitObject.StartTime - LifetimeOffset, base.LifetimeStart); }
-            set { base.LifetimeStart = value; }
+            get { return lifetimeStart ?? HitObject.StartTime - LifetimeOffset; }
+            set { lifetimeStart = value; }
         }
 
+        private double? lifetimeEnd;
         public override double LifetimeEnd
         {
             get
             {
                 var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-                return Math.Max(endTime + LifetimeOffset, base.LifetimeEnd);
+                return lifetimeEnd ?? endTime + LifetimeOffset;
             }
-            set { base.LifetimeEnd = value; }
+            set { lifetimeEnd = value; }
         }
 
         protected override void AddNested(DrawableHitObject<TObject, TJudgement> h)

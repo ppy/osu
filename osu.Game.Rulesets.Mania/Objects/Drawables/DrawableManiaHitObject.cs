@@ -4,7 +4,6 @@
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -27,9 +26,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             if (key != null)
                 Key.BindTo(key);
-
-            RelativePositionAxes = Axes.Y;
-            Y = (float)HitObject.StartTime;
         }
 
         public override Color4 AccentColour
