@@ -16,25 +16,15 @@ namespace osu.Game.Rulesets.Timing
     /// </summary>
     public class SpeedAdjustmentContainer : Container<DrawableHitObject>
     {
-        private readonly Bindable<double> visibleTimeRange = new Bindable<double> { Default = 1000 };
         /// <summary>
         /// Gets or sets the range of time that is visible by the length of the scrolling axes.
         /// </summary>
-        public Bindable<double> VisibleTimeRange
-        {
-            get { return visibleTimeRange; }
-            set { visibleTimeRange.BindTo(value); }
-        }
+        public readonly Bindable<double> VisibleTimeRange = new Bindable<double> { Default = 1000 };
 
-        private readonly BindableBool reversed = new BindableBool();
         /// <summary>
         /// Whether to reverse the scrolling direction is reversed.
         /// </summary>
-        public BindableBool Reversed
-        {
-            get { return reversed; }
-            set { reversed.BindTo(value); }
-        }
+        public readonly BindableBool Reversed = new BindableBool();
 
         protected override Container<DrawableHitObject> Content => content;
         private Container<DrawableHitObject> content;
