@@ -9,6 +9,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Game.Rulesets.Judgements;
 using osu.Framework.Allocation;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -19,7 +21,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The HitObjects contained in this Playfield.
         /// </summary>
-        protected HitObjectContainer<DrawableHitObject<TObject, TJudgement>> HitObjects;
+        public HitObjectContainer HitObjects { get; protected set; }
 
         internal Container<Drawable> ScaledContent;
 
@@ -53,7 +55,7 @@ namespace osu.Game.Rulesets.UI
                 }
             });
 
-            HitObjects = new HitObjectContainer<DrawableHitObject<TObject, TJudgement>>
+            HitObjects = new HitObjectContainer
             {
                 RelativeSizeAxes = Axes.Both,
             };
@@ -83,10 +85,23 @@ namespace osu.Game.Rulesets.UI
         public virtual void Add(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Add(h);
 
         /// <summary>
+        /// Remove a DrawableHitObject from this Playfield.
+        /// </summary>
+        /// <param name="h">The DrawableHitObject to remove.</param>
+        public virtual void Remove(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Remove(h);
+
+        /// <summary>
         /// Triggered when an object's Judgement is updated.
         /// </summary>
         /// <param name="judgedObject">The object that Judgement has been updated for.</param>
         public virtual void OnJudgement(DrawableHitObject<TObject, TJudgement> judgedObject) { }
+
+        public class HitObjectContainer : CompositeDrawable
+        {
+            public virtual IEnumerable<DrawableHitObject> Objects => InternalChildren.OfType<DrawableHitObject>();
+            public virtual void Add(DrawableHitObject hitObject) => AddInternal(hitObject);
+            public virtual bool Remove(DrawableHitObject hitObject) => RemoveInternal(hitObject);
+        }
 
         private class ScaledContainer : Container
         {
@@ -97,10 +112,6 @@ namespace osu.Game.Rulesets.UI
 
             //dividing by the customwidth will effectively scale our content to the required container size.
             protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
-        }
-
-        public class HitObjectContainer<U> : Container<U> where U : Drawable
-        {
         }
     }
 }
