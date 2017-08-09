@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Timing
         /// </summary>
         internal Axes ScrollingAxes;
 
+        public override bool RemoveWhenNotAlive => false;
+
         /// <summary>
         /// The control point that defines the speed adjustments for this container. This is set by the <see cref="SpeedAdjustmentContainer"/>.
         /// </summary>
