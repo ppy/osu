@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Catch.Beatmaps;
@@ -26,6 +27,8 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
 
         protected override Playfield<CatchBaseHit, CatchJudgement> CreatePlayfield() => new CatchPlayfield();
+
+        protected override PassThroughInputManager CreateKeyConversionInputManager() => new CatchInputManager();
 
         protected override DrawableHitObject<CatchBaseHit, CatchJudgement> GetVisualRepresentation(CatchBaseHit h)
         {

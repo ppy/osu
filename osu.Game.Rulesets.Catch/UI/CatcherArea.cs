@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
-using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -62,9 +61,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 Child = createCatcherSprite();
             }
-
-            private bool leftPressed;
-            private bool rightPressed;
 
             private int currentDirection;
 
@@ -114,19 +110,20 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 if (args.Repeat) return true;
 
-                switch (args.Key)
+                if (state.Data is CatchAction)
                 {
-                    case Key.Left:
-                        currentDirection = -1;
-                        leftPressed = true;
-                        return true;
-                    case Key.Right:
-                        currentDirection = 1;
-                        rightPressed = true;
-                        return true;
-                    case Key.ShiftLeft:
-                        Dashing = true;
-                        return true;
+                    switch ((CatchAction)state.Data)
+                    {
+                        case CatchAction.MoveLeft:
+                            currentDirection--;
+                            return true;
+                        case CatchAction.MoveRight:
+                            currentDirection++;
+                            return true;
+                        case CatchAction.Dash:
+                            Dashing = true;
+                            return true;
+                    }
                 }
 
                 return base.OnKeyDown(state, args);
@@ -134,19 +131,20 @@ namespace osu.Game.Rulesets.Catch.UI
 
             protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
             {
-                switch (args.Key)
+                if (state.Data is CatchAction)
                 {
-                    case Key.Left:
-                        currentDirection = rightPressed ? 1 : 0;
-                        leftPressed = false;
-                        return true;
-                    case Key.Right:
-                        currentDirection = leftPressed ? -1 : 0;
-                        rightPressed = false;
-                        return true;
-                    case Key.ShiftLeft:
-                        Dashing = false;
-                        return true;
+                    switch ((CatchAction)state.Data)
+                    {
+                        case CatchAction.MoveLeft:
+                            currentDirection++;
+                            return true;
+                        case CatchAction.MoveRight:
+                            currentDirection--;
+                            return true;
+                        case CatchAction.Dash:
+                            Dashing = false;
+                            return true;
+                    }
                 }
 
                 return base.OnKeyUp(state, args);
@@ -161,7 +159,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 float speed = Dashing ? 1.5f : 1;
 
                 Scale = new Vector2(Math.Sign(currentDirection), 1);
-                X = (float)MathHelper.Clamp(X + currentDirection * Clock.ElapsedFrameTime / 1800 * speed, 0, 1);
+                X = (float)MathHelper.Clamp(X + Math.Sign(currentDirection) * Clock.ElapsedFrameTime / 1800 * speed, 0, 1);
             }
 
             public void AddToStack(DrawableHitObject<CatchBaseHit, CatchJudgement> fruit, Vector2 absolutePosition)

@@ -118,6 +118,7 @@
     <Compile Include="Overlays\Profile\Sections\RecentSection.cs" />
     <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
+    <Compile Include="Input\ActionMappingInputManager.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />
@@ -309,7 +310,6 @@
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
     <Compile Include="Screens\Play\FailOverlay.cs" />
     <Compile Include="Screens\Play\MenuOverlay.cs" />
-    <Compile Include="Screens\Play\KeyConversionInputManager.cs" />
     <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\ReplayPlayer.cs" />

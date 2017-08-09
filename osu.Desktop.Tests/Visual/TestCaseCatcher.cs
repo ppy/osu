@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.UI;
 using OpenTK;
 
@@ -15,14 +16,18 @@ namespace osu.Desktop.Tests.Visual
 
             Children = new Drawable[]
             {
-                new CatcherArea
+                new CatchInputManager
                 {
-                    RelativePositionAxes = Axes.Both,
                     RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Size = new Vector2(1, 0.2f),
-                }
+                    Child = new CatcherArea
+                    {
+                        RelativePositionAxes = Axes.Both,
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Size = new Vector2(1, 0.2f),
+                    }
+                },
             };
         }
     }
