@@ -2,30 +2,26 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Catch.UI;
 using OpenTK;
-using osu.Game.Rulesets.Catch.Judgements;
 
-namespace osu.Game.Rulesets.Catch.UI
+namespace osu.Desktop.Tests.Visual
 {
-    public class CatchPlayfield : Playfield<CatchBaseHit, CatchJudgement>
+    internal class TestCaseCatcher : OsuTestCase
     {
-        public CatchPlayfield()
+        protected override void LoadComplete()
         {
-            Size = new Vector2(1);
-
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
+            base.LoadComplete();
 
             Children = new Drawable[]
             {
                 new CatcherArea
                 {
+                    RelativePositionAxes = Axes.Both,
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                    Height = 0.3f
+                    Origin = Anchor.BottomLeft,
+                    Size = new Vector2(1, 0.2f),
                 }
             };
         }
