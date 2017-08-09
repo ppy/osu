@@ -11,16 +11,17 @@ namespace osu.Game.Rulesets.Catch
     {
         public CatchInputManager(RulesetInfo ruleset) : base(ruleset)
         {
-            Mappings = new Dictionary<Key, CatchAction>
-            {
-                { Key.Z, CatchAction.MoveLeft },
-                { Key.Left, CatchAction.MoveLeft },
-                { Key.X, CatchAction.MoveRight },
-                { Key.Right, CatchAction.MoveRight },
-                { Key.LShift, CatchAction.Dash },
-                { Key.RShift, CatchAction.Dash },
-            };
         }
+
+        protected override IDictionary<Key, CatchAction> CreateDefaultMappings() => new Dictionary<Key, CatchAction>
+        {
+            { Key.Z, CatchAction.MoveLeft },
+            { Key.Left, CatchAction.MoveLeft },
+            { Key.X, CatchAction.MoveRight },
+            { Key.Right, CatchAction.MoveRight },
+            { Key.LShift, CatchAction.Dash },
+            { Key.RShift, CatchAction.Dash },
+        };
     }
 
     public enum CatchAction
