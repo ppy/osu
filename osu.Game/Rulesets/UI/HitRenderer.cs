@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The playfield.
         /// </summary>
-        protected Playfield<TObject, TJudgement> Playfield { get; private set; }
+        public Playfield<TObject, TJudgement> Playfield { get; private set; }
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
