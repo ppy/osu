@@ -39,28 +39,6 @@ namespace osu.Desktop.Tests.Visual
                 }
             });
 
-            AddStep("Add First Place", () => ranks.ScoresFirst = new[]
-            {
-                new Score
-                {
-                    Rank = ScoreRank.A,
-                    Accuracy = 0.735,
-                    PP = 666,
-                    Date = DateTimeOffset.UtcNow,
-                    Mods = new Mod[] { new ModAutoplay(), new ModDoubleTime(), new OsuModEasy() },
-                    Beatmap = new BeatmapInfo
-                    {
-                        Metadata = new BeatmapMetadata
-                        {
-                            Title = "FREEDOM DiVE",
-                            Artist = "xi"
-                        },
-                        Version = "FOUR DIMENSIONS",
-                        OnlineBeatmapID = 129891,
-                    }
-                }
-            });
-
             AddStep("Add Best Performances", () =>
             {
                 List<Score> scores = new List<Score>();
@@ -91,6 +69,30 @@ namespace osu.Desktop.Tests.Visual
                 }
                 ranks.ScoresBest = scores.ToArray();
             });
+
+            AddStep("Add First Place", () => ranks.ScoresFirst = new[]
+            {
+                new Score
+                {
+                    Rank = ScoreRank.A,
+                    Accuracy = 0.735,
+                    PP = 666,
+                    Date = DateTimeOffset.UtcNow,
+                    Mods = new Mod[] { new ModAutoplay(), new ModDoubleTime(), new OsuModEasy() },
+                    Beatmap = new BeatmapInfo
+                    {
+                        Metadata = new BeatmapMetadata
+                        {
+                            Title = "FREEDOM DiVE",
+                            Artist = "xi"
+                        },
+                        Version = "FOUR DIMENSIONS",
+                        OnlineBeatmapID = 129891,
+                    }
+                }
+            });
+
+            AddStep("Show More", ((RanksSection.ScoreFlowContainer)ranks.Children[1]).ShowMore);
         }
     }
 }
