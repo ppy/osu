@@ -256,22 +256,17 @@ namespace osu.Game
         {
             if (args.Repeat || intro == null) return false;
 
-            switch (args.Key)
+            if (state.Data is OsuAction)
             {
-                case Key.F8:
-                    chat.ToggleVisibility();
-                    return true;
-                case Key.F9:
-                    social.ToggleVisibility();
-                    return true;
-                case Key.PageUp:
-                case Key.PageDown:
-                    var swClock = (Clock as ThrottledFrameClock)?.Source as StopwatchClock;
-                    if (swClock == null) return false;
-
-                    swClock.Rate *= args.Key == Key.PageUp ? 1.1f : 0.9f;
-                    Logger.Log($@"Adjusting game clock to {swClock.Rate}", LoggingTarget.Debug);
-                    return true;
+                switch ((OsuAction)state.Data)
+                {
+                    case OsuAction.ToggleChat:
+                        chat.ToggleVisibility();
+                        return true;
+                    case OsuAction.ToggleSocial:
+                        social.ToggleVisibility();
+                        return true;
+                }
             }
 
             if (state.Keyboard.ControlPressed)

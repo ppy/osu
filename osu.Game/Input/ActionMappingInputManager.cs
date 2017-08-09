@@ -14,7 +14,7 @@ namespace osu.Game.Input
     /// Maps custom action data of type <see cref="T"/> and stores to <see cref="InputState.Data"/>.
     /// </summary>
     /// <typeparam name="T">The type of the custom action.</typeparam>
-    public class ActionMappingInputManager<T> : PassThroughInputManager
+    public abstract class ActionMappingInputManager<T> : PassThroughInputManager
         where T : struct
     {
         private readonly RulesetInfo ruleset;
@@ -30,9 +30,13 @@ namespace osu.Game.Input
         {
             this.ruleset = ruleset;
             this.variant = variant;
+
+            Mappings = CreateDefaultMappings();
         }
 
-        protected IDictionary<Key, T> Mappings { get; set; }
+        protected IDictionary<Key, T> Mappings { get; private set; }
+
+        protected abstract IDictionary<Key, T> CreateDefaultMappings();
 
         [BackgroundDependencyLoader]
         private void load(BindingStore bindings)

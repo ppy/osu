@@ -187,13 +187,14 @@ namespace osu.Game
                 Children = new Drawable[]
                 {
                     Cursor = new MenuCursor(),
-                    new OsuTooltipContainer(Cursor)
+                    new GlobalActionMappingInputManager
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = content = new OsuContextMenuContainer
+                        Child = new OsuTooltipContainer(Cursor)
                         {
                             RelativeSizeAxes = Axes.Both,
-                        },
+                            Child = content = new OsuContextMenuContainer { RelativeSizeAxes = Axes.Both },
+                        }
                     }
                 }
             });
