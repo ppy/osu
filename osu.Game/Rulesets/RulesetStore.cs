@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets
                         continue;
 
                     foreach (Type rulesetType in rulesets)
-                        instances.Add((Ruleset)Activator.CreateInstance(rulesetType));
+                        instances.Add((Ruleset)Activator.CreateInstance(rulesetType, new RulesetInfo()));
                 }
                 catch (Exception) { }
             }

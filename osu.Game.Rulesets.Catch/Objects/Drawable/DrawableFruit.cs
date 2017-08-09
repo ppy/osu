@@ -1,36 +1,128 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.MathUtils;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Catch.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
-    internal class DrawableFruit : Sprite
+    public class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit, CatchJudgement>
     {
-        //private readonly CatchBaseHit h;
+        private const float pulp_size = 30;
 
-        public DrawableFruit(CatchBaseHit h)
+        private class Pulp : Circle, IHasAccentColour
         {
-            //this.h = h;
+            public Pulp()
+            {
+                Size = new Vector2(pulp_size);
 
-            Origin = Anchor.Centre;
-            Scale = new Vector2(0.1f);
-            RelativePositionAxes = Axes.Y;
-            Position = new Vector2(h.Position, -0.1f);
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 5,
+                    Colour = AccentColour.Opacity(0.5f),
+                };
+            }
+
+            public Color4 AccentColour { get; set; } = Color4.White;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
-        {
-            Texture = textures.Get(@"Menu/logo");
 
-            //Transforms.Add(new TransformPosition { StartTime = h.StartTime - 200, EndTime = h.StartTime, StartValue = new Vector2(h.Position, -0.1f), EndValue = new Vector2(h.Position, 0.9f) });
-            //Transforms.Add(new TransformAlpha { StartTime = h.StartTime + duration + 200, EndTime = h.StartTime + duration + 400, StartValue = 1, EndValue = 0 });
-            Expire(true);
+        public DrawableFruit(CatchBaseHit h)
+            : base(h)
+        {
+            Origin = Anchor.Centre;
+            Size = new Vector2(pulp_size * 2, pulp_size * 2.6f);
+
+            RelativePositionAxes = Axes.Both;
+            X = h.Position;
+
+            Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1);
+
+            Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
+        }
+
+        public Func<CatchBaseHit, bool> CheckPosition;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Children = new Framework.Graphics.Drawable[]
+            {
+                //todo: share this more
+                new BufferedContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CacheDrawnFrameBuffer = true,
+                    Children = new Framework.Graphics.Drawable[]
+                    {
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Scale = new Vector2(0.6f),
+                        },
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Y = -0.08f
+                        },
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Y = -0.08f
+                        },
+                        new Pulp
+                        {
+                            RelativePositionAxes = Axes.Both,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                        },
+                    }
+                }
+            };
+        }
+
+        protected override CatchJudgement CreateJudgement() => new CatchJudgement();
+
+        private const float preempt = 1000;
+
+        protected override void CheckJudgement(bool userTriggered)
+        {
+            if (Judgement.TimeOffset > 0)
+                Judgement.Result = CheckPosition?.Invoke(HitObject) ?? false ? HitResult.Hit : HitResult.Miss;
+        }
+
+        protected override void UpdateState(ArmedState state)
+        {
+            using (BeginAbsoluteSequence(HitObject.StartTime - preempt))
+            {
+                // animation
+                this.FadeIn(200);
+            }
+
+            switch (state)
+            {
+                case ArmedState.Miss:
+                    using (BeginAbsoluteSequence(HitObject.StartTime, true))
+                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out);
+                    break;
+            }
         }
     }
 }
