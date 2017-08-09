@@ -53,7 +53,7 @@ namespace osu.Desktop.Tests.Visual
             TestHitRenderer hitRenderer;
             Add(hitRenderer = new TestHitRenderer(beatmap, true));
 
-            AddStep("Reverse direction", () => hitRenderer.Playfield.Reversed.Value = !hitRenderer.Playfield.Reversed);
+            AddStep("Reverse direction", () => hitRenderer.Playfield.Reversed.Toggle());
         }
 
         private class TestHitRenderer : ScrollingHitRenderer<TestPlayfield, TestHitObject, TestJudgement>

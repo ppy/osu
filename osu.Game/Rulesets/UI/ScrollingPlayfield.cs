@@ -71,12 +71,9 @@ namespace osu.Game.Rulesets.UI
         protected ScrollingPlayfield(Axes scrollingAxes, float? customWidth = null)
             : base(customWidth)
         {
-            base.HitObjects = HitObjects = new ScrollingHitObjectContainer(scrollingAxes)
-            {
-                RelativeSizeAxes = Axes.Both,
-                VisibleTimeRange = VisibleTimeRange,
-                Reversed = Reversed
-            };
+            base.HitObjects = HitObjects = new ScrollingHitObjectContainer(scrollingAxes) { RelativeSizeAxes = Axes.Both };
+            HitObjects.VisibleTimeRange.BindTo(VisibleTimeRange);
+            HitObjects.Reversed.BindTo(Reversed);
         }
 
         private List<ScrollingPlayfield<TObject, TJudgement>> nestedPlayfields;
@@ -142,26 +139,16 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         internal class ScrollingHitObjectContainer : HitObjectContainer
         {
-            private readonly BindableDouble visibleTimeRange = new BindableDouble { Default = 1000 };
             /// <summary>
             /// Gets or sets the range of time that is visible by the length of the scrolling axes.
             /// For example, only hit objects with start time less than or equal to 1000 will be visible with <see cref="VisibleTimeRange"/> = 1000.
             /// </summary>
-            public Bindable<double> VisibleTimeRange
-            {
-                get { return visibleTimeRange; }
-                set { visibleTimeRange.BindTo(value); }
-            }
+            public readonly BindableDouble VisibleTimeRange = new BindableDouble { Default = 1000 };
 
-            private readonly BindableBool reversed = new BindableBool();
             /// <summary>
             /// Whether to reverse the scrolling direction is reversed.
             /// </summary>
-            public BindableBool Reversed
-            {
-                get { return reversed; }
-                set { reversed.BindTo(value); }
-            }
+            public readonly BindableBool Reversed = new BindableBool();
 
             /// <summary>
             /// Hit objects that are to be re-processed on the next update.
@@ -186,11 +173,11 @@ namespace osu.Game.Rulesets.UI
             /// <param name="speedAdjustment">The <see cref="SpeedAdjustmentContainer"/>.</param>
             public void AddSpeedAdjustment(SpeedAdjustmentContainer speedAdjustment)
             {
-                speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
                 speedAdjustment.ScrollingAxes = scrollingAxes;
-                speedAdjustment.Reversed = Reversed;
-                speedAdjustments.Add(speedAdjustment);
+                speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
+                speedAdjustment.Reversed.BindTo(Reversed);
 
+                speedAdjustments.Add(speedAdjustment);
                 AddInternal(speedAdjustment);
             }
 
