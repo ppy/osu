@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// A container that provides the foundation for sorting <see cref="DrawableHitObject"/>s into <see cref="SpeedAdjustmentContainer"/>s.
         /// </summary>
-        internal class ScrollingHitObjectContainer : HitObjectContainer<DrawableHitObject<TObject, TJudgement>>
+        internal class ScrollingHitObjectContainer : HitObjectContainer
         {
             private readonly BindableDouble visibleTimeRange = new BindableDouble { Default = 1000 };
             /// <summary>
@@ -164,13 +164,11 @@ namespace osu.Game.Rulesets.UI
                 set { reversed.BindTo(value); }
             }
 
-            protected override Container<DrawableHitObject<TObject, TJudgement>> Content => content;
-            private readonly Container<DrawableHitObject<TObject, TJudgement>> content;
-
             /// <summary>
             /// Hit objects that are to be re-processed on the next update.
             /// </summary>
-            private readonly List<DrawableHitObject<TObject, TJudgement>> queuedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();
+            private readonly List<DrawableHitObject> queuedHitObjects = new List<DrawableHitObject>();
+            private readonly Container<SpeedAdjustmentContainer> speedAdjustments;
 
             private readonly Axes scrollingAxes;
 
@@ -182,8 +180,7 @@ namespace osu.Game.Rulesets.UI
             {
                 this.scrollingAxes = scrollingAxes;
 
-                // The following is never used - it only exists for the purpose of being able to use AddInternal below.
-                content = new Container<DrawableHitObject<TObject, TJudgement>>();
+                AddInternal(speedAdjustments = new Container<SpeedAdjustmentContainer> { RelativeSizeAxes = Axes.Both });
             }
 
             /// <summary>
@@ -195,15 +192,17 @@ namespace osu.Game.Rulesets.UI
                 speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
                 speedAdjustment.ScrollingAxes = scrollingAxes;
                 speedAdjustment.Reversed = Reversed;
-                AddInternal(speedAdjustment);
+                speedAdjustments.Add(speedAdjustment);
             }
+
+            public override IEnumerable<DrawableHitObject> Objects => speedAdjustments.SelectMany(s => s.Children);
 
             /// <summary>
             /// Adds a hit object to this <see cref="ScrollingHitObjectContainer"/>. The hit objects will be queued to be processed
             /// new <see cref="SpeedAdjustmentContainer"/>s are added to this <see cref="ScrollingHitObjectContainer"/>.
             /// </summary>
             /// <param name="hitObject">The hit object to add.</param>
-            public override void Add(DrawableHitObject<TObject, TJudgement> hitObject)
+            public override void Add(DrawableHitObject hitObject)
             {
                 if (!(hitObject is IScrollingHitObject))
                     throw new InvalidOperationException($"Hit objects added to a {nameof(ScrollingHitObjectContainer)} must implement {nameof(IScrollingHitObject)}.");
@@ -211,13 +210,7 @@ namespace osu.Game.Rulesets.UI
                 queuedHitObjects.Add(hitObject);
             }
 
-            public override bool Remove(DrawableHitObject<TObject, TJudgement> hitObject)
-            {
-                bool removed = InternalChildren.OfType<SpeedAdjustmentContainer>().Any(c => c.Remove(hitObject));
-                removed = removed || queuedHitObjects.Remove(hitObject);
-
-                return removed;
-            }
+            public override bool Remove(DrawableHitObject hitObject) => speedAdjustments.Any(s => s.Remove(hitObject)) || queuedHitObjects.Remove(hitObject);
 
             protected override void Update()
             {
@@ -246,7 +239,7 @@ namespace osu.Game.Rulesets.UI
             /// </summary>
             /// <param name="hitObject">The hit object to find the active <see cref="SpeedAdjustmentContainer"/> for.</param>
             /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="hitObject"/>'s start time. Null if there are no speed adjustments.</returns>
-            private SpeedAdjustmentContainer adjustmentContainerFor(DrawableHitObject hitObject) => InternalChildren.OfType<SpeedAdjustmentContainer>().FirstOrDefault(c => c.CanContain(hitObject)) ?? InternalChildren.OfType<SpeedAdjustmentContainer>().LastOrDefault();
+            private SpeedAdjustmentContainer adjustmentContainerFor(DrawableHitObject hitObject) => speedAdjustments.FirstOrDefault(c => c.CanContain(hitObject)) ?? speedAdjustments.LastOrDefault();
 
             /// <summary>
             /// Finds the <see cref="SpeedAdjustmentContainer"/> which provides the speed adjustment active at a time.
@@ -254,7 +247,7 @@ namespace osu.Game.Rulesets.UI
             /// </summary>
             /// <param name="time">The time to find the active <see cref="SpeedAdjustmentContainer"/> at.</param>
             /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="time"/>. Null if there are no speed adjustments.</returns>
-            private SpeedAdjustmentContainer adjustmentContainerAt(double time) => InternalChildren.OfType<SpeedAdjustmentContainer>().FirstOrDefault(c => c.CanContain(time)) ?? InternalChildren.OfType<SpeedAdjustmentContainer>().LastOrDefault();
+            private SpeedAdjustmentContainer adjustmentContainerAt(double time) => speedAdjustments.FirstOrDefault(c => c.CanContain(time)) ?? speedAdjustments.LastOrDefault();
         }
     }
 }
