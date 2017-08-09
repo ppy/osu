@@ -15,6 +15,10 @@ using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Input
 {
+    /// <summary>
+    /// Maps custom action data of type <see cref="T"/> and stores to <see cref="InputState.Data"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the custom action.</typeparam>
     public class ActionMappingInputManager<T> : PassThroughInputManager
         where T : struct
     {
@@ -22,6 +26,11 @@ namespace osu.Game.Input
 
         private readonly int? variant;
 
+        /// <summary>
+        /// Create a new instance.
+        /// </summary>
+        /// <param name="ruleset">A reference to identify the current <see cref="Ruleset"/>. Used to lookup mappings. Null for global mappings.</param>
+        /// <param name="variant">An optional variant for the specified <see cref="Ruleset"/>. Used when a ruleset has more than one possible keyboard layouts.</param>
         protected ActionMappingInputManager(RulesetInfo ruleset = null, int? variant = null)
         {
             this.ruleset = ruleset;
@@ -66,37 +75,5 @@ namespace osu.Game.Input
 
             return default(T);
         }
-    }
-
-    public class Binding
-    {
-        [ForeignKey(typeof(RulesetInfo))]
-        public int? RulesetID { get; set; }
-
-        [Indexed]
-        public int? Variant { get; set; }
-
-        public Key Key { get; set; }
-
-        public int Action { get; set; }
-    }
-
-    public class BindingStore : DatabaseBackedStore
-    {
-        public BindingStore(SQLiteConnection connection, Storage storage = null)
-            : base(connection, storage)
-        {
-        }
-
-        protected override void Prepare(bool reset = false)
-        {
-            Connection.CreateTable<Binding>();
-        }
-
-        protected override Type[] ValidTypes => new[]
-        {
-            typeof(Binding)
-        };
-
     }
 }
