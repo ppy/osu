@@ -2,12 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Drawables;
-using System;
-using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
