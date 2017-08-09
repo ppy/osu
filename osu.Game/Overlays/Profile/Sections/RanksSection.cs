@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 showMoreText.Show();
             }
 
-            public void ShowMore() => showMoreText.Alpha = Children.Where(d => !d.IsPresent).Where((d, i) => (d.Alpha = (i < 5 ? 1 : 0)) == 0).Any() ? 1 : 0;
+            public void ShowMore() => showMoreText.Alpha = Children.Where(d => !d.IsPresent).Where((d, i) => (d.Alpha = i < 5 ? 1 : 0) == 0).Any() ? 1 : 0;
         }
     }
 }
