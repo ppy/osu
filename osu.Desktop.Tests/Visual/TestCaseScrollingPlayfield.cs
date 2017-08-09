@@ -50,17 +50,27 @@ namespace osu.Desktop.Tests.Visual
 
             WorkingBeatmap beatmap = new TestWorkingBeatmap(b);
 
-            TestHitRenderer hitRenderer;
-            Add(hitRenderer = new TestHitRenderer(beatmap, true));
+            TestHitRenderer horizontalHitRenderer;
+            Add(horizontalHitRenderer = new TestHitRenderer(Axes.X, beatmap, true));
 
-            AddStep("Reverse direction", () => hitRenderer.Playfield.Reversed.Toggle());
+            TestHitRenderer verticalHitRenderer;
+            Add(verticalHitRenderer = new TestHitRenderer(Axes.Y, beatmap, true));
+
+            AddStep("Reverse direction", () =>
+            {
+                horizontalHitRenderer.Playfield.Reversed.Toggle();
+                verticalHitRenderer.Playfield.Reversed.Toggle();
+            });
         }
 
         private class TestHitRenderer : ScrollingHitRenderer<TestPlayfield, TestHitObject, TestJudgement>
         {
-            public TestHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            private readonly Axes scrollingAxes;
+
+            public TestHitRenderer(Axes scrollingAxes, WorkingBeatmap beatmap, bool isForCurrentRuleset)
                 : base(beatmap, isForCurrentRuleset)
             {
+                this.scrollingAxes = scrollingAxes;
             }
 
             public new TestPlayfield Playfield => base.Playfield;
@@ -69,9 +79,9 @@ namespace osu.Desktop.Tests.Visual
 
             protected override BeatmapConverter<TestHitObject> CreateBeatmapConverter() => new TestBeatmapConverter();
 
-            protected override Playfield<TestHitObject, TestJudgement> CreatePlayfield() => new TestPlayfield();
+            protected override Playfield<TestHitObject, TestJudgement> CreatePlayfield() => new TestPlayfield(scrollingAxes);
 
-            protected override DrawableHitObject<TestHitObject, TestJudgement> GetVisualRepresentation(TestHitObject h) => new DrawableTestHitObject(h);
+            protected override DrawableHitObject<TestHitObject, TestJudgement> GetVisualRepresentation(TestHitObject h) => new DrawableTestHitObject(scrollingAxes, h);
         }
 
         private class TestScoreProcessor : ScoreProcessor<TestHitObject, TestJudgement>
@@ -93,10 +103,14 @@ namespace osu.Desktop.Tests.Visual
 
         private class DrawableTestHitObject : DrawableScrollingHitObject<TestHitObject, TestJudgement>
         {
-            public DrawableTestHitObject(TestHitObject hitObject)
+            public DrawableTestHitObject(Axes scrollingAxes, TestHitObject hitObject)
                 : base(hitObject)
             {
-                Anchor = Anchor.CentreLeft;
+                if (scrollingAxes == Axes.Y)
+                    Anchor = Anchor.TopCentre;
+                else
+                    Anchor = Anchor.CentreLeft;
+
                 Origin = Anchor.Centre;
 
                 AutoSizeAxes = Axes.Both;
@@ -119,8 +133,8 @@ namespace osu.Desktop.Tests.Visual
             protected override Container<Drawable> Content => content;
             private readonly Container<Drawable> content;
 
-            public TestPlayfield()
-                : base(Axes.X)
+            public TestPlayfield(Axes scrollingAxes)
+                : base(scrollingAxes)
             {
                 InternalChildren = new Drawable[]
                 {
