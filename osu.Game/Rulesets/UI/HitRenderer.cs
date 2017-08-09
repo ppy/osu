@@ -67,9 +67,16 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected abstract bool AllObjectsJudged { get; }
 
-        internal HitRenderer()
+        protected readonly Ruleset Ruleset;
+
+        /// <summary>
+        /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
+        /// </summary>
+        /// <param name="ruleset">The ruleset being repesented.</param>
+        internal HitRenderer(Ruleset ruleset)
         {
-            KeyConversionInputManager = CreateKeyConversionInputManager();
+            Ruleset = ruleset;
+            KeyConversionInputManager = CreateActionMappingInputManager();
             KeyConversionInputManager.RelativeSizeAxes = Axes.Both;
         }
 
@@ -88,7 +95,7 @@ namespace osu.Game.Rulesets.UI
         /// Creates a key conversion input manager.
         /// </summary>
         /// <returns>The input manager.</returns>
-        protected virtual PassThroughInputManager CreateKeyConversionInputManager() => new PassThroughInputManager();
+        protected virtual PassThroughInputManager CreateActionMappingInputManager() => new PassThroughInputManager();
 
         protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
 
@@ -134,9 +141,10 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Creates a hit renderer for a beatmap.
         /// </summary>
+        /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        internal HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+        internal HitRenderer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset) : base(ruleset)
         {
             Debug.Assert(beatmap != null, "HitRenderer initialized with a null beatmap.");
 
@@ -236,10 +244,11 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Creates a hit renderer for a beatmap.
         /// </summary>
+        /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        protected HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(beatmap, isForCurrentRuleset)
+        protected HitRenderer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(ruleset, beatmap, isForCurrentRuleset)
         {
             InputManager.Add(content = new Container
             {
@@ -343,10 +352,11 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Creates a hit renderer for a beatmap.
         /// </summary>
+        /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        protected HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(beatmap, isForCurrentRuleset)
+        protected HitRenderer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(ruleset, beatmap, isForCurrentRuleset)
         {
         }
     }

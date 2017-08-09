@@ -17,12 +17,20 @@ namespace osu.Game.Input
     public class ActionMappingInputManager<T> : PassThroughInputManager
         where T : struct
     {
+        private readonly RulesetInfo ruleset;
+
+        protected ActionMappingInputManager(RulesetInfo ruleset = null)
+        {
+            this.ruleset = ruleset;
+        }
+
         protected IDictionary<Key, T> Mappings { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(BindingStore bindings)
         {
-            foreach (var b in bindings.Query<Binding>())
+            var rulesetId = ruleset?.ID;
+            foreach (var b in bindings.Query<Binding>(b => b.RulesetID == rulesetId))
                 Mappings[b.Key] = (T)(object)b.Action;
         }
 

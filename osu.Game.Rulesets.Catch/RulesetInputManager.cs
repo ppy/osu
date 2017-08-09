@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Catch
 {
     public class CatchInputManager : ActionMappingInputManager<CatchAction>
     {
-        public CatchInputManager()
+        public CatchInputManager(RulesetInfo ruleset) : base(ruleset)
         {
             Mappings = new Dictionary<Key, CatchAction>
             {
