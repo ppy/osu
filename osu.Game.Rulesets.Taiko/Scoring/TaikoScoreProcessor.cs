@@ -113,8 +113,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
         }
 
-        public TaikoScoreProcessor(HitRenderer<TaikoHitObject, TaikoJudgement> hitRenderer)
-            : base(hitRenderer)
+        public TaikoScoreProcessor(RulesetContainer<TaikoHitObject, TaikoJudgement> rulesetContainer)
+            : base(rulesetContainer)
         {
         }
 

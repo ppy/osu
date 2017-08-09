@@ -80,9 +80,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void PostProcess()
         {
-            connectionLayer.HitObjects = HitObjects.Children
+            connectionLayer.HitObjects = HitObjects.Objects
                 .Select(d => d.HitObject)
-                .OrderBy(h => h.StartTime);
+                .OrderBy(h => h.StartTime).OfType<OsuHitObject>();
         }
 
         public override void OnJudgement(DrawableHitObject<OsuHitObject, OsuJudgement> judgedObject)
