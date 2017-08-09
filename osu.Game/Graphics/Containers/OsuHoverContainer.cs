@@ -8,7 +8,6 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-
     public class OsuHoverContainer : OsuClickableContainer
     {
         private Color4 hoverColour;

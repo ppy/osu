@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Profile.Sections
             }
         }
 
-        private class ScoreFlowContainer : Container<DrawableScore>
+        public class ScoreFlowContainer : Container<DrawableScore>
         {
             private readonly FillFlowContainer<DrawableScore> scores;
             private readonly OsuClickableContainer showMoreText;
