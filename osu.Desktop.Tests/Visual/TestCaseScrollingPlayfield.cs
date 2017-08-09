@@ -24,8 +24,6 @@ namespace osu.Desktop.Tests.Visual
     /// </summary>
     public class TestCaseScrollingPlayfield : OsuTestCase
     {
-        private readonly TestHitRenderer hitRenderer;
-
         public TestCaseScrollingPlayfield()
         {
             Clock = new FramedClock();
@@ -52,6 +50,7 @@ namespace osu.Desktop.Tests.Visual
 
             WorkingBeatmap beatmap = new TestWorkingBeatmap(b);
 
+            TestHitRenderer hitRenderer;
             Add(hitRenderer = new TestHitRenderer(beatmap, true));
 
             AddStep("Reverse direction", () => hitRenderer.Playfield.Reversed.Value = !hitRenderer.Playfield.Reversed);
