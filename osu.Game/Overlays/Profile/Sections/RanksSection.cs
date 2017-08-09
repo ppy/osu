@@ -136,19 +136,6 @@ namespace osu.Game.Overlays.Profile.Sections
                             RelativeSizeAxes = Axes.X,
                             Direction = FillDirection.Vertical,
                         },
-                        showMoreText = new OsuHoverContainer
-                        {
-                            Action = ShowMore,
-                            AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Alpha = 0,
-                            Child = new OsuSpriteText
-                            {
-                                TextSize = 14,
-                                Text = "show more",
-                            }
-                        }
                     },
                 };
             }
@@ -156,7 +143,21 @@ namespace osu.Game.Overlays.Profile.Sections
             public override void Clear(bool disposeChildren)
             {
                 base.Clear(disposeChildren);
-                showMoreText.Show();
+                if (showMoreText == null)
+                    ((FillFlowContainer)InternalChild).Add(showMoreText = new OsuHoverContainer
+                    {
+                        Action = ShowMore,
+                        AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Child = new OsuSpriteText
+                        {
+                            TextSize = 14,
+                            Text = "show more",
+                        }
+                    });
+                else
+                    showMoreText.Show();
             }
 
             public void ShowMore() => showMoreText.Alpha = Children.Where(d => !d.IsPresent).Where((d, i) => (d.Alpha = i < 5 ? 1 : 0) == 0).Any() ? 1 : 0;

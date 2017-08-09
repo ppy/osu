@@ -16,13 +16,14 @@ using System.Collections.Generic;
 
 namespace osu.Desktop.Tests.Visual
 {
-    public class TestCaseUserRanks : TestCase
+    internal class TestCaseUserRanks : TestCase
     {
         public override string Description => "showing your latest achievements";
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             RanksSection ranks;
 
             Add(new Container
