@@ -17,15 +17,10 @@ namespace osu.Game.Rulesets.Timing
     /// </summary>
     public abstract class ScrollingContainer : Container<DrawableHitObject>
     {
-        private readonly BindableDouble visibleTimeRange = new BindableDouble { Default = 1000 };
         /// <summary>
         /// Gets or sets the range of time that is visible by the length of the scrolling axes.
         /// </summary>
-        public BindableDouble VisibleTimeRange
-        {
-            get { return visibleTimeRange; }
-            set { visibleTimeRange.BindTo(value); }
-        }
+        public readonly BindableDouble VisibleTimeRange = new BindableDouble { Default = 1000 };
 
         /// <summary>
         /// The axes through which this <see cref="ScrollingContainer"/> scrolls. This is set by the <see cref="SpeedAdjustmentContainer"/>.
