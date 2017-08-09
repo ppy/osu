@@ -106,11 +106,7 @@ namespace osu.Desktop.Tests.Visual
             public DrawableTestHitObject(Axes scrollingAxes, TestHitObject hitObject)
                 : base(hitObject)
             {
-                if (scrollingAxes == Axes.Y)
-                    Anchor = Anchor.TopCentre;
-                else
-                    Anchor = Anchor.CentreLeft;
-
+                Anchor = scrollingAxes == Axes.Y ? Anchor.TopCentre : Anchor.CentreLeft;
                 Origin = Anchor.Centre;
 
                 AutoSizeAxes = Axes.Both;
