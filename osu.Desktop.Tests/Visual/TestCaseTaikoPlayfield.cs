@@ -55,10 +55,7 @@ namespace osu.Desktop.Tests.Visual
             AddStep("Reset height", () => changePlayfieldSize(6));
 
             var controlPointInfo = new ControlPointInfo();
-            controlPointInfo.TimingPoints.Add(new TimingControlPoint
-            {
-                BeatLength = 200
-            });
+            controlPointInfo.TimingPoints.Add(new TimingControlPoint());
 
             WorkingBeatmap beatmap = new TestWorkingBeatmap(new Beatmap
             {
@@ -76,14 +73,14 @@ namespace osu.Desktop.Tests.Visual
                 ControlPointInfo = controlPointInfo
             });
 
-            var rateAdjustClock = new StopwatchClock(true) { Rate = 0.1 };
+            var rateAdjustClock = new StopwatchClock(true) { Rate = 1 };
 
             Add(playfieldContainer = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
-                Height = TaikoPlayfield.DEFAULT_HEIGHT,
+                Height = 768,
                 Clock = new FramedClock(rateAdjustClock),
                 Children = new[] { rulesetContainer = new TaikoRulesetContainer(null, beatmap, true) }
             });
