@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Input;
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Beatmaps;
@@ -12,7 +13,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override Playfield<OsuHitObject, OsuJudgement> CreatePlayfield() => new OsuPlayfield();
 
-        protected override KeyConversionInputManager CreateKeyConversionInputManager() => new OsuKeyConversionInputManager();
+        protected override PassThroughInputManager CreateKeyConversionInputManager() => new OsuKeyConversionInputManager();
 
         protected override DrawableHitObject<OsuHitObject, OsuJudgement> GetVisualRepresentation(OsuHitObject h)
         {

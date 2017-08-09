@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Input;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using OpenTK;
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The key conversion input manager for this HitRenderer.
         /// </summary>
-        protected readonly KeyConversionInputManager KeyConversionInputManager;
+        protected readonly PassThroughInputManager KeyConversionInputManager;
 
         /// <summary>
         /// Whether we are currently providing the local user a gameplay cursor.
@@ -87,7 +88,7 @@ namespace osu.Game.Rulesets.UI
         /// Creates a key conversion input manager.
         /// </summary>
         /// <returns>The input manager.</returns>
-        protected virtual KeyConversionInputManager CreateKeyConversionInputManager() => new KeyConversionInputManager();
+        protected virtual PassThroughInputManager CreateKeyConversionInputManager() => new PassThroughInputManager();
 
         protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
 
