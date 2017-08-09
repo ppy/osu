@@ -32,9 +32,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
-            RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
-
             Width = (float)HitObject.Duration;
 
             Container<DrawableDrumRollTick> tickContainer;
