@@ -10,6 +10,7 @@ using osu.Game.Database;
 using osu.Game.Rulesets;
 using OpenTK.Input;
 using SQLite.Net;
+using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Input
@@ -19,9 +20,12 @@ namespace osu.Game.Input
     {
         private readonly RulesetInfo ruleset;
 
-        protected ActionMappingInputManager(RulesetInfo ruleset = null)
+        private readonly int? variant;
+
+        protected ActionMappingInputManager(RulesetInfo ruleset = null, int? variant = null)
         {
             this.ruleset = ruleset;
+            this.variant = variant;
         }
 
         protected IDictionary<Key, T> Mappings { get; set; }
@@ -30,7 +34,7 @@ namespace osu.Game.Input
         private void load(BindingStore bindings)
         {
             var rulesetId = ruleset?.ID;
-            foreach (var b in bindings.Query<Binding>(b => b.RulesetID == rulesetId))
+            foreach (var b in bindings.Query<Binding>(b => b.RulesetID == rulesetId && b.Variant == variant))
                 Mappings[b.Key] = (T)(object)b.Action;
         }
 
@@ -68,6 +72,9 @@ namespace osu.Game.Input
     {
         [ForeignKey(typeof(RulesetInfo))]
         public int? RulesetID { get; set; }
+
+        [Indexed]
+        public int? Variant { get; set; }
 
         public Key Key { get; set; }
 
