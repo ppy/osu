@@ -178,6 +178,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                 }
             });
+
+            VisibleTimeRange.Value = 6000;
         }
 
         [BackgroundDependencyLoader]
