@@ -47,7 +47,7 @@ namespace osu.Desktop.VisualTests.Tests
                     Accuracy = 0.735,
                     PP = 666,
                     Date = DateTimeOffset.UtcNow,
-                    Mods = new Mod[] { new ModAutoplay(), new ModDoubleTime() },
+                    Mods = new Mod[] { new ModAutoplay(), new ModDoubleTime(), new OsuModEasy() },
                     Beatmap = new BeatmapInfo
                     {
                         Metadata = new BeatmapMetadata
