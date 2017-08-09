@@ -79,7 +79,7 @@ namespace osu.Game.Beatmaps
                         break;
                     case 3:
                         // Added MD5Hash column to BeatmapInfo
-                        Connection.CreateCommand("ALTER TABLE BeatmapInfo ADD COLUMN MD5Hash varchar").ExecuteNonQuery();
+                        Connection.MigrateTable<BeatmapInfo>();
                         break;
                 }
             }
