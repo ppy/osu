@@ -60,7 +60,7 @@
     <Compile Include="Objects\Fruit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\CatcherArea.cs" />
-    <Compile Include="UI\CatchHitRenderer.cs" />
+    <Compile Include="UI\CatchRulesetContainer.cs" />
     <Compile Include="UI\CatchPlayfield.cs" />
     <Compile Include="CatchRuleset.cs" />
     <Compile Include="Mods\CatchMod.cs" />

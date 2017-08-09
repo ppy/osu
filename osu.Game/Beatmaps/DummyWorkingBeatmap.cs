@@ -62,7 +62,7 @@ namespace osu.Game.Beatmaps
 
                 public override Mod GetAutoplayMod() => new ModAutoplay();
 
-                public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+                public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset)
                 {
                     throw new NotImplementedException();
                 }

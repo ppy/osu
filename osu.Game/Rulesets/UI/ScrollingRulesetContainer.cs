@@ -17,22 +17,22 @@ using osu.Game.Rulesets.Timing;
 namespace osu.Game.Rulesets.UI
 {
     /// <summary>
-    /// A type of <see cref="HitRenderer{TPlayfield, TObject, TJudgement}"/> that supports a <see cref="ScrollingPlayfield{TObject, TJudgement}"/>.
-    /// <see cref="HitObject"/>s inside this <see cref="HitRenderer{TPlayfield, TObject, TJudgement}"/> will scroll within the playfield.
+    /// A type of <see cref="RulesetContainer{TPlayfield,TObject,TJudgement}"/> that supports a <see cref="ScrollingPlayfield{TObject, TJudgement}"/>.
+    /// <see cref="HitObject"/>s inside this <see cref="RulesetContainer{TPlayfield,TObject,TJudgement}"/> will scroll within the playfield.
     /// </summary>
-    public abstract class ScrollingHitRenderer<TPlayfield, TObject, TJudgement> : HitRenderer<TPlayfield, TObject, TJudgement>
+    public abstract class ScrollingRulesetContainer<TPlayfield, TObject, TJudgement> : RulesetContainer<TPlayfield, TObject, TJudgement>
         where TObject : HitObject
         where TJudgement : Judgement
         where TPlayfield : ScrollingPlayfield<TObject, TJudgement>
     {
         /// <summary>
         /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
-        /// inside this <see cref="HitRenderer{TPlayfield, TObject, TJudgement}"/>.
+        /// inside this <see cref="RulesetContainer{TPlayfield,TObject,TJudgement}"/>.
         /// </summary>
         /// <returns></returns>
         protected readonly SortedList<MultiplierControlPoint> DefaultControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
-        protected ScrollingHitRenderer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+        protected ScrollingRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
         {
         }

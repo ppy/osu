@@ -88,25 +88,25 @@ namespace osu.Desktop.Tests.Visual
                     Clock = new FramedClock(),
                     Children = new Drawable[]
                     {
-                        new OsuHitRenderer(new OsuRuleset(new RulesetInfo()), beatmap, false)
+                        new OsuRulesetContainer(new OsuRuleset(new RulesetInfo()), beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft
                         },
-                        new TaikoHitRenderer(new TaikoRuleset(new RulesetInfo()),beatmap, false)
+                        new TaikoRulesetContainer(new TaikoRuleset(new RulesetInfo()),beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight
                         },
-                        new CatchHitRenderer(new CatchRuleset(new RulesetInfo()),beatmap, false)
+                        new CatchRulesetContainer(new CatchRuleset(new RulesetInfo()),beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft
                         },
-                        new ManiaHitRenderer(new ManiaRuleset(new RulesetInfo()),beatmap, false)
+                        new ManiaRulesetContainer(new ManiaRuleset(new RulesetInfo()),beatmap, false)
                         {
                             Scale = new Vector2(0.5f),
                             Anchor = Anchor.BottomRight,

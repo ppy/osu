@@ -16,9 +16,9 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuHitRenderer : HitRenderer<OsuHitObject, OsuJudgement>
+    public class OsuRulesetContainer : RulesetContainer<OsuHitObject, OsuJudgement>
     {
-        public OsuHitRenderer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+        public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
         {
         }

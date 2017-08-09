@@ -15,9 +15,9 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchHitRenderer : ScrollingHitRenderer<CatchPlayfield, CatchBaseHit, CatchJudgement>
+    public class CatchRulesetContainer : ScrollingRulesetContainer<CatchPlayfield, CatchBaseHit, CatchJudgement>
     {
-        public CatchHitRenderer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+        public CatchRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
         {
         }

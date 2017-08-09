@@ -338,9 +338,9 @@
     <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
     <Compile Include="Screens\Select\PlaySongSelect.cs" />
     <Compile Include="Screens\Select\SongSelect.cs" />
-    <Compile Include="Rulesets\UI\HitRenderer.cs" />
+    <Compile Include="Rulesets\UI\RulesetContainer.cs" />
     <Compile Include="Rulesets\UI\Playfield.cs" />
-    <Compile Include="Rulesets\UI\ScrollingHitRenderer.cs" />
+    <Compile Include="Rulesets\UI\ScrollingRulesetContainer.cs" />
     <Compile Include="Rulesets\UI\ScrollingPlayfield.cs" />
     <Compile Include="Screens\Select\EditSongSelect.cs" />
     <Compile Include="Screens\Play\HUD\ComboCounter.cs" />
