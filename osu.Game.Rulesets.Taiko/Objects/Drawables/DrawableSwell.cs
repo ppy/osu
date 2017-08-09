@@ -128,6 +128,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // We need to set this here because RelativeSizeAxes won't/can't set our size by default with a different RelativeChildSize
+            Width *= Parent.RelativeChildSize.X;
+        }
+
         protected override void CheckJudgement(bool userTriggered)
         {
             if (userTriggered)
