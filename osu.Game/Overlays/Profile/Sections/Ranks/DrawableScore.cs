@@ -12,12 +12,11 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Leaderboards;
 using System.Linq;
-using OpenTK.Graphics;
 using System.Diagnostics;
-using osu.Framework.Input;
 using osu.Framework.Localisation;
 using System.Globalization;
 using osu.Game.Rulesets.Scoring;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -72,7 +71,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Width = 60,
-                    Margin = new MarginPadding{ Right = 140 }
+                    Margin = new MarginPadding{ Right = 150 }
                 }
             };
         }
@@ -108,10 +107,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Font = "Exo2.0-RegularItalic",
             });
 
-            metadata.Add(new LinkContainer
+            metadata.Add(new OsuHoverContainer
             {
                 AutoSizeAxes = Axes.Both,
-                Url = $"https://osu.ppy.sh/beatmaps/{score.Beatmap.OnlineBeatmapID}",
+                Action = () => Process.Start($"https://osu.ppy.sh/beatmaps/{score.Beatmap.OnlineBeatmapID}"),
                 Child = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
@@ -135,7 +134,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             });
 
             foreach (Mod mod in score.Mods)
-                modContainer.Add(new ModIcon(mod.Icon, colour.Yellow));
+                modContainer.Add(new ModIcon(mod)
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Scale = new Vector2(0.5f),
+                });
         }
 
         private class ModContainer : FlowContainer<ModIcon>
@@ -148,62 +151,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             }
         }
 
-        private class ModIcon : Container
+        private class ModIcon : Rulesets.UI.ModIcon, IHasTooltip
         {
-            public ModIcon(FontAwesome icon, Color4 colour)
+            public ModIcon(Mod mod) : base(mod)
             {
-                AutoSizeAxes = Axes.Both;
-
-                Children = new[]
-                {
-                    new SpriteIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Icon = FontAwesome.fa_osu_mod_bg,
-                        Colour = colour,
-                        Shadow = true,
-                    },
-                    new SpriteIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Icon = icon,
-                        Colour = OsuColour.Gray(84),
-                        Position = new Vector2(0f, 2f),
-                    },
-                };
-            }
-        }
-
-        private class LinkContainer : OsuClickableContainer
-        {
-            public string Url;
-
-            private Color4 hoverColour;
-
-            public LinkContainer()
-            {
-                Action = () => Process.Start(Url);
+                TooltipText = mod.Name;
             }
 
-            protected override bool OnHover(InputState state)
-            {
-                this.FadeColour(hoverColour, 500, Easing.OutQuint);
-                return base.OnHover(state);
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                this.FadeColour(Color4.White, 500, Easing.OutQuint);
-                base.OnHoverLost(state);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                hoverColour = colours.Yellow;
-            }
+            public string TooltipText { get; }
         }
     }
 }

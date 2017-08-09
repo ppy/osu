@@ -1,17 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Scoring;
 using System;
+using System.Linq;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -84,6 +81,7 @@ namespace osu.Game.Overlays.Profile.Sections
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 60,
+                            Alpha = 0,
                         });
                         i++;
                     }
@@ -109,6 +107,7 @@ namespace osu.Game.Overlays.Profile.Sections
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 60,
+                            Alpha = 0,
                         });
                 }
                 first.ShowMore();
@@ -121,8 +120,6 @@ namespace osu.Game.Overlays.Profile.Sections
             private readonly OsuClickableContainer showMoreText;
 
             protected override Container<DrawableScore> Content => scores;
-
-            private int shownScores;
 
             public ScoreFlowContainer()
             {
@@ -139,7 +136,7 @@ namespace osu.Game.Overlays.Profile.Sections
                             RelativeSizeAxes = Axes.X,
                             Direction = FillDirection.Vertical,
                         },
-                        showMoreText = new ShowMoreContainer
+                        showMoreText = new OsuHoverContainer
                         {
                             Action = ShowMore,
                             AutoSizeAxes = Axes.Both,
@@ -159,41 +156,10 @@ namespace osu.Game.Overlays.Profile.Sections
             public override void Clear(bool disposeChildren)
             {
                 base.Clear(disposeChildren);
-                shownScores = 0;
                 showMoreText.Show();
             }
 
-            public void ShowMore()
-            {
-                shownScores = Math.Min(Children.Count, shownScores + 5);
-                int i = 0;
-                foreach(DrawableScore score in Children)
-                    score.FadeTo(i++ < shownScores ? 1 : 0);
-                showMoreText.FadeTo(shownScores == Children.Count ? 0 : 1);
-            }
-
-            private class ShowMoreContainer : OsuClickableContainer
-            {
-                private Color4 hoverColour;
-
-                protected override bool OnHover(InputState state)
-                {
-                    this.FadeColour(hoverColour, 500, Easing.OutQuint);
-                    return base.OnHover(state);
-                }
-
-                protected override void OnHoverLost(InputState state)
-                {
-                    this.FadeColour(Color4.White, 500, Easing.OutQuint);
-                    base.OnHoverLost(state);
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
-                {
-                    hoverColour = colours.Yellow;
-                }
-            }
+            public void ShowMore() => showMoreText.Alpha = Children.Where(d => !d.IsPresent).Where((d, i) => (d.Alpha = (i < 5 ? 1 : 0)) == 0).Any() ? 1 : 0;
         }
     }
 }
