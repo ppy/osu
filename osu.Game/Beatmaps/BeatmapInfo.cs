@@ -49,9 +49,10 @@ namespace osu.Game.Beatmaps
 
         public string Path { get; set; }
 
-        [JsonProperty("file_md5")]
+        [JsonProperty("file_sha2")]
         public string Hash { get; set; }
 
+        [JsonProperty("file_md5")]
         public string MD5Hash { get; set; }
 
         // General
