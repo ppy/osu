@@ -10,6 +10,25 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Input
 {
+    public enum ConcurrentActionMode
+    {
+        /// <summary>
+        /// One action can be actuated at once. The first action matching a chord will take precedence and no other action will be actuated until it has been released.
+        /// </summary>
+        None,
+        /// <summary>
+        /// Unique actions are allowed to be fired at the same time. There may therefore be more than one action in an actuated state at once.
+        /// If one action has multiple bindings, only the first will add actuation data, and the last to be released will add de-actuation data.
+        /// </summary>
+        UniqueActions,
+        /// <summary>
+        /// Both unique actions and the same action can be concurrently actuated.
+        /// Same as <see cref="UniqueActions"/>, but multiple bindings for the same action will individually add actuation and de-actuation data to events.
+        /// </summary>
+        UniqueAndSameActions,
+    }
+
+
     /// <summary>
     /// Maps custom action data of type <see cref="T"/> and stores to <see cref="InputState.Data"/>.
     /// </summary>
@@ -21,7 +40,7 @@ namespace osu.Game.Input
 
         private readonly int? variant;
 
-        private readonly bool allowConcurrentActions;
+        private readonly ConcurrentActionMode concurrencyMode;
 
         private readonly List<Binding> mappings = new List<Binding>();
 
@@ -30,12 +49,12 @@ namespace osu.Game.Input
         /// </summary>
         /// <param name="ruleset">A reference to identify the current <see cref="Ruleset"/>. Used to lookup mappings. Null for global mappings.</param>
         /// <param name="variant">An optional variant for the specified <see cref="Ruleset"/>. Used when a ruleset has more than one possible keyboard layouts.</param>
-        /// <param name="allowConcurrentActions">Allow concurrent actions to be actuated at once. Note that this disables chord bindings.</param>
-        protected ActionMappingInputManager(RulesetInfo ruleset = null, int? variant = null, bool allowConcurrentActions = false)
+        /// <param name="concurrencyMode">Specify how to deal with multiple matches of combinations and actions.</param>
+        protected ActionMappingInputManager(RulesetInfo ruleset = null, int? variant = null, ConcurrentActionMode concurrencyMode = ConcurrentActionMode.None)
         {
             this.ruleset = ruleset;
             this.variant = variant;
-            this.allowConcurrentActions = allowConcurrentActions;
+            this.concurrencyMode = concurrencyMode;
         }
 
         protected abstract IDictionary<KeyCombination, T> CreateDefaultMappings();
@@ -64,7 +83,7 @@ namespace osu.Game.Input
                     mappings.Add(b);
             }
 
-            if (allowConcurrentActions)
+            if (concurrencyMode > ConcurrentActionMode.None)
             {
                 // ensure we have no overlapping bindings.
                 foreach (var m in mappings)
@@ -77,15 +96,17 @@ namespace osu.Game.Input
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (!args.Repeat && (allowConcurrentActions || pressedBindings.Count == 0))
+            if (!args.Repeat && (concurrencyMode > ConcurrentActionMode.None || pressedBindings.Count == 0))
             {
                 Binding validBinding;
 
-                if ((validBinding = mappings.Except(pressedBindings).LastOrDefault(m => m.Keys.CheckValid(state.Keyboard.Keys, !allowConcurrentActions))) != null)
+                if ((validBinding = mappings.Except(pressedBindings).LastOrDefault(m => m.Keys.CheckValid(state.Keyboard.Keys, concurrencyMode == ConcurrentActionMode.None))) != null)
                 {
+                    if (concurrencyMode == ConcurrentActionMode.UniqueAndSameActions || pressedBindings.All(p => p.Action != validBinding.Action))
+                        state.Data = validBinding.GetAction<T>();
+
                     // store both the pressed combination and the resulting action, just in case the assignments change while we are actuated.
                     pressedBindings.Add(validBinding);
-                    state.Data = validBinding.GetAction<T>();
                 }
             }
 
@@ -96,13 +117,14 @@ namespace osu.Game.Input
         {
             foreach (var binding in pressedBindings.ToList())
             {
-                if (!binding.Keys.CheckValid(state.Keyboard.Keys, !allowConcurrentActions))
+                if (!binding.Keys.CheckValid(state.Keyboard.Keys, concurrencyMode == ConcurrentActionMode.None))
                 {
-                    // set data as KeyUp.
-                    state.Data = binding.GetAction<T>();
-
-                    // and clear the no-longer-valid combination/action.
+                    // clear the no-longer-valid combination/action.
                     pressedBindings.Remove(binding);
+
+                    if (concurrencyMode == ConcurrentActionMode.UniqueAndSameActions || pressedBindings.All(p => p.Action != binding.Action))
+                        // set data as KeyUp if we're all done with this action.
+                        state.Data = binding.GetAction<T>();
                 }
             }
 
