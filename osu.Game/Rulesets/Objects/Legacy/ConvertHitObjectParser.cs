@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         public override HitObject Parse(string text)
         {
             string[] split = text.Split(',');
+            if (split.Length > 11)
+                throw new InvalidOperationException("One or more hit objects were malformed.");
+
             ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]) & ~ConvertHitObjectType.ColourHax;
             bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
             type &= ~ConvertHitObjectType.NewCombo;
