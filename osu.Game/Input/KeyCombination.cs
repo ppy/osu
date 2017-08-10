@@ -30,7 +30,13 @@ namespace osu.Game.Input
             Keys = stringRepresentation.Split(',').Select(s => (Key)int.Parse(s));
         }
 
-        public bool CheckValid(IEnumerable<Key> keys) => !Keys.Except(keys).Any();
+        public bool CheckValid(IEnumerable<Key> keys, bool requireExactMatch = false)
+        {
+            if (requireExactMatch)
+                return Keys.SequenceEqual(keys);
+            else
+                return !Keys.Except(keys).Any();
+        }
 
         public bool Equals(KeyCombination other)
         {
