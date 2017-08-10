@@ -27,7 +27,9 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<OsuLegacyDecoder>(@"osu file format v7");
             AddDecoder<OsuLegacyDecoder>(@"osu file format v6");
             AddDecoder<OsuLegacyDecoder>(@"osu file format v5");
-            // TODO: Not sure how far back to go, or differences between versions
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v4");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v3");
+            // TODO: differences between versions
         }
 
         private ConvertHitObjectParser parser;
