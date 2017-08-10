@@ -12,6 +12,10 @@ namespace osu.Game.Input
         {
             { Key.F8, OsuAction.ToggleChat },
             { Key.F9, OsuAction.ToggleSocial },
+            { new[] { Key.LControl, Key.LAlt, Key.R }, OsuAction.ResetInputSettings },
+            { new[] { Key.LControl, Key.T }, OsuAction.ToggleToolbar },
+            { new[] { Key.LControl, Key.O }, OsuAction.ToggleSettings },
+            { new[] { Key.LControl, Key.D }, OsuAction.ToggleDirect },
         };
     }
 }
