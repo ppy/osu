@@ -8,15 +8,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Input;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class GameplayCursor : CursorContainer
+    public class GameplayCursor : CursorContainer, IHandleActions<OsuAction>
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 
@@ -26,40 +26,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         }
 
         private int downCount;
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (state.Data is OsuAction)
-            {
-                switch ((OsuAction)state.Data)
-                {
-                    case OsuAction.LeftButton:
-                    case OsuAction.RightButton:
-                        downCount++;
-                        ActiveCursor.ScaleTo(1).ScaleTo(1.2f, 100, Easing.OutQuad);
-                        break;
-                }
-            }
-
-            return false;
-        }
-
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
-        {
-            if (state.Data is OsuAction)
-            {
-                switch ((OsuAction)state.Data)
-                {
-                    case OsuAction.LeftButton:
-                    case OsuAction.RightButton:
-                        if (--downCount == 0)
-                            ActiveCursor.ScaleTo(1, 200, Easing.OutQuad);
-                        break;
-                }
-            }
-
-            return false;
-        }
 
         public class OsuCursor : Container
         {
@@ -164,6 +130,34 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 cursorContainer.Scale = new Vector2(scale);
             }
+        }
+
+        public bool OnPressed(OsuAction action)
+        {
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                case OsuAction.RightButton:
+                    downCount++;
+                    ActiveCursor.ScaleTo(1).ScaleTo(1.2f, 100, Easing.OutQuad);
+                    break;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(OsuAction action)
+        {
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                case OsuAction.RightButton:
+                    if (--downCount == 0)
+                        ActiveCursor.ScaleTo(1, 200, Easing.OutQuad);
+                    break;
+            }
+
+            return false;
         }
     }
 }

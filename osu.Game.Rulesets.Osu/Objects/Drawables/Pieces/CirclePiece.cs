@@ -7,12 +7,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
+using osu.Game.Input;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class CirclePiece : Container
+    public class CirclePiece : Container, IHandleActions<OsuAction>
     {
         private readonly Sprite disc;
 
@@ -49,19 +49,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             disc.Texture = textures.Get(@"Play/osu/disc");
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public bool OnPressed(OsuAction action)
         {
-            if (state.Data is OsuAction)
+            switch (action)
             {
-                switch ((OsuAction)state.Data)
-                {
-                    case OsuAction.LeftButton:
-                    case OsuAction.RightButton:
-                        return IsHovered && (Hit?.Invoke() ?? false);
-                }
+                case OsuAction.LeftButton:
+                case OsuAction.RightButton:
+                    return IsHovered && (Hit?.Invoke() ?? false);
             }
 
             return false;
         }
+
+        public bool OnReleased(OsuAction action) => false;
     }
 }

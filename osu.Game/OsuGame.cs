@@ -168,7 +168,7 @@ namespace osu.Game
                 volume = new VolumeControl(),
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 new OnScreenDisplay(),
-                new GlobalHotkeys //exists because UserInputManager is at a level below us.
+                new Input.GlobalHotkeys //exists because UserInputManager is at a level below us.
                 {
                     Handler = globalHotkeyPressed
                 }
@@ -251,39 +251,36 @@ namespace osu.Game
             Cursor.State = Visibility.Hidden;
         }
 
-        private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
+        private bool globalHotkeyPressed(GlobalAction action)
         {
-            if (args.Repeat || intro == null) return false;
+            if (intro == null) return false;
 
-            if (state.Data is GlobalAction)
+            switch (action)
             {
-                switch ((GlobalAction)state.Data)
-                {
-                    case GlobalAction.ToggleChat:
-                        chat.ToggleVisibility();
-                        return true;
-                    case GlobalAction.ToggleSocial:
-                        social.ToggleVisibility();
-                        return true;
-                    case GlobalAction.ResetInputSettings:
-                        var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
+                case GlobalAction.ToggleChat:
+                    chat.ToggleVisibility();
+                    return true;
+                case GlobalAction.ToggleSocial:
+                    social.ToggleVisibility();
+                    return true;
+                case GlobalAction.ResetInputSettings:
+                    var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
-                        sensitivity.Disabled = false;
-                        sensitivity.Value = 1;
-                        sensitivity.Disabled = true;
+                    sensitivity.Disabled = false;
+                    sensitivity.Value = 1;
+                    sensitivity.Disabled = true;
 
-                        frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
-                        return true;
-                    case GlobalAction.ToggleToolbar:
-                        Toolbar.ToggleVisibility();
-                        return true;
-                    case GlobalAction.ToggleSettings:
-                        settings.ToggleVisibility();
-                        return true;
-                    case GlobalAction.ToggleDirect:
-                        direct.ToggleVisibility();
-                        return true;
-                }
+                    frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
+                    return true;
+                case GlobalAction.ToggleToolbar:
+                    Toolbar.ToggleVisibility();
+                    return true;
+                case GlobalAction.ToggleSettings:
+                    settings.ToggleVisibility();
+                    return true;
+                case GlobalAction.ToggleDirect:
+                    direct.ToggleVisibility();
+                    return true;
             }
 
             return false;
