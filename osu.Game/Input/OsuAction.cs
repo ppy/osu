@@ -6,6 +6,10 @@ namespace osu.Game.Input
     public enum OsuAction
     {
         ToggleChat,
-        ToggleSocial
+        ToggleSocial,
+        ResetInputSettings,
+        ToggleToolbar,
+        ToggleSettings,
+        ToggleDirect
     }
 }

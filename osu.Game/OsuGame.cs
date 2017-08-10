@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Framework.Input;
-using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
@@ -266,36 +265,22 @@ namespace osu.Game
                     case OsuAction.ToggleSocial:
                         social.ToggleVisibility();
                         return true;
-                }
-            }
+                    case OsuAction.ResetInputSettings:
+                        var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
-            if (state.Keyboard.ControlPressed)
-            {
-                switch (args.Key)
-                {
-                    case Key.R:
-                        if (state.Keyboard.AltPressed)
-                        {
-                            var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
+                        sensitivity.Disabled = false;
+                        sensitivity.Value = 1;
+                        sensitivity.Disabled = true;
 
-                            sensitivity.Disabled = false;
-                            sensitivity.Value = 1;
-                            sensitivity.Disabled = true;
-
-                            frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
-                            return true;
-                        }
-                        break;
-                    case Key.T:
+                        frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
+                        return true;
+                    case OsuAction.ToggleToolbar:
                         Toolbar.ToggleVisibility();
                         return true;
-                    case Key.O:
+                    case OsuAction.ToggleSettings:
                         settings.ToggleVisibility();
                         return true;
-                    case Key.D:
-                        if (state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
-                            return false;
-
+                    case OsuAction.ToggleDirect:
                         direct.ToggleVisibility();
                         return true;
                 }

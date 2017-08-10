@@ -53,6 +53,8 @@ namespace osu.Game.Input
 
         public static implicit operator KeyCombination(string stringRepresentation) => new KeyCombination(stringRepresentation);
 
+        public static implicit operator KeyCombination(Key[] keys) => new KeyCombination(keys);
+
         public override string ToString() => Keys.Select(k => ((int)k).ToString()).Aggregate((s1, s2) => $"{s1},{s2}");
     }
 }
