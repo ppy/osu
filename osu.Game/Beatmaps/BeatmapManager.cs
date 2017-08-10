@@ -307,10 +307,11 @@ namespace osu.Game.Beatmaps
         /// <returns>The imported beatmap, or an existing instance if it is already present.</returns>
         private BeatmapSetInfo importToStorage(ArchiveReader reader)
         {
+            string mapName;
             // let's make sure there are actually .osu files to import.
             try
             {
-                string mapName = reader.Filenames.First(f => f.EndsWith(".osu"));
+                mapName = reader.Filenames.First(f => f.EndsWith(".osu"));
             }
             catch
             {
@@ -349,7 +350,7 @@ namespace osu.Game.Beatmaps
 
             BeatmapMetadata metadata;
 
-            using (var stream = new StreamReader(reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu")))))
+            using (var stream = new StreamReader(reader.GetStream(mapName)))
                 metadata = BeatmapDecoder.GetDecoder(stream).Decode(stream).Metadata;
 
             beatmapSet = new BeatmapSetInfo
