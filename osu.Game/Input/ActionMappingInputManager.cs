@@ -81,7 +81,7 @@ namespace osu.Game.Input
             {
                 Binding validBinding;
 
-                if ((validBinding = mappings.Except(pressedBindings).LastOrDefault(m => m.Keys.CheckValid(state.Keyboard.Keys))) != null)
+                if ((validBinding = mappings.Except(pressedBindings).LastOrDefault(m => m.Keys.CheckValid(state.Keyboard.Keys, !allowConcurrentActions))) != null)
                 {
                     // store both the pressed combination and the resulting action, just in case the assignments change while we are actuated.
                     pressedBindings.Add(validBinding);
@@ -96,7 +96,7 @@ namespace osu.Game.Input
         {
             foreach (var binding in pressedBindings.ToList())
             {
-                if (!binding.Keys.CheckValid(state.Keyboard.Keys))
+                if (!binding.Keys.CheckValid(state.Keyboard.Keys, !allowConcurrentActions))
                 {
                     // set data as KeyUp.
                     state.Data = binding.GetAction<T>();
