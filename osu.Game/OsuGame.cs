@@ -255,17 +255,17 @@ namespace osu.Game
         {
             if (args.Repeat || intro == null) return false;
 
-            if (state.Data is OsuAction)
+            if (state.Data is GlobalAction)
             {
-                switch ((OsuAction)state.Data)
+                switch ((GlobalAction)state.Data)
                 {
-                    case OsuAction.ToggleChat:
+                    case GlobalAction.ToggleChat:
                         chat.ToggleVisibility();
                         return true;
-                    case OsuAction.ToggleSocial:
+                    case GlobalAction.ToggleSocial:
                         social.ToggleVisibility();
                         return true;
-                    case OsuAction.ResetInputSettings:
+                    case GlobalAction.ResetInputSettings:
                         var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
                         sensitivity.Disabled = false;
@@ -274,13 +274,13 @@ namespace osu.Game
 
                         frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
                         return true;
-                    case OsuAction.ToggleToolbar:
+                    case GlobalAction.ToggleToolbar:
                         Toolbar.ToggleVisibility();
                         return true;
-                    case OsuAction.ToggleSettings:
+                    case GlobalAction.ToggleSettings:
                         settings.ToggleVisibility();
                         return true;
-                    case OsuAction.ToggleDirect:
+                    case GlobalAction.ToggleDirect:
                         direct.ToggleVisibility();
                         return true;
                 }
