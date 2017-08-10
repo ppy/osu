@@ -307,6 +307,16 @@ namespace osu.Game.Beatmaps
         /// <returns>The imported beatmap, or an existing instance if it is already present.</returns>
         private BeatmapSetInfo importToStorage(ArchiveReader reader)
         {
+            // let's make sure there are actually .osu files to import.
+            try
+            {
+                string mapName = reader.Filenames.First(f => f.EndsWith(".osu"));
+            }
+            catch
+            {
+                throw new InvalidOperationException("No beatmap files found in the map folder.");
+            }
+
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
             foreach (string file in reader.Filenames.Where(f => f.EndsWith(".osu")))
