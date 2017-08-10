@@ -30,7 +30,7 @@ namespace osu.Game.Input
         /// </summary>
         /// <param name="ruleset">A reference to identify the current <see cref="Ruleset"/>. Used to lookup mappings. Null for global mappings.</param>
         /// <param name="variant">An optional variant for the specified <see cref="Ruleset"/>. Used when a ruleset has more than one possible keyboard layouts.</param>
-        /// <param name="concurrencyMode">Specify how to deal with multiple matches of combinations and actions.</param>
+        /// <param name="concurrencyMode">Specify how to deal with multiple matches of <see cref="KeyCombination"/>s and <see cref="T"/>s.</param>
         protected ActionMappingInputManager(RulesetInfo ruleset = null, int? variant = null, ConcurrentActionMode concurrencyMode = ConcurrentActionMode.None)
         {
             this.ruleset = ruleset;
@@ -114,17 +114,19 @@ namespace osu.Game.Input
     public enum ConcurrentActionMode
     {
         /// <summary>
-        /// One action can be actuated at once. The first action matching a chord will take precedence and no other action will be actuated until it has been released.
+        /// One action can be pressed at once. The first action matching a chord will take precedence and no other action will be pressed until it has first been released.
         /// </summary>
         None,
         /// <summary>
-        /// Unique actions are allowed to be fired at the same time. There may therefore be more than one action in an actuated state at once.
-        /// If one action has multiple bindings, only the first will add actuation data, and the last to be released will add de-actuation data.
+        /// Unique actions are allowed to be pressed at the same time. There may therefore be more than one action in an actuated state at once.
+        /// If one action has multiple bindings, only the first will trigger an <see cref="IHandleActions{T}.OnPressed"/>.
+        /// The last binding to be released will trigger an <see cref="IHandleActions{T}.OnReleased(T)"/>.
         /// </summary>
         UniqueActions,
         /// <summary>
-        /// Both unique actions and the same action can be concurrently actuated.
-        /// Same as <see cref="UniqueActions"/>, but multiple bindings for the same action will individually add actuation and de-actuation data to events.
+        /// Unique actions are allowed to be pressed at the same time. There may therefore be more than one action in an actuated state at once (same as <see cref="UniqueActions"/>).
+        /// In addition to this, multiple <see cref="IHandleActions{T}.OnPressed"/> are fired for single actions, even if <see cref="IHandleActions{T}.OnReleased(T)"/> has not yet been fired.
+        /// The same goes for <see cref="IHandleActions{T}.OnReleased(T)"/>, which is fired for each matching binding that is released.
         /// </summary>
         UniqueAndSameActions,
     }
