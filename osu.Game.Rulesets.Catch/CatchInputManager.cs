@@ -9,11 +9,11 @@ namespace osu.Game.Rulesets.Catch
 {
     public class CatchInputManager : ActionMappingInputManager<CatchAction>
     {
-        public CatchInputManager(RulesetInfo ruleset) : base(ruleset)
+        public CatchInputManager(RulesetInfo ruleset) : base(ruleset, allowConcurrentActions: true)
         {
         }
 
-        protected override IDictionary<Key, CatchAction> CreateDefaultMappings() => new Dictionary<Key, CatchAction>
+        protected override IDictionary<KeyCombination, CatchAction> CreateDefaultMappings() => new Dictionary<KeyCombination, CatchAction>
         {
             { Key.Z, CatchAction.MoveLeft },
             { Key.Left, CatchAction.MoveLeft },

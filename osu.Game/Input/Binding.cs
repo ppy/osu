@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets;
-using OpenTK.Input;
 using SQLite.Net.Attributes;
 using SQLiteNetExtensions.Attributes;
 
@@ -16,8 +15,31 @@ namespace osu.Game.Input
         [Indexed]
         public int? Variant { get; set; }
 
-        public Key Key { get; set; }
+        [Column("Keys")]
+        public string KeysString
+        {
+            get { return Keys.ToString(); }
+            set { Keys = value; }
+        }
 
-        public int Action { get; set; }
+        [Ignore]
+        public KeyCombination Keys { get; private set; }
+
+        public int Action { get; private set; }
+
+        public Binding()
+        {
+
+        }
+
+        public Binding(KeyCombination keys, object action)
+        {
+            Keys = keys;
+            Action = (int)action;
+        }
+
+        public virtual T GetAction<T>() => (T)(object)Action;
+
+        public override string ToString() => $"{KeysString}=>{Action}";
     }
 }

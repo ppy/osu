@@ -94,6 +94,7 @@
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
     <Compile Include="Input\Binding.cs" />
     <Compile Include="Input\BindingStore.cs" />
+    <Compile Include="Input\KeyCombination.cs" />
     <Compile Include="Input\OsuAction.cs" />
     <Compile Include="Input\GlobalActionMappingInputManager.cs" />
     <Compile Include="IO\FileStore.cs" />

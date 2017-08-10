@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input;
 using osu.Game.Rulesets;
-using OpenTK.Input;
 
 namespace osu.Game.Input
 {
@@ -21,58 +21,92 @@ namespace osu.Game.Input
 
         private readonly int? variant;
 
+        private readonly bool allowConcurrentActions;
+
+        private readonly List<Binding> mappings = new List<Binding>();
+
         /// <summary>
         /// Create a new instance.
         /// </summary>
         /// <param name="ruleset">A reference to identify the current <see cref="Ruleset"/>. Used to lookup mappings. Null for global mappings.</param>
         /// <param name="variant">An optional variant for the specified <see cref="Ruleset"/>. Used when a ruleset has more than one possible keyboard layouts.</param>
-        protected ActionMappingInputManager(RulesetInfo ruleset = null, int? variant = null)
+        /// <param name="allowConcurrentActions">Allow concurrent actions to be actuated at once. Note that this disables chord bindings.</param>
+        protected ActionMappingInputManager(RulesetInfo ruleset = null, int? variant = null, bool allowConcurrentActions = false)
         {
             this.ruleset = ruleset;
             this.variant = variant;
-
-            Mappings = CreateDefaultMappings();
+            this.allowConcurrentActions = allowConcurrentActions;
         }
 
-        protected IDictionary<Key, T> Mappings { get; private set; }
+        protected abstract IDictionary<KeyCombination, T> CreateDefaultMappings();
 
-        protected abstract IDictionary<Key, T> CreateDefaultMappings();
+        private BindingStore store;
 
         [BackgroundDependencyLoader]
         private void load(BindingStore bindings)
         {
-            var rulesetId = ruleset?.ID;
-            foreach (var b in bindings.Query<Binding>(b => b.RulesetID == rulesetId && b.Variant == variant))
-                Mappings[b.Key] = (T)(object)b.Action;
+            store = bindings;
+            ReloadMappings();
         }
+
+        protected void ReloadMappings()
+        {
+            var rulesetId = ruleset?.ID;
+
+            mappings.Clear();
+
+            foreach (var kvp in CreateDefaultMappings())
+                mappings.Add(new Binding(kvp.Key, kvp.Value));
+
+            if (store != null)
+            {
+                foreach (var b in store.Query<Binding>(b => b.RulesetID == rulesetId && b.Variant == variant))
+                    mappings.Add(b);
+            }
+
+            if (allowConcurrentActions)
+            {
+                // ensure we have no overlapping bindings.
+                foreach (var m in mappings)
+                    foreach (var colliding in mappings.Where(k => !k.Keys.Equals(m.Keys) && k.Keys.CheckValid(m.Keys.Keys)))
+                        throw new InvalidOperationException($"Multiple partially overlapping bindings are not supported ({m} and {colliding} are colliding)!");
+            }
+        }
+
+        private readonly List<Binding> pressedBindings = new List<Binding>();
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            mapKey(state, args.Key);
+            if (!args.Repeat && (allowConcurrentActions || pressedBindings.Count == 0))
+            {
+                Binding validBinding;
+
+                if ((validBinding = mappings.Except(pressedBindings).LastOrDefault(m => m.Keys.CheckValid(state.Keyboard.Keys))) != null)
+                {
+                    // store both the pressed combination and the resulting action, just in case the assignments change while we are actuated.
+                    pressedBindings.Add(validBinding);
+                    state.Data = validBinding.GetAction<T>();
+                }
+            }
+
             return base.OnKeyDown(state, args);
         }
 
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
-            mapKey(state, args.Key);
+            foreach (var binding in pressedBindings.ToList())
+            {
+                if (!binding.Keys.CheckValid(state.Keyboard.Keys))
+                {
+                    // set data as KeyUp.
+                    state.Data = binding.GetAction<T>();
+
+                    // and clear the no-longer-valid combination/action.
+                    pressedBindings.Remove(binding);
+                }
+            }
+
             return base.OnKeyUp(state, args);
-        }
-
-        private void mapKey(InputState state, Key key)
-        {
-            T mappedData;
-            if (Mappings.TryGetValue(key, out mappedData))
-                state.Data = mappedData;
-        }
-
-        private T parseStringRepresentation(string str)
-        {
-            T res;
-
-            if (Enum.TryParse(str, out res))
-                return res;
-
-            return default(T);
         }
     }
 }
