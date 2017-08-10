@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace osu.Game.Input
 {
-    public enum OsuAction
+    public enum GlobalAction
     {
         [Description("Toggle chat overlay")]
         ToggleChat,

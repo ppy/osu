@@ -6,16 +6,16 @@ using System.Collections.Generic;
 
 namespace osu.Game.Input
 {
-    public class GlobalActionMappingInputManager : ActionMappingInputManager<OsuAction>
+    public class GlobalActionMappingInputManager : ActionMappingInputManager<GlobalAction>
     {
-        protected override IDictionary<KeyCombination, OsuAction> CreateDefaultMappings() => new Dictionary<KeyCombination, OsuAction>
+        protected override IDictionary<KeyCombination, GlobalAction> CreateDefaultMappings() => new Dictionary<KeyCombination, GlobalAction>
         {
-            { Key.F8, OsuAction.ToggleChat },
-            { Key.F9, OsuAction.ToggleSocial },
-            { new[] { Key.LControl, Key.LAlt, Key.R }, OsuAction.ResetInputSettings },
-            { new[] { Key.LControl, Key.T }, OsuAction.ToggleToolbar },
-            { new[] { Key.LControl, Key.O }, OsuAction.ToggleSettings },
-            { new[] { Key.LControl, Key.D }, OsuAction.ToggleDirect },
+            { Key.F8, GlobalAction.ToggleChat },
+            { Key.F9, GlobalAction.ToggleSocial },
+            { new[] { Key.LControl, Key.LAlt, Key.R }, GlobalAction.ResetInputSettings },
+            { new[] { Key.LControl, Key.T }, GlobalAction.ToggleToolbar },
+            { new[] { Key.LControl, Key.O }, GlobalAction.ToggleSettings },
+            { new[] { Key.LControl, Key.D }, GlobalAction.ToggleDirect },
         };
     }
 }
