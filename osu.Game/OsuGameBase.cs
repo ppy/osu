@@ -187,7 +187,7 @@ namespace osu.Game
                 Children = new Drawable[]
                 {
                     Cursor = new MenuCursor(),
-                    new GlobalActionMappingInputManager
+                    new GlobalActionMappingInputManager(this)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = new OsuTooltipContainer(Cursor)

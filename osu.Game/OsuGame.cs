@@ -29,7 +29,7 @@ using osu.Game.Input;
 
 namespace osu.Game
 {
-    public class OsuGame : OsuGameBase
+    public class OsuGame : OsuGameBase, IHandleActions<GlobalAction>
     {
         public Toolbar Toolbar;
 
@@ -168,10 +168,6 @@ namespace osu.Game
                 volume = new VolumeControl(),
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 new OnScreenDisplay(),
-                new Input.GlobalHotkeys //exists because UserInputManager is at a level below us.
-                {
-                    Handler = globalHotkeyPressed
-                }
             });
 
             LoadComponentAsync(screenStack = new Loader(), d =>
@@ -251,7 +247,7 @@ namespace osu.Game
             Cursor.State = Visibility.Hidden;
         }
 
-        private bool globalHotkeyPressed(GlobalAction action)
+        public bool OnPressed(GlobalAction action)
         {
             if (intro == null) return false;
 
@@ -285,6 +281,8 @@ namespace osu.Game
 
             return false;
         }
+
+        public bool OnReleased(GlobalAction action) => false;
 
         public event Action<Screen> ScreenChanged;
 
