@@ -49,9 +49,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             disc.Texture = textures.Get(@"Play/osu/disc");
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            return Hit?.Invoke() ?? false;
+            if (state.Data is OsuAction)
+            {
+                switch ((OsuAction)state.Data)
+                {
+                    case OsuAction.LeftButton:
+                    case OsuAction.RightButton:
+                        return IsHovered && (Hit?.Invoke() ?? false);
+                }
+            }
+
+            return false;
         }
     }
 }

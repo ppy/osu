@@ -94,7 +94,7 @@ namespace osu.Game.Input
 
         private readonly List<Binding> pressedBindings = new List<Binding>();
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override void PopulateDataKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!args.Repeat && (concurrencyMode > ConcurrentActionMode.None || pressedBindings.Count == 0))
             {
@@ -109,11 +109,9 @@ namespace osu.Game.Input
                     pressedBindings.Add(validBinding);
                 }
             }
-
-            return base.OnKeyDown(state, args);
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        protected override void PopulateDataKeyUp(InputState state, KeyUpEventArgs args)
         {
             foreach (var binding in pressedBindings.ToList())
             {
@@ -127,8 +125,6 @@ namespace osu.Game.Input
                         state.Data = binding.GetAction<T>();
                 }
             }
-
-            return base.OnKeyUp(state, args);
         }
     }
 }
