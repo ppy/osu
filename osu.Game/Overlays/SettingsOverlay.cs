@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -12,11 +13,10 @@ using osu.Framework.Input;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsOverlay : OsuFocusedOverlayContainer
+    public abstract class SettingsOverlay : OsuFocusedOverlayContainer
     {
         internal const float CONTENT_MARGINS = 10;
 
@@ -38,27 +38,19 @@ namespace osu.Game.Overlays
 
         private Func<float> getToolbarHeight;
 
-        public SettingsOverlay()
+        protected SettingsOverlay()
         {
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
         }
 
+        protected abstract IEnumerable<SettingsSection> CreateSections();
+
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGame game)
         {
-            var sections = new SettingsSection[]
-            {
-                new GeneralSection(),
-                new GraphicsSection(),
-                new GameplaySection(),
-                new AudioSection(),
-                new SkinSection(),
-                new InputSection(),
-                new OnlineSection(),
-                new MaintenanceSection(),
-                new DebugSection(),
-            };
+            var sections = CreateSections().ToList();
+
             Children = new Drawable[]
             {
                 new Box
@@ -72,7 +64,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
                     Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
-                    ExpandableHeader = new SettingsHeader(),
+                    ExpandableHeader = CreateHeader(),
                     FixedHeader = searchTextBox = new SearchTextBox
                     {
                         RelativeSizeAxes = Axes.X,
@@ -87,7 +79,7 @@ namespace osu.Game.Overlays
                         Exit = Hide,
                     },
                     Children = sections,
-                    Footer = new SettingsFooter()
+                    Footer = CreateFooter()
                 },
                 sidebar = new Sidebar
                 {
@@ -120,6 +112,10 @@ namespace osu.Game.Overlays
 
             getToolbarHeight = () => game?.ToolbarOffset ?? 0;
         }
+
+        protected virtual Drawable CreateHeader() => new Container();
+
+        protected virtual Drawable CreateFooter() => new Container();
 
         protected override void PopIn()
         {
