@@ -8,7 +8,7 @@ namespace osu.Game.Input
 {
     public class GlobalActionMappingInputManager : ActionMappingInputManager<OsuAction>
     {
-        protected override IDictionary<Key, OsuAction> CreateDefaultMappings() => new Dictionary<Key, OsuAction>
+        protected override IDictionary<KeyCombination, OsuAction> CreateDefaultMappings() => new Dictionary<KeyCombination, OsuAction>
         {
             { Key.F8, OsuAction.ToggleChat },
             { Key.F9, OsuAction.ToggleSocial },

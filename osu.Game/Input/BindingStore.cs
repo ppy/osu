@@ -15,6 +15,24 @@ namespace osu.Game.Input
         {
         }
 
+        protected override int StoreVersion => 2;
+
+        protected override void PerformMigration(int currentVersion, int targetVersion)
+        {
+            base.PerformMigration(currentVersion, targetVersion);
+
+            while (currentVersion++ < targetVersion)
+            {
+                switch (currentVersion)
+                {
+                    case 1:
+                        // cannot migrate; breaking underlying changes.
+                        Reset();
+                        break;
+                }
+            }
+        }
+
         protected override void Prepare(bool reset = false)
         {
             Connection.CreateTable<Binding>();
