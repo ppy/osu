@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using osu.Game.Input;
 using OpenTK.Input;
 
@@ -26,8 +27,11 @@ namespace osu.Game.Rulesets.Catch
 
     public enum CatchAction
     {
+        [Description("Move left")]
         MoveLeft,
+        [Description("Move right")]
         MoveRight,
+        [Description("Engage dash")]
         Dash
     }
 }
