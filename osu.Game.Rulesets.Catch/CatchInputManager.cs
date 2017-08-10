@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Catch
 {
     public class CatchInputManager : ActionMappingInputManager<CatchAction>
     {
-        public CatchInputManager(RulesetInfo ruleset) : base(ruleset, allowConcurrentActions: true)
+        public CatchInputManager(RulesetInfo ruleset) : base(ruleset, concurrencyMode: ConcurrentActionMode.UniqueActions)
         {
         }
 
