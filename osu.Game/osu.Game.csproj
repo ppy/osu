@@ -145,8 +145,6 @@
     <Compile Include="Rulesets\RulesetInfo.cs" />
     <Compile Include="Rulesets\Scoring\ScoreStore.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
-    <Compile Include="Graphics\Cursor\CursorTrail.cs" />
-    <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
