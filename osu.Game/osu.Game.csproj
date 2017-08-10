@@ -94,6 +94,8 @@
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
     <Compile Include="Input\Binding.cs" />
     <Compile Include="Input\BindingStore.cs" />
+    <Compile Include="Input\GlobalHotkeys.cs" />
+    <Compile Include="Input\IHandleActions.cs" />
     <Compile Include="Input\KeyCombination.cs" />
     <Compile Include="Input\GlobalAction.cs" />
     <Compile Include="Input\GlobalActionMappingInputManager.cs" />
