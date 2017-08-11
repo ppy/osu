@@ -245,7 +245,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         RelativeSizeAxes = Axes.X,
                         Text = "Register new account",
-                        //Action = registerLink
+                        //Binding = registerLink
                     }
                 };
             }

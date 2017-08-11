@@ -8,15 +8,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Input;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class GameplayCursor : CursorContainer, IHandleActions<OsuAction>
+    public class GameplayCursor : CursorContainer, IHandleKeyBindings<OsuAction>
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 

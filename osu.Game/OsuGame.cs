@@ -18,6 +18,7 @@ using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
@@ -25,11 +26,11 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
-using osu.Game.Input;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game
 {
-    public class OsuGame : OsuGameBase, IHandleActions<GlobalAction>
+    public class OsuGame : OsuGameBase, IHandleKeyBindings<GlobalAction>
     {
         public Toolbar Toolbar;
 

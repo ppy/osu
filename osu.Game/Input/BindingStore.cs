@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Platform;
 using osu.Game.Database;
+using osu.Game.Input.Bindings;
 using SQLite.Net;
 
 namespace osu.Game.Input
@@ -35,12 +36,12 @@ namespace osu.Game.Input
 
         protected override void Prepare(bool reset = false)
         {
-            Connection.CreateTable<Binding>();
+            Connection.CreateTable<DatabasedKeyBinding>();
         }
 
         protected override Type[] ValidTypes => new[]
         {
-            typeof(Binding)
+            typeof(DatabasedKeyBinding)
         };
 
     }

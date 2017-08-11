@@ -7,16 +7,17 @@ using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 
-namespace osu.Game.Input
+namespace osu.Game.Input.Bindings
 {
-    public class GlobalActionMappingInputManager : ActionMappingInputManager<GlobalAction>
+    public class GlobalBindingInputManager : DatabasedKeyBindingInputManager<GlobalAction>
     {
         private readonly Drawable handler;
 
-        public GlobalActionMappingInputManager(OsuGameBase game)
+        public GlobalBindingInputManager(OsuGameBase game)
         {
-            if (game is IHandleActions<GlobalAction>)
+            if (game is IHandleKeyBindings<GlobalAction>)
                 handler = game;
         }
 
