@@ -50,6 +50,15 @@ namespace osu.Game.Overlays.Chat
             ChannelSelectorActive.BindTo(selectorTab.Active);
         }
 
+        protected override void AddTabItem(TabItem<Channel> item, bool addToDropdown = true)
+        {
+            if (selectorTab.Depth < float.MaxValue)
+                // performTabSort might've made selectorTab's position wonky, fix it
+                TabContainer.ChangeChildDepth(selectorTab, float.MaxValue);
+
+            base.AddTabItem(item, addToDropdown);
+        }
+
         protected override TabItem<Channel> CreateTabItem(Channel value)
         {
              ChannelTabItem tab = new ChannelTabItem(value);
