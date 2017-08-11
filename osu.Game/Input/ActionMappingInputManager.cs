@@ -71,18 +71,26 @@ namespace osu.Game.Input
         {
             bool handled = false;
 
-            if (!args.Repeat && (concurrencyMode > ConcurrentActionMode.None || pressedBindings.Count == 0))
+            if (args.Repeat)
             {
-                Binding validBinding;
+                if (pressedBindings.Count > 0)
+                    return true;
 
-                while ((validBinding = mappings.Except(pressedBindings).LastOrDefault(m => m.Keys.CheckValid(state.Keyboard.Keys, concurrencyMode == ConcurrentActionMode.None))) != null)
-                {
-                    if (concurrencyMode == ConcurrentActionMode.UniqueAndSameActions || pressedBindings.All(p => p.Action != validBinding.Action))
-                        handled = drawables.OfType<IHandleActions<T>>().Any(d => d.OnPressed(validBinding.GetAction<T>()));
+                return base.PropagateKeyDown(drawables, state, args);
+            }
 
-                    // store both the pressed combination and the resulting action, just in case the assignments change while we are actuated.
-                    pressedBindings.Add(validBinding);
-                }
+            if (concurrencyMode == ConcurrentActionMode.None && pressedBindings.Count > 0)
+                return true;
+
+            Binding validBinding;
+
+            while ((validBinding = mappings.Except(pressedBindings).LastOrDefault(m => m.Keys.CheckValid(state.Keyboard.Keys, concurrencyMode == ConcurrentActionMode.None))) != null)
+            {
+                if (concurrencyMode == ConcurrentActionMode.UniqueAndSameActions || pressedBindings.All(p => p.Action != validBinding.Action))
+                    handled = drawables.OfType<IHandleActions<T>>().Any(d => d.OnPressed(validBinding.GetAction<T>()));
+
+                // store both the pressed combination and the resulting action, just in case the assignments change while we are actuated.
+                pressedBindings.Add(validBinding);
             }
 
             return handled || base.PropagateKeyDown(drawables, state, args);
