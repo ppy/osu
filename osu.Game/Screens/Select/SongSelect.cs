@@ -372,6 +372,7 @@ namespace osu.Game.Screens.Select
 
             if (!track.IsRunning)
             {
+                Game.Audio.Track.AddItemToList(track);
                 if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
                 track.Start();
             }
