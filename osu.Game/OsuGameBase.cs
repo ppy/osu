@@ -20,6 +20,7 @@ using SQLite.Net;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Database;
 using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
@@ -187,7 +188,7 @@ namespace osu.Game
                 Children = new Drawable[]
                 {
                     Cursor = new MenuCursor(),
-                    new GlobalActionMappingInputManager(this)
+                    new GlobalBindingInputManager(this)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = new OsuTooltipContainer(Cursor)

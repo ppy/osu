@@ -7,12 +7,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Input;
+using osu.Framework.Input.Bindings;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class CirclePiece : Container, IHandleActions<OsuAction>
+    public class CirclePiece : Container, IHandleKeyBindings<OsuAction>
     {
         private readonly Sprite disc;
 

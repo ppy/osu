@@ -3,12 +3,13 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using osu.Game.Input;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Catch
 {
-    public class CatchInputManager : ActionMappingInputManager<CatchAction>
+    public class CatchInputManager : DatabasedKeyBindingInputManager<CatchAction>
     {
         public CatchInputManager(RulesetInfo ruleset) : base(ruleset, concurrencyMode: ConcurrentActionMode.UniqueActions)
         {

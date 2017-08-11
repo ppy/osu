@@ -8,8 +8,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Bindings;
 using osu.Framework.MathUtils;
-using osu.Game.Input;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.UI
             catcher.Size = new Vector2(DrawSize.Y);
         }
 
-        private class Catcher : Container, IHandleActions<CatchAction>
+        private class Catcher : Container, IHandleKeyBindings<CatchAction>
         {
             private Texture texture;
 

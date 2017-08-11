@@ -4,14 +4,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input;
-using osu.Game.Input;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 using OpenTK.Input;
 using KeyboardState = osu.Framework.Input.KeyboardState;
 using MouseState = osu.Framework.Input.MouseState;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuInputManager : ActionMappingInputManager<OsuAction>
+    public class OsuInputManager : DatabasedKeyBindingInputManager<OsuAction>
     {
         public OsuInputManager(RulesetInfo ruleset) : base(ruleset, concurrencyMode: ConcurrentActionMode.UniqueActions)
         {
