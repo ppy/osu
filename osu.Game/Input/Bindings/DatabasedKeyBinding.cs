@@ -1,3 +1,6 @@
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets;
 using SQLite.Net.Attributes;
@@ -17,8 +20,8 @@ namespace osu.Game.Input.Bindings
         [Column("Keys")]
         public string KeysString
         {
-            get { return Keys.ToString(); }
-            private set { Keys = value; }
+            get { return KeyCombination.ToString(); }
+            private set { KeyCombination = value; }
         }
 
         [Column("Action")]
