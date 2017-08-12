@@ -253,8 +253,6 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                Ruleset.Value = beatmap.Ruleset;
-
                 if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
                     sampleChangeDifficulty.Play();
                 else
