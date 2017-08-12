@@ -17,18 +17,18 @@ namespace osu.Game.Input.Bindings
 
         public GlobalBindingInputManager(OsuGameBase game)
         {
-            if (game is IHandleKeyBindings<GlobalAction>)
+            if (game is IKeyBindingHandler<GlobalAction>)
                 handler = game;
         }
 
-        protected override IDictionary<KeyCombination, GlobalAction> CreateDefaultMappings() => new Dictionary<KeyCombination, GlobalAction>
+        protected override IEnumerable<KeyBinding> CreateDefaultMappings() => new[]
         {
-            { Key.F8, GlobalAction.ToggleChat },
-            { Key.F9, GlobalAction.ToggleSocial },
-            { new[] { Key.LControl, Key.LAlt, Key.R }, GlobalAction.ResetInputSettings },
-            { new[] { Key.LControl, Key.T }, GlobalAction.ToggleToolbar },
-            { new[] { Key.LControl, Key.O }, GlobalAction.ToggleSettings },
-            { new[] { Key.LControl, Key.D }, GlobalAction.ToggleDirect },
+            new KeyBinding(Key.F8, GlobalAction.ToggleChat),
+            new KeyBinding(Key.F9, GlobalAction.ToggleSocial),
+            new KeyBinding(new[] { Key.LControl, Key.LAlt, Key.R }, GlobalAction.ResetInputSettings),
+            new KeyBinding(new[] { Key.LControl, Key.T }, GlobalAction.ToggleToolbar),
+            new KeyBinding(new[] { Key.LControl, Key.O }, GlobalAction.ToggleSettings),
+            new KeyBinding(new[] { Key.LControl, Key.D }, GlobalAction.ToggleDirect),
         };
 
         protected override bool PropagateKeyDown(IEnumerable<Drawable> drawables, InputState state, KeyDownEventArgs args)

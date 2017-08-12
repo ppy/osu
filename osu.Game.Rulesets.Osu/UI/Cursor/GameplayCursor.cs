@@ -16,7 +16,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class GameplayCursor : CursorContainer, IHandleKeyBindings<OsuAction>
+    public class GameplayCursor : CursorContainer, IKeyBindingHandler<OsuAction>
     {
         protected override Drawable CreateCursor() => new OsuCursor();
 

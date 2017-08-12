@@ -30,7 +30,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game
 {
-    public class OsuGame : OsuGameBase, IHandleKeyBindings<GlobalAction>
+    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     {
         public Toolbar Toolbar;
 

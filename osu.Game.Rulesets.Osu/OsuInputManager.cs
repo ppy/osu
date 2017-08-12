@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuInputManager : DatabasedKeyBindingInputManager<OsuAction>
     {
-        public OsuInputManager(RulesetInfo ruleset) : base(ruleset, concurrencyMode: ConcurrentActionMode.UniqueActions)
+        public OsuInputManager(RulesetInfo ruleset) : base(ruleset, simultaneousMode: SimultaneousBindingMode.Unique)
         {
 
         }
@@ -34,12 +34,12 @@ namespace osu.Game.Rulesets.Osu
             }
         }
 
-        protected override IDictionary<KeyCombination, OsuAction> CreateDefaultMappings() => new Dictionary<KeyCombination, OsuAction>
+        protected override IEnumerable<KeyBinding> CreateDefaultMappings() => new[]
         {
-            { Key.Z, OsuAction.LeftButton },
-            { Key.X, OsuAction.RightButton },
-            { Key.LastKey + 1, OsuAction.LeftButton },
-            { Key.LastKey + 2, OsuAction.RightButton },
+            new KeyBinding(Key.Z, OsuAction.LeftButton),
+            new KeyBinding(Key.X, OsuAction.RightButton),
+            new KeyBinding(Key.LastKey + 1, OsuAction.LeftButton),
+            new KeyBinding(Key.LastKey + 2, OsuAction.RightButton),
         };
     }
 
