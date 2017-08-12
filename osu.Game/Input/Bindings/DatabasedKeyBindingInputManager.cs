@@ -1,3 +1,6 @@
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets;
@@ -47,7 +50,7 @@ namespace osu.Game.Input.Bindings
             if (store != null)
             {
                 foreach (var b in store.Query<DatabasedKeyBinding>(b => b.RulesetID == rulesetId && b.Variant == variant))
-                    Mappings.Add(b);
+                    KeyBindings.Add(b);
             }
         }
     }
