@@ -12,7 +12,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class CirclePiece : Container, IHandleKeyBindings<OsuAction>
+    public class CirclePiece : Container, IKeyBindingHandler<OsuAction>
     {
         private readonly Sprite disc;
 

@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.UI
             catcher.Size = new Vector2(DrawSize.Y);
         }
 
-        private class Catcher : Container, IHandleKeyBindings<CatchAction>
+        private class Catcher : Container, IKeyBindingHandler<CatchAction>
         {
             private Texture texture;
 
