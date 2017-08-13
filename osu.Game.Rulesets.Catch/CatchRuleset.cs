@@ -20,24 +20,6 @@ namespace osu.Game.Rulesets.Catch
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new CatchRulesetContainer(this, beatmap, isForCurrentRuleset);
 
-        public override IEnumerable<Mod> GetAllMods() => new Mod[]
-        {
-            new CatchModEasy(),
-            new CatchModNoFail(),
-            new CatchModHalfTime(),
-            new CatchModDaycore(),
-            new CatchModHardRock(),
-            new CatchModSuddenDeath(),
-            new CatchModPerfect(),
-            new CatchModDoubleTime(),
-            new CatchModNightcore(),
-            new CatchModHidden(),
-            new CatchModFlashlight(),
-            new CatchModRelax(),
-            new ModAutoplay(),
-            new ModCinema()
-        };
-
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
             switch (type)

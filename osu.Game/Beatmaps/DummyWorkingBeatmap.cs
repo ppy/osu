@@ -58,8 +58,6 @@ namespace osu.Game.Beatmaps
 
             private class DummyRuleset : Ruleset
             {
-                public override IEnumerable<Mod> GetAllMods() => new Mod[] { };
-
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
 
                 public override Mod GetAutoplayMod() => new ModAutoplay();
