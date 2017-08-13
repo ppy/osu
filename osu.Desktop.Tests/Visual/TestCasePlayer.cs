@@ -19,7 +19,7 @@ namespace osu.Desktop.Tests.Visual
     internal class TestCasePlayer : OsuTestCase
     {
         protected Player Player;
-        private RulesetStore rulesets;
+        protected RulesetStore rulesets;
 
         public override string Description => @"Showing everything to play the game.";
 
@@ -29,10 +29,8 @@ namespace osu.Desktop.Tests.Visual
             this.rulesets = rulesets;
         }
 
-        protected override void LoadComplete()
+        protected virtual Beatmap TestBeatmap()
         {
-            base.LoadComplete();
-
             var objects = new List<HitObject>();
 
             int time = 1500;
@@ -49,7 +47,7 @@ namespace osu.Desktop.Tests.Visual
                 time += 500;
             }
 
-            Beatmap b = new Beatmap
+            return new Beatmap
             {
                 HitObjects = objects,
                 BeatmapInfo = new BeatmapInfo
@@ -64,8 +62,13 @@ namespace osu.Desktop.Tests.Visual
                     }
                 }
             };
+        }
 
-            WorkingBeatmap beatmap = new TestWorkingBeatmap(b);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            WorkingBeatmap beatmap = new TestWorkingBeatmap(TestBeatmap());
 
             Add(new Box
             {
