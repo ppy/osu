@@ -19,14 +19,14 @@ namespace osu.Desktop.Tests.Visual
     internal class TestCasePlayer : OsuTestCase
     {
         protected Player Player;
-        protected RulesetStore rulesets;
+        protected RulesetStore Rulesets;
 
         public override string Description => @"Showing everything to play the game.";
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            this.rulesets = rulesets;
+            Rulesets = rulesets;
         }
 
         protected virtual Beatmap TestBeatmap()
@@ -53,7 +53,7 @@ namespace osu.Desktop.Tests.Visual
                 BeatmapInfo = new BeatmapInfo
                 {
                     Difficulty = new BeatmapDifficulty(),
-                    Ruleset = rulesets.Query<RulesetInfo>().First(),
+                    Ruleset = Rulesets.Query<RulesetInfo>().First(),
                     Metadata = new BeatmapMetadata
                     {
                         Artist = @"Unknown",
