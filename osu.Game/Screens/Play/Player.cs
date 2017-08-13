@@ -184,11 +184,13 @@ namespace osu.Game.Screens.Play
                             {
                                 Background?.FadeTo(1, fade_duration);
                                 hudOverlay?.FadeTo(0, fade_duration);
+                                hudOverlay.KeyCounter.IsCounting = false;
                             },
                             OnBreakOut = () =>
                             {
                                 Background?.FadeTo(1 - (float)dimLevel, fade_duration);
                                 hudOverlay?.FadeTo(1, fade_duration);
+                                hudOverlay.KeyCounter.IsCounting = true;
                             }
                         },
                     }
