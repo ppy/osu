@@ -24,7 +24,7 @@ namespace osu.Desktop.Tests.Visual
                 new Score
                 {
                     Rank = ScoreRank.XH,
-                    Accuracy = 100,
+                    Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -42,7 +42,7 @@ namespace osu.Desktop.Tests.Visual
                 new Score
                 {
                     Rank = ScoreRank.X,
-                    Accuracy = 100,
+                    Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -60,7 +60,7 @@ namespace osu.Desktop.Tests.Visual
                 new Score
                 {
                     Rank = ScoreRank.SH,
-                    Accuracy = 100,
+                    Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -78,7 +78,7 @@ namespace osu.Desktop.Tests.Visual
                 new Score
                 {
                     Rank = ScoreRank.S,
-                    Accuracy = 100,
+                    Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -96,7 +96,7 @@ namespace osu.Desktop.Tests.Visual
                 new Score
                 {
                     Rank = ScoreRank.A,
-                    Accuracy = 100,
+                    Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -114,7 +114,7 @@ namespace osu.Desktop.Tests.Visual
                 new Score
                 {
                     Rank = ScoreRank.B,
-                    Accuracy = 98.26,
+                    Accuracy = 0.9826,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -132,7 +132,7 @@ namespace osu.Desktop.Tests.Visual
                 new Score
                 {
                     Rank = ScoreRank.C,
-                    Accuracy = 96.54,
+                    Accuracy = 0.9654,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -150,7 +150,7 @@ namespace osu.Desktop.Tests.Visual
                 new Score
                 {
                     Rank = ScoreRank.F,
-                    Accuracy = 60.25,
+                    Accuracy = 0.6025,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -168,7 +168,7 @@ namespace osu.Desktop.Tests.Visual
                 new Score
                 {
                     Rank = ScoreRank.F,
-                    Accuracy = 51.40,
+                    Accuracy = 0.5140,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
@@ -186,7 +186,7 @@ namespace osu.Desktop.Tests.Visual
                 new Score
                 {
                     Rank = ScoreRank.F,
-                    Accuracy = 42.22,
+                    Accuracy = 0.4222,
                     MaxCombo = 244,
                     TotalScore = 1707827,
                     Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
