@@ -60,8 +60,6 @@ namespace osu.Game.Beatmaps
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
 
-                public override Mod GetAutoplayMod() => new ModAutoplay();
-
                 public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset)
                 {
                     throw new NotImplementedException();

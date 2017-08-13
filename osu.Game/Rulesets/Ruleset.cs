@@ -26,14 +26,14 @@ namespace osu.Game.Rulesets
             List<Mod> modList = new List<Mod>();
 
             foreach (ModType type in Enum.GetValues(typeof(ModType)))
-                modList.AddRange(GetModsFor(type).SelectMany(mod =>
+                modList.AddRange(GetModsFor(type).Where(mod => mod != null).SelectMany(mod =>
                 {
                     var multiMod = mod as MultiMod;
 
                     if (multiMod != null)
                         return multiMod.Mods;
 
-                    return new Mod[] { mod };
+                    return new[] { mod };
                 }));
 
             return modList.ToArray();
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets
             return GetAllMods().First(mod => mod.ShortenedName == shortenedName);
         }
 
-        public abstract Mod GetAutoplayMod();
+        public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
 
         protected Ruleset(RulesetInfo rulesetInfo)
         {
