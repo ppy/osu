@@ -223,7 +223,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.ModDisplay.Current.BindTo(working.Mods);
 
             breakPeriodsTrackOverlay.BindHealth(scoreProcessor.Health);
-            
+
             //bind RulesetContainer to ScoreProcessor and ourselves (for a pass situation)
             RulesetContainer.OnAllJudged += onCompletion;
 
