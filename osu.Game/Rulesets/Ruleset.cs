@@ -41,11 +41,6 @@ namespace osu.Game.Rulesets
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
-        public Mod GetModByShortenedName(string shortenedName)
-        {
-            return GetAllMods().First(mod => mod.ShortenedName == shortenedName);
-        }
-
         public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
 
         protected Ruleset(RulesetInfo rulesetInfo)
