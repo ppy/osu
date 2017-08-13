@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -27,10 +28,31 @@ namespace osu.Game.Rulesets.Scoring
 
         public int Combo { get; set; }
 
+        private string[] modStrings;
         [JsonProperty(@"mods")]
-        protected string[] ModStrings { get; set; } //todo: parse to Mod objects
+        protected string[] ModStrings {
+            get { return modStrings; }
+            set
+            {
+                modStrings = value;
 
-        public RulesetInfo Ruleset { get; set; }
+                if (ruleset != null)
+                    handleModString();
+            }
+        }
+
+        private RulesetInfo ruleset;
+        public RulesetInfo Ruleset
+        {
+            get { return ruleset; }
+            set
+            {
+                ruleset = value;
+
+                if (modStrings != null)
+                    handleModString();
+            }
+        }
 
         public Mod[] Mods { get; set; }
 
@@ -80,5 +102,17 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         public Dictionary<string, dynamic> Statistics = new Dictionary<string, dynamic>();
+
+        private void handleModString()
+        {
+            List<Mod> modList = new List<Mod>();
+
+            Ruleset rulesetInstance = Ruleset.CreateInstance();
+
+            foreach (string modShortenedName in modStrings)
+                modList.Add(rulesetInstance.GetModByShortenedName(modShortenedName));
+
+            Mods = modList.ToArray();
+        }
     }
 }
