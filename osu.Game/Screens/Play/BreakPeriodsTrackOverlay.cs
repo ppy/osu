@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -41,7 +42,7 @@ namespace osu.Game.Screens.Play
         private SampleChannel samplePass;
         private SampleChannel sampleFail;
 
-        private readonly TextAwesome resultIcon;
+        private readonly SpriteIcon resultIcon;
         private readonly ArrowsOverlay arrows;
 
         private IClock audioClock;
@@ -59,11 +60,11 @@ namespace osu.Game.Screens.Play
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
-                resultIcon = new TextAwesome
+                resultIcon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = 100,
+                    Size = new Vector2(100),
                     Alpha = 0,
                 },
                 arrows = new ArrowsOverlay(),
@@ -177,39 +178,39 @@ namespace osu.Game.Screens.Play
                     Alpha = 0,
                     Children = new Drawable[]
                     {
-                        new TextAwesome
+                        new SpriteIcon
                         {
                             Anchor = Anchor.TopLeft,
                             Origin = Anchor.TopLeft,
                             Colour = Color4.Red,
-                            TextSize = 90,
+                            Size = new Vector2(90),
                             Icon = FontAwesome.fa_arrow_right,
                             Margin = new MarginPadding { Top = margin_vertical, Left = margin_horizontal },
                         },
-                        new TextAwesome
+                        new SpriteIcon
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             Colour = Color4.Red,
-                            TextSize = 90,
+                            Size = new Vector2(90),
                             Icon = FontAwesome.fa_arrow_left,
                             Margin = new MarginPadding { Top = margin_vertical, Right = margin_horizontal },
                         },
-                        new TextAwesome
+                        new SpriteIcon
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
                             Colour = Color4.Red,
-                            TextSize = 90,
+                            Size = new Vector2(90),
                             Icon = FontAwesome.fa_arrow_right,
                             Margin = new MarginPadding { Bottom = margin_vertical, Left = margin_horizontal },
                         },
-                        new TextAwesome
+                        new SpriteIcon
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
                             Colour = Color4.Red,
-                            TextSize = 90,
+                            Size = new Vector2(90),
                             Icon = FontAwesome.fa_arrow_left,
                             Margin = new MarginPadding { Bottom = margin_vertical, Right = margin_horizontal },
                         },
