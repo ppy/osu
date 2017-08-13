@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets
                     return new[] { mod };
                 }));
 
-            return modList.ToArray();
+            return modList;
         }
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
