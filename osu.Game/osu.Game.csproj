@@ -92,8 +92,10 @@
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
-    <Compile Include="Input\Binding.cs" />
+    <Compile Include="Input\Bindings\DatabasedKeyBinding.cs" />
+    <Compile Include="Input\Bindings\DatabasedKeyBindingInputManager.cs" />
     <Compile Include="Input\BindingStore.cs" />
+    <Compile Include="Input\Bindings\GlobalBindingInputManager.cs" />
     <Compile Include="IO\FileStore.cs" />
     <Compile Include="IO\FileInfo.cs" />
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
@@ -120,7 +122,6 @@
     <Compile Include="Overlays\Profile\Sections\RecentSection.cs" />
     <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
-    <Compile Include="Input\ActionMappingInputManager.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />
@@ -142,8 +143,6 @@
     <Compile Include="Rulesets\RulesetInfo.cs" />
     <Compile Include="Rulesets\Scoring\ScoreStore.cs" />
     <Compile Include="Graphics\Backgrounds\Triangles.cs" />
-    <Compile Include="Graphics\Cursor\CursorTrail.cs" />
-    <Compile Include="Graphics\Cursor\GameplayCursor.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
