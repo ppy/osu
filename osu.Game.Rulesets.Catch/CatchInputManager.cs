@@ -11,18 +11,19 @@ namespace osu.Game.Rulesets.Catch
 {
     public class CatchInputManager : DatabasedKeyBindingInputManager<CatchAction>
     {
-        public CatchInputManager(RulesetInfo ruleset) : base(ruleset, simultaneousMode: SimultaneousBindingMode.Unique)
+        public CatchInputManager(RulesetInfo ruleset)
+            : base(ruleset, simultaneousMode: SimultaneousBindingMode.Unique)
         {
         }
 
         protected override IEnumerable<KeyBinding> CreateDefaultMappings() => new[]
         {
-            new KeyBinding( Key.Z, CatchAction.MoveLeft),
-            new KeyBinding( Key.Left, CatchAction.MoveLeft),
-            new KeyBinding( Key.X, CatchAction.MoveRight),
-            new KeyBinding( Key.Right, CatchAction.MoveRight),
-            new KeyBinding( Key.LShift, CatchAction.Dash),
-            new KeyBinding( Key.RShift, CatchAction.Dash),
+            new KeyBinding(Key.Z, CatchAction.MoveLeft),
+            new KeyBinding(Key.Left, CatchAction.MoveLeft),
+            new KeyBinding(Key.X, CatchAction.MoveRight),
+            new KeyBinding(Key.Right, CatchAction.MoveRight),
+            new KeyBinding(Key.LShift, CatchAction.Dash),
+            new KeyBinding(Key.RShift, CatchAction.Dash),
         };
     }
 
