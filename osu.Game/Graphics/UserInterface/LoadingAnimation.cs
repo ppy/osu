@@ -9,7 +9,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class LoadingAnimation : VisibilityContainer
     {
-        private readonly TextAwesome spinner;
+        private readonly SpriteIcon spinner;
 
         public LoadingAnimation()
         {
@@ -20,9 +20,9 @@ namespace osu.Game.Graphics.UserInterface
 
             Children = new Drawable[]
             {
-                spinner = new TextAwesome
+                spinner = new SpriteIcon
                 {
-                    TextSize = 20,
+                    Size = new Vector2(20),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Icon = FontAwesome.fa_spinner

@@ -19,6 +19,8 @@ using osu.Game.Online.API;
 using SQLite.Net;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Database;
+using osu.Game.Input;
+using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
@@ -36,6 +38,8 @@ namespace osu.Game
         protected FileStore FileStore;
 
         protected ScoreStore ScoreStore;
+
+        protected BindingStore BindingStore;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -104,6 +108,7 @@ namespace osu.Game
             dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, Host));
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager));
+            dependencies.Cache(BindingStore = new BindingStore(connection));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
@@ -183,13 +188,14 @@ namespace osu.Game
                 Children = new Drawable[]
                 {
                     Cursor = new MenuCursor(),
-                    new OsuTooltipContainer(Cursor)
+                    new GlobalBindingInputManager(this)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = content = new OsuContextMenuContainer
+                        Child = new OsuTooltipContainer(Cursor)
                         {
                             RelativeSizeAxes = Axes.Both,
-                        },
+                            Child = content = new OsuContextMenuContainer { RelativeSizeAxes = Axes.Both },
+                        }
                     }
                 }
             });

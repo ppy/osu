@@ -142,16 +142,16 @@ namespace osu.Game.Graphics.UserInterface
 
         private class Star : Container
         {
-            public readonly TextAwesome Icon;
+            public readonly SpriteIcon Icon;
             public Star()
             {
                 Size = new Vector2(star_size);
 
                 Children = new[]
                 {
-                    Icon = new TextAwesome
+                    Icon = new SpriteIcon
                     {
-                        TextSize = star_size,
+                        Size = new Vector2(star_size),
                         Icon = FontAwesome.fa_star,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

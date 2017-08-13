@@ -47,7 +47,11 @@ namespace osu.Game.Overlays.Direct
 
         private class RulesetToggleButton : OsuClickableContainer
         {
-            private readonly TextAwesome icon;
+            private Drawable icon
+            {
+                get { return iconContainer.Icon; }
+                set { iconContainer.Icon = value; }
+            }
 
             private RulesetInfo ruleset;
             public RulesetInfo Ruleset
@@ -56,15 +60,17 @@ namespace osu.Game.Overlays.Direct
                 set
                 {
                     ruleset = value;
-                    icon.Icon = Ruleset.CreateInstance().Icon;
+                    icon = Ruleset.CreateInstance().CreateIcon();
                 }
             }
 
             private readonly Bindable<RulesetInfo> bindable;
 
+            private readonly ConstrainedIconContainer iconContainer;
+
             private void Bindable_ValueChanged(RulesetInfo obj)
             {
-                icon.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
+                iconContainer.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
             }
 
             public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
@@ -74,11 +80,11 @@ namespace osu.Game.Overlays.Direct
 
                 Children = new[]
                 {
-                    icon = new TextAwesome
+                    iconContainer = new ConstrainedIconContainer
                     {
                         Origin = Anchor.TopLeft,
                         Anchor = Anchor.TopLeft,
-                        TextSize = 32,
+                        Size = new Vector2(32),
                     }
                 };
 

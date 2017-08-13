@@ -54,13 +54,15 @@ namespace osu.Game.Beatmaps
 
         private class DummyRulesetInfo : RulesetInfo
         {
-            public override Ruleset CreateInstance() => new DummyRuleset();
+            public override Ruleset CreateInstance() => new DummyRuleset(this);
 
             private class DummyRuleset : Ruleset
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
 
-                public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+                public override Mod GetAutoplayMod() => new ModAutoplay();
+
+                public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset)
                 {
                     throw new NotImplementedException();
                 }
@@ -75,6 +77,11 @@ namespace osu.Game.Beatmaps
                 public override string Description => "dummy";
 
                 public override IEnumerable<KeyCounter> CreateGameplayKeys() => new List<KeyCounter>();
+
+                public DummyRuleset(RulesetInfo rulesetInfo)
+                    : base(rulesetInfo)
+                {
+                }
             }
         }
     }

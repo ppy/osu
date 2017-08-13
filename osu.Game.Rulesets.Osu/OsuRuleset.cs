@@ -13,6 +13,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Settings;
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuRuleset : Ruleset
     {
-        public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new OsuHitRenderer(beatmap, isForCurrentRuleset);
+        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new OsuRulesetContainer(this, beatmap, isForCurrentRuleset);
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
         {
@@ -104,7 +105,9 @@ namespace osu.Game.Rulesets.Osu
             }
         }
 
-        public override FontAwesome Icon => FontAwesome.fa_osu_osu_o;
+        public override Mod GetAutoplayMod() => new OsuModAutoplay();
+
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_osu_o };
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
 
@@ -123,5 +126,10 @@ namespace osu.Game.Rulesets.Osu
         public override SettingsSubsection CreateSettings() => new OsuSettings();
 
         public override int LegacyID => 0;
+
+        public OsuRuleset(RulesetInfo rulesetInfo)
+            : base(rulesetInfo)
+        {
+        }
     }
 }

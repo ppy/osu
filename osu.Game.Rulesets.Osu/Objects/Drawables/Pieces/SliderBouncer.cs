@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         private readonly Slider slider;
         private readonly bool isEnd;
-        private readonly TextAwesome icon;
+        private readonly SpriteIcon icon;
 
         public SliderBouncer(Slider slider, bool isEnd)
         {
@@ -24,12 +25,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                icon = new TextAwesome
+                icon = new SpriteIcon
                 {
                     Icon = FontAwesome.fa_eercast,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = 48,
+                    Size = new Vector2(48),
                 }
             };
         }

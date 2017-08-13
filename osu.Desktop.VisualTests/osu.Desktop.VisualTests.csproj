@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProjectGuid>{69051C69-12AE-4E7D-A3E6-460D2E282312}</ProjectGuid>
@@ -185,55 +185,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutomatedVisualTestGame.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Tests\TestCaseBeatSyncedContainer.cs" />
-    <Compile Include="Tests\TestCaseChatDisplay.cs" />
-    <Compile Include="Tests\TestCaseBeatmapDetails.cs" />
-    <Compile Include="Tests\TestCaseContextMenu.cs" />
-    <Compile Include="Tests\TestCaseDrawings.cs" />
-    <Compile Include="Tests\TestCaseGamefield.cs" />
-    <Compile Include="Tests\TestCaseGraph.cs" />
-    <Compile Include="Tests\TestCaseManiaHitObjects.cs" />
-    <Compile Include="Tests\TestCaseManiaPlayfield.cs" />
-    <Compile Include="Tests\TestCaseMenuOverlays.cs" />
-    <Compile Include="Tests\TestCaseMusicController.cs" />
-    <Compile Include="Tests\TestCaseNotificationOverlay.cs" />
-    <Compile Include="Tests\TestCaseOnScreenDisplay.cs" />
-    <Compile Include="Tests\TestCaseReplaySettingsOverlay.cs" />
-    <Compile Include="Tests\TestCasePlayer.cs" />
-    <Compile Include="Tests\TestCaseHitObjects.cs" />
-    <Compile Include="Tests\TestCaseKeyCounter.cs" />
-    <Compile Include="Tests\TestCaseMenuButtonSystem.cs" />
-    <Compile Include="Tests\TestCaseReplay.cs" />
-    <Compile Include="Tests\TestCaseResults.cs" />
-    <Compile Include="Tests\TestCaseScoreCounter.cs" />
-    <Compile Include="Tests\TestCaseScrollingHitObjects.cs" />
-    <Compile Include="Tests\TestCaseSkipButton.cs" />
-    <Compile Include="Tests\TestCaseTabControl.cs" />
-    <Compile Include="Tests\TestCaseTaikoHitObjects.cs" />
-    <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
-    <Compile Include="Tests\TestCaseTextAwesome.cs" />
-    <Compile Include="Tests\TestCasePlaySongSelect.cs" />
-    <Compile Include="Tests\TestCaseTwoLayerButton.cs" />
-    <Compile Include="Tests\TestCaseUserProfile.cs" />
     <Compile Include="VisualTestGame.cs" />
-    <Compile Include="Platform\TestStorage.cs" />
-    <Compile Include="Tests\TestCaseSettings.cs" />
-    <Compile Include="Tests\TestCaseSongProgress.cs" />
-    <Compile Include="Tests\TestCaseMods.cs" />
-    <Compile Include="Tests\TestCaseDialogOverlay.cs" />
-    <Compile Include="Tests\TestCaseBeatmapOptionsOverlay.cs" />
-    <Compile Include="Tests\TestCaseLeaderboard.cs" />
-    <Compile Include="Beatmaps\TestWorkingBeatmap.cs" />
-    <Compile Include="Tests\TestCaseBeatmapDetailArea.cs" />
-    <Compile Include="Tests\TestCaseDrawableRoom.cs" />
-    <Compile Include="Tests\TestCaseUserPanel.cs" />
-    <Compile Include="Tests\TestCaseDirect.cs" />
-    <Compile Include="Tests\TestCaseSocial.cs" />
-    <Compile Include="Tests\TestCaseBreadcrumbs.cs" />
-    <Compile Include="Tests\TestCaseMedalOverlay.cs" />
-    <Compile Include="Tests\TestCaseRoomInspector.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />

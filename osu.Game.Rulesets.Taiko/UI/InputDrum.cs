@@ -21,9 +21,10 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         public InputDrum()
         {
-            Size = new Vector2(TaikoPlayfield.DEFAULT_PLAYFIELD_HEIGHT);
+            RelativeSizeAxes = Axes.Both;
+            FillMode = FillMode.Fit;
 
-            const float middle_split = 10;
+            const float middle_split = 0.025f;
 
             Children = new Drawable[]
             {
@@ -33,6 +34,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     RelativeSizeAxes = Axes.Both,
+                    RelativePositionAxes = Axes.X,
                     X = -middle_split / 2,
                     RimKey = Key.D,
                     CentreKey = Key.F
@@ -43,8 +45,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Both,
+                    RelativePositionAxes = Axes.X,
                     X = middle_split / 2,
-                    Position = new Vector2(-1f, 0),
                     RimKey = Key.K,
                     CentreKey = Key.J
                 }

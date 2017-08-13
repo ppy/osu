@@ -108,14 +108,14 @@ namespace osu.Game.Screens
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Direction = FillDirection.Vertical,
-                            Children = new[]
+                            Children = new Drawable[]
                             {
-                                new TextAwesome
+                                new SpriteIcon
                                 {
                                     Icon = FontAwesome.fa_universal_access,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    TextSize = 50,
+                                    Size = new Vector2(50),
                                 },
                                 new OsuSpriteText
                                 {
