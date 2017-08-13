@@ -30,7 +30,8 @@ namespace osu.Game.Rulesets.Scoring
 
         private string[] modStrings;
         [JsonProperty(@"mods")]
-        protected string[] ModStrings {
+        protected string[] ModStrings
+        {
             get { return modStrings; }
             set
             {

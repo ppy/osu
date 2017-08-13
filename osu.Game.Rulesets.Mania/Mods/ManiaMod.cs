@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModKeyCoop : Mod
     {
         public override string Name => "KeyCoop";
-        public override string ShortenedName => "CO";
+        public override string ShortenedName => "2P";
         public override string Description => @"Double the key amount, double the fun!";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
