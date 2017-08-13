@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
@@ -104,14 +105,7 @@ namespace osu.Game.Rulesets.Scoring
 
         private void handleModString()
         {
-            List<Mod> modList = new List<Mod>();
-
-            Ruleset rulesetInstance = Ruleset.CreateInstance();
-
-            foreach (string modShortenedName in modStrings)
-                modList.Add(rulesetInstance.GetModByShortenedName(modShortenedName));
-
-            Mods = modList.ToArray();
+            Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
         }
     }
 }

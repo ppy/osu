@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -19,19 +21,29 @@ namespace osu.Game.Rulesets
 
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
-        public abstract IEnumerable<Mod> GetAllMods();
+        public IEnumerable<Mod> GetAllMods()
+        {
+            List<Mod> modList = new List<Mod>();
+
+            foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                modList.AddRange(GetModsFor(type).SelectMany(mod =>
+                {
+                    var multiMod = mod as MultiMod;
+
+                    if (multiMod != null)
+                        return multiMod.Mods;
+
+                    return new Mod[] { mod };
+                }));
+
+            return modList.ToArray();
+        }
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
         public Mod GetModByShortenedName(string shortenedName)
         {
-            foreach(Mod mod in GetAllMods())
-            {
-                if (string.Equals(mod.ShortenedName, shortenedName))
-                    return mod;
-            }
-
-            return null;
+            return GetAllMods().First(mod => mod.ShortenedName == shortenedName);
         }
 
         public abstract Mod GetAutoplayMod();

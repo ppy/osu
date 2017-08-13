@@ -3,17 +3,18 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
-using osu.Framework;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private readonly ScoreComponentLabel maxCombo;
         private readonly ScoreComponentLabel accuracy;
         private readonly Container flagBadgeContainer;
-        private readonly FillFlowContainer<ScoreModIcon> modsContainer;
+        private readonly FillFlowContainer<ModIcon> modsContainer;
 
         private Visibility state;
         public Visibility State
@@ -239,7 +240,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                         },
                                     },
                                 },
-                                modsContainer = new FillFlowContainer<ScoreModIcon>
+                                modsContainer = new FillFlowContainer<ModIcon>
                                 {
                                     Anchor = Anchor.BottomRight,
                                     Origin = Anchor.BottomRight,
@@ -256,23 +257,11 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 foreach (Mod mod in Score.Mods)
                 {
-                    Color4 modColor;
-
-                    switch (mod.Type)
+                    modsContainer.Add(new ModIcon(mod)
                     {
-                        default:
-                        case ModType.DifficultyIncrease:
-                            modColor = OsuColour.FromHex(@"ffcc22");
-                            break;
-                        case ModType.DifficultyReduction:
-                            modColor = OsuColour.FromHex(@"88b300");
-                            break;
-                        case ModType.Special:
-                            modColor = OsuColour.FromHex(@"66ccff");
-                            break;
-                    }
-
-                    modsContainer.Add(new ScoreModIcon(mod.Icon, modColor));
+                        AutoSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.375f)
+                    });
                 }
             }
         }
@@ -336,36 +325,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                         Text = text,
                         Colour = textColour,
                         Shadow = false,
-                    },
-                };
-            }
-        }
-
-        private class ScoreModIcon : Container
-        {
-            public ScoreModIcon(FontAwesome icon, Color4 colour)
-            {
-                AutoSizeAxes = Axes.Both;
-
-                Children = new[]
-                {
-                    new SpriteIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Icon = FontAwesome.fa_osu_mod_bg,
-                        Colour = colour,
-                        Shadow = true,
-                        Size = new Vector2(30),
-                    },
-                    new SpriteIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Icon = icon,
-                        Colour = OsuColour.Gray(84),
-                        Size = new Vector2(18),
-                        Position = new Vector2(0f, 2f),
                     },
                 };
             }

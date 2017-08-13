@@ -24,27 +24,6 @@ namespace osu.Game.Rulesets.Osu
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new OsuRulesetContainer(this, beatmap, isForCurrentRuleset);
 
-        public override IEnumerable<Mod> GetAllMods() => new Mod[]
-        {
-            new OsuModEasy(),
-            new OsuModNoFail(),
-            new OsuModHalfTime(),
-            new OsuModDaycore(),
-            new OsuModHardRock(),
-            new OsuModSuddenDeath(),
-            new OsuModPerfect(),
-            new OsuModDoubleTime(),
-            new OsuModNightcore(),
-            new OsuModHidden(),
-            new OsuModFlashlight(),
-            new OsuModRelax(),
-            new OsuModAutopilot(),
-            new OsuModSpunOut(),
-            new OsuModAutoplay(),
-            new ModCinema(),
-            new OsuModTarget(),
-        };
-
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
         {
             new BeatmapStatistic

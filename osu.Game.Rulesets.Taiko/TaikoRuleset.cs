@@ -20,24 +20,6 @@ namespace osu.Game.Rulesets.Taiko
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new TaikoRulesetContainer(this, beatmap, isForCurrentRuleset);
 
-        public override IEnumerable<Mod> GetAllMods() => new Mod[]
-        {
-            new TaikoModEasy(),
-            new TaikoModNoFail(),
-            new TaikoModHalfTime(),
-            new TaikoModDaycore(),
-            new TaikoModHardRock(),
-            new TaikoModSuddenDeath(),
-            new TaikoModPerfect(),
-            new TaikoModDoubleTime(),
-            new TaikoModNightcore(),
-            new TaikoModHidden(),
-            new TaikoModFlashlight(),
-            new TaikoModRelax(),
-            new TaikoModAutoplay(),
-            new ModCinema()
-        };
-
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
             switch (type)
