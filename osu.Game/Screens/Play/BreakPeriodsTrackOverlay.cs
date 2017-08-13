@@ -22,8 +22,6 @@ namespace osu.Game.Screens.Play
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
         private const int arrows_appear_offset = 1000;
 
-        private List<BreakPeriod> breaks = new List<BreakPeriod>();
-
         private readonly BindableDouble healthBindable = new BindableDouble
         {
             MinValue = 0,
@@ -39,6 +37,8 @@ namespace osu.Game.Screens.Play
         private double health;
         private readonly double startTime;
 
+        private readonly List<BreakPeriod> breaks;
+
         private SampleChannel samplePass;
         private SampleChannel sampleFail;
 
@@ -48,14 +48,13 @@ namespace osu.Game.Screens.Play
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = value; } }
 
-        public List<BreakPeriod> Breaks { set { breaks = value; } }
-
         public Action OnBreakIn;
         public Action OnBreakOut;
 
-        public BreakPeriodsTrackOverlay(double startTime)
+        public BreakPeriodsTrackOverlay(double startTime, List<BreakPeriod> breaks)
         {
             this.startTime = startTime;
+            this.breaks = breaks;
 
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]

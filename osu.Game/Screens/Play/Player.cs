@@ -176,9 +176,8 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre
                         },
                         new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
-                        breakPeriodsTrackOverlay = new BreakPeriodsTrackOverlay(firstObjectTime)
+                        breakPeriodsTrackOverlay = new BreakPeriodsTrackOverlay(firstObjectTime, Beatmap.Value.Beatmap.Breaks)
                         {
-                            Breaks = Beatmap.Value.Beatmap.Breaks,
                             AudioClock = decoupledClock,
                             OnBreakIn = () =>
                             {
