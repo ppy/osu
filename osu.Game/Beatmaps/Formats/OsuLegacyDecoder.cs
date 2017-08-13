@@ -222,8 +222,9 @@ namespace osu.Game.Beatmaps.Formats
         /// <param name="line">The line which may contains variables.</param>
         private void decodeVariables(ref string line)
         {
-            if (line.IndexOf('$') >= 0)
+            while (line.IndexOf('$') >= 0)
             {
+                string origLine = line;
                 string[] split = line.Split(',');
                 for (int i = 0; i < split.Length; i++)
                 {
@@ -233,6 +234,7 @@ namespace osu.Game.Beatmaps.Formats
                 }
 
                 line = string.Join(",", split);
+                if (line == origLine) break;
             }
         }
 
