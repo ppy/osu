@@ -256,8 +256,23 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 foreach (Mod mod in Score.Mods)
                 {
-                    // TODO: Get actual mod colours
-                    modsContainer.Add(new ScoreModIcon(mod.Icon, OsuColour.FromHex(@"ffcc22")));
+                    Color4 modColor;
+
+                    switch (mod.Type)
+                    {
+                        default:
+                        case ModType.DifficultyIncrease:
+                            modColor = OsuColour.FromHex(@"ffcc22");
+                            break;
+                        case ModType.DifficultyReduction:
+                            modColor = OsuColour.FromHex(@"88b300");
+                            break;
+                        case ModType.Special:
+                            modColor = OsuColour.FromHex(@"66ccff");
+                            break;
+                    }
+
+                    modsContainer.Add(new ScoreModIcon(mod.Icon, modColor));
                 }
             }
         }

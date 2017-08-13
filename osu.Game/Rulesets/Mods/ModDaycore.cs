@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModDaycore : ModHalfTime
     {
         public override string Name => "Daycore";
+        public override string ShortenedName => "DC";
         public override FontAwesome Icon => FontAwesome.fa_question;
         public override string Description => "whoaaaaa";
 

@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModGravity : Mod, IGenerateSpeedAdjustments
     {
         public override string Name => "Gravity";
+        public override string ShortenedName => "GR";
 
         public override double ScoreMultiplier => 0;
 

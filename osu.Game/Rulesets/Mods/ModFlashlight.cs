@@ -8,6 +8,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModFlashlight : Mod
     {
         public override string Name => "Flashlight";
+        public override string ShortenedName => "FL";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_flashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";

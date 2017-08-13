@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using System;
-using osu.Framework.Allocation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                 i = 0;
                 foreach (var s in scores)
                 {
+                    s.Ruleset = beatmap.Ruleset;
+
                     var ls = new LeaderboardScore(s, 1 + i)
                     {
                         AlwaysPresent = true,

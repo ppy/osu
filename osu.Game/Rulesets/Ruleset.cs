@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Settings;
@@ -19,7 +19,20 @@ namespace osu.Game.Rulesets
 
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
+        public abstract IEnumerable<Mod> GetAllMods();
+
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
+
+        public Mod GetModByShortenedName(string shortenedName)
+        {
+            foreach(Mod mod in GetAllMods())
+            {
+                if (string.Equals(mod.ShortenedName, shortenedName))
+                    return mod;
+            }
+
+            return null;
+        }
 
         public abstract Mod GetAutoplayMod();
 

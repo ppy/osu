@@ -8,6 +8,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModHidden : Mod
     {
         public override string Name => "Hidden";
+        public override string ShortenedName => "HD";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override bool Ranked => true;

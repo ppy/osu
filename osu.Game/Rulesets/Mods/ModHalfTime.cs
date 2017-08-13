@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModHalfTime : Mod, IApplicableToClock
     {
         public override string Name => "Half Time";
+        public override string ShortenedName => "HT";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_halftime;
         public override ModType Type => ModType.DifficultyReduction;
         public override string Description => "Less zoom";

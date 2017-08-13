@@ -19,6 +19,36 @@ namespace osu.Game.Rulesets.Mania
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new ManiaRulesetContainer(this, beatmap, isForCurrentRuleset);
 
+        public override IEnumerable<Mod> GetAllMods() => new Mod[]
+        {
+            new ManiaModEasy(),
+            new ManiaModNoFail(),
+            new ManiaModHalfTime(),
+            new ManiaModDaycore(),
+            new ManiaModHardRock(),
+            new ManiaModSuddenDeath(),
+            new ManiaModPerfect(),
+            new ManiaModDoubleTime(),
+            new ManiaModNightcore(),
+            new ManiaModFadeIn(),
+            new ManiaModHidden(),
+            new ManiaModFlashlight(),
+            new ManiaModKey4(),
+            new ManiaModKey5(),
+            new ManiaModKey6(),
+            new ManiaModKey7(),
+            new ManiaModKey8(),
+            new ManiaModKey9(),
+            new ManiaModKey1(),
+            new ManiaModKey2(),
+            new ManiaModKey3(),
+            new ManiaModRandom(),
+            new ManiaModKeyCoop(),
+            new ModAutoplay(),
+            new ModCinema(),
+            new ManiaModGravity()
+        };
+
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
             switch (type)

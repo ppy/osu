@@ -9,6 +9,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModSuddenDeath : Mod
     {
         public override string Name => "Sudden Death";
+        public override string ShortenedName => "SD";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_suddendeath;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Miss a note and fail.";
