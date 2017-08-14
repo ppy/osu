@@ -3,22 +3,35 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets;
 using SQLite.Net;
 
 namespace osu.Game.Input
 {
     public class KeyBindingStore : DatabaseBackedStore
     {
-        public KeyBindingStore(SQLiteConnection connection, Storage storage = null)
+        public KeyBindingStore(SQLiteConnection connection, RulesetStore rulesets, Storage storage = null)
             : base(connection, storage)
         {
+            foreach (var info in rulesets.Query<RulesetInfo>())
+            {
+                var ruleset = info.CreateInstance();
+                foreach (var variant in ruleset.AvailableVariants)
+                    GetProcessedList(ruleset.GetDefaultKeyBindings(), info.ID, variant);
+            }
         }
 
-        protected override int StoreVersion => 2;
+        public void Register(KeyBindingInputManager manager)
+        {
+            GetProcessedList(manager.DefaultMappings);
+        }
+
+        protected override int StoreVersion => 3;
 
         protected override void PerformMigration(int currentVersion, int targetVersion)
         {
@@ -29,6 +42,8 @@ namespace osu.Game.Input
                 switch (currentVersion)
                 {
                     case 1:
+                    case 2:
+                    case 3:
                         // cannot migrate; breaking underlying changes.
                         Reset();
                         break;
@@ -38,6 +53,11 @@ namespace osu.Game.Input
 
         protected override void Prepare(bool reset = false)
         {
+            if (reset)
+            {
+                Connection.DropTable<DatabasedKeyBinding>();
+            }
+
             Connection.CreateTable<DatabasedKeyBinding>();
         }
 
@@ -46,16 +66,28 @@ namespace osu.Game.Input
             typeof(DatabasedKeyBinding)
         };
 
-        public List<KeyBinding> GetProcessedList(IEnumerable<KeyBinding> defaults, int? rulesetId, int? variant)
+        public IEnumerable<KeyBinding> GetProcessedList(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
-            //todo: cache and share reference
-            List<KeyBinding> bindings = new List<KeyBinding>(defaults);
+            var databaseEntries = Query<DatabasedKeyBinding>(b => b.RulesetID == rulesetId && b.Variant == variant);
 
-            // load from database if present.
-            foreach (var b in Query<DatabasedKeyBinding>(b => b.RulesetID == rulesetId && b.Variant == variant))
-                bindings.Add(b);
+            if (!databaseEntries.Any())
+            {
+                // if there are no entries for this category in the database, we should populate our defaults.
+                Connection.InsertAll(defaults.Select(k => new DatabasedKeyBinding
+                {
+                    KeyCombination = k.KeyCombination,
+                    Action = (int)k.Action,
+                    RulesetID = rulesetId,
+                    Variant = variant
+                }));
+            }
 
-            return bindings;
+            return databaseEntries;
+        }
+
+        public void Update(KeyBinding keyBinding)
+        {
+            Connection.Update(keyBinding);
         }
     }
 }
