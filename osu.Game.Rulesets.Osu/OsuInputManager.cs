@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -33,19 +33,13 @@ namespace osu.Game.Rulesets.Osu
                     keyboard.Keys = keyboard.Keys.Concat(new[] { Key.LastKey + 2 });
             }
         }
-
-        protected override IEnumerable<KeyBinding> CreateDefaultMappings() => new[]
-        {
-            new KeyBinding(Key.Z, OsuAction.LeftButton),
-            new KeyBinding(Key.X, OsuAction.RightButton),
-            new KeyBinding(Key.LastKey + 1, OsuAction.LeftButton),
-            new KeyBinding(Key.LastKey + 2, OsuAction.RightButton),
-        };
     }
 
     public enum OsuAction
     {
+        [Description("Left Button")]
         LeftButton,
+        [Description("Right Button")]
         RightButton
     }
 }

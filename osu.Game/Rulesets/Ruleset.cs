@@ -8,6 +8,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Settings;
 
@@ -53,5 +54,17 @@ namespace osu.Game.Rulesets
         /// Do not override this unless you are a legacy mode.
         /// </summary>
         public virtual int LegacyID => -1;
+
+        /// <summary>
+        /// A list of available variant ids.
+        /// </summary>
+        public virtual IEnumerable<int> AvailableVariants => new[] { 0 };
+
+        /// <summary>
+        /// Get a list of default keys for the specified variant.
+        /// </summary>
+        /// <param name="variant">A variant.</param>
+        /// <returns>A list of valid <see cref="KeyBinding"/>s.</returns>
+        public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new KeyBinding[] { };
     }
 }
