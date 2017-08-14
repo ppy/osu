@@ -2,31 +2,38 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Game.Input;
+using System.ComponentModel;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Catch
 {
-    public class CatchInputManager : ActionMappingInputManager<CatchAction>
+    public class CatchInputManager : DatabasedKeyBindingInputManager<CatchAction>
     {
-        public CatchInputManager(RulesetInfo ruleset) : base(ruleset)
+        public CatchInputManager(RulesetInfo ruleset)
+            : base(ruleset, simultaneousMode: SimultaneousBindingMode.Unique)
         {
-            Mappings = new Dictionary<Key, CatchAction>
-            {
-                { Key.Z, CatchAction.MoveLeft },
-                { Key.Left, CatchAction.MoveLeft },
-                { Key.X, CatchAction.MoveRight },
-                { Key.Right, CatchAction.MoveRight },
-                { Key.LShift, CatchAction.Dash },
-                { Key.RShift, CatchAction.Dash },
-            };
         }
+
+        protected override IEnumerable<KeyBinding> CreateDefaultMappings() => new[]
+        {
+            new KeyBinding(Key.Z, CatchAction.MoveLeft),
+            new KeyBinding(Key.Left, CatchAction.MoveLeft),
+            new KeyBinding(Key.X, CatchAction.MoveRight),
+            new KeyBinding(Key.Right, CatchAction.MoveRight),
+            new KeyBinding(Key.LShift, CatchAction.Dash),
+            new KeyBinding(Key.RShift, CatchAction.Dash),
+        };
     }
 
     public enum CatchAction
     {
+        [Description("Move left")]
         MoveLeft,
+        [Description("Move right")]
         MoveRight,
+        [Description("Engage dash")]
         Dash
     }
 }
