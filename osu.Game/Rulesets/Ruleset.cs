@@ -4,14 +4,14 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets
 {
@@ -23,10 +23,9 @@ namespace osu.Game.Rulesets
 
         public IEnumerable<Mod> GetAllMods()
         {
-            List<Mod> modList = new List<Mod>();
-
-            foreach (ModType type in Enum.GetValues(typeof(ModType)))
-                modList.AddRange(GetModsFor(type).Where(mod => mod != null).SelectMany(mod =>
+            return Enum.GetValues(typeof(ModType)).Cast<ModType>().SelectMany(type =>
+            {
+                return GetModsFor(type).Where(mod => mod != null).SelectMany(mod =>
                 {
                     var multiMod = mod as MultiMod;
 
@@ -34,9 +33,8 @@ namespace osu.Game.Rulesets
                         return multiMod.Mods;
 
                     return new[] { mod };
-                }));
-
-            return modList;
+                });
+            });
         }
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
