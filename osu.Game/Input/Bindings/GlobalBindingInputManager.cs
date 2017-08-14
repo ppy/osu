@@ -21,7 +21,7 @@ namespace osu.Game.Input.Bindings
                 handler = game;
         }
 
-        protected override IEnumerable<KeyBinding> CreateDefaultMappings() => new[]
+        public override IEnumerable<KeyBinding> DefaultMappings => new[]
         {
             new KeyBinding(Key.F8, GlobalAction.ToggleChat),
             new KeyBinding(Key.F9, GlobalAction.ToggleSocial),

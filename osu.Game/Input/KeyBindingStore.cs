@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
@@ -9,9 +11,9 @@ using SQLite.Net;
 
 namespace osu.Game.Input
 {
-    public class BindingStore : DatabaseBackedStore
+    public class KeyBindingStore : DatabaseBackedStore
     {
-        public BindingStore(SQLiteConnection connection, Storage storage = null)
+        public KeyBindingStore(SQLiteConnection connection, Storage storage = null)
             : base(connection, storage)
         {
         }
@@ -44,5 +46,16 @@ namespace osu.Game.Input
             typeof(DatabasedKeyBinding)
         };
 
+        public List<KeyBinding> GetProcessedList(IEnumerable<KeyBinding> defaults, int? rulesetId, int? variant)
+        {
+            //todo: cache and share reference
+            List<KeyBinding> bindings = new List<KeyBinding>(defaults);
+
+            // load from database if present.
+            foreach (var b in Query<DatabasedKeyBinding>(b => b.RulesetID == rulesetId && b.Variant == variant))
+                bindings.Add(b);
+
+            return bindings;
+        }
     }
 }

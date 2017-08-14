@@ -27,7 +27,7 @@ namespace osu.Game.Input.Bindings
         [Column("Action")]
         public new int Action
         {
-            get { return base.Action; }
+            get { return (int)base.Action; }
             private set { base.Action = value; }
         }
     }
