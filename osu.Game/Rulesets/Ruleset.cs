@@ -21,21 +21,7 @@ namespace osu.Game.Rulesets
 
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
-        public IEnumerable<Mod> GetAllMods()
-        {
-            return Enum.GetValues(typeof(ModType)).Cast<ModType>().SelectMany(type =>
-            {
-                return GetModsFor(type).Where(mod => mod != null).SelectMany(mod =>
-                {
-                    var multiMod = mod as MultiMod;
-
-                    if (multiMod != null)
-                        return multiMod.Mods;
-
-                    return new[] { mod };
-                });
-            });
-        }
+        public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>().SelectMany(type => GetModsFor(type).Where(mod => mod != null).SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod }));
 
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
