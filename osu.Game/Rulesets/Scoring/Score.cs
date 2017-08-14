@@ -28,19 +28,8 @@ namespace osu.Game.Rulesets.Scoring
 
         public int Combo { get; set; }
 
-        private string[] modStrings;
         [JsonProperty(@"mods")]
-        protected string[] ModStrings
-        {
-            get { return modStrings; }
-            set
-            {
-                modStrings = value;
-
-                if (ruleset != null)
-                    handleModString();
-            }
-        }
+        protected string[] ModStrings { get; set; }
 
         private RulesetInfo ruleset;
         public RulesetInfo Ruleset
@@ -50,8 +39,9 @@ namespace osu.Game.Rulesets.Scoring
             {
                 ruleset = value;
 
-                if (modStrings != null)
-                    handleModString();
+                // Handle the mod strings if they are assigned
+                if (ModStrings != null)
+                    Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => ModStrings.Contains(mod.ShortenedName)).ToArray();
             }
         }
 
@@ -103,10 +93,5 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         public Dictionary<string, dynamic> Statistics = new Dictionary<string, dynamic>();
-
-        private void handleModString()
-        {
-            Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
-        }
     }
 }
