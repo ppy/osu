@@ -108,7 +108,7 @@ namespace osu.Game
             dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, Host));
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager));
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(connection));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(connection, RulesetStore));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.

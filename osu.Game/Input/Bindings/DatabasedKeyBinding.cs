@@ -11,6 +11,9 @@ namespace osu.Game.Input.Bindings
     [Table("KeyBinding")]
     public class DatabasedKeyBinding : KeyBinding
     {
+        [PrimaryKey, AutoIncrement]
+        public int ID { get; set; }
+
         [ForeignKey(typeof(RulesetInfo))]
         public int? RulesetID { get; set; }
 
@@ -28,7 +31,7 @@ namespace osu.Game.Input.Bindings
         public new int Action
         {
             get { return (int)base.Action; }
-            private set { base.Action = value; }
+            set { base.Action = value; }
         }
     }
 }
