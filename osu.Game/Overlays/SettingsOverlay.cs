@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -29,7 +30,6 @@ namespace osu.Game.Overlays
         private const float sidebar_padding = 10;
 
         private Sidebar sidebar;
-        private SidebarButton[] sidebarButtons;
         private SidebarButton selectedSidebarButton;
 
         private SettingsSectionsContainer sectionsContainer;
@@ -38,19 +38,20 @@ namespace osu.Game.Overlays
 
         private Func<float> getToolbarHeight;
 
-        protected SettingsOverlay()
+        private readonly bool showSidebar;
+
+        protected SettingsOverlay(bool showSidebar)
         {
+            this.showSidebar = showSidebar;
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
         }
 
-        protected abstract IEnumerable<SettingsSection> CreateSections();
+        protected virtual IEnumerable<SettingsSection> CreateSections() => null;
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGame game)
         {
-            var sections = CreateSections().ToList();
-
             Children = new Drawable[]
             {
                 new Box
@@ -78,39 +79,53 @@ namespace osu.Game.Overlays
                         },
                         Exit = Hide,
                     },
-                    Children = sections,
                     Footer = CreateFooter()
-                },
-                sidebar = new Sidebar
-                {
-                    Width = SIDEBAR_WIDTH,
-                    Children = sidebarButtons = sections.Select(section =>
-                        new SidebarButton
-                        {
-                            Section = section,
-                            Action = s =>
-                            {
-                                sectionsContainer.ScrollTo(s);
-                                sidebar.State = ExpandedState.Contracted;
-                            },
-                        }
-                    ).ToArray()
                 }
             };
 
-            selectedSidebarButton = sidebarButtons[0];
-            selectedSidebarButton.Selected = true;
-
-            sectionsContainer.SelectedSection.ValueChanged += section =>
+            if (showSidebar)
             {
-                selectedSidebarButton.Selected = false;
-                selectedSidebarButton = sidebarButtons.Single(b => b.Section == section);
-                selectedSidebarButton.Selected = true;
-            };
+                Add(sidebar = new Sidebar { Width = SIDEBAR_WIDTH });
+
+                sectionsContainer.SelectedSection.ValueChanged += section =>
+                {
+                    selectedSidebarButton.Selected = false;
+                    selectedSidebarButton = sidebar.Children.Single(b => b.Section == section);
+                    selectedSidebarButton.Selected = true;
+                };
+            }
 
             searchTextBox.Current.ValueChanged += newValue => sectionsContainer.SearchContainer.SearchTerm = newValue;
 
             getToolbarHeight = () => game?.ToolbarOffset ?? 0;
+
+            CreateSections()?.ForEach(AddSection);
+        }
+
+        protected void AddSection(SettingsSection section)
+        {
+            sectionsContainer.Add(section);
+
+            if (sidebar != null)
+            {
+                var button = new SidebarButton
+                {
+                    Section = section,
+                    Action = s =>
+                    {
+                        sectionsContainer.ScrollTo(s);
+                        sidebar.State = ExpandedState.Contracted;
+                    },
+                };
+
+                sidebar.Add(button);
+
+                if (selectedSidebarButton == null)
+                {
+                    selectedSidebarButton = sidebar.Children.First();
+                    selectedSidebarButton.Selected = true;
+                }
+            }
         }
 
         protected virtual Drawable CreateHeader() => new Container();
@@ -122,7 +137,7 @@ namespace osu.Game.Overlays
             base.PopIn();
 
             sectionsContainer.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            sidebar.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
+            sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH / 2);
 
             searchTextBox.HoldFocus = true;
@@ -133,7 +148,7 @@ namespace osu.Game.Overlays
             base.PopOut();
 
             sectionsContainer.MoveToX(-width, TRANSITION_LENGTH, Easing.OutQuint);
-            sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
+            sidebar?.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(0, TRANSITION_LENGTH / 2);
 
             searchTextBox.HoldFocus = false;
@@ -155,7 +170,7 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            sectionsContainer.Margin = new MarginPadding { Left = sidebar.DrawWidth };
+            sectionsContainer.Margin = new MarginPadding { Left = sidebar?.DrawWidth ?? 0 };
             sectionsContainer.Padding = new MarginPadding { Top = getToolbarHeight() };
         }
 
