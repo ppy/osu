@@ -25,5 +25,9 @@ namespace osu.Game.Overlays
 
         protected override Drawable CreateHeader() => new SettingsHeader("settings", "Change the way osu! behaves");
         protected override Drawable CreateFooter() => new SettingsFooter();
+
+        public MainSettings() : base(true)
+        {
+        }
     }
 }
