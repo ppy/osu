@@ -225,6 +225,8 @@ namespace osu.Game.Overlays
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;
+
+            progressBar.Enabled = !disabled;
         }
 
         protected override void UpdateAfterChildren()
@@ -441,6 +443,8 @@ namespace osu.Game.Overlays
 
             private readonly Box fill;
 
+            private bool enabled;
+
             public Color4 FillColour
             {
                 set { fill.Colour = value; }
@@ -454,6 +458,12 @@ namespace osu.Game.Overlays
             public double CurrentTime
             {
                 set { CurrentNumber.Value = value; }
+            }
+
+            public bool Enabled
+            {
+                set { enabled = value; }
+                get { return enabled; }
             }
 
             public ProgressBar()
@@ -476,7 +486,11 @@ namespace osu.Game.Overlays
                 fill.Width = value * UsableWidth;
             }
 
-            protected override void OnUserChange() => OnSeek?.Invoke(Current);
+            protected override void OnUserChange()
+            {
+                if (Enabled)
+                    OnSeek?.Invoke(Current);
+            }
         }
     }
 }
