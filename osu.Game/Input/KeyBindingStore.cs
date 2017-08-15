@@ -22,14 +22,11 @@ namespace osu.Game.Input
             {
                 var ruleset = info.CreateInstance();
                 foreach (var variant in ruleset.AvailableVariants)
-                    GetProcessedList(ruleset.GetDefaultKeyBindings(), info.ID, variant);
+                    insertDefaults(ruleset.GetDefaultKeyBindings(), info.ID, variant);
             }
         }
 
-        public void Register(KeyBindingInputManager manager)
-        {
-            GetProcessedList(manager.DefaultMappings);
-        }
+        public void Register(KeyBindingInputManager manager) => insertDefaults(manager.DefaultMappings);
 
         protected override int StoreVersion => 3;
 
@@ -61,29 +58,37 @@ namespace osu.Game.Input
             Connection.CreateTable<DatabasedKeyBinding>();
         }
 
+        private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
+        {
+            var query = Query(rulesetId, variant);
+
+            // compare counts in database vs defaults
+            foreach (var group in defaults.GroupBy(k => k.Action))
+            {
+                int count;
+                while (group.Count() > (count = query.Count(k => (int)k.Action == (int)group.Key)))
+                {
+                    var insertable = group.Skip(count).First();
+
+                    // insert any defaults which are missing.
+                    Connection.Insert(new DatabasedKeyBinding
+                    {
+                        KeyCombination = insertable.KeyCombination,
+                        Action = (int)insertable.Action,
+                        RulesetID = rulesetId,
+                        Variant = variant
+                    });
+                }
+            }
+        }
+
         protected override Type[] ValidTypes => new[]
         {
             typeof(DatabasedKeyBinding)
         };
 
-        public IEnumerable<KeyBinding> GetProcessedList(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
-        {
-            var databaseEntries = Query<DatabasedKeyBinding>(b => b.RulesetID == rulesetId && b.Variant == variant);
-
-            if (!databaseEntries.Any())
-            {
-                // if there are no entries for this category in the database, we should populate our defaults.
-                Connection.InsertAll(defaults.Select(k => new DatabasedKeyBinding
-                {
-                    KeyCombination = k.KeyCombination,
-                    Action = (int)k.Action,
-                    RulesetID = rulesetId,
-                    Variant = variant
-                }));
-            }
-
-            return databaseEntries;
-        }
+        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) =>
+            Query<DatabasedKeyBinding>(b => b.RulesetID == rulesetId && b.Variant == variant);
 
         public void Update(KeyBinding keyBinding)
         {

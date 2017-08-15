@@ -44,7 +44,7 @@ namespace osu.Game.Input.Bindings
 
         protected override void ReloadMappings()
         {
-            KeyBindings = store.GetProcessedList(DefaultMappings, ruleset?.ID, variant);
+            KeyBindings = store.Query(ruleset?.ID, variant);
         }
     }
 }
