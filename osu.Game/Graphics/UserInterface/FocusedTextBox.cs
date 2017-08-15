@@ -28,16 +28,8 @@ namespace osu.Game.Graphics.UserInterface
             {
                 focus = value;
                 if (!focus && HasFocus)
-                    inputManager.ChangeFocus(null);
+                    GetContainingInputManager().ChangeFocus(null);
             }
-        }
-
-        private InputManager inputManager;
-
-        [BackgroundDependencyLoader]
-        private void load(UserInputManager inputManager)
-        {
-            this.inputManager = inputManager;
         }
 
         protected override void OnFocus(InputState state)
