@@ -27,6 +27,7 @@ namespace osu.Game.Input.Bindings
             private set { KeyCombination = value; }
         }
 
+        [Indexed]
         [Column("Action")]
         public new int Action
         {
