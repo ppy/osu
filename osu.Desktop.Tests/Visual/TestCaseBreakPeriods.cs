@@ -56,6 +56,7 @@ namespace osu.Desktop.Tests.Visual
                 {
                     Difficulty = new BeatmapDifficulty(),
                     Ruleset = Rulesets.Query<RulesetInfo>().First(),
+                    LetterboxInBreaks = true,
                     Metadata = new BeatmapMetadata
                     {
                         Artist = @"Unknown",
