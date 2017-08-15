@@ -55,9 +55,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                 i = 0;
                 foreach (var s in scores)
                 {
-                    s.Beatmap = beatmap;
-                    s.Ruleset = beatmap?.Ruleset;
-
                     var ls = new LeaderboardScore(s, 1 + i)
                     {
                         AlwaysPresent = true,
