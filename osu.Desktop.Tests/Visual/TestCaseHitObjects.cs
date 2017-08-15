@@ -27,35 +27,13 @@ namespace osu.Desktop.Tests.Visual
         {
             var rateAdjustClock = new StopwatchClock(true);
             framedClock = new FramedClock(rateAdjustClock);
-            playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
-
-            playbackSpeed.TriggerChange();
 
             AddStep(@"circles", () => loadHitobjects(HitObjectType.Circle));
             AddStep(@"slider", () => loadHitobjects(HitObjectType.Slider));
             AddStep(@"spinner", () => loadHitobjects(HitObjectType.Spinner));
 
-            AddToggleStep(@"auto", state => { auto = state; loadHitobjects(mode); });
-
-            BasicSliderBar<double> sliderBar;
-            Add(new Container
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new SpriteText { Text = "Playback Speed" },
-                    sliderBar = new BasicSliderBar<double>
-                    {
-                        Width = 150,
-                        Height = 10,
-                        SelectionColor = Color4.Orange,
-                    }
-                }
-            });
-
-            sliderBar.Current.BindTo(playbackSpeed);
+            AddToggleStep("Auto", state => { auto = state; loadHitobjects(mode); });
+            AddSliderStep("Playback speed", 0.0, 2.0, 0.5, v => rateAdjustClock.Rate = v);
 
             framedClock.ProcessFrame();
 
@@ -75,7 +53,6 @@ namespace osu.Desktop.Tests.Visual
 
         private HitObjectType mode = HitObjectType.Slider;
 
-        private readonly BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
         private readonly Container playfieldContainer;
         private readonly Container approachContainer;
 
