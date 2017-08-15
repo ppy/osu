@@ -202,6 +202,7 @@ namespace osu.Game
                 }
             });
 
+            KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
 
             // TODO: This is temporary until we reimplement the local FPS display.
