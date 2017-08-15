@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.KeyConfiguration
 
             foreach (Enum v in Enum.GetValues(actionType))
             {
-                Add(new KeyBindingRow(v, bindings.Where(b => (int)b.Action == (int)(object)v)));
+                Add(new KeyBindingRow(v, bindings.Where(b => b.Action.Equals((int)(object)v))));
             }
         }
     }
