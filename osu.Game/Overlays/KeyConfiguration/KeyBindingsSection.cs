@@ -27,25 +27,21 @@ namespace osu.Game.Overlays.KeyConfiguration
         [BackgroundDependencyLoader]
         private void load(KeyBindingStore store)
         {
-            var firstDefault = Defaults?.FirstOrDefault();
+            var enumType = Defaults?.FirstOrDefault()?.Action?.GetType();
 
-            if (firstDefault == null) return;
-
-            var actionType = firstDefault.Action.GetType();
-
-            int? variant = null;
+            if (enumType == null) return;
 
             // for now let's just assume a variant of zero.
             // this will need to be implemented in a better way in the future.
+            int? variant = null;
             if (Ruleset != null)
                 variant = 0;
 
             var bindings = store.Query(Ruleset?.ID, variant);
 
-            foreach (Enum v in Enum.GetValues(actionType))
-            {
+            foreach (Enum v in Enum.GetValues(enumType))
+                // one row per valid action.
                 Add(new KeyBindingRow(v, bindings.Where(b => b.Action.Equals((int)(object)v))));
-            }
         }
     }
 }
