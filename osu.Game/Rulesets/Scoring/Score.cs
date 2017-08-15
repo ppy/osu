@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Scoring
         public int Combo { get; set; }
 
         [JsonProperty(@"mods")]
-        protected string[] ModStrings { get; set; }
+        private string[] modStrings { get; set; }
 
         private RulesetInfo ruleset;
         public RulesetInfo Ruleset
@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Scoring
                 ruleset = value;
 
                 // Handle the mod strings if they are assigned
-                if (ModStrings != null)
-                    Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => ModStrings.Contains(mod.ShortenedName)).ToArray();
+                if (modStrings != null)
+                    Mods = ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
             }
         }
 
