@@ -5,13 +5,14 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SpinnerDisc : CircularContainer, IHasAccentColour
+    public class SpinnerDisc : CircularContainer, IHasAccentColour, IKeyBindingHandler<OsuAction>
     {
         private readonly Spinner spinner;
 
@@ -66,26 +67,53 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
+        private void updateTracking()
+        {
+            Tracking = mouseHasMainButtonPressed || actionLeftButtonPressed || actionRightButtonPressed;
+        }
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            Tracking |= state.Mouse.HasMainButtonPressed;
+            mouseHasMainButtonPressed |= state.Mouse.HasMainButtonPressed;
+            updateTracking();
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            Tracking &= state.Mouse.HasMainButtonPressed;
+            mouseHasMainButtonPressed &= state.Mouse.HasMainButtonPressed;
+            updateTracking();
             return base.OnMouseUp(state, args);
         }
 
         protected override bool OnMouseMove(InputState state)
         {
-            Tracking |= state.Mouse.HasMainButtonPressed;
+            mouseHasMainButtonPressed |= state.Mouse.HasMainButtonPressed;
             mousePosition = Parent.ToLocalSpace(state.Mouse.NativeState.Position);
+            updateTracking();
             return base.OnMouseMove(state);
         }
 
+        public bool OnPressed(OsuAction action)
+        {
+            actionLeftButtonPressed |= action == OsuAction.LeftButton;
+            actionRightButtonPressed |= action == OsuAction.RightButton;
+            updateTracking();
+            return false;
+        }
+
+        public bool OnReleased(OsuAction action)
+        {
+            actionLeftButtonPressed &= action == OsuAction.LeftButton;
+            actionRightButtonPressed &= action == OsuAction.RightButton;
+            updateTracking();
+            return false;
+        }
+
         private Vector2 mousePosition;
+        private bool mouseHasMainButtonPressed;
+        private bool actionLeftButtonPressed;
+        private bool actionRightButtonPressed;
 
         private float lastAngle;
         private float currentRotation;
