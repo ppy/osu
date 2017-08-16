@@ -74,7 +74,7 @@ namespace osu.Game.Input
                     Connection.Insert(new DatabasedKeyBinding
                     {
                         KeyCombination = insertable.KeyCombination,
-                        Action = (int)insertable.Action,
+                        Action = insertable.Action,
                         RulesetID = rulesetId,
                         Variant = variant
                     });
