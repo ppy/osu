@@ -18,8 +18,6 @@ namespace osu.Game.Screens.Play
     {
         private const int bottom_bar_height = 5;
 
-        protected override bool HideOnEscape => false;
-
         private static readonly Vector2 handle_size = new Vector2(14, 25);
 
         private const float transition_duration = 200;

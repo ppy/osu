@@ -29,6 +29,10 @@ namespace osu.Game.Overlays
 
         private const float sidebar_padding = 10;
 
+        protected Container<Drawable> ContentContainer;
+
+        protected override Container<Drawable> Content => ContentContainer;
+
         private Sidebar sidebar;
         private SidebarButton selectedSidebarButton;
 
@@ -39,6 +43,8 @@ namespace osu.Game.Overlays
         private Func<float> getToolbarHeight;
 
         private readonly bool showSidebar;
+
+        protected Box Background;
 
         protected SettingsOverlay(bool showSidebar)
         {
@@ -52,40 +58,43 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuGame game)
         {
-            Children = new Drawable[]
+            InternalChild = ContentContainer = new Container
             {
-                new Box
+                Width = width,
+                RelativeSizeAxes = Axes.Y,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.6f,
-                },
-                SectionsContainer = new SettingsSectionsContainer
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = width,
-                    Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
-                    ExpandableHeader = CreateHeader(),
-                    FixedHeader = searchTextBox = new SearchTextBox
+                    Background = new Box
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Width = 0.95f,
-                        Margin = new MarginPadding
-                        {
-                            Top = 20,
-                            Bottom = 20
-                        },
-                        Exit = Hide,
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                        Alpha = 0.6f,
                     },
-                    Footer = CreateFooter()
-                },
+                    SectionsContainer = new SettingsSectionsContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        ExpandableHeader = CreateHeader(),
+                        FixedHeader = searchTextBox = new SearchTextBox
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Width = 0.95f,
+                            Margin = new MarginPadding
+                            {
+                                Top = 20,
+                                Bottom = 20
+                            },
+                            Exit = Hide,
+                        },
+                        Footer = CreateFooter()
+                    },
+                }
             };
 
             if (showSidebar)
             {
-                Add(sidebar = new Sidebar { Width = SIDEBAR_WIDTH });
+                AddInternal(sidebar = new Sidebar { Width = SIDEBAR_WIDTH });
 
                 SectionsContainer.SelectedSection.ValueChanged += section =>
                 {
@@ -136,7 +145,7 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            SectionsContainer.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
+            ContentContainer.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH / 2);
 
@@ -147,7 +156,7 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            SectionsContainer.MoveToX(-width, TRANSITION_LENGTH, Easing.OutQuint);
+            ContentContainer.MoveToX(-width, TRANSITION_LENGTH, Easing.OutQuint);
             sidebar?.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(0, TRANSITION_LENGTH / 2);
 
@@ -170,8 +179,8 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            SectionsContainer.Margin = new MarginPadding { Left = sidebar?.DrawWidth ?? 0 };
-            SectionsContainer.Padding = new MarginPadding { Top = getToolbarHeight() };
+            ContentContainer.Margin = new MarginPadding { Left = sidebar?.DrawWidth ?? 0 };
+            ContentContainer.Padding = new MarginPadding { Top = getToolbarHeight() };
         }
 
         protected class SettingsSectionsContainer : SectionsContainer<SettingsSection>
