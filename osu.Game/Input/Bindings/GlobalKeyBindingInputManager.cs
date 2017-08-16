@@ -30,7 +30,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { Key.LControl, Key.D }, GlobalAction.ToggleDirect),
         };
 
-        protected override IEnumerable<Drawable> GetKeyboardInputQueue() => new[] { handler }.Concat(base.GetKeyboardInputQueue());
+        protected override IEnumerable<Drawable> GetKeyboardInputQueue() =>
+            handler == null ? base.GetKeyboardInputQueue() : new[] { handler }.Concat(base.GetKeyboardInputQueue());
     }
 
     public enum GlobalAction
