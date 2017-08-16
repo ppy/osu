@@ -5,7 +5,6 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Input;
 using System;
-using System.Linq;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -37,16 +36,18 @@ namespace osu.Game.Graphics.UserInterface
             BorderThickness = 0;
         }
 
-        protected override void OnFocusLost(InputState state)
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (state.Keyboard.Keys.Any(key => key == Key.Escape))
+            if (args.Key == Key.Escape)
             {
                 if (Text.Length > 0)
                     Text = string.Empty;
                 else
                     Exit?.Invoke();
+                return true;
             }
-            base.OnFocusLost(state);
+
+            return base.OnKeyDown(state, args);
         }
 
         public override bool RequestsFocus => HoldFocus;
