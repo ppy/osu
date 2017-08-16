@@ -1,17 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
 using System.Linq;
+using OpenTK;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+
 namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
@@ -144,12 +145,12 @@ namespace osu.Game.Screens.Play
                 return;
 
             double position = audioClock?.CurrentTime ?? Time.Current;
-            double progress = (position - firstHitTime) / (lastHitTime - firstHitTime);
+            float progress = (float) ((position - firstHitTime) / (lastHitTime - firstHitTime));
 
-            if (progress < 1)
+            if (progress < 1.0f)
             {
                 bar.CurrentTime = position;
-                graph.Progress = (int)(graph.ColumnCount * progress);
+                graph.Progress = progress;
             }
         }
     }
