@@ -15,9 +15,9 @@ namespace osu.Game.Overlays
         protected override Drawable CreateHeader() => new SettingsHeader("key configuration", "Customise your keys!");
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(RulesetStore rulesets, GlobalBindingInputManager global)
+        private void load(RulesetStore rulesets, GlobalKeyBindingInputManager global)
         {
-            AddSection(new GlobalBindingsSection(global, "Global"));
+            AddSection(new GlobalKeyBindingsSection(global, "Global"));
 
             foreach (var ruleset in rulesets.Query<RulesetInfo>())
                 AddSection(new RulesetBindingsSection(ruleset));

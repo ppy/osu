@@ -26,7 +26,7 @@ namespace osu.Game.Input
             }
         }
 
-        public void Register(KeyBindingInputManager manager) => insertDefaults(manager.DefaultMappings);
+        public void Register(KeyBindingInputManager manager) => insertDefaults(manager.DefaultKeyBindings);
 
         protected override int StoreVersion => 3;
 
@@ -51,9 +51,7 @@ namespace osu.Game.Input
         protected override void Prepare(bool reset = false)
         {
             if (reset)
-            {
                 Connection.DropTable<DatabasedKeyBinding>();
-            }
 
             Connection.CreateTable<DatabasedKeyBinding>();
         }
@@ -90,9 +88,6 @@ namespace osu.Game.Input
         public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) =>
             Query<DatabasedKeyBinding>(b => b.RulesetID == rulesetId && b.Variant == variant);
 
-        public void Update(KeyBinding keyBinding)
-        {
-            Connection.Update(keyBinding);
-        }
+        public void Update(KeyBinding keyBinding) => Connection.Update(keyBinding);
     }
 }

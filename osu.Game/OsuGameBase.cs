@@ -183,14 +183,14 @@ namespace osu.Game
         {
             base.LoadComplete();
 
-            GlobalBindingInputManager globalBinding;
+            GlobalKeyBindingInputManager globalBinding;
 
             base.Content.Add(new RatioAdjust
             {
                 Children = new Drawable[]
                 {
                     Cursor = new MenuCursor(),
-                    globalBinding = new GlobalBindingInputManager(this)
+                    globalBinding = new GlobalKeyBindingInputManager(this)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = new OsuTooltipContainer(Cursor)
