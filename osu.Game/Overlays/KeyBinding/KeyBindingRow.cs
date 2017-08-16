@@ -142,12 +142,16 @@ namespace osu.Game.Overlays.KeyBinding
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == Key.Delete)
+            switch (args.Key)
             {
-                bindTarget.UpdateKeyCombination(Key.Unknown);
-                store.Update(bindTarget.KeyBinding);
-                GetContainingInputManager().ChangeFocus(null);
-                return true;
+                case Key.Escape:
+                    GetContainingInputManager().ChangeFocus(null);
+                    return true;
+                case Key.Delete:
+                    bindTarget.UpdateKeyCombination(Key.Unknown);
+                    store.Update(bindTarget.KeyBinding);
+                    GetContainingInputManager().ChangeFocus(null);
+                    return true;
             }
 
             if (HasFocus)
