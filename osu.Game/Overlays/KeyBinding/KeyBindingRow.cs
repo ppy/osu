@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
@@ -106,12 +105,6 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             };
 
-            reloadBindings();
-        }
-
-        private void reloadBindings()
-        {
-            buttons.Clear();
             foreach (var b in bindings)
                 buttons.Add(new KeyButton(b));
         }
@@ -149,23 +142,50 @@ namespace osu.Game.Overlays.KeyBinding
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (HasFocus && !isModifier(args.Key))
+            switch (args.Key)
             {
-                bindTarget.KeyBinding.KeyCombination = args.Key == Key.Delete ? Key.Unknown : new KeyCombination(state.Keyboard.Keys);
+                case Key.Escape:
+                    GetContainingInputManager().ChangeFocus(null);
+                    return true;
+                case Key.Delete:
+                    bindTarget.UpdateKeyCombination(Key.Unknown);
+                    store.Update(bindTarget.KeyBinding);
+                    GetContainingInputManager().ChangeFocus(null);
+                    return true;
+            }
 
-                store.Update(bindTarget.KeyBinding);
-                GetContainingInputManager().ChangeFocus(null);
+            if (HasFocus)
+            {
+                bindTarget.UpdateKeyCombination(state.Keyboard.Keys.ToArray());
+                if (!isModifier(args.Key))
+                    finalise();
                 return true;
             }
 
             return base.OnKeyDown(state, args);
         }
 
+        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        {
+            if (HasFocus)
+            {
+                finalise();
+                return true;
+            }
+
+            return base.OnKeyUp(state, args);
+        }
+
+        private void finalise()
+        {
+            store.Update(bindTarget.KeyBinding);
+            GetContainingInputManager().ChangeFocus(null);
+        }
+
         protected override void OnFocusLost(InputState state)
         {
             bindTarget.IsBinding = false;
             bindTarget = null;
-            reloadBindings();
 
             pressAKey.FadeOut(300, Easing.OutQuint);
             pressAKey.Padding = new MarginPadding { Bottom = -pressAKey.DrawHeight };
@@ -197,19 +217,10 @@ namespace osu.Game.Overlays.KeyBinding
                 get { return isBinding; }
                 set
                 {
+                    if (value == isBinding) return;
                     isBinding = value;
 
-                    if (value)
-                    {
-                        box.FadeColour(Color4.White, transition_time, Easing.OutQuint);
-                        Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
-
-                    }
-                    else
-                    {
-                        box.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
-                        Text.FadeColour(Color4.White, transition_time, Easing.OutQuint);
-                    }
+                    updateHoverState();
                 }
             }
 
@@ -261,24 +272,34 @@ namespace osu.Game.Overlays.KeyBinding
 
             protected override bool OnHover(InputState state)
             {
-                if (isBinding)
-                    return false;
-
-                box.FadeColour(hoverColour, transition_time, Easing.OutQuint);
-                Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
-
+                updateHoverState();
                 return base.OnHover(state);
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                if (isBinding)
-                    return;
-
-                box.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
-                Text.FadeColour(Color4.White, transition_time, Easing.OutQuint);
-
+                updateHoverState();
                 base.OnHoverLost(state);
+            }
+
+            private void updateHoverState()
+            {
+                if (isBinding)
+                {
+                    box.FadeColour(Color4.White, transition_time, Easing.OutQuint);
+                    Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
+                }
+                else
+                {
+                    box.FadeColour(IsHovered ? hoverColour : Color4.Black, transition_time, Easing.OutQuint);
+                    Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
+                }
+            }
+
+            public void UpdateKeyCombination(params Key[] newCombination)
+            {
+                KeyBinding.KeyCombination = newCombination;
+                Text.Text = KeyBinding.KeyCombination.ReadableString();
             }
         }
     }

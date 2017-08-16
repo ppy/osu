@@ -22,8 +22,6 @@ namespace osu.Game.Screens.Play
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
 
-        protected override bool HideOnEscape => false;
-
         protected override bool BlockPassThroughKeyboard => true;
 
         public Action OnRetry;
@@ -95,7 +93,8 @@ namespace osu.Game.Screens.Play
                 Origin = Anchor.TopCentre,
                 Anchor = Anchor.TopCentre,
                 Height = button_height,
-                Action = delegate {
+                Action = delegate
+                {
                     action?.Invoke();
                     Hide();
                 }
