@@ -18,12 +18,12 @@ using osu.Game.Input;
 using OpenTK.Graphics;
 using OpenTK.Input;
 
-namespace osu.Game.Overlays.KeyConfiguration
+namespace osu.Game.Overlays.KeyBinding
 {
     internal class KeyBindingRow : Container, IFilterable
     {
         private readonly Enum action;
-        private readonly IEnumerable<KeyBinding> bindings;
+        private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;
 
         private const float transition_time = 150;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.KeyConfiguration
 
         public string[] FilterTerms => new[] { text.Text }.Concat(bindings.Select(b => b.KeyCombination.ReadableString())).ToArray();
 
-        public KeyBindingRow(Enum action, IEnumerable<KeyBinding> bindings)
+        public KeyBindingRow(Enum action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
         {
             this.action = action;
             this.bindings = bindings;
@@ -183,7 +183,7 @@ namespace osu.Game.Overlays.KeyConfiguration
 
         private class KeyButton : Container
         {
-            public readonly KeyBinding KeyBinding;
+            public readonly Framework.Input.Bindings.KeyBinding KeyBinding;
 
             private readonly Box box;
             public readonly OsuSpriteText Text;
@@ -213,7 +213,7 @@ namespace osu.Game.Overlays.KeyConfiguration
                 }
             }
 
-            public KeyButton(KeyBinding keyBinding)
+            public KeyButton(Framework.Input.Bindings.KeyBinding keyBinding)
             {
                 KeyBinding = keyBinding;
 

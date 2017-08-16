@@ -102,11 +102,11 @@
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
-    <Compile Include="Overlays\KeyConfiguration\GlobalBindingsSection.cs" />
-    <Compile Include="Overlays\KeyConfiguration\KeyBindingRow.cs" />
-    <Compile Include="Overlays\KeyConfiguration\KeyBindingsSection.cs" />
-    <Compile Include="Overlays\KeyConfiguration\KeyConfiguration.cs" />
-    <Compile Include="Overlays\KeyConfiguration\RulesetBindingsSection.cs" />
+    <Compile Include="Overlays\KeyBinding\GlobalBindingsSection.cs" />
+    <Compile Include="Overlays\KeyBinding\KeyBindingRow.cs" />
+    <Compile Include="Overlays\KeyBinding\KeyBindingsSection.cs" />
+    <Compile Include="Overlays\KeyBindingOverlay.cs" />
+    <Compile Include="Overlays\KeyBinding\RulesetBindingsSection.cs" />
     <Compile Include="Overlays\MainSettings.cs" />
     <Compile Include="Overlays\Music\CollectionsDropdown.cs" />
     <Compile Include="Overlays\Music\FilterControl.cs" />

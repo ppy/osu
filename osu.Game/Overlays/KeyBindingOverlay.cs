@@ -4,12 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays.KeyBinding;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 
-namespace osu.Game.Overlays.KeyConfiguration
+namespace osu.Game.Overlays
 {
-    public class KeyConfiguration : SettingsOverlay
+    public class KeyConfigurationOverlay : SettingsOverlay
     {
         protected override Drawable CreateHeader() => new SettingsHeader("key configuration", "Customise your keys!");
 
@@ -22,7 +23,7 @@ namespace osu.Game.Overlays.KeyConfiguration
                 AddSection(new RulesetBindingsSection(ruleset));
         }
 
-        public KeyConfiguration()
+        public KeyConfigurationOverlay()
             : base(false)
         {
         }

@@ -5,17 +5,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Input.Bindings;
 using osu.Game.Input;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using OpenTK;
 
-namespace osu.Game.Overlays.KeyConfiguration
+namespace osu.Game.Overlays.KeyBinding
 {
     public abstract class KeyBindingsSection : SettingsSection
     {
-        protected IEnumerable<KeyBinding> Defaults;
+        protected IEnumerable<Framework.Input.Bindings.KeyBinding> Defaults;
 
         protected RulesetInfo Ruleset;
 
