@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
-            KeyConversionInputManager = CreateActionMappingInputManager();
+            KeyConversionInputManager = CreateKeyBindingInputManager();
             KeyConversionInputManager.RelativeSizeAxes = Axes.Both;
         }
 
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.UI
         /// Creates a key conversion input manager.
         /// </summary>
         /// <returns>The input manager.</returns>
-        protected virtual PassThroughInputManager CreateActionMappingInputManager() => new PassThroughInputManager();
+        public virtual PassThroughInputManager CreateKeyBindingInputManager() => new PassThroughInputManager();
 
         protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
 
