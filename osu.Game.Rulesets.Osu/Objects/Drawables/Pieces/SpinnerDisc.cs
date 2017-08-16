@@ -75,16 +75,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public bool OnPressed(OsuAction action)
         {
-            actionLeftButtonPressed |= action == OsuAction.LeftButton;
-            actionRightButtonPressed |= action == OsuAction.RightButton;
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                    actionLeftButtonPressed = true;
+                    break;
+                case OsuAction.RightButton:
+                    actionRightButtonPressed = true;
+                    break;
+            }
             Tracking = actionLeftButtonPressed || actionRightButtonPressed;
             return false;
         }
 
         public bool OnReleased(OsuAction action)
         {
-            actionLeftButtonPressed &= action == OsuAction.LeftButton;
-            actionRightButtonPressed &= action == OsuAction.RightButton;
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                    actionLeftButtonPressed = false;
+                    break;
+                case OsuAction.RightButton:
+                    actionRightButtonPressed = false;
+                    break;
+            }
             Tracking = actionLeftButtonPressed || actionRightButtonPressed;
             return false;
         }
