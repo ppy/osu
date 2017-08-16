@@ -32,7 +32,7 @@ namespace osu.Game.Overlays
         private Sidebar sidebar;
         private SidebarButton selectedSidebarButton;
 
-        private SettingsSectionsContainer sectionsContainer;
+        protected SettingsSectionsContainer SectionsContainer;
 
         private SearchTextBox searchTextBox;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays
                     Colour = Color4.Black,
                     Alpha = 0.6f,
                 },
-                sectionsContainer = new SettingsSectionsContainer
+                SectionsContainer = new SettingsSectionsContainer
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = width,
@@ -80,14 +80,14 @@ namespace osu.Game.Overlays
                         Exit = Hide,
                     },
                     Footer = CreateFooter()
-                }
+                },
             };
 
             if (showSidebar)
             {
                 Add(sidebar = new Sidebar { Width = SIDEBAR_WIDTH });
 
-                sectionsContainer.SelectedSection.ValueChanged += section =>
+                SectionsContainer.SelectedSection.ValueChanged += section =>
                 {
                     selectedSidebarButton.Selected = false;
                     selectedSidebarButton = sidebar.Children.Single(b => b.Section == section);
@@ -95,7 +95,7 @@ namespace osu.Game.Overlays
                 };
             }
 
-            searchTextBox.Current.ValueChanged += newValue => sectionsContainer.SearchContainer.SearchTerm = newValue;
+            searchTextBox.Current.ValueChanged += newValue => SectionsContainer.SearchContainer.SearchTerm = newValue;
 
             getToolbarHeight = () => game?.ToolbarOffset ?? 0;
 
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays
 
         protected void AddSection(SettingsSection section)
         {
-            sectionsContainer.Add(section);
+            SectionsContainer.Add(section);
 
             if (sidebar != null)
             {
@@ -113,7 +113,7 @@ namespace osu.Game.Overlays
                     Section = section,
                     Action = s =>
                     {
-                        sectionsContainer.ScrollTo(s);
+                        SectionsContainer.ScrollTo(s);
                         sidebar.State = ExpandedState.Contracted;
                     },
                 };
@@ -136,7 +136,7 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            sectionsContainer.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
+            SectionsContainer.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(1, TRANSITION_LENGTH / 2);
 
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            sectionsContainer.MoveToX(-width, TRANSITION_LENGTH, Easing.OutQuint);
+            SectionsContainer.MoveToX(-width, TRANSITION_LENGTH, Easing.OutQuint);
             sidebar?.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
             this.FadeTo(0, TRANSITION_LENGTH / 2);
 
@@ -170,11 +170,11 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            sectionsContainer.Margin = new MarginPadding { Left = sidebar?.DrawWidth ?? 0 };
-            sectionsContainer.Padding = new MarginPadding { Top = getToolbarHeight() };
+            SectionsContainer.Margin = new MarginPadding { Left = sidebar?.DrawWidth ?? 0 };
+            SectionsContainer.Padding = new MarginPadding { Top = getToolbarHeight() };
         }
 
-        private class SettingsSectionsContainer : SectionsContainer<SettingsSection>
+        protected class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
             public SearchContainer<SettingsSection> SearchContainer;
 

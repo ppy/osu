@@ -4,7 +4,7 @@
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 
-namespace osu.Game.Overlays.KeyConfiguration
+namespace osu.Game.Overlays.KeyBinding
 {
     public class GlobalBindingsSection : KeyBindingsSection
     {

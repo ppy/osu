@@ -4,7 +4,7 @@
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
 
-namespace osu.Game.Overlays.KeyConfiguration
+namespace osu.Game.Overlays.KeyBinding
 {
     public class RulesetBindingsSection : KeyBindingsSection
     {
