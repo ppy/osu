@@ -7,19 +7,19 @@ namespace osu.Desktop.Tests.Visual
 {
     public class TestCaseKeyConfiguration : OsuTestCase
     {
-        private readonly KeyConfigurationOverlay configuration;
+        private readonly KeyBindingOverlay overlay;
 
         public override string Description => @"Key configuration";
 
         public TestCaseKeyConfiguration()
         {
-            Child = configuration = new KeyConfigurationOverlay();
+            Child = overlay = new KeyBindingOverlay();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            configuration.Show();
+            overlay.Show();
         }
     }
 }

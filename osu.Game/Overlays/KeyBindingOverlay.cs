@@ -10,7 +10,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays
 {
-    public class KeyConfigurationOverlay : SettingsOverlay
+    public class KeyBindingOverlay : SettingsOverlay
     {
         protected override Drawable CreateHeader() => new SettingsHeader("key configuration", "Customise your keys!");
 
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays
                 AddSection(new RulesetBindingsSection(ruleset));
         }
 
-        public KeyConfigurationOverlay()
+        public KeyBindingOverlay()
             : base(false)
         {
         }
