@@ -153,7 +153,7 @@ namespace osu.Game.Overlays
 
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
-                InputManager.ChangeFocus(null);
+                GetContainingInputManager().ChangeFocus(null);
         }
 
         public override bool AcceptsFocus => true;
@@ -162,7 +162,7 @@ namespace osu.Game.Overlays
 
         protected override void OnFocus(InputState state)
         {
-            InputManager.ChangeFocus(searchTextBox);
+            GetContainingInputManager().ChangeFocus(searchTextBox);
             base.OnFocus(state);
         }
 
