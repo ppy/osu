@@ -220,13 +220,7 @@ namespace osu.Game.Overlays.KeyBinding
                     if (value == isBinding) return;
                     isBinding = value;
 
-                    if (isBinding)
-                    {
-                        box.FadeColour(Color4.White, transition_time, Easing.OutQuint);
-                        Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
-                    }
-                    else
-                        updateHoverState();
+                    updateHoverState();
                 }
             }
 
@@ -278,22 +272,28 @@ namespace osu.Game.Overlays.KeyBinding
 
             protected override bool OnHover(InputState state)
             {
-                if (!isBinding)
-                    updateHoverState();
+                updateHoverState();
                 return base.OnHover(state);
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                if (!isBinding)
-                    updateHoverState();
+                updateHoverState();
                 base.OnHoverLost(state);
             }
 
             private void updateHoverState()
             {
-                box.FadeColour(IsHovered ? hoverColour : Color4.Black, transition_time, Easing.OutQuint);
-                Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
+                if (isBinding)
+                {
+                    box.FadeColour(Color4.White, transition_time, Easing.OutQuint);
+                    Text.FadeColour(Color4.Black, transition_time, Easing.OutQuint);
+                }
+                else
+                {
+                    box.FadeColour(IsHovered ? hoverColour : Color4.Black, transition_time, Easing.OutQuint);
+                    Text.FadeColour(IsHovered ? Color4.Black : Color4.White, transition_time, Easing.OutQuint);
+                }
             }
 
             public void UpdateKeyCombination(params Key[] newCombination)
