@@ -67,30 +67,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        private void updateTracking()
-        {
-            Tracking = mouseHasMainButtonPressed || actionLeftButtonPressed || actionRightButtonPressed;
-        }
-
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            mouseHasMainButtonPressed |= state.Mouse.HasMainButtonPressed;
-            updateTracking();
-            return base.OnMouseDown(state, args);
-        }
-
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-        {
-            mouseHasMainButtonPressed &= state.Mouse.HasMainButtonPressed;
-            updateTracking();
-            return base.OnMouseUp(state, args);
-        }
-
         protected override bool OnMouseMove(InputState state)
         {
-            mouseHasMainButtonPressed |= state.Mouse.HasMainButtonPressed;
             mousePosition = Parent.ToLocalSpace(state.Mouse.NativeState.Position);
-            updateTracking();
             return base.OnMouseMove(state);
         }
 
@@ -98,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             actionLeftButtonPressed |= action == OsuAction.LeftButton;
             actionRightButtonPressed |= action == OsuAction.RightButton;
-            updateTracking();
+            Tracking = actionLeftButtonPressed || actionRightButtonPressed;
             return false;
         }
 
@@ -106,12 +85,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             actionLeftButtonPressed &= action == OsuAction.LeftButton;
             actionRightButtonPressed &= action == OsuAction.RightButton;
-            updateTracking();
+            Tracking = actionLeftButtonPressed || actionRightButtonPressed;
             return false;
         }
 
         private Vector2 mousePosition;
-        private bool mouseHasMainButtonPressed;
         private bool actionLeftButtonPressed;
         private bool actionRightButtonPressed;
 
