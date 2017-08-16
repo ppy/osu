@@ -214,7 +214,8 @@ namespace osu.Game.Screens.Play
 
             protected override void LoadComplete()
             {
-                for (int r = 0; r < cubeCount; r++)
+                // Create the boxes in reversed order to start iterations at the bottom
+                for (int r = (int) cubeCount - 1; r >= 0; r--)
                 {
                     drawableLitRows.Add(new Box
                     {
@@ -231,10 +232,6 @@ namespace osu.Game.Screens.Play
                 }
 
                 Children = drawableLitRows.Concat(drawableDimmedRows).ToList();
-
-                // Reverse drawableLitRows and drawableDimmedRows so when iterating through them they start at the bottom
-                drawableLitRows.Reverse();
-                drawableDimmedRows.Reverse();
 
                 fillActive();
             }
