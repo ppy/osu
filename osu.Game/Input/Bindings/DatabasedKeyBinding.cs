@@ -29,10 +29,10 @@ namespace osu.Game.Input.Bindings
 
         [Indexed]
         [Column("Action")]
-        public new int Action
+        public int IntAction
         {
-            get { return (int)base.Action; }
-            set { base.Action = value; }
+            get { return (int)Action; }
+            set { Action = value; }
         }
     }
 }
