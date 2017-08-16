@@ -6,18 +6,18 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.KeyBinding
 {
-    public class GlobalBindingsSection : KeyBindingsSection
+    public class GlobalKeyBindingsSection : KeyBindingsSection
     {
         private readonly string name;
 
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_nofail;
         public override string Header => name;
 
-        public GlobalBindingsSection(KeyBindingInputManager manager, string name)
+        public GlobalKeyBindingsSection(KeyBindingInputManager manager, string name)
         {
             this.name = name;
 
-            Defaults = manager.DefaultMappings;
+            Defaults = manager.DefaultKeyBindings;
         }
     }
 }

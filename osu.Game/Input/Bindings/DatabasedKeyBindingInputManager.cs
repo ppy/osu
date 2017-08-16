@@ -21,7 +21,7 @@ namespace osu.Game.Input.Bindings
 
         private KeyBindingStore store;
 
-        public override IEnumerable<KeyBinding> DefaultMappings => ruleset.CreateInstance().GetDefaultKeyBindings();
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings();
 
         /// <summary>
         /// Create a new instance.

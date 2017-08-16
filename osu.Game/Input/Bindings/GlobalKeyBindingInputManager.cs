@@ -11,17 +11,17 @@ using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Input.Bindings
 {
-    public class GlobalBindingInputManager : DatabasedKeyBindingInputManager<GlobalAction>
+    public class GlobalKeyBindingInputManager : DatabasedKeyBindingInputManager<GlobalAction>
     {
         private readonly Drawable handler;
 
-        public GlobalBindingInputManager(OsuGameBase game)
+        public GlobalKeyBindingInputManager(OsuGameBase game)
         {
             if (game is IKeyBindingHandler<GlobalAction>)
                 handler = game;
         }
 
-        public override IEnumerable<KeyBinding> DefaultMappings => new[]
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => new[]
         {
             new KeyBinding(Key.F8, GlobalAction.ToggleChat),
             new KeyBinding(Key.F9, GlobalAction.ToggleSocial),
