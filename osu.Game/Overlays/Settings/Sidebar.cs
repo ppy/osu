@@ -87,6 +87,8 @@ namespace osu.Game.Overlays.Settings
             get { return state; }
             set
             {
+                expandEvent?.Cancel();
+
                 if (state == value) return;
 
                 state = value;
