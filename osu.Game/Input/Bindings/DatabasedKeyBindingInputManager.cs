@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets;
@@ -18,7 +19,9 @@ namespace osu.Game.Input.Bindings
 
         private readonly int? variant;
 
-        private BindingStore store;
+        private KeyBindingStore store;
+
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => ruleset.CreateInstance().GetDefaultKeyBindings();
 
         /// <summary>
         /// Create a new instance.
@@ -34,24 +37,14 @@ namespace osu.Game.Input.Bindings
         }
 
         [BackgroundDependencyLoader]
-        private void load(BindingStore bindings)
+        private void load(KeyBindingStore keyBindings)
         {
-            store = bindings;
+            store = keyBindings;
         }
 
         protected override void ReloadMappings()
         {
-            // load defaults
-            base.ReloadMappings();
-
-            var rulesetId = ruleset?.ID;
-
-            // load from database if present.
-            if (store != null)
-            {
-                foreach (var b in store.Query<DatabasedKeyBinding>(b => b.RulesetID == rulesetId && b.Variant == variant))
-                    KeyBindings.Add(b);
-            }
+            KeyBindings = store.Query(ruleset?.ID, variant);
         }
     }
 }

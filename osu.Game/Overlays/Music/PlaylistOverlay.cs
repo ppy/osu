@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -31,12 +30,10 @@ namespace osu.Game.Overlays.Music
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets;
-        private InputManager inputManager;
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours, UserInputManager inputManager)
+        private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours)
         {
-            this.inputManager = inputManager;
             this.beatmaps = beatmaps;
 
             Children = new Drawable[]
@@ -102,7 +99,7 @@ namespace osu.Game.Overlays.Music
         protected override void PopIn()
         {
             filter.Search.HoldFocus = true;
-            Schedule(() => inputManager.ChangeFocus(filter.Search));
+            Schedule(() => GetContainingInputManager().ChangeFocus(filter.Search));
 
             this.ResizeTo(new Vector2(1, playlist_height), transition_duration, Easing.OutQuint);
             this.FadeIn(transition_duration, Easing.OutQuint);
