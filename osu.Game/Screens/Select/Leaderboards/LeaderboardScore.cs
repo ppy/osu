@@ -373,6 +373,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         Icon = FontAwesome.fa_square,
                         Colour = OsuColour.FromHex(@"3087ac"),
                         Rotation = 45,
+                        Size = new Vector2(20),
                         Shadow = true,
                     },
                     new SpriteIcon
@@ -380,7 +381,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         Origin = Anchor.Centre,
                         Icon = icon,
                         Colour = OsuColour.FromHex(@"a4edff"),
-                        Scale = new Vector2(0.8f),
+                        Size = new Vector2(14),
                     },
                     new GlowingSpriteText(value, @"Exo2.0-Bold", 17, Color4.White, OsuColour.FromHex(@"83ccfa"))
                     {

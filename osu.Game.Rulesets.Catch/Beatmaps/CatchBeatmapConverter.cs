@@ -8,6 +8,7 @@ using System;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -15,9 +16,16 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     {
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
 
-        protected override IEnumerable<CatchBaseHit> ConvertHitObject(HitObject original, Beatmap beatmap)
+        protected override IEnumerable<CatchBaseHit> ConvertHitObject(HitObject obj, Beatmap beatmap)
         {
-            yield return null;
+            if (!(obj is IHasXPosition))
+                yield break;
+
+            yield return new Fruit
+            {
+                StartTime = obj.StartTime,
+                Position = ((IHasXPosition)obj).X / OsuPlayfield.BASE_SIZE.X
+            };
         }
     }
 }

@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Input;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using OpenTK;
@@ -22,12 +23,12 @@ using osu.Game.Rulesets.Beatmaps;
 namespace osu.Game.Rulesets.UI
 {
     /// <summary>
-    /// Base HitRenderer. Doesn't hold objects.
+    /// Base RulesetContainer. Doesn't hold objects.
     /// <para>
-    /// Should not be derived - derive <see cref="HitRenderer{TObject, TJudgement}"/> instead.
+    /// Should not be derived - derive <see cref="RulesetContainer{TObject,TJudgement}"/> instead.
     /// </para>
     /// </summary>
-    public abstract class HitRenderer : Container
+    public abstract class RulesetContainer : Container
     {
         /// <summary>
         /// Invoked when all the judgeable HitObjects have been judged.
@@ -40,14 +41,14 @@ namespace osu.Game.Rulesets.UI
         public bool AspectAdjust = true;
 
         /// <summary>
-        /// The input manager for this HitRenderer.
+        /// The input manager for this RulesetContainer.
         /// </summary>
         internal readonly PlayerInputManager InputManager = new PlayerInputManager();
 
         /// <summary>
-        /// The key conversion input manager for this HitRenderer.
+        /// The key conversion input manager for this RulesetContainer.
         /// </summary>
-        protected readonly KeyConversionInputManager KeyConversionInputManager;
+        protected readonly PassThroughInputManager KeyConversionInputManager;
 
         /// <summary>
         /// Whether we are currently providing the local user a gameplay cursor.
@@ -66,9 +67,16 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected abstract bool AllObjectsJudged { get; }
 
-        internal HitRenderer()
+        protected readonly Ruleset Ruleset;
+
+        /// <summary>
+        /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
+        /// </summary>
+        /// <param name="ruleset">The ruleset being repesented.</param>
+        internal RulesetContainer(Ruleset ruleset)
         {
-            KeyConversionInputManager = CreateKeyConversionInputManager();
+            Ruleset = ruleset;
+            KeyConversionInputManager = CreateKeyBindingInputManager();
             KeyConversionInputManager.RelativeSizeAxes = Axes.Both;
         }
 
@@ -87,7 +95,7 @@ namespace osu.Game.Rulesets.UI
         /// Creates a key conversion input manager.
         /// </summary>
         /// <returns>The input manager.</returns>
-        protected virtual KeyConversionInputManager CreateKeyConversionInputManager() => new KeyConversionInputManager();
+        public virtual PassThroughInputManager CreateKeyBindingInputManager() => new PassThroughInputManager();
 
         protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
 
@@ -105,14 +113,14 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// HitRenderer that applies conversion to Beatmaps. Does not contain a Playfield
+    /// RulesetContainer that applies conversion to Beatmaps. Does not contain a Playfield
     /// and does not load drawable hit objects.
     /// <para>
-    /// Should not be derived - derive <see cref="HitRenderer{TObject, TJudgement}"/> instead.
+    /// Should not be derived - derive <see cref="RulesetContainer{TObject,TJudgement}"/> instead.
     /// </para>
     /// </summary>
-    /// <typeparam name="TObject">The type of HitObject contained by this HitRenderer.</typeparam>
-    public abstract class HitRenderer<TObject> : HitRenderer
+    /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
+    public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
         /// <summary>
@@ -133,11 +141,12 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Creates a hit renderer for a beatmap.
         /// </summary>
+        /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        internal HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+        internal RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset) : base(ruleset)
         {
-            Debug.Assert(beatmap != null, "HitRenderer initialized with a null beatmap.");
+            Debug.Assert(beatmap != null, "RulesetContainer initialized with a null beatmap.");
 
             Mods = beatmap.Mods.Value;
 
@@ -153,6 +162,10 @@ namespace osu.Game.Rulesets.UI
             // Convert the beatmap
             Beatmap = converter.Convert(beatmap.Beatmap, isForCurrentRuleset);
 
+            // Apply difficulty adjustments from mods before using Difficulty.
+            foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
+                mod.ApplyToDifficulty(Beatmap.BeatmapInfo.Difficulty);
+
             // Apply defaults
             foreach (var h in Beatmap.HitObjects)
                 h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.Difficulty);
@@ -163,11 +176,11 @@ namespace osu.Game.Rulesets.UI
             ApplyBeatmap();
 
             // Add mods, should always be the last thing applied to give full control to mods
-            applyMods(beatmap.Mods.Value);
+            applyMods(Mods);
         }
 
         /// <summary>
-        /// Applies the active mods to this HitRenderer.
+        /// Applies the active mods to this RulesetContainer.
         /// </summary>
         /// <param name="mods"></param>
         private void applyMods(IEnumerable<Mod> mods)
@@ -176,7 +189,7 @@ namespace osu.Game.Rulesets.UI
                 return;
 
             foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
-                mod.ApplyToHitRenderer(this);
+                mod.ApplyToRulesetContainer(this);
         }
 
         /// <summary>
@@ -199,11 +212,11 @@ namespace osu.Game.Rulesets.UI
     }
 
     /// <summary>
-    /// A derivable HitRenderer that manages the Playfield and HitObjects.
+    /// A derivable RulesetContainer that manages the Playfield and HitObjects.
     /// </summary>
-    /// <typeparam name="TObject">The type of HitObject contained by this HitRenderer.</typeparam>
-    /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this HitRenderer.</typeparam>
-    public abstract class HitRenderer<TObject, TJudgement> : HitRenderer<TObject>
+    /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
+    /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this RulesetContainer.</typeparam>
+    public abstract class RulesetContainer<TObject, TJudgement> : RulesetContainer<TObject>
         where TObject : HitObject
         where TJudgement : Judgement
     {
@@ -221,7 +234,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The playfield.
         /// </summary>
-        protected Playfield<TObject, TJudgement> Playfield;
+        public Playfield<TObject, TJudgement> Playfield { get; private set; }
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
@@ -231,10 +244,11 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Creates a hit renderer for a beatmap.
         /// </summary>
+        /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        protected HitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(beatmap, isForCurrentRuleset)
+        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(ruleset, beatmap, isForCurrentRuleset)
         {
             InputManager.Add(content = new Container
             {
@@ -317,6 +331,34 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <returns>The Playfield.</returns>
         protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
+    }
+
+    /// <summary>
+    /// A derivable RulesetContainer that manages the Playfield and HitObjects.
+    /// </summary>
+    /// <typeparam name="TPlayfield">The type of Playfield contained by this RulesetContainer.</typeparam>
+    /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
+    /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this RulesetContainer.</typeparam>
+    public abstract class RulesetContainer<TPlayfield, TObject, TJudgement> : RulesetContainer<TObject, TJudgement>
+        where TObject : HitObject
+        where TJudgement : Judgement
+        where TPlayfield : Playfield<TObject, TJudgement>
+    {
+        /// <summary>
+        /// The playfield.
+        /// </summary>
+        protected new TPlayfield Playfield => (TPlayfield)base.Playfield;
+
+        /// <summary>
+        /// Creates a hit renderer for a beatmap.
+        /// </summary>
+        /// <param name="ruleset">The ruleset being repesented.</param>
+        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
+        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(ruleset, beatmap, isForCurrentRuleset)
+        {
+        }
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException

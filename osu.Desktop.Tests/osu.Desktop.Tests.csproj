@@ -71,6 +71,7 @@
     <Compile Include="Visual\TestCaseBeatmapOptionsOverlay.cs" />
     <Compile Include="Visual\TestCaseBeatSyncedContainer.cs" />
     <Compile Include="Visual\TestCaseBreadcrumbs.cs" />
+    <Compile Include="Visual\TestCaseCatcher.cs" />
     <Compile Include="Visual\TestCaseChatDisplay.cs" />
     <Compile Include="Visual\TestCaseContextMenu.cs" />
     <Compile Include="Visual\TestCaseDialogOverlay.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Visual\TestCaseGamefield.cs" />
     <Compile Include="Visual\TestCaseGraph.cs" />
     <Compile Include="Visual\TestCaseHitObjects.cs" />
+    <Compile Include="Visual\TestCaseKeyConfiguration.cs" />
     <Compile Include="Visual\TestCaseKeyCounter.cs" />
     <Compile Include="Visual\TestCaseLeaderboard.cs" />
     <Compile Include="Visual\TestCaseManiaHitObjects.cs" />
@@ -98,7 +100,7 @@
     <Compile Include="Visual\TestCaseResults.cs" />
     <Compile Include="Visual\TestCaseRoomInspector.cs" />
     <Compile Include="Visual\TestCaseScoreCounter.cs" />
-    <Compile Include="Visual\TestCaseScrollingHitObjects.cs" />
+    <Compile Include="Visual\TestCaseScrollingPlayfield.cs" />
     <Compile Include="Visual\TestCaseSettings.cs" />
     <Compile Include="Visual\TestCaseSkipButton.cs" />
     <Compile Include="Visual\TestCaseSocial.cs" />

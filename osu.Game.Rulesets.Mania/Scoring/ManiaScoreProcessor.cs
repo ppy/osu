@@ -155,8 +155,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
         {
         }
 
-        public ManiaScoreProcessor(HitRenderer<ManiaHitObject, ManiaJudgement> hitRenderer)
-            : base(hitRenderer)
+        public ManiaScoreProcessor(RulesetContainer<ManiaHitObject, ManiaJudgement> rulesetContainer)
+            : base(rulesetContainer)
         {
         }
 

@@ -52,7 +52,14 @@ namespace osu.Game.Beatmaps
             {
                 lock (beatmapLock)
                 {
-                    return beatmap ?? (beatmap = GetBeatmap());
+                    if (beatmap != null) return beatmap;
+
+                    beatmap = GetBeatmap();
+
+                    // use the database-backed info.
+                    beatmap.BeatmapInfo = BeatmapInfo;
+
+                    return beatmap;
                 }
             }
         }

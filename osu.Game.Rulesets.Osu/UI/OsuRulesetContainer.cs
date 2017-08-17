@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Input;
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Beatmaps;
@@ -12,14 +13,13 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuHitRenderer : HitRenderer<OsuHitObject, OsuJudgement>
+    public class OsuRulesetContainer : RulesetContainer<OsuHitObject, OsuJudgement>
     {
-        public OsuHitRenderer(WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(beatmap, isForCurrentRuleset)
+        public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
+            : base(ruleset, beatmap, isForCurrentRuleset)
         {
         }
 
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override Playfield<OsuHitObject, OsuJudgement> CreatePlayfield() => new OsuPlayfield();
 
-        protected override KeyConversionInputManager CreateKeyConversionInputManager() => new OsuKeyConversionInputManager();
+        public override PassThroughInputManager CreateKeyBindingInputManager() => new OsuInputManager(Ruleset?.RulesetInfo);
 
         protected override DrawableHitObject<OsuHitObject, OsuJudgement> GetVisualRepresentation(OsuHitObject h)
         {

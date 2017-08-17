@@ -10,8 +10,8 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.UI.Cursor;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -80,9 +80,9 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void PostProcess()
         {
-            connectionLayer.HitObjects = HitObjects.Children
+            connectionLayer.HitObjects = HitObjects.Objects
                 .Select(d => d.HitObject)
-                .OrderBy(h => h.StartTime);
+                .OrderBy(h => h.StartTime).OfType<OsuHitObject>();
         }
 
         public override void OnJudgement(DrawableHitObject<OsuHitObject, OsuJudgement> judgedObject)

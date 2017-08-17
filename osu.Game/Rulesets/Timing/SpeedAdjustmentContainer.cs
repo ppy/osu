@@ -11,61 +11,57 @@ using OpenTK;
 namespace osu.Game.Rulesets.Timing
 {
     /// <summary>
-    /// A container for hit objects which applies applies the speed adjustments defined by the properties of a <see cref="Timing.MultiplierControlPoint"/>
-    /// to affect the scroll speed of the contained <see cref="DrawableTimingSection"/>.
-    ///
-    /// <para>
-    /// This container must always be relatively-sized to its parent to provide the speed adjustments. This container will provide the speed adjustments
-    /// by modifying its size while maintaining a constant <see cref="Container{T}.RelativeChildSize"/> for its children
-    /// </para>
+    /// A container that provides the speed adjustments defined by <see cref="MultiplierControlPoint"/>s to affect the scroll speed
+    /// of container <see cref="DrawableHitObject"/>s.
     /// </summary>
-    public abstract class SpeedAdjustmentContainer : Container<DrawableHitObject>
+    public class SpeedAdjustmentContainer : Container<DrawableHitObject>
     {
-        private readonly Bindable<double> visibleTimeRange = new Bindable<double>();
         /// <summary>
-        /// Gets or sets the range of time that is visible by the length of this container.
+        /// Gets or sets the range of time that is visible by the length of the scrolling axes.
         /// </summary>
-        public Bindable<double> VisibleTimeRange
-        {
-            get { return visibleTimeRange; }
-            set { visibleTimeRange.BindTo(value); }
-        }
+        public readonly Bindable<double> VisibleTimeRange = new Bindable<double> { Default = 1000 };
+
+        /// <summary>
+        /// Whether to reverse the scrolling direction is reversed.
+        /// </summary>
+        public readonly BindableBool Reversed = new BindableBool();
 
         protected override Container<DrawableHitObject> Content => content;
         private Container<DrawableHitObject> content;
 
         /// <summary>
-        /// Axes which the content of this container will scroll through.
+        /// The axes which the content of this container will scroll through.
         /// </summary>
-        /// <returns></returns>
         public Axes ScrollingAxes { get; internal set; }
 
+        /// <summary>
+        /// The <see cref="MultiplierControlPoint"/> that defines the speed adjustments.
+        /// </summary>
         public readonly MultiplierControlPoint ControlPoint;
 
-        private DrawableTimingSection timingSection;
+        private ScrollingContainer scrollingContainer;
 
         /// <summary>
         /// Creates a new <see cref="SpeedAdjustmentContainer"/>.
         /// </summary>
-        /// <param name="controlPoint">The <see cref="MultiplierControlPoint"/> which provides the speed adjustments for this container.</param>
-        protected SpeedAdjustmentContainer(MultiplierControlPoint controlPoint)
+        /// <param name="controlPoint">The <see cref="MultiplierControlPoint"/> that defines the speed adjustments.</param>
+        public SpeedAdjustmentContainer(MultiplierControlPoint controlPoint)
         {
             ControlPoint = controlPoint;
-
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            timingSection = CreateTimingSection();
+            scrollingContainer = CreateScrollingContainer();
 
-            timingSection.ScrollingAxes = ScrollingAxes;
-            timingSection.ControlPoint = ControlPoint;
-            timingSection.VisibleTimeRange.BindTo(VisibleTimeRange);
-            timingSection.RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
+            scrollingContainer.ScrollingAxes = ScrollingAxes;
+            scrollingContainer.ControlPoint = ControlPoint;
+            scrollingContainer.VisibleTimeRange.BindTo(VisibleTimeRange);
+            scrollingContainer.RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
 
-            AddInternal(content = timingSection);
+            AddInternal(content = scrollingContainer);
         }
 
         protected override void Update()
@@ -74,34 +70,51 @@ namespace osu.Game.Rulesets.Timing
 
             // The speed adjustment happens by modifying our size by the multiplier while maintaining the visible time range as the relatve size for our children
             Size = new Vector2((ScrollingAxes & Axes.X) > 0 ? multiplier : 1, (ScrollingAxes & Axes.Y) > 0 ? multiplier : 1);
-            RelativeChildSize = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 1, (ScrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 1);
+
+            if (Reversed)
+            {
+                RelativeChildSize = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)-VisibleTimeRange : 1, (ScrollingAxes & Axes.Y) > 0 ? (float)-VisibleTimeRange : 1);
+                RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 0);
+                Origin = Anchor = Anchor.BottomRight;
+            }
+            else
+            {
+                RelativeChildSize = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)VisibleTimeRange : 1, (ScrollingAxes & Axes.Y) > 0 ? (float)VisibleTimeRange : 1);
+                RelativeChildOffset = Vector2.Zero;
+                Origin = Anchor = Anchor.TopLeft;
+            }
         }
 
         public override double LifetimeStart => ControlPoint.StartTime - VisibleTimeRange;
-        public override double LifetimeEnd => ControlPoint.StartTime + timingSection.Duration + VisibleTimeRange;
+        public override double LifetimeEnd => ControlPoint.StartTime + scrollingContainer.Duration + VisibleTimeRange;
 
         public override void Add(DrawableHitObject drawable)
         {
             var scrollingHitObject = drawable as IScrollingHitObject;
-            scrollingHitObject?.LifetimeOffset.BindTo(VisibleTimeRange);
+
+            if (scrollingHitObject != null)
+            {
+                scrollingHitObject.LifetimeOffset.BindTo(VisibleTimeRange);
+                scrollingHitObject.ScrollingAxes = ScrollingAxes;
+            }
 
             base.Add(drawable);
         }
 
         /// <summary>
-        /// Whether this speed adjustment can contain a hit object. This is true if the hit object occurs after this speed adjustment with respect to time.
+        /// Whether a <see cref="DrawableHitObject"/> falls within this <see cref="SpeedAdjustmentContainer"/>s affecting timespan.
         /// </summary>
         public bool CanContain(DrawableHitObject hitObject) => CanContain(hitObject.HitObject.StartTime);
 
         /// <summary>
-        /// Whether this speed adjustment can contain an object placed at a time value. This is true if the time occurs after this speed adjustment.
+        /// Whether a point in time falls within this <see cref="SpeedAdjustmentContainer"/>s affecting timespan.
         /// </summary>
         public bool CanContain(double startTime) => ControlPoint.StartTime <= startTime;
 
         /// <summary>
-        /// Creates the container which handles the movement of a collection of hit objects.
+        /// Creates the <see cref="ScrollingContainer"/> which contains the scrolling <see cref="DrawableHitObject"/>s of this container.
         /// </summary>
-        /// <returns>The <see cref="DrawableTimingSection"/>.</returns>
-        protected abstract DrawableTimingSection CreateTimingSection();
+        /// <returns>The <see cref="ScrollingContainer"/>.</returns>
+        protected virtual ScrollingContainer CreateScrollingContainer() => new LinearScrollingContainer(ScrollingAxes, ControlPoint);
     }
 }
