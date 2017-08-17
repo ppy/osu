@@ -13,6 +13,7 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Screens.Ranking;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -40,27 +41,35 @@ namespace osu.Game.Overlays
         public MainSettings()
             : base(true)
         {
-            keyBindingOverlay = new KeyBindingOverlay { Depth = 1 };
+            keyBindingOverlay = new KeyBindingOverlay
+            {
+                Depth = 1,
+                Anchor = Anchor.TopRight,
+            };
             keyBindingOverlay.StateChanged += keyBindingOverlay_StateChanged;
         }
 
         public override bool AcceptsFocus => keyBindingOverlay.State != Visibility.Visible;
 
+        private const float hidden_width = 120;
+
         private void keyBindingOverlay_StateChanged(VisibilityContainer container, Visibility visibility)
         {
-            const float hidden_width = 120;
-
             switch (visibility)
             {
                 case Visibility.Visible:
-                    Background.FadeTo(0.9f, 500, Easing.OutQuint);
-                    SectionsContainer.FadeOut(100);
-                    ContentContainer.MoveToX(hidden_width - ContentContainer.DrawWidth, 500, Easing.OutQuint);
+                    Background.FadeTo(0.9f, 300, Easing.OutQuint);
+                    Sidebar?.FadeColour(Color4.DarkGray, 300, Easing.OutQuint);
+
+                    SectionsContainer.FadeOut(300, Easing.OutQuint);
+                    ContentContainer.MoveToX(hidden_width - WIDTH, 500, Easing.OutQuint);
 
                     backButton.Delay(100).FadeIn(100);
                     break;
                 case Visibility.Hidden:
                     Background.FadeTo(0.6f, 500, Easing.OutQuint);
+                    Sidebar?.FadeColour(Color4.White, 300, Easing.OutQuint);
+
                     SectionsContainer.FadeIn(500, Easing.OutQuint);
                     ContentContainer.MoveToX(0, 500, Easing.OutQuint);
 
@@ -69,39 +78,26 @@ namespace osu.Game.Overlays
             }
         }
 
-        protected override void PopOut()
-        {
-            base.PopOut();
-            keyBindingOverlay.State = Visibility.Hidden;
-        }
+        protected override float ExpandedPosition => keyBindingOverlay.State == Visibility.Visible ? hidden_width - WIDTH : base.ExpandedPosition;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(keyBindingOverlay);
-            AddInternal(backButton = new BackButton
+            ContentContainer.Add(keyBindingOverlay);
+
+            ContentContainer.Add(backButton = new BackButton
             {
                 Alpha = 0,
-                Height = 150,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
+                Width = hidden_width,
+                RelativeSizeAxes = Axes.Y,
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
                 Action = () => keyBindingOverlay.Hide()
             });
         }
 
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            keyBindingOverlay.Margin = new MarginPadding { Left = ContentContainer.Margin.Left + ContentContainer.DrawWidth + ContentContainer.X };
-
-            backButton.Margin = new MarginPadding { Left = ContentContainer.Margin.Left };
-            backButton.Width = ContentContainer.DrawWidth + ContentContainer.X;
-        }
-
         private class BackButton : OsuClickableContainer
         {
-            private FillFlowContainer flow;
             private AspectContainer aspect;
 
             [BackgroundDependencyLoader]
@@ -116,46 +112,27 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
-                            flow = new FillFlowContainer
+                            new SpriteIcon
                             {
-                                Anchor = Anchor.TopCentre,
-                                RelativePositionAxes = Axes.Y,
-                                Y = 0.4f,
-                                AutoSizeAxes = Axes.Both,
+                                Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Direction = FillDirection.Horizontal,
-                                Children = new[]
-                                {
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_left },
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_left },
-                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_left },
-                                }
+                                Y = -15,
+                                Size = new Vector2(15),
+                                Shadow = true,
+                                Icon = FontAwesome.fa_chevron_left
                             },
                             new OsuSpriteText
                             {
-                                Anchor = Anchor.TopCentre,
-                                RelativePositionAxes = Axes.Y,
-                                Y = 0.7f,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Y = 15,
                                 TextSize = 12,
                                 Font = @"Exo2.0-Bold",
-                                Origin = Anchor.Centre,
                                 Text = @"back",
                             },
                         }
                     }
                 };
-            }
-
-            protected override bool OnHover(InputState state)
-            {
-                flow.TransformSpacingTo(new Vector2(5), 500, Easing.OutQuint);
-                return base.OnHover(state);
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                flow.TransformSpacingTo(new Vector2(0), 500, Easing.OutQuint);
-                base.OnHoverLost(state);
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
