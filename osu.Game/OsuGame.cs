@@ -182,7 +182,11 @@ namespace osu.Game
             LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
-            LoadComponentAsync(settings = new MainSettings { Depth = -1 }, overlayContent.Add);
+            LoadComponentAsync(settings = new MainSettings
+            {
+                GetToolbarHeight = () => ToolbarOffset,
+                Depth = -1
+            }, overlayContent.Add);
             LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
