@@ -1,15 +1,15 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
@@ -22,8 +22,8 @@ namespace osu.Game.Screens.Play
 
         public override bool HandleInput => false;
 
-        private int progress;
-        public int Progress
+        private float progress;
+        public float Progress
         {
             get { return progress; }
             set
@@ -60,6 +60,8 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        public virtual bool FillWholeSquares => true;
+
         public SquareGraph()
         {
             CacheDrawnFrameBuffer = true;
@@ -90,8 +92,14 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void redrawProgress()
         {
-            for (int i = 0; i < columns.Length; i++)
-                columns[i].State = i <= progress ? ColumnState.Lit : ColumnState.Dimmed;
+            float progressWidth = DrawWidth * progress;
+
+            foreach(Column column in columns)
+            {
+                float columnProgress = (progressWidth - column.X) / column.DrawWidth;
+                column.Progress = FillWholeSquares ? Convert.ToSingle(columnProgress >= 1.0f) : MathHelper.Clamp(columnProgress, 0.0f, 1.0f);
+            }
+
             ForceRedraw();
         }
 
@@ -147,7 +155,6 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Height = DrawHeight,
                     Position = new Vector2(x, 0),
-                    State = ColumnState.Dimmed,
                 });
             }
 
@@ -159,7 +166,7 @@ namespace osu.Game.Screens.Play
             redrawProgress();
         }
 
-        public class Column : Container, IStateful<ColumnState>
+        public class Column : Container
         {
             protected readonly Color4 EmptyColour = Color4.White.Opacity(20);
             public Color4 LitColour = Color4.LightBlue;
@@ -170,7 +177,8 @@ namespace osu.Game.Screens.Play
             private const float padding = 2;
             public const float WIDTH = cube_size + padding;
 
-            private readonly List<Box> drawableRows = new List<Box>();
+            private readonly List<Box> drawableLitRows = new List<Box>();
+            private readonly List<Box> drawableDimmedRows = new List<Box>();
 
             private float filled;
             public float Filled
@@ -185,14 +193,14 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            private ColumnState state;
-            public ColumnState State
+            private float progress;
+            public float Progress
             {
-                get { return state; }
+                get { return progress; }
                 set
                 {
-                    if (value == state) return;
-                    state = value;
+                    if (value == progress) return;
+                    progress = value;
 
                     if (IsLoaded)
                         fillActive();
@@ -201,43 +209,49 @@ namespace osu.Game.Screens.Play
 
             public Column()
             {
-                Width = WIDTH;
+                Width = cube_size;
             }
 
             protected override void LoadComplete()
             {
-                for (int r = 0; r < cubeCount; r++)
+                // Create the boxes in reversed order to start iterations at the bottom
+                for (int r = (int) cubeCount - 1; r >= 0; r--)
                 {
-                    drawableRows.Add(new Box
+                    drawableLitRows.Add(new Box
                     {
-                        Size = new Vector2(cube_size),
+                        Height = cube_size,
                         Position = new Vector2(0, r * WIDTH + padding),
+                        Colour = LitColour
+                    });
+
+                    drawableDimmedRows.Add(new Box
+                    {
+                        Height = cube_size,
+                        Y = r * WIDTH + padding
                     });
                 }
 
-                Children = drawableRows;
-
-                // Reverse drawableRows so when iterating through them they start at the bottom
-                drawableRows.Reverse();
+                Children = drawableLitRows.Concat(drawableDimmedRows).ToList();
 
                 fillActive();
             }
 
             private void fillActive()
             {
-                Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
+                int countFilled = (int)MathHelper.Clamp(filled * cubeCount, 0, cubeCount);
 
-                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+                for (int i = 0; i < drawableLitRows.Count; i++)
+                {
+                    float litProgress = i < countFilled ? progress : 0.0f;
 
-                for (int i = 0; i < drawableRows.Count; i++)
-                    drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;
+                    // Change the size and position of both boxes of this row
+                    drawableLitRows[i].Width = litProgress * cube_size;
+
+                    drawableDimmedRows[i].Width = (1.0f - litProgress) * cube_size;
+                    drawableDimmedRows[i].X = litProgress * cube_size;
+                    drawableDimmedRows[i].Colour = i < countFilled ? DimmedColour : EmptyColour;
+                }
             }
-        }
-
-        public enum ColumnState
-        {
-            Lit,
-            Dimmed
         }
     }
 }

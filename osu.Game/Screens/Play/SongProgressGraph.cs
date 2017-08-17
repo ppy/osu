@@ -10,6 +10,8 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressGraph : SquareGraph
     {
+        public override bool FillWholeSquares => false;
+
         private IEnumerable<HitObject> objects;
 
         public IEnumerable<HitObject> Objects
