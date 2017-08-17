@@ -397,7 +397,11 @@ namespace osu.Game.Overlays
         {
             if (channel == null) return;
 
+            if (channel == CurrentChannel)
+                currentChannelContainer.Clear(false);
+
             careChannels.Remove(channel);
+            loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
             channelTabs.RemoveItem(channel);
 
             channel.Joined.Value = false;
