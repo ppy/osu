@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Edit
     {
         private EditSongSelect songSelect;
 
+        private WorkingBeatmap currentBeatmap;
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
@@ -53,17 +55,29 @@ namespace osu.Game.Screens.Edit
         protected override void OnResuming(Screen last)
         {
             if (songSelect != null && songSelect.SelectedBeatmap != null)
-                changeBackground(songSelect.SelectedBeatmap);
+            {
+                currentBeatmap = songSelect.SelectedBeatmap;
+                changeBackground(currentBeatmap);
+            }
+                
             songSelect = new EditSongSelect();
+
             Beatmap.Value.Track?.Stop();
+
             base.OnResuming(last);
         }
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
+
             if (songSelect != null && songSelect.SelectedBeatmap != null)
-                changeBackground(songSelect.SelectedBeatmap);
+            {
+                currentBeatmap = songSelect.SelectedBeatmap;
+                changeBackground(currentBeatmap);
+            }
+
             songSelect = new EditSongSelect();
+
             Background.FadeColour(Color4.DarkGray, 500);
             Beatmap.Value.Track?.Stop();
         }
@@ -71,6 +85,7 @@ namespace osu.Game.Screens.Edit
         {
             Background.FadeColour(Color4.White, 500);
             Beatmap.Value.Track?.Start();
+
             return base.OnExiting(next);
         }
     }
