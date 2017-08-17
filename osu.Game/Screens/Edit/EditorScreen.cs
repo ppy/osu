@@ -17,7 +17,7 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit
 {
-    internal class EditorScreen : OsuScreen
+    public class EditorScreen : OsuScreen
     {
         private EditSongSelect songSelect;
 
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit
 
         internal override bool ShowOverlays => false;
 
-        internal EditorScreen()
+        public EditorScreen()
         {
             Children = new Drawable[]
             {
@@ -53,9 +53,7 @@ namespace osu.Game.Screens.Edit
         protected override void OnResuming(Screen last)
         {
             if (songSelect != null && songSelect.SelectedBeatmap != null)
-            {
                 changeBackground(songSelect.SelectedBeatmap);
-            }
             songSelect = new EditSongSelect();
             Beatmap.Value.Track?.Stop();
             base.OnResuming(last);
@@ -64,9 +62,7 @@ namespace osu.Game.Screens.Edit
         {
             base.OnEntering(last);
             if (songSelect != null && songSelect.SelectedBeatmap != null)
-            {
                 changeBackground(songSelect.SelectedBeatmap);
-            }
             songSelect = new EditSongSelect();
             Background.FadeColour(Color4.DarkGray, 500);
             Beatmap.Value.Track?.Stop();
