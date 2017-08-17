@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit
 
         protected override void OnResuming(Screen last)
         {
-            if (songSelect != null && songSelect.SelectedBeatmap != null)
+            if (songSelect?.SelectedBeatmap != null)
             {
                 currentBeatmap = songSelect.SelectedBeatmap;
                 changeBackground(currentBeatmap);
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
-            if (songSelect != null && songSelect.SelectedBeatmap != null)
+            if (songSelect ?.SelectedBeatmap != null)
             {
                 currentBeatmap = songSelect.SelectedBeatmap;
                 changeBackground(currentBeatmap);
