@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuInputManager : DatabasedKeyBindingInputManager<OsuAction>
     {
-        public OsuInputManager(RulesetInfo ruleset) : base(ruleset, simultaneousMode: SimultaneousBindingMode.Unique)
+        public OsuInputManager(RulesetInfo ruleset) : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
 
         }
