@@ -17,6 +17,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Settings;
+using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -24,8 +25,16 @@ namespace osu.Game.Rulesets.Osu
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new OsuRulesetContainer(this, beatmap, isForCurrentRuleset);
 
-        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
+            new KeyBinding(Key.Z, OsuAction.LeftButton),
+            new KeyBinding(Key.X, OsuAction.RightButton),
+            new KeyBinding(Key.LastKey + 1, OsuAction.LeftButton),
+            new KeyBinding(Key.LastKey + 2, OsuAction.RightButton),
+        };
+
+        public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
+            {
             new BeatmapStatistic
             {
                 Name = @"Circle count",
