@@ -31,21 +31,27 @@ namespace osu.Game.Rulesets.Scoring
         [JsonProperty(@"mods")]
         private string[] modStrings { get; set; }
 
-        private RulesetInfo ruleset;
-        public RulesetInfo Ruleset
+        public RulesetInfo Ruleset;
+
+        private Mod[] mods;
+        public Mod[] Mods
         {
-            get { return ruleset; }
+            get
+            {
+                // Evaluate the mod strings
+                if (mods == null)
+                    mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
+
+                return mods;
+            }
             set
             {
-                ruleset = value;
+                mods = value;
 
-                // Handle the mod strings if they are assigned
-                if (modStrings != null)
-                    Mods = ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
+                // Assign the mod strings
+                modStrings = mods.Select(mod => mod.ShortenedName).ToArray();
             }
         }
-
-        public Mod[] Mods { get; set; }
 
         [JsonProperty(@"user")]
         public User User;
