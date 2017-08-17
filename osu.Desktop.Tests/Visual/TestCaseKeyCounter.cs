@@ -1,11 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.MathUtils;
 using osu.Game.Screens.Play;
@@ -34,34 +31,13 @@ namespace osu.Desktop.Tests.Visual
                     new KeyCounterMouse(MouseButton.Right),
                 },
             };
-            BindableInt bindable = new BindableInt { MinValue = 0, MaxValue = 200, Default = 50 };
-            bindable.ValueChanged += delegate { kc.FadeTime = bindable.Value; };
-            AddStep("Add Random", () =>
+
+            AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
                 kc.Add(new KeyCounterKeyboard(key));
             });
-
-            TestSliderBar<int> sliderBar;
-
-            Add(new Container
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new SpriteText { Text = "FadeTime" },
-                    sliderBar = new TestSliderBar<int>
-                    {
-                        Width = 150,
-                        Height = 10,
-                        SelectionColor = Color4.Orange,
-                    }
-                }
-            });
-
-            sliderBar.Current.BindTo(bindable);
+            AddSliderStep("Fade time", 0, 200, 50, v => kc.FadeTime = v);
 
             Add(kc);
         }
