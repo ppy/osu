@@ -5,13 +5,7 @@ using OpenTK.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Screens.Select;
 using osu.Game.Beatmaps;
 
@@ -36,7 +30,7 @@ namespace osu.Game.Screens.Edit
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Colour = Color4.Yellow,
-                    Action = delegate {Push(songSelect);},
+                    Action = delegate { Push(songSelect); },
                     Text = "Song Select",
                 }
             };
