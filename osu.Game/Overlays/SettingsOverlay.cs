@@ -59,8 +59,8 @@ namespace osu.Game.Overlays
 
         protected virtual IEnumerable<SettingsSection> CreateSections() => null;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGame game)
+        [BackgroundDependencyLoader]
+        private void load()
         {
             InternalChild = ContentContainer = new Container
             {
