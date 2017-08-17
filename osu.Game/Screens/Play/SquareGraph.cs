@@ -92,12 +92,12 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void redrawProgress()
         {
-            float multipliedProgress = columns.Length * progress;
+            float progressWidth = DrawWidth * progress;
 
-            for (int i = 0; i < columns.Length; i++)
+            foreach(Column column in columns)
             {
-                float columnProgress = multipliedProgress - i;
-                columns[i].Progress = FillWholeSquares ? Convert.ToSingle(columnProgress >= 1.0f) : MathHelper.Clamp(columnProgress, 0.0f, 1.0f);
+                float columnProgress = (progressWidth - column.X) / column.DrawWidth;
+                column.Progress = FillWholeSquares ? Convert.ToSingle(columnProgress >= 1.0f) : MathHelper.Clamp(columnProgress, 0.0f, 1.0f);
             }
 
             ForceRedraw();
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Play
 
             public Column()
             {
-                Width = WIDTH;
+                Width = cube_size;
             }
 
             protected override void LoadComplete()
