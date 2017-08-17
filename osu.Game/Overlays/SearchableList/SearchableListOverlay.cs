@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.SearchableList
 
         protected override void OnFocus(InputState state)
         {
-            InputManager.ChangeFocus(Filter.Search);
+            GetContainingInputManager().ChangeFocus(Filter.Search);
         }
 
         protected override void PopIn()

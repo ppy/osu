@@ -156,11 +156,11 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, UserInputManager input)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
         {
             if (Footer != null)
             {
-                Footer.AddButton(@"random", colours.Green, () => triggerRandom(input), Key.F2);
+                Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
 
                 BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
@@ -267,9 +267,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void triggerRandom(UserInputManager input)
+        private void triggerRandom()
         {
-            if (input.CurrentState.Keyboard.ShiftPressed)
+            if (GetContainingInputManager().CurrentState.Keyboard.ShiftPressed)
                 carousel.SelectPreviousRandom();
             else
                 carousel.SelectNextRandom();

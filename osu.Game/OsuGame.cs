@@ -9,17 +9,16 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Framework.Input;
-using OpenTK.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
-using osu.Framework.Timing;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
@@ -27,10 +26,11 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game
 {
-    public class OsuGame : OsuGameBase
+    public class OsuGame : OsuGameBase, IKeyBindingHandler<GlobalAction>
     {
         public Toolbar Toolbar;
 
@@ -169,10 +169,6 @@ namespace osu.Game
                 volume = new VolumeControl(),
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both },
                 new OnScreenDisplay(),
-                new GlobalHotkeys //exists because UserInputManager is at a level below us.
-                {
-                    Handler = globalHotkeyPressed
-                }
             });
 
             LoadComponentAsync(screenStack = new Loader(), d =>
@@ -186,7 +182,7 @@ namespace osu.Game
             LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
-            LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
+            LoadComponentAsync(settings = new MainSettings { Depth = -1 }, overlayContent.Add);
             LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
@@ -252,62 +248,42 @@ namespace osu.Game
             Cursor.State = Visibility.Hidden;
         }
 
-        private bool globalHotkeyPressed(InputState state, KeyDownEventArgs args)
+        public bool OnPressed(GlobalAction action)
         {
-            if (args.Repeat || intro == null) return false;
+            if (intro == null) return false;
 
-            switch (args.Key)
+            switch (action)
             {
-                case Key.F8:
+                case GlobalAction.ToggleChat:
                     chat.ToggleVisibility();
                     return true;
-                case Key.F9:
+                case GlobalAction.ToggleSocial:
                     social.ToggleVisibility();
                     return true;
-                case Key.PageUp:
-                case Key.PageDown:
-                    var swClock = (Clock as ThrottledFrameClock)?.Source as StopwatchClock;
-                    if (swClock == null) return false;
+                case GlobalAction.ResetInputSettings:
+                    var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
 
-                    swClock.Rate *= args.Key == Key.PageUp ? 1.1f : 0.9f;
-                    Logger.Log($@"Adjusting game clock to {swClock.Rate}", LoggingTarget.Debug);
+                    sensitivity.Disabled = false;
+                    sensitivity.Value = 1;
+                    sensitivity.Disabled = true;
+
+                    frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
                     return true;
-            }
-
-            if (state.Keyboard.ControlPressed)
-            {
-                switch (args.Key)
-                {
-                    case Key.R:
-                        if (state.Keyboard.AltPressed)
-                        {
-                            var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);
-
-                            sensitivity.Disabled = false;
-                            sensitivity.Value = 1;
-                            sensitivity.Disabled = true;
-
-                            frameworkConfig.Set(FrameworkSetting.ActiveInputHandlers, string.Empty);
-                            return true;
-                        }
-                        break;
-                    case Key.T:
-                        Toolbar.ToggleVisibility();
-                        return true;
-                    case Key.O:
-                        settings.ToggleVisibility();
-                        return true;
-                    case Key.D:
-                        if (state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
-                            return false;
-
-                        direct.ToggleVisibility();
-                        return true;
-                }
+                case GlobalAction.ToggleToolbar:
+                    Toolbar.ToggleVisibility();
+                    return true;
+                case GlobalAction.ToggleSettings:
+                    settings.ToggleVisibility();
+                    return true;
+                case GlobalAction.ToggleDirect:
+                    direct.ToggleVisibility();
+                    return true;
             }
 
             return false;
         }
+
+        public bool OnReleased(GlobalAction action) => false;
 
         public event Action<Screen> ScreenChanged;
 
