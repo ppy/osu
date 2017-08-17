@@ -34,9 +34,8 @@ namespace osu.Game.Graphics.Containers
         protected override Container<Drawable> Content => content;
 
         [BackgroundDependencyLoader]
-        private void load(UserInputManager input, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            this.input = input;
             parallaxEnabled = config.GetBindable<bool>(OsuSetting.MenuParallax);
             parallaxEnabled.ValueChanged += delegate
             {
@@ -46,6 +45,12 @@ namespace osu.Game.Graphics.Containers
                     content.Scale = new Vector2(1 + ParallaxAmount);
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            input = GetContainingInputManager();
         }
 
         private bool firstUpdate = true;

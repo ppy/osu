@@ -50,8 +50,6 @@ namespace osu.Game.Screens.Select
             AlwaysPresent = true;
         }
 
-        protected override bool HideOnEscape => false;
-
         protected override bool BlockPassThroughMouse => false;
 
         protected override void PopIn()
