@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -25,7 +26,7 @@ namespace osu.Game.Overlays
 
         public const float SIDEBAR_WIDTH = Sidebar.DEFAULT_WIDTH;
 
-        private const float width = 400;
+        protected const float WIDTH = 400;
 
         private const float sidebar_padding = 10;
 
@@ -33,14 +34,17 @@ namespace osu.Game.Overlays
 
         protected override Container<Drawable> Content => ContentContainer;
 
-        private Sidebar sidebar;
+        protected Sidebar Sidebar;
         private SidebarButton selectedSidebarButton;
 
         protected SettingsSectionsContainer SectionsContainer;
 
         private SearchTextBox searchTextBox;
 
-        private Func<float> getToolbarHeight;
+        /// <summary>
+        /// Provide a source for the toolbar height.
+        /// </summary>
+        public Func<float> GetToolbarHeight;
 
         private readonly bool showSidebar;
 
@@ -55,17 +59,20 @@ namespace osu.Game.Overlays
 
         protected virtual IEnumerable<SettingsSection> CreateSections() => null;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGame game)
+        [BackgroundDependencyLoader]
+        private void load()
         {
             InternalChild = ContentContainer = new Container
             {
-                Width = width,
+                Width = WIDTH,
                 RelativeSizeAxes = Axes.Y,
                 Children = new Drawable[]
                 {
                     Background = new Box
                     {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Scale = new Vector2(2, 1), // over-extend to the left for transitions
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                         Alpha = 0.6f,
@@ -94,19 +101,17 @@ namespace osu.Game.Overlays
 
             if (showSidebar)
             {
-                AddInternal(sidebar = new Sidebar { Width = SIDEBAR_WIDTH });
+                AddInternal(Sidebar = new Sidebar { Width = SIDEBAR_WIDTH });
 
                 SectionsContainer.SelectedSection.ValueChanged += section =>
                 {
                     selectedSidebarButton.Selected = false;
-                    selectedSidebarButton = sidebar.Children.Single(b => b.Section == section);
+                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section);
                     selectedSidebarButton.Selected = true;
                 };
             }
 
             searchTextBox.Current.ValueChanged += newValue => SectionsContainer.SearchContainer.SearchTerm = newValue;
-
-            getToolbarHeight = () => game?.ToolbarOffset ?? 0;
 
             CreateSections()?.ForEach(AddSection);
         }
@@ -115,7 +120,7 @@ namespace osu.Game.Overlays
         {
             SectionsContainer.Add(section);
 
-            if (sidebar != null)
+            if (Sidebar != null)
             {
                 var button = new SidebarButton
                 {
@@ -123,15 +128,15 @@ namespace osu.Game.Overlays
                     Action = s =>
                     {
                         SectionsContainer.ScrollTo(s);
-                        sidebar.State = ExpandedState.Contracted;
+                        Sidebar.State = ExpandedState.Contracted;
                     },
                 };
 
-                sidebar.Add(button);
+                Sidebar.Add(button);
 
                 if (selectedSidebarButton == null)
                 {
-                    selectedSidebarButton = sidebar.Children.First();
+                    selectedSidebarButton = Sidebar.Children.First();
                     selectedSidebarButton.Selected = true;
                 }
             }
@@ -145,20 +150,24 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
 
-            ContentContainer.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(1, TRANSITION_LENGTH / 2);
+            ContentContainer.MoveToX(ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
+
+            Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
+            this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
 
             searchTextBox.HoldFocus = true;
         }
+
+        protected virtual float ExpandedPosition => 0;
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            ContentContainer.MoveToX(-width, TRANSITION_LENGTH, Easing.OutQuint);
-            sidebar?.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(0, TRANSITION_LENGTH / 2);
+            ContentContainer.MoveToX(-WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
+
+            Sidebar?.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
+            this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
 
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
@@ -179,8 +188,8 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            ContentContainer.Margin = new MarginPadding { Left = sidebar?.DrawWidth ?? 0 };
-            ContentContainer.Padding = new MarginPadding { Top = getToolbarHeight() };
+            ContentContainer.Margin = new MarginPadding { Left = Sidebar?.DrawWidth ?? 0 };
+            ContentContainer.Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
         protected class SettingsSectionsContainer : SectionsContainer<SettingsSection>
