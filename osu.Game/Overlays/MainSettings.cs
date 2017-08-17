@@ -41,7 +41,8 @@ namespace osu.Game.Overlays
         public MainSettings()
             : base(true)
         {
-            keyBindingOverlay = new KeyBindingOverlay {
+            keyBindingOverlay = new KeyBindingOverlay
+            {
                 Depth = 1,
                 Anchor = Anchor.TopRight,
             };
