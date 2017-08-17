@@ -10,16 +10,20 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using OpenTK;
+using osu.Game.Rulesets.Osu;
+using osu.Framework.Allocation;
+using osu.Game.Rulesets;
 
 namespace osu.Desktop.Tests.Visual
 {
     internal class TestCaseHitObjects : OsuTestCase
     {
-        private readonly FramedClock framedClock;
+        private FramedClock framedClock;
 
         private bool auto;
 
-        public TestCaseHitObjects()
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
         {
             var rateAdjustClock = new StopwatchClock(true);
             framedClock = new FramedClock(rateAdjustClock);
@@ -39,7 +43,7 @@ namespace osu.Desktop.Tests.Visual
                 Clock = framedClock,
                 Children = new[]
                 {
-                    playfieldContainer = new Container { RelativeSizeAxes = Axes.Both },
+                    playfieldContainer = new OsuInputManager(rulesets.GetRuleset(0)) { RelativeSizeAxes = Axes.Both },
                     approachContainer = new Container { RelativeSizeAxes = Axes.Both }
                 }
             };
@@ -49,8 +53,8 @@ namespace osu.Desktop.Tests.Visual
 
         private HitObjectType mode = HitObjectType.Slider;
 
-        private readonly Container playfieldContainer;
-        private readonly Container approachContainer;
+        private Container playfieldContainer;
+        private Container approachContainer;
 
         private void loadHitobjects(HitObjectType mode)
         {
