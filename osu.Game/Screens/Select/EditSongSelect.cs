@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Input;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
@@ -9,6 +10,12 @@ namespace osu.Game.Screens.Select
     {
         protected override bool ShowFooter => false;
 
-        protected override void OnSelected(InputState state) => Exit();
+        public WorkingBeatmap SelectedBeatmap;
+
+        protected override void OnSelected(InputState state)
+        {
+            SelectedBeatmap = Beatmap;
+            Exit();
+        }
     }
 }

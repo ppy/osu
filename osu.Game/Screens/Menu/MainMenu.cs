@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Menu
                         {
                             OnChart = delegate { Push(new ChartListing()); },
                             OnDirect = delegate { Push(new OnlineListing()); },
-                            OnEdit = delegate { Push(new Editor()); },
+                            OnEdit = delegate { Push(new EditorScreen()); },
                             OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
                             OnExit = delegate { Exit(); },

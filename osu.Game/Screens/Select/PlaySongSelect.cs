@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Select
             BeatmapOptions.AddButton(@"Edit", @"Beatmap", FontAwesome.fa_pencil, colours.Yellow, () =>
             {
                 ValidForResume = false;
-                Push(new Editor());
+                Push(new EditorScreen());
             }, Key.Number3);
 
             Beatmap.ValueChanged += beatmap_ValueChanged;
