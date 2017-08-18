@@ -53,18 +53,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
         }
 
-        private readonly WeakReference<OsuInputManager> osuActionInputManager = new WeakReference<OsuInputManager>(null);
-        internal OsuInputManager OsuActionInputManager
-        {
-            get
-            {
-                OsuInputManager target;
-                if (osuActionInputManager.TryGetTarget(out target)) return target;
-                target = GetContainingInputManager() as OsuInputManager;
-                osuActionInputManager.SetTarget(target);
-                return target;
-            }
-        }
+        private OsuInputManager osuActionInputManager;
+        internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
     }
 
     public enum ComboResult
