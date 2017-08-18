@@ -58,8 +58,8 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new ToolbarSocialButton(),
                         new ToolbarChatButton(),
+                        new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
                         new ToolbarButton
                         {
