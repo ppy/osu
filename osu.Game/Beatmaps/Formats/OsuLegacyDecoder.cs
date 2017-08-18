@@ -331,6 +331,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (speedMultiplier != difficultyPoint.SpeedMultiplier)
             {
+                beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == time);
                 beatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint
                 {
                     Time = time,
