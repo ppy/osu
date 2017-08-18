@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -118,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             base.Update();
 
             if (Time.Current < slider.EndTime)
-                Tracking = canCurrentlyTrack && lastState != null && ReceiveMouseInputAt(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
+                Tracking = canCurrentlyTrack && lastState != null && ReceiveMouseInputAt(lastState.Mouse.NativeState.Position) && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
         }
 
         public void UpdateProgress(double progress, int repeat)
