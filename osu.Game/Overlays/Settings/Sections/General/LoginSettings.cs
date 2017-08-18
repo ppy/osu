@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     break;
             }
 
-            if (form != null) GetContainingInputManager().ChangeFocus(form);
+            if (form != null) GetContainingInputManager()?.ChangeFocus(form);
         }
 
         public override bool AcceptsFocus => true;
