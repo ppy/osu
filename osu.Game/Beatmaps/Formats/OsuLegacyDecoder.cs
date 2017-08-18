@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Legacy;
