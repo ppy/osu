@@ -15,8 +15,6 @@ namespace osu.Game.Graphics.UserInterface.Volume
     {
         private readonly VolumeMeter volumeMeterMaster;
 
-        protected override bool HideOnEscape => false;
-
         private void volumeChanged(double newVolume)
         {
             Show();
