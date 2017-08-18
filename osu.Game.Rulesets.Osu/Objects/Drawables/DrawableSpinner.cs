@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void Update()
         {
             disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
-                
+
             base.Update();
         }
 
