@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -163,6 +164,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             disc.AccentColour = fillColour;
             circle.Colour = colours.BlueDark;
             glow.Colour = colours.BlueDark;
+        }
+
+        protected override void Update()
+        {
+            disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
+
+            base.Update();
         }
 
         protected override void UpdateAfterChildren()
