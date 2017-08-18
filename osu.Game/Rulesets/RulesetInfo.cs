@@ -22,9 +22,6 @@ namespace osu.Game.Rulesets
 
         public virtual Ruleset CreateInstance() => (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo), this);
 
-        public bool Equals(RulesetInfo other)
-        {
-            return ID == other?.ID && Available == other?.Available && Name == other?.Name && InstantiationInfo == other?.InstantiationInfo;
-        }
+        public bool Equals(RulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
     }
 }
