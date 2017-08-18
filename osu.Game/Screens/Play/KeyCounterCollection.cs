@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public override bool HandleInput => receptor?.IsAlive != true;
+        public override bool HandleInput => receptor == null;
 
         private Receptor receptor;
 

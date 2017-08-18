@@ -51,6 +51,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected virtual void UpdateCurrentState(ArmedState state)
         {
         }
+
+        private OsuInputManager osuActionInputManager;
+        internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
     }
 
     public enum ComboResult
