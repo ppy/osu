@@ -39,7 +39,7 @@ namespace osu.Game
 
         protected ScoreStore ScoreStore;
 
-        protected BindingStore BindingStore;
+        protected KeyBindingStore KeyBindingStore;
 
         protected override string MainResourceFile => @"osu.Game.Resources.dll";
 
@@ -108,7 +108,7 @@ namespace osu.Game
             dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, Host));
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager));
-            dependencies.Cache(BindingStore = new BindingStore(connection));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(connection, RulesetStore));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
@@ -183,12 +183,14 @@ namespace osu.Game
         {
             base.LoadComplete();
 
+            GlobalKeyBindingInputManager globalBinding;
+
             base.Content.Add(new RatioAdjust
             {
                 Children = new Drawable[]
                 {
                     Cursor = new MenuCursor(),
-                    new GlobalBindingInputManager(this)
+                    globalBinding = new GlobalKeyBindingInputManager(this)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = new OsuTooltipContainer(Cursor)
@@ -199,6 +201,9 @@ namespace osu.Game
                     }
                 }
             });
+
+            KeyBindingStore.Register(globalBinding);
+            dependencies.Cache(globalBinding);
 
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.

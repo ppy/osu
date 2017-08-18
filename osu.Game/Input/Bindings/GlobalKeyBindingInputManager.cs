@@ -6,22 +6,21 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Input.Bindings
 {
-    public class GlobalBindingInputManager : DatabasedKeyBindingInputManager<GlobalAction>
+    public class GlobalKeyBindingInputManager : DatabasedKeyBindingInputManager<GlobalAction>
     {
         private readonly Drawable handler;
 
-        public GlobalBindingInputManager(OsuGameBase game)
+        public GlobalKeyBindingInputManager(OsuGameBase game)
         {
             if (game is IKeyBindingHandler<GlobalAction>)
                 handler = game;
         }
 
-        protected override IEnumerable<KeyBinding> CreateDefaultMappings() => new[]
+        public override IEnumerable<KeyBinding> DefaultKeyBindings => new[]
         {
             new KeyBinding(Key.F8, GlobalAction.ToggleChat),
             new KeyBinding(Key.F9, GlobalAction.ToggleSocial),
@@ -31,23 +30,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { Key.LControl, Key.D }, GlobalAction.ToggleDirect),
         };
 
-        protected override bool PropagateKeyDown(IEnumerable<Drawable> drawables, InputState state, KeyDownEventArgs args)
-        {
-            if (handler != null)
-                drawables = new[] { handler }.Concat(drawables);
-
-            // always handle ourselves before all children.
-            return base.PropagateKeyDown(drawables, state, args);
-        }
-
-        protected override bool PropagateKeyUp(IEnumerable<Drawable> drawables, InputState state, KeyUpEventArgs args)
-        {
-            if (handler != null)
-                drawables = new[] { handler }.Concat(drawables);
-
-            // always handle ourselves before all children.
-            return base.PropagateKeyUp(drawables, state, args);
-        }
+        protected override IEnumerable<Drawable> GetKeyboardInputQueue() =>
+            handler == null ? base.GetKeyboardInputQueue() : new[] { handler }.Concat(base.GetKeyboardInputQueue());
     }
 
     public enum GlobalAction

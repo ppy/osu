@@ -11,6 +11,15 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsHeader : Container
     {
+        private readonly string heading;
+        private readonly string subheading;
+
+        public SettingsHeader(string heading, string subheading)
+        {
+            this.heading = heading;
+            this.subheading = subheading;
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -28,7 +37,7 @@ namespace osu.Game.Overlays.Settings
                     {
                         new OsuSpriteText
                         {
-                            Text = "settings",
+                            Text = heading,
                             TextSize = 40,
                             Margin = new MarginPadding
                             {
@@ -39,7 +48,7 @@ namespace osu.Game.Overlays.Settings
                         new OsuSpriteText
                         {
                             Colour = colours.Pink,
-                            Text = "Change the way osu! behaves",
+                            Text = subheading,
                             TextSize = 18,
                             Margin = new MarginPadding
                             {

@@ -2,9 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,11 +15,10 @@ using osu.Framework.Input;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
-using osu.Game.Overlays.Settings.Sections;
 
 namespace osu.Game.Overlays
 {
-    public class SettingsOverlay : OsuFocusedOverlayContainer
+    public abstract class SettingsOverlay : OsuFocusedOverlayContainer
     {
         internal const float CONTENT_MARGINS = 10;
 
@@ -24,125 +26,152 @@ namespace osu.Game.Overlays
 
         public const float SIDEBAR_WIDTH = Sidebar.DEFAULT_WIDTH;
 
-        private const float width = 400;
+        protected const float WIDTH = 400;
 
         private const float sidebar_padding = 10;
 
-        private Sidebar sidebar;
-        private SidebarButton[] sidebarButtons;
+        protected Container<Drawable> ContentContainer;
+
+        protected override Container<Drawable> Content => ContentContainer;
+
+        protected Sidebar Sidebar;
         private SidebarButton selectedSidebarButton;
 
-        private SettingsSectionsContainer sectionsContainer;
+        protected SettingsSectionsContainer SectionsContainer;
 
         private SearchTextBox searchTextBox;
 
-        private Func<float> getToolbarHeight;
+        /// <summary>
+        /// Provide a source for the toolbar height.
+        /// </summary>
+        public Func<float> GetToolbarHeight;
 
-        public SettingsOverlay()
+        private readonly bool showSidebar;
+
+        protected Box Background;
+
+        protected SettingsOverlay(bool showSidebar)
         {
+            this.showSidebar = showSidebar;
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGame game)
+        protected virtual IEnumerable<SettingsSection> CreateSections() => null;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            var sections = new SettingsSection[]
+            InternalChild = ContentContainer = new Container
             {
-                new GeneralSection(),
-                new GraphicsSection(),
-                new GameplaySection(),
-                new AudioSection(),
-                new SkinSection(),
-                new InputSection(),
-                new OnlineSection(),
-                new MaintenanceSection(),
-                new DebugSection(),
-            };
-            Children = new Drawable[]
-            {
-                new Box
+                Width = WIDTH,
+                RelativeSizeAxes = Axes.Y,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.6f,
-                },
-                sectionsContainer = new SettingsSectionsContainer
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = width,
-                    Margin = new MarginPadding { Left = SIDEBAR_WIDTH },
-                    ExpandableHeader = new SettingsHeader(),
-                    FixedHeader = searchTextBox = new SearchTextBox
+                    Background = new Box
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Origin = Anchor.TopCentre,
-                        Anchor = Anchor.TopCentre,
-                        Width = 0.95f,
-                        Margin = new MarginPadding
-                        {
-                            Top = 20,
-                            Bottom = 20
-                        },
-                        Exit = Hide,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Scale = new Vector2(2, 1), // over-extend to the left for transitions
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                        Alpha = 0.6f,
                     },
-                    Children = sections,
-                    Footer = new SettingsFooter()
-                },
-                sidebar = new Sidebar
-                {
-                    Width = SIDEBAR_WIDTH,
-                    Children = sidebarButtons = sections.Select(section =>
-                        new SidebarButton
+                    SectionsContainer = new SettingsSectionsContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        ExpandableHeader = CreateHeader(),
+                        FixedHeader = searchTextBox = new SearchTextBox
                         {
-                            Section = section,
-                            Action = s =>
+                            RelativeSizeAxes = Axes.X,
+                            Origin = Anchor.TopCentre,
+                            Anchor = Anchor.TopCentre,
+                            Width = 0.95f,
+                            Margin = new MarginPadding
                             {
-                                sectionsContainer.ScrollTo(s);
-                                sidebar.State = ExpandedState.Contracted;
+                                Top = 20,
+                                Bottom = 20
                             },
-                        }
-                    ).ToArray()
+                            Exit = Hide,
+                        },
+                        Footer = CreateFooter()
+                    },
                 }
             };
 
-            selectedSidebarButton = sidebarButtons[0];
-            selectedSidebarButton.Selected = true;
-
-            sectionsContainer.SelectedSection.ValueChanged += section =>
+            if (showSidebar)
             {
-                selectedSidebarButton.Selected = false;
-                selectedSidebarButton = sidebarButtons.Single(b => b.Section == section);
-                selectedSidebarButton.Selected = true;
-            };
+                AddInternal(Sidebar = new Sidebar { Width = SIDEBAR_WIDTH });
 
-            searchTextBox.Current.ValueChanged += newValue => sectionsContainer.SearchContainer.SearchTerm = newValue;
+                SectionsContainer.SelectedSection.ValueChanged += section =>
+                {
+                    selectedSidebarButton.Selected = false;
+                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section);
+                    selectedSidebarButton.Selected = true;
+                };
+            }
 
-            getToolbarHeight = () => game?.ToolbarOffset ?? 0;
+            searchTextBox.Current.ValueChanged += newValue => SectionsContainer.SearchContainer.SearchTerm = newValue;
+
+            CreateSections()?.ForEach(AddSection);
         }
+
+        protected void AddSection(SettingsSection section)
+        {
+            SectionsContainer.Add(section);
+
+            if (Sidebar != null)
+            {
+                var button = new SidebarButton
+                {
+                    Section = section,
+                    Action = s =>
+                    {
+                        SectionsContainer.ScrollTo(s);
+                        Sidebar.State = ExpandedState.Contracted;
+                    },
+                };
+
+                Sidebar.Add(button);
+
+                if (selectedSidebarButton == null)
+                {
+                    selectedSidebarButton = Sidebar.Children.First();
+                    selectedSidebarButton.Selected = true;
+                }
+            }
+        }
+
+        protected virtual Drawable CreateHeader() => new Container();
+
+        protected virtual Drawable CreateFooter() => new Container();
 
         protected override void PopIn()
         {
             base.PopIn();
 
-            sectionsContainer.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            sidebar.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(1, TRANSITION_LENGTH / 2);
+            ContentContainer.MoveToX(ExpandedPosition, TRANSITION_LENGTH, Easing.OutQuint);
+
+            Sidebar?.MoveToX(0, TRANSITION_LENGTH, Easing.OutQuint);
+            this.FadeTo(1, TRANSITION_LENGTH, Easing.OutQuint);
 
             searchTextBox.HoldFocus = true;
         }
+
+        protected virtual float ExpandedPosition => 0;
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            sectionsContainer.MoveToX(-width, TRANSITION_LENGTH, Easing.OutQuint);
-            sidebar.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
-            this.FadeTo(0, TRANSITION_LENGTH / 2);
+            ContentContainer.MoveToX(-WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
+
+            Sidebar?.MoveToX(-SIDEBAR_WIDTH, TRANSITION_LENGTH, Easing.OutQuint);
+            this.FadeTo(0, TRANSITION_LENGTH, Easing.OutQuint);
 
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
-                InputManager.ChangeFocus(null);
+                GetContainingInputManager().ChangeFocus(null);
         }
 
         public override bool AcceptsFocus => true;
@@ -151,7 +180,7 @@ namespace osu.Game.Overlays
 
         protected override void OnFocus(InputState state)
         {
-            InputManager.ChangeFocus(searchTextBox);
+            GetContainingInputManager().ChangeFocus(searchTextBox);
             base.OnFocus(state);
         }
 
@@ -159,11 +188,11 @@ namespace osu.Game.Overlays
         {
             base.UpdateAfterChildren();
 
-            sectionsContainer.Margin = new MarginPadding { Left = sidebar.DrawWidth };
-            sectionsContainer.Padding = new MarginPadding { Top = getToolbarHeight() };
+            ContentContainer.Margin = new MarginPadding { Left = Sidebar?.DrawWidth ?? 0 };
+            ContentContainer.Padding = new MarginPadding { Top = GetToolbarHeight?.Invoke() ?? 0 };
         }
 
-        private class SettingsSectionsContainer : SectionsContainer<SettingsSection>
+        protected class SettingsSectionsContainer : SectionsContainer<SettingsSection>
         {
             public SearchContainer<SettingsSection> SearchContainer;
 
