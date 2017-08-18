@@ -23,12 +23,12 @@ namespace osu.Game.Rulesets.Catch
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
-            new KeyBinding(Key.Z, CatchAction.MoveLeft),
-            new KeyBinding(Key.Left, CatchAction.MoveLeft),
-            new KeyBinding(Key.X, CatchAction.MoveRight),
-            new KeyBinding(Key.Right, CatchAction.MoveRight),
-            new KeyBinding(Key.LShift, CatchAction.Dash),
-            new KeyBinding(Key.RShift, CatchAction.Dash),
+            new KeyBinding(InputKey.Z, CatchAction.MoveLeft),
+            new KeyBinding(InputKey.Left, CatchAction.MoveLeft),
+            new KeyBinding(InputKey.X, CatchAction.MoveRight),
+            new KeyBinding(InputKey.Right, CatchAction.MoveRight),
+            new KeyBinding(InputKey.Shift, CatchAction.Dash),
+            new KeyBinding(InputKey.Shift, CatchAction.Dash),
         };
 
         public override IEnumerable<Mod> GetModsFor(ModType type)

@@ -40,7 +40,10 @@ namespace osu.Game.Overlays.KeyBinding
 
             foreach (Enum v in Enum.GetValues(enumType))
                 // one row per valid action.
-                Add(new KeyBindingRow(v, bindings.Where(b => b.Action.Equals((int)(object)v))));
+                Add(new KeyBindingRow(v, bindings.Where(b => b.Action.Equals((int)(object)v)))
+                {
+                    AllowMainMouseButtons = Ruleset != null
+                });
         }
     }
 }
