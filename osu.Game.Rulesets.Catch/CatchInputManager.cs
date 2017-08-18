@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Catch
     public class CatchInputManager : DatabasedKeyBindingInputManager<CatchAction>
     {
         public CatchInputManager(RulesetInfo ruleset)
-            : base(ruleset, simultaneousMode: SimultaneousBindingMode.Unique)
+            : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
         }
     }
