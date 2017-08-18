@@ -8,24 +8,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using Newtonsoft.Json;
-using osu.Framework.IO.Network;
-using FileWebRequest = osu.Framework.IO.Network.FileWebRequest;
 using WebRequest = osu.Framework.IO.Network.WebRequest;
 
 namespace osu.Desktop.Deploy
 {
     internal static class Program
     {
-        private const string nuget_path = @"packages\NuGet.CommandLine.3.5.0\tools\NuGet.exe";
-        private const string squirrel_path = @"packages\squirrel.windows.1.5.2\tools\Squirrel.exe";
-        private const string msbuild_path = @"C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe";
+        private const string nuget_path = @"packages\NuGet.CommandLine.4.1.0\tools\NuGet.exe";
+        private const string squirrel_path = @"packages\squirrel.windows.1.7.5\tools\Squirrel.exe";
+        private const string msbuild_path = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe";
 
         public static string StagingFolder = ConfigurationManager.AppSettings["StagingFolder"];
         public static string ReleasesFolder = ConfigurationManager.AppSettings["ReleasesFolder"];
-        public static string GitHubAccessToken = ConfigurationManager.AppSettings["GitHubAccessToken"];
-        public static string GitHubUsername = ConfigurationManager.AppSettings["GitHubUsername"];
-        public static string GitHubRepoName = ConfigurationManager.AppSettings["GitHubRepoName"];
         public static string SolutionName = ConfigurationManager.AppSettings["SolutionName"];
         public static string ProjectName = ConfigurationManager.AppSettings["ProjectName"];
         public static string NuSpecName = ConfigurationManager.AppSettings["NuSpecName"];
@@ -33,9 +27,6 @@ namespace osu.Desktop.Deploy
         public static string PackageName = ConfigurationManager.AppSettings["PackageName"];
         public static string IconName = ConfigurationManager.AppSettings["IconName"];
         public static string CodeSigningCertificate = ConfigurationManager.AppSettings["CodeSigningCertificate"];
-
-        public static string GitHubApiEndpoint => $"https://api.github.com/repos/{GitHubUsername}/{GitHubRepoName}/releases";
-        public static string GitHubReleasePage => $"https://github.com/{GitHubUsername}/{GitHubRepoName}/releases";
 
         /// <summary>
         /// How many previous build deltas we want to keep when publishing.
@@ -69,8 +60,6 @@ namespace osu.Desktop.Deploy
                 Directory.CreateDirectory(ReleasesFolder);
             }
 
-            checkGitHubReleases();
-
             refreshDirectory(StagingFolder);
 
             //increment build number until we have a unique one.
@@ -100,7 +89,7 @@ namespace osu.Desktop.Deploy
             updateAssemblyInfo(version);
 
             write("Running build process...");
-            runCommand(msbuild_path, $"/v:quiet /m /t:{TargetName.Replace('.', '_')} /p:OutputPath={stagingPath};Configuration=Release {SolutionName}.sln");
+            runCommand(msbuild_path, $"\"/v:quiet /m /t:{TargetName.Replace('.', '_')} /p:OutputPath={stagingPath};Configuration=Release {SolutionName}.sln\"");
 
             write("Creating NuGet deployment package...");
             runCommand(nuget_path, $"pack {NuSpecName} -Version {version} -Properties Configuration=Deploy -OutputDirectory {stagingPath} -BasePath {stagingPath}");
@@ -120,8 +109,6 @@ namespace osu.Desktop.Deploy
             File.Copy(Path.Combine(ReleasesFolder, "Setup.exe"), Path.Combine(ReleasesFolder, "install.exe"), true);
             File.Delete(Path.Combine(ReleasesFolder, "Setup.exe"));
 
-            uploadBuild(version);
-
             //reset assemblyinfo.
             updateAssemblyInfo("0.0.0");
 
@@ -133,8 +120,7 @@ namespace osu.Desktop.Deploy
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine();
-            Console.WriteLine("  Please note that OSU! and PPY are registered trademarks and as such covered by trademark law.");
-            Console.WriteLine("  Do not distribute builds of this project publicly that make use of these.");
+            Console.WriteLine("  Please note that OSU! and PPY are registered trademarks and as such covered by trademark law." + " \n  Do not distribute builds of this project publicly that make use of these.");
             Console.ResetColor();
             Console.WriteLine();
         }
@@ -186,108 +172,6 @@ namespace osu.Desktop.Deploy
             var lines = new List<string>();
             releaseLines.ForEach(l => lines.Add(l.ToString()));
             File.WriteAllLines(Path.Combine(ReleasesFolder, "RELEASES"), lines);
-        }
-
-        private static void uploadBuild(string version)
-        {
-            if (string.IsNullOrEmpty(GitHubAccessToken) || string.IsNullOrEmpty(codeSigningCertPath))
-                return;
-
-            write("Publishing to GitHub...");
-
-            write($"- Creating release {version}...", ConsoleColor.Yellow);
-            var req = new JsonWebRequest<GitHubRelease>($"{GitHubApiEndpoint}")
-            {
-                Method = HttpMethod.POST,
-            };
-            req.AddRaw(JsonConvert.SerializeObject(new GitHubRelease
-            {
-                Name = version,
-                Draft = true,
-                PreRelease = true
-            }));
-            req.AuthenticatedBlockingPerform();
-
-            var assetUploadUrl = req.ResponseObject.UploadUrl.Replace("{?name,label}", "?name={0}");
-            foreach (var a in Directory.GetFiles(ReleasesFolder).Reverse()) //reverse to upload RELEASES first.
-            {
-                write($"- Adding asset {a}...", ConsoleColor.Yellow);
-                var upload = new WebRequest(assetUploadUrl, Path.GetFileName(a))
-                {
-                    Method = HttpMethod.POST,
-                    Timeout = 240000,
-                    ContentType = "application/octet-stream",
-                };
-
-                upload.AddRaw(File.ReadAllBytes(a));
-                upload.AuthenticatedBlockingPerform();
-            }
-
-            openGitHubReleasePage();
-        }
-
-        private static void openGitHubReleasePage() => Process.Start(GitHubReleasePage);
-
-        private static void checkGitHubReleases()
-        {
-            write("Checking GitHub releases...");
-            var req = new JsonWebRequest<List<GitHubRelease>>($"{GitHubApiEndpoint}");
-            req.AuthenticatedBlockingPerform();
-
-            var lastRelease = req.ResponseObject.FirstOrDefault();
-
-            if (lastRelease == null)
-                return;
-
-            if (lastRelease.Draft)
-            {
-                openGitHubReleasePage();
-                error("There's a pending draft release! You probably don't want to push a build with this present.");
-            }
-
-            //there's a previous release for this project.
-            var assetReq = new JsonWebRequest<List<GitHubObject>>($"{GitHubApiEndpoint}/{lastRelease.Id}/assets");
-            assetReq.AuthenticatedBlockingPerform();
-            var assets = assetReq.ResponseObject;
-
-            //make sure our RELEASES file is the same as the last build on the server.
-            var releaseAsset = assets.FirstOrDefault(a => a.Name == "RELEASES");
-
-            //if we don't have a RELEASES asset then the previous release likely wasn't a Squirrel one.
-            if (releaseAsset == null) return;
-
-            write($"Last GitHub release was {lastRelease.Name}.");
-
-            bool requireDownload = false;
-
-            if (!File.Exists(Path.Combine(ReleasesFolder, nupkgDistroFilename(lastRelease.Name))))
-            {
-                write("Last version's package not found locally.", ConsoleColor.Red);
-                requireDownload = true;
-            }
-            else
-            {
-                var lastReleases = new RawFileWebRequest($"{GitHubApiEndpoint}/assets/{releaseAsset.Id}");
-                lastReleases.AuthenticatedBlockingPerform();
-                if (File.ReadAllText(Path.Combine(ReleasesFolder, "RELEASES")) != lastReleases.ResponseString)
-                {
-                    write("Server's RELEASES differed from ours.", ConsoleColor.Red);
-                    requireDownload = true;
-                }
-            }
-
-            if (!requireDownload) return;
-
-            write("Refreshing local releases directory...");
-            refreshDirectory(ReleasesFolder);
-
-            foreach (var a in assets)
-            {
-                if (a.Name.EndsWith(".exe")) continue;
-
-                write($"- Downloading {a.Name}...", ConsoleColor.Yellow);
-                new FileWebRequest(Path.Combine(ReleasesFolder, a.Name), $"{GitHubApiEndpoint}/assets/{a.Id}").AuthenticatedBlockingPerform();
-            }
         }
 
         private static void refreshDirectory(string directory)
@@ -386,12 +270,6 @@ namespace osu.Desktop.Deploy
             }
             Console.ForegroundColor = col;
             Console.WriteLine(message);
-        }
-
-        public static void AuthenticatedBlockingPerform(this WebRequest r)
-        {
-            r.AddHeader("Authorization", $"token {GitHubAccessToken}");
-            r.BlockingPerform();
         }
     }
 
