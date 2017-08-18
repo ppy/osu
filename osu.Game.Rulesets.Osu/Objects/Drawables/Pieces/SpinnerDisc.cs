@@ -12,7 +12,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SpinnerDisc : CircularContainer, IHasAccentColour, IKeyBindingHandler<OsuAction>
+    public class SpinnerDisc : CircularContainer, IHasAccentColour
     {
         private readonly Spinner spinner;
 
@@ -73,39 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return base.OnMouseMove(state);
         }
 
-        public bool OnPressed(OsuAction action)
-        {
-            switch (action)
-            {
-                case OsuAction.LeftButton:
-                    actionLeftButtonPressed = true;
-                    break;
-                case OsuAction.RightButton:
-                    actionRightButtonPressed = true;
-                    break;
-            }
-            Tracking = actionLeftButtonPressed || actionRightButtonPressed;
-            return false;
-        }
-
-        public bool OnReleased(OsuAction action)
-        {
-            switch (action)
-            {
-                case OsuAction.LeftButton:
-                    actionLeftButtonPressed = false;
-                    break;
-                case OsuAction.RightButton:
-                    actionRightButtonPressed = false;
-                    break;
-            }
-            Tracking = actionLeftButtonPressed || actionRightButtonPressed;
-            return false;
-        }
-
         private Vector2 mousePosition;
-        private bool actionLeftButtonPressed;
-        private bool actionRightButtonPressed;
 
         private float lastAngle;
         private float currentRotation;
