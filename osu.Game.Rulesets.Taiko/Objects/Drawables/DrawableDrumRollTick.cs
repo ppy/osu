@@ -15,7 +15,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
+            // Because ticks aren't added by the ScrollingPlayfield, we need to set the following properties ourselves
+            RelativePositionAxes = Axes.X;
+            X = (float)tick.StartTime;
+
             FillMode = FillMode.Fit;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // We need to set this here because RelativeSizeAxes won't/can't set our size by default with a different RelativeChildSize
+            Width *= Parent.RelativeChildSize.X;
         }
 
         protected override TaikoPiece CreateMainPiece() => new TickPiece
@@ -45,11 +57,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     Content.ScaleTo(0, 100, Easing.OutQuint);
                     break;
             }
-        }
-
-        protected override void UpdateScrollPosition(double time)
-        {
-            // Ticks don't move
         }
 
         protected override bool HandleKeyPress(Key key)
