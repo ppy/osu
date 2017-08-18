@@ -57,6 +57,9 @@ namespace osu.Game.Overlays.Chat
                 TabContainer.ChangeChildDepth(selectorTab, float.MaxValue);
 
             base.AddTabItem(item, addToDropdown);
+
+            if (SelectedTab == null)
+                SelectTab(item);
         }
 
         protected override TabItem<Channel> CreateTabItem(Channel value)
@@ -149,7 +152,7 @@ namespace osu.Game.Overlays.Chat
             protected override bool OnHover(InputState state)
             {
                 closeButton?.FadeIn(1f, Easing.InBounce);
-                
+
                 if (!Active)
                     box.FadeColour(backgroundHover, transition_length, Easing.OutQuint);
                 return true;
