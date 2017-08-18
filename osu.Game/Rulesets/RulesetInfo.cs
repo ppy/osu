@@ -6,7 +6,7 @@ using SQLite.Net.Attributes;
 
 namespace osu.Game.Rulesets
 {
-    public class RulesetInfo
+    public class RulesetInfo : IEquatable<RulesetInfo>
     {
         [PrimaryKey, AutoIncrement]
         public int? ID { get; set; }
@@ -21,5 +21,7 @@ namespace osu.Game.Rulesets
         public bool Available { get; set; }
 
         public virtual Ruleset CreateInstance() => (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo), this);
+
+        public bool Equals(RulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
     }
 }

@@ -5,21 +5,21 @@ using osu.Game.Overlays;
 
 namespace osu.Desktop.Tests.Visual
 {
-    internal class TestCaseSettings : OsuTestCase
+    public class TestCaseKeyConfiguration : OsuTestCase
     {
-        public override string Description => @"Tests the settings overlay";
+        private readonly KeyBindingOverlay overlay;
 
-        private readonly SettingsOverlay settings;
+        public override string Description => @"Key configuration";
 
-        public TestCaseSettings()
+        public TestCaseKeyConfiguration()
         {
-            Children = new[] { settings = new MainSettings() };
+            Child = overlay = new KeyBindingOverlay();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            settings.ToggleVisibility();
+            overlay.Show();
         }
     }
 }

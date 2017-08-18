@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
@@ -25,15 +24,15 @@ namespace osu.Game.Overlays.Settings
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
         public string[] FilterTerms => new[] { Header };
+
+        private const int header_size = 26;
+        private const int header_margin = 25;
+        private const int border_size = 2;
+
         public bool MatchingFilter
         {
-            set
-            {
-                this.FadeTo(value ? 1 : 0);
-            }
+            set { this.FadeTo(value ? 1 : 0); }
         }
-
-        private readonly SpriteText headerLabel;
 
         protected SettingsSection()
         {
@@ -41,9 +40,22 @@ namespace osu.Game.Overlays.Settings
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
-            const int header_size = 26;
-            const int header_margin = 25;
-            const int border_size = 2;
+            FlowContent = new FillFlowContainer
+            {
+                Margin = new MarginPadding
+                {
+                    Top = header_size + header_margin
+                },
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 30),
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             AddRangeInternal(new Drawable[]
             {
                 new Box
@@ -65,28 +77,16 @@ namespace osu.Game.Overlays.Settings
                     AutoSizeAxes = Axes.Y,
                     Children = new[]
                     {
-                        headerLabel = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             TextSize = header_size,
                             Text = Header,
+                            Colour = colours.Yellow
                         },
-                        FlowContent = new FillFlowContainer
-                        {
-                            Margin = new MarginPadding { Top = header_size + header_margin },
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 30),
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                        },
+                        FlowContent
                     }
                 },
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            headerLabel.Colour = colours.Yellow;
         }
     }
 }

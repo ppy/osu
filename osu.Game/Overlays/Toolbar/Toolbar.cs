@@ -22,8 +22,6 @@ namespace osu.Game.Overlays.Toolbar
 
         private readonly ToolbarUserArea userArea;
 
-        protected override bool HideOnEscape => false;
-
         protected override bool BlockPassThroughMouse => false;
 
         private const double transition_time = 500;
@@ -60,8 +58,8 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        new ToolbarSocialButton(),
                         new ToolbarChatButton(),
+                        new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
                         new ToolbarButton
                         {
