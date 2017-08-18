@@ -38,11 +38,8 @@ namespace osu.Game.Rulesets.Scoring
         {
             get
             {
-                // Evaluate the mod strings
-                if (mods == null)
-                    mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
-
-                return mods;
+                // Evaluate the mod strings if necessary
+                return mods ?? (mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray());
             }
             set
             {
