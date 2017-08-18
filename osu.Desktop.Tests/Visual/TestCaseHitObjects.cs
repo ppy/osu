@@ -2,60 +2,38 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using OpenTK;
-using OpenTK.Graphics;
+using osu.Game.Rulesets.Osu;
+using osu.Framework.Allocation;
+using osu.Game.Rulesets;
 
 namespace osu.Desktop.Tests.Visual
 {
     internal class TestCaseHitObjects : OsuTestCase
     {
-        private readonly FramedClock framedClock;
+        private FramedClock framedClock;
 
         private bool auto;
 
-        public TestCaseHitObjects()
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
         {
             var rateAdjustClock = new StopwatchClock(true);
             framedClock = new FramedClock(rateAdjustClock);
-            playbackSpeed.ValueChanged += delegate { rateAdjustClock.Rate = playbackSpeed.Value; };
-
-            playbackSpeed.TriggerChange();
 
             AddStep(@"circles", () => loadHitobjects(HitObjectType.Circle));
             AddStep(@"slider", () => loadHitobjects(HitObjectType.Slider));
             AddStep(@"spinner", () => loadHitobjects(HitObjectType.Spinner));
 
-            AddToggleStep(@"auto", state => { auto = state; loadHitobjects(mode); });
-
-            BasicSliderBar<double> sliderBar;
-            Add(new Container
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new SpriteText { Text = "Playback Speed" },
-                    sliderBar = new BasicSliderBar<double>
-                    {
-                        Width = 150,
-                        Height = 10,
-                        SelectionColor = Color4.Orange,
-                    }
-                }
-            });
-
-            sliderBar.Current.BindTo(playbackSpeed);
+            AddToggleStep("Auto", state => { auto = state; loadHitobjects(mode); });
+            AddSliderStep("Playback speed", 0.0, 2.0, 0.5, v => rateAdjustClock.Rate = v);
 
             framedClock.ProcessFrame();
 
@@ -65,7 +43,7 @@ namespace osu.Desktop.Tests.Visual
                 Clock = framedClock,
                 Children = new[]
                 {
-                    playfieldContainer = new Container { RelativeSizeAxes = Axes.Both },
+                    playfieldContainer = new OsuInputManager(rulesets.GetRuleset(0)) { RelativeSizeAxes = Axes.Both },
                     approachContainer = new Container { RelativeSizeAxes = Axes.Both }
                 }
             };
@@ -75,9 +53,8 @@ namespace osu.Desktop.Tests.Visual
 
         private HitObjectType mode = HitObjectType.Slider;
 
-        private readonly BindableNumber<double> playbackSpeed = new BindableDouble(0.5) { MinValue = 0, MaxValue = 1 };
-        private readonly Container playfieldContainer;
-        private readonly Container approachContainer;
+        private Container playfieldContainer;
+        private Container approachContainer;
 
         private void loadHitobjects(HitObjectType mode)
         {
