@@ -27,8 +27,6 @@ namespace osu.Desktop.Overlays
         private UpdateManager updateManager;
         private NotificationOverlay notificationOverlay;
 
-        protected override bool HideOnEscape => false;
-
         public override bool HandleInput => false;
 
         [BackgroundDependencyLoader]

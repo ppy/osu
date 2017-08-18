@@ -27,7 +27,9 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<OsuLegacyDecoder>(@"osu file format v7");
             AddDecoder<OsuLegacyDecoder>(@"osu file format v6");
             AddDecoder<OsuLegacyDecoder>(@"osu file format v5");
-            // TODO: Not sure how far back to go, or differences between versions
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v4");
+            AddDecoder<OsuLegacyDecoder>(@"osu file format v3");
+            // TODO: differences between versions
         }
 
         private ConvertHitObjectParser parser;
@@ -222,6 +224,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             while (line.IndexOf('$') >= 0)
             {
+                string origLine = line;
                 string[] split = line.Split(',');
                 for (int i = 0; i < split.Length; i++)
                 {
@@ -231,6 +234,7 @@ namespace osu.Game.Beatmaps.Formats
                 }
 
                 line = string.Join(",", split);
+                if (line == origLine) break;
             }
         }
 
@@ -327,6 +331,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (speedMultiplier != difficultyPoint.SpeedMultiplier)
             {
+                beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == time);
                 beatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint
                 {
                     Time = time,

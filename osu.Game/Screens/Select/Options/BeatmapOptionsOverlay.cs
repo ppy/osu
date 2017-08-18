@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Select.Options
         /// <param name="colour">Colour of the button.</param>
         /// <param name="icon">Icon of the button.</param>
         /// <param name="hotkey">Hotkey of the button.</param>
-        /// <param name="action">Action the button does.</param>
+        /// <param name="action">Binding the button does.</param>
         /// <param name="depth">
         /// <para>Lower depth to be put on the left, and higher to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Footer"/>!</para>
