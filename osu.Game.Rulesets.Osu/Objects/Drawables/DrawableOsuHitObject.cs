@@ -53,12 +53,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
         }
 
-        private WeakReference<OsuInputManager> osuActionInputManager = new WeakReference<OsuInputManager>(null);
+        private readonly WeakReference<OsuInputManager> osuActionInputManager = new WeakReference<OsuInputManager>(null);
         internal OsuInputManager OsuActionInputManager
         {
             get
             {
-                OsuInputManager target = null;
+                OsuInputManager target;
                 if (osuActionInputManager.TryGetTarget(out target)) return target;
                 target = GetContainingInputManager() as OsuInputManager;
                 osuActionInputManager.SetTarget(target);
