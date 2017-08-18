@@ -68,7 +68,7 @@ namespace osu.Desktop.Tests.Visual
 
             while (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
             {
-                var p = progressingNotifications.FirstOrDefault(n => n.IsLoaded && n.State == ProgressNotificationState.Queued);
+                var p = progressingNotifications.FirstOrDefault(n => n.IsAlive && n.State == ProgressNotificationState.Queued);
                 if (p == null)
                     break;
 

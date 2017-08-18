@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.UI
             catcher.Size = new Vector2(DrawSize.Y);
         }
 
-        private class Catcher : Container
+        private class Catcher : Container, IKeyBindingHandler<CatchAction>
         {
             private Texture texture;
 
@@ -104,48 +104,40 @@ namespace osu.Game.Rulesets.Catch.UI
                 OriginPosition = new Vector2(DrawWidth / 2, 10) //temporary until the sprite is aligned correctly.
             };
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            public bool OnPressed(CatchAction action)
             {
-                if (args.Repeat) return true;
-
-                if (state.Data is CatchAction)
+                switch (action)
                 {
-                    switch ((CatchAction)state.Data)
-                    {
-                        case CatchAction.MoveLeft:
-                            currentDirection--;
-                            return true;
-                        case CatchAction.MoveRight:
-                            currentDirection++;
-                            return true;
-                        case CatchAction.Dash:
-                            Dashing = true;
-                            return true;
-                    }
+                    case CatchAction.MoveLeft:
+                        currentDirection--;
+                        return true;
+                    case CatchAction.MoveRight:
+                        currentDirection++;
+                        return true;
+                    case CatchAction.Dash:
+                        Dashing = true;
+                        return true;
                 }
 
-                return base.OnKeyDown(state, args);
+                return false;
             }
 
-            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+            public bool OnReleased(CatchAction action)
             {
-                if (state.Data is CatchAction)
+                switch (action)
                 {
-                    switch ((CatchAction)state.Data)
-                    {
-                        case CatchAction.MoveLeft:
-                            currentDirection++;
-                            return true;
-                        case CatchAction.MoveRight:
-                            currentDirection--;
-                            return true;
-                        case CatchAction.Dash:
-                            Dashing = false;
-                            return true;
-                    }
+                    case CatchAction.MoveLeft:
+                        currentDirection++;
+                        return true;
+                    case CatchAction.MoveRight:
+                        currentDirection--;
+                        return true;
+                    case CatchAction.Dash:
+                        Dashing = false;
+                        return true;
                 }
 
-                return base.OnKeyUp(state, args);
+                return false;
             }
 
             protected override void Update()

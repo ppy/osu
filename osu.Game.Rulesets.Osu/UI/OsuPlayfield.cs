@@ -10,8 +10,8 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Osu.UI.Cursor;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
