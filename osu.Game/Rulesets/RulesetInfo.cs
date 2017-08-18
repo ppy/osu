@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets
 
         public bool Equals(RulesetInfo other)
         {
-            return this.ID == other.ID && this.Available == other.Available && this.Name == other.Name && this.InstantiationInfo == other.InstantiationInfo;
+            return ID == other?.ID && Available == other?.Available && Name == other?.Name && InstantiationInfo == other?.InstantiationInfo;
         }
     }
 }
