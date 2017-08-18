@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.Timing
         /// </summary>
         public Axes ScrollingAxes { get; internal set; }
 
+        public override bool RemoveWhenNotAlive => false;
+
         /// <summary>
         /// The <see cref="MultiplierControlPoint"/> that defines the speed adjustments.
         /// </summary>
