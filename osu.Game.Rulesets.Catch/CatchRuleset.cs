@@ -13,12 +13,23 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Scoring;
+using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Rulesets.Catch
 {
     public class CatchRuleset : Ruleset
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new CatchRulesetContainer(this, beatmap, isForCurrentRuleset);
+
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        {
+            new KeyBinding(Key.Z, CatchAction.MoveLeft),
+            new KeyBinding(Key.Left, CatchAction.MoveLeft),
+            new KeyBinding(Key.X, CatchAction.MoveRight),
+            new KeyBinding(Key.Right, CatchAction.MoveRight),
+            new KeyBinding(Key.LShift, CatchAction.Dash),
+            new KeyBinding(Key.RShift, CatchAction.Dash),
+        };
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {

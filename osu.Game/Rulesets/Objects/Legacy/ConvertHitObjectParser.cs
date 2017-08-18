@@ -19,147 +19,155 @@ namespace osu.Game.Rulesets.Objects.Legacy
     {
         public override HitObject Parse(string text)
         {
-            string[] split = text.Split(',');
-            ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]) & ~ConvertHitObjectType.ColourHax;
-            bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
-            type &= ~ConvertHitObjectType.NewCombo;
-
-            var soundType = (LegacySoundType)int.Parse(split[4]);
-            var bankInfo = new SampleBankInfo();
-
-            HitObject result = null;
-
-            if ((type & ConvertHitObjectType.Circle) > 0)
+            try
             {
-                result = CreateHit(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo);
+                string[] split = text.Split(',');
 
-                if (split.Length > 5)
-                    readCustomSampleBanks(split[5], bankInfo);
-            }
-            else if ((type & ConvertHitObjectType.Slider) > 0)
-            {
-                CurveType curveType = CurveType.Catmull;
-                double length = 0;
-                var points = new List<Vector2> { new Vector2(int.Parse(split[0]), int.Parse(split[1])) };
+                ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]) & ~ConvertHitObjectType.ColourHax;
+                bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
+                type &= ~ConvertHitObjectType.NewCombo;
 
-                string[] pointsplit = split[5].Split('|');
-                foreach (string t in pointsplit)
+                var soundType = (LegacySoundType)int.Parse(split[4]);
+                var bankInfo = new SampleBankInfo();
+
+                HitObject result = null;
+
+                if ((type & ConvertHitObjectType.Circle) > 0)
                 {
-                    if (t.Length == 1)
+                    result = CreateHit(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo);
+
+                    if (split.Length > 5)
+                        readCustomSampleBanks(split[5], bankInfo);
+                }
+                else if ((type & ConvertHitObjectType.Slider) > 0)
+                {
+                    CurveType curveType = CurveType.Catmull;
+                    double length = 0;
+                    var points = new List<Vector2> { new Vector2(int.Parse(split[0]), int.Parse(split[1])) };
+
+                    string[] pointsplit = split[5].Split('|');
+                    foreach (string t in pointsplit)
                     {
-                        switch (t)
+                        if (t.Length == 1)
                         {
-                            case @"C":
-                                curveType = CurveType.Catmull;
-                                break;
-                            case @"B":
-                                curveType = CurveType.Bezier;
-                                break;
-                            case @"L":
-                                curveType = CurveType.Linear;
-                                break;
-                            case @"P":
-                                curveType = CurveType.PerfectCurve;
-                                break;
+                            switch (t)
+                            {
+                                case @"C":
+                                    curveType = CurveType.Catmull;
+                                    break;
+                                case @"B":
+                                    curveType = CurveType.Bezier;
+                                    break;
+                                case @"L":
+                                    curveType = CurveType.Linear;
+                                    break;
+                                case @"P":
+                                    curveType = CurveType.PerfectCurve;
+                                    break;
+                            }
+                            continue;
                         }
-                        continue;
+
+                        string[] temp = t.Split(':');
+                        points.Add(new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)));
                     }
 
-                    string[] temp = t.Split(':');
-                    points.Add(new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)));
-                }
+                    int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
 
-                int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
+                    if (repeatCount > 9000)
+                        throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
 
-                if (repeatCount > 9000)
-                    throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
+                    if (split.Length > 7)
+                        length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
 
-                if (split.Length > 7)
-                    length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
+                    if (split.Length > 10)
+                        readCustomSampleBanks(split[10], bankInfo);
 
-                if (split.Length > 10)
-                    readCustomSampleBanks(split[10], bankInfo);
+                    // One node for each repeat + the start and end nodes
+                    // Note that the first length of the slider is considered a repeat, but there are no actual repeats happening
+                    int nodes = Math.Max(0, repeatCount - 1) + 2;
 
-                // One node for each repeat + the start and end nodes
-                // Note that the first length of the slider is considered a repeat, but there are no actual repeats happening
-                int nodes = Math.Max(0, repeatCount - 1) + 2;
-
-                // Populate node sample bank infos with the default hit object sample bank
-                var nodeBankInfos = new List<SampleBankInfo>();
-                for (int i = 0; i < nodes; i++)
-                    nodeBankInfos.Add(bankInfo.Clone());
-
-                // Read any per-node sample banks
-                if (split.Length > 9 && split[9].Length > 0)
-                {
-                    string[] sets = split[9].Split('|');
+                    // Populate node sample bank infos with the default hit object sample bank
+                    var nodeBankInfos = new List<SampleBankInfo>();
                     for (int i = 0; i < nodes; i++)
+                        nodeBankInfos.Add(bankInfo.Clone());
+
+                    // Read any per-node sample banks
+                    if (split.Length > 9 && split[9].Length > 0)
                     {
-                        if (i >= sets.Length)
-                            break;
+                        string[] sets = split[9].Split('|');
+                        for (int i = 0; i < nodes; i++)
+                        {
+                            if (i >= sets.Length)
+                                break;
 
-                        SampleBankInfo info = nodeBankInfos[i];
-                        readCustomSampleBanks(sets[i], info);
+                            SampleBankInfo info = nodeBankInfos[i];
+                            readCustomSampleBanks(sets[i], info);
+                        }
                     }
-                }
 
-                // Populate node sound types with the default hit object sound type
-                var nodeSoundTypes = new List<LegacySoundType>();
-                for (int i = 0; i < nodes; i++)
-                    nodeSoundTypes.Add(soundType);
-
-                // Read any per-node sound types
-                if (split.Length > 8 && split[8].Length > 0)
-                {
-                    string[] adds = split[8].Split('|');
+                    // Populate node sound types with the default hit object sound type
+                    var nodeSoundTypes = new List<LegacySoundType>();
                     for (int i = 0; i < nodes; i++)
+                        nodeSoundTypes.Add(soundType);
+
+                    // Read any per-node sound types
+                    if (split.Length > 8 && split[8].Length > 0)
                     {
-                        if (i >= adds.Length)
-                            break;
+                        string[] adds = split[8].Split('|');
+                        for (int i = 0; i < nodes; i++)
+                        {
+                            if (i >= adds.Length)
+                                break;
 
-                        int sound;
-                        int.TryParse(adds[i], out sound);
-                        nodeSoundTypes[i] = (LegacySoundType)sound;
+                            int sound;
+                            int.TryParse(adds[i], out sound);
+                            nodeSoundTypes[i] = (LegacySoundType)sound;
+                        }
                     }
+
+                    // Generate the final per-node samples
+                    var nodeSamples = new List<SampleInfoList>(nodes);
+                    for (int i = 0; i <= repeatCount; i++)
+                        nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
+
+                    result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, nodeSamples);
                 }
-
-                // Generate the final per-node samples
-                var nodeSamples = new List<SampleInfoList>(nodes);
-                for (int i = 0; i <= repeatCount; i++)
-                    nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
-
-                result = CreateSlider(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, points, length, curveType, repeatCount, nodeSamples);
-            }
-            else if ((type & ConvertHitObjectType.Spinner) > 0)
-            {
-                result = CreateSpinner(new Vector2(512, 384) / 2, Convert.ToDouble(split[5], CultureInfo.InvariantCulture));
-
-                if (split.Length > 6)
-                    readCustomSampleBanks(split[6], bankInfo);
-            }
-            else if ((type & ConvertHitObjectType.Hold) > 0)
-            {
-                // Note: Hold is generated by BMS converts
-
-                double endTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
-
-                if (split.Length > 5 && !string.IsNullOrEmpty(split[5]))
+                else if ((type & ConvertHitObjectType.Spinner) > 0)
                 {
-                    string[] ss = split[5].Split(':');
-                    endTime = Convert.ToDouble(ss[0], CultureInfo.InvariantCulture);
-                    readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
+                    result = CreateSpinner(new Vector2(512, 384) / 2, Convert.ToDouble(split[5], CultureInfo.InvariantCulture));
+
+                    if (split.Length > 6)
+                        readCustomSampleBanks(split[6], bankInfo);
+                }
+                else if ((type & ConvertHitObjectType.Hold) > 0)
+                {
+                    // Note: Hold is generated by BMS converts
+
+                    double endTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
+
+                    if (split.Length > 5 && !string.IsNullOrEmpty(split[5]))
+                    {
+                        string[] ss = split[5].Split(':');
+                        endTime = Convert.ToDouble(ss[0], CultureInfo.InvariantCulture);
+                        readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
+                    }
+
+                    result = CreateHold(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, endTime);
                 }
 
-                result = CreateHold(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, endTime);
+                if (result == null)
+                    throw new InvalidOperationException($@"Unknown hit object type {type}.");
+
+                result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
+                result.Samples = convertSoundType(soundType, bankInfo);
+
+                return result;
             }
-
-            if (result == null)
-                throw new InvalidOperationException($@"Unknown hit object type {type}.");
-
-            result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture);
-            result.Samples = convertSoundType(soundType, bankInfo);
-
-            return result;
+            catch (FormatException)
+            {
+                throw new FormatException("One or more hit objects were malformed.");
+            }
         }
 
         private void readCustomSampleBanks(string str, SampleBankInfo bankInfo)
