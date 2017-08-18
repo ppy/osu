@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
@@ -34,6 +35,9 @@ namespace osu.Game.Input.Bindings
         {
             this.ruleset = ruleset;
             this.variant = variant;
+
+            if (ruleset != null && variant == null)
+                throw new InvalidOperationException($"{nameof(variant)} can not be null when a non-null {nameof(ruleset)} is provided.");
         }
 
         [BackgroundDependencyLoader]
