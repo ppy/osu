@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
@@ -50,6 +51,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void UpdateCurrentState(ArmedState state)
         {
+        }
+
+        private WeakReference<OsuInputManager> osuActionInputManager = new WeakReference<OsuInputManager>(null);
+        internal OsuInputManager OsuActionInputManager
+        {
+            get
+            {
+                OsuInputManager target = null;
+                if (osuActionInputManager.TryGetTarget(out target)) return target;
+                target = GetContainingInputManager() as OsuInputManager;
+                osuActionInputManager.SetTarget(target);
+                return target;
+            }
         }
     }
 
