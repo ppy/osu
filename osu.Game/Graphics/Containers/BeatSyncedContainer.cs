@@ -33,9 +33,16 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public double TimeSinceLastBeat { get; private set; }
 
+        /// <summary>
+        /// If the beatmap is currently playing or if it has been stopped
+        /// </summary>
+        public bool BeatmapPlaying { get; private set; }
+
         protected override void Update()
         {
             var track = Beatmap.Value.Track;
+
+            BeatmapPlaying = track?.IsRunning ?? false;
 
             if (track == null)
                 return;

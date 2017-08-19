@@ -147,6 +147,8 @@ namespace osu.Game.Screens.Menu
 
             box.ScaleTo(new Vector2(1.5f, 1), 500, Easing.OutElastic);
 
+            if (!BeatmapPlaying) return true;
+
             double duration = TimeUntilNextBeat;
 
             icon.ClearTransforms();
