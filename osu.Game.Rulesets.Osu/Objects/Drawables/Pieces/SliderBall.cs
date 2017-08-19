@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
@@ -97,6 +98,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return base.OnMouseMove(state);
         }
 
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos)
+        {
+            // If the current time is between the start and end of the slider, we should track mouse input regardless of the cursor position.
+            return canCurrentlyTrack || base.ReceiveMouseInputAt(screenSpacePos);
+        }
+
         private bool tracking;
         public bool Tracking
         {
@@ -118,8 +125,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
+            // Make sure to use the base version of ReceiveMouseInputAt so that we correctly check the position.
             if (Time.Current < slider.EndTime)
-                Tracking = canCurrentlyTrack && lastState != null && ReceiveMouseInputAt(lastState.Mouse.NativeState.Position) && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+                Tracking = canCurrentlyTrack && lastState != null && base.ReceiveMouseInputAt(lastState.Mouse.NativeState.Position) && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
         }
 
         public void UpdateProgress(double progress, int repeat)
