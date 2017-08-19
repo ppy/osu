@@ -253,8 +253,6 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                Ruleset.Value = beatmap.Ruleset;
-
                 if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
                     sampleChangeDifficulty.Play();
                 else
@@ -372,6 +370,9 @@ namespace osu.Game.Screens.Select
 
             if (!track.IsRunning)
             {
+                // Ensure the track is added to the TrackManager, since it is removed after the player finishes the map.
+                // Using AddItemToList rather than AddItem so that it doesn't attempt to register adjustment dependencies more than once.
+                Game.Audio.Track.AddItemToList(track);
                 if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
                 track.Start();
             }

@@ -27,10 +27,10 @@ namespace osu.Game.Rulesets.Osu
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
-            new KeyBinding(Key.Z, OsuAction.LeftButton),
-            new KeyBinding(Key.X, OsuAction.RightButton),
-            new KeyBinding(Key.LastKey + 1, OsuAction.LeftButton),
-            new KeyBinding(Key.LastKey + 2, OsuAction.RightButton),
+            new KeyBinding(InputKey.Z, OsuAction.LeftButton),
+            new KeyBinding(InputKey.X, OsuAction.RightButton),
+            new KeyBinding(InputKey.LastKey + 1, OsuAction.LeftButton),
+            new KeyBinding(InputKey.LastKey + 2, OsuAction.RightButton),
         };
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
