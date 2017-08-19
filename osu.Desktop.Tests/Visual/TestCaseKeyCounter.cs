@@ -41,38 +41,5 @@ namespace osu.Desktop.Tests.Visual
 
             Add(kc);
         }
-        private class TestSliderBar<T> : SliderBar<T> where T : struct
-        {
-            public Color4 Color
-            {
-                get { return Box.Colour; }
-                set { Box.Colour = value; }
-            }
-
-            public Color4 SelectionColor
-            {
-                get { return SelectionBox.Colour; }
-                set { SelectionBox.Colour = value; }
-            }
-
-            protected readonly Box SelectionBox;
-            protected readonly Box Box;
-
-            public TestSliderBar()
-            {
-                Children = new Drawable[]
-                {
-                    Box = new Box { RelativeSizeAxes = Axes.Both },
-                    SelectionBox = new Box { RelativeSizeAxes = Axes.Both }
-                };
-            }
-
-            protected override void UpdateValue(float value)
-            {
-                SelectionBox.ScaleTo(
-                    new Vector2(value, 1),
-                    300, Easing.OutQuint);
-            }
-        }
     }
 }
