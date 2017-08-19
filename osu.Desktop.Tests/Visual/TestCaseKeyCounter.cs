@@ -2,12 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.MathUtils;
 using osu.Game.Screens.Play;
-using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Input;
 
 namespace osu.Desktop.Tests.Visual
