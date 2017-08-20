@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Configuration;
-using osu.Framework.Lists;
 
 namespace osu.Game.Online.Chat
 {
@@ -24,7 +23,9 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"channel_id")]
         public int Id;
 
-        public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
+        public readonly List<Message> Messages = new List<Message>();
+        // We need to keep track of all confirmed sent messages to replace them when they are received. This ensures the same order as the server sends them.
+        public readonly List<Tuple<LocalEchoMessage, Message>> ConfirmedSentMessages = new List<Tuple<LocalEchoMessage, Message>>();
 
         public Bindable<bool> Joined = new Bindable<bool>();
 
@@ -38,16 +39,38 @@ namespace osu.Game.Online.Chat
         }
 
         public event Action<IEnumerable<Message>> NewMessagesArrived;
+        public event Action<IEnumerable<Message>> MessagesRemoved;
 
         public void AddNewMessages(params Message[] messages)
         {
             messages = messages.Except(Messages).ToArray();
 
-            Messages.AddRange(messages);
+            // A list of all tuples that contains all confirmed sent messages that are handled within this call
+            List<Tuple<LocalEchoMessage, Message>> handledConfirmedSentMessages = ConfirmedSentMessages.Where(messageTuple => messages.ToList().Contains(messageTuple.Item2)).ToList();
+
+            // Remove all confirmed sent messages that are handled within this call
+            foreach (Tuple<LocalEchoMessage, Message> handledTuple in handledConfirmedSentMessages)
+                Messages.Remove(handledTuple.Item1);
+
+            // Add local echo messages and error messages to the end of the list and received messages right in front of the first local echo message.
+            foreach (Message message in messages)
+            {
+                int insertionIndex = -1;
+
+                // Calculate the index of the first local echo message if the message is a received message
+                if (!(message is LocalEchoMessage) && !(message is ErrorMessage))
+                    insertionIndex = Messages.FindIndex(element => element is LocalEchoMessage);
+
+                // If there is no local echo message or if the message isn't a received message, insert the message at the list's very end
+                Messages.Insert(insertionIndex != -1 ? insertionIndex : Messages.Count, message);
+            }
 
             purgeOldMessages();
 
             NewMessagesArrived?.Invoke(messages);
+
+            // Exclude all handled confirmed sent messages
+            ConfirmedSentMessages.RemoveAll(tuple => handledConfirmedSentMessages.Contains(tuple));
         }
 
         private void purgeOldMessages()
@@ -56,6 +79,16 @@ namespace osu.Game.Online.Chat
             if (messageCount > MAX_HISTORY)
                 Messages.RemoveRange(0, messageCount - MAX_HISTORY);
         }
+
+        public void RemoveMessages(params Message[] messages)
+        {
+            foreach (Message message in messages)
+                Messages.Remove(message);
+
+            MessagesRemoved?.Invoke(messages);
+        }
+
+        public void ReplaceLocalEchoMessage(LocalEchoMessage oldMessage, Message newMessage) => ConfirmedSentMessages.Add(new Tuple<LocalEchoMessage, Message>(oldMessage, newMessage));
 
         public override string ToString() => Name;
     }

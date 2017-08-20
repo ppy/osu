@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -46,6 +47,7 @@ namespace osu.Game.Overlays.Chat
             };
 
             channel.NewMessagesArrived += newMessagesArrived;
+            channel.MessagesRemoved += messagesRemoved;
         }
 
         [BackgroundDependencyLoader]
@@ -63,15 +65,27 @@ namespace osu.Game.Overlays.Chat
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             Channel.NewMessagesArrived -= newMessagesArrived;
+            Channel.MessagesRemoved -= messagesRemoved;
         }
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
+            // Add up to last Channel.MAX_HISTORY messages
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
-            //up to last Channel.MAX_HISTORY messages
-            flow.AddRange(displayMessages.Select(m => new ChatLine(m)));
+            foreach (Message receivedMessage in displayMessages)
+            {
+                // Check if the message is a confirmed sent messages
+                Tuple<LocalEchoMessage, Message> confirmedSentMessage = Channel.ConfirmedSentMessages.Find(tuple => tuple.Item2.Equals(receivedMessage));
+
+                // confirmedSentMessage is  unequal to null if the received message is a confirmed sent message. In this case replace the old chat line's message.
+                if (confirmedSentMessage != null)
+                    flow.Children.Single(chatLine => chatLine.Message == confirmedSentMessage.Item1).Message = confirmedSentMessage.Item2;
+                else
+                    flow.Add(new ChatLine(receivedMessage));
+            }
 
             if (!IsLoaded) return;
 
@@ -88,6 +102,22 @@ namespace osu.Game.Overlays.Chat
                     scroll.OffsetScrollPosition(-d.DrawHeight);
                 d.Expire();
             }
+
+            ensureOrder();
+        }
+
+        private void messagesRemoved(IEnumerable<Message> removedMessages)
+        {
+            foreach (ChatLine chatLine in flow.Children.Where(child => removedMessages.Contains(child.Message)))
+                chatLine.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+        }
+
+        private void ensureOrder()
+        {
+            ChatLine[] childrenArray = flow.Children.ToArray();
+
+            foreach (ChatLine chatLine in childrenArray)
+                flow.ChangeChildDepth(chatLine, -Channel.Messages.IndexOf(chatLine.Message));
         }
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());

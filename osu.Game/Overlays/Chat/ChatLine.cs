@@ -2,24 +2,47 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
-using osu.Game.Users;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Chat
 {
     public class ChatLine : Container
     {
-        public readonly Message Message;
+        private Message message;
+        public Message Message
+        {
+            get { return message; }
+            set
+            {
+                if (message.Equals(value)) return;
+
+                // Check if the children have to be redone
+                bool childrenOutdated = message.Sender != value.Sender || message.Timestamp != value.Timestamp || !string.Equals(message.Content, value.Content);
+
+                // Fade if the message type changed from local echo message to non local echo message
+                if (message is LocalEchoMessage && !(value is LocalEchoMessage))
+                    this.FadeIn(echo_to_non_echo_fade_duration);
+
+                message = value;
+
+                if (childrenOutdated)
+                {
+                    Clear();
+                    addChildren();
+                }
+            }
+        }
 
         private static readonly Color4[] username_colours = {
             OsuColour.FromHex("588c7e"),
@@ -65,16 +88,21 @@ namespace osu.Game.Overlays.Chat
         private const float message_padding = 200;
         private const float text_size = 20;
 
+        private const float echo_alpha = 0.5f;
+        private const double echo_to_non_echo_fade_duration = 400;
+
         private Action<User> loadProfile;
 
         private Color4 customUsernameColour;
 
         public ChatLine(Message message)
         {
-            Message = message;
+            this.message = message;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+
+            Alpha = message is LocalEchoMessage ? echo_alpha : 1.0f;
 
             Padding = new MarginPadding { Left = padding, Right = padding };
         }
@@ -90,12 +118,17 @@ namespace osu.Game.Overlays.Chat
         {
             base.LoadComplete();
 
-            bool hasBackground = !string.IsNullOrEmpty(Message.Sender.Colour);
+            addChildren();
+        }
+
+        private void addChildren()
+        {
+            bool hasBackground = !string.IsNullOrEmpty(message.Sender.Colour);
             Drawable username = new OsuSpriteText
             {
                 Font = @"Exo2.0-BoldItalic",
-                Text = $@"{Message.Sender.Username}" + (hasBackground ? "" : ":"),
-                Colour = hasBackground ? customUsernameColour : username_colours[Message.UserId % username_colours.Length],
+                Text = $@"{message.Sender.Username}" + (hasBackground ? "" : ":"),
+                Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
                 TextSize = text_size,
             };
 
@@ -108,7 +141,7 @@ namespace osu.Game.Overlays.Chat
                     Parameters = new EdgeEffectParameters
                     {
                         Radius = 1,
-                        Colour = OsuColour.FromHex(Message.Sender.Colour),
+                        Colour = OsuColour.FromHex(message.Sender.Colour),
                         Type = EdgeEffectType.Shadow,
                     }
                 }, d =>
@@ -143,7 +176,7 @@ namespace osu.Game.Overlays.Chat
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = @"Exo2.0-SemiBold",
-                            Text = $@"{Message.Timestamp.LocalDateTime:HH:mm:ss}",
+                            Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}",
                             FixedWidth = true,
                             TextSize = text_size * 0.75f,
                             Alpha = 0.4f,
@@ -154,7 +187,7 @@ namespace osu.Game.Overlays.Chat
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
                             Child = username,
-                            Action = () => loadProfile(Message.Sender),
+                            Action = () => loadProfile(message.Sender),
                         },
                     }
                 },
@@ -170,7 +203,7 @@ namespace osu.Game.Overlays.Chat
                             t.TextSize = text_size;
                         })
                         {
-                            Text = Message.Content,
+                            Text = message.Content,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                         }
