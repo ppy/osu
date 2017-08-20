@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Chat
             };
 
             channel.NewMessagesArrived += newMessagesArrived;
-            channel.MessagesRemoved += messagesRemoved;
+            channel.LocalEchoMessagesRemoved += localEchoMessagesRemoved;
         }
 
         [BackgroundDependencyLoader]
@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Chat
             base.Dispose(isDisposing);
 
             Channel.NewMessagesArrived -= newMessagesArrived;
-            Channel.MessagesRemoved -= messagesRemoved;
+            Channel.LocalEchoMessagesRemoved -= localEchoMessagesRemoved;
         }
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)
@@ -77,12 +77,12 @@ namespace osu.Game.Overlays.Chat
 
             foreach (Message receivedMessage in displayMessages)
             {
-                // Check if the message is a confirmed sent messages
-                Tuple<LocalEchoMessage, Message> confirmedSentMessage = Channel.ConfirmedSentMessages.Find(tuple => tuple.Item2.Equals(receivedMessage));
+                // Get the received message's sent message tuple if there is one
+                Tuple<LocalEchoMessage, Message> sentMessageTuple = Channel.SentMessages.Find(tuple => receivedMessage.Equals(tuple.Item2));
 
-                // confirmedSentMessage is  unequal to null if the received message is a confirmed sent message. In this case replace the old chat line's message.
-                if (confirmedSentMessage != null)
-                    flow.Children.Single(chatLine => chatLine.Message == confirmedSentMessage.Item1).Message = confirmedSentMessage.Item2;
+                // sentMessageTuple is  unequal to null if the received message is a handled sent message. In this case replace the old chat line's message.
+                if (sentMessageTuple != null)
+                    flow.Children.Single(chatLine => chatLine.Message == sentMessageTuple.Item1).Message = sentMessageTuple.Item2;
                 else
                     flow.Add(new ChatLine(receivedMessage));
             }
@@ -106,9 +106,9 @@ namespace osu.Game.Overlays.Chat
             ensureOrder();
         }
 
-        private void messagesRemoved(IEnumerable<Message> removedMessages)
+        private void localEchoMessagesRemoved(IEnumerable<Message> RemovedLocalEchoMessages)
         {
-            foreach (ChatLine chatLine in flow.Children.Where(child => removedMessages.Contains(child.Message)))
+            foreach (ChatLine chatLine in flow.Children.Where(child => RemovedLocalEchoMessages.Contains(child.Message)))
                 chatLine.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
         }
 

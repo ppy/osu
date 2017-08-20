@@ -476,7 +476,7 @@ namespace osu.Game.Overlays
 
             req.Failure += e =>
             {
-                currentChannel.RemoveMessages(message);
+                currentChannel.RemoveLocalEchoMessage(message);
 
                 inputTextBox.FlashColour(Color4.Red, 1000);
             };
