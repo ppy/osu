@@ -13,12 +13,22 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Scoring;
+using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new TaikoRulesetContainer(this, beatmap, isForCurrentRuleset);
+
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        {
+            new KeyBinding(InputKey.D, TaikoAction.LeftRim),
+            new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
+            new KeyBinding(InputKey.J, TaikoAction.RightCentre),
+            new KeyBinding(InputKey.K, TaikoAction.RightRim),
+        };
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
