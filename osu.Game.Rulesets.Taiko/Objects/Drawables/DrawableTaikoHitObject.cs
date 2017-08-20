@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.ComponentModel;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -44,17 +43,5 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public abstract bool OnPressed(TaikoAction action);
 
         public virtual bool OnReleased(TaikoAction action) => false;
-    }
-
-    public enum TaikoAction
-    {
-        [Description("Left (Rim)")]
-        LeftRim,
-        [Description("Left (Centre)")]
-        LeftCentre,
-        [Description("Right (Centre)")]
-        RightCentre,
-        [Description("Right (Rim)")]
-        RightRim
     }
 }
