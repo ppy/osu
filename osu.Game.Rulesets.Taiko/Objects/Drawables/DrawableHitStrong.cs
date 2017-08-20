@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Input;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 
