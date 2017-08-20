@@ -106,9 +106,9 @@ namespace osu.Game.Overlays.Chat
             ensureOrder();
         }
 
-        private void localEchoMessagesRemoved(IEnumerable<Message> RemovedLocalEchoMessages)
+        private void localEchoMessagesRemoved(IEnumerable<Message> removedLocalEchoMessages)
         {
-            foreach (ChatLine chatLine in flow.Children.Where(child => RemovedLocalEchoMessages.Contains(child.Message)))
+            foreach (ChatLine chatLine in flow.Children.Where(child => removedLocalEchoMessages.Contains(child.Message)))
                 chatLine.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
         }
 
