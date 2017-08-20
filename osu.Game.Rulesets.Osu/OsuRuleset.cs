@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Osu
         {
             new KeyBinding(InputKey.Z, OsuAction.LeftButton),
             new KeyBinding(InputKey.X, OsuAction.RightButton),
-            new KeyBinding(InputKey.LastKey + 1, OsuAction.LeftButton),
-            new KeyBinding(InputKey.LastKey + 2, OsuAction.RightButton),
+            new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
+            new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
 
         public override IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new[]
