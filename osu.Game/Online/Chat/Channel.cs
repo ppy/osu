@@ -54,7 +54,7 @@ namespace osu.Game.Online.Chat
 
             foreach (Message message in messages)
             {
-                // Add non echo messages to its calculated index and local echo messages to the end
+                // Add non echo messages in front of the local echo messages and local echo messages to the end
                 if (!(message is LocalEchoMessage))
                     Messages.Insert(Messages.Count - (SentMessages.Count - handledSentMessages.Count), message);
                 else
@@ -96,10 +96,15 @@ namespace osu.Game.Online.Chat
 
         public void ReplaceLocalEchoMessage(LocalEchoMessage oldMessage, Message newMessage)
         {
-            // Replace the old message's tuple with a new one containing the received message.
             int oldTupleIndex = SentMessages.FindIndex(tuple => tuple.Item1.Equals(oldMessage));
-            SentMessages.RemoveAt(oldTupleIndex);
-            SentMessages.Insert(oldTupleIndex, new Tuple<LocalEchoMessage, Message>(oldMessage, newMessage));
+
+            // Check if the local echo message exists. It may not if it has already been pushed out of both lists.
+            if (oldTupleIndex != -1)
+            {
+                // Replace the old message's tuple with a new one containing the received message.
+                SentMessages.RemoveAt(oldTupleIndex);
+                SentMessages.Insert(oldTupleIndex, new Tuple<LocalEchoMessage, Message>(oldMessage, newMessage));
+            }
         }
 
         public override string ToString() => Name;
