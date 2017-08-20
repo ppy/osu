@@ -27,12 +27,21 @@ namespace osu.Game.Overlays.Chat
             {
                 if (message.Equals(value)) return;
 
+                if (!IsLoaded)
+                {
+                    message = value;
+                    return;
+                }
+
                 // Check if the children have to be redone
                 bool childrenOutdated = message.Sender != value.Sender || message.Timestamp != value.Timestamp || !string.Equals(message.Content, value.Content);
 
                 // Fade if the message type changed from local echo message to non local echo message
                 if (message is LocalEchoMessage && !(value is LocalEchoMessage))
+                {
                     this.FadeIn(echo_to_non_echo_fade_duration);
+                    timestamp.FadeTo(timestamp_alpha, echo_to_non_echo_fade_duration);
+                }
 
                 message = value;
 
@@ -88,6 +97,8 @@ namespace osu.Game.Overlays.Chat
         private const float message_padding = 200;
         private const float text_size = 20;
 
+        private const float timestamp_alpha = 0.4f;
+
         private const float echo_alpha = 0.5f;
         private const double echo_to_non_echo_fade_duration = 400;
 
@@ -95,14 +106,14 @@ namespace osu.Game.Overlays.Chat
 
         private Color4 customUsernameColour;
 
+        private OsuSpriteText timestamp;
+
         public ChatLine(Message message)
         {
             this.message = message;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-
-            Alpha = message is LocalEchoMessage ? echo_alpha : 1.0f;
 
             Padding = new MarginPadding { Left = padding, Right = padding };
         }
@@ -118,6 +129,7 @@ namespace osu.Game.Overlays.Chat
         {
             base.LoadComplete();
 
+            Alpha = message is LocalEchoMessage ? echo_alpha : 1.0f;
             addChildren();
         }
 
@@ -171,7 +183,7 @@ namespace osu.Game.Overlays.Chat
                     Size = new Vector2(message_padding, text_size),
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        timestamp = new OsuSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -179,7 +191,7 @@ namespace osu.Game.Overlays.Chat
                             Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}",
                             FixedWidth = true,
                             TextSize = text_size * 0.75f,
-                            Alpha = 0.4f,
+                            Alpha = message is LocalEchoMessage ? 0.0f : timestamp_alpha,
                         },
                         new ClickableContainer
                         {
