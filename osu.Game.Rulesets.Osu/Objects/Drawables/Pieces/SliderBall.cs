@@ -98,17 +98,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return base.OnMouseMove(state);
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos)
-        {
-            // If the current time is between the start and end of the slider, we should track mouse input regardless of the cursor position.
-            return canCurrentlyTrack || base.ReceiveMouseInputAt(screenSpacePos);
-        }
+        // If the current time is between the start and end of the slider, we should track mouse input regardless of the cursor position.
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => canCurrentlyTrack || base.ReceiveMouseInputAt(screenSpacePos);
 
         private bool tracking;
         public bool Tracking
         {
             get { return tracking; }
-            set
+            private set
             {
                 if (value == tracking) return;
 
