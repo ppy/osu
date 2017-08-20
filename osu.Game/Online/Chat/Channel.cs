@@ -52,17 +52,18 @@ namespace osu.Game.Online.Chat
             foreach (Tuple<LocalEchoMessage, Message> handledTuple in handledConfirmedSentMessages)
                 Messages.Remove(handledTuple.Item1);
 
-            // Add local echo messages and error messages to the end of the list and received messages right in front of the first local echo message.
+            // Calculate the insertion index for all non echo messages. They are inserted in front of the first local echo message
+            int nonEchoInsertionIndex = -1;
+            if (messages.Any(message => !(message is LocalEchoMessage)))
+                nonEchoInsertionIndex = Messages.FindIndex(element => element is LocalEchoMessage);
+
             foreach (Message message in messages)
             {
-                int insertionIndex = -1;
-
-                // Calculate the index of the first local echo message if the message is a received message
-                if (!(message is LocalEchoMessage) && !(message is ErrorMessage))
-                    insertionIndex = Messages.FindIndex(element => element is LocalEchoMessage);
-
-                // If there is no local echo message or if the message isn't a received message, insert the message at the list's very end
-                Messages.Insert(insertionIndex != -1 ? insertionIndex : Messages.Count, message);
+                // Add non echo messages to its calculated index and local echo messages to the end
+                if (!(message is LocalEchoMessage) && nonEchoInsertionIndex != -1)
+                    Messages.Insert(nonEchoInsertionIndex++, message);
+                else
+                    Messages.Add(message);
             }
 
             purgeOldMessages();
