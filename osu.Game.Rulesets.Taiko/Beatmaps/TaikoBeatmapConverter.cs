@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(obj.StartTime);
 
                 double speedAdjustment = difficultyPoint.SpeedMultiplier;
-                double speedAdjustedBeatLength = timingPoint.BeatLength * speedAdjustment;
+                double speedAdjustedBeatLength = timingPoint.BeatLength / speedAdjustment;
 
                 // The true distance, accounting for any repeats. This ends up being the drum roll distance later
                 double distance = distanceData.Distance * repeats * legacy_velocity_multiplier;
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 // For some reason, old osu! always uses speedAdjustment to determine the taiko velocity, but
                 // only uses it to determine osu! velocity if beatmap version < 8. Let's account for that here.
                 if (beatmap.BeatmapInfo.BeatmapVersion >= 8)
-                    speedAdjustedBeatLength /= speedAdjustment;
+                    speedAdjustedBeatLength *= speedAdjustment;
 
                 // The velocity of the osu! hit object - calculated as the velocity of a slider
                 double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier * legacy_velocity_multiplier / speedAdjustedBeatLength;
