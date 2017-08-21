@@ -44,7 +44,6 @@ namespace osu.Game.Online.Chat
 
         public int CompareTo(Message other)
         {
-
             if (!Id.HasValue)
                 return other.Id.HasValue ? 1 : Timestamp.CompareTo(other.Timestamp);
             if (!other.Id.HasValue)
