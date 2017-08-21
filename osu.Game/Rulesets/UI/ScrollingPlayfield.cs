@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.UI
 
                 var target = adjustmentContainerFor(hitObject);
                 if (target == null)
-                    throw new InvalidOperationException($"A {nameof(SpeedAdjustmentContainer)} to container {hitObject.ToString()} could not be found.");
+                    throw new InvalidOperationException($"A {nameof(SpeedAdjustmentContainer)} to container {hitObject} could not be found.");
 
                 target.Add(hitObject);
             }
