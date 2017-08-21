@@ -414,6 +414,7 @@ namespace osu.Game.Overlays
             if (fetchReq != null) return;
 
             fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
+
             fetchReq.Success += delegate (List<Message> messages)
             {
                 foreach (var group in messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
@@ -424,6 +425,7 @@ namespace osu.Game.Overlays
                 Debug.Write("success!");
                 fetchReq = null;
             };
+
             fetchReq.Failure += delegate
             {
                 Debug.Write("failure!");
