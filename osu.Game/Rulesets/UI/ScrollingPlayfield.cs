@@ -151,10 +151,6 @@ namespace osu.Game.Rulesets.UI
             /// </summary>
             public readonly BindableBool Reversed = new BindableBool();
 
-            /// <summary>
-            /// Hit objects that are to be re-processed on the next update.
-            /// </summary>
-            private readonly List<DrawableHitObject> queuedHitObjects = new List<DrawableHitObject>();
             private readonly Container<SpeedAdjustmentContainer> speedAdjustments;
 
             private readonly Axes scrollingAxes;
@@ -168,6 +164,9 @@ namespace osu.Game.Rulesets.UI
                 this.scrollingAxes = scrollingAxes;
 
                 AddInternal(speedAdjustments = new Container<SpeedAdjustmentContainer> { RelativeSizeAxes = Axes.Both });
+
+                // Default speed adjustment
+                AddSpeedAdjustment(new SpeedAdjustmentContainer(new MultiplierControlPoint(0)));
             }
 
             /// <summary>
@@ -180,6 +179,21 @@ namespace osu.Game.Rulesets.UI
                 speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
                 speedAdjustment.Reversed.BindTo(Reversed);
                 speedAdjustments.Add(speedAdjustment);
+
+                // We now need to re-sort the hit objects in the last speed adjustment prior to this one, to see if they need a new parent
+                var previousSpeedAdjustment = speedAdjustments.LastOrDefault(s => s.ControlPoint.StartTime < speedAdjustment.ControlPoint.StartTime);
+                if (previousSpeedAdjustment == null)
+                    return;
+
+                foreach (DrawableHitObject h in previousSpeedAdjustment.Children)
+                {
+                    var newSpeedAdjustment = adjustmentContainerFor(h);
+                    if (newSpeedAdjustment == previousSpeedAdjustment)
+                        continue;
+
+                    previousSpeedAdjustment.Remove(h);
+                    newSpeedAdjustment.Add(h);
+                }
             }
 
             public override IEnumerable<DrawableHitObject> Objects => speedAdjustments.SelectMany(s => s.Children);
@@ -194,30 +208,14 @@ namespace osu.Game.Rulesets.UI
                 if (!(hitObject is IScrollingHitObject))
                     throw new InvalidOperationException($"Hit objects added to a {nameof(ScrollingHitObjectContainer)} must implement {nameof(IScrollingHitObject)}.");
 
-                queuedHitObjects.Add(hitObject);
+                var target = adjustmentContainerFor(hitObject);
+                if (target == null)
+                    throw new InvalidOperationException($"A {nameof(SpeedAdjustmentContainer)} to container {hitObject.ToString()} could not be found.");
+
+                target.Add(hitObject);
             }
 
-            public override bool Remove(DrawableHitObject hitObject) => speedAdjustments.Any(s => s.Remove(hitObject)) || queuedHitObjects.Remove(hitObject);
-
-            protected override void Update()
-            {
-                base.Update();
-
-                // Todo: At the moment this is going to re-process every single Update, however this will only be a null-op
-                // when there are no SpeedAdjustmentContainers available. This should probably error or something, but it's okay for now.
-
-                for (int i = queuedHitObjects.Count - 1; i >= 0; i--)
-                {
-                    var hitObject = queuedHitObjects[i];
-
-                    var target = adjustmentContainerFor(hitObject);
-                    if (target == null)
-                        continue;
-
-                    target.Add(hitObject);
-                    queuedHitObjects.RemoveAt(i);
-                }
-            }
+            public override bool Remove(DrawableHitObject hitObject) => speedAdjustments.Any(s => s.Remove(hitObject));
 
             /// <summary>
             /// Finds the <see cref="SpeedAdjustmentContainer"/> which provides the speed adjustment active at the start time
