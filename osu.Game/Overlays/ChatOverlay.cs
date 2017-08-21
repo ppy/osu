@@ -6,23 +6,23 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Threading;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
-using osu.Game.Graphics.UserInterface;
-using osu.Framework.Graphics.UserInterface;
-using OpenTK.Graphics;
-using osu.Framework.Input;
-using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Chat;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
@@ -136,7 +136,7 @@ namespace osu.Game.Overlays
                                             Height = 1,
                                             PlaceholderText = "type your message",
                                             Exit = () => State = Visibility.Hidden,
-                                            OnCommit = postMessage,
+                                            OnCommit = commitInputTextBox,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
                                         }
@@ -433,9 +433,16 @@ namespace osu.Game.Overlays
             api.Queue(fetchReq);
         }
 
-        private void postMessage(TextBox textbox, bool newText)
+        private void commitInputTextBox(TextBox textbox, bool newText)
         {
-            var postText = textbox.Text;
+            postMessage();
+
+            textbox.Text = string.Empty;
+        }
+
+        private void postMessage()
+        {
+            var postText = inputTextBox.Text;
 
             if (string.IsNullOrEmpty(postText))
                 return;
@@ -443,7 +450,6 @@ namespace osu.Game.Overlays
             if (!api.IsLoggedIn)
             {
                 currentChannel?.AddNewMessages(new ErrorMessage("Please login to participate in chat!"));
-                textbox.Text = string.Empty;
                 return;
             }
 
@@ -453,11 +459,10 @@ namespace osu.Game.Overlays
             {
                 // TODO: handle commands
                 currentChannel.AddNewMessages(new ErrorMessage("Chat commands are not supported yet!"));
-                textbox.Text = string.Empty;
                 return;
             }
 
-            var message = new Message
+            var message = new LocalEchoMessage
             {
                 Sender = api.LocalUser.Value,
                 Timestamp = DateTimeOffset.Now,
@@ -466,22 +471,17 @@ namespace osu.Game.Overlays
                 Content = postText
             };
 
-            textbox.ReadOnly = true;
             var req = new PostMessageRequest(message);
+            currentChannel.AddNewMessages(message);
 
             req.Failure += e =>
             {
-                textbox.FlashColour(Color4.Red, 1000);
-                textbox.ReadOnly = false;
+                currentChannel.RemoveLocalEchoMessage(message);
+
+                inputTextBox.FlashColour(Color4.Red, 1000);
             };
 
-            req.Success += m =>
-            {
-                currentChannel.AddNewMessages(m);
-
-                textbox.ReadOnly = false;
-                textbox.Text = string.Empty;
-            };
+            req.Success += m => currentChannel.ReplaceLocalEchoMessage(message, m);
 
             api.Queue(req);
         }

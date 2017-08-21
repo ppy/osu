@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -46,6 +47,7 @@ namespace osu.Game.Overlays.Chat
             };
 
             channel.NewMessagesArrived += newMessagesArrived;
+            channel.LocalEchoMessagesRemoved += localEchoMessagesRemoved;
         }
 
         [BackgroundDependencyLoader]
@@ -63,15 +65,27 @@ namespace osu.Game.Overlays.Chat
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             Channel.NewMessagesArrived -= newMessagesArrived;
+            Channel.LocalEchoMessagesRemoved -= localEchoMessagesRemoved;
         }
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
+            // Add up to last Channel.MAX_HISTORY messages
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
-            //up to last Channel.MAX_HISTORY messages
-            flow.AddRange(displayMessages.Select(m => new ChatLine(m)));
+            foreach (Message receivedMessage in displayMessages)
+            {
+                // Get the received message's sent message tuple if there is one
+                Tuple<LocalEchoMessage, Message> sentMessageTuple = Channel.SentMessages.Find(tuple => receivedMessage.Equals(tuple.Item2));
+
+                // sentMessageTuple is  unequal to null if the received message is a handled sent message. In this case replace the old chat line's message.
+                if (sentMessageTuple != null)
+                    flow.Children.Single(chatLine => chatLine.Message == sentMessageTuple.Item1).Message = sentMessageTuple.Item2;
+                else
+                    flow.Add(new ChatLine(receivedMessage));
+            }
 
             if (!IsLoaded) return;
 
@@ -88,6 +102,22 @@ namespace osu.Game.Overlays.Chat
                     scroll.OffsetScrollPosition(-d.DrawHeight);
                 d.Expire();
             }
+
+            ensureOrder();
+        }
+
+        private void localEchoMessagesRemoved(IEnumerable<Message> removedLocalEchoMessages)
+        {
+            foreach (ChatLine chatLine in flow.Children.Where(child => removedLocalEchoMessages.Contains(child.Message)))
+                chatLine.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+        }
+
+        private void ensureOrder()
+        {
+            ChatLine[] childrenArray = flow.Children.ToArray();
+
+            foreach (ChatLine chatLine in childrenArray)
+                flow.ChangeChildDepth(chatLine, -Channel.Messages.IndexOf(chatLine.Message));
         }
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
