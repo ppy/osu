@@ -1,14 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
@@ -102,14 +100,6 @@ namespace osu.Game.Rulesets.Taiko
         public override string Description => "osu!taiko";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_taiko_o };
-
-        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[]
-        {
-            new KeyCounterKeyboard(Key.D),
-            new KeyCounterKeyboard(Key.F),
-            new KeyCounterKeyboard(Key.J),
-            new KeyCounterKeyboard(Key.K)
-        };
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new TaikoDifficultyCalculator(beatmap);
 

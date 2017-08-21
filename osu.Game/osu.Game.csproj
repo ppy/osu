@@ -101,6 +101,7 @@
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
+    <Compile Include="Online\Chat\LocalEchoMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
     <Compile Include="Overlays\KeyBinding\GlobalKeyBindingsSection.cs" />
     <Compile Include="Overlays\KeyBinding\KeyBindingRow.cs" />
@@ -128,6 +129,8 @@
     <Compile Include="Overlays\Profile\Sections\RecentSection.cs" />
     <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
+    <Compile Include="Rulesets\UI\RulesetInputManager.cs" />
+    <Compile Include="Screens\Play\KeyCounterAction.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />

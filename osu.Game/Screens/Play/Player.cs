@@ -85,8 +85,6 @@ namespace osu.Game.Screens.Play
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
-            Ruleset rulesetInstance;
-
             WorkingBeatmap working = Beatmap.Value;
             Beatmap beatmap;
 
@@ -98,7 +96,7 @@ namespace osu.Game.Screens.Play
                     throw new InvalidOperationException("Beatmap was not loaded");
 
                 ruleset = osu?.Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
-                rulesetInstance = ruleset.CreateInstance();
+                var rulesetInstance = ruleset.CreateInstance();
 
                 try
                 {
@@ -261,7 +259,6 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
 
-            hudOverlay.KeyCounter.AddRange(rulesetInstance.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindRulesetContainer(RulesetContainer);
 
