@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
 
         public virtual void BindRulesetContainer(RulesetContainer rulesetContainer)
         {
-            rulesetContainer.InputManager.Add(KeyCounter.GetReceptor());
+            (rulesetContainer.KeyBindingInputManager as ICanAttachKeyCounter)?.Attach(KeyCounter);
 
             replayLoaded = rulesetContainer.HasReplayLoaded;
 
