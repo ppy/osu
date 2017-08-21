@@ -39,10 +39,14 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         /// </summary>
         private const float taiko_base_distance = 100;
 
+        private bool isForCurrentRuleset;
+
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
 
         protected override Beatmap<TaikoHitObject> ConvertBeatmap(Beatmap original, bool isForCurrentRuleset)
         {
+            this.isForCurrentRuleset = isForCurrentRuleset;
+
             // Rewrite the beatmap info to add the slider velocity multiplier
             BeatmapInfo info = original.BeatmapInfo.DeepClone();
             info.Difficulty.SliderMultiplier *= legacy_velocity_multiplier;
@@ -104,7 +108,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 // If the drum roll is to be split into hit circles, assume the ticks are 1/8 spaced within the duration of one beat
                 double tickSpacing = Math.Min(speedAdjustedBeatLength / beatmap.BeatmapInfo.Difficulty.SliderTickRate, taikoDuration / repeats);
 
-                if (tickSpacing > 0 && osuDuration < 2 * speedAdjustedBeatLength)
+                if (!isForCurrentRuleset && tickSpacing > 0 && osuDuration < 2 * speedAdjustedBeatLength)
                 {
                     List<SampleInfoList> allSamples = curveData != null ? curveData.RepeatSamples : new List<SampleInfoList>(new[] { samples });
 
