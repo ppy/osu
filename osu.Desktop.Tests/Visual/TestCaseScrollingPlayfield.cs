@@ -8,6 +8,7 @@ using osu.Desktop.Tests.Beatmaps;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Beatmaps;
@@ -76,6 +77,8 @@ namespace osu.Desktop.Tests.Visual
             public new TestPlayfield Playfield => base.Playfield;
 
             public override ScoreProcessor CreateScoreProcessor() => new TestScoreProcessor();
+
+            public override PassThroughInputManager CreateInputManager() => new PassThroughInputManager();
 
             protected override BeatmapConverter<TestHitObject> CreateBeatmapConverter() => new TestBeatmapConverter();
 

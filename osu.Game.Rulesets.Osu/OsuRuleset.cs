@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -10,7 +9,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.OsuDifficulty;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -121,14 +119,6 @@ namespace osu.Game.Rulesets.Osu
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new OsuDifficultyCalculator(beatmap);
 
         public override string Description => "osu!";
-
-        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[]
-        {
-            new KeyCounterKeyboard(Key.Z),
-            new KeyCounterKeyboard(Key.X),
-            new KeyCounterMouse(MouseButton.Left),
-            new KeyCounterMouse(MouseButton.Right)
-        };
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
