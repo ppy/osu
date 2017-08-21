@@ -56,8 +56,7 @@ namespace osu.Game.Online.Chat
         {
             messages = messages.Except(Messages).ToArray();
 
-            foreach (Message message in messages)
-                Messages.Add(message);
+            Messages.AddRange(messages);
 
             purgeOldMessages();
 

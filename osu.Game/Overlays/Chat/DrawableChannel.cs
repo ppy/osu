@@ -86,8 +86,7 @@ namespace osu.Game.Overlays.Chat
             // Add up to last Channel.MAX_HISTORY messages
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
-            foreach (Message m in displayMessages)
-                flow.Add(new ChatLine(m));
+            flow.AddRange(displayMessages.Select(m => new ChatLine(m)));
 
             if (!IsLoaded) return;
 
