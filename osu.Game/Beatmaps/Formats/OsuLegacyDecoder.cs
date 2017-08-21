@@ -280,7 +280,7 @@ namespace osu.Game.Beatmaps.Formats
 
             double time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo);
             double beatLength = double.Parse(split[1].Trim(), NumberFormatInfo.InvariantInfo);
-            double speedMultiplier = beatLength < 0 ? -beatLength / 100.0 : 1;
+            double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
 
             TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
             if (split.Length >= 3)
