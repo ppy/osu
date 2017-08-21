@@ -77,8 +77,6 @@ namespace osu.Game.Rulesets.UI
         {
             Ruleset = ruleset;
             KeyBindingInputManager = CreateInputManager();
-            if (!(KeyBindingInputManager is ICanAttachKeyCounter))
-                throw new InvalidOperationException($"Rulesets should create input managers of type {nameof(ICanAttachKeyCounter)}");
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
         }
 
