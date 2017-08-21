@@ -79,7 +79,7 @@ namespace osu.Game.Online.Chat
         public void ReplaceMessage(LocalEchoMessage echo, Message final)
         {
             if (!pendingMessages.Remove(echo))
-                Trace.Fail("Attempted to remove echo that wasn't present");
+                throw new InvalidOperationException("Attempted to remove echo that wasn't present");
 
             Messages.Remove(echo);
 
