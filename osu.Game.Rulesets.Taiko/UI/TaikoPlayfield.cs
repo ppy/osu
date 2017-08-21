@@ -45,6 +45,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         private readonly Container topLevelHitContainer;
 
+        private readonly Container barlineContainer;
+
         private readonly Container overlayBackgroundContainer;
         private readonly Container backgroundContainer;
 
@@ -85,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     {
                         new Container
                         {
-                            Name = "Masked elements",
+                            Name = "Masked elements before hit objects",
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
                             Masking = true,
@@ -103,12 +105,20 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit
-                                },
-                                content = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
+                                }
                             }
+                        },
+                        barlineContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = HIT_TARGET_OFFSET }
+                        },
+                        content = new Container
+                        {
+                            Name = "Hit objects",
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                            Masking = true
                         },
                         kiaiExplosionContainer = new Container<KiaiHitExplosion>
                         {
@@ -197,6 +207,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             h.Depth = (float)h.HitObject.StartTime;
 
             base.Add(h);
+
+            var barline = h as DrawableBarLine;
+            if (barline != null)
+                barlineContainer.Add(barline.CreateProxy());
 
             // Swells should be moved at the very top of the playfield when they reach the hit target
             var swell = h as DrawableSwell;

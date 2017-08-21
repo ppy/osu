@@ -3,11 +3,11 @@
 
 using System.ComponentModel;
 using osu.Framework.Input.Bindings;
-using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuInputManager : DatabasedKeyBindingInputManager<OsuAction>
+    public class OsuInputManager : RulesetInputManager<OsuAction>
     {
         public OsuInputManager(RulesetInfo ruleset) : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {

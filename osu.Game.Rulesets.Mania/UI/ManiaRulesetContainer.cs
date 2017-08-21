@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Lists;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -91,6 +92,8 @@ namespace osu.Game.Rulesets.Mania.UI
         };
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
+
+        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo);
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter();
 
