@@ -16,6 +16,8 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps;
 using osu.Desktop.Tests.Beatmaps;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Desktop.Tests.Visual
@@ -30,10 +32,11 @@ namespace osu.Desktop.Tests.Visual
         protected override double TimePerAction => default_duration * 2;
 
         private readonly Random rng = new Random(1337);
-        private readonly TaikoRulesetContainer rulesetContainer;
-        private readonly Container playfieldContainer;
+        private TaikoRulesetContainer rulesetContainer;
+        private Container playfieldContainer;
 
-        public TestCaseTaikoPlayfield()
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
         {
             AddStep("Hit!", () => addHitJudgement(false));
             AddStep("Kiai hit", () => addHitJudgement(true));
@@ -82,7 +85,7 @@ namespace osu.Desktop.Tests.Visual
                 RelativeSizeAxes = Axes.X,
                 Height = 768,
                 Clock = new FramedClock(rateAdjustClock),
-                Children = new[] { rulesetContainer = new TaikoRulesetContainer(null, beatmap, true) }
+                Children = new[] { rulesetContainer = new TaikoRulesetContainer(rulesets.GetRuleset(1).CreateInstance(), beatmap, true) }
             });
         }
 

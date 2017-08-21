@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -35,9 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
 
-        private readonly Key[] rimKeys = { Key.D, Key.K };
-        private readonly Key[] centreKeys = { Key.F, Key.J };
-        private Key[] lastKeySet;
+        private readonly TaikoAction[] rimActions = { TaikoAction.LeftRim, TaikoAction.RightRim };
+        private readonly TaikoAction[] centreActions = { TaikoAction.LeftCentre, TaikoAction.RightCentre };
+        private TaikoAction[] lastAction;
 
         /// <summary>
         /// The amount of times the user has hit this swell.
@@ -211,8 +210,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-
-        protected override bool HandleKeyPress(Key key)
+        public override bool OnPressed(TaikoAction action)
         {
             if (Judgement.Result != HitResult.None)
                 return false;
@@ -222,12 +220,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return false;
 
             // Find the keyset which this key corresponds to
-            var keySet = rimKeys.Contains(key) ? rimKeys : centreKeys;
+            var keySet = rimActions.Contains(action) ? rimActions : centreActions;
 
             // Ensure alternating keysets
-            if (keySet == lastKeySet)
+            if (keySet == lastAction)
                 return false;
-            lastKeySet = keySet;
+            lastAction = keySet;
 
             UpdateJudgement(true);
 

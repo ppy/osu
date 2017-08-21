@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Taiko.Replays;
 using OpenTK;
 using osu.Game.Rulesets.Beatmaps;
 using System.Linq;
+using osu.Framework.Input;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -91,6 +92,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
         protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
+
+        public override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
         protected override Playfield<TaikoHitObject, TaikoJudgement> CreatePlayfield() => new TaikoPlayfield
         {
