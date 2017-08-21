@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
 
-        public override PassThroughInputManager CreateKeyBindingInputManager() => new TaikoInputManager(Ruleset?.RulesetInfo);
+        public override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
         protected override Playfield<TaikoHitObject, TaikoJudgement> CreatePlayfield() => new TaikoPlayfield
         {
