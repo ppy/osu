@@ -1,25 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Ionic.Zip;
-using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Beatmaps.IO
 {
     public sealed class OszArchiveReader : ArchiveReader
     {
-        public static void Register()
-        {
-            AddReader<OszArchiveReader>((storage, path) =>
-            {
-                using (var stream = storage.GetStream(path))
-                    return ZipFile.IsZipFile(stream, false);
-            });
-            OsuLegacyDecoder.Register();
-        }
-
         private readonly Stream archiveStream;
         private readonly ZipFile archive;
 
@@ -27,13 +17,6 @@ namespace osu.Game.Beatmaps.IO
         {
             this.archiveStream = archiveStream;
             archive = ZipFile.Read(archiveStream);
-
-            BeatmapFilenames = archive.Entries.Where(e => e.FileName.EndsWith(@".osu")).Select(e => e.FileName).ToArray();
-
-            if (BeatmapFilenames.Length == 0)
-                throw new FileNotFoundException(@"This directory contains no beatmaps");
-
-            StoryboardFilename = archive.Entries.Where(e => e.FileName.EndsWith(@".osb")).Select(e => e.FileName).FirstOrDefault();
         }
 
         public override Stream GetStream(string name)
@@ -41,7 +24,16 @@ namespace osu.Game.Beatmaps.IO
             ZipEntry entry = archive.Entries.SingleOrDefault(e => e.FileName == name);
             if (entry == null)
                 throw new FileNotFoundException();
-            return entry.OpenReader();
+
+            // allow seeking
+            MemoryStream copy = new MemoryStream();
+
+            using (Stream s = entry.OpenReader())
+                s.CopyTo(copy);
+
+            copy.Position = 0;
+
+            return copy;
         }
 
         public override void Dispose()
@@ -49,6 +41,8 @@ namespace osu.Game.Beatmaps.IO
             archive.Dispose();
             archiveStream.Dispose();
         }
+
+        public override IEnumerable<string> Filenames => archive.Entries.Select(e => e.FileName).ToArray();
 
         public override Stream GetUnderlyingStream() => archiveStream;
     }

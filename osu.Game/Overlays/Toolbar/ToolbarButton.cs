@@ -1,10 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,17 +11,30 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarButton : Container
+    public class ToolbarButton : OsuClickableContainer
     {
         public const float WIDTH = Toolbar.HEIGHT * 1.4f;
 
+        public void SetIcon(Drawable icon)
+        {
+            IconContainer.Icon = icon;
+            IconContainer.Show();
+        }
+
+        public void SetIcon(FontAwesome icon) => SetIcon(new SpriteIcon
+        {
+            Size = new Vector2(20),
+            Icon = icon
+        });
+
         public FontAwesome Icon
         {
-            get { return DrawableIcon.Icon; }
-            set { DrawableIcon.Icon = value; }
+            set { SetIcon(value); }
         }
 
         public string Text
@@ -57,15 +66,13 @@ namespace osu.Game.Overlays.Toolbar
 
         protected virtual Anchor TooltipAnchor => Anchor.TopLeft;
 
-        public Action Action;
-        protected TextAwesome DrawableIcon;
+        protected ConstrainedIconContainer IconContainer;
         protected SpriteText DrawableText;
         protected Box HoverBackground;
         private readonly FillFlowContainer tooltipContainer;
         private readonly SpriteText tooltip1;
         private readonly SpriteText tooltip2;
         protected FillFlowContainer Flow;
-        private SampleChannel sampleClick;
 
         public ToolbarButton()
         {
@@ -92,11 +99,12 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
-                        DrawableIcon = new TextAwesome
+                        IconContainer = new ConstrainedIconContainer
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            TextSize = 20
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Size = new Vector2(20),
+                            Alpha = 0,
                         },
                         DrawableText = new OsuSpriteText
                         {
@@ -135,27 +143,19 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            sampleClick = audio.Sample.Get(@"Menu/menuclick");
-        }
-
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
         protected override bool OnClick(InputState state)
         {
-            Action?.Invoke();
-            sampleClick.Play();
-            HoverBackground.FlashColour(Color4.White.Opacity(100), 500, EasingTypes.OutQuint);
-            return true;
+            HoverBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
+            return base.OnClick(state);
         }
 
         protected override bool OnHover(InputState state)
         {
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
-            return false;
+            return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
@@ -172,7 +172,7 @@ namespace osu.Game.Overlays.Toolbar
             RelativeSizeAxes = Axes.Both;
             Masking = true;
             MaskingSmoothness = 0;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = Color4.Black.Opacity(40),

@@ -21,6 +21,7 @@ using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.IO.Stores;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -46,10 +47,13 @@ namespace osu.Game.Screens.Tournament
 
         public ITeamList TeamList;
 
-        protected override DependencyContainer CreateLocalDependencies(DependencyContainer parent) => new DependencyContainer(parent);
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, Storage storage, DependencyContainer dependencies)
+        private void load(TextureStore textures, Storage storage)
         {
             this.storage = storage;
 
@@ -81,6 +85,7 @@ namespace osu.Game.Screens.Tournament
                 },
                 new Sprite
                 {
+                    RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fill,
                     Texture = textures.Get(@"Backgrounds/Drawings/background.png")
                 },
@@ -335,7 +340,6 @@ namespace osu.Game.Screens.Tournament
                 {
                     Logger.Error(ex, "Failed to read last drawings results.");
                 }
-
             }
             else
             {

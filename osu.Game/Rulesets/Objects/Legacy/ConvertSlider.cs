@@ -6,8 +6,8 @@ using System;
 using System.Collections.Generic;
 using OpenTK;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Database;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier / difficultyPoint.SpeedMultiplier;
+            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
         }

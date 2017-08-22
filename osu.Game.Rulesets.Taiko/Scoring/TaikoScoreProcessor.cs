@@ -3,7 +3,6 @@
 
 using System;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -114,8 +113,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
         }
 
-        public TaikoScoreProcessor(HitRenderer<TaikoHitObject, TaikoJudgement> hitRenderer)
-            : base(hitRenderer)
+        public TaikoScoreProcessor(RulesetContainer<TaikoHitObject, TaikoJudgement> rulesetContainer)
+            : base(rulesetContainer)
         {
         }
 

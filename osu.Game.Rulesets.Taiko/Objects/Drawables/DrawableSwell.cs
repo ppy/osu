@@ -7,14 +7,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -35,11 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
 
-        private readonly CirclePiece circlePiece;
-
-        private readonly Key[] rimKeys = { Key.D, Key.K };
-        private readonly Key[] centreKeys = { Key.F, Key.J };
-        private Key[] lastKeySet;
+        private readonly TaikoAction[] rimActions = { TaikoAction.LeftRim, TaikoAction.RightRim };
+        private readonly TaikoAction[] centreActions = { TaikoAction.LeftCentre, TaikoAction.RightCentre };
+        private TaikoAction[] lastAction;
 
         /// <summary>
         /// The amount of times the user has hit this swell.
@@ -52,91 +49,90 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableSwell(Swell swell)
             : base(swell)
         {
-            Children = new Drawable[]
+            FillMode = FillMode.Fit;
+
+            Add(bodyContainer = new Container
             {
-                bodyContainer = new Container
+                RelativeSizeAxes = Axes.Both,
+                Depth = 1,
+                Children = new Drawable[]
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    expandingRing = new CircularContainer
                     {
-                        expandingRing = new CircularContainer
+                        Name = "Expanding ring",
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Alpha = 0,
+                        RelativeSizeAxes = Axes.Both,
+                        BlendingMode = BlendingMode.Additive,
+                        Masking = true,
+                        Children = new[]
                         {
-                            Name = "Expanding ring",
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Alpha = 0,
-                            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER),
-                            BlendingMode = BlendingMode.Additive,
-                            Masking = true,
-                            Children = new []
+                            new Box
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = inner_ring_alpha,
-                                }
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = inner_ring_alpha,
                             }
-                        },
-                        targetRing = new CircularContainer
+                        }
+                    },
+                    targetRing = new CircularContainer
+                    {
+                        Name = "Target ring (thick border)",
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        BorderThickness = target_ring_thick_border,
+                        BlendingMode = BlendingMode.Additive,
+                        Children = new Drawable[]
                         {
-                            Name = "Target ring (thick border)",
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER),
-                            Masking = true,
-                            BorderThickness = target_ring_thick_border,
-                            BlendingMode = BlendingMode.Additive,
-                            Children = new Drawable[]
+                            new Box
                             {
-                                new Box
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true
+                            },
+                            new CircularContainer
+                            {
+                                Name = "Target ring (thin border)",
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Masking = true,
+                                BorderThickness = target_ring_thin_border,
+                                BorderColour = Color4.White,
+                                Children = new[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0,
-                                    AlwaysPresent = true
-                                },
-                                new CircularContainer
-                                {
-                                    Name = "Target ring (thin border)",
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Masking = true,
-                                    BorderThickness = target_ring_thin_border,
-                                    BorderColour = Color4.White,
-                                    Children = new[]
+                                    new Box
                                     {
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Alpha = 0,
-                                            AlwaysPresent = true
-                                        }
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0,
+                                        AlwaysPresent = true
                                     }
                                 }
-                            }
-                        },
-                        circlePiece = new CirclePiece
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Children = new []
-                            {
-                                symbol = new SwellSymbolPiece()
                             }
                         }
                     }
                 }
-            };
+            });
 
-            circlePiece.KiaiMode = HitObject.Kiai;
+            MainPiece.Add(symbol = new SwellSymbolPiece());
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            circlePiece.AccentColour = colours.YellowDark;
+            MainPiece.AccentColour = colours.YellowDark;
             expandingRing.Colour = colours.YellowLight;
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // We need to set this here because RelativeSizeAxes won't/can't set our size by default with a different RelativeChildSize
+            Width *= Parent.RelativeChildSize.X;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -147,13 +143,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 var completion = (float)userHits / HitObject.RequiredHits;
 
-                expandingRing.FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50);
-                using (expandingRing.BeginDelayedSequence(50))
-                    expandingRing.FadeTo(completion / 8, 2000, EasingTypes.OutQuint);
+                expandingRing
+                    .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
+                    .Then()
+                    .FadeTo(completion / 8, 2000, Easing.OutQuint);
 
-                symbol.RotateTo((float)(completion * HitObject.Duration / 8), 4000, EasingTypes.OutQuint);
+                symbol.RotateTo((float)(completion * HitObject.Duration / 8), 4000, Easing.OutQuint);
 
-                expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, EasingTypes.OutQuint);
+                expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (userHits == HitObject.RequiredHits)
                 {
@@ -180,44 +177,40 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void UpdateState(ArmedState state)
         {
             const float preempt = 100;
-
-            Delay(HitObject.StartTime - Time.Current - preempt, true);
-
-            targetRing.ScaleTo(target_ring_scale, preempt * 4, EasingTypes.OutQuint);
-
-            Delay(preempt, true);
-
-            Delay(Judgement.TimeOffset + HitObject.Duration, true);
-
             const float out_transition_time = 300;
+
+            double untilStartTime = HitObject.StartTime - Time.Current;
+            double untilJudgement = untilStartTime + Judgement.TimeOffset + HitObject.Duration;
+
+            targetRing.Delay(untilStartTime - preempt).ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
+            this.Delay(untilJudgement).FadeOut(out_transition_time, Easing.Out);
 
             switch (state)
             {
                 case ArmedState.Hit:
-                    bodyContainer.ScaleTo(1.4f, out_transition_time);
+                    bodyContainer.Delay(untilJudgement).ScaleTo(1.4f, out_transition_time);
                     break;
             }
-
-            FadeOut(out_transition_time, EasingTypes.Out);
 
             Expire();
         }
 
-        protected override void UpdateScrollPosition(double time)
+        protected override void Update()
         {
-            // Make the swell stop at the hit target
-            double t = Math.Min(HitObject.StartTime, time);
+            base.Update();
 
+            // Make the swell stop at the hit target
+            X = (float)Math.Max(Time.Current, HitObject.StartTime);
+
+            double t = Math.Min(HitObject.StartTime, Time.Current);
             if (t == HitObject.StartTime && !hasStarted)
             {
                 OnStart?.Invoke();
                 hasStarted = true;
             }
-
-            base.UpdateScrollPosition(t);
         }
 
-        protected override bool HandleKeyPress(Key key)
+        public override bool OnPressed(TaikoAction action)
         {
             if (Judgement.Result != HitResult.None)
                 return false;
@@ -227,12 +220,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return false;
 
             // Find the keyset which this key corresponds to
-            var keySet = rimKeys.Contains(key) ? rimKeys : centreKeys;
+            var keySet = rimActions.Contains(action) ? rimActions : centreActions;
 
             // Ensure alternating keysets
-            if (keySet == lastKeySet)
+            if (keySet == lastAction)
                 return false;
-            lastKeySet = keySet;
+            lastAction = keySet;
 
             UpdateJudgement(true);
 

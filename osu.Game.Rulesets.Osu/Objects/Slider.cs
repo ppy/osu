@@ -6,9 +6,9 @@ using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Database;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Osu.Objects
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier / difficultyPoint.SpeedMultiplier;
+            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate;

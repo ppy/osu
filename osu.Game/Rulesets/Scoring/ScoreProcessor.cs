@@ -16,8 +16,9 @@ namespace osu.Game.Rulesets.Scoring
     {
         /// <summary>
         /// Invoked when the ScoreProcessor is in a failed state.
+        /// Return true if the fail was permitted.
         /// </summary>
-        public event Action Failed;
+        public event Func<bool> Failed;
 
         /// <summary>
         /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by the <see cref="ScoreProcessor"/>.
@@ -106,8 +107,8 @@ namespace osu.Game.Rulesets.Scoring
             if (alreadyFailed || !HasFailed)
                 return;
 
-            alreadyFailed = true;
-            Failed?.Invoke();
+            if (Failed?.Invoke() != false)
+                alreadyFailed = true;
         }
 
         /// <summary>
@@ -149,13 +150,13 @@ namespace osu.Game.Rulesets.Scoring
         {
         }
 
-        protected ScoreProcessor(HitRenderer<TObject, TJudgement> hitRenderer)
+        protected ScoreProcessor(RulesetContainer<TObject, TJudgement> rulesetContainer)
         {
-            Judgements.Capacity = hitRenderer.Beatmap.HitObjects.Count;
+            Judgements.Capacity = rulesetContainer.Beatmap.HitObjects.Count;
 
-            hitRenderer.OnJudgement += AddJudgement;
+            rulesetContainer.OnJudgement += AddJudgement;
 
-            ComputeTargets(hitRenderer.Beatmap);
+            ComputeTargets(rulesetContainer.Beatmap);
 
             Reset();
         }

@@ -4,7 +4,7 @@
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 Disc.Colour = value;
 
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Hollow = true,
                     Type = EdgeEffectType.Glow,

@@ -3,27 +3,32 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using OpenTK;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
     /// <summary>
     /// The symbol used for centre hit pieces.
     /// </summary>
-    public class CentreHitSymbolPiece : CircularContainer
+    public class CentreHitSymbolPiece : Container
     {
         public CentreHitSymbolPiece()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            Size = new Vector2(CirclePiece.SYMBOL_INNER_SIZE);
-            Masking = true;
+
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(CirclePiece.SYMBOL_SIZE);
+            Padding = new MarginPadding(CirclePiece.SYMBOL_BORDER);
+
             Children = new[]
             {
-                new Box
+                new CircularContainer
                 {
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    Children = new[] { new Box { RelativeSizeAxes = Axes.Both } }
                 }
             };
         }

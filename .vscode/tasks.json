@@ -2,41 +2,41 @@
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
     "version": "2.0.0",
-    "problemMatcher": "$msCompile",
-    "isShellCommand": true,
     "command": "msbuild",
+    "type": "shell",
     "suppressTaskName": true,
-    "showOutput": "silent",
     "args": [
         "/property:GenerateFullPaths=true",
-        "/property:DebugType=portable"
+        "/property:DebugType=portable",
+        "/verbosity:minimal",
+        "/m" //parallel compiling support.
     ],
-    "windows": {
-        "args": [
-            "/property:GenerateFullPaths=true",
-            "/property:DebugType=portable",
-            "/m" //parallel compiling support. doesn't work well with mono atm
-        ]
-    },
-    "tasks": [
-        {
+    "tasks": [{
             "taskName": "Build (Debug)",
-            "isBuildCommand": true
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
         },
         {
             "taskName": "Build (Release)",
             "args": [
                 "/property:Configuration=Release"
+            ],
+            "problemMatcher": [
+                "$msCompile"
             ]
-        },
-        {
-            "taskName": "Clean All",
-            "dependsOn": ["Clean (Debug)", "Clean (Release)"]
         },
         {
             "taskName": "Clean (Debug)",
             "args": [
                 "/target:Clean"
+            ],
+            "problemMatcher": [
+                "$msCompile"
             ]
         },
         {
@@ -44,6 +44,19 @@
             "args": [
                 "/target:Clean",
                 "/property:Configuration=Release"
+            ],
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
+            "taskName": "Clean All",
+            "dependsOn": [
+                "Clean (Debug)",
+                "Clean (Release)"
+            ],
+            "problemMatcher": [
+                "$msCompile"
             ]
         }
     ]

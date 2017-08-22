@@ -13,6 +13,9 @@ namespace osu.Game.Graphics
 
         public static Color4 FromHex(string hex)
         {
+            if (hex[0] == '#')
+                hex = hex.Substring(1);
+
             switch (hex.Length)
             {
                 default:
@@ -87,5 +90,7 @@ namespace osu.Game.Graphics
         public readonly Color4 RedDarker = FromHex(@"870000");
 
         public readonly Color4 ChatBlue = FromHex(@"17292e");
+
+        public readonly Color4 ContextMenuGray = FromHex(@"223034");
     }
 }

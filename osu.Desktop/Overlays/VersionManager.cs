@@ -10,6 +10,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using Squirrel;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
@@ -24,16 +25,14 @@ namespace osu.Desktop.Overlays
     public class VersionManager : OverlayContainer
     {
         private UpdateManager updateManager;
-        private NotificationManager notificationManager;
-
-        protected override bool HideOnEscape => false;
+        private NotificationOverlay notificationOverlay;
 
         public override bool HandleInput => false;
 
         [BackgroundDependencyLoader]
-        private void load(NotificationManager notification, OsuColour colours, TextureStore textures, OsuGameBase game)
+        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game)
         {
-            notificationManager = notification;
+            notificationOverlay = notification;
 
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
@@ -92,12 +91,6 @@ namespace osu.Desktop.Overlays
                 checkForUpdateAsync();
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            State = Visibility.Visible;
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -121,7 +114,7 @@ namespace osu.Desktop.Overlays
                 if (notification == null)
                 {
                     notification = new UpdateProgressNotification { State = ProgressNotificationState.Active };
-                    Schedule(() => notificationManager.Post(notification));
+                    Schedule(() => notificationOverlay.Post(notification));
                 }
 
                 Schedule(() =>
@@ -180,7 +173,7 @@ namespace osu.Desktop.Overlays
 
         protected override void PopIn()
         {
-            FadeIn(1000);
+            this.FadeIn(1000);
         }
 
         protected override void PopOut()
@@ -191,7 +184,7 @@ namespace osu.Desktop.Overlays
         {
             private OsuGame game;
 
-            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification()
+            protected override Notification CreateCompletionNotification() => new ProgressCompletionNotification
             {
                 Text = @"Update ready to install. Click to restart!",
                 Activated = () =>
@@ -207,20 +200,20 @@ namespace osu.Desktop.Overlays
             {
                 this.game = game;
 
-                IconContent.Add(new Drawable[]
+                IconContent.AddRange(new Drawable[]
                 {
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        ColourInfo = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
+                        Colour = ColourInfo.GradientVertical(colours.YellowDark, colours.Yellow)
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_upload,
                         Colour = Color4.White,
-                        TextSize = 20
+                        Size = new Vector2(20),
                     }
                 });
             }

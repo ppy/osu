@@ -5,142 +5,53 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.SearchableList;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class FilterControl : Container
+    public class FilterControl : SearchableListFilterControl<DirectSortCriteria, RankStatus>
     {
-        public static readonly float HEIGHT = 35 + 32 + 30 + padding * 2; // search + mode toggle buttons + sort tabs + padding
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        private FillFlowContainer<RulesetToggleButton> modeButtons;
 
-        private const float padding = 10;
-
-        private readonly Box tabStrip;
-        private readonly FillFlowContainer<RulesetToggleButton> modeButtons;
-
-        public readonly SearchTextBox Search;
-        public readonly SortTabControl SortTabs;
-        public readonly OsuEnumDropdown<RankStatus> RankStatusDropdown;
-        public readonly Bindable<DirectOverlay.PanelDisplayStyle> DisplayStyle = new Bindable<DirectOverlay.PanelDisplayStyle>();
-
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || RankStatusDropdown.Contains(screenSpacePos);
-
-        public FilterControl()
+        protected override Color4 BackgroundColour => OsuColour.FromHex(@"384552");
+        protected override DirectSortCriteria DefaultTab => DirectSortCriteria.Ranked;
+        protected override Drawable CreateSupplementaryControls()
         {
-            RelativeSizeAxes = Axes.X;
-            Height = HEIGHT;
-            DisplayStyle.Value = DirectOverlay.PanelDisplayStyle.Grid;
-
-            Children = new Drawable[]
+            modeButtons = new FillFlowContainer<RulesetToggleButton>
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex(@"384552"),
-                    Alpha = 0.9f,
-                },
-                tabStrip = new Box
-                {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                },
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = DirectOverlay.WIDTH_PADDING, Right = DirectOverlay.WIDTH_PADDING },
-                    Children = new Drawable[]
-                    {
-                        Search = new DirectSearchTextBox
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Margin = new MarginPadding { Top = padding },
-                        },
-                        modeButtons = new FillFlowContainer<RulesetToggleButton>
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(padding, 0f),
-                            Margin = new MarginPadding { Top = padding },
-                        },
-                        SortTabs = new SortTabControl
-                        {
-                            RelativeSizeAxes = Axes.X,
-                        },
-                    },
-                },
-                new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Spacing = new Vector2(10f, 0f),
-                    Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Top = HEIGHT - SlimEnumDropdown<DirectTab>.HEIGHT - padding, Right = DirectOverlay.WIDTH_PADDING },
-                    Children = new Drawable[]
-                    {
-                        new FillFlowContainer
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Spacing = new Vector2(5f, 0f),
-                            Direction = FillDirection.Horizontal,
-                            Children = new[]
-                            {
-                                new DisplayStyleToggleButton(FontAwesome.fa_th_large, DirectOverlay.PanelDisplayStyle.Grid, DisplayStyle),
-                                new DisplayStyleToggleButton(FontAwesome.fa_list_ul, DirectOverlay.PanelDisplayStyle.List, DisplayStyle),
-                            },
-                        },
-                        RankStatusDropdown = new SlimEnumDropdown<RankStatus>
-                        {
-                            RelativeSizeAxes = Axes.None,
-                            Width = 160f,
-                        },
-                    },
-                },
+                AutoSizeAxes = Axes.Both,
+                Spacing = new Vector2(10f, 0f),
             };
 
-            RankStatusDropdown.Current.Value = RankStatus.RankedApproved;
-            SortTabs.Current.Value = SortCriteria.Title;
-            SortTabs.Current.TriggerChange();
+            return modeButtons;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, RulesetDatabase rulesets, OsuColour colours)
+        private void load(OsuGame game, RulesetStore rulesets, OsuColour colours)
         {
-            tabStrip.Colour = colours.Yellow;
-            RankStatusDropdown.AccentColour = colours.BlueDark;
+            DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 
-            var b = new Bindable<RulesetInfo>(); //backup bindable incase the game is null
+            Ruleset.BindTo(game?.Ruleset ?? new Bindable<RulesetInfo> { Value = rulesets.GetRuleset(0) });
             foreach (var r in rulesets.AllRulesets)
             {
-                modeButtons.Add(new RulesetToggleButton(game?.Ruleset ?? b, r));
+                modeButtons.Add(new RulesetToggleButton(Ruleset, r));
             }
         }
 
-        private class DirectSearchTextBox : SearchTextBox
+        private class RulesetToggleButton : OsuClickableContainer
         {
-            protected override Color4 BackgroundUnfocused => backgroundColour;
-            protected override Color4 BackgroundFocused => backgroundColour;
-
-            private Color4 backgroundColour;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private Drawable icon
             {
-                backgroundColour = colours.Gray2.Opacity(0.9f);
+                get { return iconContainer.Icon; }
+                set { iconContainer.Icon = value; }
             }
-        }
-
-        private class RulesetToggleButton : ClickableContainer
-        {
-            private readonly TextAwesome icon;
 
             private RulesetInfo ruleset;
             public RulesetInfo Ruleset
@@ -149,15 +60,17 @@ namespace osu.Game.Overlays.Direct
                 set
                 {
                     ruleset = value;
-                    icon.Icon = Ruleset.CreateInstance().Icon;
+                    icon = Ruleset.CreateInstance().CreateIcon();
                 }
             }
 
             private readonly Bindable<RulesetInfo> bindable;
 
+            private readonly ConstrainedIconContainer iconContainer;
+
             private void Bindable_ValueChanged(RulesetInfo obj)
             {
-                icon.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
+                iconContainer.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
             }
 
             public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
@@ -167,11 +80,11 @@ namespace osu.Game.Overlays.Direct
 
                 Children = new[]
                 {
-                    icon = new TextAwesome
+                    iconContainer = new ConstrainedIconContainer
                     {
                         Origin = Anchor.TopLeft,
                         Anchor = Anchor.TopLeft,
-                        TextSize = 32,
+                        Size = new Vector2(32),
                     }
                 };
 
@@ -188,46 +101,16 @@ namespace osu.Game.Overlays.Direct
                 base.Dispose(isDisposing);
             }
         }
+    }
 
-        private class DisplayStyleToggleButton : ClickableContainer
-        {
-            private readonly TextAwesome icon;
-            private readonly DirectOverlay.PanelDisplayStyle style;
-            private readonly Bindable<DirectOverlay.PanelDisplayStyle> bindable;
-
-            public DisplayStyleToggleButton(FontAwesome icon, DirectOverlay.PanelDisplayStyle style, Bindable<DirectOverlay.PanelDisplayStyle> bindable)
-            {
-                this.bindable = bindable;
-                this.style = style;
-                Size = new Vector2(SlimEnumDropdown<DirectTab>.HEIGHT);
-
-                Children = new Drawable[]
-                {
-                    this.icon = new TextAwesome
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Icon = icon,
-                        TextSize = 18,
-                        UseFullGlyphHeight = false,
-                        Alpha = 0.5f,
-                    },
-                };
-
-                bindable.ValueChanged += Bindable_ValueChanged;
-                Bindable_ValueChanged(bindable.Value);
-                Action = () => bindable.Value = this.style;
-            }
-
-            private void Bindable_ValueChanged(DirectOverlay.PanelDisplayStyle style)
-            {
-                icon.FadeTo(style == this.style ? 1.0f : 0.5f, 100);
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                bindable.ValueChanged -= Bindable_ValueChanged;
-            }
-        }
+    public enum DirectSortCriteria
+    {
+        Title,
+        Artist,
+        Creator,
+        Difficulty,
+        Ranked,
+        Rating,
+        Plays,
     }
 }

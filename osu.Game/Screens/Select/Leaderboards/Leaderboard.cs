@@ -11,7 +11,9 @@ using osu.Framework.Graphics.Containers;
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -24,6 +26,8 @@ namespace osu.Game.Screens.Select.Leaderboards
         private readonly FillFlowContainer<LeaderboardScore> scrollFlow;
 
         public Action<Score> ScoreSelected;
+
+        private readonly LoadingAnimation loading;
 
         private IEnumerable<Score> scores;
         public IEnumerable<Score> Scores
@@ -59,8 +63,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                     };
                     scrollFlow.Add(ls);
 
-                    ls.Delay(i++ * 50, true);
-                    ls.Show();
+                    using (BeginDelayedSequence(i++ * 50, true))
+                        ls.Show();
                 }
 
                 scrollContainer.ScrollTo(0f, false);
@@ -71,7 +75,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             Children = new Drawable[]
             {
-                scrollContainer = new ScrollContainer
+                scrollContainer = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -86,6 +90,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         },
                     },
                 },
+                loading = new LoadingAnimation()
             };
         }
 
@@ -117,6 +122,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         private GetScoresRequest getScoresRequest;
+
         private void updateScores()
         {
             if (!IsLoaded) return;
@@ -126,8 +132,14 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             if (api == null || Beatmap == null) return;
 
+            loading.Show();
+
             getScoresRequest = new GetScoresRequest(Beatmap);
-            getScoresRequest.Success += r => Scores = r.Scores;
+            getScoresRequest.Success += r =>
+            {
+                Scores = r.Scores;
+                loading.Hide();
+            };
             api.Queue(getScoresRequest);
         }
 
@@ -151,7 +163,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     c.Colour = Color4.Transparent;
                 else
                 {
-                    c.ColourInfo = ColourInfo.GradientVertical(
+                    c.Colour = ColourInfo.GradientVertical(
                         Color4.White.Opacity(Math.Min(1 - (topY - fadeStart) / LeaderboardScore.HEIGHT, 1)),
                         Color4.White.Opacity(Math.Min(1 - (bottomY - fadeStart) / LeaderboardScore.HEIGHT, 1)));
                 }

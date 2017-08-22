@@ -11,7 +11,7 @@ namespace osu.Game.Online.Chat
     public class Message : IComparable<Message>, IEquatable<Message>
     {
         [JsonProperty(@"message_id")]
-        public readonly long Id;
+        public readonly long? Id;
 
         //todo: this should be inside sender.
         [JsonProperty(@"sender_id")]
@@ -37,14 +37,22 @@ namespace osu.Game.Online.Chat
         {
         }
 
-        public Message(long id)
+        public Message(long? id)
         {
             Id = id;
         }
 
-        public int CompareTo(Message other) => Id.CompareTo(other.Id);
+        public int CompareTo(Message other)
+        {
+            if (!Id.HasValue)
+                return other.Id.HasValue ? 1 : Timestamp.CompareTo(other.Timestamp);
+            if (!other.Id.HasValue)
+                return -1;
 
-        public bool Equals(Message other) => Id == other?.Id;
+            return Id.Value.CompareTo(other.Id.Value);
+        }
+
+        public virtual bool Equals(Message other) => Id == other?.Id;
 
         public override int GetHashCode() => Id.GetHashCode();
     }

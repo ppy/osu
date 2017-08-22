@@ -4,10 +4,8 @@
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
@@ -17,7 +15,8 @@ using osu.Game.Screens.Ranking;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Play
 {
@@ -34,8 +33,6 @@ namespace osu.Game.Screens.Play
 
         public SkipButton(double startTime)
         {
-            AlwaysReceiveInput = true;
-
             this.startTime = startTime;
 
             RelativePositionAxes = Axes.Both;
@@ -103,9 +100,9 @@ namespace osu.Game.Screens.Play
                 return;
             }
 
-            FadeInFromZero(fade_time);
+            this.FadeInFromZero(fade_time);
             using (BeginAbsoluteSequence(beginFadeTime))
-                FadeOut(fade_time);
+                this.FadeOut(fade_time);
 
             button.Action = () => AudioClock?.Seek(startTime - skip_required_cutoff - fade_time);
 
@@ -117,7 +114,7 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             base.Update();
-            remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, EasingTypes.OutQuint);
+            remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -157,14 +154,14 @@ namespace osu.Game.Screens.Play
                     {
                         case Visibility.Visible:
                             if (lastState == Visibility.Hidden)
-                                FadeIn(500, EasingTypes.OutExpo);
+                                this.FadeIn(500, Easing.OutExpo);
 
-                            if (!Hovering)
+                            if (!IsHovered)
                                 using (BeginDelayedSequence(1000))
                                     scheduledHide = Schedule(() => State = Visibility.Hidden);
                             break;
                         case Visibility.Hidden:
-                            FadeOut(1000, EasingTypes.OutExpo);
+                            this.FadeOut(1000, Easing.OutExpo);
                             break;
                     }
                 }
@@ -177,16 +174,14 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class Button : Container
+        private class Button : OsuClickableContainer
         {
-            public Action Action;
             private Color4 colourNormal;
             private Color4 colourHover;
             private Box box;
             private FillFlowContainer flow;
             private Box background;
             private AspectContainer aspect;
-            private SampleChannel activationSound;
 
             public Button()
             {
@@ -194,10 +189,8 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, AudioManager audio)
+            private void load(OsuColour colours)
             {
-                activationSound = audio.Sample.Get(@"Menu/menuhit");
-
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
 
@@ -232,11 +225,11 @@ namespace osu.Game.Screens.Play
                                 AutoSizeAxes = Axes.Both,
                                 Origin = Anchor.Centre,
                                 Direction = FillDirection.Horizontal,
-                                Children = new []
+                                Children = new[]
                                 {
-                                    new TextAwesome { Icon = FontAwesome.fa_chevron_right },
-                                    new TextAwesome { Icon = FontAwesome.fa_chevron_right },
-                                    new TextAwesome { Icon = FontAwesome.fa_chevron_right },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_right },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_right },
+                                    new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_right },
                                 }
                             },
                             new OsuSpriteText
@@ -256,41 +249,47 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnHover(InputState state)
             {
-                flow.TransformSpacingTo(new Vector2(5), 500, EasingTypes.OutQuint);
-                box.FadeColour(colourHover, 500, EasingTypes.OutQuint);
-                background.FadeTo(0.4f, 500, EasingTypes.OutQuint);
+                flow.TransformSpacingTo(new Vector2(5), 500, Easing.OutQuint);
+                box.FadeColour(colourHover, 500, Easing.OutQuint);
+                background.FadeTo(0.4f, 500, Easing.OutQuint);
                 return base.OnHover(state);
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                flow.TransformSpacingTo(new Vector2(0), 500, EasingTypes.OutQuint);
-                box.FadeColour(colourNormal, 500, EasingTypes.OutQuint);
-                background.FadeTo(0.2f, 500, EasingTypes.OutQuint);
+                flow.TransformSpacingTo(new Vector2(0), 500, Easing.OutQuint);
+                box.FadeColour(colourNormal, 500, Easing.OutQuint);
+                background.FadeTo(0.2f, 500, Easing.OutQuint);
                 base.OnHoverLost(state);
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                aspect.ScaleTo(0.75f, 2000, EasingTypes.OutQuint);
+                aspect.ScaleTo(0.75f, 2000, Easing.OutQuint);
                 return base.OnMouseDown(state, args);
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                aspect.ScaleTo(1, 1000, EasingTypes.OutElastic);
+                aspect.ScaleTo(1, 1000, Easing.OutElastic);
                 return base.OnMouseUp(state, args);
             }
 
             protected override bool OnClick(InputState state)
             {
-                Action?.Invoke();
+                if (!Enabled)
+                    return false;
 
-                activationSound.Play();
+                box.FlashColour(Color4.White, 500, Easing.OutQuint);
+                aspect.ScaleTo(1.2f, 2000, Easing.OutQuint);
 
-                box.FlashColour(Color4.White, 500, EasingTypes.OutQuint);
-                aspect.ScaleTo(1.2f, 2000, EasingTypes.OutQuint);
-                return true;
+                bool result = base.OnClick(state);
+
+                // for now, let's disable the skip button after the first press.
+                // this will likely need to be contextual in the future (bound from external components).
+                Enabled.Value = false;
+
+                return result;
             }
         }
     }

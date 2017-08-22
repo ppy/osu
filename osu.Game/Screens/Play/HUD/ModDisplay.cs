@@ -12,22 +12,26 @@ using osu.Game.Rulesets.UI;
 using OpenTK;
 using osu.Framework.Input;
 using osu.Game.Graphics.Containers;
+using System.Linq;
 
 namespace osu.Game.Screens.Play.HUD
 {
     public class ModDisplay : Container, IHasCurrentValue<IEnumerable<Mod>>
     {
+        private const int fade_duration = 1000;
+
         private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>();
 
         public Bindable<IEnumerable<Mod>> Current => mods;
 
         private readonly FillFlowContainer<ModIcon> iconsContainer;
+        private readonly OsuSpriteText unrankedText;
 
         public ModDisplay()
         {
             Children = new Drawable[]
             {
-                iconsContainer = new ReverseDepthFillFlowContainer<ModIcon>
+                iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -35,8 +39,9 @@ namespace osu.Game.Screens.Play.HUD
                     Direction = FillDirection.Horizontal,
                     Margin = new MarginPadding { Left = 10, Right = 10 },
                 },
-                new OsuSpriteText
+                unrankedText = new OsuSpriteText
                 {
+                    AlwaysPresent = true,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
                     Text = @"/ UNRANKED /",
@@ -54,7 +59,6 @@ namespace osu.Game.Screens.Play.HUD
                     {
                         AutoSizeAxes = Axes.Both,
                         Scale = new Vector2(0.6f),
-
                     });
                 }
 
@@ -71,16 +75,21 @@ namespace osu.Game.Screens.Play.HUD
 
         private void appearTransform()
         {
-            iconsContainer.Flush();
-            iconsContainer.FadeInFromZero(1000, EasingTypes.OutQuint);
+            if (mods.Value.Any(m => !m.Ranked))
+                unrankedText.FadeInFromZero(fade_duration, Easing.OutQuint);
+            else
+                unrankedText.Hide();
+
+            iconsContainer.FinishTransforms();
+            iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
             expand();
             using (iconsContainer.BeginDelayedSequence(1200))
                 contract();
         }
 
-        private void expand() => iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, EasingTypes.OutQuint);
+        private void expand() => iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
 
-        private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, EasingTypes.OutQuint);
+        private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
 
         protected override bool OnHover(InputState state)
         {

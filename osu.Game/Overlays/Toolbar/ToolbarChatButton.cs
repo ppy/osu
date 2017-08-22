@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarChatButton()
         {
-            Icon = FontAwesome.fa_comments;
+            SetIcon(FontAwesome.fa_comments);
         }
 
         [BackgroundDependencyLoader]

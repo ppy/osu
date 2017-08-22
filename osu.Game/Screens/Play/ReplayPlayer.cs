@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            HitRenderer.SetReplay(Replay);
+            RulesetContainer.SetReplay(Replay);
         }
     }
 }

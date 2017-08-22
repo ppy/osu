@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 {
                     Masking = true,
                     Origin = Anchor.Centre,
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Glow,
                         Radius = 60,

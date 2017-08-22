@@ -19,8 +19,6 @@ namespace osu.Game.Graphics.Containers
 
         public ParallaxContainer()
         {
-            AlwaysReceiveInput = true;
-
             RelativeSizeAxes = Axes.Both;
             AddInternal(content = new Container
             {
@@ -36,18 +34,23 @@ namespace osu.Game.Graphics.Containers
         protected override Container<Drawable> Content => content;
 
         [BackgroundDependencyLoader]
-        private void load(UserInputManager input, OsuConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            this.input = input;
             parallaxEnabled = config.GetBindable<bool>(OsuSetting.MenuParallax);
             parallaxEnabled.ValueChanged += delegate
             {
                 if (!parallaxEnabled)
                 {
-                    content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
+                    content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, Easing.OutQuint);
                     content.Scale = new Vector2(1 + ParallaxAmount);
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            input = GetContainingInputManager();
         }
 
         private bool firstUpdate = true;
@@ -59,7 +62,7 @@ namespace osu.Game.Graphics.Containers
             if (parallaxEnabled)
             {
                 Vector2 offset = input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2;
-                content.MoveTo(offset * ParallaxAmount, firstUpdate ? 0 : 1000, EasingTypes.OutQuint);
+                content.MoveTo(offset * ParallaxAmount, firstUpdate ? 0 : 1000, Easing.OutQuint);
                 content.Scale = new Vector2(1 + ParallaxAmount);
             }
 

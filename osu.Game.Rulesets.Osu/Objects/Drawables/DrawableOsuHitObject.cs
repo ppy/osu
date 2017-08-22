@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -17,18 +18,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             : base(hitObject)
         {
             AccentColour = HitObject.ComboColour;
+            Alpha = 0;
         }
 
         protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.Hit300 };
 
         protected sealed override void UpdateState(ArmedState state)
         {
-            Flush();
-
-            UpdateInitialState();
+            FinishTransforms();
 
             using (BeginAbsoluteSequence(HitObject.StartTime - TIME_PREEMPT, true))
             {
+                UpdateInitialState();
+
                 UpdatePreemptState();
 
                 using (BeginDelayedSequence(TIME_PREEMPT + Judgement.TimeOffset, true))
@@ -36,19 +38,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected virtual void UpdateCurrentState(ArmedState state)
+        protected virtual void UpdateInitialState()
         {
+            Hide();
         }
 
         protected virtual void UpdatePreemptState()
         {
-            FadeIn(TIME_FADEIN);
+            this.FadeIn(TIME_FADEIN);
         }
 
-        protected virtual void UpdateInitialState()
+        protected virtual void UpdateCurrentState(ArmedState state)
         {
-            Alpha = 0;
         }
+
+        private OsuInputManager osuActionInputManager;
+        internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
     }
 
     public enum ComboResult

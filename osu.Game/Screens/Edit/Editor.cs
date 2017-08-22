@@ -7,6 +7,7 @@ using OpenTK.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
@@ -18,21 +19,21 @@ namespace osu.Game.Screens.Edit
 
         protected override void OnResuming(Screen last)
         {
-            Beatmap?.Track?.Stop();
+            Beatmap.Value.Track?.Stop();
             base.OnResuming(last);
         }
 
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
-            Background.Schedule(() => Background.FadeColour(Color4.DarkGray, 500));
-            Beatmap?.Track?.Stop();
+            Background.FadeColour(Color4.DarkGray, 500);
+            Beatmap.Value.Track?.Stop();
         }
 
         protected override bool OnExiting(Screen next)
         {
-            Background.Schedule(() => Background.FadeColour(Color4.White, 500));
-            Beatmap?.Track?.Start();
+            Background.FadeColour(Color4.White, 500);
+            Beatmap.Value.Track?.Start();
             return base.OnExiting(next);
         }
     }

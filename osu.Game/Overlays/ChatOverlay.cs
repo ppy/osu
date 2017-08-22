@@ -6,35 +6,38 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Framework.Threading;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
-using osu.Game.Graphics.UserInterface;
-using osu.Framework.Graphics.UserInterface;
-using OpenTK.Graphics;
-using osu.Framework.Input;
-using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : FocusedOverlayContainer, IOnlineComponent
+    public class ChatOverlay : OsuFocusedOverlayContainer, IOnlineComponent
     {
         private const float textbox_height = 60;
+        private const float channel_selection_min_height = 0.3f;
 
         private ScheduledDelegate messageRequest;
 
-        private readonly Container currentChannelContainer;
+        private readonly Container<DrawableChannel> currentChannelContainer;
 
-        private readonly FocusedTextBox inputTextBox;
+        private readonly LoadingAnimation loading;
+
+        private readonly FocusedTextBox textbox;
 
         private APIAccess api;
 
@@ -48,16 +51,22 @@ namespace osu.Game.Overlays
 
         private readonly ChatTabControl channelTabs;
 
+        private readonly Container chatContainer;
+        private readonly Container tabsArea;
         private readonly Box chatBackground;
         private readonly Box tabBackground;
 
         private Bindable<double> chatHeight;
 
+        private readonly Container channelSelectionContainer;
+        private readonly ChannelSelectionOverlay channelSelection;
+
+        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceiveMouseInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceiveMouseInputAt(screenSpacePos);
+
         public ChatOverlay()
         {
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
-            Size = new Vector2(1, DEFAULT_HEIGHT);
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
@@ -65,81 +74,131 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                new Container
+                channelSelectionContainer = new Container
                 {
-                    Name = @"chat area",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = TAB_AREA_HEIGHT },
-                    Children = new Drawable[]
+                    Height = 1f - DEFAULT_HEIGHT,
+                    Masking = true,
+                    Children = new[]
                     {
-                        chatBackground = new Box
+                        channelSelection = new ChannelSelectionOverlay
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
-                        currentChannelContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding
-                            {
-                                Bottom = textbox_height + padding
-                            },
-                        },
+                    },
+                },
+                chatContainer = new Container
+                {
+                    Name = @"chat container",
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = DEFAULT_HEIGHT,
+                    Children = new[]
+                    {
                         new Container
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Height = textbox_height,
-                            Padding = new MarginPadding
-                            {
-                                Top = padding * 2,
-                                Bottom = padding * 2,
-                                Left = ChatLine.LEFT_PADDING + padding * 2,
-                                Right = padding * 2,
-                            },
+                            Name = @"chat area",
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Top = TAB_AREA_HEIGHT },
                             Children = new Drawable[]
                             {
-                                inputTextBox = new FocusedTextBox
+                                chatBackground = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Height = 1,
-                                    PlaceholderText = "type your message",
-                                    Exit = () => State = Visibility.Hidden,
-                                    OnCommit = postMessage,
-                                    HoldFocus = true,
-                                }
+                                },
+                                currentChannelContainer = new Container<DrawableChannel>
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding
+                                    {
+                                        Bottom = textbox_height
+                                    },
+                                },
+                                new Container
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = textbox_height,
+                                    Padding = new MarginPadding
+                                    {
+                                        Top = padding * 2,
+                                        Bottom = padding * 2,
+                                        Left = ChatLine.LEFT_PADDING + padding * 2,
+                                        Right = padding * 2,
+                                    },
+                                    Children = new Drawable[]
+                                    {
+                                        textbox = new FocusedTextBox
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Height = 1,
+                                            PlaceholderText = "type your message",
+                                            Exit = () => State = Visibility.Hidden,
+                                            OnCommit = postMessage,
+                                            ReleaseFocusOnCommit = false,
+                                            HoldFocus = true,
+                                        }
+                                    }
+                                },
+                                loading = new LoadingAnimation(),
                             }
-                        }
-                    }
-                },
-                new Container
-                {
-                    Name = @"tabs area",
-                    RelativeSizeAxes = Axes.X,
-                    Height = TAB_AREA_HEIGHT,
-                    Children = new Drawable[]
-                    {
-                        tabBackground = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
                         },
-                        channelTabs = new ChatTabControl
+                        tabsArea = new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            Name = @"tabs area",
+                            RelativeSizeAxes = Axes.X,
+                            Height = TAB_AREA_HEIGHT,
+                            Children = new Drawable[]
+                            {
+                                tabBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = Color4.Black,
+                                },
+                                channelTabs = new ChatTabControl
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                            }
                         },
-                    }
+                    },
                 },
             };
 
             channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
+            channelTabs.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
+            channelSelection.StateChanged += (overlay, state) =>
+            {
+                channelTabs.ChannelSelectorActive.Value = state == Visibility.Visible;
+
+                if (state == Visibility.Visible)
+                {
+                    textbox.HoldFocus = false;
+                    if (1f - chatHeight.Value < channel_selection_min_height)
+                    {
+                        chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, Easing.OutQuint);
+                        channelSelectionContainer.ResizeHeightTo(channel_selection_min_height, 800, Easing.OutQuint);
+                        channelSelection.Show();
+                        chatHeight.Value = 1f - channel_selection_min_height;
+                    }
+                }
+                else
+                {
+                    textbox.HoldFocus = true;
+                }
+            };
         }
 
         private double startDragChatHeight;
+        private bool isDragging;
 
         protected override bool OnDragStart(InputState state)
         {
-            if (!channelTabs.Hovering)
+            isDragging = tabsArea.IsHovered;
+
+            if (!isDragging)
                 return base.OnDragStart(state);
 
             startDragChatHeight = chatHeight.Value;
@@ -148,10 +207,20 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
-            Trace.Assert(state.Mouse.PositionMouseDown != null);
+            if (isDragging)
+            {
+                Trace.Assert(state.Mouse.PositionMouseDown != null);
 
-            chatHeight.Value = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
-            return base.OnDrag(state);
+                chatHeight.Value = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
+            }
+
+            return true;
+        }
+
+        protected override bool OnDragEnd(InputState state)
+        {
+            isDragging = false;
+            return base.OnDragEnd(state);
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -173,26 +242,26 @@ namespace osu.Game.Overlays
 
         protected override void OnFocus(InputState state)
         {
-            //this is necessary as inputTextBox is masked away and therefore can't get focus :(
-            InputManager.ChangeFocus(inputTextBox);
+            //this is necessary as textbox is masked away and therefore can't get focus :(
+            GetContainingInputManager().ChangeFocus(textbox);
             base.OnFocus(state);
         }
 
         protected override void PopIn()
         {
-            MoveToY(0, transition_length, EasingTypes.OutQuint);
-            FadeIn(transition_length, EasingTypes.OutQuint);
+            this.MoveToY(0, transition_length, Easing.OutQuint);
+            this.FadeIn(transition_length, Easing.OutQuint);
 
-            inputTextBox.HoldFocus = true;
+            textbox.HoldFocus = true;
             base.PopIn();
         }
 
         protected override void PopOut()
         {
-            MoveToY(Height, transition_length, EasingTypes.InSine);
-            FadeOut(transition_length, EasingTypes.InSine);
+            this.MoveToY(Height, transition_length, Easing.InSine);
+            this.FadeOut(transition_length, Easing.InSine);
 
-            inputTextBox.HoldFocus = false;
+            textbox.HoldFocus = false;
             base.PopOut();
         }
 
@@ -205,8 +274,9 @@ namespace osu.Game.Overlays
             chatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
             chatHeight.ValueChanged += h =>
             {
-                Height = (float)h;
-                tabBackground.FadeTo(Height == 1 ? 1 : 0.8f, 200);
+                chatContainer.Height = (float)h;
+                channelSelectionContainer.Height = 1f - (float)h;
+                tabBackground.FadeTo(h == 1 ? 1 : 0.8f, 200);
             };
             chatHeight.TriggerChange();
 
@@ -221,14 +291,7 @@ namespace osu.Game.Overlays
 
         private void initializeChannels()
         {
-            SpriteText loading;
-            Add(loading = new OsuSpriteText
-            {
-                Text = @"initialising chat...",
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                TextSize = 40,
-            });
+            loading.Show();
 
             messageRequest?.Cancel();
 
@@ -237,12 +300,19 @@ namespace osu.Game.Overlays
             {
                 Scheduler.Add(delegate
                 {
-                    loading.FadeOut(100);
-                    loading.Expire();
-
                     addChannel(channels.Find(c => c.Name == @"#lazer"));
                     addChannel(channels.Find(c => c.Name == @"#osu"));
                     addChannel(channels.Find(c => c.Name == @"#lobby"));
+
+                    channelSelection.OnRequestJoin = addChannel;
+                    channelSelection.Sections = new[]
+                    {
+                        new ChannelSection
+                        {
+                            Header = "All Channels",
+                            Channels = channels,
+                        },
+                    };
                 });
 
                 messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
@@ -262,24 +332,36 @@ namespace osu.Game.Overlays
 
             set
             {
-                if (currentChannel == value) return;
-
-                if (channelTabs.ChannelSelectorActive) return;
-
-                if (currentChannel != null)
-                    currentChannelContainer.Clear(false);
+                if (currentChannel == value || value == null) return;
 
                 currentChannel = value;
 
+                textbox.Current.Disabled = currentChannel.ReadOnly;
+                channelTabs.Current.Value = value;
+
                 var loaded = loadedChannels.Find(d => d.Channel == value);
                 if (loaded == null)
-                    loadedChannels.Add(loaded = new DrawableChannel(currentChannel));
+                {
+                    currentChannelContainer.FadeOut(500, Easing.OutQuint);
+                    loading.Show();
 
-                inputTextBox.Current.Disabled = currentChannel.ReadOnly;
+                    loaded = new DrawableChannel(currentChannel);
+                    loadedChannels.Add(loaded);
+                    LoadComponentAsync(loaded, l =>
+                    {
+                        if (currentChannel.Messages.Any())
+                            loading.Hide();
 
-                currentChannelContainer.Add(loaded);
-
-                channelTabs.Current.Value = value;
+                        currentChannelContainer.Clear(false);
+                        currentChannelContainer.Add(loaded);
+                        currentChannelContainer.FadeIn(500, Easing.OutQuint);
+                    });
+                }
+                else
+                {
+                    currentChannelContainer.Clear(false);
+                    currentChannelContainer.Add(loaded);
+                }
             }
         }
 
@@ -296,7 +378,6 @@ namespace osu.Game.Overlays
             }
             else
             {
-
                 careChannels.Add(channel);
                 channelTabs.AddItem(channel);
             }
@@ -306,6 +387,8 @@ namespace osu.Game.Overlays
 
             if (CurrentChannel == null)
                 CurrentChannel = channel;
+
+            channel.Joined.Value = true;
         }
 
         private void fetchInitialMessages(Channel channel)
@@ -314,6 +397,7 @@ namespace osu.Game.Overlays
 
             req.Success += delegate (List<Message> messages)
             {
+                loading.Hide();
                 channel.AddNewMessages(messages.ToArray());
                 Debug.Write("success!");
             };
@@ -330,6 +414,7 @@ namespace osu.Game.Overlays
             if (fetchReq != null) return;
 
             fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
+
             fetchReq.Success += delegate (List<Message> messages)
             {
                 foreach (var group in messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
@@ -340,6 +425,7 @@ namespace osu.Game.Overlays
                 Debug.Write("success!");
                 fetchReq = null;
             };
+
             fetchReq.Failure += delegate
             {
                 Debug.Write("failure!");
@@ -353,51 +439,42 @@ namespace osu.Game.Overlays
         {
             var postText = textbox.Text;
 
+            textbox.Text = string.Empty;
+
             if (string.IsNullOrEmpty(postText))
                 return;
 
+            var target = currentChannel;
+
+            if (target == null) return;
+
             if (!api.IsLoggedIn)
             {
-                currentChannel?.AddNewMessages(new ErrorMessage("Please login to participate in chat!"));
-                textbox.Text = string.Empty;
+                target.AddNewMessages(new ErrorMessage("Please login to participate in chat!"));
                 return;
             }
-
-            if (currentChannel == null) return;
 
             if (postText[0] == '/')
             {
                 // TODO: handle commands
-                currentChannel.AddNewMessages(new ErrorMessage("Chat commands are not supported yet!"));
-                textbox.Text = string.Empty;
+                target.AddNewMessages(new ErrorMessage("Chat commands are not supported yet!"));
                 return;
             }
 
-            var message = new Message
+            var message = new LocalEchoMessage
             {
                 Sender = api.LocalUser.Value,
                 Timestamp = DateTimeOffset.Now,
-                TargetType = TargetType.Channel, //TODO: read this from currentChannel
-                TargetId = currentChannel.Id,
+                TargetType = TargetType.Channel, //TODO: read this from channel
+                TargetId = target.Id,
                 Content = postText
             };
 
-            textbox.ReadOnly = true;
             var req = new PostMessageRequest(message);
 
-            req.Failure += e =>
-            {
-                textbox.FlashColour(Color4.Red, 1000);
-                textbox.ReadOnly = false;
-            };
-
-            req.Success += m =>
-            {
-                currentChannel.AddNewMessages(m);
-
-                textbox.ReadOnly = false;
-                textbox.Text = string.Empty;
-            };
+            target.AddLocalEcho(message);
+            req.Failure += e => target.ReplaceMessage(message, null);
+            req.Success += m => target.ReplaceMessage(message, m);
 
             api.Queue(req);
         }

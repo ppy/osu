@@ -14,10 +14,12 @@ using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialog : FocusedOverlayContainer
+    public class PopupDialog : OsuFocusedOverlayContainer
     {
         public static readonly float ENTER_DURATION = 500;
         public static readonly float EXIT_DURATION = 200;
@@ -28,14 +30,14 @@ namespace osu.Game.Overlays.Dialog
         private readonly Container content;
         private readonly Container ring;
         private readonly FillFlowContainer<PopupDialogButton> buttonsContainer;
-        private readonly TextAwesome iconText;
+        private readonly SpriteIcon icon;
         private readonly SpriteText header;
         private readonly SpriteText body;
 
         public FontAwesome Icon
         {
-            get { return iconText.Icon; }
-            set { iconText.Icon = value; }
+            get { return icon.Icon; }
+            set { icon.Icon = value; }
         }
 
         public string HeaderText
@@ -55,7 +57,7 @@ namespace osu.Game.Overlays.Dialog
             get { return buttonsContainer.Children; }
             set
             {
-                buttonsContainer.Children = value;
+                buttonsContainer.ChildrenEnumerable = value;
                 foreach (PopupDialogButton b in value)
                 {
                     var action = b.Action;
@@ -78,7 +80,7 @@ namespace osu.Game.Overlays.Dialog
         {
             if (args.Repeat) return false;
 
-            if (args.Key == Key.Enter)
+            if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
             {
                 Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
                 return true;
@@ -113,17 +115,17 @@ namespace osu.Game.Overlays.Dialog
                 ring.ResizeTo(ringMinifiedSize);
             }
 
-            content.FadeIn(ENTER_DURATION, EasingTypes.OutQuint);
-            ring.ResizeTo(ringSize, ENTER_DURATION, EasingTypes.OutQuint);
-            buttonsContainer.TransformSpacingTo(Vector2.Zero, ENTER_DURATION, EasingTypes.OutQuint);
-            buttonsContainer.MoveToY(0, ENTER_DURATION, EasingTypes.OutQuint);
+            content.FadeIn(ENTER_DURATION, Easing.OutQuint);
+            ring.ResizeTo(ringSize, ENTER_DURATION, Easing.OutQuint);
+            buttonsContainer.TransformSpacingTo(Vector2.Zero, ENTER_DURATION, Easing.OutQuint);
+            buttonsContainer.MoveToY(0, ENTER_DURATION, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            content.FadeOut(EXIT_DURATION, EasingTypes.InSine);
+            content.FadeOut(EXIT_DURATION, Easing.InSine);
         }
 
         public PopupDialog()
@@ -145,7 +147,7 @@ namespace osu.Game.Overlays.Dialog
                         {
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.5f),
@@ -203,12 +205,12 @@ namespace osu.Game.Overlays.Dialog
                                                     RelativeSizeAxes = Axes.Both,
                                                     Colour = Color4.Black.Opacity(0),
                                                 },
-                                                iconText = new TextAwesome
+                                                icon = new SpriteIcon
                                                 {
                                                     Origin = Anchor.Centre,
                                                     Anchor = Anchor.Centre,
                                                     Icon = FontAwesome.fa_close,
-                                                    TextSize = 50,
+                                                    Size = new Vector2(50),
                                                 },
                                             },
                                         },

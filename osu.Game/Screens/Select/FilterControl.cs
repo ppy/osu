@@ -8,14 +8,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Input;
-using osu.Game.Database;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select
 {
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Select
 
         private readonly SearchTextBox searchTextBox;
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || groupTabs.Contains(screenSpacePos) || sortTabs.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || groupTabs.ReceiveMouseInputAt(screenSpacePos) || sortTabs.ReceiveMouseInputAt(screenSpacePos);
 
         public FilterControl()
         {
@@ -82,7 +82,6 @@ namespace osu.Game.Screens.Select
                 new Container
                 {
                     Padding = new MarginPadding(20),
-                    AlwaysReceiveInput = true,
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
                     Anchor = Anchor.TopRight,
@@ -109,7 +108,6 @@ namespace osu.Game.Screens.Select
                             Direction = FillDirection.Horizontal,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            AlwaysReceiveInput = true,
                             Children = new Drawable[]
                             {
                                 groupTabs = new OsuTabControl<GroupMode>
@@ -123,14 +121,14 @@ namespace osu.Game.Screens.Select
                                 //{
                                 //    Font = @"Exo2.0-Bold",
                                 //    Text = "Sort results by",
-                                //    TextSize = 14,
+                                //    Size = 14,
                                 //    Margin = new MarginPadding
                                 //    {
                                 //        Top = 5,
                                 //        Bottom = 5
                                 //    },
                                 //},
-                                sortTabs = new OsuTabControl<SortMode>()
+                                sortTabs = new OsuTabControl<SortMode>
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Width = 0.5f,
@@ -155,7 +153,7 @@ namespace osu.Game.Screens.Select
         {
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
-                inputManager.ChangeFocus(searchTextBox);
+                GetContainingInputManager().ChangeFocus(searchTextBox);
         }
 
         public void Activate()
@@ -165,13 +163,9 @@ namespace osu.Game.Screens.Select
 
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        private InputManager inputManager;
-
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, UserInputManager inputManager)
+        private void load(OsuColour colours, OsuGame osu)
         {
-            this.inputManager = inputManager;
-
             sortTabs.AccentColour = colours.GreenLight;
 
             if (osu != null)

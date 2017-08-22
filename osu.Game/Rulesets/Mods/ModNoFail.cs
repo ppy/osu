@@ -15,5 +15,10 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModAutoplay) };
+
+        /// <summary>
+        /// We never fail, 'yo.
+        /// </summary>
+        public override bool AllowFail => false;
     }
 }

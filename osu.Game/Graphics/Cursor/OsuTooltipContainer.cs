@@ -1,20 +1,21 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.Cursor
 {
     public class OsuTooltipContainer : TooltipContainer
     {
-        protected override Tooltip CreateTooltip() => new OsuTooltip();
+        protected override ITooltip CreateTooltip() => new OsuTooltip();
 
         public OsuTooltipContainer(CursorContainer cursor) : base(cursor)
         {
@@ -24,6 +25,7 @@ namespace osu.Game.Graphics.Cursor
         {
             private readonly Box background;
             private readonly OsuSpriteText text;
+            private bool instantMovement = true;
 
             public override string TooltipText
             {
@@ -32,10 +34,10 @@ namespace osu.Game.Graphics.Cursor
                     if (value == text.Text) return;
 
                     text.Text = value;
-                    if (Alpha > 0)
+                    if (IsPresent)
                     {
                         AutoSizeDuration = 250;
-                        background.FlashColour(OsuColour.Gray(0.4f), 1000, EasingTypes.OutQuint);
+                        background.FlashColour(OsuColour.Gray(0.4f), 1000, Easing.OutQuint);
                     }
                     else
                         AutoSizeDuration = 0;
@@ -46,11 +48,11 @@ namespace osu.Game.Graphics.Cursor
 
             public OsuTooltip()
             {
-                AutoSizeEasing = EasingTypes.OutQuint;
+                AutoSizeEasing = Easing.OutQuint;
 
                 CornerRadius = 5;
                 Masking = true;
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Colour = Color4.Black.Opacity(40),
@@ -80,13 +82,23 @@ namespace osu.Game.Graphics.Cursor
 
             protected override void PopIn()
             {
-                FadeIn(500, EasingTypes.OutQuint);
+                instantMovement |= !IsPresent;
+                this.FadeIn(500, Easing.OutQuint);
             }
 
-            protected override void PopOut()
+            protected override void PopOut() => this.Delay(150).FadeOut(500, Easing.OutQuint);
+
+            public override void Move(Vector2 pos)
             {
-                using (BeginDelayedSequence(150))
-                    FadeOut(500, EasingTypes.OutQuint);
+                if (instantMovement)
+                {
+                    Position = pos;
+                    instantMovement = false;
+                }
+                else
+                {
+                    this.MoveTo(pos, 200, Easing.OutQuint);
+                }
             }
         }
     }

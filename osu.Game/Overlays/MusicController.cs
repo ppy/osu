@@ -12,20 +12,23 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Localisation;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Threading;
 using osu.Game.Overlays.Music;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class MusicController : FocusedOverlayContainer
+    public class MusicController : OsuFocusedOverlayContainer
     {
         private const float player_height = 130;
 
@@ -36,10 +39,12 @@ namespace osu.Game.Overlays
         private const float bottom_black_area_height = 55;
 
         private Drawable currentBackground;
-        private DragBar progressBar;
+        private ProgressBar progressBar;
 
-        private Button playButton;
-        private Button playlistButton;
+        private IconButton prevButton;
+        private IconButton playButton;
+        private IconButton nextButton;
+        private IconButton playlistButton;
 
         private SpriteText title, artist;
 
@@ -56,6 +61,9 @@ namespace osu.Game.Overlays
         {
             Width = 400;
             Margin = new MarginPadding(10);
+
+            // required to let MusicController handle beatmap cycling.
+            AlwaysPresent = true;
         }
 
         protected override bool OnDragStart(InputState state) => true;
@@ -75,7 +83,7 @@ namespace osu.Game.Overlays
 
         protected override bool OnDragEnd(InputState state)
         {
-            dragContainer.MoveTo(Vector2.Zero, 800, EasingTypes.OutElastic);
+            dragContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
             return base.OnDragEnd(state);
         }
 
@@ -105,7 +113,7 @@ namespace osu.Game.Overlays
                             Height = player_height,
                             Masking = true,
                             CornerRadius = 5,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(40),
@@ -143,7 +151,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Children = new Drawable[]
                                     {
-                                        new FillFlowContainer<Button>
+                                        new FillFlowContainer<IconButton>
                                         {
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
@@ -152,26 +160,26 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.Centre,
                                             Children = new[]
                                             {
-                                                new Button
+                                                prevButton = new IconButton
                                                 {
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
                                                 },
-                                                playButton = new Button
+                                                playButton = new IconButton
                                                 {
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
                                                     Action = play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
-                                                new Button
+                                                nextButton = new IconButton
                                                 {
                                                     Action = next,
                                                     Icon = FontAwesome.fa_step_forward,
                                                 },
                                             }
                                         },
-                                        playlistButton = new Button
+                                        playlistButton = new IconButton
                                         {
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.CentreRight,
@@ -181,13 +189,13 @@ namespace osu.Game.Overlays
                                         },
                                     }
                                 },
-                                progressBar = new DragBar
+                                progressBar = new ProgressBar
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.BottomCentre,
                                     Height = progress_height,
-                                    Colour = colours.Yellow,
-                                    SeekRequested = seek
+                                    FillColour = colours.Yellow,
+                                    OnSeek = progress => current?.Track.Seek(progress)
                                 }
                             },
                         },
@@ -197,15 +205,26 @@ namespace osu.Game.Overlays
 
             beatmapBacking.BindTo(game.Beatmap);
 
-            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, EasingTypes.OutQuint);
+            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
         protected override void LoadComplete()
         {
             beatmapBacking.ValueChanged += beatmapChanged;
+            beatmapBacking.DisabledChanged += beatmapDisabledChanged;
             beatmapBacking.TriggerChange();
 
             base.LoadComplete();
+        }
+
+        private void beatmapDisabledChanged(bool disabled)
+        {
+            if (disabled)
+                playlist.Hide();
+
+            prevButton.Enabled.Value = !disabled;
+            nextButton.Enabled.Value = !disabled;
+            playlistButton.Enabled.Value = !disabled;
         }
 
         protected override void UpdateAfterChildren()
@@ -222,10 +241,13 @@ namespace osu.Game.Overlays
             {
                 var track = current.Track;
 
-                progressBar.UpdatePosition(track.Length == 0 ? 0 : (float)(track.CurrentTime / track.Length));
+                progressBar.EndTime = track.Length;
+                progressBar.CurrentTime = track.CurrentTime;
+
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
-                if (track.HasCompleted && !track.Looping) next();
+                if (track.HasCompleted && !track.Looping && !beatmapBacking.Disabled)
+                    next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
@@ -237,7 +259,8 @@ namespace osu.Game.Overlays
 
             if (track == null)
             {
-                playlist.PlayNext();
+                if (!beatmapBacking.Disabled)
+                    playlist.PlayNext();
                 return;
             }
 
@@ -264,13 +287,11 @@ namespace osu.Game.Overlays
 
         private void beatmapChanged(WorkingBeatmap beatmap)
         {
-            progressBar.IsEnabled = beatmap != null;
-
             TransformDirection direction = TransformDirection.None;
 
             if (current != null)
             {
-                bool audioEquals = beatmapBacking.Value?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
+                bool audioEquals = beatmap?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
 
                 if (audioEquals)
                     direction = TransformDirection.None;
@@ -283,15 +304,18 @@ namespace osu.Game.Overlays
                 {
                     //figure out the best direction based on order in playlist.
                     var last = playlist.BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo.ID).Count();
-                    var next = beatmapBacking.Value == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmapBacking.Value.BeatmapSetInfo.ID).Count();
+                    var next = beatmap == null ? -1 : playlist.BeatmapSets.TakeWhile(b => b.ID != beatmap.BeatmapSetInfo.ID).Count();
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
             }
 
-            current = beatmapBacking.Value;
+            current = beatmap;
 
-            updateDisplay(beatmapBacking, direction);
+            progressBar.CurrentTime = 0;
+
+            updateDisplay(current, direction);
+
             queuedDirection = null;
         }
 
@@ -331,13 +355,13 @@ namespace osu.Game.Overlays
                         {
                             case TransformDirection.Next:
                                 d.Position = new Vector2(400, 0);
-                                d.MoveToX(0, 500, EasingTypes.OutCubic);
-                                currentBackground.MoveToX(-400, 500, EasingTypes.OutCubic);
+                                d.MoveToX(0, 500, Easing.OutCubic);
+                                currentBackground.MoveToX(-400, 500, Easing.OutCubic);
                                 break;
                             case TransformDirection.Prev:
                                 d.Position = new Vector2(-400, 0);
-                                d.MoveToX(0, 500, EasingTypes.OutCubic);
-                                currentBackground.MoveToX(400, 500, EasingTypes.OutCubic);
+                                d.MoveToX(0, 500, Easing.OutCubic);
+                                currentBackground.MoveToX(400, 500, Easing.OutCubic);
                                 break;
                         }
                         currentBackground.Expire();
@@ -350,26 +374,20 @@ namespace osu.Game.Overlays
             });
         }
 
-        private void seek(float position)
-        {
-            var track = current?.Track;
-            track?.Seek(track.Length * position);
-        }
-
         protected override void PopIn()
         {
             base.PopIn();
 
-            FadeIn(transition_length, EasingTypes.OutQuint);
-            dragContainer.ScaleTo(1, transition_length, EasingTypes.OutElastic);
+            this.FadeIn(transition_length, Easing.OutQuint);
+            dragContainer.ScaleTo(1, transition_length, Easing.OutElastic);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            FadeOut(transition_length, EasingTypes.OutQuint);
-            dragContainer.ScaleTo(0.9f, transition_length, EasingTypes.OutQuint);
+            this.FadeOut(transition_length, Easing.OutQuint);
+            dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
         }
 
         private enum TransformDirection
@@ -395,6 +413,7 @@ namespace osu.Game.Overlays
                 {
                     sprite = new Sprite
                     {
+                        RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(150),
                         FillMode = FillMode.Fill,
                     },
@@ -416,104 +435,48 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class Button : ClickableContainer
+        private class ProgressBar : SliderBar<double>
         {
-            private readonly TextAwesome icon;
-            private readonly Box hover;
-            private readonly Container content;
+            public Action<double> OnSeek;
 
-            public FontAwesome Icon
+            private readonly Box fill;
+
+            public Color4 FillColour
             {
-                get { return icon.Icon; }
-                set { icon.Icon = value; }
+                set { fill.Colour = value; }
             }
 
-            private const float button_size = 30;
-            private Color4 flashColour;
-
-            public Vector2 IconScale
+            public double EndTime
             {
-                get { return icon.Scale; }
-                set { icon.Scale = value; }
+                set { CurrentNumber.MaxValue = value; }
             }
 
-            public Button()
+            public double CurrentTime
             {
-                AutoSizeAxes = Axes.Both;
+                set { CurrentNumber.Value = value; }
+            }
 
-                Origin = Anchor.Centre;
-                Anchor = Anchor.Centre;
+            public ProgressBar()
+            {
+                CurrentNumber.MinValue = 0;
+                CurrentNumber.MaxValue = 1;
+                RelativeSizeAxes = Axes.X;
 
                 Children = new Drawable[]
                 {
-                    content = new Container
+                    fill = new Box
                     {
-                        Size = new Vector2(button_size),
-                        CornerRadius = 5,
-                        Masking = true,
-
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        EdgeEffect = new EdgeEffect
-                        {
-                            Colour = Color4.Black.Opacity(0.04f),
-                            Type = EdgeEffectType.Shadow,
-                            Radius = 5,
-                        },
-                        Children = new Drawable[]
-                        {
-                            hover = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0,
-                            },
-                            icon = new TextAwesome
-                            {
-                                TextSize = 18,
-                                Origin = Anchor.Centre,
-                                Anchor = Anchor.Centre
-                            }
-                        }
+                        RelativeSizeAxes = Axes.Y
                     }
                 };
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            protected override void UpdateValue(float value)
             {
-                hover.Colour = colours.Yellow.Opacity(0.6f);
-                flashColour = colours.Yellow;
+                fill.Width = value * UsableWidth;
             }
 
-            protected override bool OnHover(InputState state)
-            {
-                hover.FadeIn(500, EasingTypes.OutQuint);
-                return base.OnHover(state);
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                hover.FadeOut(500, EasingTypes.OutQuint);
-                base.OnHoverLost(state);
-            }
-
-            protected override bool OnClick(InputState state)
-            {
-                hover.FlashColour(flashColour, 800, EasingTypes.OutQuint);
-                return base.OnClick(state);
-            }
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                content.ScaleTo(0.75f, 2000, EasingTypes.OutQuint);
-                return base.OnMouseDown(state, args);
-            }
-
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-            {
-                content.ScaleTo(1, 1000, EasingTypes.OutElastic);
-                return base.OnMouseUp(state, args);
-            }
+            protected override void OnUserChange() => OnSeek?.Invoke(Current);
         }
     }
 }

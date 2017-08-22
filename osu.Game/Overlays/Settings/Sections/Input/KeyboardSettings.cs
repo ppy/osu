@@ -10,14 +10,15 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         protected override string Header => "Keyboard";
 
-        public KeyboardSettings()
+        public KeyboardSettings(KeyBindingOverlay keyConfig)
         {
             Children = new Drawable[]
             {
                 new OsuButton
                 {
                     RelativeSizeAxes = Axes.X,
-                    Text = "Key Configuration"
+                    Text = "Key Configuration",
+                    Action = () => keyConfig.ToggleVisibility()
                 },
             };
         }

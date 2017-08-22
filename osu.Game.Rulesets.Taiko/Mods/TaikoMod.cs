@@ -37,6 +37,11 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
     }
 
+    public class TaikoModDaycore : ModDaycore
+    {
+        public override double ScoreMultiplier => 0.5;
+    }
+
     public class TaikoModDoubleTime : ModDoubleTime
     {
         public override double ScoreMultiplier => 1.12;

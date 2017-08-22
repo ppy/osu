@@ -5,7 +5,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,10 +13,11 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 using osu.Framework;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class LeaderboardScore : ClickableContainer, IStateful<Visibility>
+    public class LeaderboardScore : OsuClickableContainer, IStateful<Visibility>
     {
         public static readonly float HEIGHT = 60;
 
@@ -60,26 +61,29 @@ namespace osu.Game.Screens.Select.Leaderboards
                         nameLabel.MoveToX(150);
                         break;
                     case Visibility.Visible:
-                        FadeIn(200);
-                        content.MoveToY(0, 800, EasingTypes.OutQuint);
+                        this.FadeIn(200);
+                        content.MoveToY(0, 800, Easing.OutQuint);
 
-                        Delay(100, true);
-                        avatar.FadeIn(300, EasingTypes.OutQuint);
-                        nameLabel.FadeIn(350, EasingTypes.OutQuint);
-
-                        avatar.MoveToX(0, 300, EasingTypes.OutQuint);
-                        nameLabel.MoveToX(0, 350, EasingTypes.OutQuint);
-
-                        Delay(250, true);
-                        scoreLabel.FadeIn(200);
-                        scoreRank.FadeIn(200);
-
-                        Delay(50, true);
-                        var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
-
-                        for (int i = 0; i < drawables.Length; i++)
+                        using (BeginDelayedSequence(100, true))
                         {
-                            drawables[i].FadeIn(100 + i * 50);
+                            avatar.FadeIn(300, Easing.OutQuint);
+                            nameLabel.FadeIn(350, Easing.OutQuint);
+
+                            avatar.MoveToX(0, 300, Easing.OutQuint);
+                            nameLabel.MoveToX(0, 350, Easing.OutQuint);
+
+                            using (BeginDelayedSequence(250, true))
+                            {
+                                scoreLabel.FadeIn(200);
+                                scoreRank.FadeIn(200);
+
+                                using (BeginDelayedSequence(50, true))
+                                {
+                                    var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
+                                    for (int i = 0; i < drawables.Length; i++)
+                                        drawables[i].FadeIn(100 + i * 50);
+                                }
+                            }
                         }
 
                         break;
@@ -147,7 +151,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                         CornerRadius = corner_radius,
                                         Masking = true,
                                         OnLoadComplete = d => d.FadeInFromZero(200),
-                                        EdgeEffect = new EdgeEffect
+                                        EdgeEffect = new EdgeEffectParameters
                                         {
                                             Type = EdgeEffectType.Shadow,
                                             Radius = 1,
@@ -187,7 +191,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        new DrawableFlag(Score.User?.Country?.FlagName ?? "__")
+                                                        new DrawableFlag(Score.User?.Country?.FlagName)
                                                         {
                                                             Width = 30,
                                                             RelativeSizeAxes = Axes.Y,
@@ -265,13 +269,13 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            background.FadeTo(0.5f, 300, EasingTypes.OutQuint);
+            background.FadeTo(0.5f, 300, Easing.OutQuint);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(Framework.Input.InputState state)
         {
-            background.FadeTo(background_alpha, 200, EasingTypes.OutQuint);
+            background.FadeTo(background_alpha, 200, Easing.OutQuint);
             base.OnHoverLost(state);
         }
 
@@ -330,25 +334,23 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 Children = new[]
                 {
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         Icon = FontAwesome.fa_osu_mod_bg,
                         Colour = colour,
                         Shadow = true,
-                        TextSize = 30,
-                        UseFullGlyphHeight = false,
+                        Size = new Vector2(30),
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
                         Icon = icon,
                         Colour = OsuColour.Gray(84),
-                        TextSize = 18,
+                        Size = new Vector2(18),
                         Position = new Vector2(0f, 2f),
-                        UseFullGlyphHeight = false,
                     },
                 };
             }
@@ -365,20 +367,21 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                 Children = new Drawable[]
                 {
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Origin = Anchor.Centre,
                         Icon = FontAwesome.fa_square,
                         Colour = OsuColour.FromHex(@"3087ac"),
                         Rotation = 45,
+                        Size = new Vector2(20),
                         Shadow = true,
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Origin = Anchor.Centre,
                         Icon = icon,
                         Colour = OsuColour.FromHex(@"a4edff"),
-                        Scale = new Vector2(0.8f),
+                        Size = new Vector2(14),
                     },
                     new GlowingSpriteText(value, @"Exo2.0-Bold", 17, Color4.White, OsuColour.FromHex(@"83ccfa"))
                     {

@@ -6,16 +6,14 @@ using System.Collections.Generic;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens
 {
@@ -46,19 +44,20 @@ namespace osu.Game.Screens
             boxContainer.ScaleTo(0.2f);
             boxContainer.RotateTo(-20);
 
-            Content.Delay(300, true);
+            using (Content.BeginDelayedSequence(300, true))
+            {
+                boxContainer.ScaleTo(1, transition_time, Easing.OutElastic);
+                boxContainer.RotateTo(0, transition_time / 2, Easing.OutQuint);
 
-            boxContainer.ScaleTo(1, transition_time, EasingTypes.OutElastic);
-            boxContainer.RotateTo(0, transition_time / 2, EasingTypes.OutQuint);
-
-            textContainer.MoveTo(Vector2.Zero, transition_time, EasingTypes.OutExpo);
-            Content.FadeIn(transition_time, EasingTypes.OutExpo);
+                textContainer.MoveTo(Vector2.Zero, transition_time, Easing.OutExpo);
+                Content.FadeIn(transition_time, Easing.OutExpo);
+            }
         }
 
         protected override bool OnExiting(Screen next)
         {
-            textContainer.MoveTo(new Vector2(DrawSize.X / 16, 0), transition_time, EasingTypes.OutExpo);
-            Content.FadeOut(transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(DrawSize.X / 16, 0), transition_time, Easing.OutExpo);
+            Content.FadeOut(transition_time, Easing.OutExpo);
 
             return base.OnExiting(next);
         }
@@ -67,16 +66,16 @@ namespace osu.Game.Screens
         {
             base.OnSuspending(next);
 
-            textContainer.MoveTo(new Vector2(-(DrawSize.X / 16), 0), transition_time, EasingTypes.OutExpo);
-            Content.FadeOut(transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(new Vector2(-(DrawSize.X / 16), 0), transition_time, Easing.OutExpo);
+            Content.FadeOut(transition_time, Easing.OutExpo);
         }
 
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
 
-            textContainer.MoveTo(Vector2.Zero, transition_time, EasingTypes.OutExpo);
-            Content.FadeIn(transition_time, EasingTypes.OutExpo);
+            textContainer.MoveTo(Vector2.Zero, transition_time, Easing.OutExpo);
+            Content.FadeIn(transition_time, Easing.OutExpo);
         }
 
         public ScreenWhiteBox()
@@ -109,14 +108,14 @@ namespace osu.Game.Screens
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Direction = FillDirection.Vertical,
-                            Children = new[]
+                            Children = new Drawable[]
                             {
-                                new TextAwesome
+                                new SpriteIcon
                                 {
                                     Icon = FontAwesome.fa_universal_access,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    TextSize = 50,
+                                    Size = new Vector2(50),
                                 },
                                 new OsuSpriteText
                                 {
@@ -195,12 +194,6 @@ namespace osu.Game.Screens
                 Icon = FontAwesome.fa_osu_right_o;
                 Anchor = Anchor.BottomRight;
                 Origin = Anchor.BottomRight;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
-            {
-                ActivationSound = audio.Sample.Get(@"Menu/menuhit");
             }
         }
     }
