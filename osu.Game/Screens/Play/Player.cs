@@ -24,8 +24,6 @@ using osu.Game.Screens.Ranking;
 using osu.Game.Beatmaps.Timing;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps;
-using osu.Framework.Graphics.Shapes;
-using OpenTK.Graphics;
 using osu.Game.Online.API;
 
 namespace osu.Game.Screens.Play
@@ -33,7 +31,6 @@ namespace osu.Game.Screens.Play
     public class Player : OsuScreen
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
-        private const int letterbox_height = 80;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
@@ -55,8 +52,6 @@ namespace osu.Game.Screens.Play
 
         private PauseContainer pauseContainer;
 
-        private Container letterboxInBreaksContainer;
-
         private RulesetInfo ruleset;
 
         private APIAccess api;
@@ -77,6 +72,7 @@ namespace osu.Game.Screens.Play
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
         private BreakOverlay breakOverlay;
+        private BreakLetterboxOverlay breakLetterboxOverlay;
 
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
@@ -170,38 +166,7 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
-                        letterboxInBreaksContainer = new Container
-                        {
-                            Alpha = 0,
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                new Container
-                                {
-                                    Anchor = Anchor.TopLeft,
-                                    Origin = Anchor.TopLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = letterbox_height,
-                                    Child = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.Black,
-                                    }
-                                },
-                                new Container
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = letterbox_height,
-                                    Child = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.Black,
-                                    }
-                                }
-                            }
-                        },
+                        breakLetterboxOverlay = new BreakLetterboxOverlay(),
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -230,7 +195,7 @@ namespace osu.Game.Screens.Play
                                 hudOverlay.KeyCounter.IsCounting = false;
 
                                 if(Beatmap.Value.Beatmap.BeatmapInfo.LetterboxInBreaks)
-                                    letterboxInBreaksContainer.FadeTo(1, fade_duration);
+                                    breakLetterboxOverlay.FadeTo(1, fade_duration);
                             },
                             OnBreakOut = () =>
                             {
@@ -242,7 +207,7 @@ namespace osu.Game.Screens.Play
                                 hudOverlay.KeyCounter.IsCounting = true;
 
                                 if(Beatmap.Value.Beatmap.BeatmapInfo.LetterboxInBreaks)
-                                    letterboxInBreaksContainer.FadeTo(0, fade_duration);
+                                    breakLetterboxOverlay.FadeTo(0, fade_duration);
                             }
                         },
                     }
