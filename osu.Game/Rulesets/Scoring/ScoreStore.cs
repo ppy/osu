@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Scoring
                 var version = sr.ReadInt32();
                 /* score.FileChecksum = */
                 var beatmapHash = sr.ReadString();
-                score.Beatmap = beatmaps.QueryBeatmap(b => b.Hash == beatmapHash);
+                score.Beatmap = beatmaps.QueryBeatmap(b => b.MD5Hash == beatmapHash);
                 /* score.PlayerName = */
                 sr.ReadString();
                 /* var localScoreChecksum = */

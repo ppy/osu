@@ -20,7 +20,7 @@ namespace osu.Game.Beatmaps
         /// The current version of this store. Used for migrations (see <see cref="PerformMigration(int, int)"/>).
         /// The initial version is 1.
         /// </summary>
-        protected override int StoreVersion => 2;
+        protected override int StoreVersion => 3;
 
         public BeatmapStore(SQLiteConnection connection)
             : base(connection)
@@ -76,6 +76,10 @@ namespace osu.Game.Beatmaps
                     case 2:
                         // cannot migrate; breaking underlying changes.
                         Reset();
+                        break;
+                    case 3:
+                        // Added MD5Hash column to BeatmapInfo
+                        Connection.MigrateTable<BeatmapInfo>();
                         break;
                 }
             }

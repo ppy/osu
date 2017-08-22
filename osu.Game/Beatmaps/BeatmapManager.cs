@@ -372,6 +372,7 @@ namespace osu.Game.Beatmaps
 
                     beatmap.BeatmapInfo.Path = name;
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
+                    beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
                     // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                     beatmap.BeatmapInfo.Metadata = null;
