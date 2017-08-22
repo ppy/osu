@@ -13,7 +13,7 @@ namespace osu.Desktop.Tests.Visual
 
         public TestCaseSettings()
         {
-            Children = new[] { settings = new SettingsOverlay() };
+            Children = new[] { settings = new MainSettings() };
         }
 
         protected override void LoadComplete()

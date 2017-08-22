@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -110,8 +109,6 @@ namespace osu.Game.Rulesets.Mania
         public override string Description => "osu!mania";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
-
-        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[] { /* Todo: Should be keymod specific */ };
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new ManiaDifficultyCalculator(beatmap);
 
