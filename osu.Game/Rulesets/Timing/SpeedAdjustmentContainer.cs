@@ -51,11 +51,7 @@ namespace osu.Game.Rulesets.Timing
         {
             ControlPoint = controlPoint;
             RelativeSizeAxes = Axes.Both;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             scrollingContainer = CreateScrollingContainer();
 
             scrollingContainer.ScrollingAxes = ScrollingAxes;
