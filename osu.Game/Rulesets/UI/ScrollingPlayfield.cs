@@ -173,7 +173,8 @@ namespace osu.Game.Rulesets.UI
             }
 
             /// <summary>
-            /// Adds a <see cref="SpeedAdjustmentContainer"/> to this container.
+            /// Adds a <see cref="SpeedAdjustmentContainer"/> to this container, re-sorting all hit objects
+            /// in the last <see cref="SpeedAdjustmentContainer"/> that occurred (time-wise) before it.
             /// </summary>
             /// <param name="speedAdjustment">The <see cref="SpeedAdjustmentContainer"/>.</param>
             public void AddSpeedAdjustment(SpeedAdjustmentContainer speedAdjustment)
@@ -184,6 +185,8 @@ namespace osu.Game.Rulesets.UI
 
                 if (speedAdjustments.Count > 0)
                 {
+                    // We need to re-sort all hit objects in the speed adjustment container prior to figure out if they
+                    // should now lie within this one
                     var existingAdjustment = adjustmentContainerAt(speedAdjustment.ControlPoint.StartTime);
                     for (int i = 0; i < existingAdjustment.Count; i++)
                     {
