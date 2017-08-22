@@ -23,6 +23,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         public HitObjectPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density, PatternType lastStair)
             : base(random, hitObject, beatmap, availableColumns, previousPattern)
         {
+            if (previousTime > hitObject.StartTime) throw new ArgumentOutOfRangeException(nameof(previousTime));
+            if (density < 0) throw new ArgumentOutOfRangeException(nameof(density));
+
             StairType = lastStair;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);

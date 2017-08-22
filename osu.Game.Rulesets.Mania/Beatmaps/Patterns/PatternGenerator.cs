@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 
@@ -33,6 +34,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
 
         protected PatternGenerator(HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
         {
+            if (hitObject == null) throw new ArgumentNullException(nameof(hitObject));
+            if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
+            if (availableColumns <= 0) throw new ArgumentOutOfRangeException(nameof(availableColumns));
+            if (previousPattern == null) throw new ArgumentNullException(nameof(previousPattern));
+
             HitObject = hitObject;
             Beatmap = beatmap;
             AvailableColumns = availableColumns;
