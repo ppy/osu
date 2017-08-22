@@ -115,18 +115,18 @@ namespace osu.Desktop.Tests.Visual
             Assert.AreEqual(1, speedAdjustments[3].ControlPoint.Multiplier);
 
             // Check insertion of hit objects
-            Assert.IsTrue(hitObjectContainer.SpeedAdjustments[0].Contains(hitObjects[0]));
-            Assert.IsTrue(speedAdjustments[0].Contains(hitObjects[1]));
-            Assert.IsTrue(speedAdjustments[1].Contains(hitObjects[2]));
-            Assert.IsTrue(speedAdjustments[2].Contains(hitObjects[3]));
-            Assert.IsTrue(speedAdjustments[3].Contains(hitObjects[4]));
-            Assert.IsTrue(speedAdjustments[3].Contains(hitObjects[5]));
+            Assert.IsTrue(hitObjectContainer.SpeedAdjustments[4].Contains(hitObjects[0]));
+            Assert.IsTrue(hitObjectContainer.SpeedAdjustments[3].Contains(hitObjects[1]));
+            Assert.IsTrue(hitObjectContainer.SpeedAdjustments[2].Contains(hitObjects[2]));
+            Assert.IsTrue(hitObjectContainer.SpeedAdjustments[1].Contains(hitObjects[3]));
+            Assert.IsTrue(hitObjectContainer.SpeedAdjustments[0].Contains(hitObjects[4]));
+            Assert.IsTrue(hitObjectContainer.SpeedAdjustments[0].Contains(hitObjects[5]));
 
-            hitObjectContainer.RemoveSpeedAdjustment(speedAdjustments[1]);
+            hitObjectContainer.RemoveSpeedAdjustment(hitObjectContainer.SpeedAdjustments[3]);
 
-            // The hit object contained in this speed adjustment should be resorted into the previous one
+            // The hit object contained in this speed adjustment should be resorted into the one occuring before it
 
-            Assert.IsTrue(speedAdjustments[0].Contains(hitObjects[2]));
+            Assert.IsTrue(hitObjectContainer.SpeedAdjustments[3].Contains(hitObjects[1]));
         }
 
         private class TestRulesetContainer : ScrollingRulesetContainer<TestPlayfield, TestHitObject, TestJudgement>
