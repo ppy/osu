@@ -109,7 +109,7 @@ namespace osu.Game
             dependencies.Cache(RulesetStore = new RulesetStore(connection));
             dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(connection, RulesetStore));
             dependencies.Cache(new OsuColour());
 
