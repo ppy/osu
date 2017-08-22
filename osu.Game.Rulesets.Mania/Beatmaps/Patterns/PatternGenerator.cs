@@ -32,13 +32,17 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// </summary>
         protected readonly Beatmap Beatmap;
 
-        protected PatternGenerator(HitObject hitObject, Beatmap beatmap, Pattern previousPattern)
+        protected PatternGenerator(HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
         {
-            PreviousPattern = previousPattern;
+            if (hitObject == null) throw new ArgumentNullException(nameof(hitObject));
+            if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
+            if (availableColumns <= 0) throw new ArgumentOutOfRangeException(nameof(availableColumns));
+            if (previousPattern == null) throw new ArgumentNullException(nameof(previousPattern));
+
             HitObject = hitObject;
             Beatmap = beatmap;
-
-            AvailableColumns = (int)Math.Round(beatmap.BeatmapInfo.Difficulty.CircleSize);
+            AvailableColumns = availableColumns;
+            PreviousPattern = previousPattern;
         }
 
         /// <summary>
