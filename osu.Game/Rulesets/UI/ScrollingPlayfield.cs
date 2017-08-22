@@ -185,14 +185,18 @@ namespace osu.Game.Rulesets.UI
                 if (previousSpeedAdjustment == null)
                     return;
 
-                foreach (DrawableHitObject h in previousSpeedAdjustment.Children)
+                for (int i = 0; i < previousSpeedAdjustment.Children.Count; i++)
                 {
-                    var newSpeedAdjustment = adjustmentContainerFor(h);
+                    DrawableHitObject hitObject = previousSpeedAdjustment[i];
+
+                    var newSpeedAdjustment = adjustmentContainerFor(hitObject);
                     if (newSpeedAdjustment == previousSpeedAdjustment)
                         continue;
 
-                    previousSpeedAdjustment.Remove(h);
-                    newSpeedAdjustment.Add(h);
+                    previousSpeedAdjustment.Remove(hitObject);
+                    newSpeedAdjustment.Add(hitObject);
+
+                    i--;
                 }
             }
 
