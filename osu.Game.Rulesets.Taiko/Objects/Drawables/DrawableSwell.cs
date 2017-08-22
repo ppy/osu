@@ -199,6 +199,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             base.Update();
 
+            Size = BaseSize * Parent.RelativeChildSize;
+
             // Make the swell stop at the hit target
             X = (float)Math.Max(Time.Current, HitObject.StartTime);
 
