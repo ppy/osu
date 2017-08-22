@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 
 namespace osu.Game.Screens.Play
 {
@@ -50,6 +51,8 @@ namespace osu.Game.Screens.Play
 
         private RulesetInfo ruleset;
 
+        private APIAccess api;
+
         private ScoreProcessor scoreProcessor;
         protected RulesetContainer RulesetContainer;
 
@@ -69,9 +72,12 @@ namespace osu.Game.Screens.Play
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGame osu)
+        private void load(AudioManager audio, OsuConfigManager config, OsuGame osu, APIAccess api)
         {
+            this.api = api;
+
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
@@ -235,7 +241,7 @@ namespace osu.Game.Screens.Play
                         Ruleset = ruleset
                     };
                     scoreProcessor.PopulateScore(score);
-                    score.User = RulesetContainer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
+                    score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
                     Push(new Results(score));
                 });
             }
