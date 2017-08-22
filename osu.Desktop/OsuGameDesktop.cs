@@ -20,16 +20,11 @@ namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
-        private readonly VersionManager versionManager;
+        private VersionManager versionManager;
 
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
-            versionManager = new VersionManager
-            {
-                Depth = int.MinValue,
-                State = Visibility.Hidden
-            };
         }
 
         public override Storage GetStorageForStableInstall()
@@ -88,11 +83,15 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            LoadComponentAsync(versionManager, Add);
+            LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue });
+
             ScreenChanged += s =>
             {
-                if (!versionManager.IsPresent && s is Intro)
+                if (s is Intro && s.ChildScreen == null)
+                {
+                    Add(versionManager);
                     versionManager.State = Visibility.Visible;
+                }
             };
         }
 
