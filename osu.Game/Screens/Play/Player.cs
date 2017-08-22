@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
-                        breakLetterboxOverlay = new BreakLetterboxOverlay { Fade_duration = fade_duration },
+                        breakLetterboxOverlay = new BreakLetterboxOverlay { FadeDuration = fade_duration },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,

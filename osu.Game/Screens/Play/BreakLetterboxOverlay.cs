@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play
     {
         private const int letterbox_height = 80;
 
-        public double Fade_duration;
+        public double FadeDuration;
 
         private Visibility state;
         public Visibility State
@@ -29,10 +29,10 @@ namespace osu.Game.Screens.Play
                 switch (state)
                 {
                     case Visibility.Visible:
-                        this.FadeIn(Fade_duration, Easing.OutExpo);
+                        this.FadeIn(FadeDuration, Easing.OutQuint);
                         break;
                     case Visibility.Hidden:
-                        this.FadeOut(Fade_duration, Easing.OutExpo);
+                        this.FadeOut(FadeDuration, Easing.OutQuint);
                         break;
                 }
             }
