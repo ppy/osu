@@ -69,19 +69,6 @@ namespace osu.Game.Screens
             sampleExit = audio.Sample.Get(@"UI/melodic-1");
         }
 
-        protected override void Update()
-        {
-            if (!IsCurrentScreen) return;
-
-            if (ParentScreen != null)
-            {
-                // we only want to apply these restrictions when we are inside a screen stack.
-                // the use case for not applying is in visual/unit tests.
-                Ruleset.Disabled = !AllowBeatmapRulesetChange;
-                Beatmap.Disabled = !AllowBeatmapRulesetChange;
-            }
-        }
-
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
