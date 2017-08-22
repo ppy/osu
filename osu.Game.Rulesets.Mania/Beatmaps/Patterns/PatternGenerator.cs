@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// <summary>
         /// The number of columns available to create the pattern.
         /// </summary>
-        public int AvailableColumns;
+        protected readonly int AvailableColumns;
 
         /// <summary>
         /// The last pattern.
@@ -31,11 +31,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// </summary>
         protected readonly Beatmap Beatmap;
 
-        protected PatternGenerator(HitObject hitObject, Beatmap beatmap, Pattern previousPattern)
+        protected PatternGenerator(HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
         {
-            PreviousPattern = previousPattern;
             HitObject = hitObject;
             Beatmap = beatmap;
+            AvailableColumns = availableColumns;
+            PreviousPattern = previousPattern;
         }
 
         /// <summary>

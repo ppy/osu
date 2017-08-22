@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateSpecific(HitObject original)
         {
-            var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, lastPattern) { AvailableColumns = availableColumns };
+            var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, availableColumns, lastPattern);
 
             Pattern newPattern = generator.Generate();
             lastPattern = newPattern;
@@ -119,22 +119,20 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             Patterns.PatternGenerator conversion = null;
 
             if (distanceData != null)
-                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, lastPattern);
+                conversion = new DistanceObjectPatternGenerator(random, original, beatmap, availableColumns, lastPattern);
             else if (endTimeData != null)
-                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap);
+                conversion = new EndTimeObjectPatternGenerator(random, original, beatmap, availableColumns);
             else if (positionData != null)
             {
                 computeDensity(original.StartTime);
 
-                conversion = new HitObjectPatternGenerator(random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair);
+                conversion = new HitObjectPatternGenerator(random, original, beatmap, availableColumns, lastPattern, lastTime, lastPosition, density, lastStair);
 
                 recordNote(original.StartTime, positionData.Position);
             }
 
             if (conversion == null)
                 return null;
-
-            conversion.AvailableColumns = availableColumns;
 
             Pattern newPattern = conversion.Generate();
             lastPattern = newPattern;
@@ -150,8 +148,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private class SpecificBeatmapPatternGenerator : Patterns.Legacy.PatternGenerator
         {
-            public SpecificBeatmapPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, Pattern previousPattern)
-                : base(random, hitObject, beatmap, previousPattern)
+            public SpecificBeatmapPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
+                : base(random, hitObject, beatmap, availableColumns, previousPattern)
             {
             }
 

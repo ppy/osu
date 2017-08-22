@@ -25,8 +25,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </summary>
         protected readonly FastRandom Random;
 
-        protected PatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, Pattern previousPattern)
-            : base(hitObject, beatmap, previousPattern)
+        protected PatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
+            : base(hitObject, beatmap, availableColumns, previousPattern)
         {
             Random = random;
 
