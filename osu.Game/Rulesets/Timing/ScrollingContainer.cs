@@ -74,8 +74,7 @@ namespace osu.Game.Rulesets.Timing
             // absolutely-sized element along the scrolling axes and adding a corresponding duration value. This introduces a bit of error, but will never under-estimate.ion.
 
             // Find the largest element that is absolutely-sized along ScrollingAxes
-            float maxAbsoluteSize = Children.Where(c => (c.RelativeSizeAxes & ScrollingAxes) == 0)
-                                            .Select(c => (ScrollingAxes & Axes.X) > 0 ? c.Width : c.Height)
+            float maxAbsoluteSize = Children.Select(c => (ScrollingAxes & Axes.X) > 0 ? c.DrawWidth : c.DrawHeight)
                                             .DefaultIfEmpty().Max();
 
             float ourAbsoluteSize = (ScrollingAxes & Axes.X) > 0 ? DrawWidth : DrawHeight;
