@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Add(new CapsWarning
             {
-                TextSize = 20,
+                Size = new Vector2(20),
             });
         }
 
@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private class CapsWarning : TextAwesome, IHasTooltip
+        private class CapsWarning : SpriteIcon, IHasTooltip
         {
             public string TooltipText => Console.CapsLock ? @"Caps lock is active" : string.Empty;
 
@@ -91,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
                 updateVisibility();
             }
 
-            private void updateVisibility() => FadeTo(Console.CapsLock ? 1 : 0, 250, EasingTypes.OutQuint);
+            private void updateVisibility() => this.FadeTo(Console.CapsLock ? 1 : 0, 250, Easing.OutQuint);
         }
     }
 }
