@@ -173,8 +173,6 @@ namespace osu.Game.Rulesets.UI
             // Post-process the beatmap
             processor.PostProcess(Beatmap);
 
-            ApplyBeatmap();
-
             // Add mods, should always be the last thing applied to give full control to mods
             applyMods(Mods);
         }
@@ -191,11 +189,6 @@ namespace osu.Game.Rulesets.UI
             foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
                 mod.ApplyToRulesetContainer(this);
         }
-
-        /// <summary>
-        /// Called when the beatmap of this hit renderer has been set. Used to apply any default values from the beatmap.
-        /// </summary>
-        protected virtual void ApplyBeatmap() { }
 
         /// <summary>
         /// Creates a processor to perform post-processing operations
