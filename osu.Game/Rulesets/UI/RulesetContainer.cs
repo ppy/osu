@@ -139,16 +139,25 @@ namespace osu.Game.Rulesets.UI
         protected IEnumerable<Mod> Mods;
 
         /// <summary>
+        /// The <see cref="WorkingBeatmap"/> this <see cref="RulesetContainer{TObject}"/> was created with.
+        /// </summary>
+        protected readonly WorkingBeatmap WorkingBeatmap;
+
+        /// <summary>
+        /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
         /// Creates a hit renderer for a beatmap.
         /// </summary>
         /// <param name="ruleset">The ruleset being repesented.</param>
-        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
         internal RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset) : base(ruleset)
+        internal RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap, bool isForCurrentRuleset)
+            : base(ruleset)
         {
-            Debug.Assert(beatmap != null, "RulesetContainer initialized with a null beatmap.");
+            Debug.Assert(workingBeatmap != null, "RulesetContainer initialized with a null beatmap.");
 
-            Mods = beatmap.Mods.Value;
+            WorkingBeatmap = workingBeatmap;
+            Mods = workingBeatmap.Mods.Value;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -156,11 +165,11 @@ namespace osu.Game.Rulesets.UI
             BeatmapProcessor<TObject> processor = CreateBeatmapProcessor();
 
             // Check if the beatmap can be converted
-            if (!converter.CanConvert(beatmap.Beatmap))
+            if (!converter.CanConvert(workingBeatmap.Beatmap))
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can not be converted for the current ruleset (converter: {converter}).");
 
             // Convert the beatmap
-            Beatmap = converter.Convert(beatmap.Beatmap, isForCurrentRuleset);
+            Beatmap = converter.Convert(workingBeatmap.Beatmap, isForCurrentRuleset);
 
             // Apply difficulty adjustments from mods before using Difficulty.
             foreach (var mod in Mods.OfType<IApplicableToDifficulty>())

@@ -33,9 +33,10 @@ namespace osu.Game.Rulesets.Mania.UI
     public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject, ManiaJudgement>
     {
         /// <summary>
-        /// Preferred column count. This will only have an effect during the initialization of the play field.
+        /// The number of columns which the <see cref="ManiaPlayfield"/> should display, and which
+        /// the beatmap converter will attempt to convert beatmaps to use.
         /// </summary>
-        public int PreferredColumns;
+        private int availableColumns;
 
         public IEnumerable<DrawableBarLine> BarLines;
 
@@ -76,14 +77,7 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected override void ApplyBeatmap()
-        {
-            base.ApplyBeatmap();
-
-            PreferredColumns = (int)Math.Max(1, Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize));
-        }
-
-        protected sealed override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(PreferredColumns)
+        protected sealed override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(availableColumns)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -95,7 +89,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo);
 
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter();
+        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter()
+        {
+            availableColumns = (int)Math.Max(1, Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize));
+            return new ManiaBeatmapConverter(IsForCurrentRuleset, availableColumns);
+        }
 
         protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
         {
