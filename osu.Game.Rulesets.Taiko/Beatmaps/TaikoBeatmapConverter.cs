@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
         /// </summary>
         private const float taiko_base_distance = 100;
 
-        private bool isForCurrentRuleset;
+        private readonly bool isForCurrentRuleset;
 
         protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(HitObject) };
 
