@@ -94,13 +94,15 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
+        private SQLiteConnection connection;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
+            connection = Host.Storage.GetDatabase(@"client");
 
             connection.CreateTable<StoreVersion>();
 
@@ -236,6 +238,8 @@ namespace osu.Game
                 LocalConfig.Set(OsuSetting.Token, LocalConfig.Get<bool>(OsuSetting.SavePassword) ? API.Token : string.Empty);
                 LocalConfig.Save();
             }
+
+            connection.Dispose();
 
             base.Dispose(isDisposing);
         }

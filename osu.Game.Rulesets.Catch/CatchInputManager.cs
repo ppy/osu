@@ -3,14 +3,14 @@
 
 using System.ComponentModel;
 using osu.Framework.Input.Bindings;
-using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch
 {
-    public class CatchInputManager : DatabasedKeyBindingInputManager<CatchAction>
+    public class CatchInputManager : RulesetInputManager<CatchAction>
     {
         public CatchInputManager(RulesetInfo ruleset)
-            : base(ruleset, simultaneousMode: SimultaneousBindingMode.Unique)
+            : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
         }
     }
