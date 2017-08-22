@@ -4,13 +4,12 @@
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
-using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableCentreHit : DrawableHit
     {
-        protected override Key[] HitKeys { get; } = { Key.F, Key.J };
+        protected override TaikoAction[] HitActions { get; } = { TaikoAction.LeftCentre, TaikoAction.RightCentre };
 
         public DrawableCentreHit(Hit hit)
             : base(hit)

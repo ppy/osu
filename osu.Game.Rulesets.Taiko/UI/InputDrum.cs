@@ -3,13 +3,12 @@
 
 using System;
 using OpenTK;
-using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -36,8 +35,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.X,
                     X = -middle_split / 2,
-                    RimKey = Key.D,
-                    CentreKey = Key.F
+                    RimAction = TaikoAction.LeftRim,
+                    CentreAction = TaikoAction.LeftCentre
                 },
                 new TaikoHalfDrum(true)
                 {
@@ -47,8 +46,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                     RelativePositionAxes = Axes.X,
                     X = middle_split / 2,
-                    RimKey = Key.K,
-                    CentreKey = Key.J
+                    RimAction = TaikoAction.RightRim,
+                    CentreAction = TaikoAction.RightCentre
                 }
             };
         }
@@ -56,17 +55,17 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// <summary>
         /// A half-drum. Contains one centre and one rim hit.
         /// </summary>
-        private class TaikoHalfDrum : Container
+        private class TaikoHalfDrum : Container, IKeyBindingHandler<TaikoAction>
         {
             /// <summary>
             /// The key to be used for the rim of the half-drum.
             /// </summary>
-            public Key RimKey;
+            public TaikoAction RimAction;
 
             /// <summary>
             /// The key to be used for the centre of the half-drum.
             /// </summary>
-            public Key CentreKey;
+            public TaikoAction CentreAction;
 
             private readonly Sprite rim;
             private readonly Sprite rimHit;
@@ -124,20 +123,17 @@ namespace osu.Game.Rulesets.Taiko.UI
                 centreHit.Colour = colours.Pink;
             }
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            public bool OnPressed(TaikoAction action)
             {
-                if (args.Repeat)
-                    return false;
-
                 Drawable target = null;
                 Drawable back = null;
 
-                if (args.Key == CentreKey)
+                if (action == CentreAction)
                 {
                     target = centreHit;
                     back = centre;
                 }
-                else if (args.Key == RimKey)
+                else if (action == RimAction)
                 {
                     target = rimHit;
                     back = rim;
@@ -166,6 +162,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                 return false;
             }
+
+            public bool OnReleased(TaikoAction action) => false;
         }
     }
 }
