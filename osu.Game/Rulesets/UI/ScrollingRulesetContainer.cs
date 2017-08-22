@@ -40,17 +40,6 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            DefaultControlPoints.ForEach(c => applySpeedAdjustment(c, Playfield));
-        }
-
-        private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield<TObject, TJudgement> playfield)
-        {
-            playfield.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint));
-            playfield.NestedPlayfields.ForEach(p => applySpeedAdjustment(controlPoint, p));
-        }
-
-        protected override void ApplyBeatmap()
-        {
             // Calculate default multiplier control points
             var lastTimingPoint = new TimingControlPoint();
             var lastDifficultyPoint = new DifficultyControlPoint();
@@ -95,6 +84,14 @@ namespace osu.Game.Rulesets.UI
             // If we have no control points, add a default one
             if (DefaultControlPoints.Count == 0)
                 DefaultControlPoints.Add(new MultiplierControlPoint());
+
+            DefaultControlPoints.ForEach(c => applySpeedAdjustment(c, Playfield));
+        }
+
+        private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield<TObject, TJudgement> playfield)
+        {
+            playfield.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint));
+            playfield.NestedPlayfields.ForEach(p => applySpeedAdjustment(controlPoint, p));
         }
 
         /// <summary>
