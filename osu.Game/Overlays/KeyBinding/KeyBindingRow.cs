@@ -172,6 +172,21 @@ namespace osu.Game.Overlays.KeyBinding
             return base.OnMouseUp(state, args);
         }
 
+        protected override bool OnWheel(InputState state)
+        {
+            if (HasFocus)
+            {
+                if (bindTarget.IsHovered)
+                {
+                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+                    finalise();
+                    return true;
+                }
+            }
+
+            return base.OnWheel(state);
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (!HasFocus)
