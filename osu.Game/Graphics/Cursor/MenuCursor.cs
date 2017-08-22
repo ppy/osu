@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Configuration;
 using System;
+using System.Diagnostics;
 using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics.Cursor
@@ -21,20 +22,31 @@ namespace osu.Game.Graphics.Cursor
 
         private bool dragging;
 
+        private bool startRotation;
+
         protected override bool OnMouseMove(InputState state)
         {
             if (dragging)
             {
-                Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown ?? state.Mouse.Delta;
-                float degrees = (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y)) + 24.3f;
+                Debug.Assert(state.Mouse.PositionMouseDown != null);
 
-                // Always rotate in the direction of least distance
-                float diff = (degrees - ActiveCursor.Rotation) % 360;
-                if (diff < -180) diff += 360;
-                if (diff > 180) diff -= 360;
-                degrees = ActiveCursor.Rotation + diff;
+                // don't start rotating until we're moved a minimum distance away from the mouse down location,
+                // else it can have an annoying effect.
+                startRotation |= Vector2.Distance(state.Mouse.Position, state.Mouse.PositionMouseDown.Value) > 30;
 
-                ActiveCursor.RotateTo(degrees, 600, Easing.OutQuint);
+                if (startRotation)
+                {
+                    Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
+                    float degrees = (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y)) + 24.3f;
+
+                    // Always rotate in the direction of least distance
+                    float diff = (degrees - ActiveCursor.Rotation) % 360;
+                    if (diff < -180) diff += 360;
+                    if (diff > 180) diff -= 360;
+                    degrees = ActiveCursor.Rotation + diff;
+
+                    ActiveCursor.RotateTo(degrees, 600, Easing.OutQuint);
+                }
             }
 
             return base.OnMouseMove(state);
@@ -61,6 +73,7 @@ namespace osu.Game.Graphics.Cursor
             if (!state.Mouse.HasMainButtonPressed)
             {
                 dragging = false;
+                startRotation = false;
 
                 ((Cursor)ActiveCursor).AdditiveLayer.FadeOut(500, Easing.OutQuint);
                 ActiveCursor.RotateTo(0, 600 * (1 + Math.Abs(ActiveCursor.Rotation / 720)), Easing.OutElasticHalf);
