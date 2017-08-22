@@ -45,7 +45,6 @@ namespace osu.Desktop.Overlays
             Origin = Anchor.BottomCentre;
 
             Alpha = 0;
-            State = Visibility.Hidden;
 
             Children = new Drawable[]
             {
@@ -103,11 +102,9 @@ namespace osu.Desktop.Overlays
         {
             base.LoadComplete();
 
-            State = Visibility.Visible;
-
             var version = game.Version;
             var lastVersion = config.Get<string>(OsuSetting.Version);
-            if (char.IsNumber(version[0]) && version != lastVersion)
+            if (game.IsDeployedBuild && version != lastVersion)
             {
                 config.Set(OsuSetting.Version, version);
 
