@@ -181,26 +181,25 @@ namespace osu.Game.Rulesets.UI
                 speedAdjustment.ScrollingAxes = scrollingAxes;
                 speedAdjustment.VisibleTimeRange.BindTo(VisibleTimeRange);
                 speedAdjustment.Reversed.BindTo(Reversed);
-                speedAdjustments.Add(speedAdjustment);
 
-                // We now need to re-sort the hit objects in the last speed adjustment prior to this one, to see if they need a new parent
-                var previousSpeedAdjustment = speedAdjustments.LastOrDefault(s => s != speedAdjustment && s.ControlPoint.StartTime <= speedAdjustment.ControlPoint.StartTime);
-                if (previousSpeedAdjustment == null)
-                    return;
-
-                for (int i = 0; i < previousSpeedAdjustment.Children.Count; i++)
+                if (speedAdjustments.Count > 0)
                 {
-                    DrawableHitObject hitObject = previousSpeedAdjustment[i];
+                    var existingAdjustment = adjustmentContainerAt(speedAdjustment.ControlPoint.StartTime);
+                    for (int i = 0; i < existingAdjustment.Count; i++)
+                    {
+                        DrawableHitObject hitObject = existingAdjustment[i];
 
-                    var newSpeedAdjustment = adjustmentContainerFor(hitObject);
-                    if (newSpeedAdjustment == previousSpeedAdjustment)
-                        continue;
+                        if (!speedAdjustment.CanContain(hitObject.HitObject.StartTime))
+                            continue;
 
-                    previousSpeedAdjustment.Remove(hitObject);
-                    newSpeedAdjustment.Add(hitObject);
+                        existingAdjustment.Remove(hitObject);
+                        speedAdjustment.Add(hitObject);
 
-                    i--;
+                        i--;
+                    }
                 }
+
+                speedAdjustments.Add(speedAdjustment);
             }
 
             /// <summary>
@@ -237,19 +236,10 @@ namespace osu.Game.Rulesets.UI
                 if (!(hitObject is IScrollingHitObject))
                     throw new InvalidOperationException($"Hit objects added to a {nameof(ScrollingHitObjectContainer)} must implement {nameof(IScrollingHitObject)}.");
 
-                adjustmentContainerFor(hitObject).Add(hitObject);
+                adjustmentContainerAt(hitObject.HitObject.StartTime).Add(hitObject);
             }
 
             public override bool Remove(DrawableHitObject hitObject) => speedAdjustments.Any(s => s.Remove(hitObject));
-
-            /// <summary>
-            /// Finds the <see cref="SpeedAdjustmentContainer"/> which provides the speed adjustment active at the start time
-            /// of a hit object. If there is no <see cref="SpeedAdjustmentContainer"/> active at the start time of the hit object,
-            /// then the first (time-wise) speed adjustment is returned.
-            /// </summary>
-            /// <param name="hitObject">The hit object to find the active <see cref="SpeedAdjustmentContainer"/> for.</param>
-            /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="hitObject"/>'s start time. Null if there are no speed adjustments.</returns>
-            private SpeedAdjustmentContainer adjustmentContainerFor(DrawableHitObject hitObject) => speedAdjustments.LastOrDefault(c => c.CanContain(hitObject)) ?? defaultSpeedAdjustment;
 
             /// <summary>
             /// Finds the <see cref="SpeedAdjustmentContainer"/> which provides the speed adjustment active at a time.

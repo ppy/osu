@@ -99,11 +99,6 @@ namespace osu.Game.Rulesets.Timing
         }
 
         /// <summary>
-        /// Whether a <see cref="DrawableHitObject"/> falls within this <see cref="SpeedAdjustmentContainer"/>s affecting timespan.
-        /// </summary>
-        public bool CanContain(DrawableHitObject hitObject) => CanContain(hitObject.HitObject.StartTime);
-
-        /// <summary>
         /// Whether a point in time falls within this <see cref="SpeedAdjustmentContainer"/>s affecting timespan.
         /// </summary>
         public bool CanContain(double startTime) => ControlPoint.StartTime <= startTime;
