@@ -154,6 +154,8 @@ namespace osu.Game.Rulesets.UI
             private readonly Container<SpeedAdjustmentContainer> speedAdjustments;
             public IReadOnlyList<SpeedAdjustmentContainer> SpeedAdjustments => speedAdjustments;
 
+            private readonly SpeedAdjustmentContainer defaultSpeedAdjustment;
+
             private readonly Axes scrollingAxes;
 
             /// <summary>
@@ -167,7 +169,7 @@ namespace osu.Game.Rulesets.UI
                 AddInternal(speedAdjustments = new Container<SpeedAdjustmentContainer> { RelativeSizeAxes = Axes.Both });
 
                 // Default speed adjustment
-                AddSpeedAdjustment(new SpeedAdjustmentContainer(new MultiplierControlPoint(0)));
+                AddSpeedAdjustment(defaultSpeedAdjustment = new SpeedAdjustmentContainer(new MultiplierControlPoint(0)));
             }
 
             /// <summary>
@@ -208,6 +210,9 @@ namespace osu.Game.Rulesets.UI
             /// <param name="speedAdjustment">The <see cref="SpeedAdjustmentContainer"/> to remove.</param>
             public void RemoveSpeedAdjustment(SpeedAdjustmentContainer speedAdjustment)
             {
+                if (speedAdjustment == defaultSpeedAdjustment)
+                    throw new InvalidOperationException($"The default {nameof(SpeedAdjustmentContainer)} must not be removed.");
+
                 if (!speedAdjustments.Remove(speedAdjustment))
                     return;
 
@@ -232,11 +237,7 @@ namespace osu.Game.Rulesets.UI
                 if (!(hitObject is IScrollingHitObject))
                     throw new InvalidOperationException($"Hit objects added to a {nameof(ScrollingHitObjectContainer)} must implement {nameof(IScrollingHitObject)}.");
 
-                var target = adjustmentContainerFor(hitObject);
-                if (target == null)
-                    throw new InvalidOperationException($"A {nameof(SpeedAdjustmentContainer)} to container {hitObject} could not be found.");
-
-                target.Add(hitObject);
+                adjustmentContainerFor(hitObject).Add(hitObject);
             }
 
             public override bool Remove(DrawableHitObject hitObject) => speedAdjustments.Any(s => s.Remove(hitObject));
@@ -248,7 +249,7 @@ namespace osu.Game.Rulesets.UI
             /// </summary>
             /// <param name="hitObject">The hit object to find the active <see cref="SpeedAdjustmentContainer"/> for.</param>
             /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="hitObject"/>'s start time. Null if there are no speed adjustments.</returns>
-            private SpeedAdjustmentContainer adjustmentContainerFor(DrawableHitObject hitObject) => speedAdjustments.LastOrDefault(c => c.CanContain(hitObject)) ?? speedAdjustments.FirstOrDefault();
+            private SpeedAdjustmentContainer adjustmentContainerFor(DrawableHitObject hitObject) => speedAdjustments.LastOrDefault(c => c.CanContain(hitObject)) ?? defaultSpeedAdjustment;
 
             /// <summary>
             /// Finds the <see cref="SpeedAdjustmentContainer"/> which provides the speed adjustment active at a time.
@@ -256,7 +257,7 @@ namespace osu.Game.Rulesets.UI
             /// </summary>
             /// <param name="time">The time to find the active <see cref="SpeedAdjustmentContainer"/> at.</param>
             /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="time"/>. Null if there are no speed adjustments.</returns>
-            private SpeedAdjustmentContainer adjustmentContainerAt(double time) => speedAdjustments.LastOrDefault(c => c.CanContain(time)) ?? speedAdjustments.FirstOrDefault();
+            private SpeedAdjustmentContainer adjustmentContainerAt(double time) => speedAdjustments.LastOrDefault(c => c.CanContain(time)) ?? defaultSpeedAdjustment;
         }
     }
 }
