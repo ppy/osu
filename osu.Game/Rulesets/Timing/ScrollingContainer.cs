@@ -96,6 +96,8 @@ namespace osu.Game.Rulesets.Timing
         {
             base.Update();
 
+            RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
+
             // We want our size and position-space along the scrolling axes to span our duration to completely enclose all the hit objects
             Size = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)Duration : Size.X, (ScrollingAxes & Axes.Y) > 0 ? (float)Duration : Size.Y);
             // And we need to make sure the hit object's position-space doesn't change due to our resizing
