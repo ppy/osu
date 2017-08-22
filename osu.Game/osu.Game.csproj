@@ -299,7 +299,7 @@
     <Compile Include="Screens\Play\ReplaySettings\PlaybackSettings.cs" />
     <Compile Include="Screens\Play\ReplaySettings\ReplayCheckbox.cs" />
     <Compile Include="Screens\Play\PauseContainer.cs" />
-    <Compile Include="Screens\Play\BreakPeriodsTrackOverlay.cs" />
+    <Compile Include="Screens\Play\BreakOverlay.cs" />
     <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
     <Compile Include="Screens\Play\SquareGraph.cs" />

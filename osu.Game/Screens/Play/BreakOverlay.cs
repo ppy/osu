@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
 {
-    public class BreakPeriodsTrackOverlay : Container
+    public class BreakOverlay : Container
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
         private const int arrows_appear_offset = 1000;
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
         public Action OnBreakIn;
         public Action OnBreakOut;
 
-        public BreakPeriodsTrackOverlay(double startTime, List<BreakPeriod> breaks)
+        public BreakOverlay(double startTime, List<BreakPeriod> breaks)
         {
             this.startTime = startTime;
             this.breaks = breaks;

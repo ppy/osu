@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Play
 
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
-        private BreakPeriodsTrackOverlay breakPeriodsTrackOverlay;
+        private BreakOverlay breakOverlay;
 
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
@@ -217,7 +217,7 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre
                         },
                         new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
-                        breakPeriodsTrackOverlay = new BreakPeriodsTrackOverlay(firstObjectTime, Beatmap.Value.Beatmap.Breaks)
+                        breakOverlay = new BreakOverlay(firstObjectTime, Beatmap.Value.Beatmap.Breaks)
                         {
                             AudioClock = decoupledClock,
                             OnBreakIn = () =>
@@ -275,7 +275,7 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.ModDisplay.Current.BindTo(working.Mods);
 
-            breakPeriodsTrackOverlay.BindHealth(scoreProcessor.Health);
+            breakOverlay.BindHealth(scoreProcessor.Health);
 
             //bind RulesetContainer to ScoreProcessor and ourselves (for a pass situation)
             RulesetContainer.OnAllJudged += onCompletion;
