@@ -45,18 +45,15 @@ namespace osu.Game.Rulesets.Timing
             RelativePositionAxes = Axes.Both;
         }
 
-        public override void InvalidateFromChild(Invalidation invalidation)
+        protected override int Compare(Drawable x, Drawable y)
         {
-            // We only want to re-compute our size when a child's size or position has changed
-            if ((invalidation & Invalidation.RequiredParentSizeToFit) == 0)
-            {
-                base.InvalidateFromChild(invalidation);
-                return;
-            }
+            var hX = (DrawableHitObject)x;
+            var hY = (DrawableHitObject)y;
 
-            durationBacking.Invalidate();
-
-            base.InvalidateFromChild(invalidation);
+            int result = hY.HitObject.StartTime.CompareTo(hX.HitObject.StartTime);
+            if (result != 0)
+                return result;
+            return base.Compare(y, x);
         }
 
         private double computeDuration()
