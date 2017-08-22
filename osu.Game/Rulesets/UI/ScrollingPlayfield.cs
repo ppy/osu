@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.UI
             /// </summary>
             public readonly BindableBool Reversed = new BindableBool();
 
-            private readonly Container<SpeedAdjustmentContainer> speedAdjustments;
+            private readonly SortedContainer speedAdjustments;
             public IReadOnlyList<SpeedAdjustmentContainer> SpeedAdjustments => speedAdjustments;
 
             private readonly SpeedAdjustmentContainer defaultSpeedAdjustment;
@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.UI
             {
                 this.scrollingAxes = scrollingAxes;
 
-                AddInternal(speedAdjustments = new Container<SpeedAdjustmentContainer> { RelativeSizeAxes = Axes.Both });
+                AddInternal(speedAdjustments = new SortedContainer { RelativeSizeAxes = Axes.Both });
 
                 // Default speed adjustment
                 AddSpeedAdjustment(defaultSpeedAdjustment = new SpeedAdjustmentContainer(new MultiplierControlPoint(0)));
@@ -257,7 +257,21 @@ namespace osu.Game.Rulesets.UI
             /// </summary>
             /// <param name="time">The time to find the active <see cref="SpeedAdjustmentContainer"/> at.</param>
             /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="time"/>. Null if there are no speed adjustments.</returns>
-            private SpeedAdjustmentContainer adjustmentContainerAt(double time) => speedAdjustments.LastOrDefault(c => c.CanContain(time)) ?? defaultSpeedAdjustment;
+            private SpeedAdjustmentContainer adjustmentContainerAt(double time) => speedAdjustments.First(c => c.CanContain(time)) ?? defaultSpeedAdjustment;
+
+            private class SortedContainer : Container<SpeedAdjustmentContainer>
+            {
+                protected override int Compare(Drawable x, Drawable y)
+                {
+                    var sX = (SpeedAdjustmentContainer)x;
+                    var sY = (SpeedAdjustmentContainer)y;
+
+                    int result = sY.ControlPoint.StartTime.CompareTo(sX.ControlPoint.StartTime);
+                    if (result != 0)
+                        return result;
+                    return base.Compare(x, y);
+                }
+            }
         }
     }
 }
