@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
-                        breakLetterboxOverlay = new BreakLetterboxOverlay(),
+                        breakLetterboxOverlay = new BreakLetterboxOverlay { Fade_duration = fade_duration },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -195,7 +195,7 @@ namespace osu.Game.Screens.Play
                                 hudOverlay.KeyCounter.IsCounting = false;
 
                                 if(Beatmap.Value.Beatmap.BeatmapInfo.LetterboxInBreaks)
-                                    breakLetterboxOverlay.FadeTo(1, fade_duration);
+                                    breakLetterboxOverlay.State = Visibility.Visible;
                             },
                             OnBreakOut = () =>
                             {
@@ -207,7 +207,7 @@ namespace osu.Game.Screens.Play
                                 hudOverlay.KeyCounter.IsCounting = true;
 
                                 if(Beatmap.Value.Beatmap.BeatmapInfo.LetterboxInBreaks)
-                                    breakLetterboxOverlay.FadeTo(0, fade_duration);
+                                    breakLetterboxOverlay.State = Visibility.Hidden;
                             }
                         },
                     }

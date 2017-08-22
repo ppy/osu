@@ -2,19 +2,44 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
 {
-    public class BreakLetterboxOverlay : Container
+    public class BreakLetterboxOverlay : Container, IStateful<Visibility>
     {
         private const int letterbox_height = 80;
 
+        public double Fade_duration;
+
+        private Visibility state;
+        public Visibility State
+        {
+            get
+            {
+                return state;
+            }
+            set
+            {
+                state = value;
+
+                switch (state)
+                {
+                    case Visibility.Visible:
+                        this.FadeIn(Fade_duration, Easing.OutExpo);
+                        break;
+                    case Visibility.Hidden:
+                        this.FadeOut(Fade_duration, Easing.OutExpo);
+                        break;
+                }
+            }
+        }
+
         public BreakLetterboxOverlay()
         {
-            Alpha = 0;
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
@@ -43,6 +68,12 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            State = Visibility.Hidden;
         }
     }
 }
