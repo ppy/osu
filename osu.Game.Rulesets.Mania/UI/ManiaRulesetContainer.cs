@@ -74,6 +74,8 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load()
         {
+            Playfield.Reversed.Value = true;
+
             BarLines.ForEach(Playfield.Add);
         }
 
@@ -81,8 +83,6 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            // Invert by default for now (should be moved to config/skin later)
-            Scale = new Vector2(1, -1)
         };
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
