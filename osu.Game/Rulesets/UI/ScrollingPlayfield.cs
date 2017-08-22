@@ -228,7 +228,7 @@ namespace osu.Game.Rulesets.UI
             /// </summary>
             /// <param name="hitObject">The hit object to find the active <see cref="SpeedAdjustmentContainer"/> for.</param>
             /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="hitObject"/>'s start time. Null if there are no speed adjustments.</returns>
-            private SpeedAdjustmentContainer adjustmentContainerFor(DrawableHitObject hitObject) => speedAdjustments.FirstOrDefault(c => c.CanContain(hitObject)) ?? speedAdjustments.LastOrDefault();
+            private SpeedAdjustmentContainer adjustmentContainerFor(DrawableHitObject hitObject) => speedAdjustments.LastOrDefault(c => c.CanContain(hitObject)) ?? speedAdjustments.FirstOrDefault();
 
             /// <summary>
             /// Finds the <see cref="SpeedAdjustmentContainer"/> which provides the speed adjustment active at a time.
@@ -236,7 +236,7 @@ namespace osu.Game.Rulesets.UI
             /// </summary>
             /// <param name="time">The time to find the active <see cref="SpeedAdjustmentContainer"/> at.</param>
             /// <returns>The <see cref="SpeedAdjustmentContainer"/> active at <paramref name="time"/>. Null if there are no speed adjustments.</returns>
-            private SpeedAdjustmentContainer adjustmentContainerAt(double time) => speedAdjustments.FirstOrDefault(c => c.CanContain(time)) ?? speedAdjustments.LastOrDefault();
+            private SpeedAdjustmentContainer adjustmentContainerAt(double time) => speedAdjustments.LastOrDefault(c => c.CanContain(time)) ?? speedAdjustments.FirstOrDefault();
         }
     }
 }
