@@ -71,8 +71,8 @@ namespace osu.Game.Screens.Play
 
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGame osu, APIAccess api)
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuConfigManager config, APIAccess api)
         {
             this.api = api;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
                 if (beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                ruleset = osu?.Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
+                ruleset = Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
                 var rulesetInstance = ruleset.CreateInstance();
 
                 try
