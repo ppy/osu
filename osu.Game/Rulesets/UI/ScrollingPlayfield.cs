@@ -181,7 +181,7 @@ namespace osu.Game.Rulesets.UI
                 speedAdjustments.Add(speedAdjustment);
 
                 // We now need to re-sort the hit objects in the last speed adjustment prior to this one, to see if they need a new parent
-                var previousSpeedAdjustment = speedAdjustments.LastOrDefault(s => s.ControlPoint.StartTime < speedAdjustment.ControlPoint.StartTime);
+                var previousSpeedAdjustment = speedAdjustments.LastOrDefault(s => s.ControlPoint.StartTime <= speedAdjustment.ControlPoint.StartTime);
                 if (previousSpeedAdjustment == null)
                     return;
 
