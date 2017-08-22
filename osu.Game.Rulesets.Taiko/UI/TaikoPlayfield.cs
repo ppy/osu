@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgement>
+    public class TaikoPlayfield : ScrollingPlayfield<TaikoHitObject, TaikoJudgement>
     {
         /// <summary>
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoRulesetContainer"/>.
@@ -35,15 +35,17 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         private const float left_area_size = 240;
 
-        protected override Container<Drawable> Content => hitObjectContainer;
 
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
-        private readonly Container<DrawableBarLine> barLineContainer;
         private readonly Container<DrawableTaikoJudgement> judgementContainer;
 
-        private readonly Container hitObjectContainer;
+        protected override Container<Drawable> Content => content;
+        private readonly Container content;
+
         private readonly Container topLevelHitContainer;
+
+        private readonly Container barlineContainer;
 
         private readonly Container overlayBackgroundContainer;
         private readonly Container backgroundContainer;
@@ -52,6 +54,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         public TaikoPlayfield()
+            : base(Axes.X)
         {
             AddRangeInternal(new Drawable[]
             {
@@ -84,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     {
                         new Container
                         {
-                            Name = "Masked elements",
+                            Name = "Masked elements before hit objects",
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
                             Masking = true,
@@ -96,22 +99,26 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     FillMode = FillMode.Fit,
                                     BlendingMode = BlendingMode.Additive,
                                 },
-                                barLineContainer = new Container<DrawableBarLine>
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
                                 new HitTarget
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit
-                                },
-                                hitObjectContainer = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
+                                }
                             }
+                        },
+                        barlineContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = HIT_TARGET_OFFSET }
+                        },
+                        content = new Container
+                        {
+                            Name = "Hit objects",
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                            Masking = true
                         },
                         kiaiExplosionContainer = new Container<KiaiHitExplosion>
                         {
@@ -181,6 +188,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                 }
             });
+
+            VisibleTimeRange.Value = 6000;
         }
 
         [BackgroundDependencyLoader]
@@ -199,15 +208,14 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             base.Add(h);
 
+            var barline = h as DrawableBarLine;
+            if (barline != null)
+                barlineContainer.Add(barline.CreateProxy());
+
             // Swells should be moved at the very top of the playfield when they reach the hit target
             var swell = h as DrawableSwell;
             if (swell != null)
                 swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
-        }
-
-        public void AddBarLine(DrawableBarLine barLine)
-        {
-            barLineContainer.Add(barLine);
         }
 
         public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> judgedObject)
@@ -230,7 +238,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             if (!secondHit)
             {
-                if (judgedObject.X >= -0.05f && !(judgedObject is DrawableSwell))
+                if (judgedObject.X >= -0.05f && judgedObject is DrawableHit)
                 {
                     // If we're far enough away from the left stage, we should bring outselves in front of it
                     topLevelHitContainer.Add(judgedObject.CreateProxy());

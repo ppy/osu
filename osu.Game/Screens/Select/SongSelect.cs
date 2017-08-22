@@ -156,11 +156,11 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours, UserInputManager input)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
         {
             if (Footer != null)
             {
-                Footer.AddButton(@"random", colours.Green, () => triggerRandom(input), Key.F2);
+                Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
 
                 BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
@@ -253,8 +253,6 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                Ruleset.Value = beatmap.Ruleset;
-
                 if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
                     sampleChangeDifficulty.Play();
                 else
@@ -267,9 +265,9 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void triggerRandom(UserInputManager input)
+        private void triggerRandom()
         {
-            if (input.CurrentState.Keyboard.ShiftPressed)
+            if (GetContainingInputManager().CurrentState.Keyboard.ShiftPressed)
                 carousel.SelectPreviousRandom();
             else
                 carousel.SelectNextRandom();
@@ -372,6 +370,9 @@ namespace osu.Game.Screens.Select
 
             if (!track.IsRunning)
             {
+                // Ensure the track is added to the TrackManager, since it is removed after the player finishes the map.
+                // Using AddItemToList rather than AddItem so that it doesn't attempt to register adjustment dependencies more than once.
+                Game.Audio.Track.AddItemToList(track);
                 if (preview) track.Seek(Beatmap.Value.Metadata.PreviewTime);
                 track.Start();
             }

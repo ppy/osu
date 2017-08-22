@@ -1,10 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
@@ -96,11 +98,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return base.OnMouseMove(state);
         }
 
+        // If the current time is between the start and end of the slider, we should track mouse input regardless of the cursor position.
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => canCurrentlyTrack || base.ReceiveMouseInputAt(screenSpacePos);
+
         private bool tracking;
         public bool Tracking
         {
             get { return tracking; }
-            set
+            private set
             {
                 if (value == tracking) return;
 
@@ -117,8 +122,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
+            // Make sure to use the base version of ReceiveMouseInputAt so that we correctly check the position.
             if (Time.Current < slider.EndTime)
-                Tracking = canCurrentlyTrack && lastState != null && ReceiveMouseInputAt(lastState.Mouse.NativeState.Position) && lastState.Mouse.HasMainButtonPressed;
+                Tracking = canCurrentlyTrack && lastState != null && base.ReceiveMouseInputAt(lastState.Mouse.NativeState.Position) && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
         }
 
         public void UpdateProgress(double progress, int repeat)

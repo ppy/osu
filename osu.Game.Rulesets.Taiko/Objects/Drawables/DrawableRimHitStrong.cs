@@ -4,13 +4,12 @@
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
-using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableRimHitStrong : DrawableHitStrong
     {
-        protected override Key[] HitKeys { get; } = { Key.D, Key.K };
+        protected override TaikoAction[] HitActions { get; } = { TaikoAction.LeftRim, TaikoAction.RightRim };
 
         public DrawableRimHitStrong(Hit hit)
             : base(hit)

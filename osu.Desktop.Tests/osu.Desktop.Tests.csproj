@@ -81,6 +81,7 @@
     <Compile Include="Visual\TestCaseGamefield.cs" />
     <Compile Include="Visual\TestCaseGraph.cs" />
     <Compile Include="Visual\TestCaseHitObjects.cs" />
+    <Compile Include="Visual\TestCaseKeyConfiguration.cs" />
     <Compile Include="Visual\TestCaseKeyCounter.cs" />
     <Compile Include="Visual\TestCaseLeaderboard.cs" />
     <Compile Include="Visual\TestCaseManiaHitObjects.cs" />

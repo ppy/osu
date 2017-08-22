@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
-using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -16,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        protected abstract Key[] HitKeys { get; }
+        protected abstract TaikoAction[] HitActions { get; }
 
         /// <summary>
         /// Whether the last key pressed is a valid hit key.
@@ -27,6 +26,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hit)
         {
             FillMode = FillMode.Fit;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // We need to set this here because RelativeSizeAxes won't/can't set our size by default with a different RelativeChildSize
+            Width *= Parent.RelativeChildSize.X;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -54,12 +61,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 Judgement.Result = HitResult.Miss;
         }
 
-        protected override bool HandleKeyPress(Key key)
+        public override bool OnPressed(TaikoAction action)
         {
             if (Judgement.Result != HitResult.None)
                 return false;
 
-            validKeyPressed = HitKeys.Contains(key);
+            validKeyPressed = HitActions.Contains(action);
 
             return UpdateJudgement(true);
         }

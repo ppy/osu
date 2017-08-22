@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
+        public override bool RemoveWhenNotAlive => false;
+
         protected DrawableScrollingHitObject(TObject hitObject)
             : base(hitObject)
         {

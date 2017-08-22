@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Select
         {
             searchTextBox.HoldFocus = false;
             if (searchTextBox.HasFocus)
-                inputManager.ChangeFocus(searchTextBox);
+                GetContainingInputManager().ChangeFocus(searchTextBox);
         }
 
         public void Activate()
@@ -163,13 +163,9 @@ namespace osu.Game.Screens.Select
 
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        private InputManager inputManager;
-
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, UserInputManager inputManager)
+        private void load(OsuColour colours, OsuGame osu)
         {
-            this.inputManager = inputManager;
-
             sortTabs.AccentColour = colours.GreenLight;
 
             if (osu != null)

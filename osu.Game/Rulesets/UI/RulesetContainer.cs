@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The key conversion input manager for this RulesetContainer.
         /// </summary>
-        protected readonly PassThroughInputManager KeyConversionInputManager;
+        public readonly PassThroughInputManager KeyBindingInputManager;
 
         /// <summary>
         /// Whether we are currently providing the local user a gameplay cursor.
@@ -76,8 +76,8 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
-            KeyConversionInputManager = CreateActionMappingInputManager();
-            KeyConversionInputManager.RelativeSizeAxes = Axes.Both;
+            KeyBindingInputManager = CreateInputManager();
+            KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
         }
 
         /// <summary>
@@ -92,10 +92,10 @@ namespace osu.Game.Rulesets.UI
         public abstract ScoreProcessor CreateScoreProcessor();
 
         /// <summary>
-        /// Creates a key conversion input manager.
+        /// Creates a key conversion input manager. An exception will be thrown if a valid <see cref="RulesetInputManager{T}"/> is not returned.
         /// </summary>
         /// <returns>The input manager.</returns>
-        protected virtual PassThroughInputManager CreateActionMappingInputManager() => new PassThroughInputManager();
+        public abstract PassThroughInputManager CreateInputManager();
 
         protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
 
@@ -253,7 +253,7 @@ namespace osu.Game.Rulesets.UI
             InputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new[] { KeyConversionInputManager }
+                Children = new[] { KeyBindingInputManager }
             });
 
             AddInternal(InputManager);
@@ -262,7 +262,7 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            KeyConversionInputManager.Add(Playfield = CreatePlayfield());
+            KeyBindingInputManager.Add(Playfield = CreatePlayfield());
 
             loadObjects();
 
