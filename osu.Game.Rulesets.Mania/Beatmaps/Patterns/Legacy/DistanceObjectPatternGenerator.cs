@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private PatternType convertType;
 
-        public DistanceObjectPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, Pattern previousPattern)
-            : base(random, hitObject, beatmap, previousPattern)
+        public DistanceObjectPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
+            : base(random, hitObject, beatmap, availableColumns, previousPattern)
         {
             convertType = PatternType.None;
             if (Beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime).KiaiMode)
