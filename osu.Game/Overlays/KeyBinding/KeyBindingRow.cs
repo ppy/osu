@@ -136,40 +136,49 @@ namespace osu.Game.Overlays.KeyBinding
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (HasFocus)
-            {
-                if (bindTarget.IsHovered)
-                {
-                    if (!AllowMainMouseButtons)
-                    {
-                        switch (args.Button)
-                        {
-                            case MouseButton.Left:
-                            case MouseButton.Right:
-                                return true;
-                        }
-                    }
+            if (!HasFocus || !bindTarget.IsHovered)
+                return base.OnMouseDown(state, args);
 
-                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
-                    return true;
+            if (!AllowMainMouseButtons)
+            {
+                switch (args.Button)
+                {
+                    case MouseButton.Left:
+                    case MouseButton.Right:
+                        return true;
                 }
             }
 
-            return base.OnMouseDown(state, args);
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+            return true;
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            if (HasFocus && !state.Mouse.Buttons.Any())
+            // don't do anything until the last button is released.
+            if (!HasFocus || state.Mouse.Buttons.Any())
+                return base.OnMouseUp(state, args);
+
+            if (bindTarget.IsHovered)
+                finalise();
+            else
+                updateBindTarget();
+            return true;
+        }
+
+        protected override bool OnWheel(InputState state)
+        {
+            if (HasFocus)
             {
                 if (bindTarget.IsHovered)
+                {
+                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
                     finalise();
-                else
-                    updateBindTarget();
-                return true;
+                    return true;
+                }
             }
 
-            return base.OnMouseUp(state, args);
+            return base.OnWheel(state);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -196,13 +205,10 @@ namespace osu.Game.Overlays.KeyBinding
 
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
-            if (HasFocus)
-            {
-                finalise();
-                return true;
-            }
+            if (!HasFocus) return base.OnKeyUp(state, args);
 
-            return base.OnKeyUp(state, args);
+            finalise();
+            return true;
         }
 
         private void finalise()

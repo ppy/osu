@@ -8,7 +8,6 @@ using osu.Game.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
-using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
@@ -160,7 +159,7 @@ namespace osu.Game
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ActionRequested = delegate(InputState state) { volume.Adjust(state); }
+                    ActionRequested = action => volume.Adjust(action)
                 },
                 mainContent = new Container
                 {
