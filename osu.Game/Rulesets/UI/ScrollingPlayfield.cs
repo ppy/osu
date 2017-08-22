@@ -259,7 +259,7 @@ namespace osu.Game.Rulesets.UI
                     int result = sY.ControlPoint.StartTime.CompareTo(sX.ControlPoint.StartTime);
                     if (result != 0)
                         return result;
-                    return base.Compare(x, y);
+                    return base.Compare(y, x);
                 }
             }
         }
