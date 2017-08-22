@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.Centre
                         },
                         new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
-                        breakOverlay = new BreakOverlay(firstObjectTime, Beatmap.Value.Beatmap.Breaks)
+                        breakOverlay = new BreakOverlay(firstObjectTime, Beatmap.Value.Beatmap.Breaks, ruleset.CreateInstance().AllowWarningArrows)
                         {
                             AudioClock = decoupledClock,
                             OnBreakIn = () =>

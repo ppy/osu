@@ -35,9 +35,10 @@ namespace osu.Game.Screens.Play
         private bool arrowsHasBeenShown;
         private bool startArrowsHasBeenShown;
         private double health;
-        private readonly double startTime;
 
         private readonly List<BreakPeriod> breaks;
+        private readonly bool arrowsHasBeenAllowed;
+        private readonly double startTime;
 
         private SampleChannel samplePass;
         private SampleChannel sampleFail;
@@ -51,10 +52,11 @@ namespace osu.Game.Screens.Play
         public Action OnBreakIn;
         public Action OnBreakOut;
 
-        public BreakOverlay(double startTime, List<BreakPeriod> breaks)
+        public BreakOverlay(double startTime, List<BreakPeriod> breaks, bool arrowsHasBeenAllowed)
         {
             this.startTime = startTime;
             this.breaks = breaks;
+            this.arrowsHasBeenAllowed = arrowsHasBeenAllowed;
 
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
@@ -142,7 +144,7 @@ namespace osu.Game.Screens.Play
                 // Show warning arrows
                 if (currentBreak.EndTime - currentTime < arrows_appear_offset && !arrowsHasBeenShown)
                 {
-                    if (currentBreak.HasEffect)
+                    if (currentBreak.HasEffect && arrowsHasBeenAllowed)
                         arrows.PlayWarning();
 
                     arrowsHasBeenShown = true;

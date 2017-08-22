@@ -101,6 +101,8 @@ namespace osu.Game.Rulesets.Taiko
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_taiko_o };
 
+        public override bool AllowWarningArrows => false;
+
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new TaikoDifficultyCalculator(beatmap);
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
