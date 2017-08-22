@@ -91,7 +91,21 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter()
         {
-            availableColumns = (int)Math.Max(1, Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize));
+            if (IsForCurrentRuleset)
+                availableColumns = (int)Math.Max(1, Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize));
+            else
+            {
+                float percentSliderOrSpinner = WorkingBeatmap.Beatmap.HitObjects.Count(h => h is IHasEndTime) / WorkingBeatmap.Beatmap.HitObjects.Count;
+                if (percentSliderOrSpinner < 0.2)
+                    availableColumns = 7;
+                else if (percentSliderOrSpinner < 0.3 || Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize) >= 5)
+                    availableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) > 5 ? 7 : 6;
+                else if (percentSliderOrSpinner > 0.6)
+                    availableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) > 4 ? 5 : 4;
+                else
+                    availableColumns = Math.Max(4, Math.Min((int)Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) + 1, 7));
+            }
+
             return new ManiaBeatmapConverter(IsForCurrentRuleset, availableColumns);
         }
 
