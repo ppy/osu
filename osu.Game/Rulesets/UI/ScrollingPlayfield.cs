@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The container that contains the <see cref="SpeedAdjustmentContainer"/>s and <see cref="DrawableHitObject"/>s.
         /// </summary>
-        internal new readonly ScrollingHitObjectContainer HitObjects;
+        public new readonly ScrollingHitObjectContainer HitObjects;
 
         /// <summary>
         /// Creates a new <see cref="ScrollingPlayfield{TObject, TJudgement}"/>.
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// A container that provides the foundation for sorting <see cref="DrawableHitObject"/>s into <see cref="SpeedAdjustmentContainer"/>s.
         /// </summary>
-        internal class ScrollingHitObjectContainer : HitObjectContainer
+        public class ScrollingHitObjectContainer : HitObjectContainer
         {
             /// <summary>
             /// Gets or sets the range of time that is visible by the length of the scrolling axes.
@@ -152,6 +152,7 @@ namespace osu.Game.Rulesets.UI
             public readonly BindableBool Reversed = new BindableBool();
 
             private readonly Container<SpeedAdjustmentContainer> speedAdjustments;
+            public IReadOnlyList<SpeedAdjustmentContainer> SpeedAdjustments => speedAdjustments;
 
             private readonly Axes scrollingAxes;
 
