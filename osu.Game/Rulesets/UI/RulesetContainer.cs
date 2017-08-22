@@ -144,19 +144,24 @@ namespace osu.Game.Rulesets.UI
         protected readonly WorkingBeatmap WorkingBeatmap;
 
         /// <summary>
+        /// Whether the specified beatmap is assumed to be specific to the current ruleset.
+        /// </summary>
+        protected readonly bool IsForCurrentRuleset;
+
+        /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
         /// Creates a hit renderer for a beatmap.
         /// </summary>
         /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        internal RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset) : base(ruleset)
         internal RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap, bool isForCurrentRuleset)
             : base(ruleset)
         {
             Debug.Assert(workingBeatmap != null, "RulesetContainer initialized with a null beatmap.");
 
             WorkingBeatmap = workingBeatmap;
+            IsForCurrentRuleset = isForCurrentRuleset;
             Mods = workingBeatmap.Mods.Value;
 
             RelativeSizeAxes = Axes.Both;
