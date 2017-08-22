@@ -200,6 +200,25 @@ namespace osu.Game.Rulesets.UI
                 }
             }
 
+            /// <summary>
+            /// Removes a <see cref="SpeedAdjustmentContainer"/> from this container, re-sorting all hit objects
+            /// which it contained into new <see cref="SpeedAdjustmentContainer"/>s.
+            /// </summary>
+            /// <param name="speedAdjustment">The <see cref="SpeedAdjustmentContainer"/> to remove.</param>
+            public void RemoveSpeedAdjustment(SpeedAdjustmentContainer speedAdjustment)
+            {
+                if (!speedAdjustments.Remove(speedAdjustment))
+                    return;
+
+                while (speedAdjustment.Count > 0)
+                {
+                    DrawableHitObject hitObject = speedAdjustment[0];
+
+                    speedAdjustment.Remove(hitObject);
+                    Add(hitObject);
+                }
+            }
+
             public override IEnumerable<DrawableHitObject> Objects => speedAdjustments.SelectMany(s => s.Children);
 
             /// <summary>
