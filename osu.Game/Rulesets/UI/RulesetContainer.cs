@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.UI
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can not be converted for the current ruleset (converter: {converter}).");
 
             // Convert the beatmap
-            Beatmap = converter.Convert(workingBeatmap.Beatmap, isForCurrentRuleset);
+            Beatmap = converter.Convert(workingBeatmap.Beatmap);
 
             // Apply difficulty adjustments from mods before using Difficulty.
             foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
