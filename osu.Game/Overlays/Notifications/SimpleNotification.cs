@@ -4,17 +4,16 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using OpenTK;
 
 namespace osu.Game.Overlays.Notifications
 {
     public class SimpleNotification : Notification
     {
-        private string text;
+        private string text = string.Empty;
         public string Text
         {
             get { return text; }
@@ -36,7 +35,7 @@ namespace osu.Game.Overlays.Notifications
             }
         }
 
-        private readonly SpriteText textDrawable;
+        private readonly TextFlowContainer textDrawable;
         private readonly SpriteIcon iconDrawable;
 
         protected Box IconBackgound;
@@ -59,9 +58,8 @@ namespace osu.Game.Overlays.Notifications
                 }
             });
 
-            Content.Add(textDrawable = new OsuSpriteText
+            Content.Add(textDrawable = new TextFlowContainer(t => t.TextSize = 16)
             {
-                TextSize = 16,
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
