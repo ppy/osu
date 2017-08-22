@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Timing
         /// </summary>
         internal MultiplierControlPoint ControlPoint;
 
-        private Cached<double> durationBacking = new Cached<double>();
+        private Cached<double> durationBacking;
 
         /// <summary>
         /// Creates a new <see cref="ScrollingContainer"/>.
