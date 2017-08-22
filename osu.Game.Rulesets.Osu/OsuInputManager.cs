@@ -2,36 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.ComponentModel;
-using System.Linq;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
-using osu.Game.Input.Bindings;
-using OpenTK.Input;
-using KeyboardState = osu.Framework.Input.KeyboardState;
-using MouseState = osu.Framework.Input.MouseState;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuInputManager : DatabasedKeyBindingInputManager<OsuAction>
+    public class OsuInputManager : RulesetInputManager<OsuAction>
     {
-        public OsuInputManager(RulesetInfo ruleset) : base(ruleset, simultaneousMode: SimultaneousBindingMode.Unique)
+        public OsuInputManager(RulesetInfo ruleset) : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
-
-        }
-        protected override void TransformState(InputState state)
-        {
-            base.TransformState(state);
-
-            var mouse = state.Mouse as MouseState;
-            var keyboard = state.Keyboard as KeyboardState;
-
-            if (mouse != null && keyboard != null)
-            {
-                if (mouse.IsPressed(MouseButton.Left))
-                    keyboard.Keys = keyboard.Keys.Concat(new[] { Key.LastKey + 1 });
-                if (mouse.IsPressed(MouseButton.Right))
-                    keyboard.Keys = keyboard.Keys.Concat(new[] { Key.LastKey + 2 });
-            }
         }
     }
 

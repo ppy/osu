@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -35,9 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
 
-        private readonly Key[] rimKeys = { Key.D, Key.K };
-        private readonly Key[] centreKeys = { Key.F, Key.J };
-        private Key[] lastKeySet;
+        private readonly TaikoAction[] rimActions = { TaikoAction.LeftRim, TaikoAction.RightRim };
+        private readonly TaikoAction[] centreActions = { TaikoAction.LeftCentre, TaikoAction.RightCentre };
+        private TaikoAction[] lastAction;
 
         /// <summary>
         /// The amount of times the user has hit this swell.
@@ -118,7 +117,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             });
 
             MainPiece.Add(symbol = new SwellSymbolPiece());
-
         }
 
         [BackgroundDependencyLoader]
@@ -127,6 +125,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.AccentColour = colours.YellowDark;
             expandingRing.Colour = colours.YellowLight;
             targetRing.BorderColour = colours.YellowDark.Opacity(0.25f);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // We need to set this here because RelativeSizeAxes won't/can't set our size by default with a different RelativeChildSize
+            Width *= Parent.RelativeChildSize.X;
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -189,21 +195,22 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Expire();
         }
 
-        protected override void UpdateScrollPosition(double time)
+        protected override void Update()
         {
-            // Make the swell stop at the hit target
-            double t = Math.Min(HitObject.StartTime, time);
+            base.Update();
 
+            // Make the swell stop at the hit target
+            X = (float)Math.Max(Time.Current, HitObject.StartTime);
+
+            double t = Math.Min(HitObject.StartTime, Time.Current);
             if (t == HitObject.StartTime && !hasStarted)
             {
                 OnStart?.Invoke();
                 hasStarted = true;
             }
-
-            base.UpdateScrollPosition(t);
         }
 
-        protected override bool HandleKeyPress(Key key)
+        public override bool OnPressed(TaikoAction action)
         {
             if (Judgement.Result != HitResult.None)
                 return false;
@@ -213,12 +220,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return false;
 
             // Find the keyset which this key corresponds to
-            var keySet = rimKeys.Contains(key) ? rimKeys : centreKeys;
+            var keySet = rimActions.Contains(action) ? rimActions : centreActions;
 
             // Ensure alternating keysets
-            if (keySet == lastKeySet)
+            if (keySet == lastAction)
                 return false;
-            lastKeySet = keySet;
+            lastAction = keySet;
 
             UpdateJudgement(true);
 
