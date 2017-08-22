@@ -28,12 +28,18 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private Pattern lastPattern = new Pattern();
         private FastRandom random;
         private Beatmap beatmap;
-        private bool isForCurrentRuleset;
 
-        protected override Beatmap<ManiaHitObject> ConvertBeatmap(Beatmap original, bool isForCurrentRuleset)
+        private readonly int availableColumns;
+        private readonly bool isForCurrentRuleset;
+
+        public ManiaBeatmapConverter(bool isForCurrentRuleset, int availableColumns)
         {
             this.isForCurrentRuleset = isForCurrentRuleset;
+            this.availableColumns = availableColumns;
+        }
 
+        protected override Beatmap<ManiaHitObject> ConvertBeatmap(Beatmap original)
+        {
             beatmap = original;
 
             BeatmapDifficulty difficulty = original.BeatmapInfo.Difficulty;
@@ -89,7 +95,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateSpecific(HitObject original)
         {
-            var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, lastPattern);
+            var generator = new SpecificBeatmapPatternGenerator(random, original, beatmap, lastPattern) { AvailableColumns = availableColumns };
 
             Pattern newPattern = generator.Generate();
             lastPattern = newPattern;
@@ -127,6 +133,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             if (conversion == null)
                 return null;
+
+            conversion.AvailableColumns = availableColumns;
 
             Pattern newPattern = conversion.Generate();
             lastPattern = newPattern;
