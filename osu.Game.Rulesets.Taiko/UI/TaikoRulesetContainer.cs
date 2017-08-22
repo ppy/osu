@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
-        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
+        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter(IsForCurrentRuleset);
 
         public override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 

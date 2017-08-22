@@ -31,7 +31,11 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// The axes which the content of this container will scroll through.
         /// </summary>
-        public Axes ScrollingAxes { get; internal set; }
+        public Axes ScrollingAxes
+        {
+            get { return scrollingContainer.ScrollingAxes; }
+            set { scrollingContainer.ScrollingAxes = value; }
+        }
 
         public override bool RemoveWhenNotAlive => false;
 
@@ -52,11 +56,8 @@ namespace osu.Game.Rulesets.Timing
             RelativeSizeAxes = Axes.Both;
 
             scrollingContainer = CreateScrollingContainer();
-
-            scrollingContainer.ScrollingAxes = ScrollingAxes;
             scrollingContainer.ControlPoint = ControlPoint;
             scrollingContainer.VisibleTimeRange.BindTo(VisibleTimeRange);
-            scrollingContainer.RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
 
             AddInternal(content = scrollingContainer);
         }
@@ -99,11 +100,6 @@ namespace osu.Game.Rulesets.Timing
         }
 
         /// <summary>
-        /// Whether a <see cref="DrawableHitObject"/> falls within this <see cref="SpeedAdjustmentContainer"/>s affecting timespan.
-        /// </summary>
-        public bool CanContain(DrawableHitObject hitObject) => CanContain(hitObject.HitObject.StartTime);
-
-        /// <summary>
         /// Whether a point in time falls within this <see cref="SpeedAdjustmentContainer"/>s affecting timespan.
         /// </summary>
         public bool CanContain(double startTime) => ControlPoint.StartTime <= startTime;
@@ -112,6 +108,6 @@ namespace osu.Game.Rulesets.Timing
         /// Creates the <see cref="ScrollingContainer"/> which contains the scrolling <see cref="DrawableHitObject"/>s of this container.
         /// </summary>
         /// <returns>The <see cref="ScrollingContainer"/>.</returns>
-        protected virtual ScrollingContainer CreateScrollingContainer() => new LinearScrollingContainer(ScrollingAxes, ControlPoint);
+        protected virtual ScrollingContainer CreateScrollingContainer() => new LinearScrollingContainer(ControlPoint);
     }
 }
