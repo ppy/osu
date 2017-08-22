@@ -24,6 +24,8 @@ namespace osu.Game.Overlays.Notifications
 
         private FlowContainer<Notification> notifications;
 
+        public int DisplayedCount => notifications.Count;
+
         public void Add(Notification notification)
         {
             notifications.Add(notification);

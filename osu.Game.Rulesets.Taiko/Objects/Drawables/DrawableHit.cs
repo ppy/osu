@@ -28,14 +28,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // We need to set this here because RelativeSizeAxes won't/can't set our size by default with a different RelativeChildSize
-            Width *= Parent.RelativeChildSize.X;
-        }
-
         protected override void CheckJudgement(bool userTriggered)
         {
             if (!userTriggered)
@@ -69,6 +61,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             validKeyPressed = HitActions.Contains(action);
 
             return UpdateJudgement(true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Size = BaseSize * Parent.RelativeChildSize;
         }
 
         protected override void UpdateState(ArmedState state)

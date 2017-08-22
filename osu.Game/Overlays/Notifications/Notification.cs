@@ -19,9 +19,9 @@ namespace osu.Game.Overlays.Notifications
     public abstract class Notification : Container
     {
         /// <summary>
-        /// Use requested close.
+        /// User requested close.
         /// </summary>
-        public Action Closed;
+        public event Action Closed;
 
         /// <summary>
         /// Run on user activating the notification. Return true to close.
