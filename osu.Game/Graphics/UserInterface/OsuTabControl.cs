@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -22,9 +23,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => base.InternalContains(screenSpacePos) || Dropdown.Contains(screenSpacePos);
-
-        private bool isEnumType => typeof(T).IsEnum;
+        private static bool isEnumType => typeof(T).IsEnum;
 
         public OsuTabControl()
         {
@@ -74,33 +73,18 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            public override bool Active
-            {
-                get { return base.Active; }
-                set
-                {
-                    if (Active == value) return;
-
-                    if (value)
-                        fadeActive();
-                    else
-                        fadeInactive();
-                    base.Active = value;
-                }
-            }
-
             private const float transition_length = 500;
 
             private void fadeActive()
             {
-                box.FadeIn(transition_length, EasingTypes.OutQuint);
-                Text.FadeColour(Color4.White, transition_length, EasingTypes.OutQuint);
+                box.FadeIn(transition_length, Easing.OutQuint);
+                Text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
             }
 
             private void fadeInactive()
             {
-                box.FadeOut(transition_length, EasingTypes.OutQuint);
-                Text.FadeColour(AccentColour, transition_length, EasingTypes.OutQuint);
+                box.FadeOut(transition_length, Easing.OutQuint);
+                Text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
             }
 
             protected override bool OnHover(InputState state)
@@ -150,6 +134,10 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 };
             }
+
+            protected override void OnActivated() => fadeActive();
+
+            protected override void OnDeactivated() => fadeInactive();
         }
 
         private class OsuTabDropdown : OsuDropdown<T>
@@ -221,10 +209,10 @@ namespace osu.Game.Graphics.UserInterface
 
                     Foreground.Children = new Drawable[]
                     {
-                        new TextAwesome
+                        new SpriteIcon
                         {
                             Icon = FontAwesome.fa_ellipsis_h,
-                            TextSize = 14,
+                            Size = new Vector2(14),
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
                         }

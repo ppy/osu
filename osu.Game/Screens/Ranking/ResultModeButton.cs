@@ -5,11 +5,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -36,19 +36,6 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        public override bool Active
-        {
-            get
-            {
-                return base.Active;
-            }
-            set
-            {
-                base.Active = value;
-                colouredPart.FadeColour(Active ? activeColour : inactiveColour, 200, EasingTypes.OutQuint);
-            }
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -60,7 +47,7 @@ namespace osu.Game.Screens.Ranking
             activeColour = colours.PinkDarker;
             inactiveColour = OsuColour.Gray(0.8f);
 
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Colour = Color4.Black.Opacity(0.4f),
                 Type = EdgeEffectType.Shadow,
@@ -91,18 +78,22 @@ namespace osu.Game.Screens.Ranking
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Transparent,
                         },
-                        new TextAwesome
+                        new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Shadow = false,
                             Colour = OsuColour.Gray(0.95f),
                             Icon = icon,
-                            TextSize = 20,
+                            Size = new Vector2(20),
                         }
                     }
                 }
             };
         }
+
+        protected override void OnActivated() => colouredPart.FadeColour(activeColour, 200, Easing.OutQuint);
+
+        protected override void OnDeactivated() => colouredPart.FadeColour(inactiveColour, 200, Easing.OutQuint);
     }
 }

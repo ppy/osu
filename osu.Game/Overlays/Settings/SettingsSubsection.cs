@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings
         {
             set
             {
-                FadeTo(value ? 1 : 0);
+                this.FadeTo(value ? 1 : 0);
             }
         }
 
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new OsuSpriteText
                 {
@@ -52,4 +52,3 @@ namespace osu.Game.Overlays.Settings
         }
     }
 }
-

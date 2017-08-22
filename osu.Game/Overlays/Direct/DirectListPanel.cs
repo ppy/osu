@@ -6,16 +6,15 @@ using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Database;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
-using osu.Framework.Graphics.Textures;
-using System.Linq;
 using osu.Framework.Input;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -31,7 +30,7 @@ namespace osu.Game.Overlays.Direct
             Height = height;
             CornerRadius = 5;
             Masking = true;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Offset = new Vector2(0f, 1f),
@@ -44,11 +43,11 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
 
-            FadeInFromZero(200, EasingTypes.Out);
+            this.FadeInFromZero(200, Easing.Out);
         }
 
         [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation, TextureStore textures)
+        private void load(LocalisationEngine localisation)
         {
             Children = new[]
             {
@@ -57,11 +56,11 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                GetBackground(textures),
+                CreateBackground(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ColourInfo = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.25f), Color4.Black.Opacity(0.75f)),
+                    Colour = ColourInfo.GradientHorizontal(Color4.Black.Opacity(0.25f), Color4.Black.Opacity(0.75f)),
                 },
                 new Container
                 {
@@ -104,11 +103,11 @@ namespace osu.Game.Overlays.Direct
                             Margin = new MarginPadding { Right = height - vertical_padding * 2 + vertical_padding },
                             Children = new Drawable[]
                             {
-                                new Statistic(FontAwesome.fa_play_circle, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.PlayCount ?? 0)
+                                new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
                                 {
                                     Margin = new MarginPadding { Right = 1 },
                                 },
-                                new Statistic(FontAwesome.fa_heart, SetInfo.Beatmaps.FirstOrDefault()?.OnlineInfo.FavouriteCount ?? 0),
+                                new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                                 new FillFlowContainer
                                 {
                                     Anchor = Anchor.TopRight,
@@ -151,20 +150,19 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        private class DownloadButton : ClickableContainer
+        private class DownloadButton : OsuClickableContainer
         {
-            private readonly TextAwesome icon;
+            private readonly SpriteIcon icon;
 
             public DownloadButton()
             {
                 Children = new Drawable[]
                 {
-                    icon = new TextAwesome
+                    icon = new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        UseFullGlyphHeight = false,
-                        TextSize = 30,
+                        Size = new Vector2(30),
                         Icon = FontAwesome.fa_osu_chevron_down_o,
                     },
                 };
@@ -172,25 +170,25 @@ namespace osu.Game.Overlays.Direct
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
-                icon.ScaleTo(0.9f, 1000, EasingTypes.Out);
+                icon.ScaleTo(0.9f, 1000, Easing.Out);
                 return base.OnMouseDown(state, args);
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                icon.ScaleTo(1f, 500, EasingTypes.OutElastic);
+                icon.ScaleTo(1f, 500, Easing.OutElastic);
                 return base.OnMouseUp(state, args);
             }
 
             protected override bool OnHover(InputState state)
             {
-                icon.ScaleTo(1.1f, 500, EasingTypes.OutElastic);
+                icon.ScaleTo(1.1f, 500, Easing.OutElastic);
                 return base.OnHover(state);
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                icon.ScaleTo(1f, 500, EasingTypes.OutElastic);
+                icon.ScaleTo(1f, 500, Easing.OutElastic);
             }
         }
     }

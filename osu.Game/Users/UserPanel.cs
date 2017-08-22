@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -8,20 +9,19 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 
 namespace osu.Game.Users
 {
-    public class UserPanel : Container
+    public class UserPanel : ClickableContainer
     {
+        private readonly User user;
         private const float height = 100;
         private const float content_padding = 10;
         private const float status_height = 30;
-
-        private OsuColour colours;
 
         private readonly Container statusBar;
         private readonly Box statusBg;
@@ -29,12 +29,16 @@ namespace osu.Game.Users
 
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
+        public new Action Action;
+
         public UserPanel(User user)
         {
+            this.user = user;
+
             Height = height - status_height;
             Masking = true;
             CornerRadius = 5;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = Color4.Black.Opacity(0.25f),
@@ -43,8 +47,9 @@ namespace osu.Game.Users
 
             Children = new Drawable[]
             {
-                new AsyncLoadWrapper(new CoverBackgroundSprite(user)
+                new AsyncLoadWrapper(new UserCoverBackground(user)
                 {
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fill,
@@ -68,7 +73,7 @@ namespace osu.Game.Users
                             User = user,
                             Masking = true,
                             CornerRadius = 5,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.25f),
@@ -97,7 +102,7 @@ namespace osu.Game.Users
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        new DrawableFlag(user.Country?.FlagName ?? @"__")
+                                        new DrawableFlag(user.Country?.FlagName)
                                         {
                                             Width = 30f,
                                             RelativeSizeAxes = Axes.Y,
@@ -137,15 +142,15 @@ namespace osu.Game.Users
                             Origin = Anchor.Centre,
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(5f, 0f),
-                            Children = new[]
+                            Children = new Drawable[]
                             {
-                                new TextAwesome
+                                new SpriteIcon
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Icon = FontAwesome.fa_circle_o,
                                     Shadow = true,
-                                    TextSize = 14,
+                                    Size = new Vector2(14),
                                 },
                                 statusMessage = new OsuSpriteText
                                 {
@@ -160,11 +165,17 @@ namespace osu.Game.Users
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuColour colours, UserProfileOverlay profile)
         {
-            this.colours = colours;
             Status.ValueChanged += displayStatus;
+            Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
+
+            base.Action = () =>
+            {
+                Action?.Invoke();
+                profile?.ShowUser(user);
+            };
         }
 
         protected override void LoadComplete()
@@ -179,35 +190,17 @@ namespace osu.Game.Users
 
             if (status == null)
             {
-                statusBar.ResizeHeightTo(0f, transition_duration, EasingTypes.OutQuint);
-                statusBar.FadeOut(transition_duration, EasingTypes.OutQuint);
-                ResizeHeightTo(height - status_height, transition_duration, EasingTypes.OutQuint);
+                statusBar.ResizeHeightTo(0f, transition_duration, Easing.OutQuint);
+                statusBar.FadeOut(transition_duration, Easing.OutQuint);
+                this.ResizeHeightTo(height - status_height, transition_duration, Easing.OutQuint);
             }
             else
             {
-                statusBar.ResizeHeightTo(status_height, transition_duration, EasingTypes.OutQuint);
-                statusBar.FadeIn(transition_duration, EasingTypes.OutQuint);
-                ResizeHeightTo(height, transition_duration, EasingTypes.OutQuint);
+                statusBar.ResizeHeightTo(status_height, transition_duration, Easing.OutQuint);
+                statusBar.FadeIn(transition_duration, Easing.OutQuint);
+                this.ResizeHeightTo(height, transition_duration, Easing.OutQuint);
 
-                statusBg.FadeColour(status.GetAppropriateColour(colours), 500, EasingTypes.OutQuint);
                 statusMessage.Text = status.Message;
-            }
-        }
-
-        private class CoverBackgroundSprite : Sprite
-        {
-            private readonly User user;
-
-            public CoverBackgroundSprite(User user)
-            {
-                this.user = user;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                if (!string.IsNullOrEmpty(user.CoverUrl))
-                    Texture = textures.Get(user.CoverUrl);
             }
         }
     }

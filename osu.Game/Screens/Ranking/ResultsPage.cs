@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
@@ -33,14 +33,13 @@ namespace osu.Game.Screens.Ranking
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            fill.Delay(400);
-            fill.FadeInFromZero(600);
+            fill.Delay(400).FadeInFromZero(600);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AddInternal(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 fill = new Box
                 {
@@ -50,7 +49,7 @@ namespace osu.Game.Screens.Ranking
                 },
                 new CircularContainer
                 {
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = colours.GrayF.Opacity(0.8f),
                         Type = EdgeEffectType.Shadow,
@@ -64,7 +63,8 @@ namespace osu.Game.Screens.Ranking
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        new Box{
+                        new Box
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
                             AlwaysPresent = true
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Ranking
                 },
                 content = new CircularContainer
                 {
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = Color4.Black.Opacity(0.2f),
                         Type = EdgeEffectType.Shadow,
@@ -87,6 +87,5 @@ namespace osu.Game.Screens.Ranking
                 }
             });
         }
-
     }
 }

@@ -2,15 +2,17 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Database;
-using osu.Game.Graphics;
-using OpenTK.Graphics;
-using osu.Framework.Localisation;
 using osu.Framework.Graphics.Sprites;
-using System.Collections.Generic;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
+using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
@@ -21,8 +23,8 @@ namespace osu.Game.Overlays.Music
         private Color4 hoverColour;
         private Color4 artistColour;
 
-        private TextAwesome handle;
-        private Paragraph text;
+        private SpriteIcon handle;
+        private TextFlowContainer text;
         private IEnumerable<SpriteText> titleSprites;
         private UnicodeBindableString titleBind;
         private UnicodeBindableString artistBind;
@@ -40,7 +42,7 @@ namespace osu.Game.Overlays.Music
                 if (value == selected) return;
                 selected = value;
 
-                Flush(true);
+                FinishTransforms(true);
                 foreach (SpriteText s in titleSprites)
                     s.FadeColour(Selected ? hoverColour : Color4.White, fade_duration);
             }
@@ -66,18 +68,17 @@ namespace osu.Game.Overlays.Music
 
             Children = new Drawable[]
             {
-                handle = new TextAwesome
+                handle = new SpriteIcon
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    TextSize = 12,
+                    Size = new Vector2(12),
                     Colour = colours.Gray5,
                     Icon = FontAwesome.fa_bars,
                     Alpha = 0f,
-                    Margin = new MarginPadding { Left = 5 },
-                    Padding = new MarginPadding { Top = 2 },
+                    Margin = new MarginPadding { Left = 5, Top = 2 },
                 },
-                text = new Paragraph
+                text = new OsuTextFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -137,17 +138,14 @@ namespace osu.Game.Overlays.Music
 
         public bool MatchingFilter
         {
+            get { return matching; }
             set
             {
                 if (matching == value) return;
 
                 matching = value;
 
-                FadeTo(matching ? 1 : 0, 200);
-            }
-            get
-            {
-                return matching;
+                this.FadeTo(matching ? 1 : 0, 200);
             }
         }
     }

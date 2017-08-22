@@ -1,13 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics.Containers;
 using OpenTK;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Audio;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens
 {
@@ -27,59 +30,49 @@ namespace osu.Game.Screens
 
         internal virtual bool HasLocalCursorDisplayed => false;
 
-        internal virtual bool AllowRulesetChange => true;
+        /// <summary>
+        /// Whether the beatmap or ruleset should be allowed to be changed by the user or game.
+        /// Used to mark exclusive areas where this is strongly prohibited, like gameplay.
+        /// </summary>
+        internal virtual bool AllowBeatmapRulesetChange => true;
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
-
-        public WorkingBeatmap Beatmap
+        public WorkingBeatmap InitialBeatmap
         {
-            get
-            {
-                return beatmap.Value;
-            }
             set
             {
-                beatmap.Value = value;
+                if (IsLoaded) throw new InvalidOperationException($"Cannot set {nameof(InitialBeatmap)} post-load.");
+                Beatmap.Value = value;
             }
         }
 
+        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+
+        private SampleChannel sampleExit;
+
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGameBase game, OsuGame osuGame)
+        private void load(OsuGameBase game, OsuGame osuGame, AudioManager audio)
         {
             if (game != null)
             {
                 //if we were given a beatmap at ctor time, we want to pass this on to the game-wide beatmap.
-                var localMap = beatmap.Value;
-                beatmap.BindTo(game.Beatmap);
+                var localMap = Beatmap.Value;
+                Beatmap.BindTo(game.Beatmap);
                 if (localMap != null)
-                    beatmap.Value = localMap;
+                    Beatmap.Value = localMap;
             }
 
             if (osuGame != null)
-                ruleset.BindTo(osuGame.Ruleset);
+                Ruleset.BindTo(osuGame.Ruleset);
+
+            sampleExit = audio.Sample.Get(@"UI/melodic-1");
         }
 
-        protected override void LoadComplete()
+        protected override void OnResuming(Screen last)
         {
-            base.LoadComplete();
-
-            beatmap.ValueChanged += OnBeatmapChanged;
-        }
-
-        /// <summary>
-        /// The global Beatmap was changed.
-        /// </summary>
-        protected virtual void OnBeatmapChanged(WorkingBeatmap beatmap)
-        {
-        }
-
-        protected override void Update()
-        {
-            if (!IsCurrentScreen) return;
-
-            ruleset.Disabled = !AllowRulesetChange;
+            base.OnResuming(last);
+            sampleExit?.Play();
         }
 
         protected override void OnEntering(Screen last)
@@ -87,8 +80,6 @@ namespace osu.Game.Screens
             OsuScreen lastOsu = last as OsuScreen;
 
             BackgroundScreen bg = CreateBackground();
-
-            OnBeatmapChanged(Beatmap);
 
             if (lastOsu?.Background != null)
             {
@@ -134,11 +125,7 @@ namespace osu.Game.Screens
             if (base.OnExiting(next))
                 return true;
 
-            // while this is not necessary as we are constructing our own bindable, there are cases where
-            // the GC doesn't run as fast as expected and this is triggered post-exit.
-            // added to resolve https://github.com/ppy/osu/issues/829
-            beatmap.ValueChanged -= OnBeatmapChanged;
-
+            Beatmap.UnbindAll();
             return false;
         }
     }

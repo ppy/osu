@@ -2,14 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -24,7 +22,7 @@ namespace osu.Game.Overlays.Direct
             SetInfo = setInfo;
         }
 
-        protected IEnumerable<DifficultyIcon> GetDifficultyIcons()
+        protected List<DifficultyIcon> GetDifficultyIcons()
         {
             var icons = new List<DifficultyIcon>();
 
@@ -34,20 +32,25 @@ namespace osu.Game.Overlays.Direct
             return icons;
         }
 
-        protected Drawable GetBackground(TextureStore textures)
+        protected Drawable CreateBackground() => new DelayedLoadWrapper(new BeatmapSetCover(SetInfo)
         {
-            return new AsyncLoadWrapper(new BeatmapBackgroundSprite(new OnlineWorkingBeatmap(SetInfo.Beatmaps.FirstOrDefault(), textures, null))
-            {
-                FillMode = FillMode.Fill,
-                OnLoadComplete = d => d.FadeInFromZero(400, EasingTypes.Out),
-            }) { RelativeSizeAxes = Axes.Both };
-        }
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            RelativeSizeAxes = Axes.Both,
+            FillMode = FillMode.Fill,
+            OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
+        })
+        {
+            RelativeSizeAxes = Axes.Both,
+            TimeBeforeLoad = 300
+        };
 
         public class Statistic : FillFlowContainer
         {
             private readonly SpriteText text;
 
             private int value;
+
             public int Value
             {
                 get { return value; }
@@ -72,11 +75,11 @@ namespace osu.Game.Overlays.Direct
                     {
                         Font = @"Exo2.0-SemiBoldItalic",
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Icon = icon,
                         Shadow = true,
-                        TextSize = 14,
+                        Size = new Vector2(14),
                         Margin = new MarginPadding { Top = 1 },
                     },
                 };

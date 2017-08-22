@@ -2,13 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Scoring;
 
@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override HitRenderer CreateHitRendererWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new ManiaHitRenderer(beatmap, isForCurrentRuleset);
+        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new ManiaRulesetContainer(this, beatmap, isForCurrentRuleset);
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
@@ -27,7 +27,14 @@ namespace osu.Game.Rulesets.Mania
                     {
                         new ManiaModEasy(),
                         new ManiaModNoFail(),
-                        new ManiaModHalfTime(),
+                        new MultiMod
+                        {
+                            Mods = new Mod[]
+                            {
+                                new ManiaModHalfTime(),
+                                new ManiaModDaycore(),
+                            },
+                        },
                     };
 
                 case ModType.DifficultyIncrease:
@@ -89,6 +96,7 @@ namespace osu.Game.Rulesets.Mania
                                 new ModCinema(),
                             },
                         },
+                        new ManiaModGravity()
                     };
 
                 default:
@@ -96,16 +104,21 @@ namespace osu.Game.Rulesets.Mania
             }
         }
 
+        public override Mod GetAutoplayMod() => new ModAutoplay();
+
         public override string Description => "osu!mania";
 
-        public override FontAwesome Icon => FontAwesome.fa_osu_mania_o;
-
-        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[] { /* Todo: Should be keymod specific */ };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new ManiaDifficultyCalculator(beatmap);
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
 
         public override int LegacyID => 3;
+
+        public ManiaRuleset(RulesetInfo rulesetInfo)
+            : base(rulesetInfo)
+        {
+        }
     }
 }

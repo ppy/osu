@@ -1,10 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -20,6 +22,7 @@ namespace osu.Game.Screens.Select
         private OsuScreen player;
         private readonly ModSelectOverlay modSelect;
         private readonly BeatmapDetailArea beatmapDetails;
+        private bool removeAutoModOnResume;
 
         public PlaySongSelect()
         {
@@ -51,28 +54,34 @@ namespace osu.Game.Screens.Select
                 ValidForResume = false;
                 Push(new Editor());
             }, Key.Number3);
+
+            Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
-        protected override void OnBeatmapChanged(WorkingBeatmap beatmap)
+        private void beatmap_ValueChanged(WorkingBeatmap beatmap)
         {
-            beatmap?.Mods.BindTo(modSelect.SelectedMods);
+            if (!IsCurrentScreen) return;
 
-            if (Beatmap?.Track != null)
-                Beatmap.Track.Looping = false;
+            beatmap.Mods.BindTo(modSelect.SelectedMods);
 
             beatmapDetails.Beatmap = beatmap;
 
-            if (beatmap?.Track != null)
+            if (beatmap.Track != null)
                 beatmap.Track.Looping = true;
-
-            base.OnBeatmapChanged(beatmap);
         }
 
         protected override void OnResuming(Screen last)
         {
             player = null;
 
-            Beatmap.Track.Looping = true;
+            if (removeAutoModOnResume)
+            {
+                var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
+                modSelect.SelectedMods.Value = modSelect.SelectedMods.Value.Where(m => m.GetType() != autoType).ToArray();
+                removeAutoModOnResume = false;
+            }
+
+            Beatmap.Value.Track.Looping = true;
 
             base.OnResuming(last);
         }
@@ -95,22 +104,33 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            if (Beatmap?.Track != null)
-                Beatmap.Track.Looping = false;
+            if (Beatmap.Value.Track != null)
+                Beatmap.Value.Track.Looping = false;
 
             return false;
         }
 
-        protected override void OnSelected()
+        protected override void OnSelected(InputState state)
         {
             if (player != null) return;
 
-            Beatmap.Track.Looping = false;
-
-            LoadComponentAsync(player = new PlayerLoader(new Player
+            if (state?.Keyboard.ControlPressed == true)
             {
-                Beatmap = Beatmap, //eagerly set this so it's present before push.
-            }), l => Push(player));
+                var auto = Ruleset.Value.CreateInstance().GetAutoplayMod();
+                var autoType = auto.GetType();
+
+                var mods = modSelect.SelectedMods.Value;
+                if (mods.All(m => m.GetType() != autoType))
+                {
+                    modSelect.SelectedMods.Value = mods.Concat(new[] { auto });
+                    removeAutoModOnResume = true;
+                }
+            }
+
+            Beatmap.Value.Track.Looping = false;
+            Beatmap.Disabled = true;
+
+            LoadComponentAsync(player = new PlayerLoader(new Player()), l => Push(player));
         }
     }
 }

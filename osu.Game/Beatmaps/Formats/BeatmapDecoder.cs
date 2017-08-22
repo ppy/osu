@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Database;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -13,9 +12,16 @@ namespace osu.Game.Beatmaps.Formats
     {
         private static readonly Dictionary<string, Type> decoders = new Dictionary<string, Type>();
 
+        static BeatmapDecoder()
+        {
+            OsuLegacyDecoder.Register();
+        }
+
         public static BeatmapDecoder GetDecoder(StreamReader stream)
         {
-            string line = stream.ReadLine()?.Trim();
+            string line;
+            do { line = stream.ReadLine()?.Trim(); }
+                while (line != null && line.Length == 0);
 
             if (line == null || !decoders.ContainsKey(line))
                 throw new IOException(@"Unknown file format");

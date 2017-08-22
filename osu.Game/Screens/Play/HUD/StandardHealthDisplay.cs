@@ -5,12 +5,12 @@ using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Play.HUD
                     return;
                 glowColour = value;
 
-                fill.EdgeEffect = new EdgeEffect
+                fill.EdgeEffect = new EdgeEffectParameters
                 {
                     Colour = glowColour.Opacity(base_glow_opacity),
                     Radius = 8,
@@ -97,11 +97,11 @@ namespace osu.Game.Screens.Play.HUD
             if (judgement.Result == HitResult.Miss)
                 return;
 
-            fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, EasingTypes.OutQuint);
-            fill.Delay(glow_fade_delay);
-            fill.FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, EasingTypes.OutQuint);
+            fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, Easing.OutQuint)
+                .Delay(glow_fade_delay)
+                .FadeEdgeEffectTo(base_glow_opacity, glow_fade_time, Easing.OutQuint);
         }
 
-        protected override void SetHealth(float value) => fill.ResizeTo(new Vector2(value, 1), 200, EasingTypes.OutQuint);
+        protected override void SetHealth(float value) => fill.ResizeTo(new Vector2(value, 1), 200, Easing.OutQuint);
     }
 }

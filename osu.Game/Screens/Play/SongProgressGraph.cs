@@ -19,28 +19,28 @@ namespace osu.Game.Screens.Play
                 objects = value;
 
                 const int granularity = 200;
+                Values = new int[granularity];
+
+                if (!objects.Any())
+                    return;
 
                 var firstHit = objects.First().StartTime;
-                var lastHit = (objects.Last() as IHasEndTime)?.EndTime ?? 0;
+                var lastHit = objects.Max(o => (o as IHasEndTime)?.EndTime ?? o.StartTime);
 
                 if (lastHit == 0)
                     lastHit = objects.Last().StartTime;
 
                 var interval = (lastHit - firstHit + 1) / granularity;
 
-                var values = new int[granularity];
-
                 foreach (var h in objects)
                 {
                     IHasEndTime end = h as IHasEndTime;
 
-                    int startRange = (int)((h.StartTime - firstHit)/ interval);
+                    int startRange = (int)((h.StartTime - firstHit) / interval);
                     int endRange = (int)(((end?.EndTime > 0 ? end.EndTime : h.StartTime) - firstHit) / interval);
                     for (int i = startRange; i <= endRange; i++)
-                        values[i]++;
+                        Values[i]++;
                 }
-
-                Values = values;
             }
         }
     }

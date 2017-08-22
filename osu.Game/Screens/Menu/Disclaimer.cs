@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Menu
     internal class Disclaimer : OsuScreen
     {
         private Intro intro;
-        private readonly TextAwesome icon;
+        private readonly SpriteIcon icon;
         private Color4 iconColour;
 
         internal override bool ShowOverlays => false;
@@ -37,12 +37,12 @@ namespace osu.Game.Screens.Menu
                     Spacing = new Vector2(0, 2),
                     Children = new Drawable[]
                     {
-                        icon = new TextAwesome
+                        icon = new SpriteIcon
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Icon = FontAwesome.fa_warning,
-                            TextSize = 30,
+                            Size = new Vector2(30),
                         },
                         new OsuSpriteText
                         {
@@ -98,18 +98,13 @@ namespace osu.Game.Screens.Menu
         {
             base.OnEntering(last);
 
-            Content.FadeInFromZero(500);
+            icon.Delay(1500).FadeColour(iconColour, 200);
 
-            icon.Delay(1500);
-            icon.FadeColour(iconColour, 200);
-
-            Delay(6000, true);
-
-            Content.FadeOut(250);
-
-            Delay(250);
-
-            Schedule(() => Push(intro));
+            Content
+                .FadeInFromZero(500)
+                .Then(5500)
+                .FadeOut(250)
+                .Finally(d => Push(intro));
         }
     }
 }

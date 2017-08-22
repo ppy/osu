@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -31,6 +32,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private UserPanel panel;
         private UserDropdown dropdown;
 
+        /// <summary>
+        /// Called to request a hide of a parent displaying this container.
+        /// </summary>
+        public Action RequestHide;
+
         public override RectangleF BoundingBox => bounding ? base.BoundingBox : RectangleF.Empty;
 
         public bool Bounding
@@ -39,7 +45,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             set
             {
                 bounding = value;
-                Invalidate(Invalidation.Geometry);
+                Invalidate(Invalidation.MiscGeometry);
             }
         }
 
@@ -51,13 +57,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
             Spacing = new Vector2(0f, 5f);
         }
 
-        private InputManager inputManager;
-
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, APIAccess api, UserInputManager inputManager)
+        private void load(OsuColour colours, APIAccess api)
         {
-            this.inputManager = inputManager;
             this.colours = colours;
+
             api?.Register(this);
         }
 
@@ -129,7 +133,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                         },
                                     },
                                 },
-                                panel = new UserPanel(api.LocalUser.Value) { RelativeSizeAxes = Axes.X },
+                                panel = new UserPanel(api.LocalUser.Value)
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Action = RequestHide
+                                },
                                 dropdown = new UserDropdown { RelativeSizeAxes = Axes.X },
                             },
                         },
@@ -163,7 +171,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     break;
             }
 
-            if (form != null) inputManager.ChangeFocus(form);
+            if (form != null) GetContainingInputManager()?.ChangeFocus(form);
         }
 
         public override bool AcceptsFocus => true;
@@ -172,7 +180,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         protected override void OnFocus(InputState state)
         {
-            if (form != null) inputManager.ChangeFocus(form);
+            if (form != null) GetContainingInputManager().ChangeFocus(form);
             base.OnFocus(state);
         }
 
@@ -181,7 +189,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
             private TextBox username;
             private TextBox password;
             private APIAccess api;
-            private InputManager inputManager;
 
             private void performLogin()
             {
@@ -190,9 +197,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
-            private void load(APIAccess api, OsuConfigManager config, UserInputManager inputManager)
+            private void load(APIAccess api, OsuConfigManager config)
             {
-                this.inputManager = inputManager;
                 this.api = api;
                 Direction = FillDirection.Vertical;
                 Spacing = new Vector2(0, 5);
@@ -245,7 +251,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             protected override void OnFocus(InputState state)
             {
-                Schedule(() => { inputManager.ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
+                Schedule(() => { GetContainingInputManager().ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
             }
         }
 
@@ -275,12 +281,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 public const float LABEL_LEFT_MARGIN = 20;
 
-                private readonly TextAwesome statusIcon;
+                private readonly SpriteIcon statusIcon;
                 public Color4 StatusColour
                 {
                     set
                     {
-                        statusIcon.FadeColour(value, 500, EasingTypes.OutQuint);
+                        statusIcon.FadeColour(value, 500, Easing.OutQuint);
                     }
                 }
 
@@ -290,22 +296,22 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     Margin = new MarginPadding { Bottom = 5 };
                     Masking = true;
                     CornerRadius = 5;
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = Color4.Black.Opacity(0.25f),
                         Radius = 4,
                     };
 
-                    Icon.TextSize = 14;
+                    Icon.Size = new Vector2(14);
                     Icon.Margin = new MarginPadding(0);
 
-                    Foreground.Add(statusIcon = new TextAwesome
+                    Foreground.Add(statusIcon = new SpriteIcon
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Icon = FontAwesome.fa_circle_o,
-                        TextSize = 14,
+                        Size = new Vector2(14),
                     });
 
                     Text.Margin = new MarginPadding { Left = LABEL_LEFT_MARGIN };
@@ -326,7 +332,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     CornerRadius = 5;
                     ItemsContainer.Padding = new MarginPadding(0);
                     Masking = true;
-                    EdgeEffect = new EdgeEffect
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
                         Colour = Color4.Black.Opacity(0.25f),

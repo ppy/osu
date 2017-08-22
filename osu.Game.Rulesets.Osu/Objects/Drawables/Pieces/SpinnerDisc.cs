@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
@@ -31,7 +30,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             spinner = s;
 
-            AlwaysReceiveInput = true;
             RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]
@@ -39,6 +37,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 background = new SpinnerBackground { Alpha = idle_alpha },
             };
         }
+
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         private bool tracking;
         public bool Tracking
@@ -66,21 +66,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            Tracking |= state.Mouse.HasMainButtonPressed;
-            return base.OnMouseDown(state, args);
-        }
-
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-        {
-            Tracking &= state.Mouse.HasMainButtonPressed;
-            return base.OnMouseUp(state, args);
-        }
-
         protected override bool OnMouseMove(InputState state)
         {
-            Tracking |= state.Mouse.HasMainButtonPressed;
             mousePosition = Parent.ToLocalSpace(state.Mouse.NativeState.Position);
             return base.OnMouseMove(state);
         }
@@ -126,13 +113,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             if (Complete && updateCompleteTick())
             {
-                background.Flush(flushType: typeof(TransformAlpha));
-                background.FadeTo(tracking_alpha + 0.2f, 60, EasingTypes.OutExpo);
-                background.Delay(60);
-                background.FadeTo(tracking_alpha, 250, EasingTypes.OutQuint);
+                background.FinishTransforms(false, nameof(Alpha));
+                background
+                    .FadeTo(tracking_alpha + 0.2f, 60, Easing.OutExpo)
+                    .Then()
+                    .FadeTo(tracking_alpha, 250, Easing.OutQuint);
             }
 
-            RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, EasingTypes.OutExpo);
+            this.RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, Easing.OutExpo);
         }
     }
 }

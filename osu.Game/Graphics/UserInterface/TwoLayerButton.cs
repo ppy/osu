@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,10 +13,11 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using System;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class TwoLayerButton : ClickableContainer
+    public class TwoLayerButton : OsuClickableContainer
     {
         private readonly BouncingIcon bouncingIcon;
 
@@ -31,7 +31,6 @@ namespace osu.Game.Graphics.UserInterface
 
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
-        public SampleChannel ActivationSound;
         private readonly SpriteText text;
 
         public Color4 HoverColour;
@@ -62,8 +61,12 @@ namespace osu.Game.Graphics.UserInterface
 
                 X = (value & Anchor.x2) > 0 ? SIZE_RETRACTED.X * shear * 0.5f : 0;
 
+                Remove(c1);
+                Remove(c2);
                 c1.Depth = (value & Anchor.x2) > 0 ? 0 : 1;
                 c2.Depth = (value & Anchor.x2) > 0 ? 1 : 0;
+                Add(c1);
+                Add(c2);
             }
         }
 
@@ -79,18 +82,21 @@ namespace osu.Game.Graphics.UserInterface
                     Width = 0.4f,
                     Children = new Drawable[]
                     {
-                        new Container {
+                        new Container
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Shear = new Vector2(shear, 0),
                             Masking = true,
                             MaskingSmoothness = 2,
-                            EdgeEffect = new EdgeEffect {
+                            EdgeEffect = new EdgeEffectParameters
+                            {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
                                 Offset = new Vector2(2, 0),
                                 Radius = 2,
                             },
-                            Children = new [] {
+                            Children = new[]
+                            {
                                 IconLayer = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -113,18 +119,21 @@ namespace osu.Game.Graphics.UserInterface
                     Width = 0.6f,
                     Children = new Drawable[]
                     {
-                        new Container {
+                        new Container
+                        {
                             RelativeSizeAxes = Axes.Both,
                             Shear = new Vector2(shear, 0),
                             Masking = true,
                             MaskingSmoothness = 2,
-                            EdgeEffect = new EdgeEffect {
+                            EdgeEffect = new EdgeEffectParameters
+                            {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),
                                 Offset = new Vector2(2, 0),
                                 Radius = 2,
                             },
-                            Children = new [] {
+                            Children = new[]
+                            {
                                 TextLayer = new Box
                                 {
                                     Origin = Anchor.TopLeft,
@@ -160,24 +169,24 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => IconLayer.Contains(screenSpacePos) || TextLayer.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => IconLayer.ReceiveMouseInputAt(screenSpacePos) || TextLayer.ReceiveMouseInputAt(screenSpacePos);
 
         protected override bool OnHover(InputState state)
         {
-            ResizeTo(SIZE_EXTENDED, transform_time, EasingTypes.OutElastic);
-            IconLayer.FadeColour(HoverColour, transform_time, EasingTypes.OutElastic);
+            this.ResizeTo(SIZE_EXTENDED, transform_time, Easing.OutElastic);
+            IconLayer.FadeColour(HoverColour, transform_time, Easing.OutElastic);
 
-            bouncingIcon.ScaleTo(1.1f, transform_time, EasingTypes.OutElastic);
+            bouncingIcon.ScaleTo(1.1f, transform_time, Easing.OutElastic);
 
             return true;
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            ResizeTo(SIZE_RETRACTED, transform_time, EasingTypes.OutElastic);
-            IconLayer.FadeColour(TextLayer.Colour, transform_time, EasingTypes.OutElastic);
+            this.ResizeTo(SIZE_RETRACTED, transform_time, Easing.OutElastic);
+            IconLayer.FadeColour(TextLayer.Colour, transform_time, Easing.OutElastic);
 
-            bouncingIcon.ScaleTo(1, transform_time, EasingTypes.OutElastic);
+            bouncingIcon.ScaleTo(1, transform_time, Easing.OutElastic);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -196,10 +205,8 @@ namespace osu.Game.Graphics.UserInterface
             Add(flash);
 
             flash.Alpha = 1;
-            flash.FadeOut(500, EasingTypes.OutQuint);
+            flash.FadeOut(500, Easing.OutQuint);
             flash.Expire();
-
-            ActivationSound.Play();
 
             return base.OnClick(state);
         }
@@ -208,7 +215,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             private const double beat_in_time = 60;
 
-            private readonly TextAwesome icon;
+            private readonly SpriteIcon icon;
 
             public FontAwesome Icon { set { icon.Icon = value; } }
 
@@ -219,11 +226,11 @@ namespace osu.Game.Graphics.UserInterface
 
                 Children = new Drawable[]
                 {
-                    icon = new TextAwesome
+                    icon = new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        TextSize = 25
+                        Size = new Vector2(25),
                     }
                 };
             }
@@ -238,9 +245,9 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (beatIndex < 0) return;
 
-                icon.ScaleTo(1 - 0.1f * amplitudeAdjust, beat_in_time, EasingTypes.Out);
-                using (icon.BeginDelayedSequence(beat_in_time))
-                    icon.ScaleTo(1, beatLength * 2, EasingTypes.OutQuint);
+                icon.ScaleTo(1 - 0.1f * amplitudeAdjust, beat_in_time, Easing.Out)
+                    .Then()
+                    .ScaleTo(1, beatLength * 2, Easing.OutQuint);
             }
         }
     }

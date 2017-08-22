@@ -6,8 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -16,6 +14,8 @@ using System.Linq;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Threading;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
@@ -47,6 +47,7 @@ namespace osu.Game.Screens.Select
         public BeatmapInfo Beatmap
         {
             get { return beatmap; }
+
             set
             {
                 if (beatmap == value) return;
@@ -79,15 +80,16 @@ namespace osu.Game.Screens.Select
                 lookup.Success += res =>
                 {
                     if (beatmap != requestedBeatmap)
-                            //the beatmap has been changed since we started the lookup.
-                            return;
+                        //the beatmap has been changed since we started the lookup.
+                        return;
 
                     requestedBeatmap.Metrics = res;
                     Schedule(() => updateMetrics(res));
                 };
-                lookup.Failure += e => updateMetrics(null);
+                lookup.Failure += e => Schedule(() => updateMetrics(null));
 
                 api.Queue(lookup);
+                loading.Show();
             }
 
             updateMetrics(requestedBeatmap.Metrics, false);
@@ -103,6 +105,9 @@ namespace osu.Game.Screens.Select
             var hasRatings = metrics?.Ratings.Any() ?? false;
             var hasRetriesFails = (metrics?.Retries.Any() ?? false) && metrics.Fails.Any();
 
+            if (failOnMissing)
+                loading.Hide();
+
             if (hasRatings)
             {
                 var ratings = metrics.Ratings.ToList();
@@ -114,12 +119,12 @@ namespace osu.Game.Screens.Select
 
                 ratingsGraph.Values = ratings.Select(rating => (float)rating);
 
-                ratingsContainer.FadeColour(Color4.White, 500, EasingTypes.Out);
+                ratingsContainer.FadeColour(Color4.White, 500, Easing.Out);
             }
             else if (failOnMissing)
                 ratingsGraph.Values = new float[10];
             else
-                ratingsContainer.FadeColour(Color4.Gray, 500, EasingTypes.Out);
+                ratingsContainer.FadeColour(Color4.Gray, 500, Easing.Out);
 
             if (hasRetriesFails)
             {
@@ -134,7 +139,7 @@ namespace osu.Game.Screens.Select
                 failGraph.Values = fails.Select(fail => (float)fail);
                 retryGraph.Values = retries.Zip(fails, (retry, fail) => retry + MathHelper.Clamp(fail, 0, maxValue));
 
-                retryFailContainer.FadeColour(Color4.White, 500, EasingTypes.Out);
+                retryFailContainer.FadeColour(Color4.White, 500, Easing.Out);
             }
             else if (failOnMissing)
             {
@@ -142,7 +147,7 @@ namespace osu.Game.Screens.Select
                 retryGraph.Values = new float[100];
             }
             else
-                retryFailContainer.FadeColour(Color4.Gray, 500, EasingTypes.Out);
+                retryFailContainer.FadeColour(Color4.Gray, 500, Easing.Out);
         }
 
         public BeatmapDetails()
@@ -155,7 +160,7 @@ namespace osu.Game.Screens.Select
                     Colour = Color4.Black,
                     Alpha = 0.5f,
                 },
-                new FillFlowContainer<MetadataSegment>()
+                new FillFlowContainer<MetadataSegment>
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -164,8 +169,8 @@ namespace osu.Game.Screens.Select
                     Width = 0.4f,
                     Direction = FillDirection.Vertical,
                     LayoutDuration = 200,
-                    LayoutEasing = EasingTypes.OutQuint,
-                    Children = new []
+                    LayoutEasing = Easing.OutQuint,
+                    Children = new[]
                     {
                         description = new MetadataSegment("Description"),
                         source = new MetadataSegment("Source"),
@@ -199,9 +204,9 @@ namespace osu.Game.Screens.Select
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0,5),
+                                    Spacing = new Vector2(0, 5),
                                     Padding = new MarginPadding(10),
-                                    Children = new []
+                                    Children = new[]
                                     {
                                         circleSize = new DifficultyRow("Circle Size", 7),
                                         drainRate = new DifficultyRow("HP Drain"),
@@ -319,11 +324,13 @@ namespace osu.Game.Screens.Select
                             }
                         },
                     },
-                }
+                },
+                loading = new LoadingAnimation()
             };
         }
 
         private APIAccess api;
+        private readonly LoadingAnimation loading;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, APIAccess api)
@@ -432,7 +439,7 @@ namespace osu.Game.Screens.Select
                     {
                         Show();
                         if (header.Text == "Tags")
-                            content.Children = value.Split(' ').Select(text => new OsuSpriteText
+                            content.ChildrenEnumerable = value.Split(' ').Select(text => new OsuSpriteText
                             {
                                 Text = text,
                                 Font = "Exo2.0-Regular",
@@ -479,7 +486,7 @@ namespace osu.Game.Screens.Select
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Full,
-                        Spacing = new Vector2(5,0),
+                        Spacing = new Vector2(5, 0),
                         Margin = new MarginPadding { Top = header.TextSize }
                     }
                 };

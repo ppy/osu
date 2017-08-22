@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
-using osu.Game.Database;
+using osu.Game.Beatmaps;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Multiplayer
@@ -12,6 +12,9 @@ namespace osu.Game.Online.Multiplayer
         public Bindable<string> Name = new Bindable<string>();
         public Bindable<User> Host = new Bindable<User>();
         public Bindable<RoomStatus> Status = new Bindable<RoomStatus>();
-        public Bindable<BeatmapMetadata> Beatmap = new Bindable<BeatmapMetadata>();
+        public Bindable<GameType> Type = new Bindable<GameType>();
+        public Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public Bindable<int?> MaxParticipants = new Bindable<int?>();
+        public Bindable<User[]> Participants = new Bindable<User[]>();
     }
 }

@@ -5,7 +5,7 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -24,11 +24,11 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             Judgement = judgement;
 
-            Anchor = Anchor.Centre;
+            Anchor = Anchor.CentreLeft;
             Origin = Anchor.Centre;
 
-            RelativeSizeAxes = Axes.Y;
-            Size = new Vector2(TaikoHitObject.DEFAULT_CIRCLE_DIAMETER, 1);
+            RelativeSizeAxes = Axes.Both;
+            Size = new Vector2(TaikoHitObject.DEFAULT_SIZE, 1);
 
             Masking = true;
             Alpha = 0.25f;
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = isRim ? colours.BlueDarker : colours.PinkDarker,
@@ -59,8 +59,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             base.LoadComplete();
 
-            ScaleTo(new Vector2(1, 3f), 500, EasingTypes.OutQuint);
-            FadeOut(250);
+            this.ScaleTo(new Vector2(1, 3f), 500, Easing.OutQuint);
+            this.FadeOut(250);
 
             Expire();
         }

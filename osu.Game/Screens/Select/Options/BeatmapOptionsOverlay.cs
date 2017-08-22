@@ -5,7 +5,7 @@ using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
@@ -14,7 +14,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsOverlay : FocusedOverlayContainer
+    public class BeatmapOptionsOverlay : OsuFocusedOverlayContainer
     {
         private const float transition_duration = 500;
         private const float x_position = 0.2f;
@@ -29,27 +29,27 @@ namespace osu.Game.Screens.Select.Options
         {
             base.PopIn();
 
-            FadeIn(transition_duration, EasingTypes.OutQuint);
+            this.FadeIn(transition_duration, Easing.OutQuint);
 
             if (buttonsContainer.Position.X == 1 || Alpha == 0)
                 buttonsContainer.MoveToX(x_position - x_movement);
 
-            holder.ScaleTo(new Vector2(1, 1), transition_duration / 2, EasingTypes.OutQuint);
+            holder.ScaleTo(new Vector2(1, 1), transition_duration / 2, Easing.OutQuint);
 
-            buttonsContainer.MoveToX(x_position, transition_duration, EasingTypes.OutQuint);
-            buttonsContainer.TransformSpacingTo(Vector2.Zero, transition_duration, EasingTypes.OutQuint);
+            buttonsContainer.MoveToX(x_position, transition_duration, Easing.OutQuint);
+            buttonsContainer.TransformSpacingTo(Vector2.Zero, transition_duration, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
 
-            holder.ScaleTo(new Vector2(1, 0), transition_duration / 2, EasingTypes.InSine);
+            holder.ScaleTo(new Vector2(1, 0), transition_duration / 2, Easing.InSine);
 
-            buttonsContainer.MoveToX(x_position + x_movement, transition_duration, EasingTypes.InSine);
-            buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, EasingTypes.InSine);
+            buttonsContainer.MoveToX(x_position + x_movement, transition_duration, Easing.InSine);
+            buttonsContainer.TransformSpacingTo(new Vector2(200f, 0f), transition_duration, Easing.InSine);
 
-            FadeOut(transition_duration, EasingTypes.InQuint);
+            this.FadeOut(transition_duration, Easing.InQuint);
         }
 
         public BeatmapOptionsOverlay()
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select.Options
                     Scale = new Vector2(1, 0),
                     Colour = Color4.Black.Opacity(0.5f),
                 },
-                buttonsContainer = new ReverseDepthFillFlowContainer<BeatmapOptionsButton>
+                buttonsContainer = new ReverseChildIDFillFlowContainer<BeatmapOptionsButton>
                 {
                     Height = height,
                     RelativePositionAxes = Axes.X,
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Select.Options
         /// <param name="colour">Colour of the button.</param>
         /// <param name="icon">Icon of the button.</param>
         /// <param name="hotkey">Hotkey of the button.</param>
-        /// <param name="action">Action the button does.</param>
+        /// <param name="action">Binding the button does.</param>
         /// <param name="depth">
         /// <para>Lower depth to be put on the left, and higher to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Footer"/>!</para>

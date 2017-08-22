@@ -6,10 +6,10 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -22,8 +22,6 @@ namespace osu.Game.Overlays.Toolbar
 
         private readonly ToolbarUserArea userArea;
 
-        protected override bool HideOnEscape => false;
-
         protected override bool BlockPassThroughMouse => false;
 
         private const double transition_time = 500;
@@ -33,8 +31,6 @@ namespace osu.Game.Overlays.Toolbar
 
         public Toolbar()
         {
-            AlwaysReceiveInput = true;
-
             Children = new Drawable[]
             {
                 new ToolbarBackground(),
@@ -55,7 +51,6 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 new FillFlowContainer
                 {
-                    AlwaysReceiveInput = true,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Direction = FillDirection.Horizontal,
@@ -64,6 +59,7 @@ namespace osu.Game.Overlays.Toolbar
                     Children = new Drawable[]
                     {
                         new ToolbarChatButton(),
+                        new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
                         new ToolbarButton
                         {
@@ -101,7 +97,7 @@ namespace osu.Game.Overlays.Toolbar
                         Anchor = Anchor.BottomLeft,
                         Alpha = 0,
                         Height = 90,
-                        ColourInfo = ColourInfo.GradientVertical(
+                        Colour = ColourInfo.GradientVertical(
                             OsuColour.Gray(0.1f).Opacity(0.5f), OsuColour.Gray(0.1f).Opacity(0)),
                     },
                 };
@@ -109,30 +105,30 @@ namespace osu.Game.Overlays.Toolbar
 
             protected override bool OnHover(InputState state)
             {
-                solidBackground.FadeTo(alpha_hovering, transition_time, EasingTypes.OutQuint);
-                gradientBackground.FadeIn(transition_time, EasingTypes.OutQuint);
+                solidBackground.FadeTo(alpha_hovering, transition_time, Easing.OutQuint);
+                gradientBackground.FadeIn(transition_time, Easing.OutQuint);
                 return true;
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                solidBackground.FadeTo(alpha_normal, transition_time, EasingTypes.OutQuint);
-                gradientBackground.FadeOut(transition_time, EasingTypes.OutQuint);
+                solidBackground.FadeTo(alpha_normal, transition_time, Easing.OutQuint);
+                gradientBackground.FadeOut(transition_time, Easing.OutQuint);
             }
         }
 
         protected override void PopIn()
         {
-            MoveToY(0, transition_time, EasingTypes.OutQuint);
-            FadeIn(transition_time / 2, EasingTypes.OutQuint);
+            this.MoveToY(0, transition_time, Easing.OutQuint);
+            this.FadeIn(transition_time / 2, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             userArea?.LoginOverlay.Hide();
 
-            MoveToY(-DrawSize.Y, transition_time, EasingTypes.OutQuint);
-            FadeOut(transition_time);
+            this.MoveToY(-DrawSize.Y, transition_time, Easing.OutQuint);
+            this.FadeOut(transition_time);
         }
     }
 }

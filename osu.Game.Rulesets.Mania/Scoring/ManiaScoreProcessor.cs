@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -156,8 +155,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
         {
         }
 
-        public ManiaScoreProcessor(HitRenderer<ManiaHitObject, ManiaJudgement> hitRenderer)
-            : base(hitRenderer)
+        public ManiaScoreProcessor(RulesetContainer<ManiaHitObject, ManiaJudgement> rulesetContainer)
+            : base(rulesetContainer)
         {
         }
 

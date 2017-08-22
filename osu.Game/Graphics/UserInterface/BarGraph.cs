@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.UserInterface
                 base.Direction = (direction & BarDirection.Horizontal) > 0 ? FillDirection.Vertical : FillDirection.Horizontal;
                 foreach (var bar in Children)
                 {
-                    bar.Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / Children.Count()) : new Vector2(1.0f / Children.Count(), 1);
+                    bar.Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / Children.Count) : new Vector2(1.0f / Children.Count, 1);
                     bar.Direction = direction;
                 }
             }
@@ -44,21 +44,33 @@ namespace osu.Game.Graphics.UserInterface
             {
                 List<Bar> bars = Children.ToList();
                 foreach (var bar in value.Select((length, index) => new { Value = length, Bar = bars.Count > index ? bars[index] : null }))
+                {
+                    float length = MaxValue ?? value.Max();
+                    if (length != 0)
+                        length = bar.Value / length;
+
+                    float size = value.Count();
+                    if (size != 0)
+                        size = 1.0f / size;
+
                     if (bar.Bar != null)
                     {
-                        bar.Bar.Length = bar.Value / (MaxValue ?? value.Max());
-                        bar.Bar.Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / value.Count()) : new Vector2(1.0f / value.Count(), 1);
+                        bar.Bar.Length = length;
+                        bar.Bar.Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, size) : new Vector2(size, 1);
                     }
                     else
+                    {
                         Add(new Bar
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / value.Count()) : new Vector2(1.0f / value.Count(), 1),
-                            Length = bar.Value / (MaxValue ?? value.Max()),
+                            Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, size) : new Vector2(size, 1),
+                            Length = length,
                             Direction = Direction,
                         });
+                    }
+                }
                 //I'm using ToList() here because Where() returns an Enumerable which can change it's elements afterwards
-                Remove(Children.Where((bar, index) => index >= value.Count()).ToList());
+                RemoveRange(Children.Where((bar, index) => index >= value.Count()).ToList());
             }
         }
     }

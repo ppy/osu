@@ -28,17 +28,17 @@ namespace osu.Game.Graphics.UserInterface
                     var tabIndex = TabContainer.IndexOf(TabMap[tab]);
 
                     t.State = tIndex < tabIndex ? Visibility.Hidden : Visibility.Visible;
-                    t.Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, EasingTypes.OutQuint);
+                    t.Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, Easing.OutQuint);
                 }
             };
         }
 
         private class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
-            public readonly TextAwesome Chevron;
+            public readonly SpriteIcon Chevron;
 
             //don't allow clicking between transitions and don't make the chevron clickable
-            protected override bool InternalContains(Vector2 screenSpacePos) => Alpha == 1f && Text.Contains(screenSpacePos);
+            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Alpha == 1f && Text.ReceiveMouseInputAt(screenSpacePos);
             public override bool HandleInput => State == Visibility.Visible;
 
             private Visibility state;
@@ -54,13 +54,13 @@ namespace osu.Game.Graphics.UserInterface
 
                     if (State == Visibility.Visible)
                     {
-                        FadeIn(transition_duration, EasingTypes.OutQuint);
-                        ScaleTo(new Vector2(1f), transition_duration, EasingTypes.OutQuint);
+                        this.FadeIn(transition_duration, Easing.OutQuint);
+                        this.ScaleTo(new Vector2(1f), transition_duration, Easing.OutQuint);
                     }
                     else
                     {
-                        FadeOut(transition_duration, EasingTypes.OutQuint);
-                        ScaleTo(new Vector2(0.8f, 1f), transition_duration, EasingTypes.OutQuint);
+                        this.FadeOut(transition_duration, Easing.OutQuint);
+                        this.ScaleTo(new Vector2(0.8f, 1f), transition_duration, Easing.OutQuint);
                     }
                 }
             }
@@ -69,11 +69,11 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Text.TextSize = 16;
                 Padding = new MarginPadding { Right = padding + 8 }; //padding + chevron width
-                Add(Chevron = new TextAwesome
+                Add(Chevron = new SpriteIcon
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
-                    TextSize = 12,
+                    Size = new Vector2(12),
                     Icon = FontAwesome.fa_chevron_right,
                     Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,

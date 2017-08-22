@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.UserInterface;
@@ -14,6 +13,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             GainedSelection?.Invoke(this);
 
-            background.ColourInfo = ColourInfo.GradientVertical(
+            background.Colour = ColourInfo.GradientVertical(
                 new Color4(20, 43, 51, 255),
                 new Color4(40, 86, 102, 255));
 
@@ -139,7 +139,7 @@ namespace osu.Game.Beatmaps.Drawables
                                 },
                                 starCounter = new StarCounter
                                 {
-                                    Count = (float)beatmap.StarDifficulty,
+                                    CountStars = (float)beatmap.StarDifficulty,
                                     Scale = new Vector2(0.8f),
                                 }
                             }

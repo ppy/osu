@@ -5,7 +5,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using System;
 
 namespace osu.Game.Graphics.UserInterface
@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private const int resize_duration = 250;
 
-        private const EasingTypes easing = EasingTypes.InOutCubic;
+        private const Easing easing = Easing.InOutCubic;
 
         private float length;
         /// <summary>
@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(0,0,0,0)
+                    Colour = new Color4(0, 0, 0, 0)
                 },
                 bar = new Box
                 {

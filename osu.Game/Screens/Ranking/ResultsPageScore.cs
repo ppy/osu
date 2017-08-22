@@ -15,7 +15,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -23,6 +22,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Ranking
                             {
                                 new Box
                                 {
-                                    ColourInfo = ColourInfo.GradientHorizontal(
+                                    Colour = ColourInfo.GradientHorizontal(
                                         colours.GrayC.Opacity(0),
                                         colours.GrayC.Opacity(0.9f)),
                                     RelativeSizeAxes = Axes.Both,
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    ColourInfo = ColourInfo.GradientHorizontal(
+                                    Colour = ColourInfo.GradientHorizontal(
                                         colours.GrayC.Opacity(0.9f),
                                         colours.GrayC.Opacity(0)),
                                     RelativeSizeAxes = Axes.Both,
@@ -157,13 +157,13 @@ namespace osu.Game.Screens.Ranking
                             Origin = Anchor.TopCentre,
                             Direction = FillDirection.Horizontal,
                             LayoutDuration = 200,
-                            LayoutEasing = EasingTypes.OutQuint
+                            LayoutEasing = Easing.OutQuint
                         }
                     }
                 }
             };
 
-            statisticsContainer.Children = Score.Statistics.Select(s => new DrawableScoreStatistic(s));
+            statisticsContainer.ChildrenEnumerable = Score.Statistics.Select(s => new DrawableScoreStatistic(s));
         }
 
         protected override void LoadComplete()
@@ -177,9 +177,9 @@ namespace osu.Game.Screens.Ranking
                 int delay = 0;
                 foreach (var s in statisticsContainer.Children)
                 {
-                    s.FadeOut();
-                    s.Delay(delay += 200);
-                    s.FadeIn(300 + delay, EasingTypes.Out);
+                    s.FadeOut()
+                     .Then(delay += 200)
+                     .FadeIn(300 + delay, Easing.Out);
                 }
             });
         }
@@ -342,6 +342,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     cover = new Sprite
                     {
+                        RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fill,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -370,7 +371,7 @@ namespace osu.Game.Screens.Ranking
         {
             protected override double RollingDuration => 3000;
 
-            protected override EasingTypes RollingEasing => EasingTypes.OutPow10;
+            protected override Easing RollingEasing => Easing.OutPow10;
 
             public SlowScoreCounter(uint leading = 0) : base(leading)
             {

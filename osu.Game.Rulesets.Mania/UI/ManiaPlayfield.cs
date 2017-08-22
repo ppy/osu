@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
 using OpenTK;
@@ -15,24 +14,15 @@ using osu.Framework.Allocation;
 using OpenTK.Input;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Timing;
-using osu.Framework.Input;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : Playfield<ManiaHitObject, ManiaJudgement>
+    public class ManiaPlayfield : ScrollingPlayfield<ManiaHitObject, ManiaJudgement>
     {
         public const float HIT_TARGET_POSITION = 50;
-
-        private const float time_span_default = 5000;
-        private const float time_span_min = 10;
-        private const float time_span_max = 50000;
-        private const float time_span_step = 200;
 
         /// <summary>
         /// Default column keys, expanding outwards from the middle as more column are added.
@@ -58,21 +48,23 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
-        private readonly ControlPointContainer barLineContainer;
+        protected override Container<Drawable> Content => content;
+        private readonly Container<Drawable> content;
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
         private readonly int columnCount;
 
-        public ManiaPlayfield(int columnCount, IEnumerable<TimingChange> timingChanges)
+        public ManiaPlayfield(int columnCount)
+            : base(Axes.Y)
         {
             this.columnCount = columnCount;
 
             if (columnCount <= 0)
                 throw new ArgumentException("Can't have zero or fewer columns.");
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Container
                 {
@@ -116,12 +108,12 @@ namespace osu.Game.Rulesets.Mania.UI
                             Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
                             Children = new[]
                             {
-                                barLineContainer = new ControlPointContainer(timingChanges)
+                                content = new Container
                                 {
                                     Name = "Bar lines",
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
-                                    RelativeSizeAxes = Axes.Y
+                                    RelativeSizeAxes = Axes.Y,
                                     // Width is set in the Update method
                                 }
                             }
@@ -131,9 +123,14 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             for (int i = 0; i < columnCount; i++)
-                columns.Add(new Column(timingChanges));
+            {
+                var c = new Column();
+                c.Reversed.BindTo(Reversed);
+                c.VisibleTimeRange.BindTo(VisibleTimeRange);
 
-            TimeSpan = time_span_default;
+                columns.Add(c);
+                AddNested(c);
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -207,79 +204,13 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
-        public void Add(DrawableBarLine barline) => barLineContainer.Add(barline);
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (state.Keyboard.ControlPressed)
-            {
-                switch (args.Key)
-                {
-                    case Key.Minus:
-                        transformTimeSpanTo(TimeSpan + time_span_step, 200, EasingTypes.OutQuint);
-                        break;
-                    case Key.Plus:
-                        transformTimeSpanTo(TimeSpan - time_span_step, 200, EasingTypes.OutQuint);
-                        break;
-                }
-            }
-
-            return false;
-        }
-
-        private double timeSpan;
-        /// <summary>
-        /// The amount of time which the length of the playfield spans.
-        /// </summary>
-        public double TimeSpan
-        {
-            get { return timeSpan; }
-            set
-            {
-                if (timeSpan == value)
-                    return;
-                timeSpan = value;
-
-                timeSpan = MathHelper.Clamp(timeSpan, time_span_min, time_span_max);
-
-                barLineContainer.TimeSpan = value;
-                Columns.ForEach(c => c.ControlPointContainer.TimeSpan = value);
-            }
-        }
-
-        private void transformTimeSpanTo(double newTimeSpan, double duration = 0, EasingTypes easing = EasingTypes.None)
-        {
-            TransformTo(() => TimeSpan, newTimeSpan, duration, easing, new TransformTimeSpan());
-        }
+        public void Add(DrawableBarLine barline) => HitObjects.Add(barline);
 
         protected override void Update()
         {
             // Due to masking differences, it is not possible to get the width of the columns container automatically
             // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
-            barLineContainer.Width = columns.Width;
-        }
-
-        private class TransformTimeSpan : Transform<double>
-        {
-            public override double CurrentValue
-            {
-                get
-                {
-                    double time = Time?.Current ?? 0;
-                    if (time < StartTime) return StartValue;
-                    if (time >= EndTime) return EndValue;
-
-                    return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-                }
-            }
-
-            public override void Apply(Drawable d)
-            {
-                base.Apply(d);
-
-                var p = (ManiaPlayfield)d;
-                p.TimeSpan = CurrentValue;
-            }
+            content.Width = columns.Width;
         }
     }
 }

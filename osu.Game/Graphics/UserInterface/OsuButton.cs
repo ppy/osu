@@ -3,8 +3,12 @@
 
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -13,9 +17,12 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuButton : Button
+    public class OsuButton : Button, IFilterable
     {
         private Box hover;
+
+        private SampleChannel sampleClick;
+        private SampleChannel sampleHover;
 
         public OsuButton()
         {
@@ -33,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
         public override bool HandleInput => Action != null;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, AudioManager audio)
         {
             if (Action == null)
                 Colour = OsuColour.Gray(0.5f);
@@ -43,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
             Content.Masking = true;
             Content.CornerRadius = 5;
 
-            Add(new Drawable[]
+            AddRange(new Drawable[]
             {
                 new Triangles
                 {
@@ -59,10 +66,28 @@ namespace osu.Game.Graphics.UserInterface
                     Alpha = 0,
                 },
             });
+
+            sampleClick = audio.Sample.Get(@"UI/generic-click");
+            sampleHover = audio.Sample.Get(@"UI/generic-hover");
+
+            Enabled.ValueChanged += enabled_ValueChanged;
+            Enabled.TriggerChange();
+        }
+
+        private void enabled_ValueChanged(bool enabled)
+        {
+            this.FadeColour(enabled ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            sampleClick?.Play();
+            return base.OnClick(state);
         }
 
         protected override bool OnHover(InputState state)
         {
+            sampleHover?.Play();
             hover.FadeIn(200);
             return base.OnHover(state);
         }
@@ -75,14 +100,24 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            Content.ScaleTo(0.9f, 4000, EasingTypes.OutQuint);
+            Content.ScaleTo(0.9f, 4000, Easing.OutQuint);
             return base.OnMouseDown(state, args);
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            Content.ScaleTo(1, 1000, EasingTypes.OutElastic);
+            Content.ScaleTo(1, 1000, Easing.OutElastic);
             return base.OnMouseUp(state, args);
+        }
+
+        public string[] FilterTerms => new[] { Text };
+
+        public bool MatchingFilter
+        {
+            set
+            {
+                this.FadeTo(value ? 1 : 0);
+            }
         }
     }
 }

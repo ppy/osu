@@ -23,12 +23,24 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         protected double EarlyActivationMilliseconds;
 
+        /// <summary>
+        /// The time in milliseconds until the next beat.
+        /// </summary>
+        public double TimeUntilNextBeat { get; private set; }
+
+        /// <summary>
+        /// The time in milliseconds since the last beat
+        /// </summary>
+        public double TimeSinceLastBeat { get; private set; }
+
         protected override void Update()
         {
-            if (Beatmap.Value?.Track == null)
+            var track = Beatmap.Value.Track;
+
+            if (track == null)
                 return;
 
-            double currentTrackTime = Beatmap.Value.Track.CurrentTime + EarlyActivationMilliseconds;
+            double currentTrackTime = track.Length > 0 ? track.CurrentTime + EarlyActivationMilliseconds : Clock.CurrentTime;
 
             TimingControlPoint timingPoint = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
             EffectControlPoint effectPoint = Beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
@@ -42,12 +54,16 @@ namespace osu.Game.Graphics.Containers
             if (currentTrackTime < timingPoint.Time)
                 beatIndex--;
 
-            if (timingPoint == lastTimingPoint && beatIndex == lastBeat)
+            TimeUntilNextBeat = (timingPoint.Time - currentTrackTime) % timingPoint.BeatLength;
+            if (TimeUntilNextBeat < 0)
+                TimeUntilNextBeat += timingPoint.BeatLength;
+
+            TimeSinceLastBeat = timingPoint.BeatLength - TimeUntilNextBeat;
+
+            if (timingPoint.Equals(lastTimingPoint) && beatIndex == lastBeat)
                 return;
 
-            double offsetFromBeat = (timingPoint.Time - currentTrackTime) % timingPoint.BeatLength;
-
-            using (BeginDelayedSequence(offsetFromBeat, true))
+            using (BeginDelayedSequence(-TimeSinceLastBeat, true))
                 OnNewBeat(beatIndex, timingPoint, effectPoint, Beatmap.Value.Track.CurrentAmplitudes);
 
             lastBeat = beatIndex;

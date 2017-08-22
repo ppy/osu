@@ -5,16 +5,17 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Audio.Sample;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DialogButton : ClickableContainer
+    public class DialogButton : OsuClickableContainer
     {
         private const float hover_width = 0.9f;
         private const float hover_duration = 500;
@@ -78,8 +79,6 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public SampleChannel SampleClick, SampleHover;
-
         private readonly Container backgroundContainer;
         private readonly Container colourContainer;
         private readonly Container glowContainer;
@@ -92,33 +91,30 @@ namespace osu.Game.Graphics.UserInterface
 
         private bool didClick; // Used for making sure that the OnMouseDown animation can call instead of OnHoverLost's when clicking
 
-        protected override bool InternalContains(Vector2 screenSpacePos) => backgroundContainer.Contains(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceiveMouseInputAt(screenSpacePos);
 
         protected override bool OnClick(Framework.Input.InputState state)
         {
             didClick = true;
-            colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, EasingTypes.In);
+            colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
             flash();
-            SampleClick?.Play();
-            Action?.Invoke();
 
-            Delay(click_duration);
-            Schedule(delegate {
+            this.Delay(click_duration).Schedule(delegate {
                 colourContainer.ResizeTo(new Vector2(0.8f, 1f));
                 spriteText.Spacing = Vector2.Zero;
                 glowContainer.FadeOut();
             });
 
-            return true;
+            return base.OnClick(state);
         }
 
         protected override bool OnHover(Framework.Input.InputState state)
         {
-            spriteText.TransformSpacingTo(hoverSpacing, hover_duration, EasingTypes.OutElastic);
+            spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
 
-            colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, EasingTypes.OutElastic);
-            glowContainer.FadeIn(glow_fade_duration, EasingTypes.Out);
-            SampleHover?.Play();
+            colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
+            glowContainer.FadeIn(glow_fade_duration, Easing.Out);
+            base.OnHover(state);
             return true;
         }
 
@@ -126,9 +122,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (!didClick)
             {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, EasingTypes.OutElastic);
-                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, EasingTypes.OutElastic);
-                glowContainer.FadeOut(glow_fade_duration, EasingTypes.Out);
+                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, Easing.OutElastic);
+                spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
+                glowContainer.FadeOut(glow_fade_duration, Easing.Out);
             }
 
             didClick = false;
@@ -152,9 +148,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateGlow()
         {
-            leftGlow.ColourInfo = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
+            leftGlow.Colour = ColourInfo.GradientHorizontal(new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f), ButtonColour);
             centerGlow.Colour = ButtonColour;
-            rightGlow.ColourInfo = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
+            rightGlow.Colour = ColourInfo.GradientHorizontal(ButtonColour, new Color4(ButtonColour.R, ButtonColour.G, ButtonColour.B, 0f));
         }
 
         public DialogButton()
@@ -222,7 +218,7 @@ namespace osu.Game.Graphics.UserInterface
                             Width = 0.8f,
                             Masking = true,
                             MaskingSmoothness = 2,
-                            EdgeEffect = new EdgeEffect
+                            EdgeEffect = new EdgeEffectParameters
                             {
                                 Type = EdgeEffectType.Shadow,
                                 Colour = Color4.Black.Opacity(0.2f),

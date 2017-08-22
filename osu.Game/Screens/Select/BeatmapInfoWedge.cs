@@ -11,16 +11,15 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Select
 {
@@ -36,7 +35,7 @@ namespace osu.Game.Screens.Select
             Masking = true;
             BorderColour = new Color4(221, 255, 255, 255);
             BorderThickness = 2.5f;
-            EdgeEffect = new EdgeEffect
+            EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = new Color4(130, 204, 255, 150),
@@ -45,36 +44,28 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        protected override bool HideOnEscape => false;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            AlwaysPresent = true;
+        }
 
         protected override bool BlockPassThroughMouse => false;
 
         protected override void PopIn()
         {
-            MoveToX(0, 800, EasingTypes.OutQuint);
-            RotateTo(0, 800, EasingTypes.OutQuint);
+            this.MoveToX(0, 800, Easing.OutQuint);
+            this.RotateTo(0, 800, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
-            MoveToX(-100, 800, EasingTypes.InQuint);
-            RotateTo(10, 800, EasingTypes.InQuint);
+            this.MoveToX(-100, 800, Easing.InQuint);
+            this.RotateTo(10, 800, Easing.InQuint);
         }
 
         public void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            if (beatmap?.BeatmapInfo == null)
-            {
-                State = Visibility.Hidden;
-                beatmapInfoContainer?.FadeOut(250);
-                beatmapInfoContainer?.Expire();
-                beatmapInfoContainer = null;
-                return;
-            }
-
-            State = Visibility.Visible;
-            AlwaysPresent = true;
-
             var lastContainer = beatmapInfoContainer;
             float newDepth = lastContainer?.Depth + 1 ?? 0;
 
@@ -84,7 +75,7 @@ namespace osu.Game.Screens.Select
                     Shear = -Shear,
                     OnLoadComplete = d =>
                     {
-                        FadeIn(250);
+                        this.FadeIn(250);
 
                         lastContainer?.FadeOut(250);
                         lastContainer?.Expire();
@@ -146,12 +137,13 @@ namespace osu.Game.Screens.Select
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        ColourInfo = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
+                        Colour = ColourInfo.GradientVertical(Color4.White, Color4.White.Opacity(0.3f)),
                         Children = new[]
                         {
                             // Zoomed-in and cropped beatmap background
                             new BeatmapBackgroundSprite(beatmap)
                             {
+                                RelativeSizeAxes = Axes.Both,
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 FillMode = FillMode.Fill,
@@ -253,21 +245,21 @@ namespace osu.Game.Screens.Select
                     AutoSizeAxes = Axes.Both;
                     Children = new Drawable[]
                     {
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Icon = FontAwesome.fa_square,
                         Origin = Anchor.Centre,
                         Colour = new Color4(68, 17, 136, 255),
                         Rotation = 45,
-                        TextSize = 20
+                        Size = new Vector2(20),
                     },
-                    new TextAwesome
+                    new SpriteIcon
                     {
                         Icon = statistic.Icon,
                         Origin = Anchor.Centre,
                         Colour = new Color4(255, 221, 85, 255),
                         Scale = new Vector2(0.8f),
-                        TextSize = 20
+                        Size = new Vector2(20),
                     },
                     new OsuSpriteText
                     {

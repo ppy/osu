@@ -3,9 +3,9 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {
@@ -18,7 +18,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
+
+            RelativeSizeAxes = Axes.Both;
             Size = new Vector2(CirclePiece.SYMBOL_SIZE);
+
             BorderThickness = CirclePiece.SYMBOL_BORDER;
             BorderColour = Color4.White;
             Masking = true;

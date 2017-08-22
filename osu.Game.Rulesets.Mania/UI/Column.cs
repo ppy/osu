@@ -7,21 +7,20 @@ using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Timing;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Judgements;
 using System;
 using osu.Framework.Configuration;
+using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Judgements;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class Column : Container, IHasAccentColour
+    public class Column : ScrollingPlayfield<ManiaHitObject, ManiaJudgement>, IHasAccentColour
     {
         private const float key_icon_size = 10;
         private const float key_icon_corner_radius = 3;
@@ -42,14 +41,15 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
-        public readonly ControlPointContainer ControlPointContainer;
+        protected override Container<Drawable> Content => content;
+        private readonly Container<Drawable> content;
 
-        public Column(IEnumerable<TimingChange> timingChanges)
+        public Column()
+            : base(Axes.Y)
         {
-            RelativeSizeAxes = Axes.Y;
             Width = column_width;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 background = new Box
                 {
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 {
                     Name = "Hit target + hit objects",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = ManiaPlayfield.HIT_TARGET_POSITION},
+                    Padding = new MarginPadding { Top = ManiaPlayfield.HIT_TARGET_POSITION },
                     Children = new Drawable[]
                     {
                         new Container
@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 }
                             }
                         },
-                        ControlPointContainer = new ControlPointContainer(timingChanges)
+                        content = new Container
                         {
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             Name = "Key gradient",
                             RelativeSizeAxes = Axes.Both,
-                            ColourInfo = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0)),
+                            Colour = ColourInfo.GradientVertical(Color4.Black, Color4.Black.Opacity(0)),
                             Alpha = 0.5f
                         },
                         keyIcon = new Container
@@ -145,6 +145,8 @@ namespace osu.Game.Rulesets.Mania.UI
             };
         }
 
+        public override Axes RelativeSizeAxes => Axes.Y;
+
         private bool isSpecial;
         public bool IsSpecial
         {
@@ -171,14 +173,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 background.Colour = accentColour;
 
-                hitTargetBar.EdgeEffect = new EdgeEffect
+                hitTargetBar.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
                     Radius = 5,
                     Colour = accentColour.Opacity(0.5f),
                 };
 
-                keyIcon.EdgeEffect = new EdgeEffect
+                keyIcon.EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
                     Radius = 5,
@@ -187,10 +189,14 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject)
+        /// <summary>
+        /// Adds a DrawableHitObject to this Playfield.
+        /// </summary>
+        /// <param name="hitObject">The DrawableHitObject to add.</param>
+        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject)
         {
             hitObject.AccentColour = AccentColour;
-            ControlPointContainer.Add(hitObject);
+            HitObjects.Add(hitObject);
         }
 
         private bool onKeyDown(InputState state, KeyDownEventArgs args)
@@ -200,8 +206,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             if (args.Key == Key)
             {
-                background.FadeTo(background.Alpha + 0.2f, 50, EasingTypes.OutQuint);
-                keyIcon.ScaleTo(1.4f, 50, EasingTypes.OutQuint);
+                background.FadeTo(background.Alpha + 0.2f, 50, Easing.OutQuint);
+                keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint);
             }
 
             return false;
@@ -211,8 +217,8 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             if (args.Key == Key)
             {
-                background.FadeTo(0.2f, 800, EasingTypes.OutQuart);
-                keyIcon.ScaleTo(1f, 400, EasingTypes.OutQuart);
+                background.FadeTo(0.2f, 800, Easing.OutQuart);
+                keyIcon.ScaleTo(1f, 400, Easing.OutQuart);
             }
 
             return false;

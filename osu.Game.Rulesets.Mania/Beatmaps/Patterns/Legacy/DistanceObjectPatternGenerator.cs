@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private PatternType convertType;
 
-        public DistanceObjectPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, Pattern previousPattern)
-            : base(random, hitObject, beatmap, previousPattern)
+        public DistanceObjectPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
+            : base(random, hitObject, beatmap, availableColumns, previousPattern)
         {
             convertType = PatternType.None;
             if (Beatmap.ControlPointInfo.EffectPointAt(hitObject.StartTime).KiaiMode)
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             // The true distance, accounting for any repeats
             double distance = (distanceData?.Distance ?? 0) * repeatCount;
             // The velocity of the osu! hit object - calculated as the velocity of a slider
-            double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier / (timingPoint.BeatLength * difficultyPoint.SpeedMultiplier);
+            double osuVelocity = osu_base_scoring_distance * beatmap.BeatmapInfo.Difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / timingPoint.BeatLength;
             // The duration of the osu! hit object
             double osuDuration = distance / osuVelocity;
 
@@ -448,7 +448,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             return curveData.RepeatSamples[index];
         }
 
-
         /// <summary>
         /// Constructs and adds a note to a pattern.
         /// </summary>
@@ -479,7 +478,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     Head = { Samples = sampleInfoListAt(startTime) },
                     Tail = { Samples = sampleInfoListAt(endTime) }
                 };
-
 
                 newObject = holdNote;
             }

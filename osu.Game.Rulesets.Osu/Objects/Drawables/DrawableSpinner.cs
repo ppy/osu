@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -28,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly CirclePiece circle;
         private readonly GlowPiece glow;
 
-        private readonly TextAwesome symbol;
+        private readonly SpriteIcon symbol;
 
         private readonly Color4 baseColour = OsuColour.FromHex(@"002c3c");
         private readonly Color4 fillColour = OsuColour.FromHex(@"005b7c");
@@ -38,8 +39,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public DrawableSpinner(Spinner s) : base(s)
         {
-            AlwaysReceiveInput = true;
-
             Origin = Anchor.Centre;
             Position = s.Position;
 
@@ -66,12 +65,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             Anchor = Anchor.Centre,
                         },
                         new RingPiece(),
-                        symbol = new TextAwesome
+                        symbol = new SpriteIcon
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            UseFullGlyphHeight = true,
-                            TextSize = 48,
+                            Size = new Vector2(48),
                             Icon = FontAwesome.fa_asterisk,
                             Shadow = false,
                         },
@@ -168,6 +166,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             glow.Colour = colours.BlueDark;
         }
 
+        protected override void Update()
+        {
+            disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
+
+            base.Update();
+        }
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -176,9 +181,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             ticks.Rotation = disc.Rotation;
 
             float relativeCircleScale = spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
-            disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, EasingTypes.OutQuint);
+            disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
 
-            symbol.RotateTo(disc.Rotation / 2, 500, EasingTypes.OutQuint);
+            symbol.RotateTo(disc.Rotation / 2, 500, Easing.OutQuint);
         }
 
         protected override void UpdatePreemptState()
@@ -186,35 +191,33 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.UpdatePreemptState();
 
             circleContainer.ScaleTo(spinner.Scale * 0.3f);
-            circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, EasingTypes.OutQuint);
+            circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);
 
             disc.RotateTo(-720);
             symbol.RotateTo(-720);
 
-            mainContainer.ScaleTo(0);
-            mainContainer.ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, EasingTypes.OutQuint);
-
-            mainContainer.Delay(TIME_PREEMPT - 150);
-            mainContainer.ScaleTo(1, 500, EasingTypes.OutQuint);
+            mainContainer
+                .ScaleTo(0)
+                .ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, Easing.OutQuint)
+                .Then()
+                .ScaleTo(1, 500, Easing.OutQuint);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            Delay(spinner.Duration, true);
-
-            FadeOut(160);
+            var sequence = this.Delay(spinner.Duration).FadeOut(160);
 
             switch (state)
             {
                 case ArmedState.Hit:
-                    ScaleTo(Scale * 1.2f, 320, EasingTypes.Out);
-                    Expire();
+                    sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
                 case ArmedState.Miss:
-                    ScaleTo(Scale * 0.8f, 320, EasingTypes.In);
-                    Expire();
+                    sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
             }
+
+            Expire();
         }
     }
 }

@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
 using OpenTK;
@@ -26,11 +25,15 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </summary>
         protected readonly FastRandom Random;
 
-        protected PatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, Pattern previousPattern)
-            : base(hitObject, beatmap, previousPattern)
+        protected PatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern)
+            : base(hitObject, beatmap, availableColumns, previousPattern)
         {
-            Random = random;
+            if (random == null) throw new ArgumentNullException(nameof(random));
+            if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
+            if (availableColumns <= 0) throw new ArgumentOutOfRangeException(nameof(availableColumns));
+            if (previousPattern == null) throw new ArgumentNullException(nameof(previousPattern));
 
+            Random = random;
             RandomStart = AvailableColumns == 8 ? 1 : 0;
         }
 
@@ -63,6 +66,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns>The amount of notes to be generated.</returns>
         protected int GetRandomNoteCount(double p2, double p3, double p4 = 0, double p5 = 0, double p6 = 0)
         {
+            if (p2 < 0 || p2 > 1) throw new ArgumentOutOfRangeException(nameof(p2));
+            if (p3 < 0 || p3 > 1) throw new ArgumentOutOfRangeException(nameof(p3));
+            if (p4 < 0 || p4 > 1) throw new ArgumentOutOfRangeException(nameof(p4));
+            if (p5 < 0 || p5 > 1) throw new ArgumentOutOfRangeException(nameof(p5));
+            if (p6 < 0 || p6 > 1) throw new ArgumentOutOfRangeException(nameof(p6));
+
             double val = Random.NextDouble();
             if (val >= 1 - p6)
                 return 6;

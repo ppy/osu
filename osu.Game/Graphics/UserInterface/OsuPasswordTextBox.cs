@@ -7,8 +7,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.Sprites;
 using System;
+using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -58,8 +58,8 @@ namespace osu.Game.Graphics.UserInterface
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                circle.FadeIn(500, EasingTypes.OutQuint);
-                circle.ResizeTo(new Vector2(0.8f), 500, EasingTypes.OutQuint);
+                circle.FadeIn(500, Easing.OutQuint);
+                circle.ResizeTo(new Vector2(0.8f), 500, Easing.OutQuint);
             }
         }
 

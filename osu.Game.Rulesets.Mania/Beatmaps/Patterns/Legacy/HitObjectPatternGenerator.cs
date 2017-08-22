@@ -20,9 +20,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private readonly PatternType convertType;
 
-        public HitObjectPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density, PatternType lastStair)
-            : base(random, hitObject, beatmap, previousPattern)
+        public HitObjectPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density, PatternType lastStair)
+            : base(random, hitObject, beatmap, availableColumns, previousPattern)
         {
+            if (previousTime > hitObject.StartTime) throw new ArgumentOutOfRangeException(nameof(previousTime));
+            if (density < 0) throw new ArgumentOutOfRangeException(nameof(density));
+
             StairType = lastStair;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
@@ -32,12 +35,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             float positionSeparation = ((positionData?.Position ?? Vector2.Zero) - previousPosition).Length;
             double timeSeparation = hitObject.StartTime - previousTime;
-
-            if (timeSeparation <= 125)
-            {
-                // More than 120 BPM
-                convertType |= PatternType.ForceNotStack;
-            }
 
             if (timeSeparation <= 80)
             {
@@ -64,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 // More than 111 BPM stream
                 convertType |= PatternType.Cycle | PatternType.KeepSingle;
             }
-            else if (timeSeparation <= 150 & positionSeparation < 20)
+            else if (timeSeparation <= 150 && positionSeparation < 20)
             {
                 // More than 100 BPM stream
                 convertType |= PatternType.ForceStack | PatternType.LowProbability;

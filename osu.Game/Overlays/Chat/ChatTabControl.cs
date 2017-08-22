@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
@@ -26,22 +27,39 @@ namespace osu.Game.Overlays.Chat
 
         public readonly Bindable<bool> ChannelSelectorActive = new Bindable<bool>();
 
+        private readonly ChannelTabItem.ChannelSelectorTabItem selectorTab;
+
         public ChatTabControl()
         {
             TabContainer.Margin = new MarginPadding { Left = 50 };
             TabContainer.Spacing = new Vector2(-shear_width, 0);
             TabContainer.Masking = false;
 
-            AddInternal(new TextAwesome
+            AddInternal(new SpriteIcon
             {
                 Icon = FontAwesome.fa_comments,
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
-                TextSize = 20,
-                Padding = new MarginPadding(10),
+                Size = new Vector2(20),
+                Margin = new MarginPadding(10),
             });
 
-            AddTabItem(new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }, ChannelSelectorActive));
+            AddTabItem(selectorTab = new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }));
+
+            ChannelSelectorActive.BindTo(selectorTab.Active);
+        }
+
+        protected override void SelectTab(TabItem<Channel> tab)
+        {
+            if (tab is ChannelTabItem.ChannelSelectorTabItem)
+            {
+                tab.Active.Toggle();
+                return;
+            }
+
+            selectorTab.Active.Value = false;
+
+            base.SelectTab(tab);
         }
 
         private class ChannelTabItem : TabItem<Channel>
@@ -54,19 +72,7 @@ namespace osu.Game.Overlays.Chat
             private readonly SpriteText textBold;
             private readonly Box box;
             private readonly Box highlightBox;
-            private readonly TextAwesome icon;
-
-            public override bool Active
-            {
-                get { return base.Active; }
-                set
-                {
-                    if (Active == value) return;
-
-                    base.Active = value;
-                    updateState();
-                }
-            }
+            private readonly SpriteIcon icon;
 
             private void updateState()
             {
@@ -80,30 +86,30 @@ namespace osu.Game.Overlays.Chat
 
             private void fadeActive()
             {
-                ResizeTo(new Vector2(Width, 1.1f), transition_length, EasingTypes.OutQuint);
+                this.ResizeTo(new Vector2(Width, 1.1f), transition_length, Easing.OutQuint);
 
-                box.FadeColour(backgroundActive, transition_length, EasingTypes.OutQuint);
-                highlightBox.FadeIn(transition_length, EasingTypes.OutQuint);
+                box.FadeColour(backgroundActive, transition_length, Easing.OutQuint);
+                highlightBox.FadeIn(transition_length, Easing.OutQuint);
 
-                text.FadeOut(transition_length, EasingTypes.OutQuint);
-                textBold.FadeIn(transition_length, EasingTypes.OutQuint);
+                text.FadeOut(transition_length, Easing.OutQuint);
+                textBold.FadeIn(transition_length, Easing.OutQuint);
             }
 
             private void fadeInactive()
             {
-                ResizeTo(new Vector2(Width, 1), transition_length, EasingTypes.OutQuint);
+                this.ResizeTo(new Vector2(Width, 1), transition_length, Easing.OutQuint);
 
-                box.FadeColour(backgroundInactive, transition_length, EasingTypes.OutQuint);
-                highlightBox.FadeOut(transition_length, EasingTypes.OutQuint);
+                box.FadeColour(backgroundInactive, transition_length, Easing.OutQuint);
+                highlightBox.FadeOut(transition_length, Easing.OutQuint);
 
-                text.FadeIn(transition_length, EasingTypes.OutQuint);
-                textBold.FadeOut(transition_length, EasingTypes.OutQuint);
+                text.FadeIn(transition_length, Easing.OutQuint);
+                textBold.FadeOut(transition_length, Easing.OutQuint);
             }
 
             protected override bool OnHover(InputState state)
             {
                 if (!Active)
-                    box.FadeColour(backgroundHover, transition_length, EasingTypes.OutQuint);
+                    box.FadeColour(backgroundHover, transition_length, Easing.OutQuint);
                 return true;
             }
 
@@ -141,7 +147,7 @@ namespace osu.Game.Overlays.Chat
                 Shear = new Vector2(shear_width / ChatOverlay.TAB_AREA_HEIGHT, 0);
 
                 Masking = true;
-                EdgeEffect = new EdgeEffect
+                EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
                     Radius = 10,
@@ -170,7 +176,7 @@ namespace osu.Game.Overlays.Chat
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            icon = new TextAwesome
+                            icon = new SpriteIcon
                             {
                                 Icon = FontAwesome.fa_hashtag,
                                 Anchor = Anchor.CentreLeft,
@@ -178,7 +184,7 @@ namespace osu.Game.Overlays.Chat
                                 Colour = Color4.Black,
                                 X = -10,
                                 Alpha = 0.2f,
-                                TextSize = ChatOverlay.TAB_AREA_HEIGHT,
+                                Size = new Vector2(ChatOverlay.TAB_AREA_HEIGHT),
                             },
                             text = new OsuSpriteText
                             {
@@ -205,21 +211,8 @@ namespace osu.Game.Overlays.Chat
 
             public class ChannelSelectorTabItem : ChannelTabItem
             {
-                public override bool Active
+                public ChannelSelectorTabItem(Channel value) : base(value)
                 {
-                    get { return base.Active; }
-                    set
-                    {
-                        activeBindable.Value = value;
-                        base.Active = value;
-                    }
-                }
-
-                private readonly Bindable<bool> activeBindable;
-
-                public ChannelSelectorTabItem(Channel value, Bindable<bool> active) : base(value)
-                {
-                    activeBindable = active;
                     Depth = float.MaxValue;
                     Width = 45;
 
@@ -236,6 +229,10 @@ namespace osu.Game.Overlays.Chat
                     backgroundActive = colour.Gray3;
                 }
             }
+
+            protected override void OnActivated() => updateState();
+
+            protected override void OnDeactivated() => updateState();
         }
     }
 }

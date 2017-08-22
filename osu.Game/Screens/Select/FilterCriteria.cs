@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Database;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Screens.Select

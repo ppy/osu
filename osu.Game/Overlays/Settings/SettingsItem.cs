@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Settings
                 if (text == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    Add(text = new OsuSpriteText() { Depth = 1 });
+                    Add(text = new OsuSpriteText { Depth = 1 });
                 }
 
                 text.Text = value;
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Settings
         // hold a reference to the provided bindable so we don't have to in every settings section.
         private Bindable<T> bindable;
 
-        public Bindable<T> Bindable
+        public virtual Bindable<T> Bindable
         {
             get
             {
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Settings
             set
             {
                 // probably needs a better transition.
-                FadeTo(value ? 1 : 0);
+                this.FadeTo(value ? 1 : 0);
             }
         }
 

@@ -4,14 +4,15 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings.Sections.General;
 using OpenTK.Graphics;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    internal class LoginOverlay : FocusedOverlayContainer
+    internal class LoginOverlay : OsuFocusedOverlayContainer
     {
         private LoginSettings settingsSection;
 
@@ -27,7 +28,8 @@ namespace osu.Game.Overlays
         {
             Children = new Drawable[]
             {
-                new Box {
+                new Box
+                {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                     Alpha = 0.6f,
@@ -38,12 +40,13 @@ namespace osu.Game.Overlays
                     AutoSizeAxes = Axes.Y,
                     Masking = true,
                     AutoSizeDuration = transition_time,
-                    AutoSizeEasing = EasingTypes.OutQuint,
+                    AutoSizeEasing = Easing.OutQuint,
                     Children = new Drawable[]
                     {
                         settingsSection = new LoginSettings
                         {
                             Padding = new MarginPadding(10),
+                            RequestHide = Hide,
                         },
                         new Box
                         {
@@ -64,9 +67,9 @@ namespace osu.Game.Overlays
             base.PopIn();
 
             settingsSection.Bounding = true;
-            FadeIn(transition_time, EasingTypes.OutQuint);
+            this.FadeIn(transition_time, Easing.OutQuint);
 
-            InputManager.ChangeFocus(settingsSection);
+            GetContainingInputManager().ChangeFocus(settingsSection);
         }
 
         protected override void PopOut()
@@ -74,7 +77,7 @@ namespace osu.Game.Overlays
             base.PopOut();
 
             settingsSection.Bounding = false;
-            FadeOut(transition_time);
+            this.FadeOut(transition_time);
         }
     }
 }
