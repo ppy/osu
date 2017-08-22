@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using System;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Platform;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -65,9 +66,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private class CapsWarning : SpriteIcon, IHasTooltip
         {
-            public string TooltipText => Console.CapsLock ? @"Caps lock is active" : string.Empty;
+            public string TooltipText => host.CapsLockEnabled ? @"Caps lock is active" : string.Empty;
 
             public override bool HandleInput => true;
+
+            private GameHost host;
 
             public CapsWarning()
             {
@@ -80,9 +83,10 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colour)
+            private void load(OsuColour colour, GameHost host)
             {
                 Colour = colour.YellowLight;
+                this.host = host;
             }
 
             protected override void Update()
@@ -91,7 +95,7 @@ namespace osu.Game.Graphics.UserInterface
                 updateVisibility();
             }
 
-            private void updateVisibility() => this.FadeTo(Console.CapsLock ? 1 : 0, 250, Easing.OutQuint);
+            private void updateVisibility() => this.FadeTo(host.CapsLockEnabled ? 1 : 0, 250, Easing.OutQuint);
         }
     }
 }
