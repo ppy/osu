@@ -74,8 +74,7 @@ namespace osu.Game.Rulesets.Timing
             // absolutely-sized element along the scrolling axes and adding a corresponding duration value. This introduces a bit of error, but will never under-estimate.ion.
 
             // Find the largest element that is absolutely-sized along ScrollingAxes
-            float maxAbsoluteSize = Children.Where(c => (c.RelativeSizeAxes & ScrollingAxes) == 0)
-                                            .Select(c => (ScrollingAxes & Axes.X) > 0 ? c.Width : c.Height)
+            float maxAbsoluteSize = Children.Select(c => (ScrollingAxes & Axes.X) > 0 ? c.DrawWidth : c.DrawHeight)
                                             .DefaultIfEmpty().Max();
 
             float ourAbsoluteSize = (ScrollingAxes & Axes.X) > 0 ? DrawWidth : DrawHeight;
@@ -95,6 +94,8 @@ namespace osu.Game.Rulesets.Timing
         protected override void Update()
         {
             base.Update();
+
+            RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
 
             // We want our size and position-space along the scrolling axes to span our duration to completely enclose all the hit objects
             Size = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)Duration : Size.X, (ScrollingAxes & Axes.Y) > 0 ? (float)Duration : Size.Y);
