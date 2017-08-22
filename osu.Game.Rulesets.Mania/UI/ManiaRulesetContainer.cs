@@ -74,8 +74,6 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Playfield.Reversed.Value = true;
-
             BarLines.ForEach(Playfield.Add);
         }
 
