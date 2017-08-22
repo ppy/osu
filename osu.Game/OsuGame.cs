@@ -361,7 +361,7 @@ namespace osu.Game
 
             // we only want to apply these restrictions when we are inside a screen stack.
             // the use case for not applying is in visual/unit tests.
-            bool applyRestrictions = currentScreen?.AllowBeatmapRulesetChange ?? false;
+            bool applyRestrictions = !currentScreen?.AllowBeatmapRulesetChange ?? false;
 
             Ruleset.Disabled = applyRestrictions;
             Beatmap.Disabled = applyRestrictions;
