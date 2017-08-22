@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Caching;
 using osu.Framework.Configuration;
@@ -45,49 +46,34 @@ namespace osu.Game.Rulesets.Timing
             RelativePositionAxes = Axes.Both;
         }
 
-        public override void InvalidateFromChild(Invalidation invalidation)
+        protected override int Compare(Drawable x, Drawable y)
         {
-            // We only want to re-compute our size when a child's size or position has changed
-            if ((invalidation & Invalidation.RequiredParentSizeToFit) == 0)
-            {
-                base.InvalidateFromChild(invalidation);
-                return;
-            }
+            var hX = (DrawableHitObject)x;
+            var hY = (DrawableHitObject)y;
 
+            int result = hY.HitObject.StartTime.CompareTo(hX.HitObject.StartTime);
+            if (result != 0)
+                return result;
+            return base.Compare(y, x);
+        }
+
+        public override void Add(DrawableHitObject drawable)
+        {
             durationBacking.Invalidate();
-
-            base.InvalidateFromChild(invalidation);
+            base.Add(drawable);
         }
 
-        private double computeDuration()
+        public override bool Remove(DrawableHitObject drawable)
         {
-            if (!Children.Any())
-                return 0;
-
-            double baseDuration = Children.Max(c => (c.HitObject as IHasEndTime)?.EndTime ?? c.HitObject.StartTime) - ControlPoint.StartTime;
-
-            // If we have a singular hit object at the timing section's start time, let's set a sane default duration
-            if (baseDuration == 0)
-                baseDuration = 1;
-
-            // This container needs to resize such that it completely encloses the hit objects to avoid masking optimisations. This is done by converting the largest
-            // absolutely-sized element along the scrolling axes and adding a corresponding duration value. This introduces a bit of error, but will never under-estimate.ion.
-
-            // Find the largest element that is absolutely-sized along ScrollingAxes
-            float maxAbsoluteSize = Children.Select(c => (ScrollingAxes & Axes.X) > 0 ? c.DrawWidth : c.DrawHeight)
-                                            .DefaultIfEmpty().Max();
-
-            float ourAbsoluteSize = (ScrollingAxes & Axes.X) > 0 ? DrawWidth : DrawHeight;
-
-            // Add the extra duration to account for the absolute size
-            baseDuration *= 1 + maxAbsoluteSize / ourAbsoluteSize;
-
-            return baseDuration;
+            durationBacking.Invalidate();
+            return base.Remove(drawable);
         }
+
+        // Todo: This may underestimate the size of the hit object in some cases, but won't be too much of a problem for now
+        private double computeDuration() => Math.Max(0, Children.Select(c => (c.HitObject as IHasEndTime)?.EndTime ?? c.HitObject.StartTime).DefaultIfEmpty().Max() - ControlPoint.StartTime) + 1000;
 
         /// <summary>
-        /// The maximum duration of any one hit object inside this <see cref="ScrollingContainer"/>. This is calculated as the maximum
-        /// duration of all hit objects relative to this <see cref="ScrollingContainer"/>'s <see cref="MultiplierControlPoint.StartTime"/>.
+        /// An approximate total duration of this scrolling container.
         /// </summary>
         public double Duration => durationBacking.IsValid ? durationBacking : (durationBacking.Value = computeDuration());
 
