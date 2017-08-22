@@ -34,6 +34,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         public ManiaBeatmapConverter(bool isForCurrentRuleset, int availableColumns)
         {
+            if (availableColumns <= 0) throw new ArgumentOutOfRangeException(nameof(availableColumns));
+
             this.isForCurrentRuleset = isForCurrentRuleset;
             this.availableColumns = availableColumns;
         }
