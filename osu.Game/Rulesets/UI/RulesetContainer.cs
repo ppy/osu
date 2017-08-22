@@ -139,16 +139,30 @@ namespace osu.Game.Rulesets.UI
         protected IEnumerable<Mod> Mods;
 
         /// <summary>
+        /// The <see cref="WorkingBeatmap"/> this <see cref="RulesetContainer{TObject}"/> was created with.
+        /// </summary>
+        protected readonly WorkingBeatmap WorkingBeatmap;
+
+        /// <summary>
+        /// Whether the specified beatmap is assumed to be specific to the current ruleset.
+        /// </summary>
+        protected readonly bool IsForCurrentRuleset;
+
+        /// <summary>
+        /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
         /// Creates a hit renderer for a beatmap.
         /// </summary>
         /// <param name="ruleset">The ruleset being repesented.</param>
-        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        internal RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset) : base(ruleset)
+        internal RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap, bool isForCurrentRuleset)
+            : base(ruleset)
         {
-            Debug.Assert(beatmap != null, "RulesetContainer initialized with a null beatmap.");
+            Debug.Assert(workingBeatmap != null, "RulesetContainer initialized with a null beatmap.");
 
-            Mods = beatmap.Mods.Value;
+            WorkingBeatmap = workingBeatmap;
+            IsForCurrentRuleset = isForCurrentRuleset;
+            Mods = workingBeatmap.Mods.Value;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -156,11 +170,11 @@ namespace osu.Game.Rulesets.UI
             BeatmapProcessor<TObject> processor = CreateBeatmapProcessor();
 
             // Check if the beatmap can be converted
-            if (!converter.CanConvert(beatmap.Beatmap))
+            if (!converter.CanConvert(workingBeatmap.Beatmap))
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmap)} can not be converted for the current ruleset (converter: {converter}).");
 
             // Convert the beatmap
-            Beatmap = converter.Convert(beatmap.Beatmap, isForCurrentRuleset);
+            Beatmap = converter.Convert(workingBeatmap.Beatmap);
 
             // Apply difficulty adjustments from mods before using Difficulty.
             foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
@@ -172,8 +186,6 @@ namespace osu.Game.Rulesets.UI
 
             // Post-process the beatmap
             processor.PostProcess(Beatmap);
-
-            ApplyBeatmap();
 
             // Add mods, should always be the last thing applied to give full control to mods
             applyMods(Mods);
@@ -191,11 +203,6 @@ namespace osu.Game.Rulesets.UI
             foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
                 mod.ApplyToRulesetContainer(this);
         }
-
-        /// <summary>
-        /// Called when the beatmap of this hit renderer has been set. Used to apply any default values from the beatmap.
-        /// </summary>
-        protected virtual void ApplyBeatmap() { }
 
         /// <summary>
         /// Creates a processor to perform post-processing operations
