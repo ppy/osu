@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Play
         public BreakLetterboxOverlay()
         {
             RelativeSizeAxes = Axes.Both;
+            Alpha = 0;
             Children = new Drawable[]
             {
                 new Container
@@ -68,12 +69,6 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            State = Visibility.Hidden;
         }
     }
 }
