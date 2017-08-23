@@ -187,9 +187,6 @@ namespace osu.Game.Screens.Play
                             {
                                 Background?.FadeTo(1, fade_duration);//TODO: get rid of 1, needs more stable-like look
 
-                                if (!RulesetContainer.HasReplayLoaded)
-                                    hudOverlay?.FadeTo(0, fade_duration);
-
                                 hudOverlay.KeyCounter.IsCounting = false;
 
                                 //TODO: stop HP drain
@@ -197,9 +194,6 @@ namespace osu.Game.Screens.Play
                             OnBreakOut = () =>
                             {
                                 Background?.FadeTo(1 - (float)dimLevel, fade_duration);
-
-                                if (!RulesetContainer.HasReplayLoaded)
-                                    hudOverlay?.FadeTo(1, fade_duration);
 
                                 hudOverlay.KeyCounter.IsCounting = true;
 

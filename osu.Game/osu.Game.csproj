@@ -134,6 +134,7 @@
     <Compile Include="Screens\Play\BreakOverlay.cs" />
     <Compile Include="Screens\Play\BreakTracker.cs" />
     <Compile Include="Screens\Play\KeyCounterAction.cs" />
+    <Compile Include="Screens\Play\LetterboxOverlay.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />

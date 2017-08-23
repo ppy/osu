@@ -4,6 +4,7 @@
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
 
@@ -12,6 +13,9 @@ namespace osu.Game.Screens.Play
     public class BreakOverlay : Container, IStateful<Visibility>
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
+
+        private readonly LetterboxOverlay letterboxOverlay;
+        private ScheduledDelegate scheduledShow;
 
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = value; } }
@@ -26,6 +30,9 @@ namespace osu.Game.Screens.Play
             set
             {
                 state = value;
+
+                if (letterboxing)
+                    letterboxOverlay.State = state;
 
                 switch (state)
                 {
@@ -44,6 +51,13 @@ namespace osu.Game.Screens.Play
         {
             this.letterboxing = letterboxing;
             RelativeSizeAxes = Axes.Both;
+
+            Children = new Drawable[]
+            {
+                letterboxOverlay = new LetterboxOverlay { FadeDuration = fade_duration },
+            };
+
+            State = Visibility.Hidden;
         }
 
         public void StartBreak(double remainingTime)
@@ -51,11 +65,21 @@ namespace osu.Game.Screens.Play
             if (remainingTime < BreakPeriod.MIN_BREAK_DURATION)
                 return;
 
+            endTime = remainingTime + audioClock?.CurrentTime ?? Time.Current;
+
             if (State == Visibility.Visible)
+            {
                 State = Visibility.Hidden;
 
-            endTime = remainingTime + audioClock?.CurrentTime ?? Time.Current;
-            State = Visibility.Visible;
+                scheduledShow?.Cancel();
+
+                using (BeginDelayedSequence(fade_duration))
+                    scheduledShow = Schedule(() => State = Visibility.Visible);
+            }
+            else
+            {
+                State = Visibility.Visible;
+            }
         }
 
         protected override void Update()

@@ -12,7 +12,11 @@ namespace osu.Desktop.Tests.Visual
 
         public TestCaseBreakOverlay()
         {
-            BreakOverlay breakOverlay = new BreakOverlay(true) { AudioClock = new FramedClock() };
+            Clock = new FramedClock();
+
+            BreakOverlay breakOverlay = new BreakOverlay(true) { AudioClock = Clock };
+
+            Add(breakOverlay);
 
             AddStep("Add 5s break", () => breakOverlay.StartBreak(5000));
             AddStep("Add 10s break", () => breakOverlay.StartBreak(10000));
