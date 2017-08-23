@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The key conversion input manager for this RulesetContainer.
         /// </summary>
-        public readonly PassThroughInputManager KeyBindingInputManager;
+        public PassThroughInputManager KeyBindingInputManager;
 
         /// <summary>
         /// Whether we are currently providing the local user a gameplay cursor.
@@ -76,6 +76,11 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
         }
