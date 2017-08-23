@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The key conversion input manager for this RulesetContainer.
         /// </summary>
-        public readonly PassThroughInputManager KeyBindingInputManager;
+        public PassThroughInputManager KeyBindingInputManager;
 
         /// <summary>
         /// Whether we are currently providing the local user a gameplay cursor.
@@ -76,6 +76,11 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
         }
@@ -244,7 +249,7 @@ namespace osu.Game.Rulesets.UI
         public Playfield<TObject, TJudgement> Playfield { get; private set; }
 
         protected override Container<Drawable> Content => content;
-        private readonly Container content;
+        private Container content;
 
         private readonly List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
@@ -257,6 +262,11 @@ namespace osu.Game.Rulesets.UI
         protected RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             InputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -264,11 +274,6 @@ namespace osu.Game.Rulesets.UI
             });
 
             AddInternal(InputManager);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             KeyBindingInputManager.Add(Playfield = CreatePlayfield());
 
             loadObjects();

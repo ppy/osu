@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -22,7 +21,7 @@ namespace osu.Game.Overlays.KeyBinding
 {
     internal class KeyBindingRow : Container, IFilterable
     {
-        private readonly Enum action;
+        private readonly object action;
         private readonly IEnumerable<Framework.Input.Bindings.KeyBinding> bindings;
 
         private const float transition_time = 150;
@@ -50,7 +49,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         public string[] FilterTerms => new[] { text.Text }.Concat(bindings.Select(b => b.KeyCombination.ReadableString())).ToArray();
 
-        public KeyBindingRow(Enum action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
+        public KeyBindingRow(object action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
         {
             this.action = action;
             this.bindings = bindings;
