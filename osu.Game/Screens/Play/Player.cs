@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
 
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
-        private BreakOverlay breakOverlay;
+        private BreakTracker breakTracker;
 
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
@@ -177,10 +177,11 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        breakOverlay = new BreakOverlay(Beatmap.Value.Beatmap.Breaks, Beatmap.Value.BeatmapInfo.LetterboxInBreaks)
+                        breakTracker = new BreakTracker(Beatmap.Value.Beatmap.Breaks, Beatmap.Value.BeatmapInfo.LetterboxInBreaks)
                         {
                             AudioClock = decoupledClock,
-                            OnBreakIn = () => {
+                            OnBreakIn = () =>
+                            {
 
                             },
                             OnBreakOut = () =>

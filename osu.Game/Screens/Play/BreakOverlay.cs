@@ -2,22 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps.Timing;
-using System;
-using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play
 {
     public class BreakOverlay : Container, IStateful<Visibility>
     {
-        public Action OnBreakIn;
-        public Action OnBreakOut;
-
-        private readonly bool letterboxing;
-        private readonly List<BreakPeriod> breaks;
-
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = value; } }
 
@@ -35,24 +27,34 @@ namespace osu.Game.Screens.Play
                 switch (state)
                 {
                     case Visibility.Visible:
-                        OnBreakIn?.Invoke();
                         break;
                     case Visibility.Hidden:
-                        OnBreakOut?.Invoke();
                         break;
                 }
             }
         }
 
-        public BreakOverlay(List<BreakPeriod> breaks, bool letterboxing)
+        private double endTime;
+
+        public BreakOverlay()
         {
-            this.breaks = breaks;
-            this.letterboxing = letterboxing;
+            RelativeSizeAxes = Axes.Both;
+        }
+
+        public void Show(double remainingTime)
+        {
+            endTime = audioClock?.CurrentTime ?? Time.Current + remainingTime;
+            State = Visibility.Visible;
         }
 
         protected override void Update()
         {
+            if (State == Visibility.Hidden) return;
+
             double currentTime = audioClock?.CurrentTime ?? Time.Current;
+
+            if(currentTime >= endTime)
+                State = Visibility.Hidden;
         }
     }
 }
