@@ -24,6 +24,8 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
+        protected Triangles Triangles;
+
         public OsuButton()
         {
             Height = 40;
@@ -52,7 +54,7 @@ namespace osu.Game.Graphics.UserInterface
 
             AddRange(new Drawable[]
             {
-                new Triangles
+                Triangles = new Triangles
                 {
                     RelativeSizeAxes = Axes.Both,
                     ColourDark = colours.BlueDarker,
