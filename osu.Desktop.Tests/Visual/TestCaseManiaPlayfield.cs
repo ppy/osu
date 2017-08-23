@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -13,7 +12,6 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Timing;
-using OpenTK;
 using osu.Game.Rulesets;
 
 namespace osu.Desktop.Tests.Visual
@@ -39,12 +37,12 @@ namespace osu.Desktop.Tests.Visual
             AddStep("8 columns", () => createPlayfield(8, SpecialColumnPosition.Normal));
             AddStep("Left special style", () => createPlayfield(8, SpecialColumnPosition.Left));
             AddStep("Right special style", () => createPlayfield(8, SpecialColumnPosition.Right));
+            AddStep("Reversed", () => createPlayfield(4, SpecialColumnPosition.Normal, true));
 
             AddStep("Notes with input", () => createPlayfieldWithNotes(false));
-            AddWaitStep((int)Math.Ceiling((start_time + duration) / TimePerAction));
-
+            AddStep("Notes with input (reversed)", () => createPlayfieldWithNotes(false, true));
             AddStep("Notes with gravity", () => createPlayfieldWithNotes(true));
-            AddWaitStep((int)Math.Ceiling((start_time + duration) / TimePerAction));
+            AddStep("Notes with gravity (reversed)", () => createPlayfieldWithNotes(true, true));
         }
 
         [BackgroundDependencyLoader]
@@ -58,23 +56,25 @@ namespace osu.Desktop.Tests.Visual
             TimingPoint = { BeatLength = 1000 }
         }, gravity ? ScrollingAlgorithm.Gravity : ScrollingAlgorithm.Basic);
 
-        private void createPlayfield(int cols, SpecialColumnPosition specialPos)
+        private void createPlayfield(int cols, SpecialColumnPosition specialPos, bool inverted = false)
         {
             Clear();
 
             var inputManager = new ManiaInputManager(maniaRuleset, cols) { RelativeSizeAxes = Axes.Both };
             Add(inputManager);
 
-            inputManager.Add(new ManiaPlayfield(cols)
+            ManiaPlayfield playfield;
+            inputManager.Add(playfield = new ManiaPlayfield(cols)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                SpecialColumnPosition = specialPos,
-                Scale = new Vector2(1, -1)
+                SpecialColumnPosition = specialPos
             });
+
+            playfield.Inverted.Value = inverted;
         }
 
-        private void createPlayfieldWithNotes(bool gravity)
+        private void createPlayfieldWithNotes(bool gravity, bool inverted = false)
         {
             Clear();
 
@@ -83,33 +83,34 @@ namespace osu.Desktop.Tests.Visual
             var inputManager = new ManiaInputManager(maniaRuleset, 4) { RelativeSizeAxes = Axes.Both };
             Add(inputManager);
 
-            ManiaPlayfield playField;
-            inputManager.Add(playField = new ManiaPlayfield(4)
+            ManiaPlayfield playfield;
+            inputManager.Add(playfield = new ManiaPlayfield(4)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Scale = new Vector2(1, -1),
                 Clock = new FramedClock(rateAdjustClock)
             });
 
+            playfield.Inverted.Value = inverted;
+
             if (!gravity)
-                playField.Columns.ForEach(c => c.Add(createTimingChange(0, false)));
+                playfield.Columns.ForEach(c => c.Add(createTimingChange(0, false)));
 
             for (double t = start_time; t <= start_time + duration; t += 100)
             {
                 if (gravity)
-                    playField.Columns.ElementAt(0).Add(createTimingChange(t, true));
+                    playfield.Columns.ElementAt(0).Add(createTimingChange(t, true));
 
-                playField.Add(new DrawableNote(new Note
+                playfield.Add(new DrawableNote(new Note
                 {
                     StartTime = t,
                     Column = 0
                 }, ManiaAction.Key1));
 
                 if (gravity)
-                    playField.Columns.ElementAt(3).Add(createTimingChange(t, true));
+                    playfield.Columns.ElementAt(3).Add(createTimingChange(t, true));
 
-                playField.Add(new DrawableNote(new Note
+                playfield.Add(new DrawableNote(new Note
                 {
                     StartTime = t,
                     Column = 3
@@ -117,9 +118,9 @@ namespace osu.Desktop.Tests.Visual
             }
 
             if (gravity)
-                playField.Columns.ElementAt(1).Add(createTimingChange(start_time, true));
+                playfield.Columns.ElementAt(1).Add(createTimingChange(start_time, true));
 
-            playField.Add(new DrawableHoldNote(new HoldNote
+            playfield.Add(new DrawableHoldNote(new HoldNote
             {
                 StartTime = start_time,
                 Duration = duration,
@@ -127,9 +128,9 @@ namespace osu.Desktop.Tests.Visual
             }, ManiaAction.Key2));
 
             if (gravity)
-                playField.Columns.ElementAt(2).Add(createTimingChange(start_time, true));
+                playfield.Columns.ElementAt(2).Add(createTimingChange(start_time, true));
 
-            playField.Add(new DrawableHoldNote(new HoldNote
+            playfield.Add(new DrawableHoldNote(new HoldNote
             {
                 StartTime = start_time,
                 Duration = duration,
