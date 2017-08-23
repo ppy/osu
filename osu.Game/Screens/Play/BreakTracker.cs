@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Play
 
         public BreakTracker(WorkingBeatmap beatmap)
         {
-            this.breaks = beatmap.Beatmap.Breaks;
+            breaks = beatmap.Beatmap.Breaks;
 
             RelativeSizeAxes = Axes.Both;
             Child = breakOverlay = new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks);
