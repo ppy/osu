@@ -157,5 +157,7 @@ namespace osu.Game.Rulesets.Mania
 
             return bindings;
         }
+
+        public override string GetVariantName(int variant) => $"{variant}K";
     }
 }
