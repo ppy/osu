@@ -64,8 +64,8 @@ namespace osu.Desktop.Tests.Visual
 
             AddStep("Reverse direction", () =>
             {
-                horizontalRulesetContainer.Playfield.Reversed.Toggle();
-                verticalRulesetContainer.Playfield.Reversed.Toggle();
+                horizontalRulesetContainer.Playfield.Reverse();
+                verticalRulesetContainer.Playfield.Reverse();
             });
         }
 
@@ -210,6 +210,8 @@ namespace osu.Desktop.Tests.Visual
                     content = new Container { RelativeSizeAxes = Axes.Both }
                 };
             }
+
+            public void Reverse() => Reversed.Toggle();
         }
 
 
