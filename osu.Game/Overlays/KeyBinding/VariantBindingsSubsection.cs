@@ -7,17 +7,18 @@ namespace osu.Game.Overlays.KeyBinding
 {
     public class VariantBindingsSubsection : KeyBindingsSubsection
     {
-        protected override string Header => variant > 0 ? $"Variant: {variant}" : string.Empty;
-
-        private readonly int variant;
+        protected override string Header => variantName;
+        private readonly string variantName;
 
         public VariantBindingsSubsection(RulesetInfo ruleset, int variant)
             : base(variant)
         {
-            this.variant = variant;
-
             Ruleset = ruleset;
-            Defaults = ruleset.CreateInstance().GetDefaultKeyBindings(variant);
+
+            var rulesetInstance = ruleset.CreateInstance();
+
+            variantName = rulesetInstance.GetVariantName(variant);
+            Defaults = rulesetInstance.GetDefaultKeyBindings(variant);
         }
     }
 }
