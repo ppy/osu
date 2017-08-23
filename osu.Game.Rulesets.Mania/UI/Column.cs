@@ -3,17 +3,15 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
-using osu.Framework.Configuration;
+using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Judgements;
@@ -32,10 +30,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
-        /// <summary>
-        /// The key that will trigger input actions for this column and hit objects contained inside it.
-        /// </summary>
-        public Bindable<Key> Key = new Bindable<Key>();
+        public ManiaAction Action;
 
         private readonly Box background;
         private readonly Container hitTargetBar;
@@ -101,8 +96,8 @@ namespace osu.Game.Rulesets.Mania.UI
                         // For column lighting, we need to capture input events before the notes
                         new InputTarget
                         {
-                            KeyDown = onKeyDown,
-                            KeyUp = onKeyUp
+                            Pressed = onPressed,
+                            Released = onReleased
                         }
                     }
                 },
@@ -199,12 +194,9 @@ namespace osu.Game.Rulesets.Mania.UI
             HitObjects.Add(hitObject);
         }
 
-        private bool onKeyDown(InputState state, KeyDownEventArgs args)
+        private bool onPressed(ManiaAction action)
         {
-            if (args.Repeat)
-                return false;
-
-            if (args.Key == Key)
+            if (action == Action)
             {
                 background.FadeTo(background.Alpha + 0.2f, 50, Easing.OutQuint);
                 keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint);
@@ -213,9 +205,9 @@ namespace osu.Game.Rulesets.Mania.UI
             return false;
         }
 
-        private bool onKeyUp(InputState state, KeyUpEventArgs args)
+        private bool onReleased(ManiaAction action)
         {
-            if (args.Key == Key)
+            if (action == Action)
             {
                 background.FadeTo(0.2f, 800, Easing.OutQuart);
                 keyIcon.ScaleTo(1f, 400, Easing.OutQuart);
@@ -227,10 +219,10 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// This is a simple container which delegates various input events that have to be captured before the notes.
         /// </summary>
-        private class InputTarget : Container
+        private class InputTarget : Container, IKeyBindingHandler<ManiaAction>
         {
-            public Func<InputState, KeyDownEventArgs, bool> KeyDown;
-            public Func<InputState, KeyUpEventArgs, bool> KeyUp;
+            public Func<ManiaAction, bool> Pressed;
+            public Func<ManiaAction, bool> Released;
 
             public InputTarget()
             {
@@ -239,8 +231,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 Alpha = 0;
             }
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => KeyDown?.Invoke(state, args) ?? false;
-            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => KeyUp?.Invoke(state, args) ?? false;
+            public bool OnPressed(ManiaAction action) => Pressed?.Invoke(action) ?? false;
+            public bool OnReleased(ManiaAction action) => Released?.Invoke(action) ?? false;
         }
     }
 }
