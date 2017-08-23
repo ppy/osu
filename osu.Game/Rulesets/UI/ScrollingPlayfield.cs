@@ -55,9 +55,9 @@ namespace osu.Game.Rulesets.UI
         };
 
         /// <summary>
-        /// Whether to reverse the scrolling direction is reversed.
+        /// Whether to reverse the scrolling direction is reversed. Note that this does _not_ invert the hit objects.
         /// </summary>
-        public readonly BindableBool Reversed = new BindableBool();
+        protected readonly BindableBool Reversed = new BindableBool();
 
         /// <summary>
         /// The container that contains the <see cref="SpeedAdjustmentContainer"/>s and <see cref="DrawableHitObject"/>s.

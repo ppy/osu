@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using OpenTK.Input;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Framework.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
@@ -45,6 +46,11 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        /// <summary>
+        /// Whether this playfield should be inverted. This flips everything inside the playfield.
+        /// </summary>
+        public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
+
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
 
@@ -63,6 +69,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             if (columnCount <= 0)
                 throw new ArgumentException("Can't have zero or fewer columns.");
+
+            Inverted.Value = true;
 
             InternalChildren = new Drawable[]
             {
@@ -126,7 +134,6 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < columnCount; i++)
             {
                 var c = new Column();
-                c.Reversed.BindTo(Reversed);
                 c.VisibleTimeRange.BindTo(VisibleTimeRange);
 
                 c.IsSpecial = isSpecialColumn(i);
@@ -135,6 +142,14 @@ namespace osu.Game.Rulesets.Mania.UI
                 columns.Add(c);
                 AddNested(c);
             }
+
+            Inverted.ValueChanged += invertedChanged;
+            Inverted.TriggerChange();
+        }
+
+        private void invertedChanged(bool newValue)
+        {
+            Scale = new Vector2(1, newValue ? -1 : 1);
         }
 
         [BackgroundDependencyLoader]
