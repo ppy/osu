@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo);
+        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, availableColumns);
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter()
         {
