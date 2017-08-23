@@ -22,7 +22,7 @@ namespace osu.Game.Input
             {
                 var ruleset = info.CreateInstance();
                 foreach (var variant in ruleset.AvailableVariants)
-                    insertDefaults(ruleset.GetDefaultKeyBindings(), info.ID, variant);
+                    insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
             }
         }
 
