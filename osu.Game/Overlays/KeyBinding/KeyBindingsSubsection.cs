@@ -17,9 +17,9 @@ namespace osu.Game.Overlays.KeyBinding
 
         protected RulesetInfo Ruleset;
 
-        private readonly int variant;
+        private readonly int? variant;
 
-        protected KeyBindingsSubsection(int variant)
+        protected KeyBindingsSubsection(int? variant)
         {
             this.variant = variant;
 

@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.KeyBinding
             protected override string Header => string.Empty;
 
             public DefaultBindingsSubsection(KeyBindingInputManager manager)
-                : base(0)
+                : base(null)
             {
                 Defaults = manager.DefaultKeyBindings;
             }
