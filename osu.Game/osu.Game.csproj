@@ -130,6 +130,7 @@
     <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
     <Compile Include="Rulesets\UI\RulesetInputManager.cs" />
+    <Compile Include="Screens\Play\BreakOverlay.cs" />
     <Compile Include="Screens\Play\KeyCounterAction.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />
