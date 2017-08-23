@@ -4,10 +4,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
 using OpenTK;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.KeyBinding
 {
@@ -31,14 +35,38 @@ namespace osu.Game.Overlays.KeyBinding
         {
             var bindings = store.Query(Ruleset?.ID, variant);
 
-            foreach (var defaultBinding in Defaults)
+            foreach (var defaultGroup in Defaults.GroupBy(d => d.Action))
             {
                 // one row per valid action.
-                Add(new KeyBindingRow(defaultBinding.Action, bindings.Where(b => b.Action.Equals((int)defaultBinding.Action)))
+                Add(new KeyBindingRow(defaultGroup.Key, bindings.Where(b => b.Action.Equals((int)defaultGroup.Key)))
                 {
-                    AllowMainMouseButtons = Ruleset != null
+                    AllowMainMouseButtons = Ruleset != null,
+                    Defaults = defaultGroup.Select(d => d.KeyCombination)
                 });
             }
+
+            Add(new ResetButton
+            {
+                Action = () => Children.OfType<KeyBindingRow>().ForEach(k => k.RestoreDefaults())
+            });
+        }
+    }
+
+    internal class ResetButton : OsuButton
+    {
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            Text = "Reset";
+            RelativeSizeAxes = Axes.X;
+            Margin = new MarginPadding { Top = 5 };
+            Height = 20;
+
+            Content.CornerRadius = 5;
+
+            BackgroundColour = colours.PinkDark;
+            Triangles.ColourDark = colours.PinkDarker;
+            Triangles.ColourLight = colours.Pink;
         }
     }
 }
