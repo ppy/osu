@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -12,38 +11,34 @@ using OpenTK;
 
 namespace osu.Game.Overlays.KeyBinding
 {
-    public abstract class KeyBindingsSection : SettingsSection
+    public abstract class KeyBindingsSubsection : SettingsSubsection
     {
         protected IEnumerable<Framework.Input.Bindings.KeyBinding> Defaults;
 
         protected RulesetInfo Ruleset;
 
-        protected KeyBindingsSection()
+        private readonly int variant;
+
+        protected KeyBindingsSubsection(int variant)
         {
+            this.variant = variant;
+
             FlowContent.Spacing = new Vector2(0, 1);
         }
 
         [BackgroundDependencyLoader]
         private void load(KeyBindingStore store)
         {
-            var enumType = Defaults?.FirstOrDefault()?.Action?.GetType();
-
-            if (enumType == null) return;
-
-            // for now let's just assume a variant of zero.
-            // this will need to be implemented in a better way in the future.
-            int? variant = null;
-            if (Ruleset != null)
-                variant = 0;
-
             var bindings = store.Query(Ruleset?.ID, variant);
 
-            foreach (Enum v in Enum.GetValues(enumType))
+            foreach (var defaultBinding in Defaults)
+            {
                 // one row per valid action.
-                Add(new KeyBindingRow(v, bindings.Where(b => b.Action.Equals((int)(object)v)))
+                Add(new KeyBindingRow(defaultBinding.Action, bindings.Where(b => b.Action.Equals((int)defaultBinding.Action)))
                 {
                     AllowMainMouseButtons = Ruleset != null
                 });
+            }
         }
     }
 }
