@@ -4,6 +4,7 @@
 using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 
@@ -11,9 +12,11 @@ namespace osu.Game.Screens.Play
 {
     public class LetterboxOverlay : Container, IStateful<Visibility>
     {
-        private const int letterbox_height = 80;
+        private const int letterbox_height = 350;
 
         public double FadeDuration;
+
+        private Color4 transparentBlack => new Color4(0, 0, 0, 0);
 
         private Visibility state;
         public Visibility State
@@ -53,7 +56,13 @@ namespace osu.Game.Screens.Play
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
+                        Colour = new ColourInfo
+                        {
+                            TopLeft = Color4.Black,
+                            TopRight = Color4.Black,
+                            BottomLeft = transparentBlack,
+                            BottomRight = transparentBlack,
+                        }
                     }
                 },
                 new Container
@@ -65,7 +74,13 @@ namespace osu.Game.Screens.Play
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
+                        Colour = new ColourInfo
+                        {
+                            TopLeft = transparentBlack,
+                            TopRight = transparentBlack,
+                            BottomLeft = Color4.Black,
+                            BottomRight = Color4.Black,
+                        }
                     }
                 }
             };
