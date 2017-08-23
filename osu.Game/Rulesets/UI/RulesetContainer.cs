@@ -249,7 +249,7 @@ namespace osu.Game.Rulesets.UI
         public Playfield<TObject, TJudgement> Playfield { get; private set; }
 
         protected override Container<Drawable> Content => content;
-        private readonly Container content;
+        private Container content;
 
         private readonly List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
@@ -262,6 +262,11 @@ namespace osu.Game.Rulesets.UI
         protected RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
         {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             InputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -269,11 +274,6 @@ namespace osu.Game.Rulesets.UI
             });
 
             AddInternal(InputManager);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             KeyBindingInputManager.Add(Playfield = CreatePlayfield());
 
             loadObjects();
