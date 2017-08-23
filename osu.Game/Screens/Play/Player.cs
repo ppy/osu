@@ -21,6 +21,7 @@ using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
+using osu.Game.Beatmaps.Timing;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
@@ -29,6 +30,8 @@ namespace osu.Game.Screens.Play
 {
     public class Player : OsuScreen
     {
+        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION_FOR_EFFECT / 2;
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
@@ -68,6 +71,8 @@ namespace osu.Game.Screens.Play
 
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
+        private BreakOverlay breakOverlay;
+        private BreakLetterboxOverlay breakLetterboxOverlay;
 
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
@@ -161,7 +166,7 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
-                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
+                        breakLetterboxOverlay = new BreakLetterboxOverlay { FadeDuration = fade_duration },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -175,6 +180,35 @@ namespace osu.Game.Screens.Play
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
+                        },
+                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
+                        breakOverlay = new BreakOverlay(firstObjectTime, Beatmap.Value.Beatmap.Breaks, ruleset.CreateInstance().AllowWarningArrows)
+                        {
+                            AudioClock = decoupledClock,
+                            OnBreakIn = () =>
+                            {
+                                Background?.FadeTo(1, fade_duration);
+
+                                if(!RulesetContainer.HasReplayLoaded)
+                                    hudOverlay?.FadeTo(0, fade_duration);
+
+                                hudOverlay.KeyCounter.IsCounting = false;
+
+                                if(Beatmap.Value.Beatmap.BeatmapInfo.LetterboxInBreaks)
+                                    breakLetterboxOverlay.State = Visibility.Visible;
+                            },
+                            OnBreakOut = () =>
+                            {
+                                Background?.FadeTo(1 - (float)dimLevel, fade_duration);
+
+                                if(!RulesetContainer.HasReplayLoaded)
+                                    hudOverlay?.FadeTo(1, fade_duration);
+
+                                hudOverlay.KeyCounter.IsCounting = true;
+
+                                if(Beatmap.Value.Beatmap.BeatmapInfo.LetterboxInBreaks)
+                                    breakLetterboxOverlay.State = Visibility.Hidden;
+                            }
                         },
                     }
                 },
@@ -205,6 +239,8 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
             hudOverlay.ModDisplay.Current.BindTo(working.Mods);
+
+            breakOverlay.BindHealth(scoreProcessor.Health);
 
             //bind RulesetContainer to ScoreProcessor and ourselves (for a pass situation)
             RulesetContainer.OnAllJudged += onCompletion;

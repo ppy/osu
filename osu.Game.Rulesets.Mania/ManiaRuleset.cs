@@ -110,6 +110,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
 
+        public override bool AllowWarningArrows => false;
+
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new ManiaDifficultyCalculator(beatmap);
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();

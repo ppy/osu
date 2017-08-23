@@ -130,6 +130,7 @@
     <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
     <Compile Include="Rulesets\UI\RulesetInputManager.cs" />
+    <Compile Include="Screens\Play\BreakLetterboxOverlay.cs" />
     <Compile Include="Screens\Play\KeyCounterAction.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />
@@ -299,6 +300,7 @@
     <Compile Include="Screens\Play\ReplaySettings\PlaybackSettings.cs" />
     <Compile Include="Screens\Play\ReplaySettings\ReplayCheckbox.cs" />
     <Compile Include="Screens\Play\PauseContainer.cs" />
+    <Compile Include="Screens\Play\BreakOverlay.cs" />
     <Compile Include="Screens\Play\SongProgressInfo.cs" />
     <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
     <Compile Include="Screens\Play\SquareGraph.cs" />

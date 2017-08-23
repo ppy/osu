@@ -84,16 +84,16 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        private const double skip_required_cutoff = 3000;
+        public const double SKIP_REQUIRED_CUTOFF = 3000;
         private const double fade_time = 300;
 
-        private double beginFadeTime => startTime - skip_required_cutoff - fade_time;
+        private double beginFadeTime => startTime - SKIP_REQUIRED_CUTOFF - fade_time;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            if (startTime < skip_required_cutoff)
+            if (startTime < SKIP_REQUIRED_CUTOFF)
             {
                 Alpha = 0;
                 Expire();
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play
             using (BeginAbsoluteSequence(beginFadeTime))
                 this.FadeOut(fade_time);
 
-            button.Action = () => AudioClock?.Seek(startTime - skip_required_cutoff - fade_time);
+            button.Action = () => AudioClock?.Seek(startTime - SKIP_REQUIRED_CUTOFF - fade_time);
 
             displayTime = Time.Current;
 

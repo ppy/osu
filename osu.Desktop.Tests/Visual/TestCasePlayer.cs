@@ -19,20 +19,18 @@ namespace osu.Desktop.Tests.Visual
     internal class TestCasePlayer : OsuTestCase
     {
         protected Player Player;
-        private RulesetStore rulesets;
+        protected RulesetStore Rulesets;
 
         public override string Description => @"Showing everything to play the game.";
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            this.rulesets = rulesets;
+            Rulesets = rulesets;
         }
 
-        protected override void LoadComplete()
+        protected virtual Beatmap TestBeatmap()
         {
-            base.LoadComplete();
-
             var objects = new List<HitObject>();
 
             int time = 1500;
@@ -49,13 +47,13 @@ namespace osu.Desktop.Tests.Visual
                 time += 500;
             }
 
-            Beatmap b = new Beatmap
+            return new Beatmap
             {
                 HitObjects = objects,
                 BeatmapInfo = new BeatmapInfo
                 {
                     Difficulty = new BeatmapDifficulty(),
-                    Ruleset = rulesets.Query<RulesetInfo>().First(),
+                    Ruleset = Rulesets.Query<RulesetInfo>().First(),
                     Metadata = new BeatmapMetadata
                     {
                         Artist = @"Unknown",
@@ -64,8 +62,13 @@ namespace osu.Desktop.Tests.Visual
                     }
                 }
             };
+        }
 
-            WorkingBeatmap beatmap = new TestWorkingBeatmap(b);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            WorkingBeatmap beatmap = new TestWorkingBeatmap(TestBeatmap());
 
             Add(new Box
             {

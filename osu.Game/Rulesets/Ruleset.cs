@@ -43,6 +43,8 @@ namespace osu.Game.Rulesets
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_question_circle };
 
+        public virtual bool AllowWarningArrows => true;
+
         public abstract string Description { get; }
 
         public virtual SettingsSubsection CreateSettings() => null;
