@@ -122,11 +122,15 @@ namespace osu.Game.Rulesets.Mania.UI
                 }
             };
 
+            var currentAction = ManiaAction.Key1;
             for (int i = 0; i < columnCount; i++)
             {
                 var c = new Column();
                 c.Reversed.BindTo(Reversed);
                 c.VisibleTimeRange.BindTo(VisibleTimeRange);
+
+                c.IsSpecial = isSpecialColumn(i);
+                c.Action = c.IsSpecial ? ManiaAction.Special : currentAction++;
 
                 columns.Add(c);
                 AddNested(c);
@@ -145,15 +149,11 @@ namespace osu.Game.Rulesets.Mania.UI
             specialColumnColour = colours.BlueDark;
 
             // Set the special column + colour + key
-            for (int i = 0; i < columnCount; i++)
+            foreach (var column in Columns)
             {
-                Column column = Columns.ElementAt(i);
-                column.IsSpecial = isSpecialColumn(i);
-
                 if (!column.IsSpecial)
                     continue;
 
-                column.Key.Value = Key.Space;
                 column.AccentColour = specialColumnColour;
             }
 
@@ -166,21 +166,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 Color4 colour = normalColumnColours[i % normalColumnColours.Count];
                 nonSpecialColumns[i].AccentColour = colour;
                 nonSpecialColumns[nonSpecialColumns.Count - 1 - i].AccentColour = colour;
-            }
-
-            // We'll set the keys for non-special columns in another separate loop because it's not mirrored like the above colours
-            // Todo: This needs to go when we get to bindings and use Button1, ..., ButtonN instead
-            for (int i = 0; i < nonSpecialColumns.Count; i++)
-            {
-                Column column = nonSpecialColumns[i];
-
-                int keyOffset = default_keys.Length / 2 - nonSpecialColumns.Count / 2 + i;
-                if (keyOffset >= 0 && keyOffset < default_keys.Length)
-                    column.Key.Value = default_keys[keyOffset];
-                else
-                    // There is no default key defined for this column. Let's set this to Unknown for now
-                    // however note that this will be gone after bindings are in place
-                    column.Key.Value = Key.Unknown;
             }
         }
 
