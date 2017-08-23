@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Play
 {
     public class Player : OsuScreen
     {
+        private const int fade_duration = 400; //TODO: get rid of a random number
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
@@ -182,11 +184,21 @@ namespace osu.Game.Screens.Play
                             AudioClock = decoupledClock,
                             OnBreakIn = () =>
                             {
+                                Background?.FadeTo(1, fade_duration);//TODO: get rid of 1, needs more stable-like look
 
+                                if (!RulesetContainer.HasReplayLoaded)
+                                    hudOverlay?.FadeTo(0, fade_duration);
+
+                                hudOverlay.KeyCounter.IsCounting = false;
                             },
                             OnBreakOut = () =>
                             {
+                                Background?.FadeTo(1 - (float)dimLevel, fade_duration);
 
+                                if (!RulesetContainer.HasReplayLoaded)
+                                    hudOverlay?.FadeTo(1, fade_duration);
+
+                                hudOverlay.KeyCounter.IsCounting = true;
                             }
                         }
                     }
