@@ -13,6 +13,8 @@ namespace osu.Game.Screens.Play
 {
     public class BreakTracker : Container
     {
+        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
+
         public Action OnBreakIn;
         public Action OnBreakOut;
 
@@ -47,7 +49,7 @@ namespace osu.Game.Screens.Play
                 breakOverlay.StartBreak(currentBreak.EndTime - currentBreak.StartTime);
             }
 
-            if (currentTime >= currentBreak.EndTime)
+            if (currentTime >= currentBreak.EndTime - fade_duration)
             {
                 OnBreakOut?.Invoke();
                 currentBreakIndex++;

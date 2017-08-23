@@ -5,11 +5,14 @@ using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Play
 {
     public class BreakOverlay : Container, IStateful<Visibility>
     {
+        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
+
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = value; } }
 
@@ -45,6 +48,9 @@ namespace osu.Game.Screens.Play
 
         public void StartBreak(double remainingTime)
         {
+            if (remainingTime < BreakPeriod.MIN_BREAK_DURATION)
+                return;
+
             if (State == Visibility.Visible)
                 State = Visibility.Hidden;
 
@@ -58,7 +64,7 @@ namespace osu.Game.Screens.Play
 
             double currentTime = audioClock?.CurrentTime ?? Time.Current;
 
-            if (currentTime >= endTime)
+            if (currentTime >= endTime - fade_duration)
                 State = Visibility.Hidden;
         }
     }
