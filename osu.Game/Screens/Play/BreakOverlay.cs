@@ -60,12 +60,12 @@ namespace osu.Game.Screens.Play
             State = Visibility.Hidden;
         }
 
-        public void StartBreak(double remainingTime)
+        public void StartBreak(double breakDuration)
         {
-            if (remainingTime < BreakPeriod.MIN_BREAK_DURATION)
+            if (breakDuration < BreakPeriod.MIN_BREAK_DURATION)
                 return;
 
-            endTime = remainingTime + audioClock?.CurrentTime ?? Time.Current;
+            endTime = breakDuration + audioClock?.CurrentTime ?? Time.Current;
 
             if (State == Visibility.Visible)
             {
