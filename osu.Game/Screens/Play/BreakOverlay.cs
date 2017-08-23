@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play
 
         public void Show(double remainingTime)
         {
-            endTime = audioClock?.CurrentTime ?? Time.Current + remainingTime;
+            endTime = remainingTime + audioClock?.CurrentTime ?? Time.Current;
             State = Visibility.Visible;
         }
 
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Play
 
             double currentTime = audioClock?.CurrentTime ?? Time.Current;
 
-            if(currentTime >= endTime)
+            if (currentTime >= endTime)
                 State = Visibility.Hidden;
         }
     }

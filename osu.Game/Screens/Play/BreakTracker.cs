@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play
 
         private readonly List<BreakPeriod> breaks;
 
-        private readonly int currentBreakIndex;
+        private int currentBreakIndex;
 
         private IClock audioClock;
         public IClock AudioClock { set { breakOverlay.AudioClock = audioClock = value; } }
@@ -38,6 +38,14 @@ namespace osu.Game.Screens.Play
             if (currentBreakIndex == breaks.Count) return;
 
             double currentTime = audioClock?.CurrentTime ?? Time.Current;
+
+            var currentBreak = breaks[currentBreakIndex];
+
+            if (currentTime >= currentBreak.StartTime && breakOverlay.State == Visibility.Hidden)
+                breakOverlay.Show(currentBreak.EndTime - currentBreak.StartTime);
+
+            if (currentTime >= currentBreak.EndTime)
+                currentBreakIndex++;
         }
     }
 }
