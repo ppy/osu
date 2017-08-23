@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.UI
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replay">The replay, null for local input.</param>
-        public void SetReplay(Replay replay)
+        public virtual void SetReplay(Replay replay)
         {
             Replay = replay;
             InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
@@ -272,6 +272,11 @@ namespace osu.Game.Rulesets.UI
             KeyBindingInputManager.Add(Playfield = CreatePlayfield());
 
             loadObjects();
+        }
+
+        public override void SetReplay(Replay replay)
+        {
+            base.SetReplay(replay);
 
             if (InputManager?.ReplayInputHandler != null)
                 InputManager.ReplayInputHandler.ToScreenSpace = Playfield.ScaledContent.ToScreenSpace;
