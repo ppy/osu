@@ -17,8 +17,10 @@ namespace osu.Game.Rulesets.Mania
 
     public enum ManiaAction
     {
+        [Description("Special")]
+        Special,
         [Description("Key 1")]
-        Key1,
+        Key1 = 10,
         [Description("Key 2")]
         Key2,
         [Description("Key 3")]
@@ -34,8 +36,6 @@ namespace osu.Game.Rulesets.Mania
         [Description("Key 8")]
         Key8,
         [Description("Key 9")]
-        Key9,
-        [Description("Special")]
-        Special
+        Key9
     }
 }
