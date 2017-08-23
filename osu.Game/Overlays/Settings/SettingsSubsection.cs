@@ -7,14 +7,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Settings
 {
     public abstract class SettingsSubsection : FillFlowContainer, IHasFilterableChildren
     {
-        protected override Container<Drawable> Content => content;
+        protected override Container<Drawable> Content => FlowContent;
 
-        private readonly Container<Drawable> content;
+        protected readonly FillFlowContainer FlowContent;
 
         protected abstract string Header { get; }
 
@@ -33,6 +34,19 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
+
+            FlowContent = new FillFlowContainer
+            {
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 5),
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             AddRangeInternal(new Drawable[]
             {
                 new OsuSpriteText
@@ -41,13 +55,7 @@ namespace osu.Game.Overlays.Settings
                     Margin = new MarginPadding { Bottom = 10 },
                     Font = @"Exo2.0-Black",
                 },
-                content = new FillFlowContainer
-                {
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 5),
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                },
+                FlowContent
             });
         }
     }

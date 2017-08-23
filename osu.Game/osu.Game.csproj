@@ -105,9 +105,10 @@
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
     <Compile Include="Overlays\KeyBinding\GlobalKeyBindingsSection.cs" />
     <Compile Include="Overlays\KeyBinding\KeyBindingRow.cs" />
-    <Compile Include="Overlays\KeyBinding\KeyBindingsSection.cs" />
+    <Compile Include="Overlays\KeyBinding\KeyBindingsSubsection.cs" />
     <Compile Include="Overlays\KeyBindingOverlay.cs" />
     <Compile Include="Overlays\KeyBinding\RulesetBindingsSection.cs" />
+    <Compile Include="Overlays\KeyBinding\VariantBindingsSubsection.cs" />
     <Compile Include="Overlays\MainSettings.cs" />
     <Compile Include="Overlays\Music\CollectionsDropdown.cs" />
     <Compile Include="Overlays\Music\FilterControl.cs" />

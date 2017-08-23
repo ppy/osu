@@ -14,7 +14,7 @@ namespace osu.Desktop.Tests.Visual
         [Test]
         public override void RunTest()
         {
-            using (var host = new HeadlessGameHost())
+            using (var host = new HeadlessGameHost(realtime: false))
                 host.Run(new OsuTestCaseTestRunner(this));
         }
 
