@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using OpenTK;
@@ -39,11 +40,11 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
         {
-            rulesetContainer.Objects.OfType<OsuHitObject>().ForEach(h => h.Position = new Vector2(h.Position.X, 384 - h.Y));
+            rulesetContainer.Objects.OfType<OsuHitObject>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Y));
             rulesetContainer.Objects.OfType<Slider>().ForEach(s =>
             {
                 var newControlPoints = new List<Vector2>();
-                s.ControlPoints.ForEach(c => newControlPoints.Add(new Vector2(c.X, 384 - c.Y)));
+                s.ControlPoints.ForEach(c => newControlPoints.Add(new Vector2(c.X, OsuPlayfield.BASE_SIZE.Y - c.Y)));
 
                 s.ControlPoints = newControlPoints;
                 s.Curve?.Calculate(); // Recalculate the slider curve
