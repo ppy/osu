@@ -11,7 +11,7 @@ namespace osu.Desktop.Tests.Visual
 
         public TestCaseBreakOverlay()
         {
-            BreakOverlay breakOverlay = new BreakOverlay();
+            BreakOverlay breakOverlay = new BreakOverlay(true);
 
             AddStep("Add 5s break", () => breakOverlay.Show(5000));
             AddStep("Add 10s break", () => breakOverlay.Show(10000));

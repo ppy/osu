@@ -34,10 +34,12 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        private readonly bool letterboxing;
         private double endTime;
 
-        public BreakOverlay()
+        public BreakOverlay(bool letterboxing)
         {
+            this.letterboxing = letterboxing;
             RelativeSizeAxes = Axes.Both;
         }
 

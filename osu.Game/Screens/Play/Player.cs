@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        breakTracker = new BreakTracker(Beatmap.Value.Beatmap.Breaks, Beatmap.Value.BeatmapInfo.LetterboxInBreaks)
+                        breakTracker = new BreakTracker(Beatmap.Value)
                         {
                             AudioClock = decoupledClock,
                             OnBreakIn = () =>

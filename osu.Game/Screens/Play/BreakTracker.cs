@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Timing;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,6 @@ namespace osu.Game.Screens.Play
 
         private readonly BreakOverlay breakOverlay;
 
-        private readonly bool letterboxing;
         private readonly List<BreakPeriod> breaks;
 
         private readonly int currentBreakIndex;
@@ -25,13 +25,12 @@ namespace osu.Game.Screens.Play
         private IClock audioClock;
         public IClock AudioClock { set { breakOverlay.AudioClock = audioClock = value; } }
 
-        public BreakTracker(List<BreakPeriod> breaks, bool letterboxing)
+        public BreakTracker(WorkingBeatmap beatmap)
         {
-            this.breaks = breaks;
-            this.letterboxing = letterboxing;
+            this.breaks = beatmap.Beatmap.Breaks;
 
             RelativeSizeAxes = Axes.Both;
-            Child = breakOverlay = new BreakOverlay();
+            Child = breakOverlay = new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks);
         }
 
         protected override void Update()
