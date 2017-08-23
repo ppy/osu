@@ -75,7 +75,7 @@ namespace osu.Game.Overlays
         private void notificationClosed()
         {
             // hide ourselves if all notifications have been dismissed.
-            if (sections.Select(c => c.DisplayedCount).Sum() > 0)
+            if (sections.Select(c => c.DisplayedCount).Sum() == 0)
                 State = Visibility.Hidden;
         }
 

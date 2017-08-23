@@ -142,12 +142,12 @@ namespace osu.Game.Overlays.Notifications
             NotificationContent.MoveToX(0, 500, Easing.OutQuint);
         }
 
-        private bool wasClosed;
+        public bool WasClosed;
 
         public virtual void Close()
         {
-            if (wasClosed) return;
-            wasClosed = true;
+            if (WasClosed) return;
+            WasClosed = true;
 
             Closed?.Invoke();
             this.FadeOut(100);
