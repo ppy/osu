@@ -146,8 +146,8 @@ namespace osu.Game.Rulesets.Mania
 
             var bindings = new List<KeyBinding>();
 
-            for (int i = 0; i < variant / 2; i++)
-                bindings.Add(new KeyBinding(leftKeys[leftKeys.Length - 1 - i], currentKey++));
+            for (int i = leftKeys.Length - variant / 2; i < leftKeys.Length; i++)
+                bindings.Add(new KeyBinding(leftKeys[i], currentKey++));
 
             for (int i = 0; i < variant / 2; i++)
                 bindings.Add(new KeyBinding(rightKeys[i], currentKey++));
