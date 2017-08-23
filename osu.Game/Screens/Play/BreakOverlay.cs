@@ -43,8 +43,11 @@ namespace osu.Game.Screens.Play
             RelativeSizeAxes = Axes.Both;
         }
 
-        public void Show(double remainingTime)
+        public void StartBreak(double remainingTime)
         {
+            if (State == Visibility.Visible)
+                State = Visibility.Hidden;
+
             endTime = remainingTime + audioClock?.CurrentTime ?? Time.Current;
             State = Visibility.Visible;
         }

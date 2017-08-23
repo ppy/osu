@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
             if (currentTime >= currentBreak.StartTime && breakOverlay.State == Visibility.Hidden)
             {
                 OnBreakIn?.Invoke();
-                breakOverlay.Show(currentBreak.EndTime - currentBreak.StartTime);
+                breakOverlay.StartBreak(currentBreak.EndTime - currentBreak.StartTime);
             }
 
             if (currentTime >= currentBreak.EndTime)
