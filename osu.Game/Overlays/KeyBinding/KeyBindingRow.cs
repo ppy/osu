@@ -109,6 +109,17 @@ namespace osu.Game.Overlays.KeyBinding
                 buttons.Add(new KeyButton(b));
         }
 
+        public void RestoreDefaults()
+        {
+            int i = 0;
+            foreach (var d in Defaults)
+            {
+                var button = buttons[i++];
+                button.UpdateKeyCombination(d);
+                store.Update(button.KeyBinding);
+            }
+        }
+
         protected override bool OnHover(InputState state)
         {
             this.FadeEdgeEffectTo<Container>(1, transition_time, Easing.OutQuint);
@@ -128,6 +139,8 @@ namespace osu.Game.Overlays.KeyBinding
         private KeyButton bindTarget;
 
         public bool AllowMainMouseButtons;
+
+        public IEnumerable<KeyCombination> Defaults;
 
         private bool isModifier(Key k) => k < Key.F1;
 
