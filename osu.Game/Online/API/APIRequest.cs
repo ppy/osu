@@ -11,11 +11,11 @@ namespace osu.Game.Online.API
     /// An API request with a well-defined response type.
     /// </summary>
     /// <typeparam name="T">Type of the response (used for deserialisation).</typeparam>
-    public class APIRequest<T> : APIRequest
+    public abstract class APIRequest<T> : APIRequest
     {
         protected override WebRequest CreateWebRequest() => new JsonWebRequest<T>(Uri);
 
-        public APIRequest()
+        protected APIRequest()
         {
             base.Success += onSuccess;
         }
@@ -28,10 +28,36 @@ namespace osu.Game.Online.API
         public new event APISuccessHandler<T> Success;
     }
 
+    public abstract class APIDownloadRequest : APIRequest
+    {
+        protected override WebRequest CreateWebRequest()
+        {
+            var request = new WebRequest(Uri);
+            request.DownloadProgress += request_Progress;
+            return request;
+        }
+
+        private void request_Progress(WebRequest request, long current, long total) => API.Scheduler.Add(delegate { Progress?.Invoke(current, total); });
+
+        protected APIDownloadRequest()
+        {
+            base.Success += onSuccess;
+        }
+
+        private void onSuccess()
+        {
+            Success?.Invoke(WebRequest.ResponseData);
+        }
+
+        public event APIProgressHandler Progress;
+
+        public new event APISuccessHandler<byte[]> Success;
+    }
+
     /// <summary>
     /// AN API request with no specified response type.
     /// </summary>
-    public class APIRequest
+    public abstract class APIRequest
     {
         /// <summary>
         /// The maximum amount of time before this request will fail.
@@ -42,7 +68,7 @@ namespace osu.Game.Online.API
 
         protected virtual WebRequest CreateWebRequest() => new WebRequest(Uri);
 
-        protected virtual string Uri => $@"{api.Endpoint}/api/v2/{Target}";
+        protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
 
         private double remainingTime => Math.Max(0, Timeout - (DateTime.Now.TotalMilliseconds() - (startTime ?? 0)));
 
@@ -52,7 +78,7 @@ namespace osu.Game.Online.API
 
         public double StartTime => startTime ?? -1;
 
-        private APIAccess api;
+        protected APIAccess API;
         protected WebRequest WebRequest;
 
         public event APISuccessHandler Success;
@@ -64,7 +90,7 @@ namespace osu.Game.Online.API
 
         public void Perform(APIAccess api)
         {
-            this.api = api;
+            API = api;
 
             if (checkAndProcessFailure())
                 return;
@@ -109,9 +135,9 @@ namespace osu.Game.Online.API
         /// <returns>Whether we are in a failed or cancelled state.</returns>
         private bool checkAndProcessFailure()
         {
-            if (api == null || pendingFailure == null) return cancelled;
+            if (API == null || pendingFailure == null) return cancelled;
 
-            api.Scheduler.Add(pendingFailure);
+            API.Scheduler.Add(pendingFailure);
             pendingFailure = null;
             return true;
         }
@@ -119,5 +145,6 @@ namespace osu.Game.Online.API
 
     public delegate void APIFailureHandler(Exception e);
     public delegate void APISuccessHandler();
+    public delegate void APIProgressHandler(long current, long total);
     public delegate void APISuccessHandler<in T>(T content);
 }
