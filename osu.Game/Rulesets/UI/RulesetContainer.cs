@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Screens.Play;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -43,7 +42,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The input manager for this RulesetContainer.
         /// </summary>
-        internal readonly PlayerInputManager InputManager = new PlayerInputManager();
+        internal IHasReplayHandler ReplayInputManager => (IHasReplayHandler)KeyBindingInputManager;
 
         /// <summary>
         /// The key conversion input manager for this RulesetContainer.
@@ -58,7 +57,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Whether we have a replay loaded currently.
         /// </summary>
-        public bool HasReplayLoaded => InputManager.ReplayInputHandler != null;
+        public bool HasReplayLoaded => ReplayInputManager.ReplayInputHandler != null;
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
@@ -76,11 +75,7 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
         }
@@ -113,7 +108,7 @@ namespace osu.Game.Rulesets.UI
         public virtual void SetReplay(Replay replay)
         {
             Replay = replay;
-            InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
+            ReplayInputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
         }
     }
 
@@ -267,13 +262,12 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            InputManager.Add(content = new Container
+            KeyBindingInputManager.Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new[] { KeyBindingInputManager }
             });
 
-            AddInternal(InputManager);
+            AddInternal(KeyBindingInputManager);
             KeyBindingInputManager.Add(Playfield = CreatePlayfield());
 
             loadObjects();
@@ -283,8 +277,8 @@ namespace osu.Game.Rulesets.UI
         {
             base.SetReplay(replay);
 
-            if (InputManager?.ReplayInputHandler != null)
-                InputManager.ReplayInputHandler.ToScreenSpace = Playfield.ScaledContent.ToScreenSpace;
+            if (ReplayInputManager?.ReplayInputHandler != null)
+                ReplayInputManager.ReplayInputHandler.ToScreenSpace = input => Playfield.ScaledContent.ToScreenSpace(input);
         }
 
         /// <summary>
