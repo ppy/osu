@@ -25,7 +25,6 @@ namespace osu.Game.Overlays.Direct
         public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
-            CornerRadius = 4;
         }
 
         protected override void LoadComplete()
@@ -39,6 +38,8 @@ namespace osu.Game.Overlays.Direct
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, LocalisationEngine localisation)
         {
+            Content.CornerRadius = 4;
+
             AddRange(new Drawable[]
             {
                 new Box

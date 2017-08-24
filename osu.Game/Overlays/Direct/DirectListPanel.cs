@@ -28,20 +28,15 @@ namespace osu.Game.Overlays.Direct
         {
             RelativeSizeAxes = Axes.X;
             Height = height;
-            CornerRadius = 5;
         }
 
         [BackgroundDependencyLoader]
         private void load(LocalisationEngine localisation)
         {
-            Children = new[]
+            Content.CornerRadius = 5;
+
+            AddRange(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
-                CreateBackground(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -132,7 +127,7 @@ namespace osu.Game.Overlays.Direct
                         },
                     },
                 },
-            };
+            });
         }
 
         private class DownloadButton : OsuClickableContainer
