@@ -8,7 +8,6 @@ using osu.Game.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
-using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Game.Graphics.UserInterface.Volume;
 using osu.Framework.Allocation;
@@ -160,7 +159,7 @@ namespace osu.Game
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ActionRequested = delegate(InputState state) { volume.Adjust(state); }
+                    ActionRequested = action => volume.Adjust(action)
                 },
                 mainContent = new Container
                 {
@@ -182,7 +181,11 @@ namespace osu.Game
             LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
             LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
-            LoadComponentAsync(settings = new SettingsOverlay { Depth = -1 }, overlayContent.Add);
+            LoadComponentAsync(settings = new MainSettings
+            {
+                GetToolbarHeight = () => ToolbarOffset,
+                Depth = -1
+            }, overlayContent.Add);
             LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
@@ -354,6 +357,13 @@ namespace osu.Game
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
+
+            // we only want to apply these restrictions when we are inside a screen stack.
+            // the use case for not applying is in visual/unit tests.
+            bool applyRestrictions = !currentScreen?.AllowBeatmapRulesetChange ?? false;
+
+            Ruleset.Disabled = applyRestrictions;
+            Beatmap.Disabled = applyRestrictions;
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 

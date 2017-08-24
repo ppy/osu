@@ -5,11 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
-using OpenTK.Input;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Lists;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -32,9 +31,10 @@ namespace osu.Game.Rulesets.Mania.UI
     public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject, ManiaJudgement>
     {
         /// <summary>
-        /// Preferred column count. This will only have an effect during the initialization of the play field.
+        /// The number of columns which the <see cref="ManiaPlayfield"/> should display, and which
+        /// the beatmap converter will attempt to convert beatmaps to use.
         /// </summary>
-        public int PreferredColumns;
+        private int availableColumns;
 
         public IEnumerable<DrawableBarLine> BarLines;
 
@@ -75,36 +75,47 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected override void ApplyBeatmap()
-        {
-            base.ApplyBeatmap();
-
-            PreferredColumns = (int)Math.Max(1, Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize));
-        }
-
-        protected sealed override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(PreferredColumns)
+        protected sealed override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(availableColumns)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
-            // Invert by default for now (should be moved to config/skin later)
-            Scale = new Vector2(1, -1)
         };
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter();
+        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, availableColumns);
+
+        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter()
+        {
+            if (IsForCurrentRuleset)
+                availableColumns = (int)Math.Max(1, Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize));
+            else
+            {
+                float percentSliderOrSpinner = (float)WorkingBeatmap.Beatmap.HitObjects.Count(h => h is IHasEndTime) / WorkingBeatmap.Beatmap.HitObjects.Count;
+                if (percentSliderOrSpinner < 0.2)
+                    availableColumns = 7;
+                else if (percentSliderOrSpinner < 0.3 || Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize) >= 5)
+                    availableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) > 5 ? 7 : 6;
+                else if (percentSliderOrSpinner > 0.6)
+                    availableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) > 4 ? 5 : 4;
+                else
+                    availableColumns = Math.Max(4, Math.Min((int)Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) + 1, 7));
+            }
+
+            return new ManiaBeatmapConverter(IsForCurrentRuleset, availableColumns);
+        }
 
         protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
         {
-            Bindable<Key> key = Playfield.Columns.ElementAt(h.Column).Key;
+            ManiaAction action = Playfield.Columns.ElementAt(h.Column).Action;
 
             var holdNote = h as HoldNote;
             if (holdNote != null)
-                return new DrawableHoldNote(holdNote, key);
+                return new DrawableHoldNote(holdNote, action);
 
             var note = h as Note;
             if (note != null)
-                return new DrawableNote(note, key);
+                return new DrawableNote(note, action);
 
             return null;
         }

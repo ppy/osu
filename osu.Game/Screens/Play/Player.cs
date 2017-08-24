@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 
 namespace osu.Game.Screens.Play
 {
@@ -50,6 +51,8 @@ namespace osu.Game.Screens.Play
 
         private RulesetInfo ruleset;
 
+        private APIAccess api;
+
         private ScoreProcessor scoreProcessor;
         protected RulesetContainer RulesetContainer;
 
@@ -68,15 +71,16 @@ namespace osu.Game.Screens.Play
 
         private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(AudioManager audio, OsuConfigManager config, OsuGame osu)
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio, OsuConfigManager config, APIAccess api)
         {
+            this.api = api;
+
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
-
-            Ruleset rulesetInstance;
 
             WorkingBeatmap working = Beatmap.Value;
             Beatmap beatmap;
@@ -88,8 +92,8 @@ namespace osu.Game.Screens.Play
                 if (beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                ruleset = osu?.Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
-                rulesetInstance = ruleset.CreateInstance();
+                ruleset = Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
+                var rulesetInstance = ruleset.CreateInstance();
 
                 try
                 {
@@ -192,7 +196,6 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
 
-            hudOverlay.KeyCounter.AddRange(rulesetInstance.CreateGameplayKeys());
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindRulesetContainer(RulesetContainer);
 
@@ -238,7 +241,7 @@ namespace osu.Game.Screens.Play
                         Ruleset = ruleset
                     };
                     scoreProcessor.PopulateScore(score);
-                    score.User = RulesetContainer.Replay?.User ?? (Game as OsuGame)?.API?.LocalUser?.Value;
+                    score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
                     Push(new Results(score));
                 });
             }

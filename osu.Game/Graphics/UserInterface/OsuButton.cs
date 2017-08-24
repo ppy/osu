@@ -7,6 +7,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -16,12 +17,14 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuButton : Button
+    public class OsuButton : Button, IFilterable
     {
         private Box hover;
 
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
+
+        protected Triangles Triangles;
 
         public OsuButton()
         {
@@ -51,7 +54,7 @@ namespace osu.Game.Graphics.UserInterface
 
             AddRange(new Drawable[]
             {
-                new Triangles
+                Triangles = new Triangles
                 {
                     RelativeSizeAxes = Axes.Both,
                     ColourDark = colours.BlueDarker,
@@ -107,6 +110,16 @@ namespace osu.Game.Graphics.UserInterface
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
             return base.OnMouseUp(state, args);
+        }
+
+        public string[] FilterTerms => new[] { Text };
+
+        public bool MatchingFilter
+        {
+            set
+            {
+                this.FadeTo(value ? 1 : 0);
+            }
         }
     }
 }

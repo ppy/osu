@@ -11,6 +11,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -31,47 +32,37 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
-            RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
+            Width = (float)HitObject.Duration;
+
+            Container<DrawableDrumRollTick> tickContainer;
+            MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick>
+            {
+                RelativeSizeAxes = Axes.Both,
+                RelativeChildOffset = new Vector2((float)HitObject.StartTime, 0),
+                RelativeChildSize = new Vector2((float)HitObject.Duration, 1)
+            });
 
             foreach (var tick in drumRoll.Ticks)
             {
-                var newTick = new DrawableDrumRollTick(tick)
-                {
-                    X = (float)((tick.StartTime - HitObject.StartTime) / HitObject.Duration)
-                };
-
+                var newTick = new DrawableDrumRollTick(tick);
                 newTick.OnJudgement += onTickJudgement;
 
                 AddNested(newTick);
-                MainPiece.Add(newTick);
+                tickContainer.Add(newTick);
             }
         }
 
         protected override TaikoJudgement CreateJudgement() => new TaikoJudgement { SecondHit = HitObject.IsStrong };
 
-        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece
-        {
-            Length = (float)(HitObject.Duration / HitObject.ScrollTime),
-            PlayfieldLengthReference = () => Parent.DrawSize.X
-        };
+        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
+
+        public override bool OnPressed(TaikoAction action) => false;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             MainPiece.AccentColour = AccentColour = colours.YellowDark;
             accentDarkColour = colours.YellowDarker;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // This is naive, however it's based on the reasoning that the hit target
-            // is further than mid point of the play field, so the time taken to scroll in should always
-            // be greater than the time taken to scroll out to the left of the screen.
-            // Thus, using PreEmpt here is enough for the drum roll to completely scroll out.
-            LifetimeEnd = HitObject.EndTime + HitObject.ScrollTime;
         }
 
         private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)

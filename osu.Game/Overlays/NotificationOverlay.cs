@@ -22,7 +22,7 @@ namespace osu.Game.Overlays
         private ScrollContainer scrollContainer;
         private FlowContainer<NotificationSection> sections;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
+        [BackgroundDependencyLoader]
         private void load()
         {
             Width = width;
@@ -72,6 +72,13 @@ namespace osu.Game.Overlays
 
         private int runningDepth;
 
+        private void notificationClosed()
+        {
+            // hide ourselves if all notifications have been dismissed.
+            if (sections.Select(c => c.DisplayedCount).Sum() == 0)
+                State = Visibility.Hidden;
+        }
+
         public void Post(Notification notification)
         {
             Schedule(() =>
@@ -80,6 +87,8 @@ namespace osu.Game.Overlays
 
                 ++runningDepth;
                 notification.Depth = notification.DisplayOnTop ? runningDepth : -runningDepth;
+
+                notification.Closed += notificationClosed;
 
                 var hasCompletionTarget = notification as IHasCompletionTarget;
                 if (hasCompletionTarget != null)
