@@ -94,13 +94,13 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Whether we running up-to-date with our parent clock.
+        /// Whether we are running up-to-date with our parent clock.
         /// If not, we will need to keep processing children until we catch up.
         /// </summary>
         private bool requireMoreUpdateLoops;
 
         /// <summary>
-        /// Whether we in a valid state (ie. should we keep processing children frames).
+        /// Whether we are in a valid state (ie. should we keep processing children frames).
         /// This should be set to false when the replay is, for instance, waiting for future frames to arrive.
         /// </summary>
         private bool validState;
