@@ -1,10 +1,10 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Game.Database;
 using SQLite.Net;
 using SQLiteNetExtensions.Extensions;
+using System;
 
 namespace osu.Game.Beatmaps
 {
@@ -14,6 +14,7 @@ namespace osu.Game.Beatmaps
     public class BeatmapStore : DatabaseBackedStore
     {
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
+
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
         /// <summary>

@@ -1,20 +1,20 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using osu.Game;
-using System.Linq;
-using System.Windows.Forms;
-using osu.Framework.Platform;
-using osu.Framework.Desktop.Platform;
+using Microsoft.Win32;
 using osu.Desktop.Overlays;
-using System.Reflection;
+using osu.Framework.Desktop.Platform;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
+using osu.Game;
+using osu.Game.Screens.Menu;
+using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Win32;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Menu;
+using System.Windows.Forms;
 
 namespace osu.Desktop
 {
