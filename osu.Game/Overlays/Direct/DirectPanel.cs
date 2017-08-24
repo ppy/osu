@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Extensions.Color4Extensions;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -20,6 +22,21 @@ namespace osu.Game.Overlays.Direct
         protected DirectPanel(BeatmapSetInfo setInfo)
         {
             SetInfo = setInfo;
+
+            Masking = true;
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Shadow,
+                Offset = new Vector2(0f, 1f),
+                Radius = 3f,
+                Colour = Color4.Black.Opacity(0.25f),
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            this.FadeInFromZero(200, Easing.Out);
         }
 
         protected List<DifficultyIcon> GetDifficultyIcons()

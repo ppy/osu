@@ -26,22 +26,11 @@ namespace osu.Game.Overlays.Direct
         {
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
             CornerRadius = 4;
-            Masking = true;
-
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(0f, 1f),
-                Radius = 3f,
-                Colour = Color4.Black.Opacity(0.25f),
-            };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            this.FadeInFromZero(200, Easing.Out);
             bottomPanel.LayoutDuration = 200;
             bottomPanel.LayoutEasing = Easing.Out;
             bottomPanel.Origin = Anchor.BottomLeft;
