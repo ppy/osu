@@ -126,7 +126,6 @@ namespace osu.Desktop.Tests.Visual
             private void load(OsuColour colours)
             {
                 background.Colour = colours.Gray3;
-                ContextMenu.Menu.Background.Colour = colours.Gray3;
                 TitleText.Colour = normalColour = colours.BlueLight;
             }
 
@@ -148,10 +147,19 @@ namespace osu.Desktop.Tests.Visual
 
             protected override SpriteText CreateTitleText() => new OsuSpriteText { TextSize = text_size };
 
-            protected override ContextMenu<ContextMenuItem> CreateContextMenu() => new OsuContextMenu<ContextMenuItem>
+            protected override ContextMenu<ContextMenuItem> CreateContextMenu() => new EditorContextMenu
             {
                 OriginPosition = new Vector2(8, 0)
             };
+        }
+
+        private class EditorContextMenu : OsuContextMenu<ContextMenuItem>
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                Menu.Background.Colour = colours.Gray3;
+            }
         }
 
         private class EditorContextMenuSpacer : EditorContextMenuItem
