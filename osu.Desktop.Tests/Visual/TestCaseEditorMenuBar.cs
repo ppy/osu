@@ -31,7 +31,7 @@ namespace osu.Desktop.Tests.Visual
                     {
                         new EditorMenuBarItem("File")
                         {
-                            Items = new OsuContextMenuItem[]
+                            Items = new[]
                             {
                                 new EditorContextMenuItem("Clear All Notes"),
                                 new EditorContextMenuItem("Open Difficulty..."),
@@ -178,6 +178,13 @@ namespace osu.Desktop.Tests.Visual
             public EditorContextMenuItem(string title, MenuItemType type = MenuItemType.Standard)
                 : base(title.PadRight(min_text_length), type)
             {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = colours.Gray3;
+                BackgroundColourHover = colours.Gray2;
             }
         }
     }
