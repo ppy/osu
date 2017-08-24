@@ -92,93 +92,93 @@ namespace osu.Desktop.Tests.Visual
                 }
             });
         }
-    }
 
-    public class EditorMenuBar : MenuBar
-    {
-    }
-
-    public class EditorMenuBarItem : MenuBarItem
-    {
-        private const int fade_duration = 250;
-        private const float text_size = 17;
-
-        private readonly Container background;
-
-        private Color4 normalColour;
-
-        public EditorMenuBarItem(string title)
-            : base(title)
+        private class EditorMenuBar : MenuBar
         {
-            Content.Padding = new MarginPadding(8);
+        }
 
-            AddInternal(background = new Container
+        private class EditorMenuBarItem : MenuBarItem
+        {
+            private const int fade_duration = 250;
+            private const float text_size = 17;
+
+            private readonly Container background;
+
+            private Color4 normalColour;
+
+            public EditorMenuBarItem(string title)
+                : base(title)
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                Depth = float.MaxValue,
-                Alpha = 0,
-                Child = new Container<Box>
+                Content.Padding = new MarginPadding(8);
+
+                AddInternal(background = new Container
                 {
-                    // The following is done so we can have top rounded corners but not bottom corners
                     RelativeSizeAxes = Axes.Both,
-                    Height = 2,
                     Masking = true,
-                    CornerRadius = 5,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
-                }
-            });
+                    Depth = float.MaxValue,
+                    Alpha = 0,
+                    Child = new Container<Box>
+                    {
+                        // The following is done so we can have top rounded corners but not bottom corners
+                        RelativeSizeAxes = Axes.Both,
+                        Height = 2,
+                        Masking = true,
+                        CornerRadius = 5,
+                        Child = new Box { RelativeSizeAxes = Axes.Both }
+                    }
+                });
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                background.Colour = colours.Gray3;
+                ContextMenu.Menu.Background.Colour = colours.Gray3;
+                TitleText.Colour = normalColour = colours.BlueLight;
+            }
+
+            public override void Open()
+            {
+                base.Open();
+
+                background.FadeIn(fade_duration, Easing.OutQuint);
+                TitleText.FadeColour(Color4.White, fade_duration, Easing.OutQuint);
+            }
+
+            public override void Close()
+            {
+                base.Close();
+
+                background.FadeOut(fade_duration, Easing.OutQuint);
+                TitleText.FadeColour(normalColour, fade_duration, Easing.OutQuint);
+            }
+
+            protected override SpriteText CreateTitleText() => new OsuSpriteText { TextSize = text_size };
+
+            protected override ContextMenu<ContextMenuItem> CreateContextMenu() => new OsuContextMenu<ContextMenuItem>
+            {
+                OriginPosition = new Vector2(8, 0)
+            };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private class EditorContextMenuSpacer : EditorContextMenuItem
         {
-            background.Colour = colours.Gray3;
-            ContextMenu.Menu.Background.Colour = colours.Gray3;
-            TitleText.Colour = normalColour = colours.BlueLight;
+            public override bool HandleInput => false;
+
+            public EditorContextMenuSpacer()
+                : base(" ")
+            {
+            }
         }
 
-        public override void Open()
+        private class EditorContextMenuItem : OsuContextMenuItem
         {
-            base.Open();
+            private const int min_text_length = 40;
 
-            background.FadeIn(fade_duration, Easing.OutQuint);
-            TitleText.FadeColour(Color4.White, fade_duration, Easing.OutQuint);
-        }
-
-        public override void Close()
-        {
-            base.Close();
-
-            background.FadeOut(fade_duration, Easing.OutQuint);
-            TitleText.FadeColour(normalColour, fade_duration, Easing.OutQuint);
-        }
-
-        protected override SpriteText CreateTitleText() => new OsuSpriteText { TextSize = text_size };
-
-        protected override ContextMenu<ContextMenuItem> CreateContextMenu() => new OsuContextMenu<ContextMenuItem>
-        {
-            OriginPosition = new Vector2(8, 0)
-        };
-    }
-
-    public class EditorContextMenuSpacer : EditorContextMenuItem
-    {
-        public override bool HandleInput => false;
-
-        public EditorContextMenuSpacer()
-            : base(" ")
-        {
-        }
-    }
-
-    public class EditorContextMenuItem : OsuContextMenuItem
-    {
-        private const int min_text_length = 40;
-
-        public EditorContextMenuItem(string title, MenuItemType type = MenuItemType.Standard)
-            : base(title.PadRight(min_text_length), type)
-        {
+            public EditorContextMenuItem(string title, MenuItemType type = MenuItemType.Standard)
+                : base(title.PadRight(min_text_length), type)
+            {
+            }
         }
     }
 }
