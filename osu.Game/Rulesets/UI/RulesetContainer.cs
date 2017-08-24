@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The input manager.</returns>
         public abstract PassThroughInputManager CreateInputManager();
 
-        protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
+        protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
         public Replay Replay { get; private set; }
 

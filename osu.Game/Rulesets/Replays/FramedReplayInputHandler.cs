@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Input.Handlers;
@@ -18,7 +17,7 @@ namespace osu.Game.Rulesets.Replays
     /// The ReplayHandler will take a replay and handle the propagation of updates to the input stack.
     /// It handles logic of any frames which *must* be executed.
     /// </summary>
-    public class FramedReplayInputHandler : ReplayInputHandler
+    public abstract class FramedReplayInputHandler : ReplayInputHandler
     {
         private readonly Replay replay;
 
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Replays
 
         private int nextFrameIndex => MathHelper.Clamp(currentFrameIndex + (currentDirection > 0 ? 1 : -1), 0, Frames.Count - 1);
 
-        public FramedReplayInputHandler(Replay replay)
+        protected FramedReplayInputHandler(Replay replay)
         {
             this.replay = replay;
         }
@@ -51,7 +50,7 @@ namespace osu.Game.Rulesets.Replays
         {
         }
 
-        private Vector2? position
+        protected Vector2? Position
         {
             get
             {
@@ -62,23 +61,7 @@ namespace osu.Game.Rulesets.Replays
             }
         }
 
-        public override List<InputState> GetPendingStates()
-        {
-            var buttons = new HashSet<MouseButton>();
-            if (CurrentFrame?.MouseLeft ?? false)
-                buttons.Add(MouseButton.Left);
-            if (CurrentFrame?.MouseRight ?? false)
-                buttons.Add(MouseButton.Right);
-
-            return new List<InputState>
-            {
-                new InputState
-                {
-                    Mouse = new ReplayMouseState(ToScreenSpace(position ?? Vector2.Zero), buttons),
-                    Keyboard = new ReplayKeyboardState(new List<Key>())
-                }
-            };
-        }
+        public override List<InputState> GetPendingStates() => new List<InputState>();
 
         public bool AtLastFrame => currentFrameIndex == Frames.Count - 1;
         public bool AtFirstFrame => currentFrameIndex == 0;
@@ -133,10 +116,9 @@ namespace osu.Game.Rulesets.Replays
 
         protected class ReplayMouseState : MouseState
         {
-            public ReplayMouseState(Vector2 position, IEnumerable<MouseButton> list)
+            public ReplayMouseState(Vector2 position)
             {
                 Position = position;
-                list.ForEach(b => SetPressed(b, true));
             }
         }
 
