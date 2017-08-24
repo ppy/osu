@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
@@ -46,8 +45,6 @@ namespace osu.Game.Rulesets
 
         public abstract string Description { get; }
 
-        public abstract IEnumerable<KeyCounter> CreateGameplayKeys();
-
         public virtual SettingsSubsection CreateSettings() => null;
 
         /// <summary>
@@ -66,5 +63,12 @@ namespace osu.Game.Rulesets
         /// <param name="variant">A variant.</param>
         /// <returns>A list of valid <see cref="KeyBinding"/>s.</returns>
         public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new KeyBinding[] { };
+
+        /// <summary>
+        /// Gets the name for a key binding variant. This is used for display in the settings overlay.
+        /// </summary>
+        /// <param name="variant">The variant.</param>
+        /// <returns>A descriptive name of the variant.</returns>
+        public virtual string GetVariantName(int variant) => string.Empty;
     }
 }

@@ -5,20 +5,18 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
-using osu.Framework.Configuration;
-using OpenTK.Input;
-using osu.Framework.Input;
 using OpenTK;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
     /// <summary>
     /// Visualises a <see cref="HoldNote"/> hit object.
     /// </summary>
-    public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>
+    public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>, IKeyBindingHandler<ManiaAction>
     {
         private readonly DrawableNote head;
         private readonly DrawableNote tail;
@@ -36,8 +34,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private bool hasBroken;
 
-        public DrawableHoldNote(HoldNote hitObject, Bindable<Key> key = null)
-            : base(hitObject, key)
+        public DrawableHoldNote(HoldNote hitObject, ManiaAction action)
+            : base(hitObject, action)
         {
             RelativeSizeAxes = Axes.Both;
             Height = (float)HitObject.Duration;
@@ -58,12 +56,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     RelativeChildOffset = new Vector2(0, (float)HitObject.StartTime),
                     RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
                 },
-                head = new DrawableHeadNote(this, key)
+                head = new DrawableHeadNote(this, action)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 },
-                tail = new DrawableTailNote(this, key)
+                tail = new DrawableTailNote(this, action)
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre
@@ -106,16 +104,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public bool OnPressed(ManiaAction action)
         {
-            // Make sure the keypress happened within the body of the hold note
+            // Make sure the action happened within the body of the hold note
             if (Time.Current < HitObject.StartTime || Time.Current > HitObject.EndTime)
                 return false;
 
-            if (args.Key != Key)
-                return false;
-
-            if (args.Repeat)
+            if (action != Action)
                 return false;
 
             // The user has pressed during the body of the hold note, after the head note and its hit windows have passed
@@ -126,13 +121,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             return true;
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        public bool OnReleased(ManiaAction action)
         {
             // Make sure that the user started holding the key during the hold note
             if (!holdStartTime.HasValue)
                 return false;
 
-            if (args.Key != Key)
+            if (action != Action)
                 return false;
 
             holdStartTime = null;
@@ -151,8 +146,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             private readonly DrawableHoldNote holdNote;
 
-            public DrawableHeadNote(DrawableHoldNote holdNote, Bindable<Key> key = null)
-                : base(holdNote.HitObject.Head, key)
+            public DrawableHeadNote(DrawableHoldNote holdNote, ManiaAction action)
+                : base(holdNote.HitObject.Head, action)
             {
                 this.holdNote = holdNote;
 
@@ -160,9 +155,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Y = 0;
             }
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            public override bool OnPressed(ManiaAction action)
             {
-                if (!base.OnKeyDown(state, args))
+                if (!base.OnPressed(action))
                     return false;
 
                 // We only want to trigger a holding state from the head if the head has received a judgement
@@ -188,8 +183,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             private readonly DrawableHoldNote holdNote;
 
-            public DrawableTailNote(DrawableHoldNote holdNote, Bindable<Key> key = null)
-                : base(holdNote.HitObject.Tail, key)
+            public DrawableTailNote(DrawableHoldNote holdNote, ManiaAction action)
+                : base(holdNote.HitObject.Tail, action)
             {
                 this.holdNote = holdNote;
 
@@ -210,7 +205,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 tailJudgement.HasBroken = holdNote.hasBroken;
             }
 
-            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+            public override bool OnPressed(ManiaAction action) => false; // Tail doesn't handle key down
+
+            public override bool OnReleased(ManiaAction action)
             {
                 // Make sure that the user started holding the key during the hold note
                 if (!holdNote.holdStartTime.HasValue)
@@ -219,18 +216,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (Judgement.Result != HitResult.None)
                     return false;
 
-                if (args.Key != Key)
+                if (action != Action)
                     return false;
 
                 UpdateJudgement(true);
 
                 // Handled by the hold note, which will set holding = false
-                return false;
-            }
-
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-            {
-                // Tail doesn't handle key down
                 return false;
             }
         }
