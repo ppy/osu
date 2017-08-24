@@ -2,10 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -19,6 +21,8 @@ namespace osu.Game.Overlays.Direct
     {
         protected readonly BeatmapSetInfo SetInfo;
 
+        protected Box BlackBackground;
+
         protected DirectPanel(BeatmapSetInfo setInfo)
         {
             SetInfo = setInfo;
@@ -31,6 +35,21 @@ namespace osu.Game.Overlays.Direct
                 Radius = 3f,
                 Colour = Color4.Black.Opacity(0.25f),
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddRange(new[]
+            {
+                // temporary blackness until the actual background loads.
+                BlackBackground = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                },
+                CreateBackground(),
+            });
         }
 
         protected override void LoadComplete()
@@ -55,7 +74,11 @@ namespace osu.Game.Overlays.Direct
             Origin = Anchor.Centre,
             RelativeSizeAxes = Axes.Both,
             FillMode = FillMode.Fill,
-            OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
+            OnLoadComplete = d =>
+            {
+                d.FadeInFromZero(400, Easing.Out);
+                BlackBackground.Delay(400).FadeOut();
+            },
         })
         {
             RelativeSizeAxes = Axes.Both,
