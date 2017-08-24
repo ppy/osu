@@ -116,6 +116,7 @@
     <Compile Include="Overlays\Music\PlaylistList.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
     <Compile Include="Graphics\Containers\SectionsContainer.cs" />
+    <Compile Include="Graphics\UserInterface\ProgressBar.cs" />
     <Compile Include="Overlays\Settings\Sections\Maintenance\GeneralSettings.cs" />
     <Compile Include="Overlays\Settings\SettingsHeader.cs" />
     <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
