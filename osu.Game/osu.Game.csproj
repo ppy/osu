@@ -323,7 +323,6 @@
     <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
     <Compile Include="Screens\Play\FailOverlay.cs" />
     <Compile Include="Screens\Play\MenuOverlay.cs" />
-    <Compile Include="Screens\Play\PlayerInputManager.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\ReplayPlayer.cs" />
     <Compile Include="Screens\Play\SkipButton.cs" />
