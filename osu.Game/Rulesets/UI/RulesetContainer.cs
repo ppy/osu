@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The input manager for this RulesetContainer.
         /// </summary>
-        internal IHasReplayHandler ReplayInputManager => (IHasReplayHandler)KeyBindingInputManager;
+        internal IHasReplayHandler ReplayInputManager => KeyBindingInputManager as IHasReplayHandler;
 
         /// <summary>
         /// The key conversion input manager for this RulesetContainer.
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Whether we have a replay loaded currently.
         /// </summary>
-        public bool HasReplayLoaded => ReplayInputManager.ReplayInputHandler != null;
+        public bool HasReplayLoaded => ReplayInputManager?.ReplayInputHandler != null;
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
@@ -107,6 +107,9 @@ namespace osu.Game.Rulesets.UI
         /// <param name="replay">The replay, null for local input.</param>
         public virtual void SetReplay(Replay replay)
         {
+            if (ReplayInputManager == null)
+                throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports replay loading is not available");
+
             Replay = replay;
             ReplayInputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
         }
