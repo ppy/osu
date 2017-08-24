@@ -7,8 +7,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using System;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Platform;
 
 namespace osu.Game.Graphics.UserInterface
@@ -19,12 +19,33 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool AllowClipboardExport => false;
 
+        private readonly CapsWarning warning;
+
+        private GameHost host;
+
         public OsuPasswordTextBox()
         {
-            Add(new CapsWarning
+            Add(warning = new CapsWarning
             {
                 Size = new Vector2(20),
+                Origin = Anchor.CentreRight,
+                Anchor = Anchor.CentreRight,
+                Margin = new MarginPadding { Right = 10 },
+                Alpha = 0,
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
+        {
+            this.host = host;
+        }
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (args.Key == OpenTK.Input.Key.CapsLock)
+                warning.FadeTo(host.CapsLockEnabled ? 1 : 0, 250, Easing.OutQuint);
+            return base.OnKeyDown(state, args);
         }
 
         public class PasswordMaskChar : Container
@@ -66,36 +87,18 @@ namespace osu.Game.Graphics.UserInterface
 
         private class CapsWarning : SpriteIcon, IHasTooltip
         {
-            public string TooltipText => host.CapsLockEnabled ? @"Caps lock is active" : string.Empty;
-
-            public override bool HandleInput => true;
-
-            private GameHost host;
+            public string TooltipText => @"Caps lock is active";
 
             public CapsWarning()
             {
                 Icon = FontAwesome.fa_warning;
-                Origin = Anchor.CentreRight;
-                Anchor = Anchor.CentreRight;
-                Margin = new MarginPadding { Right = 10 };
-                AlwaysPresent = true;
-                Alpha = 0;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colour, GameHost host)
+            private void load(OsuColour colour)
             {
                 Colour = colour.YellowLight;
-                this.host = host;
             }
-
-            protected override void Update()
-            {
-                base.Update();
-                updateVisibility();
-            }
-
-            private void updateVisibility() => this.FadeTo(host.CapsLockEnabled ? 1 : 0, 250, Easing.OutQuint);
         }
     }
 }
