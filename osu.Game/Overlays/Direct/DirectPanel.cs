@@ -9,11 +9,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
+using osu.Framework.Input;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -23,33 +26,60 @@ namespace osu.Game.Overlays.Direct
 
         protected Box BlackBackground;
 
+        private const double hover_transition_time = 400;
+
+        private Container content;
+
+        protected override Container<Drawable> Content => content;
+
         protected DirectPanel(BeatmapSetInfo setInfo)
         {
             SetInfo = setInfo;
-
-            Masking = true;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(0f, 1f),
-                Radius = 3f,
-                Colour = Color4.Black.Opacity(0.25f),
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRange(new[]
+            AddInternal(content = new Container
             {
-                // temporary blackness until the actual background loads.
-                BlackBackground = new Box
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                EdgeEffect = new EdgeEffectParameters
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
+                    Type = EdgeEffectType.Shadow,
+                    Offset = new Vector2(0f, 1f),
+                    Radius = 2f,
+                    Colour = Color4.Black.Opacity(0.25f),
                 },
-                CreateBackground(),
+                Children = new[]
+                {
+                    // temporary blackness until the actual background loads.
+                    BlackBackground = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                    },
+                    CreateBackground(),
+                }
             });
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            content.FadeEdgeEffectTo(1f, hover_transition_time, Easing.OutQuint);
+            content.TransformTo(content.PopulateTransform(new TransformEdgeEffectRadius(), 14, hover_transition_time, Easing.OutQuint));
+            content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
+
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            content.FadeEdgeEffectTo(0.25f, hover_transition_time, Easing.OutQuint);
+            content.TransformTo(content.PopulateTransform(new TransformEdgeEffectRadius(), 2, hover_transition_time, Easing.OutQuint));
+            content.MoveToY(0, hover_transition_time, Easing.OutQuint);
+
+            base.OnHoverLost(state);
         }
 
         protected override void LoadComplete()
@@ -126,6 +156,31 @@ namespace osu.Game.Overlays.Direct
 
                 Value = value;
             }
+        }
+
+        private class TransformEdgeEffectRadius : Transform<float, Container>
+        {
+            /// <summary>
+            /// Current value of the transformed colour in linear colour space.
+            /// </summary>
+            private float valueAt(double time)
+            {
+                if (time < StartTime) return StartValue;
+                if (time >= EndTime) return EndValue;
+
+                return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+            }
+
+            public override string TargetMember => "EdgeEffect.Colour";
+
+            protected override void Apply(Container c, double time)
+            {
+                EdgeEffectParameters e = c.EdgeEffect;
+                e.Radius = valueAt(time);
+                c.EdgeEffect = e;
+            }
+
+            protected override void ReadIntoStartValue(Container d) => StartValue = d.EdgeEffect.Radius;
         }
     }
 }
