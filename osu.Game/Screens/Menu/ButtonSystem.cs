@@ -1,22 +1,22 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Toolbar;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Audio;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Menu
 {
@@ -152,7 +152,6 @@ namespace osu.Game.Screens.Menu
                             backButton.TriggerOnClick();
                             return true;
                     }
-
 
                     return false;
             }

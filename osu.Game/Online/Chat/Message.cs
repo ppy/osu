@@ -1,10 +1,10 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.ComponentModel;
 using Newtonsoft.Json;
 using osu.Game.Users;
+using System;
+using System.ComponentModel;
 
 namespace osu.Game.Online.Chat
 {
@@ -61,6 +61,7 @@ namespace osu.Game.Online.Chat
     {
         [Description(@"channel")]
         Channel,
+
         [Description(@"user")]
         User
     }

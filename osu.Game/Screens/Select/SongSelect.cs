@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Threading;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -20,12 +18,15 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select.Options;
+using System;
+using System.Threading;
 
 namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
         private BeatmapManager manager;
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
         private readonly BeatmapCarousel carousel;

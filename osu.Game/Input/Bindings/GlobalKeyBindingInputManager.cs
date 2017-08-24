@@ -1,11 +1,11 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Input.Bindings
 {
@@ -40,18 +40,25 @@ namespace osu.Game.Input.Bindings
     {
         [Description("Toggle chat overlay")]
         ToggleChat,
+
         [Description("Toggle social overlay")]
         ToggleSocial,
+
         [Description("Reset input settings")]
         ResetInputSettings,
+
         [Description("Toggle toolbar")]
         ToggleToolbar,
+
         [Description("Toggle settings")]
         ToggleSettings,
+
         [Description("Toggle osu!direct")]
         ToggleDirect,
+
         [Description("Increase Volume")]
         IncreaseVolume,
+
         [Description("Decrease Volume")]
         DecreaseVolume,
     }

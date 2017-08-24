@@ -2,9 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
 using osu.Framework.Graphics.Colour;
-
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {

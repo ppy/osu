@@ -1,7 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,8 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Screens.Ranking;
-using OpenTK;
-using OpenTK.Graphics;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays
 {
@@ -36,6 +36,7 @@ namespace osu.Game.Overlays
         };
 
         protected override Drawable CreateHeader() => new SettingsHeader("settings", "Change the way osu! behaves");
+
         protected override Drawable CreateFooter() => new SettingsFooter();
 
         public MainSettings()

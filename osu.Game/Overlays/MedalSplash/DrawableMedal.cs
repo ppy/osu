@@ -1,8 +1,8 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework;
 using OpenTK;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.MedalSplash
         private readonly TextFlowContainer description;
         private readonly FillFlowContainer infoFlow;
         private DisplayState state;
+
         public DrawableMedal(Medal medal)
         {
             this.medal = medal;
@@ -171,8 +172,6 @@ namespace osu.Game.Overlays.MedalSplash
                     description.FadeInFromZero(duration * 2);
                     break;
             }
-
-
         }
     }
 

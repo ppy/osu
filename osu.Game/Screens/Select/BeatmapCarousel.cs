@@ -2,23 +2,23 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Input;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using osu.Framework.Input;
+using osu.Framework.MathUtils;
+using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Configuration;
-using osu.Framework.Input;
-using OpenTK.Input;
-using osu.Framework.MathUtils;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using osu.Framework.Allocation;
-using osu.Framework.Threading;
-using osu.Framework.Configuration;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace osu.Game.Screens.Select
 {
