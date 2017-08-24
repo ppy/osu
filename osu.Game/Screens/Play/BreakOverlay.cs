@@ -67,11 +67,11 @@ namespace osu.Game.Screens.Play
 
             endTime = breakDuration + audioClock?.CurrentTime ?? Time.Current;
 
+            scheduledShow?.Cancel();
+
             if (State == Visibility.Visible)
             {
                 State = Visibility.Hidden;
-
-                scheduledShow?.Cancel();
 
                 using (BeginDelayedSequence(fade_duration))
                     scheduledShow = Schedule(() => State = Visibility.Visible);
