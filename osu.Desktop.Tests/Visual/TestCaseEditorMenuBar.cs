@@ -20,81 +20,74 @@ namespace osu.Desktop.Tests.Visual
     {
         public TestCaseEditorMenuBar()
         {
-            Add(new Container
+            Add(new MenuBar
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Width = 500,
-                Child = new EditorMenuBar
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Y = 50,
+                Items = new[]
                 {
-                    Items = new[]
+                    new EditorMenuBarItem("File")
                     {
-                        new EditorMenuBarItem("File")
+                        Items = new[]
                         {
-                            Items = new[]
-                            {
-                                new EditorContextMenuItem("Clear All Notes"),
-                                new EditorContextMenuItem("Open Difficulty..."),
-                                new EditorContextMenuItem("Save"),
-                                new EditorContextMenuItem("Create a new Difficulty..."),
-                                new EditorContextMenuSpacer(),
-                                new EditorContextMenuItem("Revert to Saved"),
-                                new EditorContextMenuItem("Revert to Saved (Full)"),
-                                new EditorContextMenuSpacer(),
-                                new EditorContextMenuItem("Test Beatmap"),
-                                new EditorContextMenuItem("Open AiMod"),
-                                new EditorContextMenuSpacer(),
-                                new EditorContextMenuItem("Upload Beatmap..."),
-                                new EditorContextMenuItem("Export Package"),
-                                new EditorContextMenuItem("Export Map Package"),
-                                new EditorContextMenuItem("Import from..."),
-                                new EditorContextMenuSpacer(),
-                                new EditorContextMenuItem("Open Song Folder"),
-                                new EditorContextMenuItem("Open .osu in Notepad"),
-                                new EditorContextMenuItem("Open .osb in Notepad"),
-                                new EditorContextMenuSpacer(),
-                                new EditorContextMenuItem("Exit"),
-                            }
-                        },
-                        new EditorMenuBarItem("Timing")
+                            new EditorContextMenuItem("Clear All Notes"),
+                            new EditorContextMenuItem("Open Difficulty..."),
+                            new EditorContextMenuItem("Save"),
+                            new EditorContextMenuItem("Create a new Difficulty..."),
+                            new EditorContextMenuSpacer(),
+                            new EditorContextMenuItem("Revert to Saved"),
+                            new EditorContextMenuItem("Revert to Saved (Full)"),
+                            new EditorContextMenuSpacer(),
+                            new EditorContextMenuItem("Test Beatmap"),
+                            new EditorContextMenuItem("Open AiMod"),
+                            new EditorContextMenuSpacer(),
+                            new EditorContextMenuItem("Upload Beatmap..."),
+                            new EditorContextMenuItem("Export Package"),
+                            new EditorContextMenuItem("Export Map Package"),
+                            new EditorContextMenuItem("Import from..."),
+                            new EditorContextMenuSpacer(),
+                            new EditorContextMenuItem("Open Song Folder"),
+                            new EditorContextMenuItem("Open .osu in Notepad"),
+                            new EditorContextMenuItem("Open .osb in Notepad"),
+                            new EditorContextMenuSpacer(),
+                            new EditorContextMenuItem("Exit"),
+                        }
+                    },
+                    new EditorMenuBarItem("Timing")
+                    {
+                        Items = new[]
                         {
-                            Items = new[]
-                            {
-                                new EditorContextMenuItem("Time Signature"),
-                                new EditorContextMenuItem("Metronome Clicks"),
-                                new EditorContextMenuSpacer(),
-                                new EditorContextMenuItem("Add Timing Section"),
-                                new EditorContextMenuItem("Add Inheriting Section"),
-                                new EditorContextMenuItem("Reset Current Section"),
-                                new EditorContextMenuItem("Delete Timing Section"),
-                                new EditorContextMenuItem("Resnap Current Section"),
-                                new EditorContextMenuSpacer(),
-                                new EditorContextMenuItem("Timing Setup"),
-                                new EditorContextMenuSpacer(),
-                                new EditorContextMenuItem("Resnap All Notes", MenuItemType.Destructive),
-                                new EditorContextMenuItem("Move all notes in time...", MenuItemType.Destructive),
-                                new EditorContextMenuItem("Recalculate Slider Lengths", MenuItemType.Destructive),
-                                new EditorContextMenuItem("Delete All Timing Sections", MenuItemType.Destructive),
-                                new EditorContextMenuSpacer(),
-                                new EditorContextMenuItem("Set Current Position as Preview Point"),
-                            }
-                        },
-                        new EditorMenuBarItem("Testing")
+                            new EditorContextMenuItem("Time Signature"),
+                            new EditorContextMenuItem("Metronome Clicks"),
+                            new EditorContextMenuSpacer(),
+                            new EditorContextMenuItem("Add Timing Section"),
+                            new EditorContextMenuItem("Add Inheriting Section"),
+                            new EditorContextMenuItem("Reset Current Section"),
+                            new EditorContextMenuItem("Delete Timing Section"),
+                            new EditorContextMenuItem("Resnap Current Section"),
+                            new EditorContextMenuSpacer(),
+                            new EditorContextMenuItem("Timing Setup"),
+                            new EditorContextMenuSpacer(),
+                            new EditorContextMenuItem("Resnap All Notes", MenuItemType.Destructive),
+                            new EditorContextMenuItem("Move all notes in time...", MenuItemType.Destructive),
+                            new EditorContextMenuItem("Recalculate Slider Lengths", MenuItemType.Destructive),
+                            new EditorContextMenuItem("Delete All Timing Sections", MenuItemType.Destructive),
+                            new EditorContextMenuSpacer(),
+                            new EditorContextMenuItem("Set Current Position as Preview Point"),
+                        }
+                    },
+                    new EditorMenuBarItem("Testing")
+                    {
+                        Items = new[]
                         {
-                            Items = new[]
-                            {
-                                new EditorContextMenuItem("Item 1"),
-                                new EditorContextMenuItem("Item 2"),
-                                new EditorContextMenuItem("Item 3"),
-                            }
-                        },
-                    }
+                            new EditorContextMenuItem("Item 1"),
+                            new EditorContextMenuItem("Item 2"),
+                            new EditorContextMenuItem("Item 3"),
+                        }
+                    },
                 }
             });
-        }
-
-        private class EditorMenuBar : MenuBar
-        {
         }
 
         private class EditorMenuBarItem : MenuBarItem
