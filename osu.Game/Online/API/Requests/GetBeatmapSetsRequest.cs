@@ -46,6 +46,9 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty(@"favourite_count")]
         private int favouriteCount { get; set; }
 
+        [JsonProperty(@"id")]
+        private int onlineId { get; set; }
+
         [JsonProperty(@"beatmaps")]
         private IEnumerable<GetBeatmapSetsBeatmapResponse> beatmaps { get; set; }
 
@@ -53,6 +56,7 @@ namespace osu.Game.Online.API.Requests
         {
             return new BeatmapSetInfo
             {
+                OnlineBeatmapSetID = onlineId,
                 Metadata = this,
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
