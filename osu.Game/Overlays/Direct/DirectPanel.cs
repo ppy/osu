@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Direct
             SetInfo = setInfo;
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(permitNulls: true)]
         private void load(APIAccess api, BeatmapManager beatmaps, OsuColour colours, NotificationOverlay notifications)
         {
             this.api = api;
@@ -110,6 +110,8 @@ namespace osu.Game.Overlays.Direct
 
         protected void StartDownload()
         {
+            if (api == null) return;
+
             if (!api.LocalUser.Value.IsSupporter)
             {
                 notifications.Post(new SimpleNotification
