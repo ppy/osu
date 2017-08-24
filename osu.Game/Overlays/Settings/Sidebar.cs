@@ -14,12 +14,12 @@ using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class Sidebar : Container, IStateful<ExpandedState>
+    public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>
     {
-        private readonly FillFlowContainer content;
+        private readonly FillFlowContainer<SidebarButton> content;
         internal const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
         internal const int EXPANDED_WIDTH = 200;
-        protected override Container<Drawable> Content => content;
+        protected override Container<SidebarButton> Content => content;
 
         public Sidebar()
         {
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     Children = new[]
                     {
-                        content = new FillFlowContainer
+                        content = new FillFlowContainer<SidebarButton>
                         {
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
@@ -87,6 +87,8 @@ namespace osu.Game.Overlays.Settings
             get { return state; }
             set
             {
+                expandEvent?.Cancel();
+
                 if (state == value) return;
 
                 state = value;
