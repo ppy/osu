@@ -29,21 +29,6 @@ namespace osu.Game.Overlays.Direct
             RelativeSizeAxes = Axes.X;
             Height = height;
             CornerRadius = 5;
-            Masking = true;
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(0f, 1f),
-                Radius = 3f,
-                Colour = Color4.Black.Opacity(0.25f),
-            };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            this.FadeInFromZero(200, Easing.Out);
         }
 
         [BackgroundDependencyLoader]
