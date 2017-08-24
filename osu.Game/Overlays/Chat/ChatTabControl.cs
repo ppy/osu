@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Chat
                 Margin = new MarginPadding(10),
             });
 
-            AddTabItem(selectorTab = new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }));
+            base.AddTabItem(selectorTab = new ChannelTabItem.ChannelSelectorTabItem(new Channel { Name = "+" }));
 
             ChannelSelectorActive.BindTo(selectorTab.Active);
         }
@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Chat
             {
                 this.ResizeTo(new Vector2(Width, 1.1f), transition_length, Easing.OutQuint);
 
-                closeButton?.MoveToX(-5f, 0.5f, Easing.OutElastic);
+                closeButton.MoveToX(-5f, 0.5f, Easing.OutElastic);
                 box.FadeColour(backgroundActive, transition_length, Easing.OutQuint);
                 highlightBox.FadeIn(transition_length, Easing.OutQuint);
 
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Chat
             {
                 this.ResizeTo(new Vector2(Width, 1), transition_length, Easing.OutQuint);
 
-                closeButton?.MoveToX(5f, 0.5f, Easing.InElastic);
+                closeButton.MoveToX(5f, 0.5f, Easing.InElastic);
                 box.FadeColour(backgroundInactive, transition_length, Easing.OutQuint);
                 highlightBox.FadeOut(transition_length, Easing.OutQuint);
 
@@ -151,7 +151,8 @@ namespace osu.Game.Overlays.Chat
 
             protected override bool OnHover(InputState state)
             {
-                closeButton?.FadeIn(1f, Easing.InBounce);
+                if (IsRemovable)
+                    closeButton.FadeIn(1f, Easing.InBounce);
 
                 if (!Active)
                     box.FadeColour(backgroundHover, transition_length, Easing.OutQuint);
@@ -160,7 +161,9 @@ namespace osu.Game.Overlays.Chat
 
             protected override void OnHoverLost(InputState state)
             {
-                closeButton?.FadeOut(1f, Easing.OutBounce);
+                if (closeButton.IsPresent)
+                    closeButton.FadeOut(1f, Easing.OutBounce);
+
                 updateState();
             }
 
@@ -250,25 +253,21 @@ namespace osu.Game.Overlays.Chat
                                 Font = @"Exo2.0-Bold",
                                 TextSize = 18,
                             },
+                            closeButton  = new Button
+                            {
+                                Alpha = 0,
+                                Width = 20,
+                                Height = 20,
+                                Margin = new MarginPadding { Right = 10 },
+                                Origin = Anchor.CentreRight,
+                                Anchor = Anchor.CentreRight,
+                                Text = @"x",
+                                BackgroundColour = Color4.Transparent,
+                                Action = delegate { if (IsRemovable) OnRequestClose?.Invoke(); },
+                            },
                         },
                     },
                 };
-
-                if (IsRemovable)
-                {
-                    Add(closeButton  = new Button
-                    {
-                        Alpha = 0,
-                        Width = 20,
-                        Height = 20,
-                        Margin = new MarginPadding { Right = 10 },
-                        Origin = Anchor.CentreRight,
-                        Anchor = Anchor.CentreRight,
-                        Text = @"x",
-                        BackgroundColour = Color4.Transparent,
-                        Action = () => OnRequestClose?.Invoke(),
-                    });
-                }
             }
 
             public class ChannelSelectorTabItem : ChannelTabItem
