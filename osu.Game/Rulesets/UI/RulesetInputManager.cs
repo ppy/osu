@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.UI
         {
         }
 
+        #region Action mapping (for replays)
+
         private List<T> lastPressedActions = new List<T>();
 
         protected override void HandleNewState(InputState state)
@@ -47,8 +49,9 @@ namespace osu.Game.Rulesets.UI
             lastPressedActions = newActions;
         }
 
-        private ManualClock clock;
-        private IFrameBasedClock parentClock;
+        #endregion
+
+        #region IHasReplayHandler
 
         private ReplayInputHandler replayInputHandler;
         public ReplayInputHandler ReplayInputHandler
@@ -69,13 +72,12 @@ namespace osu.Game.Rulesets.UI
             }
         }
 
-        private Bindable<bool> mouseDisabled;
+        #endregion
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
-        }
+        #region Clock control
+
+        private ManualClock clock;
+        private IFrameBasedClock parentClock;
 
         protected override void LoadComplete()
         {
@@ -152,6 +154,18 @@ namespace osu.Game.Rulesets.UI
             base.Update();
         }
 
+        #endregion
+
+        #region Setting application (disables etc.)
+
+        private Bindable<bool> mouseDisabled;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+        }
+
         protected override void TransformState(InputState state)
         {
             base.TransformState(state);
@@ -170,6 +184,10 @@ namespace osu.Game.Rulesets.UI
                 }
             }
         }
+
+        #endregion
+
+        #region Key Counter Attachment
 
         public void Attach(KeyCounterCollection keyCounter)
         {
@@ -191,13 +209,22 @@ namespace osu.Game.Rulesets.UI
 
             public bool OnReleased(T action) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnReleased(action));
         }
+
+        #endregion
     }
 
+    /// <summary>
+    /// Expose the <see cref="ReplayInputHandler"/>  in a capable <see cref="InputManager"/>.
+    /// </summary>
     public interface IHasReplayHandler
     {
         ReplayInputHandler ReplayInputHandler { get; set; }
     }
 
+    /// <summary>
+    /// Supports attaching a <see cref="KeyCounterCollection"/>.
+    /// Keys will be populated automatically and a receptor will be injected inside.
+    /// </summary>
     public interface ICanAttachKeyCounter
     {
         void Attach(KeyCounterCollection keyCounter);
