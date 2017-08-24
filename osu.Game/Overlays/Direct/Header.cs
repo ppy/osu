@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.ComponentModel;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.SearchableList;
+using System.ComponentModel;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -29,10 +29,13 @@ namespace osu.Game.Overlays.Direct
     public enum DirectTab
     {
         Search,
+
         [Description("Newest Maps")]
         NewestMaps = DirectSortCriteria.Ranked,
+
         [Description("Top Rated")]
         TopRated = DirectSortCriteria.Rating,
+
         [Description("Most Played")]
         MostPlayed = DirectSortCriteria.Plays,
     }

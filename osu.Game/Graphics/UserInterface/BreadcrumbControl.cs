@@ -39,6 +39,7 @@ namespace osu.Game.Graphics.UserInterface
 
             //don't allow clicking between transitions and don't make the chevron clickable
             public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Alpha == 1f && Text.ReceiveMouseInputAt(screenSpacePos);
+
             public override bool HandleInput => State == Visibility.Visible;
 
             private Visibility state;

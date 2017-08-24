@@ -4,26 +4,26 @@
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Framework.Timing;
-using osu.Game.Configuration;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Backgrounds;
-using System;
-using System.Linq;
 using osu.Framework.Threading;
+using osu.Framework.Timing;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Online.API;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Ranking;
-using osu.Framework.Audio.Sample;
-using osu.Game.Beatmaps;
-using osu.Game.Online.API;
+using System;
+using System.Linq;
 
 namespace osu.Game.Screens.Play
 {

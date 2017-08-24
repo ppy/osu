@@ -1,20 +1,20 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
-using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {

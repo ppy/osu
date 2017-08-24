@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
 using OpenTK.Graphics;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Select;
-using osu.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Screens.Edit
 {

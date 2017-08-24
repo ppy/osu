@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using System.Linq;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,8 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays.Music
 {
@@ -78,7 +78,6 @@ namespace osu.Game.Overlays.Music
             beatmaps.BeatmapSetRemoved += s => Schedule(() => list.RemoveBeatmapSet(s));
 
             list.BeatmapSets = BeatmapSets = beatmaps.GetAllUsableBeatmapSets();
-
 
             beatmapBacking.BindTo(game.Beatmap);
 

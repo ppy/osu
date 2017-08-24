@@ -1,11 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
 using Ionic.Zip;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
@@ -20,6 +15,11 @@ using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using SQLite.Net;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace osu.Game.Beatmaps
 {
@@ -433,7 +433,6 @@ namespace osu.Game.Beatmaps
 
                     using (var stream = new StreamReader(store.GetStream(getPathForFile(BeatmapSetInfo.StoryboardFile))))
                         decoder.Decode(stream, beatmap);
-
 
                     return beatmap;
                 }

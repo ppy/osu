@@ -1,21 +1,21 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Select.Filter;
-using Container = osu.Framework.Graphics.Containers.Container;
-using osu.Framework.Input;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Select.Filter;
+using System;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Screens.Select
 {

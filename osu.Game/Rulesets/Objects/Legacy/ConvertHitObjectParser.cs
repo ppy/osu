@@ -2,12 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using osu.Game.Audio;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using osu.Game.Beatmaps.Formats;
-using osu.Game.Audio;
 using System.Linq;
 
 namespace osu.Game.Rulesets.Objects.Legacy

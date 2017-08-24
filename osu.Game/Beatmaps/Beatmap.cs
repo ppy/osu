@@ -2,12 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.IO.Serialization;
 
 namespace osu.Game.Beatmaps
 {
@@ -20,6 +20,7 @@ namespace osu.Game.Beatmaps
         public BeatmapInfo BeatmapInfo;
         public ControlPointInfo ControlPointInfo = new ControlPointInfo();
         public List<BreakPeriod> Breaks = new List<BreakPeriod>();
+
         public readonly List<Color4> ComboColors = new List<Color4>
         {
             new Color4(17, 136, 170, 255),

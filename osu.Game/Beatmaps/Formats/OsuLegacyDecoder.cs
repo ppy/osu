@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Legacy;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Objects.Legacy;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using OpenTK.Graphics;
-using osu.Game.Beatmaps.Timing;
-using osu.Game.Beatmaps.Legacy;
-using osu.Game.Rulesets.Objects.Legacy;
-using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Beatmaps.Formats
 {

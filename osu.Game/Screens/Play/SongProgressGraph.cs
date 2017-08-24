@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
-using System.Collections.Generic;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Play
 {

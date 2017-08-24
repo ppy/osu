@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.IO;
-using System.Linq;
 using osu.Framework.Desktop;
 using osu.Framework.Desktop.Platform;
 using osu.Game.IPC;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace osu.Desktop
 {
@@ -43,7 +43,6 @@ namespace osu.Desktop
                             host.Run(new OsuGameDesktop(args));
                             break;
                     }
-
                 }
                 return 0;
             }

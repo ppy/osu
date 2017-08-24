@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using osu.Framework.Screens;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Screens.Backgrounds;
-using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens.Backgrounds;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Screens
 {

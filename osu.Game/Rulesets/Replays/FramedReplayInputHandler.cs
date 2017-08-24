@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
+using OpenTK;
+using OpenTK.Input;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Input.Handlers;
-using OpenTK;
-using OpenTK.Input;
+using System;
+using System.Collections.Generic;
 using KeyboardState = osu.Framework.Input.KeyboardState;
 using MouseState = osu.Framework.Input.MouseState;
 

@@ -1,9 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -12,6 +9,9 @@ using osu.Game.IPC;
 using osu.Game.Rulesets.Replays;
 using SharpCompress.Compressors.LZMA;
 using SQLite.Net;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace osu.Game.Rulesets.Scoring
 {

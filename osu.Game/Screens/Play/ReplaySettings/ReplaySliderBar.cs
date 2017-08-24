@@ -2,11 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics.UserInterface;
-using System;
-using osu.Game.Graphics;
 using osu.Framework.Graphics;
+using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using System;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {

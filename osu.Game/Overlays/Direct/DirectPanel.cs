@@ -1,29 +1,29 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using System.IO;
-using System.Threading.Tasks;
-using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
+using osu.Framework.Input;
+using osu.Framework.Logging;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Beatmaps.IO;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK.Graphics;
-using osu.Framework.Input;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Framework.Logging;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Overlays.Notifications;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace osu.Game.Overlays.Direct
 {

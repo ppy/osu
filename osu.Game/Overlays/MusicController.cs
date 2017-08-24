@@ -1,10 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -20,10 +16,14 @@ using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Music;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Music;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace osu.Game.Overlays
 {

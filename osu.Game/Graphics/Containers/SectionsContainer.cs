@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using System;
+using System.Linq;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -110,6 +110,7 @@ namespace osu.Game.Graphics.Containers
 
         private float headerHeight, footerHeight;
         private readonly MarginPadding originalSectionsMargin;
+
         private void updateSectionsMargin()
         {
             if (!Children.Any()) return;
@@ -140,6 +141,7 @@ namespace osu.Game.Graphics.Containers
         public void ScrollTo(Drawable section) => scrollContainer.ScrollTo(scrollContainer.GetChildPosInContent(section) - (FixedHeader?.BoundingBox.Height ?? 0));
 
         private float lastKnownScroll;
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();

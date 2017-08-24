@@ -10,6 +10,7 @@ namespace osu.Game.Beatmaps.Drawables
     public class BeatmapSetCover : Sprite
     {
         private readonly BeatmapSetInfo set;
+
         public BeatmapSetCover(BeatmapSetInfo set)
         {
             this.set = set;

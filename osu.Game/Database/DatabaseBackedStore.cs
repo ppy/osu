@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using SQLite.Net;
 using SQLiteNetExtensions.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace osu.Game.Database
 {
@@ -70,7 +70,6 @@ namespace osu.Game.Database
         /// </summary>
         protected virtual void StartupTasks()
         {
-
         }
 
         /// <summary>
@@ -82,7 +81,6 @@ namespace osu.Game.Database
         /// Reset this database to a default state. Undo all changes to database and storage backings.
         /// </summary>
         public void Reset() => Prepare(true);
-
 
         public TableQuery<T> Query<T>(Expression<Func<T, bool>> filter = null) where T : class
         {
