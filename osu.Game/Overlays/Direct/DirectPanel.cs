@@ -17,6 +17,8 @@ using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -30,6 +32,9 @@ namespace osu.Game.Overlays.Direct
 
         private Container content;
 
+        private APIAccess api;
+        private ProgressBar progressBar;
+
         protected override Container<Drawable> Content => content;
 
         protected DirectPanel(BeatmapSetInfo setInfo)
@@ -38,8 +43,10 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(APIAccess api, OsuColour colours)
         {
+            this.api = api;
+
             AddInternal(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -60,6 +67,16 @@ namespace osu.Game.Overlays.Direct
                         Colour = Color4.Black,
                     },
                     CreateBackground(),
+                    progressBar = new ProgressBar
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Height = 0,
+                        Alpha = 0,
+                        BackgroundColour = Color4.Black.Opacity(0.7f),
+                        FillColour = colours.Blue,
+                        Depth = -1,
+                    },
                 }
             });
         }
@@ -80,6 +97,16 @@ namespace osu.Game.Overlays.Direct
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
 
             base.OnHoverLost(state);
+        }
+
+        protected void StartDownload()
+        {
+            progressBar.FadeIn(400, Easing.OutQuint);
+            progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
+
+            progressBar.Current.Value = 0.5f;
+
+            api.Queue(new APIRequest());
         }
 
         protected override void LoadComplete()

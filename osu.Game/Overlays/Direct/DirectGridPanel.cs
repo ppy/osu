@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -170,6 +171,12 @@ namespace osu.Game.Overlays.Direct
                     },
                 },
             });
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            StartDownload();
+            return true;
         }
     }
 }
