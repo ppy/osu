@@ -39,14 +39,8 @@ namespace osu.Game.Overlays.Direct
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, LocalisationEngine localisation)
         {
-            Children = new[]
+            AddRange(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
-                CreateBackground(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -174,7 +168,7 @@ namespace osu.Game.Overlays.Direct
                         new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
-            };
+            });
         }
     }
 }
