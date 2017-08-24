@@ -10,9 +10,11 @@ using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -48,6 +50,8 @@ namespace osu.Game.Rulesets.Osu.UI
                 return new DrawableSpinner(spinner);
             return null;
         }
+
+        protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuReplayInputHandler(replay);
 
         protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f);
     }
