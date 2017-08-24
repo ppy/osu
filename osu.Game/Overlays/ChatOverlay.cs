@@ -334,7 +334,15 @@ namespace osu.Game.Overlays
 
             set
             {
-                if (currentChannel == value || value == null) return;
+                if (currentChannel == value) return;
+
+                if (value == null)
+                {
+                    currentChannel = null;
+                    textbox.Current.Disabled = true;
+                    currentChannelContainer.Clear(false);
+                    return;
+                }
 
                 currentChannel = value;
 
@@ -397,11 +405,7 @@ namespace osu.Game.Overlays
         {
             if (channel == null) return;
 
-            if (channel == CurrentChannel)
-            {
-                currentChannel = null;
-                currentChannelContainer.Clear(false);
-            }
+            if (channel == CurrentChannel) CurrentChannel = null;
 
             careChannels.Remove(channel);
             loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
