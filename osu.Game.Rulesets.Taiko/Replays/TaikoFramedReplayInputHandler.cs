@@ -16,18 +16,18 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
         public override List<InputState> GetPendingStates()
         {
-            var keys = new List<TaikoAction>();
+            var actions = new List<TaikoAction>();
 
             if (CurrentFrame?.MouseRight1 == true)
-                keys.Add(TaikoAction.LeftCentre);
+                actions.Add(TaikoAction.LeftCentre);
             if (CurrentFrame?.MouseRight2 == true)
-                keys.Add(TaikoAction.RightCentre);
+                actions.Add(TaikoAction.RightCentre);
             if (CurrentFrame?.MouseLeft1 == true)
-                keys.Add(TaikoAction.LeftRim);
+                actions.Add(TaikoAction.LeftRim);
             if (CurrentFrame?.MouseLeft2 == true)
-                keys.Add(TaikoAction.RightRim);
+                actions.Add(TaikoAction.RightRim);
 
-            return new List<InputState> { new ReplayState<TaikoAction> { PressedActions = keys } };
+            return new List<InputState> { new ReplayState<TaikoAction> { PressedActions = actions } };
         }
     }
 }
