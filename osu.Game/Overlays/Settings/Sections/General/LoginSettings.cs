@@ -365,10 +365,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             [Description(@"Do not disturb")]
             DoNotDisturb,
-
             [Description(@"Appear offline")]
             AppearOffline,
-
             [Description(@"Sign out")]
             SignOut,
         }
