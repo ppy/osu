@@ -16,6 +16,7 @@ namespace osu.Game.Overlays.Music
     public class CollectionsDropdown<T> : OsuDropdown<T>
     {
         protected override DropdownHeader CreateHeader() => new CollectionsHeader { AccentColour = AccentColour };
+
         protected override Menu CreateMenu() => new CollectionsMenu();
 
         [BackgroundDependencyLoader]

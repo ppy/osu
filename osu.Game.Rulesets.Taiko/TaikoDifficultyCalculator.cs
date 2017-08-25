@@ -5,9 +5,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System;
 
 namespace osu.Game.Rulesets.Taiko
 {

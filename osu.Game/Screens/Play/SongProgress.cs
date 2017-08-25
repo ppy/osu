@@ -2,16 +2,17 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using System;
-using System.Collections.Generic;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
-using System.Linq;
 using osu.Framework.Timing;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer

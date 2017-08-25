@@ -1,20 +1,20 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Taiko.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using System.Linq;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Judgements;
+using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Rulesets.UI;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// The size of the left area of the playfield. This area contains the input drum.
         /// </summary>
         private const float left_area_size = 240;
-
 
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;

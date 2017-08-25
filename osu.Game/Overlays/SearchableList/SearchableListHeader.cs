@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
+using System;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -21,7 +21,9 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract Color4 BackgroundColour { get; }
         protected abstract float TabStripWidth { get; } //can be removed once (if?) TabControl support auto sizing
         protected abstract T DefaultTab { get; }
+
         protected abstract Drawable CreateHeaderText();
+
         protected abstract FontAwesome Icon { get; }
 
         protected SearchableListHeader()

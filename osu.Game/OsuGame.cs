@@ -1,31 +1,31 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using OpenTK;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Screens;
-using osu.Game.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Overlays;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
+using osu.Framework.Screens;
+using osu.Framework.Threading;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface.Volume;
-using osu.Framework.Allocation;
+using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.Toolbar;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
-using OpenTK;
+using osu.Game.Screens.Play;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Platform;
-using osu.Framework.Threading;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Scoring;
-using osu.Game.Overlays.Notifications;
-using osu.Game.Rulesets;
-using osu.Game.Screens.Play;
-using osu.Game.Input.Bindings;
 
 namespace osu.Game
 {

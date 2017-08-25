@@ -4,10 +4,10 @@
 using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
-using System;
-using System.Collections.Generic;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Users;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
@@ -51,7 +51,9 @@ namespace osu.Game.Rulesets.Osu.Replays
         #endregion
 
         #region Utilities
+
         protected double ApplyModsToTime(double v) => v;
+
         protected double ApplyModsToRate(double v) => v;
 
         private class ReplayFrameComparer : IComparer<ReplayFrame>

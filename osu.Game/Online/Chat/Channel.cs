@@ -1,12 +1,12 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Configuration;
 using osu.Framework.Lists;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Online.Chat
 {
@@ -40,7 +40,9 @@ namespace osu.Game.Online.Chat
         }
 
         public event Action<IEnumerable<Message>> NewMessagesArrived;
+
         public event Action<LocalEchoMessage, Message> PendingMessageResolved;
+
         public event Action<Message> MessageRemoved;
 
         public void AddLocalEcho(LocalEchoMessage message)

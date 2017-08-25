@@ -10,8 +10,8 @@ using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays.Mods
 {

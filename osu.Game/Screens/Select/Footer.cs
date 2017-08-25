@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -13,6 +11,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
+using System;
+using System.Linq;
 
 namespace osu.Game.Screens.Select
 {

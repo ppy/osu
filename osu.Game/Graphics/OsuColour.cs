@@ -1,14 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Graphics
 {
     public class OsuColour
     {
         public static Color4 Gray(float amt) => new Color4(amt, amt, amt, 1f);
+
         public static Color4 Gray(byte amt) => new Color4(amt, amt, amt, 255);
 
         public static Color4 FromHex(string hex)

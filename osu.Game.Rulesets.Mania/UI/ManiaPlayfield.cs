@@ -1,23 +1,23 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Mania.Judgements;
-using osu.Framework.Graphics.Containers;
-using System;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
 using OpenTK.Input;
-using System.Linq;
-using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -204,6 +204,7 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
+
         public void Add(DrawableBarLine barline) => HitObjects.Add(barline);
 
         protected override void Update()

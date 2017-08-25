@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Globalization;
 using Newtonsoft.Json;
 using osu.Framework.Extensions;
+using System;
+using System.Globalization;
 
 namespace osu.Game.Online.API
 {
@@ -57,7 +57,6 @@ namespace osu.Game.Online.API
             }
             catch
             {
-
             }
             return null;
         }

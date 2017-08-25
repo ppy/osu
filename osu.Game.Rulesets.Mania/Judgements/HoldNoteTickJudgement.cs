@@ -8,6 +8,7 @@ namespace osu.Game.Rulesets.Mania.Judgements
         public override bool AffectsCombo => false;
 
         public override int NumericResultForScore(ManiaHitResult result) => 20;
+
         public override int NumericResultForAccuracy(ManiaHitResult result) => 0; // Don't count ticks into accuracy
     }
 }

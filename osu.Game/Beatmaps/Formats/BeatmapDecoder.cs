@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Rulesets.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             string line;
             do { line = stream.ReadLine()?.Trim(); }
-                while (line != null && line.Length == 0);
+            while (line != null && line.Length == 0);
 
             if (line == null || !decoders.ContainsKey(line))
                 throw new IOException(@"Unknown file format");

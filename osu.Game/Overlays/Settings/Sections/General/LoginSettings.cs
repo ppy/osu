@@ -1,24 +1,23 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using OpenTK;
-using osu.Framework.Input;
 using osu.Game.Users;
+using System;
 using System.ComponentModel;
-using osu.Game.Graphics;
-using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
-
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Settings.Sections.General
@@ -258,7 +257,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private class UserDropdown : OsuEnumDropdown<UserAction>
         {
             protected override DropdownHeader CreateHeader() => new UserDropdownHeader { AccentColour = AccentColour };
+
             protected override Menu CreateMenu() => new UserDropdownMenu();
+
             protected override DropdownMenuItem<UserAction> CreateMenuItem(string text, UserAction value) => new UserDropdownMenuItem(text, value) { AccentColour = AccentColour };
 
             public Color4 StatusColour

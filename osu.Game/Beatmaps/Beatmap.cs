@@ -2,12 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.IO.Serialization;
 
 namespace osu.Game.Beatmaps
 {

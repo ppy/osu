@@ -1,18 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net;
-using System.Threading;
 using osu.Framework;
 using osu.Framework.Configuration;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Online.API.Requests;
 using osu.Game.Users;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
+using System.Threading;
 
 namespace osu.Game.Online.API
 {
@@ -123,9 +123,9 @@ namespace osu.Game.Online.API
                             continue;
                         }
 
-
                         var userReq = new GetUserRequest();
-                        userReq.Success += u => {
+                        userReq.Success += u =>
+                        {
                             LocalUser.Value = u;
                             //we're connected!
                             State = APIState.Online;

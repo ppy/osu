@@ -3,15 +3,15 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -99,7 +99,8 @@ namespace osu.Game.Graphics.UserInterface
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
             flash();
 
-            this.Delay(click_duration).Schedule(delegate {
+            this.Delay(click_duration).Schedule(delegate
+            {
                 colourContainer.ResizeTo(new Vector2(0.8f, 1f));
                 spriteText.Spacing = Vector2.Zero;
                 glowContainer.FadeOut();

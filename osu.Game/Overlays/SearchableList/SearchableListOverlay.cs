@@ -27,7 +27,9 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract Color4 BackgroundColour { get; }
         protected abstract Color4 TrianglesColourLight { get; }
         protected abstract Color4 TrianglesColourDark { get; }
+
         protected abstract SearchableListHeader<T> CreateHeader();
+
         protected abstract SearchableListFilterControl<U, S> CreateFilterControl();
 
         protected SearchableListOverlay()

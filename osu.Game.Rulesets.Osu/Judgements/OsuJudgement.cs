@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using osu.Framework.Extensions;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Framework.Extensions;
 
 namespace osu.Game.Rulesets.Osu.Judgements
 {

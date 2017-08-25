@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.ES30;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Lines;
+using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Configuration;
-using OpenTK;
-using OpenTK.Graphics.ES30;
-using OpenTK.Graphics;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -52,6 +52,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private int textureWidth => (int)PathWidth * 2;
 
         private readonly Slider slider;
+
         public SliderBody(Slider s)
         {
             slider = s;
@@ -145,6 +146,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private readonly List<Vector2> currentCurve = new List<Vector2>();
+
         private bool updateSnaking(double p0, double p1)
         {
             if (SnakedStart == p0 && SnakedEnd == p1) return false;

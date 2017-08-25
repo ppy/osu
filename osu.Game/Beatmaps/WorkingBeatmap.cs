@@ -41,7 +41,9 @@ namespace osu.Game.Beatmaps
         }
 
         protected abstract Beatmap GetBeatmap();
+
         protected abstract Texture GetBackground();
+
         protected abstract Track GetTrack();
 
         private Beatmap beatmap;

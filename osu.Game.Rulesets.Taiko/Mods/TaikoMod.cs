@@ -12,12 +12,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModNoFail : ModNoFail
     {
-
     }
 
     public class TaikoModEasy : ModEasy
     {
-
     }
 
     public class TaikoModHidden : ModHidden
@@ -34,7 +32,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
     public class TaikoModSuddenDeath : ModSuddenDeath
     {
-
     }
 
     public class TaikoModDaycore : ModDaycore
@@ -69,7 +66,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
     public class TaikoModPerfect : ModPerfect
     {
-
     }
 
     public class TaikoModAutoplay : ModAutoplay<TaikoHitObject>

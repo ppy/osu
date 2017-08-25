@@ -3,25 +3,25 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Users;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Overlays.MedalSplash;
-using osu.Framework.Allocation;
-using osu.Framework.Audio.Sample;
-using osu.Framework.Audio;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
-using OpenTK.Input;
-using System.Linq;
-using osu.Framework.Graphics.Shapes;
+using osu.Game.Users;
 using System;
-using osu.Framework.MathUtils;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
