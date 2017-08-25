@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Direct
 {
     public abstract class DirectPanel : Container
     {
-        protected readonly BeatmapSetInfo SetInfo;
+        public readonly BeatmapSetInfo SetInfo;
 
         protected Box BlackBackground;
 
@@ -108,9 +108,22 @@ namespace osu.Game.Overlays.Direct
             base.OnHoverLost(state);
         }
 
+        // this should eventually be moved to a more central place, like BeatmapManager.
+        private DownloadBeatmapSetRequest downloadRequest;
+
         protected void StartDownload()
         {
             if (api == null) return;
+
+            // we already have an active download running.
+            if (downloadRequest != null)
+            {
+                content.MoveToX(-5, 50, Easing.OutSine).Then()
+                       .MoveToX(5, 100, Easing.InOutSine).Then()
+                       .MoveToX(-5, 100, Easing.InOutSine).Then()
+                       .MoveToX(0, 50, Easing.InSine).Then();
+                return;
+            }
 
             if (!api.LocalUser.Value.IsSupporter)
             {
@@ -132,16 +145,18 @@ namespace osu.Game.Overlays.Direct
                 Text = $"Downloading {SetInfo.Metadata.Artist} - {SetInfo.Metadata.Title}",
             };
 
-            var request = new DownloadBeatmapSetRequest(SetInfo);
-            request.Failure += e =>
+            downloadRequest = new DownloadBeatmapSetRequest(SetInfo);
+            downloadRequest.Failure += e =>
             {
                 progressBar.Current.Value = 0;
                 progressBar.FadeOut(500);
                 downloadNotification.State = ProgressNotificationState.Completed;
                 Logger.Error(e, "Failed to get beatmap download information");
+
+                downloadRequest = null;
             };
 
-            request.Progress += (current, total) =>
+            downloadRequest.Progress += (current, total) =>
             {
                 float progress = (float)current / total;
 
@@ -151,7 +166,7 @@ namespace osu.Game.Overlays.Direct
                 downloadNotification.Progress = progress;
             };
 
-            request.Success += data =>
+            downloadRequest.Success += data =>
             {
                 progressBar.Current.Value = 1;
                 progressBar.FadeOut(500);
@@ -165,14 +180,15 @@ namespace osu.Game.Overlays.Direct
 
             downloadNotification.CancelRequested += () =>
             {
-                request.Cancel();
+                downloadRequest.Cancel();
+                downloadRequest = null;
                 return true;
             };
 
             notifications.Post(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            Task.Run(() => request.Perform(api));
+            Task.Run(() => downloadRequest.Perform(api));
         }
 
         public class DownloadBeatmapSetRequest : APIDownloadRequest
