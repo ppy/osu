@@ -39,18 +39,12 @@ namespace osu.Game.Graphics.UserInterface
         protected override void AnimateOpen() => this.FadeIn(fade_duration, Easing.OutQuint);
         protected override void AnimateClose() => this.FadeOut(fade_duration, Easing.OutQuint);
 
-        protected override FlowContainer<MenuItemRepresentation> CreateItemsFlow()
-        {
-            var flow = base.CreateItemsFlow();
-            flow.Padding = new MarginPadding { Vertical = OsuContextMenuItemRepresentation.MARGIN_VERTICAL };
+        protected override MarginPadding ItemFlowContainerPadding => new MarginPadding { Vertical = DrawableOsuContextMenuItem.MARGIN_VERTICAL };
 
-            return flow;
-        }
+        protected override DrawableMenuItem CreateDrawableMenuItem(TItem item) => new DrawableOsuContextMenuItem(this, item);
 
-        protected override MenuItemRepresentation CreateMenuItemRepresentation(TItem model) => new OsuContextMenuItemRepresentation(this, model);
-
-        #region OsuContextMenuItemRepresentation
-        private class OsuContextMenuItemRepresentation : MenuItemRepresentation
+        #region DrawableOsuContextMenuItem
+        private class DrawableOsuContextMenuItem : DrawableMenuItem
         {
             private const int margin_horizontal = 17;
             private const int text_size = 17;
@@ -63,8 +57,8 @@ namespace osu.Game.Graphics.UserInterface
             private OsuSpriteText text;
             private OsuSpriteText textBold;
 
-            public OsuContextMenuItemRepresentation(Menu<TItem> menu, TItem model)
-                : base(menu, model)
+            public DrawableOsuContextMenuItem(Menu<TItem> menu, TItem item)
+                : base(item)
             {
             }
 
@@ -82,7 +76,7 @@ namespace osu.Game.Graphics.UserInterface
 
             private void updateTextColour()
             {
-                switch (Model.Type)
+                switch (Item.Type)
                 {
                     case MenuItemType.Standard:
                         textBold.Colour = text.Colour = Color4.White;
@@ -117,7 +111,7 @@ namespace osu.Game.Graphics.UserInterface
                 return base.OnClick(state);
             }
 
-            protected override Drawable CreateText(string title) => new Container
+            protected override Drawable CreateContent() => new Container
             {
                 AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.CentreLeft,
@@ -129,7 +123,7 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         TextSize = text_size,
-                        Text = title,
+                        Text = Item.Text,
                         Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
                     },
                     textBold = new OsuSpriteText
@@ -139,7 +133,7 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         TextSize = text_size,
-                        Text = title,
+                        Text = Item.Text,
                         Font = @"Exo2.0-Bold",
                         Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
                     }

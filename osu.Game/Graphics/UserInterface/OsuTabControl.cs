@@ -48,9 +48,9 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                var dropDown = Dropdown as OsuTabDropdown;
-                if (dropDown != null)
-                    dropDown.AccentColour.Value = value;
+                var dropdown = Dropdown as OsuTabDropdown;
+                if (dropdown != null)
+                    dropdown.AccentColour.Value = value;
                 foreach (var item in TabContainer.Children.OfType<OsuTabItem>())
                     item.AccentColour = value;
             }
@@ -140,16 +140,20 @@ namespace osu.Game.Graphics.UserInterface
             protected override void OnDeactivated() => fadeInactive();
         }
 
+        // todo: this needs to go
         private class OsuTabDropdown : OsuDropdown<T>
         {
             public OsuTabDropdown()
             {
                 RelativeSizeAxes = Axes.X;
-
-
             }
 
-            protected override DropdownMenu CreateMenu() => new OsuTabDropdownMenu();
+            protected override DropdownMenu CreateMenu()
+            {
+                var menu = new OsuTabDropdownMenu();
+                menu.AccentColour.BindTo(AccentColour);
+                return menu;
+            }
 
             protected override DropdownHeader CreateHeader()
             {
@@ -175,17 +179,23 @@ namespace osu.Game.Graphics.UserInterface
                     MaxHeight = 400;
                 }
 
-                protected override MenuItemRepresentation CreateMenuItemRepresentation(DropdownMenuItem<T> model) => new OsuTabDropdownMenuItemRepresentation(this, model);
-
-                private class OsuTabDropdownMenuItemRepresentation : OsuDropdownMenuItemRepresentation
+                protected override DrawableMenuItem CreateDrawableMenuItem(DropdownMenuItem<T> item)
                 {
-                    public OsuTabDropdownMenuItemRepresentation(Menu<DropdownMenuItem<T>> menu, DropdownMenuItem<T> model)
-                        : base(menu, model)
+                    var poop = new DrawableOsuTabDropdownMenuItem(this, item);
+                    poop.AccentColour.BindTo(AccentColour);
+                    return poop;
+                }
+
+                private class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
+                {
+                    public DrawableOsuTabDropdownMenuItem(Menu<DropdownMenuItem<T>> menu, DropdownMenuItem<T> item)
+                        : base(item)
                     {
                         ForegroundColourHover = Color4.Black;
                     }
                 }
             }
+
 
             protected class OsuTabDropdownHeader : OsuDropdownHeader
             {
