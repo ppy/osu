@@ -161,11 +161,19 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets)
+        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, BeatmapManager beatmaps)
         {
             this.api = api;
             this.rulesets = rulesets;
             resultCountsContainer.Colour = colours.Yellow;
+
+            beatmaps.BeatmapSetAdded += setAdded;
+        }
+
+        private void setAdded(BeatmapSetInfo set)
+        {
+            // if a new map was imported, we should remove it from search results (download completed etc.)
+            panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID)?.FadeOut(400).Expire();
         }
 
         private void updateResultCounts()
