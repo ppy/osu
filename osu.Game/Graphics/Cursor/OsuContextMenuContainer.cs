@@ -7,8 +7,8 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class OsuContextMenuContainer : ContextMenuContainer
+    public class OsuContextMenuContainer : ContextMenuContainer<OsuContextMenuItem>
     {
-        protected override ContextMenu<ContextMenuItem> CreateContextMenu() => new OsuContextMenu<ContextMenuItem>();
+        protected override Menu<OsuContextMenuItem> CreateMenu() => new OsuContextMenu<OsuContextMenuItem>();
     }
 }
