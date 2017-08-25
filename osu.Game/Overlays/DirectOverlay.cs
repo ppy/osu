@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
-        private readonly FillFlowContainer<DirectPanel> panels;
+        private FillFlowContainer<DirectPanel> panels;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
@@ -47,17 +47,6 @@ namespace osu.Game.Overlays
             {
                 if (beatmapSets?.Equals(value) ?? false) return;
                 beatmapSets = value;
-
-                if (BeatmapSets == null)
-                {
-                    foreach (var p in panels.Children)
-                    {
-                        p.FadeOut(200);
-                        p.Expire();
-                    }
-
-                    return;
-                }
 
                 recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             }
@@ -107,13 +96,6 @@ namespace osu.Game.Overlays
                             Font = @"Exo2.0-Bold",
                         },
                     }
-                },
-                panels = new FillFlowContainer<DirectPanel>
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(panel_padding),
-                    Margin = new MarginPadding { Top = 10 },
                 },
             };
 
@@ -193,18 +175,38 @@ namespace osu.Game.Overlays
 
         private void recreatePanels(PanelDisplayStyle displayStyle)
         {
+            if (panels != null)
+            {
+                panels.FadeOut(200);
+                panels.Expire();
+                panels = null;
+            }
+
             if (BeatmapSets == null) return;
 
-            panels.ChildrenEnumerable = BeatmapSets.Select<BeatmapSetInfo, DirectPanel>(b =>
-             {
-                 switch (displayStyle)
-                 {
-                     case PanelDisplayStyle.Grid:
-                         return new DirectGridPanel(b) { Width = 400 };
-                     default:
-                         return new DirectListPanel(b);
-                 }
-             });
+            var newPanels = new FillFlowContainer<DirectPanel>
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(panel_padding),
+                Margin = new MarginPadding { Top = 10 },
+                ChildrenEnumerable = BeatmapSets.Select<BeatmapSetInfo, DirectPanel>(b =>
+                {
+                    switch (displayStyle)
+                    {
+                        case PanelDisplayStyle.Grid:
+                            return new DirectGridPanel(b) { Width = 400 };
+                        default:
+                            return new DirectListPanel(b);
+                    }
+                })
+            };
+
+            LoadComponentAsync(newPanels, p =>
+            {
+                if (panels != null) ScrollFlow.Remove(panels);
+                ScrollFlow.Add(panels = newPanels);
+            });
         }
 
         private GetBeatmapSetsRequest getSetsRequest;
