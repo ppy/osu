@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Screens.Play;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -43,12 +42,12 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The input manager for this RulesetContainer.
         /// </summary>
-        internal readonly PlayerInputManager InputManager = new PlayerInputManager();
+        internal IHasReplayHandler ReplayInputManager => KeyBindingInputManager as IHasReplayHandler;
 
         /// <summary>
         /// The key conversion input manager for this RulesetContainer.
         /// </summary>
-        public readonly PassThroughInputManager KeyBindingInputManager;
+        public PassThroughInputManager KeyBindingInputManager;
 
         /// <summary>
         /// Whether we are currently providing the local user a gameplay cursor.
@@ -58,7 +57,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Whether we have a replay loaded currently.
         /// </summary>
-        public bool HasReplayLoaded => InputManager.ReplayInputHandler != null;
+        public bool HasReplayLoaded => ReplayInputManager?.ReplayInputHandler != null;
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
@@ -76,6 +75,7 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
+
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
         }
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The input manager.</returns>
         public abstract PassThroughInputManager CreateInputManager();
 
-        protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
+        protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
         public Replay Replay { get; private set; }
 
@@ -105,10 +105,13 @@ namespace osu.Game.Rulesets.UI
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replay">The replay, null for local input.</param>
-        public void SetReplay(Replay replay)
+        public virtual void SetReplay(Replay replay)
         {
+            if (ReplayInputManager == null)
+                throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports replay loading is not available");
+
             Replay = replay;
-            InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
+            ReplayInputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
         }
     }
 
@@ -244,7 +247,7 @@ namespace osu.Game.Rulesets.UI
         public Playfield<TObject, TJudgement> Playfield { get; private set; }
 
         protected override Container<Drawable> Content => content;
-        private readonly Container content;
+        private Container content;
 
         private readonly List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
 
@@ -257,24 +260,28 @@ namespace osu.Game.Rulesets.UI
         protected RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
         {
-            InputManager.Add(content = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Children = new[] { KeyBindingInputManager }
-            });
-
-            AddInternal(InputManager);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            KeyBindingInputManager.Add(content = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+
+            AddInternal(KeyBindingInputManager);
             KeyBindingInputManager.Add(Playfield = CreatePlayfield());
 
             loadObjects();
+        }
 
-            if (InputManager?.ReplayInputHandler != null)
-                InputManager.ReplayInputHandler.ToScreenSpace = Playfield.ScaledContent.ToScreenSpace;
+        public override void SetReplay(Replay replay)
+        {
+            base.SetReplay(replay);
+
+            if (ReplayInputManager?.ReplayInputHandler != null)
+                ReplayInputManager.ReplayInputHandler.ToScreenSpace = input => Playfield.ScaledContent.ToScreenSpace(input);
         }
 
         /// <summary>

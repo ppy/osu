@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using OpenTK;
@@ -40,8 +41,8 @@ namespace osu.Desktop.Tests.Visual
                                 RelativeChildSize = new Vector2(1, 10000),
                                 Children = new[]
                                 {
-                                    new DrawableNote(new Note { StartTime = 5000 }) { AccentColour = Color4.Red },
-                                    new DrawableNote(new Note { StartTime = 6000 }) { AccentColour = Color4.Red }
+                                    new DrawableNote(new Note { StartTime = 5000 }, ManiaAction.Key1) { AccentColour = Color4.Red },
+                                    new DrawableNote(new Note { StartTime = 6000 }, ManiaAction.Key1) { AccentColour = Color4.Red }
                                 }
                             }
                         }
@@ -66,7 +67,7 @@ namespace osu.Desktop.Tests.Visual
                                     {
                                         StartTime = 5000,
                                         Duration = 1000
-                                    }) { AccentColour = Color4.Red }
+                                    }, ManiaAction.Key1) { AccentColour = Color4.Red }
                                 }
                             }
                         }
