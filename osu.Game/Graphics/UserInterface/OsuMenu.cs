@@ -25,7 +25,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateMenuHeight()
         {
             var actualHeight = (RelativeSizeAxes & Axes.Y) > 0 ? 1 : ContentHeight;
-            this.ResizeTo(new Vector2(1, State == MenuState.Opened ? actualHeight : 0), 300, Easing.OutQuint);
+            this.ResizeHeightTo(State == MenuState.Opened ? actualHeight : 0, 300, Easing.OutQuint);
         }
 
         protected override FlowContainer<MenuItemRepresentation> CreateItemsFlow()
