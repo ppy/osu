@@ -44,9 +44,23 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Key == OpenTK.Input.Key.CapsLock)
-                warning.FadeTo(host.CapsLockEnabled ? 1 : 0, 250, Easing.OutQuint);
+                updateCapsWarning(host.CapsLockEnabled);
             return base.OnKeyDown(state, args);
         }
+
+        protected override void OnFocus(InputState state)
+        {
+            updateCapsWarning(host.CapsLockEnabled);
+            base.OnFocus(state);
+        }
+
+        protected override void OnFocusLost(InputState state)
+        {
+            updateCapsWarning(false);
+            base.OnFocusLost(state);
+        }
+
+        private void updateCapsWarning(bool visible) => warning.FadeTo(visible ? 1 : 0, 250, Easing.OutQuint);
 
         public class PasswordMaskChar : Container
         {
