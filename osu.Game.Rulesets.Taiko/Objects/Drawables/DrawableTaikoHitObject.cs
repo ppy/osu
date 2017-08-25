@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
+        protected readonly Vector2 BaseSize;
+
         protected readonly TaikoPiece MainPiece;
 
         public new TaikoHitType HitObject;
@@ -29,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Origin = Anchor.Custom;
 
             RelativeSizeAxes = Axes.Both;
-            Size = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
+            Size = BaseSize = new Vector2(HitObject.IsStrong ? TaikoHitObject.DEFAULT_STRONG_SIZE : TaikoHitObject.DEFAULT_SIZE);
 
             Add(MainPiece = CreateMainPiece());
             MainPiece.KiaiMode = HitObject.Kiai;

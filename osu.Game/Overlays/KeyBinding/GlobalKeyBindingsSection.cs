@@ -3,21 +3,29 @@
 
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Overlays.KeyBinding
 {
-    public class GlobalKeyBindingsSection : KeyBindingsSection
+    public class GlobalKeyBindingsSection : SettingsSection
     {
-        private readonly string name;
+        public override FontAwesome Icon => FontAwesome.fa_osu_hot;
+        public override string Header => "Global";
 
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_nofail;
-        public override string Header => name;
-
-        public GlobalKeyBindingsSection(KeyBindingInputManager manager, string name)
+        public GlobalKeyBindingsSection(KeyBindingInputManager manager)
         {
-            this.name = name;
+            Add(new DefaultBindingsSubsection(manager));
+        }
 
-            Defaults = manager.DefaultKeyBindings;
+        private class DefaultBindingsSubsection : KeyBindingsSubsection
+        {
+            protected override string Header => string.Empty;
+
+            public DefaultBindingsSubsection(KeyBindingInputManager manager)
+                : base(null)
+            {
+                Defaults = manager.DefaultKeyBindings;
+            }
         }
     }
 }

@@ -5,9 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
-using OpenTK.Input;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -85,7 +83,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo);
+        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, availableColumns);
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter()
         {
@@ -109,15 +107,15 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
         {
-            Bindable<Key> key = Playfield.Columns.ElementAt(h.Column).Key;
+            ManiaAction action = Playfield.Columns.ElementAt(h.Column).Action;
 
             var holdNote = h as HoldNote;
             if (holdNote != null)
-                return new DrawableHoldNote(holdNote, key);
+                return new DrawableHoldNote(holdNote, action);
 
             var note = h as Note;
             if (note != null)
-                return new DrawableNote(note, key);
+                return new DrawableNote(note, action);
 
             return null;
         }
