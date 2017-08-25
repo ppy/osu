@@ -306,20 +306,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     BackgroundColour = colours.Gray3;
                 }
 
-                protected override FlowContainer<MenuItemRepresentation> CreateItemsFlow()
+                protected override MarginPadding ItemFlowContainerPadding => new MarginPadding();
+
+                protected override DrawableMenuItem CreateDrawableMenuItem(DropdownMenuItem<UserAction> item) => new DrawableUserDropdownMenuItem(this, item);
+
+                private class DrawableUserDropdownMenuItem : DrawableOsuDropdownMenuItem
                 {
-                    var flow = base.CreateItemsFlow();
-                    flow.Padding = new MarginPadding(0);
-
-                    return flow;
-                }
-
-                protected override MenuItemRepresentation CreateMenuItemRepresentation(DropdownMenuItem<UserAction> model) => new UserDropdownMenuItem(this, model);
-
-                private class UserDropdownMenuItem : OsuDropdownMenuItemRepresentation
-                {
-                    public UserDropdownMenuItem(Menu<DropdownMenuItem<UserAction>> menu, DropdownMenuItem<UserAction> model)
-                        : base(menu, model)
+                    public DrawableUserDropdownMenuItem(Menu<DropdownMenuItem<UserAction>> menu, DropdownMenuItem<UserAction> item)
+                        : base(item)
                     {
                         Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 5 };
                         Label.Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 };

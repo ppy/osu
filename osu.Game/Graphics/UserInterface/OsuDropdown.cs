@@ -44,18 +44,40 @@ namespace osu.Game.Graphics.UserInterface
         #region OsuDropdownMenu
         protected class OsuDropdownMenu : DropdownMenu
         {
+            // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
+            public OsuDropdownMenu()
+            {
+                CornerRadius = 4;
+                BackgroundColour = Color4.Black.Opacity(0.5f);
+            }
+
+            // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
+            protected override void AnimateOpen() => this.FadeIn(300, Easing.OutQuint);
+            protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
+
+            // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
+            protected override MarginPadding ItemFlowContainerPadding => new MarginPadding(5);
+
+            // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
+            protected override void UpdateMenuHeight()
+            {
+                var actualHeight = (RelativeSizeAxes & Axes.Y) > 0 ? 1 : ContentHeight;
+                this.ResizeHeightTo(State == MenuState.Opened ? actualHeight : 0, 300, Easing.OutQuint);
+            }
+
             public readonly Bindable<Color4?> AccentColour = new Bindable<Color4?>();
 
-            protected override MenuItemRepresentation CreateMenuItemRepresentation(DropdownMenuItem<T> model)
+
+            protected override DrawableMenuItem CreateDrawableMenuItem(DropdownMenuItem<T> item)
             {
-                var newItem = new OsuDropdownMenuItemRepresentation(this, model);
+                var newItem = new DrawableOsuDropdownMenuItem(item);
                 newItem.AccentColour.BindTo(AccentColour);
 
                 return newItem;
             }
 
-            #region OsuDropdownMenuItemRepresentation
-            protected class OsuDropdownMenuItemRepresentation : DropdownMenuItemRepresentation
+            #region DrawableOsuDropdownMenuItem
+            protected class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem
             {
                 public readonly Bindable<Color4?> AccentColour = new Bindable<Color4?>();
 
@@ -65,8 +87,8 @@ namespace osu.Game.Graphics.UserInterface
                 private Color4 nonAccentHoverColour;
                 private Color4 nonAccentSelectedColour;
 
-                public OsuDropdownMenuItemRepresentation(Menu<DropdownMenuItem<T>> menu, DropdownMenuItem<T> model)
-                    : base(menu, model)
+                public DrawableOsuDropdownMenuItem(DropdownMenuItem<T> item)
+                    : base(item)
                 {
                     Foreground.Padding = new MarginPadding(2);
 
@@ -88,17 +110,17 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     BackgroundColourHover = newValue ?? nonAccentHoverColour;
                     BackgroundColourSelected = newValue ?? nonAccentSelectedColour;
-                    AnimateBackground(IsHovered);
-                    AnimateForeground(IsHovered);
+                    UpdateBackgroundColour();
+                    UpdateForegroundColour();
                 }
 
-                protected override void AnimateForeground(bool hover)
+                protected override void UpdateForegroundColour()
                 {
-                    base.AnimateForeground(hover);
-                    chevron.Alpha = hover ? 1 : 0;
+                    base.UpdateForegroundColour();
+                    chevron.Alpha = IsHovered ? 1 : 0;
                 }
 
-                protected override Drawable CreateText(string title) => new FillFlowContainer
+                protected override Drawable CreateContent() => new FillFlowContainer
                 {
                     Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.X,
@@ -118,7 +140,7 @@ namespace osu.Game.Graphics.UserInterface
                         },
                         Label = new OsuSpriteText
                         {
-                            Text = title,
+                            Text = Item.Text,
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                         }
