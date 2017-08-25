@@ -12,8 +12,15 @@ namespace osu.Game.Overlays.SearchableList
 {
     public class SlimEnumDropdown<T> : OsuEnumDropdown<T>
     {
-        protected override DropdownHeader CreateHeader() => new SlimDropdownHeader { AccentColour = AccentColour };
-        protected override Menu CreateMenu() => new SlimMenu();
+        protected override DropdownHeader CreateHeader()
+        {
+            var newHeader = new SlimDropdownHeader();
+            newHeader.AccentColour.BindTo(AccentColour);
+
+            return newHeader;
+        }
+
+        protected override DropdownMenu CreateMenu() => new SlimMenu();
 
         private class SlimDropdownHeader : OsuDropdownHeader
         {
@@ -31,11 +38,11 @@ namespace osu.Game.Overlays.SearchableList
             }
         }
 
-        private class SlimMenu : OsuMenu
+        private class SlimMenu : OsuDropdownMenu
         {
             public SlimMenu()
             {
-                Background.Colour = Color4.Black.Opacity(0.7f);
+                BackgroundColour = Color4.Black.Opacity(0.7f);
             }
         }
     }
