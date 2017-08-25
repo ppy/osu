@@ -5,28 +5,39 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuMenu : Menu
+    public class OsuMenu<TItem> : Menu<TItem>
+        where TItem : MenuItem
     {
         public OsuMenu()
         {
             CornerRadius = 4;
-            Background.Colour = Color4.Black.Opacity(0.5f);
-
-            ItemsContainer.Padding = new MarginPadding(5);
+            BackgroundColour = Color4.Black.Opacity(0.5f);
         }
 
         protected override void AnimateOpen() => this.FadeIn(300, Easing.OutQuint);
-
         protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
 
-        protected override void UpdateContentHeight()
+        protected override void UpdateMenuHeight()
         {
             var actualHeight = (RelativeSizeAxes & Axes.Y) > 0 ? 1 : ContentHeight;
             this.ResizeTo(new Vector2(1, State == MenuState.Opened ? actualHeight : 0), 300, Easing.OutQuint);
         }
+
+        protected override FlowContainer<MenuItemRepresentation> CreateItemsFlow()
+        {
+            var flow = base.CreateItemsFlow();
+            flow.Padding = new MarginPadding(5);
+
+            return flow;
+        }
+    }
+
+    public class OsuMenu : OsuMenu<MenuItem>
+    {
     }
 }
