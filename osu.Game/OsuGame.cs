@@ -242,11 +242,6 @@ namespace osu.Game
                 };
             }
 
-
-            // ensure both overlays aren't presented at the same time
-            chat.StateChanged += (container, state) => social.State = state == Visibility.Visible ? Visibility.Hidden : social.State;
-            social.StateChanged += (container, state) => chat.State = state == Visibility.Visible ? Visibility.Hidden : chat.State;
-
             LoadComponentAsync(Toolbar = new Toolbar
             {
                 Depth = -4,
