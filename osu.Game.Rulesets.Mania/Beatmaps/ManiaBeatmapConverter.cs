@@ -1,18 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Rulesets.Beatmaps;
-using osu.Game.Rulesets.Mania.Objects;
-using System;
-using System.Collections.Generic;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
-using osu.Game.Rulesets.Mania.MathUtils;
-using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 using OpenTK;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
+using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
+using osu.Game.Rulesets.Mania.MathUtils;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -72,6 +72,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
         private double density = int.MaxValue;
+
         private void computeDensity(double newNoteTime)
         {
             if (prevNoteTimes.Count == max_notes_for_density)
@@ -84,6 +85,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         private double lastTime;
         private Vector2 lastPosition;
         private PatternType lastStair;
+
         private void recordNote(double time, Vector2 position)
         {
             lastTime = time;

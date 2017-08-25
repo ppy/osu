@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {

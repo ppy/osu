@@ -1,13 +1,13 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Users;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {

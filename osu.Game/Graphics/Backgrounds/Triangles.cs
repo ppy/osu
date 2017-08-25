@@ -1,21 +1,21 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Graphics;
-using System;
+using OpenTK.Graphics.ES30;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Batches;
+using osu.Framework.Graphics.Colour;
+using osu.Framework.Graphics.OpenGL.Vertices;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using OpenTK.Graphics.ES30;
-using osu.Framework.Graphics.Colour;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Allocation;
-using System.Collections.Generic;
-using osu.Framework.Graphics.Batches;
-using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Lists;
+using osu.Framework.MathUtils;
+using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -183,6 +183,7 @@ namespace osu.Game.Graphics.Backgrounds
         protected override DrawNode CreateDrawNode() => new TrianglesDrawNode();
 
         private readonly TrianglesDrawNodeSharedData sharedData = new TrianglesDrawNodeSharedData();
+
         protected override void ApplyDrawNode(DrawNode node)
         {
             base.ApplyDrawNode(node);

@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
-using System.Collections.Generic;
 
 namespace osu.Game.Graphics.UserInterface
 {

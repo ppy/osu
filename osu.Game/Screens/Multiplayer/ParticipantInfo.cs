@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,6 +9,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Multiplayer
 {

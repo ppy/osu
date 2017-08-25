@@ -9,6 +9,7 @@ namespace osu.Game.Users
     public abstract class UserStatus
     {
         public abstract string Message { get; }
+
         public abstract Color4 GetAppropriateColour(OsuColour colours);
     }
 
@@ -25,6 +26,7 @@ namespace osu.Game.Users
     public class UserStatusOffline : UserStatus
     {
         public override string Message => @"Offline";
+
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.Gray7;
     }
 
@@ -43,7 +45,7 @@ namespace osu.Game.Users
         public override string Message => @"in Multiplayer Lobby";
     }
 
-    public class UserStatusSoloGame :  UserStatusBusy
+    public class UserStatusSoloGame : UserStatusBusy
     {
         public override string Message => @"Solo Game";
     }
@@ -56,12 +58,14 @@ namespace osu.Game.Users
     public class UserStatusModding : UserStatus
     {
         public override string Message => @"Modding a map";
+
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
     }
 
     public class UserStatusDoNotDisturb : UserStatus
     {
         public override string Message => @"Do not disturb";
+
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.RedDark;
     }
 }

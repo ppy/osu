@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -14,6 +13,7 @@ using osu.Game.Overlays.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using System.Linq;
 
 namespace osu.Game.Screens.Select
 {

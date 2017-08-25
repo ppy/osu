@@ -40,6 +40,7 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             protected override void AnimateOpen() => this.FadeIn(fade_duration, Easing.OutQuint);
+
             protected override void AnimateClose() => this.FadeOut(fade_duration, Easing.OutQuint);
 
             protected override void UpdateContentHeight()

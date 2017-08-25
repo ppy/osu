@@ -52,7 +52,6 @@ namespace osu.Game.Rulesets.Replays
 
         protected ReplayFrame()
         {
-
         }
 
         public ReplayFrame(double time, float? mouseX, float? mouseY, ReplayButtonState buttonState)

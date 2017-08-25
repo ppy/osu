@@ -5,8 +5,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania
 {

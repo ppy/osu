@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Game.Rulesets.Judgements;
-using Container = osu.Framework.Graphics.Containers.Container;
-using osu.Game.Rulesets.Objects.Types;
-using OpenTK.Graphics;
 using osu.Game.Audio;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects.Types;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -197,6 +197,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         protected abstract TJudgement CreateJudgement();
+
         protected abstract void UpdateState(ArmedState state);
     }
 }

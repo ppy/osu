@@ -1,16 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
-using osu.Framework;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Game.Overlays.Toolbar;
+using System.Linq;
 
 namespace osu.Game.Overlays.Settings
 {

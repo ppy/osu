@@ -1,9 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -17,7 +16,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
-using OpenTK.Graphics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
@@ -37,6 +37,7 @@ namespace osu.Game.Overlays
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
+
         protected override SearchableListFilterControl<DirectSortCriteria, RankStatus> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;

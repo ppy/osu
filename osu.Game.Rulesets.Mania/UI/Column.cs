@@ -5,16 +5,16 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Colour;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects.Drawables;
-using System;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI;
+using System;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -232,6 +232,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             public bool OnPressed(ManiaAction action) => Pressed?.Invoke(action) ?? false;
+
             public bool OnReleased(ManiaAction action) => Released?.Invoke(action) ?? false;
         }
     }

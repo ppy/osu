@@ -9,12 +9,10 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModNoFail : ModNoFail
     {
-
     }
 
     public class ManiaModEasy : ModEasy
     {
-
     }
 
     public class ManiaModHidden : ModHidden
@@ -31,7 +29,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 
     public class ManiaModSuddenDeath : ModSuddenDeath
     {
-
     }
 
     public class ManiaModDaycore : ModDaycore
@@ -62,7 +59,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 
     public class ManiaModPerfect : ModPerfect
     {
-
     }
 
     public class ManiaModFadeIn : Mod

@@ -1,14 +1,14 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Timing;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
+using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {

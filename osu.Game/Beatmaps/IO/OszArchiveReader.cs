@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using Ionic.Zip;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Ionic.Zip;
 
 namespace osu.Game.Beatmaps.IO
 {

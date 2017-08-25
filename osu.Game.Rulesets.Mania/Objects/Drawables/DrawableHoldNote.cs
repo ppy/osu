@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
-using OpenTK.Graphics;
 using OpenTK;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Mania.Judgements;
+using OpenTK.Graphics;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {

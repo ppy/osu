@@ -190,7 +190,9 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         protected abstract void OnDisplayedCountRolling(int currentValue, int newValue);
+
         protected abstract void OnDisplayedCountIncrement(int newValue);
+
         protected abstract void OnDisplayedCountChange(int newValue);
     }
 }

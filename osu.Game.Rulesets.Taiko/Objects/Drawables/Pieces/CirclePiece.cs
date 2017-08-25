@@ -1,14 +1,14 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics.Backgrounds;
-using OpenTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Framework.Audio.Track;
+using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
 {

@@ -7,12 +7,10 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModNoFail : ModNoFail
     {
-
     }
 
     public class CatchModEasy : ModEasy
     {
-
     }
 
     public class CatchModHidden : ModHidden
@@ -29,7 +27,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 
     public class CatchModSuddenDeath : ModSuddenDeath
     {
-
     }
 
     public class CatchModDaycore : ModDaycore
@@ -64,6 +61,5 @@ namespace osu.Game.Rulesets.Catch.Mods
 
     public class CatchModPerfect : ModPerfect
     {
-
     }
 }

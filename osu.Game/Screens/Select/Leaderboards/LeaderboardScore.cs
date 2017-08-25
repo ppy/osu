@@ -3,17 +3,17 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
-using osu.Framework;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -265,6 +265,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         public void ToggleVisibility() => State = State == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
 
         public override void Hide() => State = Visibility.Hidden;
+
         public override void Show() => State = Visibility.Visible;
 
         protected override bool OnHover(Framework.Input.InputState state)

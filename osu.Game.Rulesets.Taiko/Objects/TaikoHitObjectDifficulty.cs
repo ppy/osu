@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         }
 
         private TypeSwitch lastTypeSwitchEven = TypeSwitch.None;
+
         private double typeChangeAddition(TaikoHitObjectDifficulty previousHitObject)
         {
             // If we don't have the same hit type, trigger a type change!

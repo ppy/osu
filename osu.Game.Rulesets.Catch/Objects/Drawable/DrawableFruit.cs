@@ -1,7 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -11,8 +12,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
-using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -36,7 +36,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             public Color4 AccentColour { get; set; } = Color4.White;
         }
-
 
         public DrawableFruit(CatchBaseHit h)
             : base(h)

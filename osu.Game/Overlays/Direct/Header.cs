@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.ComponentModel;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.SearchableList;
+using System.ComponentModel;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -16,7 +16,9 @@ namespace osu.Game.Overlays.Direct
         protected override float TabStripWidth => 298;
 
         protected override DirectTab DefaultTab => DirectTab.Search;
+
         protected override Drawable CreateHeaderText() => new OsuSpriteText { Text = @"osu!direct", TextSize = 25 };
+
         protected override FontAwesome Icon => FontAwesome.fa_osu_chevron_down_o;
 
         public Header()

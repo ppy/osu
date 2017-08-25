@@ -1,18 +1,19 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
 
 namespace osu.Game.Overlays.SearchableList
 {
     public class SlimEnumDropdown<T> : OsuEnumDropdown<T>
     {
         protected override DropdownHeader CreateHeader() => new SlimDropdownHeader { AccentColour = AccentColour };
+
         protected override Menu CreateMenu() => new SlimMenu();
 
         private class SlimDropdownHeader : OsuDropdownHeader

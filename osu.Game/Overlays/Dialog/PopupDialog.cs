@@ -1,21 +1,21 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using System.Linq;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays.Dialog
 {

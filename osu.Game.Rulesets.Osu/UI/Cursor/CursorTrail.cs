@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Diagnostics;
+using OpenTK;
+using OpenTK.Graphics.ES30;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -13,8 +13,8 @@ using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Timing;
-using OpenTK;
-using OpenTK.Graphics.ES30;
+using System;
+using System.Diagnostics;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {

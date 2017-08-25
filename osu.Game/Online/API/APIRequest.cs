@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Network;
+using System;
 
 namespace osu.Game.Online.API
 {
@@ -82,6 +82,7 @@ namespace osu.Game.Online.API
         protected WebRequest WebRequest;
 
         public event APISuccessHandler Success;
+
         public event APIFailureHandler Failure;
 
         private bool cancelled;
@@ -144,7 +145,10 @@ namespace osu.Game.Online.API
     }
 
     public delegate void APIFailureHandler(Exception e);
+
     public delegate void APISuccessHandler();
+
     public delegate void APIProgressHandler(long current, long total);
+
     public delegate void APISuccessHandler<in T>(T content);
 }

@@ -1,18 +1,18 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using OpenTK;
+using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
-using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Game.Graphics;
-using osu.Framework.Allocation;
-using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using System;
 
 namespace osu.Game.Screens.Play
 {
@@ -75,6 +75,7 @@ namespace osu.Game.Screens.Play
         public override bool HandleInput => State == Visibility.Visible;
 
         protected override void PopIn() => this.FadeIn(transition_duration, Easing.In);
+
         protected override void PopOut() => this.FadeOut(transition_duration, Easing.In);
 
         // Don't let mouse down events through the overlay or people can click circles while paused.

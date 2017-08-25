@@ -1,9 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -11,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
@@ -22,7 +20,9 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
-using osu.Framework.Graphics.Shapes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -30,7 +30,9 @@ namespace osu.Game.Screens.Ranking
     {
         private ScoreCounter scoreCounter;
 
-        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { }
+        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap)
+        {
+        }
 
         private FillFlowContainer<DrawableScoreStatistic> statisticsContainer;
 

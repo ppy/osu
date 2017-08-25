@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using OpenTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using System;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {

@@ -2,15 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Replays;
 using System;
 using System.Diagnostics;
-using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {

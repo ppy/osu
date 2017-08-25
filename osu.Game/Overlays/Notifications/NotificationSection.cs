@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using OpenTK;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays.Notifications
 {

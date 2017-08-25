@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using OpenTK;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -24,7 +24,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     public class OsuModEasy : ModEasy
     {
-
     }
 
     public class OsuModHidden : ModHidden
@@ -90,7 +89,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
     public class OsuModPerfect : ModPerfect
     {
-
     }
 
     public class OsuModSpunOut : Mod
