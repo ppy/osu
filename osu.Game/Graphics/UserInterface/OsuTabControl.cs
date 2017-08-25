@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
                 accentColour = value;
                 var dropDown = Dropdown as OsuTabDropdown;
                 if (dropDown != null)
-                    dropDown.AccentColour = value;
+                    dropDown.AccentColour.Value = value;
                 foreach (var item in TabContainer.Children.OfType<OsuTabItem>())
                     item.AccentColour = value;
             }
@@ -142,55 +142,53 @@ namespace osu.Game.Graphics.UserInterface
 
         private class OsuTabDropdown : OsuDropdown<T>
         {
-            protected override DropdownHeader CreateHeader() => new OsuTabDropdownHeader
-            {
-                AccentColour = AccentColour,
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-            };
-
-            protected override DropdownMenuItem<T> CreateMenuItem(string text, T value)
-            {
-                var item = base.CreateMenuItem(text, value);
-                item.ForegroundColourHover = Color4.Black;
-                return item;
-            }
-
             public OsuTabDropdown()
             {
-                DropdownMenu.Anchor = Anchor.TopRight;
-                DropdownMenu.Origin = Anchor.TopRight;
-
                 RelativeSizeAxes = Axes.X;
 
-                DropdownMenu.Background.Colour = Color4.Black.Opacity(0.7f);
-                DropdownMenu.MaxHeight = 400;
+
+            }
+
+            protected override DropdownMenu CreateMenu() => new OsuTabDropdownMenu();
+
+            protected override DropdownHeader CreateHeader()
+            {
+                var newHeader = new OsuTabDropdownHeader
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight
+                };
+
+                newHeader.AccentColour.BindTo(AccentColour);
+
+                return newHeader;
+            }
+
+            private class OsuTabDropdownMenu : OsuDropdownMenu
+            {
+                public OsuTabDropdownMenu()
+                {
+                    Anchor = Anchor.TopRight;
+                    Origin = Anchor.TopRight;
+
+                    BackgroundColour = Color4.Black.Opacity(0.7f);
+                    MaxHeight = 400;
+                }
+
+                protected override MenuItemRepresentation CreateMenuItemRepresentation(DropdownMenuItem<T> model) => new OsuTabDropdownMenuItemRepresentation(this, model);
+
+                private class OsuTabDropdownMenuItemRepresentation : OsuDropdownMenuItemRepresentation
+                {
+                    public OsuTabDropdownMenuItemRepresentation(Menu<DropdownMenuItem<T>> menu, DropdownMenuItem<T> model)
+                        : base(menu, model)
+                    {
+                        ForegroundColourHover = Color4.Black;
+                    }
+                }
             }
 
             protected class OsuTabDropdownHeader : OsuDropdownHeader
             {
-                public override Color4 AccentColour
-                {
-                    get { return base.AccentColour; }
-                    set
-                    {
-                        base.AccentColour = value;
-                        Foreground.Colour = value;
-                    }
-                }
-
-                protected override bool OnHover(InputState state)
-                {
-                    Foreground.Colour = BackgroundColour;
-                    return base.OnHover(state);
-                }
-
-                protected override void OnHoverLost(InputState state)
-                {
-                    Foreground.Colour = BackgroundColourHover;
-                    base.OnHoverLost(state);
-                }
-
                 public OsuTabDropdownHeader()
                 {
                     RelativeSizeAxes = Axes.None;
@@ -219,6 +217,25 @@ namespace osu.Game.Graphics.UserInterface
                     };
 
                     Padding = new MarginPadding { Left = 5, Right = 5 };
+
+                    AccentColour.ValueChanged += accentColourChanged;
+                }
+
+                private void accentColourChanged(Color4? newValue)
+                {
+                    Foreground.Colour = newValue ?? Color4.White;
+                }
+
+                protected override bool OnHover(InputState state)
+                {
+                    Foreground.Colour = BackgroundColour;
+                    return base.OnHover(state);
+                }
+
+                protected override void OnHoverLost(InputState state)
+                {
+                    Foreground.Colour = BackgroundColourHover;
+                    base.OnHoverLost(state);
                 }
             }
         }
