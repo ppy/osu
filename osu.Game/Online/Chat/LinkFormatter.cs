@@ -87,7 +87,7 @@ namespace osu.Game.Online.Chat
                 if (displayText.Length == 0 || linkText.Length == 0) continue;
 
                 //ensure we don't have encapsulated links.
-                if (result.Links.Find(l => (l.Index <= index && l.Index + l.Length >= index + m.Length) || (index <= l.Index && index + m.Length >= l.Index + l.Length)) == null)
+                if (result.Links.Find(l => l.Index <= index && l.Index + l.Length >= index + m.Length || index <= l.Index && index + m.Length >= l.Index + l.Length) == null)
                 {
                     result.Text = result.Text.Remove(index, m.Length).Insert(index, displayText);
 
@@ -97,7 +97,7 @@ namespace osu.Game.Online.Chat
                     result.Links.Add(new Link(linkText, index, displayText));
 
                     //adjust the offset for processing the current matches group.
-                    captureOffset += (m.Length - displayText.Length);
+                    captureOffset += m.Length - displayText.Length;
                 }
             }
         }
