@@ -289,6 +289,8 @@ namespace osu.Game.Overlays
 
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
+        private List<Channel> allChannels;
+
         private void initializeChannels()
         {
             loading.Show();
@@ -310,7 +312,7 @@ namespace osu.Game.Overlays
                         new ChannelSection
                         {
                             Header = "All Channels",
-                            Channels = channels,
+                            Channels = allChannels = channels,
                         },
                     };
                 });
@@ -477,6 +479,32 @@ namespace osu.Game.Overlays
             req.Success += m => target.ReplaceMessage(message, m);
 
             api.Queue(req);
+        }
+
+        public void HandleLink(string link)
+        {
+            //url handling.
+            if (link.StartsWith(@"osu://"))
+            {
+                string[] split = link.Replace(@"osu://", string.Empty).Split('/');
+                switch (split[0])
+                {
+                    //case @"dl":
+                    //    OsuDirect.HandlePickup(LinkId.Set, Int32.Parse(split[1]), null);
+                    //    return;
+                    case @"chan":
+                        Channel requested = allChannels.Find(c => c.Name == split[1]);
+                        addChannel(requested);
+                        if(requested != null)
+                            CurrentChannel = requested;
+                        return;
+                        //case @"spectate":
+                        //case @"edit":
+                }
+                return;
+            }
+
+            Process.Start(link);
         }
     }
 }

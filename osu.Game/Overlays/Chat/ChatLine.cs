@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Game.Users;
-using System.Diagnostics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Cursor;
 
@@ -250,6 +249,8 @@ namespace osu.Game.Overlays.Chat
             private readonly Link link;
             private readonly Box background;
 
+            private ChatOverlay chat;
+
             public ClickableLink(Link link, int depth)
             {
                 this.link = link;
@@ -272,9 +273,15 @@ namespace osu.Game.Overlays.Chat
                 };
             }
 
+            [BackgroundDependencyLoader]
+            private void load(ChatOverlay chat)
+            {
+                this.chat = chat;
+            }
+
             protected override bool OnClick(InputState state)
             {
-                Process.Start(link.Url);
+                chat.HandleLink(link.Url);
                 return base.OnClick(state);
             }
 
