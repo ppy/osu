@@ -15,6 +15,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Users;
 using System.Diagnostics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -242,8 +243,10 @@ namespace osu.Game.Overlays.Chat
             });
         }
 
-        private class ClickableLink : ClickableContainer
+        private class ClickableLink : ClickableContainer, IHasTooltip
         {
+            public string TooltipText => @"Link: " + link.Url;
+
             private readonly Link link;
             private readonly Box background;
 
