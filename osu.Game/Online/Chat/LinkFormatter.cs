@@ -94,7 +94,7 @@ namespace osu.Game.Online.Chat
                     //since we just changed the line display text, offset any already processed links.
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
-                    result.Links.Add(new Link(linkText, index, displayText.Length));
+                    result.Links.Add(new Link(linkText, index, displayText));
 
                     //adjust the offset for processing the current matches group.
                     captureOffset += (m.Length - displayText.Length);
@@ -139,12 +139,22 @@ namespace osu.Game.Online.Chat
         public string Url;
         public int Index;
         public int Length;
+        public string DisplayText;
 
         public Link(string url, int startIndex, int length)
         {
             Url = url;
             Index = startIndex;
+            DisplayText = url;
             Length = length;
+        }
+
+        public Link(string url, int startIndex, string displayText)
+        {
+            Url = url;
+            Index = startIndex;
+            DisplayText = displayText;
+            Length = displayText.Length;
         }
     }
 

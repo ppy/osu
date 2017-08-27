@@ -101,6 +101,7 @@
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
+    <Compile Include="Online\Chat\LinkFormatter.cs" />
     <Compile Include="Online\Chat\LocalEchoMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
     <Compile Include="Overlays\KeyBinding\GlobalKeyBindingsSection.cs" />
