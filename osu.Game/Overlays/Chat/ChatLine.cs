@@ -8,11 +8,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Game.Users;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -81,7 +83,7 @@ namespace osu.Game.Overlays.Chat
 
         private Message message;
         private OsuSpriteText username;
-        private OsuTextFlowContainer contentFlow;
+        private FillFlowContainer contentFlow;
 
         public Message Message
         {
@@ -181,19 +183,12 @@ namespace osu.Game.Overlays.Chat
                         },
                     }
                 },
-                new Container
+                contentFlow = new FillFlowContainer
                 {
+                    Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Left = message_padding + padding },
-                    Children = new Drawable[]
-                    {
-                        contentFlow = new OsuTextFlowContainer(t => { t.TextSize = text_size; })
-                        {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                        }
-                    }
                 }
             };
 
@@ -208,7 +203,99 @@ namespace osu.Game.Overlays.Chat
 
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
             username.Text = $@"{message.Sender.Username}" + (senderHasBackground ? "" : ":");
-            contentFlow.Text = message.Content;
+
+            contentFlow.Clear();
+
+            LinkFormatterResult formatterResults = LinkFormatter.Format(message.Content);
+
+            string finalText = formatterResults.Text;
+
+            int linksCount = formatterResults.Links.Count;
+            int depth = 0;
+
+            if (linksCount > 0)
+            {
+                for (int i = linksCount - 1; i >= 0; i--)
+                {
+                    Link l = formatterResults.Links[i];
+
+                    addTextPieceToMessage(finalText.Substring(l.Index + l.Length), depth);
+                    depth++;
+                    contentFlow.Add(new ClickableLink(l, depth));
+                    depth++;
+
+                    finalText = finalText.Substring(0, l.Index);
+                }
+            }
+
+            if (finalText.Length > 0)
+                addTextPieceToMessage(finalText, depth);
+        }
+
+        private void addTextPieceToMessage(string text, int depth)
+        {
+            contentFlow.Add(new OsuSpriteText
+            {
+                Text = text,
+                TextSize = text_size,
+                Depth = depth,
+            });
+        }
+
+        private class ClickableLink : ClickableContainer, IHasTooltip
+        {
+            public string TooltipText => @"Link: " + link.Url;
+
+            private readonly Link link;
+            private readonly Box background;
+
+            private ChatOverlay chat;
+
+            public ClickableLink(Link link, int depth)
+            {
+                this.link = link;
+
+                AutoSizeAxes = Axes.Both;
+                Depth = depth;
+                Children = new Drawable[]
+                {
+                    background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                        Alpha = 0.6f,
+                    },
+                    new OsuSpriteText
+                    {
+                        Text = link.DisplayText,
+                        TextSize = text_size,
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(ChatOverlay chat)
+            {
+                this.chat = chat;
+            }
+
+            protected override bool OnClick(InputState state)
+            {
+                chat.HandleLink(link.Url);
+                return base.OnClick(state);
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                background.FadeTo(0.8f);
+                return base.OnHover(state);
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                background.FadeTo(0.6f);
+                base.OnHoverLost(state);
+            }
         }
     }
 }
