@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -20,7 +21,7 @@ namespace osu.Desktop.Tests.Visual
     {
         public TestCaseEditorMenuBar()
         {
-            Add(new MenuBar
+            Add(new EditorMenuBar
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
@@ -31,161 +32,200 @@ namespace osu.Desktop.Tests.Visual
                     {
                         Items = new[]
                         {
-                            new EditorContextMenuItem("Clear All Notes"),
-                            new EditorContextMenuItem("Open Difficulty..."),
-                            new EditorContextMenuItem("Save"),
-                            new EditorContextMenuItem("Create a new Difficulty..."),
-                            new EditorContextMenuSpacer(),
-                            new EditorContextMenuItem("Revert to Saved"),
-                            new EditorContextMenuItem("Revert to Saved (Full)"),
-                            new EditorContextMenuSpacer(),
-                            new EditorContextMenuItem("Test Beatmap"),
-                            new EditorContextMenuItem("Open AiMod"),
-                            new EditorContextMenuSpacer(),
-                            new EditorContextMenuItem("Upload Beatmap..."),
-                            new EditorContextMenuItem("Export Package"),
-                            new EditorContextMenuItem("Export Map Package"),
-                            new EditorContextMenuItem("Import from..."),
-                            new EditorContextMenuSpacer(),
-                            new EditorContextMenuItem("Open Song Folder"),
-                            new EditorContextMenuItem("Open .osu in Notepad"),
-                            new EditorContextMenuItem("Open .osb in Notepad"),
-                            new EditorContextMenuSpacer(),
-                            new EditorContextMenuItem("Exit"),
+                            new EditorMenuItem("Clear All Notes"),
+                            new EditorMenuItem("Open Difficulty..."),
+                            new EditorMenuItem("Save"),
+                            new EditorMenuItem("Create a new Difficulty..."),
+                            new EditorMenuSpacer(),
+                            new EditorMenuItem("Revert to Saved"),
+                            new EditorMenuItem("Revert to Saved (Full)"),
+                            new EditorMenuSpacer(),
+                            new EditorMenuItem("Test Beatmap"),
+                            new EditorMenuItem("Open AiMod"),
+                            new EditorMenuSpacer(),
+                            new EditorMenuItem("Upload Beatmap..."),
+                            new EditorMenuItem("Export Package"),
+                            new EditorMenuItem("Export Map Package"),
+                            new EditorMenuItem("Import from..."),
+                            new EditorMenuSpacer(),
+                            new EditorMenuItem("Open Song Folder"),
+                            new EditorMenuItem("Open .osu in Notepad"),
+                            new EditorMenuItem("Open .osb in Notepad"),
+                            new EditorMenuSpacer(),
+                            new EditorMenuItem("Exit"),
                         }
                     },
                     new EditorMenuBarItem("Timing")
                     {
                         Items = new[]
                         {
-                            new EditorContextMenuItem("Time Signature"),
-                            new EditorContextMenuItem("Metronome Clicks"),
-                            new EditorContextMenuSpacer(),
-                            new EditorContextMenuItem("Add Timing Section"),
-                            new EditorContextMenuItem("Add Inheriting Section"),
-                            new EditorContextMenuItem("Reset Current Section"),
-                            new EditorContextMenuItem("Delete Timing Section"),
-                            new EditorContextMenuItem("Resnap Current Section"),
-                            new EditorContextMenuSpacer(),
-                            new EditorContextMenuItem("Timing Setup"),
-                            new EditorContextMenuSpacer(),
-                            new EditorContextMenuItem("Resnap All Notes", MenuItemType.Destructive),
-                            new EditorContextMenuItem("Move all notes in time...", MenuItemType.Destructive),
-                            new EditorContextMenuItem("Recalculate Slider Lengths", MenuItemType.Destructive),
-                            new EditorContextMenuItem("Delete All Timing Sections", MenuItemType.Destructive),
-                            new EditorContextMenuSpacer(),
-                            new EditorContextMenuItem("Set Current Position as Preview Point"),
+                            new EditorMenuItem("Time Signature"),
+                            new EditorMenuItem("Metronome Clicks"),
+                            new EditorMenuSpacer(),
+                            new EditorMenuItem("Add Timing Section"),
+                            new EditorMenuItem("Add Inheriting Section"),
+                            new EditorMenuItem("Reset Current Section"),
+                            new EditorMenuItem("Delete Timing Section"),
+                            new EditorMenuItem("Resnap Current Section"),
+                            new EditorMenuSpacer(),
+                            new EditorMenuItem("Timing Setup"),
+                            new EditorMenuSpacer(),
+                            new EditorMenuItem("Resnap All Notes", MenuItemType.Destructive),
+                            new EditorMenuItem("Move all notes in time...", MenuItemType.Destructive),
+                            new EditorMenuItem("Recalculate Slider Lengths", MenuItemType.Destructive),
+                            new EditorMenuItem("Delete All Timing Sections", MenuItemType.Destructive),
+                            new EditorMenuSpacer(),
+                            new EditorMenuItem("Set Current Position as Preview Point"),
                         }
                     },
                     new EditorMenuBarItem("Testing")
                     {
                         Items = new[]
                         {
-                            new EditorContextMenuItem("Item 1"),
-                            new EditorContextMenuItem("Item 2"),
-                            new EditorContextMenuItem("Item 3"),
+                            new EditorMenuItem("Item 1"),
+                            new EditorMenuItem("Item 2"),
+                            new EditorMenuItem("Item 3"),
                         }
                     },
                 }
             });
         }
 
-        private class EditorMenuBarItem : MenuBarItem
+        private class EditorMenuBar : MenuBar
         {
-            private const int fade_duration = 250;
-            private const float text_size = 17;
+            protected override DrawableMenuBarItem CreateDrawableMenuBarItem(MenuItem item) => new DrawableEditorMenuBarItem(item);
 
-            private readonly Container background;
-
-            private Color4 normalColour;
-
-            public EditorMenuBarItem(string title)
-                : base(title)
+            private class DrawableEditorMenuBarItem : DrawableMenuBarItem
             {
-                Content.Padding = new MarginPadding(8);
+                private const int fade_duration = 250;
+                private const float text_size = 17;
 
-                AddInternal(background = new Container
+                private readonly Container background;
+
+                private Color4 normalColour;
+
+                public DrawableEditorMenuBarItem(MenuItem item)
+                    : base(item)
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Depth = float.MaxValue,
-                    Alpha = 0,
-                    Child = new Container<Box>
+                    if (!(item is EditorMenuBarItem))
+                        throw new ArgumentException($"{nameof(item)} must be a {nameof(EditorMenuBarItem)}.");
+
+                    Text.Padding = new MarginPadding(8);
+
+                    AddInternal(background = new Container
                     {
-                        // The following is done so we can have top rounded corners but not bottom corners
                         RelativeSizeAxes = Axes.Both,
-                        Height = 2,
                         Masking = true,
-                        CornerRadius = 5,
-                        Child = new Box { RelativeSizeAxes = Axes.Both }
+                        Depth = float.MaxValue,
+                        Alpha = 0,
+                        Child = new Container<Box>
+                        {
+                            // The following is done so we can have top rounded corners but not bottom corners
+                            RelativeSizeAxes = Axes.Both,
+                            Height = 2,
+                            Masking = true,
+                            CornerRadius = 5,
+                            Child = new Box { RelativeSizeAxes = Axes.Both }
+                        }
+                    });
+
+                    Menu.OnOpen += menuOpen;
+                    Menu.OnClose += menuClose;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    background.Colour = colours.Gray3;
+                    Text.Colour = normalColour = colours.BlueLight;
+                }
+
+                private void menuOpen()
+                {
+                    background.FadeIn(fade_duration, Easing.OutQuint);
+                    Text.FadeColour(Color4.White, fade_duration, Easing.OutQuint);
+                }
+
+                private void menuClose()
+                {
+                    background.FadeOut(fade_duration, Easing.OutQuint);
+                    Text.FadeColour(normalColour, fade_duration, Easing.OutQuint);
+                }
+
+                protected override SpriteText CreateText() => new OsuSpriteText { TextSize = text_size };
+
+                protected override Menu CreateMenu() => new EditorMenu();
+
+                private class EditorMenu : OsuMenu
+                {
+                    public EditorMenu()
+                    {
+                        Anchor = Anchor.BottomLeft;
+                        BypassAutoSizeAxes = Axes.Both;
+                        OriginPosition = new Vector2(8, 0);
                     }
-                });
+
+                    [BackgroundDependencyLoader]
+                    private void load(OsuColour colours)
+                    {
+                        BackgroundColour = colours.Gray3;
+                    }
+
+                    protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableEditorMenuItem(item);
+
+                    private class DrawableEditorMenuItem : DrawableOsuMenuItem
+                    {
+                        public override bool HandleInput => !isSpacer;
+                        private readonly bool isSpacer;
+
+                        public DrawableEditorMenuItem(MenuItem item)
+                            : base(item)
+                        {
+                            if (!(item is EditorMenuItem))
+                                throw new ArgumentException($"{nameof(item)} must be a {nameof(EditorMenuItem)}.");
+
+                            isSpacer = item is EditorMenuSpacer;
+                        }
+
+                        [BackgroundDependencyLoader]
+                        private void load(OsuColour colours)
+                        {
+                            BackgroundColour = colours.Gray3;
+                            BackgroundColourHover = colours.Gray2;
+                        }
+                    }
+                }
             }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                background.Colour = colours.Gray3;
-                TitleText.Colour = normalColour = colours.BlueLight;
-            }
-
-            public override void Open()
-            {
-                base.Open();
-
-                background.FadeIn(fade_duration, Easing.OutQuint);
-                TitleText.FadeColour(Color4.White, fade_duration, Easing.OutQuint);
-            }
-
-            public override void Close()
-            {
-                base.Close();
-
-                background.FadeOut(fade_duration, Easing.OutQuint);
-                TitleText.FadeColour(normalColour, fade_duration, Easing.OutQuint);
-            }
-
-            protected override SpriteText CreateTitleText() => new OsuSpriteText { TextSize = text_size };
-
-            protected override ContextMenu<ContextMenuItem> CreateContextMenu() => new EditorContextMenu
-            {
-                OriginPosition = new Vector2(8, 0)
-            };
         }
 
-        private class EditorContextMenu : OsuContextMenu<ContextMenuItem>
+        private class EditorMenuBarItem : MenuItem
         {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Menu.Background.Colour = colours.Gray3;
-            }
-        }
-
-        private class EditorContextMenuSpacer : EditorContextMenuItem
-        {
-            public override bool HandleInput => false;
-
-            public EditorContextMenuSpacer()
-                : base(" ")
+            public EditorMenuBarItem(string text)
+                : base(text)
             {
             }
         }
 
-        private class EditorContextMenuItem : OsuContextMenuItem
+        private class EditorMenuItem : OsuMenuItem
         {
             private const int min_text_length = 40;
 
-            public EditorContextMenuItem(string title, MenuItemType type = MenuItemType.Standard)
-                : base(title.PadRight(min_text_length), type)
+            public EditorMenuItem(string text, MenuItemType type = MenuItemType.Standard)
+                : base(text.PadRight(min_text_length), type)
             {
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            public EditorMenuItem(string text, MenuItemType type, Action action)
+                : base(text.PadRight(min_text_length), type, action)
             {
-                BackgroundColour = colours.Gray3;
-                BackgroundColourHover = colours.Gray2;
+            }
+        }
+
+        private class EditorMenuSpacer : EditorMenuItem
+        {
+            public EditorMenuSpacer()
+                : base(" ")
+            {
             }
         }
     }
