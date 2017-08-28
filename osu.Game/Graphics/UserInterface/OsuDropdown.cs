@@ -81,8 +81,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 public readonly Bindable<Color4?> AccentColour = new Bindable<Color4?>();
 
-                private SpriteIcon chevron;
-                protected OsuSpriteText Label;
+                private TextContainer textContainer;
 
                 private Color4 nonAccentHoverColour;
                 private Color4 nonAccentSelectedColour;
@@ -117,19 +116,32 @@ namespace osu.Game.Graphics.UserInterface
                 protected override void UpdateForegroundColour()
                 {
                     base.UpdateForegroundColour();
-                    chevron.Alpha = IsHovered ? 1 : 0;
+
+                    textContainer.Chevron.Alpha = IsHovered ? 1 : 0;
                 }
 
-                protected override Drawable CreateContent()
+                protected override Drawable CreateContent() => textContainer = new TextContainer();
+
+                protected class TextContainer : FillFlowContainer, IHasText
                 {
-                    var container = new FillFlowContainer
+                    public string Text
                     {
-                        Direction = FillDirection.Horizontal,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
+                        get { return Label.Text; }
+                        set { Label.Text = value; }
+                    }
+
+                    public readonly OsuSpriteText Label;
+                    public readonly SpriteIcon Chevron;
+
+                    public TextContainer()
+                    {
+                        RelativeSizeAxes = Axes.X;
+                        AutoSizeAxes = Axes.Y;
+                        Direction = FillDirection.Horizontal;
+
                         Children = new Drawable[]
                         {
-                            chevron = new SpriteIcon
+                            Chevron = new SpriteIcon
                             {
                                 AlwaysPresent = true,
                                 Icon = FontAwesome.fa_chevron_right,
@@ -142,15 +154,11 @@ namespace osu.Game.Graphics.UserInterface
                             },
                             Label = new OsuSpriteText
                             {
-                                Text = Item.Text,
                                 Origin = Anchor.CentreLeft,
                                 Anchor = Anchor.CentreLeft,
                             }
-                        }
-                    };
-
-                    Item.Text.ValueChanged += newText => Label.Text = newText;
-                    return container;
+                        };
+                    }
                 }
             }
             #endregion
