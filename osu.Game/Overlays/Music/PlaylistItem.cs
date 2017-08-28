@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -28,6 +29,7 @@ namespace osu.Game.Overlays.Music
         private IEnumerable<SpriteText> titleSprites;
         private UnicodeBindableString titleBind;
         private UnicodeBindableString artistBind;
+        private FillFlowContainer<PlaylistItem> Playlist;
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
@@ -48,8 +50,9 @@ namespace osu.Game.Overlays.Music
             }
         }
 
-        public PlaylistItem(BeatmapSetInfo setInfo)
+        public PlaylistItem(FillFlowContainer<PlaylistItem> playlist, BeatmapSetInfo setInfo)
         {
+            Playlist = playlist;
             BeatmapSetInfo = setInfo;
 
             RelativeSizeAxes = Axes.X;
@@ -129,6 +132,44 @@ namespace osu.Game.Overlays.Music
         protected override bool OnClick(Framework.Input.InputState state)
         {
             OnSelect?.Invoke(BeatmapSetInfo);
+            return true;
+        }
+
+        protected override bool OnDragStart(InputState state)
+        {
+            return true;
+        }
+
+        // Maybe render some ghost text
+        protected override bool OnDrag(InputState state)
+        {
+            return true;
+        }
+
+        private int clamp(int value, int min, int max)
+        {
+            return (value <= min) ? min : (value >= max) ? max : value;
+        }
+
+        protected override bool OnDragEnd(InputState state)
+        {
+            int src = (int) Depth;
+            int dst = clamp((int) ((state.Mouse.Position.Y - Parent.DrawPosition.Y) / Height), 0, Playlist.Count - 1);
+
+            if (src == dst)
+                return true;
+
+            if (src < dst)
+            {
+                for (int i = src + 1; i <= dst; i++)
+                    Playlist.ChangeChildDepth(Playlist[i], i - 1);
+            }
+            else
+            {
+                for (int i = dst; i < src; i++)
+                    Playlist.ChangeChildDepth(Playlist[i], i + 1);
+            }
+            Playlist.ChangeChildDepth(this, dst);
             return true;
         }
 
