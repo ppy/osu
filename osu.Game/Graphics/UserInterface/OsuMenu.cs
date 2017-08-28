@@ -8,8 +8,7 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuMenu<TItem> : Menu<TItem>
-        where TItem : MenuItem
+    public class OsuMenu : Menu
     {
         public OsuMenu()
         {
