@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Music
         private UnicodeBindableString titleBind;
         private UnicodeBindableString artistBind;
 
-        private readonly FillFlowContainer<PlaylistItem> Playlist;
+        private readonly FillFlowContainer<PlaylistItem> playlist;
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         public Action<BeatmapSetInfo> OnSelect;
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Music
 
         public PlaylistItem(FillFlowContainer<PlaylistItem> playlist, BeatmapSetInfo setInfo)
         {
-            Playlist = playlist;
+            this.playlist = playlist;
             BeatmapSetInfo = setInfo;
 
             RelativeSizeAxes = Axes.X;
@@ -117,19 +117,19 @@ namespace osu.Game.Overlays.Music
             });
         }
 
-        protected override bool OnHover(Framework.Input.InputState state)
+        protected override bool OnHover(InputState state)
         {
             handle.FadeIn(fade_duration);
 
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(Framework.Input.InputState state)
+        protected override void OnHoverLost(InputState state)
         {
             handle.FadeOut(fade_duration);
         }
 
-        protected override bool OnClick(Framework.Input.InputState state)
+        protected override bool OnClick(InputState state)
         {
             OnSelect?.Invoke(BeatmapSetInfo);
             return true;
@@ -146,15 +146,10 @@ namespace osu.Game.Overlays.Music
             return true;
         }
 
-        private int clamp(int value, int min, int max)
-        {
-            return (value <= min) ? min : (value >= max) ? max : value;
-        }
-
         protected override bool OnDragEnd(InputState state)
         {
             int src = (int) Depth;
-            int dst = clamp((int) ((state.Mouse.Position.Y - Parent.DrawPosition.Y) / Height), 0, Playlist.Count - 1);
+            int dst = clamp((int) ((state.Mouse.Position.Y - Parent.DrawPosition.Y) / Height), 0, playlist.Count - 1);
 
             if (src == dst)
                 return true;
@@ -162,15 +157,20 @@ namespace osu.Game.Overlays.Music
             if (src < dst)
             {
                 for (int i = src + 1; i <= dst; i++)
-                    Playlist.ChangeChildDepth(Playlist[i], i - 1);
+                    playlist.ChangeChildDepth(playlist[i], i - 1);
             }
             else
             {
                 for (int i = dst; i < src; i++)
-                    Playlist.ChangeChildDepth(Playlist[i], i + 1);
+                    playlist.ChangeChildDepth(playlist[i], i + 1);
             }
-            Playlist.ChangeChildDepth(this, dst);
+            playlist.ChangeChildDepth(this, dst);
             return true;
+        }
+
+        private int clamp(int value, int min, int max)
+        {
+            return value <= min ? min : value >= max ? max : value;
         }
 
         public string[] FilterTerms { get; private set; }
