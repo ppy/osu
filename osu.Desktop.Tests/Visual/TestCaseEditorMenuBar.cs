@@ -107,8 +107,6 @@ namespace osu.Desktop.Tests.Visual
                 public DrawableEditorMenuBarItem(MenuItem item)
                     : base(item)
                 {
-                    if (!(item is EditorMenuBarItem))
-                        throw new ArgumentException($"{nameof(item)} must be a {nameof(EditorMenuBarItem)}.");
 
                     Text.Padding = new MarginPadding(8);
 
@@ -181,8 +179,6 @@ namespace osu.Desktop.Tests.Visual
                         public DrawableEditorMenuItem(MenuItem item)
                             : base(item)
                         {
-                            if (!(item is EditorMenuItem))
-                                throw new ArgumentException($"{nameof(item)} must be a {nameof(EditorMenuItem)}.");
 
                             isSpacer = item is EditorMenuSpacer;
                         }
