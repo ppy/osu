@@ -120,32 +120,38 @@ namespace osu.Game.Graphics.UserInterface
                     chevron.Alpha = IsHovered ? 1 : 0;
                 }
 
-                protected override Drawable CreateContent() => new FillFlowContainer
+                protected override Drawable CreateContent()
                 {
-                    Direction = FillDirection.Horizontal,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
+                    var container = new FillFlowContainer
                     {
-                        chevron = new SpriteIcon
+                        Direction = FillDirection.Horizontal,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
                         {
-                            AlwaysPresent = true,
-                            Icon = FontAwesome.fa_chevron_right,
-                            Colour = Color4.Black,
-                            Alpha = 0.5f,
-                            Size = new Vector2(8),
-                            Margin = new MarginPadding { Left = 3, Right = 3 },
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.CentreLeft,
-                        },
-                        Label = new OsuSpriteText
-                        {
-                            Text = Item.Text,
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.CentreLeft,
+                            chevron = new SpriteIcon
+                            {
+                                AlwaysPresent = true,
+                                Icon = FontAwesome.fa_chevron_right,
+                                Colour = Color4.Black,
+                                Alpha = 0.5f,
+                                Size = new Vector2(8),
+                                Margin = new MarginPadding { Left = 3, Right = 3 },
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                            },
+                            Label = new OsuSpriteText
+                            {
+                                Text = Item.Text,
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                            }
                         }
-                    }
-                };
+                    };
+
+                    Item.Text.ValueChanged += newText => Label.Text = newText;
+                    return container;
+                }
             }
             #endregion
         }
