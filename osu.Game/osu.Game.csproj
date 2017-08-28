@@ -133,6 +133,10 @@
     <Compile Include="Overlays\Toolbar\ToolbarDirectButton.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
     <Compile Include="Rulesets\UI\RulesetInputManager.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuItemSpacer.cs" />
     <Compile Include="Screens\Play\KeyCounterAction.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />

@@ -105,9 +105,10 @@ namespace osu.Game.Graphics.UserInterface
                 return base.OnClick(state);
             }
 
-            protected override Drawable CreateContent() => text = new TextContainer();
+            protected sealed override Drawable CreateContent() => text = CreateTextContainer();
+            protected virtual TextContainer CreateTextContainer() => new TextContainer();
 
-            private class TextContainer : Container, IHasText
+            protected class TextContainer : Container, IHasText
             {
                 public string Text
                 {
