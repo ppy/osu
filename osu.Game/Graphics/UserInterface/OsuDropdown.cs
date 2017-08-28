@@ -68,7 +68,7 @@ namespace osu.Game.Graphics.UserInterface
             public readonly Bindable<Color4?> AccentColour = new Bindable<Color4?>();
 
 
-            protected override DrawableMenuItem CreateDrawableMenuItem(DropdownMenuItem<T> item)
+            protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item)
             {
                 var newItem = new DrawableOsuDropdownMenuItem(item);
                 newItem.AccentColour.BindTo(AccentColour);
@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.UserInterface
                 private Color4 nonAccentHoverColour;
                 private Color4 nonAccentSelectedColour;
 
-                public DrawableOsuDropdownMenuItem(DropdownMenuItem<T> item)
+                public DrawableOsuDropdownMenuItem(MenuItem item)
                     : base(item)
                 {
                     Foreground.Padding = new MarginPadding(2);

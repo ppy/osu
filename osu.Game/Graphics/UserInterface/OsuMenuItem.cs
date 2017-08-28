@@ -6,17 +6,17 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuContextMenuItem : MenuItem
+    public class OsuMenuItem : MenuItem
     {
         public readonly MenuItemType Type;
 
-        public OsuContextMenuItem(string text, MenuItemType type = MenuItemType.Standard)
+        public OsuMenuItem(string text, MenuItemType type = MenuItemType.Standard)
             : base(text)
         {
             Type = type;
         }
 
-        public OsuContextMenuItem(string text, MenuItemType type, Action action)
+        public OsuMenuItem(string text, MenuItemType type, Action action)
             : base(text, action)
         {
             Type = type;
