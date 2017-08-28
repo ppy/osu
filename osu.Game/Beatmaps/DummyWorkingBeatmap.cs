@@ -26,7 +26,7 @@ namespace osu.Game.Beatmaps
                     Title = "no beatmaps available!",
                     Author = "no one",
                 },
-                BeatmapSet = new BeatmapSetInfo(),
+                BeatmapSet = new BeatmapSetInfo { DeletePending = true },
                 Difficulty = new BeatmapDifficulty
                 {
                     DrainRate = 0,
