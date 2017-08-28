@@ -111,34 +111,45 @@ namespace osu.Game.Graphics.UserInterface
                 return base.OnClick(state);
             }
 
-            protected override Drawable CreateContent() => new Container
+            protected override Drawable CreateContent()
             {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Children = new Drawable[]
+                var container = new Container
                 {
-                    text = new OsuSpriteText
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        TextSize = text_size,
-                        Text = Item.Text,
-                        Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
-                    },
-                    textBold = new OsuSpriteText
-                    {
-                        AlwaysPresent = true,
-                        Alpha = 0,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        TextSize = text_size,
-                        Text = Item.Text,
-                        Font = @"Exo2.0-Bold",
-                        Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
+                        text = new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            TextSize = text_size,
+                            Text = Item.Text,
+                            Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
+                        },
+                        textBold = new OsuSpriteText
+                        {
+                            AlwaysPresent = true,
+                            Alpha = 0,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            TextSize = text_size,
+                            Text = Item.Text,
+                            Font = @"Exo2.0-Bold",
+                            Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
+                        }
                     }
-                }
-            };
+                };
+
+                Item.Text.ValueChanged += newText =>
+                {
+                    text.Text = newText;
+                    textBold.Text = newText;
+                };
+
+                return container;
+            }
         }
         #endregion
     }
