@@ -316,9 +316,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         : base(item)
                     {
                         Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 5 };
-                        Label.Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 };
                         CornerRadius = 5;
                     }
+
+                    protected override Drawable CreateContent() => new TextContainer
+                    {
+                        Label = { Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 } }
+                    };
                 }
             }
 
