@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -15,8 +16,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuContextMenu<TItem> : OsuMenu<TItem>
-        where TItem : OsuContextMenuItem
+    public class OsuContextMenu : OsuMenu
     {
         private const int fade_duration = 250;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override MarginPadding ItemFlowContainerPadding => new MarginPadding { Vertical = DrawableOsuContextMenuItem.MARGIN_VERTICAL };
 
-        protected override DrawableMenuItem CreateDrawableMenuItem(TItem item) => new DrawableOsuContextMenuItem(this, item);
+        protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuContextMenuItem(item);
 
         #region DrawableOsuContextMenuItem
         private class DrawableOsuContextMenuItem : DrawableMenuItem
@@ -57,9 +57,11 @@ namespace osu.Game.Graphics.UserInterface
 
             private TextContainer text;
 
-            public DrawableOsuContextMenuItem(Menu<TItem> menu, TItem item)
+            public DrawableOsuContextMenuItem(MenuItem item)
                 : base(item)
             {
+                if (!(Item is OsuMenuItem))
+                    throw new ArgumentException($"{nameof(item)} must be a {nameof(OsuMenuItem)}.");
             }
 
             [BackgroundDependencyLoader]
@@ -76,7 +78,7 @@ namespace osu.Game.Graphics.UserInterface
 
             private void updateTextColour()
             {
-                switch (Item.Type)
+                switch (((OsuMenuItem)Item).Type)
                 {
                     case MenuItemType.Standard:
                         text.Colour = Color4.White;

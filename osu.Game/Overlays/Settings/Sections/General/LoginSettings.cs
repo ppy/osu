@@ -308,11 +308,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                 protected override MarginPadding ItemFlowContainerPadding => new MarginPadding();
 
-                protected override DrawableMenuItem CreateDrawableMenuItem(DropdownMenuItem<UserAction> item) => new DrawableUserDropdownMenuItem(this, item);
+                protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
 
                 private class DrawableUserDropdownMenuItem : DrawableOsuDropdownMenuItem
                 {
-                    public DrawableUserDropdownMenuItem(Menu<DropdownMenuItem<UserAction>> menu, DropdownMenuItem<UserAction> item)
+                    public DrawableUserDropdownMenuItem(MenuItem item)
                         : base(item)
                     {
                         Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 5 };
