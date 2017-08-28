@@ -181,9 +181,9 @@ namespace osu.Game.Graphics.UserInterface
 
                 protected override DrawableMenuItem CreateDrawableMenuItem(DropdownMenuItem<T> item)
                 {
-                    var poop = new DrawableOsuTabDropdownMenuItem(this, item);
-                    poop.AccentColour.BindTo(AccentColour);
-                    return poop;
+                    var result = new DrawableOsuTabDropdownMenuItem(this, item);
+                    result.AccentColour.BindTo(AccentColour);
+                    return result;
                 }
 
                 private class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
