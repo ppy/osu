@@ -8,6 +8,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
@@ -54,8 +55,7 @@ namespace osu.Game.Graphics.UserInterface
             private SampleChannel sampleClick;
             private SampleChannel sampleHover;
 
-            private OsuSpriteText text;
-            private OsuSpriteText textBold;
+            private TextContainer text;
 
             public DrawableOsuContextMenuItem(Menu<TItem> menu, TItem item)
                 : base(item)
@@ -79,13 +79,13 @@ namespace osu.Game.Graphics.UserInterface
                 switch (Item.Type)
                 {
                     case MenuItemType.Standard:
-                        textBold.Colour = text.Colour = Color4.White;
+                        text.Colour = Color4.White;
                         break;
                     case MenuItemType.Destructive:
-                        textBold.Colour = text.Colour = Color4.Red;
+                        text.Colour = Color4.Red;
                         break;
                     case MenuItemType.Highlighted:
-                        textBold.Colour = text.Colour = OsuColour.FromHex(@"ffcc22");
+                        text.Colour = OsuColour.FromHex(@"ffcc22");
                         break;
                 }
             }
@@ -93,15 +93,15 @@ namespace osu.Game.Graphics.UserInterface
             protected override bool OnHover(InputState state)
             {
                 sampleHover.Play();
-                textBold.FadeIn(transition_length, Easing.OutQuint);
-                text.FadeOut(transition_length, Easing.OutQuint);
+                text.BoldText.FadeIn(transition_length, Easing.OutQuint);
+                text.NormalText.FadeOut(transition_length, Easing.OutQuint);
                 return base.OnHover(state);
             }
 
             protected override void OnHoverLost(InputState state)
             {
-                textBold.FadeOut(transition_length, Easing.OutQuint);
-                text.FadeIn(transition_length, Easing.OutQuint);
+                text.BoldText.FadeOut(transition_length, Easing.OutQuint);
+                text.NormalText.FadeIn(transition_length, Easing.OutQuint);
                 base.OnHoverLost(state);
             }
 
@@ -111,44 +111,51 @@ namespace osu.Game.Graphics.UserInterface
                 return base.OnClick(state);
             }
 
-            protected override Drawable CreateContent()
+            protected override Drawable CreateContent() => text = new TextContainer();
+
+            private class TextContainer : Container, IHasText
             {
-                var container = new Container
+                public string Text
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    get { return NormalText.Text; }
+                    set
+                    {
+                        NormalText.Text = value;
+                        BoldText.Text = value;
+                    }
+                }
+
+                public readonly SpriteText NormalText;
+                public readonly SpriteText BoldText;
+
+                public TextContainer()
+                {
+                    Anchor = Anchor.CentreLeft;
+                    Origin = Anchor.CentreLeft;
+
+                    AutoSizeAxes = Axes.Both;
+
                     Children = new Drawable[]
                     {
-                        text = new OsuSpriteText
+                        NormalText = new OsuSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             TextSize = text_size,
-                            Text = Item.Text,
                             Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
                         },
-                        textBold = new OsuSpriteText
+                        BoldText = new OsuSpriteText
                         {
                             AlwaysPresent = true,
                             Alpha = 0,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             TextSize = text_size,
-                            Text = Item.Text,
                             Font = @"Exo2.0-Bold",
                             Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
                         }
-                    }
-                };
-
-                Item.Text.ValueChanged += newText =>
-                {
-                    text.Text = newText;
-                    textBold.Text = newText;
-                };
-
-                return container;
+                    };
+                }
             }
         }
         #endregion
