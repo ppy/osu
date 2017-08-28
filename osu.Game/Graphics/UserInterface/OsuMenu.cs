@@ -52,8 +52,7 @@ namespace osu.Game.Graphics.UserInterface
             public DrawableOsuMenuItem(MenuItem item)
                 : base(item)
             {
-                if (!(Item is OsuMenuItem))
-                    throw new ArgumentException($"{nameof(item)} must be a {nameof(OsuMenuItem)}.");
+
             }
 
             [BackgroundDependencyLoader]
@@ -70,8 +69,9 @@ namespace osu.Game.Graphics.UserInterface
 
             private void updateTextColour()
             {
-                switch (((OsuMenuItem)Item).Type)
+                switch ((Item as OsuMenuItem)?.Type)
                 {
+                    default:
                     case MenuItemType.Standard:
                         text.Colour = Color4.White;
                         break;
