@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Music
         {
             set
             {
-                items.Children = value.Select(item => new PlaylistItem(item) { OnSelect = itemSelected }).ToList();
+                items.Children = value.Select((item, index) => new PlaylistItem(items, item) { OnSelect = itemSelected, Depth = index }).ToList();
             }
         }
 
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Music
 
         public void AddBeatmapSet(BeatmapSetInfo beatmapSet)
         {
-            items.Add(new PlaylistItem(beatmapSet) { OnSelect = itemSelected });
+            items.Add(new PlaylistItem(items, beatmapSet) { OnSelect = itemSelected, Depth = items.Count });
         }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
@@ -95,6 +95,9 @@ namespace osu.Game.Overlays.Music
                         InvalidateLayout();
                 }
             }
+
+            // Compare with reversed ChildID and Depth
+            protected override int Compare(Drawable x, Drawable y) => base.Compare(y, x);
 
             public IEnumerable<IFilterable> FilterableChildren => Children;
 
