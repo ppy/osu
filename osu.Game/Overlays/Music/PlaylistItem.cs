@@ -29,8 +29,8 @@ namespace osu.Game.Overlays.Music
         private IEnumerable<SpriteText> titleSprites;
         private UnicodeBindableString titleBind;
         private UnicodeBindableString artistBind;
-        private FillFlowContainer<PlaylistItem> Playlist;
 
+        private readonly FillFlowContainer<PlaylistItem> Playlist;
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         public Action<BeatmapSetInfo> OnSelect;
