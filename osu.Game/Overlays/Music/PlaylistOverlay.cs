@@ -126,24 +126,24 @@ namespace osu.Game.Overlays.Music
 
         public void PlayPrevious()
         {
-            var currentID = beatmapBacking.Value?.BeatmapSetInfo.ID ?? -1;
-            var available = BeatmapSets.Reverse();
-
-            var playable = available.SkipWhile(b => b.ID != currentID).Skip(1).FirstOrDefault() ?? available.FirstOrDefault();
+            var playable = list.PreviousItem;
 
             if (playable != null)
+            {
                 playSpecified(playable.Beatmaps[0]);
+                list.SelectedItem = playable;
+            }
         }
 
         public void PlayNext()
         {
-            var currentID = beatmapBacking.Value?.BeatmapSetInfo.ID ?? -1;
-            var available = BeatmapSets;
-
-            var playable = available.SkipWhile(b => b.ID != currentID).Skip(1).FirstOrDefault() ?? available.FirstOrDefault();
+            var playable = list.NextItem;
 
             if (playable != null)
+            {
                 playSpecified(playable.Beatmaps[0]);
+                list.SelectedItem = playable;
+            }
         }
 
         private void playSpecified(BeatmapInfo info)

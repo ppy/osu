@@ -46,6 +46,24 @@ namespace osu.Game.Overlays.Music
             }
         }
 
+        public BeatmapSetInfo NextItem
+        {
+            get
+            {
+                var available = items.Children;
+                return (available.SkipWhile(i => !i.Selected).Skip(1).FirstOrDefault() ?? available.FirstOrDefault())?.BeatmapSetInfo;
+            }
+        }
+
+        public BeatmapSetInfo PreviousItem
+        {
+            get
+            {
+                var available = items.Children.Reverse();
+                return (available.SkipWhile(i => !i.Selected).Skip(1).FirstOrDefault() ?? available.FirstOrDefault())?.BeatmapSetInfo;
+            }
+        }
+
         public PlaylistList()
         {
             Children = new Drawable[]
