@@ -348,23 +348,23 @@ namespace osu.Game.Overlays
 
                 playerContainer.Add(new AsyncLoadWrapper(new Background(beatmap)
                 {
-                    OnLoadComplete = d =>
+                    OnLoadComplete = newBackground =>
                     {
                         switch (direction)
                         {
                             case TransformDirection.Next:
-                                d.Position = new Vector2(400, 0);
-                                d.MoveToX(0, 500, Easing.OutCubic);
+                                newBackground.Position = new Vector2(400, 0);
+                                newBackground.MoveToX(0, 500, Easing.OutCubic);
                                 currentBackground.MoveToX(-400, 500, Easing.OutCubic);
                                 break;
                             case TransformDirection.Prev:
-                                d.Position = new Vector2(-400, 0);
-                                d.MoveToX(0, 500, Easing.OutCubic);
+                                newBackground.Position = new Vector2(-400, 0);
+                                newBackground.MoveToX(0, 500, Easing.OutCubic);
                                 currentBackground.MoveToX(400, 500, Easing.OutCubic);
                                 break;
                         }
                         currentBackground.Expire();
-                        currentBackground = d;
+                        currentBackground = newBackground;
                     }
                 })
                 {

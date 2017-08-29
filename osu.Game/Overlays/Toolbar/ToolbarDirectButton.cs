@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarDirectButton()
         {
-            SetIcon(FontAwesome.fa_download);
+            SetIcon(FontAwesome.fa_osu_chevron_down_o);
         }
 
         [BackgroundDependencyLoader]

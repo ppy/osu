@@ -226,9 +226,21 @@ namespace osu.Game
             dependencies.Cache(notificationOverlay);
             dependencies.Cache(dialogOverlay);
 
-            // ensure both overlays aren't presented at the same time
-            chat.StateChanged += (container, state) => social.State = state == Visibility.Visible ? Visibility.Hidden : social.State;
-            social.StateChanged += (container, state) => chat.State = state == Visibility.Visible ? Visibility.Hidden : chat.State;
+            // ensure only one of these overlays are open at once.
+            var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
+            foreach (var overlay in singleDisplayOverlays)
+            {
+                overlay.StateChanged += (container, state) =>
+                {
+                    if (state == Visibility.Hidden) return;
+
+                    foreach (var c in singleDisplayOverlays)
+                    {
+                        if (c == container) continue;
+                        c.State = Visibility.Hidden;
+                    }
+                };
+            }
 
             LoadComponentAsync(Toolbar = new Toolbar
             {

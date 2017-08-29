@@ -11,14 +11,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Transforms;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 using osu.Framework.Input;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Framework.Logging;
@@ -29,7 +27,7 @@ namespace osu.Game.Overlays.Direct
 {
     public abstract class DirectPanel : Container
     {
-        protected readonly BeatmapSetInfo SetInfo;
+        public readonly BeatmapSetInfo SetInfo;
 
         protected Box BlackBackground;
 
@@ -49,6 +47,23 @@ namespace osu.Game.Overlays.Direct
             SetInfo = setInfo;
         }
 
+        private readonly EdgeEffectParameters edgeEffectNormal = new EdgeEffectParameters
+        {
+            Type = EdgeEffectType.Shadow,
+            Offset = new Vector2(0f, 1f),
+            Radius = 2f,
+            Colour = Color4.Black.Opacity(0.25f),
+        };
+
+        private readonly EdgeEffectParameters edgeEffectHovered = new EdgeEffectParameters
+        {
+            Type = EdgeEffectType.Shadow,
+            Offset = new Vector2(0f, 5f),
+            Radius = 10f,
+            Colour = Color4.Black.Opacity(0.3f),
+        };
+
+
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(APIAccess api, BeatmapManager beatmaps, OsuColour colours, NotificationOverlay notifications)
         {
@@ -60,13 +75,7 @@ namespace osu.Game.Overlays.Direct
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Offset = new Vector2(0f, 1f),
-                    Radius = 2f,
-                    Colour = Color4.Black.Opacity(0.25f),
-                },
+                EdgeEffect = edgeEffectNormal,
                 Children = new[]
                 {
                     // temporary blackness until the actual background loads.
@@ -92,8 +101,7 @@ namespace osu.Game.Overlays.Direct
 
         protected override bool OnHover(InputState state)
         {
-            content.FadeEdgeEffectTo(1f, hover_transition_time, Easing.OutQuint);
-            content.TransformTo(content.PopulateTransform(new TransformEdgeEffectRadius(), 14, hover_transition_time, Easing.OutQuint));
+            content.TweenEdgeEffectTo(edgeEffectHovered, hover_transition_time, Easing.OutQuint);
             content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
 
             return base.OnHover(state);
@@ -101,16 +109,28 @@ namespace osu.Game.Overlays.Direct
 
         protected override void OnHoverLost(InputState state)
         {
-            content.FadeEdgeEffectTo(0.25f, hover_transition_time, Easing.OutQuint);
-            content.TransformTo(content.PopulateTransform(new TransformEdgeEffectRadius(), 2, hover_transition_time, Easing.OutQuint));
+            content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
 
             base.OnHoverLost(state);
         }
 
+        // this should eventually be moved to a more central place, like BeatmapManager.
+        private DownloadBeatmapSetRequest downloadRequest;
+
         protected void StartDownload()
         {
             if (api == null) return;
+
+            // we already have an active download running.
+            if (downloadRequest != null)
+            {
+                content.MoveToX(-5, 50, Easing.OutSine).Then()
+                       .MoveToX(5, 100, Easing.InOutSine).Then()
+                       .MoveToX(-5, 100, Easing.InOutSine).Then()
+                       .MoveToX(0, 50, Easing.InSine).Then();
+                return;
+            }
 
             if (!api.LocalUser.Value.IsSupporter)
             {
@@ -132,16 +152,18 @@ namespace osu.Game.Overlays.Direct
                 Text = $"Downloading {SetInfo.Metadata.Artist} - {SetInfo.Metadata.Title}",
             };
 
-            var request = new DownloadBeatmapSetRequest(SetInfo);
-            request.Failure += e =>
+            downloadRequest = new DownloadBeatmapSetRequest(SetInfo);
+            downloadRequest.Failure += e =>
             {
                 progressBar.Current.Value = 0;
                 progressBar.FadeOut(500);
                 downloadNotification.State = ProgressNotificationState.Completed;
                 Logger.Error(e, "Failed to get beatmap download information");
+
+                downloadRequest = null;
             };
 
-            request.Progress += (current, total) =>
+            downloadRequest.Progress += (current, total) =>
             {
                 float progress = (float)current / total;
 
@@ -151,7 +173,7 @@ namespace osu.Game.Overlays.Direct
                 downloadNotification.Progress = progress;
             };
 
-            request.Success += data =>
+            downloadRequest.Success += data =>
             {
                 progressBar.Current.Value = 1;
                 progressBar.FadeOut(500);
@@ -165,14 +187,15 @@ namespace osu.Game.Overlays.Direct
 
             downloadNotification.CancelRequested += () =>
             {
-                request.Cancel();
+                downloadRequest.Cancel();
+                downloadRequest = null;
                 return true;
             };
 
             notifications.Post(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            Task.Run(() => request.Perform(api));
+            Task.Run(() => downloadRequest.Perform(api));
         }
 
         public class DownloadBeatmapSetRequest : APIDownloadRequest
@@ -261,31 +284,6 @@ namespace osu.Game.Overlays.Direct
 
                 Value = value;
             }
-        }
-
-        private class TransformEdgeEffectRadius : Transform<float, Container>
-        {
-            /// <summary>
-            /// Current value of the transformed colour in linear colour space.
-            /// </summary>
-            private float valueAt(double time)
-            {
-                if (time < StartTime) return StartValue;
-                if (time >= EndTime) return EndValue;
-
-                return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
-            }
-
-            public override string TargetMember => "EdgeEffect.Colour";
-
-            protected override void Apply(Container c, double time)
-            {
-                EdgeEffectParameters e = c.EdgeEffect;
-                e.Radius = valueAt(time);
-                c.EdgeEffect = e;
-            }
-
-            protected override void ReadIntoStartValue(Container d) => StartValue = d.EdgeEffect.Radius;
         }
     }
 }
