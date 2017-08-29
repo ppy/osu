@@ -135,7 +135,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     base.UpdateForegroundColour();
 
-                    var content = Foreground.Child as Content;
+                    var content = Foreground.Children.FirstOrDefault() as Content;
                     if (content != null) content.Chevron.Alpha = IsHovered ? 1 : 0;
                 }
 
