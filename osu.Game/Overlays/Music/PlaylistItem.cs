@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -201,7 +202,7 @@ namespace osu.Game.Overlays.Music
                         max = m - 1;
                 }
 
-                return (int)items[min - 1].Depth;
+                return (int)items[Math.Max(0, min - 1)].Depth;
             }
         }
     }
