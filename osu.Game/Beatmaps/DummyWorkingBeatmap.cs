@@ -26,7 +26,7 @@ namespace osu.Game.Beatmaps
                     Title = "no beatmaps available!",
                     Author = "no one",
                 },
-                BeatmapSet = new BeatmapSetInfo { DeletePending = true }, //let song select show no beatmaps available if this is the only one
+                BeatmapSet = new BeatmapSetInfo(),
                 Difficulty = new BeatmapDifficulty
                 {
                     DrainRate = 0,
