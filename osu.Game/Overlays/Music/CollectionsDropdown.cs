@@ -15,13 +15,35 @@ namespace osu.Game.Overlays.Music
 {
     public class CollectionsDropdown<T> : OsuDropdown<T>
     {
-        protected override DropdownHeader CreateHeader() => new CollectionsHeader { AccentColour = AccentColour };
-        protected override Menu CreateMenu() => new CollectionsMenu();
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AccentColour = colours.Gray6;
+        }
+
+        protected override DropdownHeader CreateHeader() => new CollectionsHeader();
+
+        protected override DropdownMenu CreateMenu() => new CollectionsMenu();
+
+        private class CollectionsMenu : OsuDropdownMenu
+        {
+            public CollectionsMenu()
+            {
+                CornerRadius = 5;
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Shadow,
+                    Colour = Color4.Black.Opacity(0.3f),
+                    Radius = 3,
+                    Offset = new Vector2(0f, 1f),
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = colours.Gray4;
+            }
         }
 
         private class CollectionsHeader : OsuDropdownHeader
@@ -39,27 +61,6 @@ namespace osu.Game.Overlays.Music
                 Icon.Size = new Vector2(14);
                 Icon.Margin = new MarginPadding(0);
                 Foreground.Padding = new MarginPadding { Top = 4, Bottom = 4, Left = 10, Right = 10 };
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(0.3f),
-                    Radius = 3,
-                    Offset = new Vector2(0f, 1f),
-                };
-            }
-        }
-
-        private class CollectionsMenu : OsuMenu
-        {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Background.Colour = colours.Gray4;
-            }
-
-            public CollectionsMenu()
-            {
-                CornerRadius = 5;
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
