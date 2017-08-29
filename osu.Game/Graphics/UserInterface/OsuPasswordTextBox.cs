@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -43,7 +44,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (args.Key == OpenTK.Input.Key.CapsLock)
+            if (args.Key == Key.CapsLock)
                 updateCapsWarning(host.CapsLockEnabled);
             return base.OnKeyDown(state, args);
         }
