@@ -248,8 +248,7 @@ namespace osu.Game.Screens.Select
 
             if (beatmap == null)
             {
-                if (!Beatmap.IsDefault)
-                    performLoad();
+                performLoad();
             }
             else
             {
