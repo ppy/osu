@@ -24,11 +24,14 @@ using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Play
 {
     public class Player : OsuScreen
     {
+        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
         internal override bool ShowOverlays => false;
@@ -176,6 +179,26 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
+                        new BreakTracker(Beatmap.Value)
+                        {
+                            AudioClock = decoupledClock,
+                            OnBreakIn = () =>
+                            {
+                                Background?.FadeTo(1, fade_duration);//TODO: get rid of 1, needs more stable-like look
+
+                                hudOverlay.KeyCounter.IsCounting = false;
+
+                                //TODO: stop HP drain
+                            },
+                            OnBreakOut = () =>
+                            {
+                                Background?.FadeTo(1 - (float)dimLevel, fade_duration);
+
+                                hudOverlay.KeyCounter.IsCounting = true;
+
+                                //TODO: start HP drain
+                            }
+                        }
                     }
                 },
                 failOverlay = new FailOverlay
