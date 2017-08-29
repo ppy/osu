@@ -140,13 +140,7 @@ namespace osu.Game.Overlays.Music
             return true;
         }
 
-        // Maybe render some ghost text
         protected override bool OnDrag(InputState state)
-        {
-            return true;
-        }
-
-        protected override bool OnDragEnd(InputState state)
         {
             int src = (int)Depth;
             int dst = MathHelper.Clamp((int)(state.Mouse.Position.Y / Height), 0, playlist.Count - 1);
