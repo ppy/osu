@@ -37,34 +37,34 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (accentColour == null)
+            if (accentColour == default(Color4))
                 AccentColour = colours.Blue;
         }
 
-        private Color4? accentColour;
+        private Color4 accentColour;
         public Color4 AccentColour
         {
-            get { return accentColour.GetValueOrDefault(); }
+            get { return accentColour; }
             set
             {
                 accentColour = value;
-                var dropdown = Dropdown as OsuTabDropdown;
+                var dropdown = Dropdown as IHasAccentColour;
                 if (dropdown != null)
-                    dropdown.AccentColour.Value = value;
-                foreach (var item in TabContainer.Children.OfType<OsuTabItem>())
-                    item.AccentColour = value;
+                    dropdown.AccentColour = value;
+                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
+                    i.AccentColour = value;
             }
         }
 
-        public class OsuTabItem : TabItem<T>
+        public class OsuTabItem : TabItem<T>, IHasAccentColour
         {
             protected readonly SpriteText Text;
             private readonly Box box;
 
-            private Color4? accentColour;
+            private Color4 accentColour;
             public Color4 AccentColour
             {
-                get { return accentColour.GetValueOrDefault(); }
+                get { return accentColour; }
                 set
                 {
                     accentColour = value;
@@ -103,7 +103,7 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                if (accentColour == null)
+                if (accentColour == default(Color4))
                     AccentColour = colours.Blue;
             }
 
@@ -148,25 +148,13 @@ namespace osu.Game.Graphics.UserInterface
                 RelativeSizeAxes = Axes.X;
             }
 
-            protected override DropdownMenu CreateMenu()
+            protected override DropdownMenu CreateMenu() => new OsuTabDropdownMenu();
+
+            protected override DropdownHeader CreateHeader() => new OsuTabDropdownHeader
             {
-                var menu = new OsuTabDropdownMenu();
-                menu.AccentColour.BindTo(AccentColour);
-                return menu;
-            }
-
-            protected override DropdownHeader CreateHeader()
-            {
-                var newHeader = new OsuTabDropdownHeader
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
-                };
-
-                newHeader.AccentColour.BindTo(AccentColour);
-
-                return newHeader;
-            }
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight
+            };
 
             private class OsuTabDropdownMenu : OsuDropdownMenu
             {
@@ -179,12 +167,7 @@ namespace osu.Game.Graphics.UserInterface
                     MaxHeight = 400;
                 }
 
-                protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item)
-                {
-                    var result = new DrawableOsuTabDropdownMenuItem(item);
-                    result.AccentColour.BindTo(AccentColour);
-                    return result;
-                }
+                protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item) { AccentColour = AccentColour };
 
                 private class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
                 {
@@ -199,6 +182,20 @@ namespace osu.Game.Graphics.UserInterface
 
             protected class OsuTabDropdownHeader : OsuDropdownHeader
             {
+                public override Color4 AccentColour
+                {
+                    get
+                    {
+                        return base.AccentColour;
+                    }
+
+                    set
+                    {
+                        base.AccentColour = value;
+                        Foreground.Colour = value;
+                    }
+                }
+
                 public OsuTabDropdownHeader()
                 {
                     RelativeSizeAxes = Axes.None;
@@ -227,13 +224,6 @@ namespace osu.Game.Graphics.UserInterface
                     };
 
                     Padding = new MarginPadding { Left = 5, Right = 5 };
-
-                    AccentColour.ValueChanged += accentColourChanged;
-                }
-
-                private void accentColourChanged(Color4? newValue)
-                {
-                    Foreground.Colour = newValue ?? Color4.White;
                 }
 
                 protected override bool OnHover(InputState state)
