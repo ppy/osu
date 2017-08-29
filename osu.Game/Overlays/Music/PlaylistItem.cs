@@ -148,8 +148,8 @@ namespace osu.Game.Overlays.Music
 
         protected override bool OnDragEnd(InputState state)
         {
-            int src = (int) Depth;
-            int dst = clamp((int) ((state.Mouse.Position.Y - Parent.DrawPosition.Y) / Height), 0, playlist.Count - 1);
+            int src = (int)Depth;
+            int dst = MathHelper.Clamp((int)(state.Mouse.Position.Y / Height), 0, playlist.Count - 1);
 
             if (src == dst)
                 return true;
@@ -164,13 +164,9 @@ namespace osu.Game.Overlays.Music
                 for (int i = dst; i < src; i++)
                     playlist.ChangeChildDepth(playlist[i], i + 1);
             }
+
             playlist.ChangeChildDepth(this, dst);
             return true;
-        }
-
-        private int clamp(int value, int min, int max)
-        {
-            return value <= min ? min : value >= max ? max : value;
         }
 
         public string[] FilterTerms { get; private set; }
