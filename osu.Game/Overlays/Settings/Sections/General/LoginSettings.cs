@@ -257,13 +257,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         private class UserDropdown : OsuEnumDropdown<UserAction>
         {
-            protected override DropdownHeader CreateHeader()
-            {
-                var newHeader = new UserDropdownHeader();
-                newHeader.AccentColour.BindTo(AccentColour);
-
-                return newHeader;
-            }
+            protected override DropdownHeader CreateHeader() => new UserDropdownHeader();
 
             protected override DropdownMenu CreateMenu() => new UserDropdownMenu();
 
@@ -280,7 +274,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                AccentColour.Value = colours.Gray5;
+                AccentColour = colours.Gray5;
             }
 
             private class UserDropdownMenu : OsuDropdownMenu
@@ -319,7 +313,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         CornerRadius = 5;
                     }
 
-                    protected override Drawable CreateContent() => new TextContainer
+                    protected override Drawable CreateContent() => new Content
                     {
                         Label = { Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 } }
                     };
