@@ -71,15 +71,9 @@ namespace osu.Game.Overlays.Music
 
             Children = new Drawable[]
             {
-                handle = new SpriteIcon
+                handle = new PlaylistItemHandle(playlist)
                 {
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                    Size = new Vector2(12),
                     Colour = colours.Gray5,
-                    Icon = FontAwesome.fa_bars,
-                    Alpha = 0f,
-                    Margin = new MarginPadding { Left = 5, Top = 2 },
                 },
                 text = new OsuTextFlowContainer
                 {
@@ -135,34 +129,6 @@ namespace osu.Game.Overlays.Music
             return true;
         }
 
-        protected override bool OnDragStart(InputState state)
-        {
-            return true;
-        }
-
-        protected override bool OnDrag(InputState state)
-        {
-            int src = (int)Depth;
-            int dst = MathHelper.Clamp((int)(state.Mouse.Position.Y / Height), 0, playlist.Count - 1);
-
-            if (src == dst)
-                return true;
-
-            if (src < dst)
-            {
-                for (int i = src + 1; i <= dst; i++)
-                    playlist.ChangeChildDepth(playlist[i], i - 1);
-            }
-            else
-            {
-                for (int i = dst; i < src; i++)
-                    playlist.ChangeChildDepth(playlist[i], i + 1);
-            }
-
-            playlist.ChangeChildDepth(this, dst);
-            return true;
-        }
-
         public string[] FilterTerms { get; private set; }
 
         private bool matching = true;
@@ -177,6 +143,47 @@ namespace osu.Game.Overlays.Music
                 matching = value;
 
                 this.FadeTo(matching ? 1 : 0, 200);
+            }
+        }
+
+        private class PlaylistItemHandle : SpriteIcon
+        {
+            private readonly FillFlowContainer<PlaylistItem> playlist;
+
+            public PlaylistItemHandle(FillFlowContainer<PlaylistItem> playlist)
+            {
+                this.playlist = playlist;
+                Anchor = Anchor.TopLeft;
+                Origin = Anchor.TopLeft;
+                Size = new Vector2(12);
+                Icon = FontAwesome.fa_bars;
+                Alpha = 0f;
+                Margin = new MarginPadding { Left = 5, Top = 2 };
+            }
+
+            protected override bool OnDragStart(InputState state) => true;
+
+            protected override bool OnDrag(InputState state)
+            {
+                int src = (int)Parent.Depth;
+                int dst = MathHelper.Clamp((int)((state.Mouse.Position.Y + Parent.Position.Y) / Parent.Height), 0, playlist.Count - 1);
+
+                if (src == dst)
+                    return true;
+
+                if (src < dst)
+                {
+                    for (int i = src + 1; i <= dst; i++)
+                        playlist.ChangeChildDepth(playlist[i], i - 1);
+                }
+                else
+                {
+                    for (int i = dst; i < src; i++)
+                        playlist.ChangeChildDepth(playlist[i], i + 1);
+                }
+
+                playlist.ChangeChildDepth(Parent as PlaylistItem, dst);
+                return true;
             }
         }
     }
