@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.Music
             protected override bool OnDrag(InputState state)
             {
                 int src = (int)Parent.Depth;
-                int dst = MathHelper.Clamp((int)((state.Mouse.Position.Y + Parent.Position.Y) / Parent.Height), 0, playlist.Count - 1);
+                int dst = getIndex(state.Mouse.Position.Y + Parent.Position.Y);
 
                 if (src == dst)
                     return true;
@@ -184,6 +184,24 @@ namespace osu.Game.Overlays.Music
 
                 playlist.ChangeChildDepth(Parent as PlaylistItem, dst);
                 return true;
+            }
+
+            private int getIndex(float position) {
+                IReadOnlyList<PlaylistItem> items = playlist.Children;
+
+                // Binary Search without matching exact
+                int min = 0;
+                int max = items.Count - 1;
+                while (min <= max)
+                {
+                    int m = (min + max) / 2;
+                    if (items[m].Y < position)
+                        min = m + 1;
+                    else if (items[m].Y > position)
+                        max = m - 1;
+                }
+
+                return (int)items[min - 1].Depth;
             }
         }
     }
