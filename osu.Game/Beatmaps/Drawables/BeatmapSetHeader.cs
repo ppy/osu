@@ -9,16 +9,22 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class BeatmapSetHeader : Panel
+    public class BeatmapSetHeader : Panel, IHasContextMenu
     {
         public Action<BeatmapSetHeader> GainedSelection;
+
+        public Action<WorkingBeatmap> DeleteRequested;
+
         private readonly SpriteText title;
         private readonly SpriteText artist;
 
@@ -147,6 +153,21 @@ namespace osu.Game.Beatmaps.Drawables
         {
             foreach (var p in panels)
                 difficultyIcons.Add(new DifficultyIcon(p.Beatmap));
+        }
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (State == PanelSelectedState.NotSelected)
+                    items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => State = PanelSelectedState.Selected));
+
+                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke(beatmap)));
+
+                return items.ToArray();
+            }
         }
     }
 }

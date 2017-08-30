@@ -106,6 +106,7 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.CentreRight,
                 SelectionChanged = carouselSelectionChanged,
                 BeatmapsChanged = carouselBeatmapsLoaded,
+                DeleteRequested = b => promptDelete(b),
                 StartRequested = () => carouselRaisedStart(),
             });
             Add(FilterControl = new FilterControl
@@ -163,7 +164,7 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
 
-                BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
+                BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, () => promptDelete(Beatmap), Key.Number4, float.MaxValue);
             }
 
             if (manager == null)
@@ -389,10 +390,12 @@ namespace osu.Game.Screens.Select
                 Beatmap.SetDefault();
         }
 
-        private void promptDelete()
+        private void promptDelete(WorkingBeatmap beatmap)
         {
-            if (Beatmap != null && !Beatmap.IsDefault)
-                dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap));
+            if (beatmap == null)
+                return;
+
+            dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -408,7 +411,8 @@ namespace osu.Game.Screens.Select
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
                     {
-                        promptDelete();
+                        if (!Beatmap.IsDefault)
+                            promptDelete(Beatmap);
                         return true;
                     }
                     break;

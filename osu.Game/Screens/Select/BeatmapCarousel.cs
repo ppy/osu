@@ -140,6 +140,8 @@ namespace osu.Game.Screens.Select
 
         public Action StartRequested;
 
+        public Action<WorkingBeatmap> DeleteRequested;
+
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
             if (groups.All(g => g.State == BeatmapGroupState.Hidden))
@@ -305,6 +307,7 @@ namespace osu.Game.Screens.Select
             {
                 SelectionChanged = (g, p) => selectGroup(g, p),
                 StartRequested = b => StartRequested?.Invoke(),
+                DeleteRequested = b => DeleteRequested?.Invoke(b),
                 State = BeatmapGroupState.Collapsed
             };
         }
