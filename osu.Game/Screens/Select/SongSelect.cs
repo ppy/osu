@@ -107,6 +107,7 @@ namespace osu.Game.Screens.Select
                 SelectionChanged = carouselSelectionChanged,
                 BeatmapsChanged = carouselBeatmapsLoaded,
                 DeleteRequested = b => promptDelete(b),
+                DeleteDifficultyRequested = b => promptDelete(b),
                 StartRequested = () => carouselRaisedStart(),
             });
             Add(FilterControl = new FilterControl
@@ -164,7 +165,7 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
 
-                BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, () => promptDelete(Beatmap), Key.Number4, float.MaxValue);
+                BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, () => promptDelete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
             }
 
             if (manager == null)
@@ -392,6 +393,14 @@ namespace osu.Game.Screens.Select
         }
 
         private void promptDelete(BeatmapSetInfo beatmap)
+        {
+            if (beatmap == null)
+                return;
+
+            dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
+        }
+
+        private void promptDelete(BeatmapInfo beatmap)
         {
             if (beatmap == null)
                 return;

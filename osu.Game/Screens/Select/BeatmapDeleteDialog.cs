@@ -13,29 +13,36 @@ namespace osu.Game.Screens.Select
     {
         private BeatmapManager manager;
 
+        private readonly Action deleteAction;
+
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmapManager)
         {
             manager = beatmapManager;
         }
 
-        public BeatmapDeleteDialog(WorkingBeatmap beatmap)
+        public BeatmapDeleteDialog(BeatmapSetInfo beatmap) : this()
         {
-            if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
+            BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title} (ALL DIFFICULTIES)";
+            deleteAction = () => manager.Delete(beatmap);
+        }
 
+        public BeatmapDeleteDialog(BeatmapInfo beatmap) : this()
+        {
+            BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title} [{beatmap.Version}]";
+            deleteAction = () => manager.Delete(beatmap);
+        }
+
+        public BeatmapDeleteDialog()
+        {
             Icon = FontAwesome.fa_trash_o;
             HeaderText = @"Confirm deletion of";
-            BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Totally. Delete it.",
-                    Action = () =>
-                    {
-                        beatmap.Dispose();
-                        manager.Delete(beatmap.BeatmapSetInfo);
-                    },
+                    Action = () => deleteAction(),
                 },
                 new PopupDialogCancelButton
                 {
