@@ -249,7 +249,8 @@ namespace osu.Game.Screens.Select
 
             if (beatmap == null)
             {
-                performLoad();
+                if (!Beatmap.IsDefault)
+                    performLoad();
             }
             else
             {
@@ -390,7 +391,7 @@ namespace osu.Game.Screens.Select
                 Beatmap.SetDefault();
         }
 
-        private void promptDelete(WorkingBeatmap beatmap)
+        private void promptDelete(BeatmapSetInfo beatmap)
         {
             if (beatmap == null)
                 return;
@@ -412,7 +413,7 @@ namespace osu.Game.Screens.Select
                     if (state.Keyboard.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)
-                            promptDelete(Beatmap);
+                            promptDelete(Beatmap.Value.BeatmapSetInfo);
                         return true;
                     }
                     break;

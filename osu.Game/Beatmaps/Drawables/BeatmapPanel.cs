@@ -157,7 +157,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             new OsuMenuItem("Play", MenuItemType.Highlighted),
             new OsuMenuItem("Edit"),
-            new OsuMenuItem("Delete", MenuItemType.Destructive),
+            new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke(Beatmap)),
         };
     }
 }

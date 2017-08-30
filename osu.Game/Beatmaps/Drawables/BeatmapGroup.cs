@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         public Action<BeatmapInfo> StartRequested;
 
-        public Action<WorkingBeatmap> DeleteRequested;
+        public Action<BeatmapSetInfo> DeleteRequested;
 
         public BeatmapSetHeader Header;
 
