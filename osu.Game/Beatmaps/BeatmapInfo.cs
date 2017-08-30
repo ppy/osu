@@ -49,8 +49,15 @@ namespace osu.Game.Beatmaps
 
         public string Path { get; set; }
 
-        [JsonProperty("file_md5")]
+        [JsonProperty("file_sha2")]
         public string Hash { get; set; }
+
+        /// <summary>
+        /// MD5 is kept for legacy support (matching against replays, osu-web-10 etc.).
+        /// </summary>
+        [Indexed]
+        [JsonProperty("file_md5")]
+        public string MD5Hash { get; set; }
 
         // General
         public int AudioLeadIn { get; set; }

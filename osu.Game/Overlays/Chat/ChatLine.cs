@@ -2,26 +2,24 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK;
+using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Graphics.Effects;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Allocation;
 using osu.Game.Users;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
     public class ChatLine : Container
     {
-        public readonly Message Message;
-
-        private static readonly Color4[] username_colours = {
+        private static readonly Color4[] username_colours =
+        {
             OsuColour.FromHex("588c7e"),
             OsuColour.FromHex("b2a367"),
             OsuColour.FromHex("c98f65"),
@@ -69,6 +67,8 @@ namespace osu.Game.Overlays.Chat
 
         private Color4 customUsernameColour;
 
+        private OsuSpriteText timestamp;
+
         public ChatLine(Message message)
         {
             Message = message;
@@ -79,6 +79,26 @@ namespace osu.Game.Overlays.Chat
             Padding = new MarginPadding { Left = padding, Right = padding };
         }
 
+        private Message message;
+        private OsuSpriteText username;
+        private OsuTextFlowContainer contentFlow;
+
+        public Message Message
+        {
+            get { return message; }
+            set
+            {
+                if (message == value) return;
+
+                message = value;
+
+                if (!IsLoaded)
+                    return;
+
+                updateMessageContent();
+            }
+        }
+
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, UserProfileOverlay profile)
         {
@@ -86,49 +106,54 @@ namespace osu.Game.Overlays.Chat
             loadProfile = u => profile?.ShowUser(u);
         }
 
+        private bool senderHasBackground => !string.IsNullOrEmpty(message.Sender.Colour);
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            bool hasBackground = !string.IsNullOrEmpty(Message.Sender.Colour);
-            Drawable username = new OsuSpriteText
+            bool hasBackground = senderHasBackground;
+
+            Drawable effectedUsername = username = new OsuSpriteText
             {
                 Font = @"Exo2.0-BoldItalic",
-                Text = $@"{Message.Sender.Username}" + (hasBackground ? "" : ":"),
-                Colour = hasBackground ? customUsernameColour : username_colours[Message.UserId % username_colours.Length],
+                Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
                 TextSize = text_size,
             };
 
             if (hasBackground)
             {
                 // Background effect
-                username = username.WithEffect(new EdgeEffect
+                effectedUsername = new Container
                 {
+                    AutoSizeAxes = Axes.Both,
+                    Masking = true,
                     CornerRadius = 4,
-                    Parameters = new EdgeEffectParameters
-                    {
-                        Radius = 1,
-                        Colour = OsuColour.FromHex(Message.Sender.Colour),
-                        Type = EdgeEffectType.Shadow,
-                    }
-                }, d =>
-                {
-                    d.Padding = new MarginPadding { Left = 3, Right = 3, Bottom = 1, Top = -3 };
-                    d.Y = 3;
-                })
-                // Drop shadow effect
-                .WithEffect(new EdgeEffect
-                {
-                    CornerRadius = 4,
-                    Parameters = new EdgeEffectParameters
+                    EdgeEffect = new EdgeEffectParameters
                     {
                         Roundness = 1,
                         Offset = new Vector2(0, 3),
                         Radius = 3,
                         Colour = Color4.Black.Opacity(0.3f),
                         Type = EdgeEffectType.Shadow,
+                    },
+                    // Drop shadow effect
+                    Child = new Container
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = 4,
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Radius = 1,
+                            Colour = OsuColour.FromHex(message.Sender.Colour),
+                            Type = EdgeEffectType.Shadow,
+                        },
+                        Padding = new MarginPadding { Left = 3, Right = 3, Bottom = 1, Top = -3 },
+                        Y = 3,
+                        Child = username,
                     }
-                });
+                };
             }
 
             Children = new Drawable[]
@@ -138,23 +163,21 @@ namespace osu.Game.Overlays.Chat
                     Size = new Vector2(message_padding, text_size),
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        timestamp = new OsuSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = @"Exo2.0-SemiBold",
-                            Text = $@"{Message.Timestamp.LocalDateTime:HH:mm:ss}",
                             FixedWidth = true,
                             TextSize = text_size * 0.75f,
-                            Alpha = 0.4f,
                         },
                         new ClickableContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
-                            Child = username,
-                            Action = () => loadProfile(Message.Sender),
+                            Child = effectedUsername,
+                            Action = () => loadProfile(message.Sender),
                         },
                     }
                 },
@@ -165,18 +188,27 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
-                        new OsuTextFlowContainer(t =>
+                        contentFlow = new OsuTextFlowContainer(t => { t.TextSize = text_size; })
                         {
-                            t.TextSize = text_size;
-                        })
-                        {
-                            Text = Message.Content,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                         }
                     }
                 }
             };
+
+            updateMessageContent();
+            FinishTransforms(true);
+        }
+
+        private void updateMessageContent()
+        {
+            this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
+            timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
+
+            timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
+            username.Text = $@"{message.Sender.Username}" + (senderHasBackground ? "" : ":");
+            contentFlow.Text = message.Content;
         }
     }
 }

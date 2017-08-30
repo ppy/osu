@@ -1,24 +1,35 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Mods;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Scoring;
+using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Rulesets.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset) => new TaikoRulesetContainer(this, beatmap, isForCurrentRuleset);
+
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
+        {
+            new KeyBinding(InputKey.D, TaikoAction.LeftRim),
+            new KeyBinding(InputKey.F, TaikoAction.LeftCentre),
+            new KeyBinding(InputKey.J, TaikoAction.RightCentre),
+            new KeyBinding(InputKey.K, TaikoAction.RightRim),
+            new KeyBinding(InputKey.MouseLeft, TaikoAction.LeftCentre),
+            new KeyBinding(InputKey.MouseLeft, TaikoAction.RightCentre),
+            new KeyBinding(InputKey.MouseRight, TaikoAction.LeftRim),
+            new KeyBinding(InputKey.MouseRight, TaikoAction.RightRim),
+        };
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
         {
@@ -89,14 +100,6 @@ namespace osu.Game.Rulesets.Taiko
         public override string Description => "osu!taiko";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_taiko_o };
-
-        public override IEnumerable<KeyCounter> CreateGameplayKeys() => new KeyCounter[]
-        {
-            new KeyCounterKeyboard(Key.D),
-            new KeyCounterKeyboard(Key.F),
-            new KeyCounterKeyboard(Key.J),
-            new KeyCounterKeyboard(Key.K)
-        };
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new TaikoDifficultyCalculator(beatmap);
 
