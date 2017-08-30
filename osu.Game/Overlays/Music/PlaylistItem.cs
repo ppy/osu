@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -151,6 +150,9 @@ namespace osu.Game.Overlays.Music
         {
             private readonly FillFlowContainer<PlaylistItem> playlist;
 
+            private const int line_height = 22;
+            private const int rearrange_buffer = 3;
+
             public PlaylistItemHandle(FillFlowContainer<PlaylistItem> playlist)
             {
                 this.playlist = playlist;
@@ -202,7 +204,12 @@ namespace osu.Game.Overlays.Music
                         max = m - 1;
                 }
 
-                return (int)items[Math.Max(0, min - 1)].Depth;
+                int index = Math.Max(0, min - 1);
+                // Only move if mouse falls within buffer
+                if (position - items[index].Y > rearrange_buffer && position - items[index].Y < line_height - rearrange_buffer) {
+                    return (int)items[index].Depth;
+                }
+                return (int)Parent.Depth;
             }
         }
     }
