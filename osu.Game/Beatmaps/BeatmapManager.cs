@@ -170,7 +170,7 @@ namespace osu.Game.Beatmaps
         /// Delete a beatmap from the manager.
         /// Is a no-op for already deleted beatmaps.
         /// </summary>
-        /// <param name="beatmapSet">The beatmap to delete.</param>
+        /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
             lock (beatmaps)
@@ -178,6 +178,16 @@ namespace osu.Game.Beatmaps
 
             if (!beatmapSet.Protected)
                 files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+        }
+
+        /// <summary>
+        /// Delete a beatmap from the manager.
+        /// Is a no-op for already deleted beatmaps.
+        /// </summary>
+        /// <param name="beatmap">The beatmap difficulty to delete.</param>
+        public void Delete(BeatmapInfo beatmap)
+        {
+            //todo: implement
         }
 
         /// <summary>

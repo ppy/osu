@@ -25,6 +25,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public Action<BeatmapSetInfo> DeleteRequested;
 
+        public Action<BeatmapInfo> DeleteDifficultyRequested;
+
         public BeatmapSetHeader Header;
 
         private BeatmapGroupState state;
@@ -77,6 +79,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 Alpha = 0,
                 GainedSelection = panelGainedSelection,
+                DeleteRequested = p => DeleteDifficultyRequested?.Invoke(p),
                 StartRequested = p => { StartRequested?.Invoke(p.Beatmap); },
                 RelativeSizeAxes = Axes.X,
             }).ToList();
