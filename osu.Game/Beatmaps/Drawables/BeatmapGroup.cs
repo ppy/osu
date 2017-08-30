@@ -23,6 +23,8 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         public Action<BeatmapInfo> StartRequested;
 
+        public Action<WorkingBeatmap> DeleteRequested;
+
         public BeatmapSetHeader Header;
 
         private BeatmapGroupState state;
@@ -66,6 +68,7 @@ namespace osu.Game.Beatmaps.Drawables
             Header = new BeatmapSetHeader(beatmap)
             {
                 GainedSelection = headerGainedSelection,
+                DeleteRequested = b => DeleteRequested(b),
                 RelativeSizeAxes = Axes.X,
             };
 
