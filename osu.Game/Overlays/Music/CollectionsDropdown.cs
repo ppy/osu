@@ -18,16 +18,10 @@ namespace osu.Game.Overlays.Music
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AccentColour.Value = colours.Gray6;
+            AccentColour = colours.Gray6;
         }
 
-        protected override DropdownHeader CreateHeader()
-        {
-            var newHeader = new CollectionsHeader();
-            newHeader.AccentColour.BindTo(AccentColour);
-
-            return newHeader;
-        }
+        protected override DropdownHeader CreateHeader() => new CollectionsHeader();
 
         protected override DropdownMenu CreateMenu() => new CollectionsMenu();
 

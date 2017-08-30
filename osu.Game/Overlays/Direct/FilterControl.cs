@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Direct
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game, RulesetStore rulesets, OsuColour colours)
         {
-            DisplayStyleControl.Dropdown.AccentColour.Value = colours.BlueDark;
+            DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 
             Ruleset.BindTo(game?.Ruleset ?? new Bindable<RulesetInfo> { Value = rulesets.GetRuleset(0) });
             foreach (var r in rulesets.AllRulesets)

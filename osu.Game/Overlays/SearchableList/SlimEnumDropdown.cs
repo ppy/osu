@@ -12,13 +12,7 @@ namespace osu.Game.Overlays.SearchableList
 {
     public class SlimEnumDropdown<T> : OsuEnumDropdown<T>
     {
-        protected override DropdownHeader CreateHeader()
-        {
-            var newHeader = new SlimDropdownHeader();
-            newHeader.AccentColour.BindTo(AccentColour);
-
-            return newHeader;
-        }
+        protected override DropdownHeader CreateHeader() => new SlimDropdownHeader();
 
         protected override DropdownMenu CreateMenu() => new SlimMenu();
 
