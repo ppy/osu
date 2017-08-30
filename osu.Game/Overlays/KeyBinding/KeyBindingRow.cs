@@ -122,14 +122,14 @@ namespace osu.Game.Overlays.KeyBinding
 
         protected override bool OnHover(InputState state)
         {
-            this.FadeEdgeEffectTo<Container>(1, transition_time, Easing.OutQuint);
+            FadeEdgeEffectTo(1, transition_time, Easing.OutQuint);
 
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            this.FadeEdgeEffectTo<Container>(0, transition_time, Easing.OutQuint);
+            FadeEdgeEffectTo(0, transition_time, Easing.OutQuint);
 
             base.OnHoverLost(state);
         }
