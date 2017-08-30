@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
     {
         public Action<BeatmapSetHeader> GainedSelection;
 
-        public Action<WorkingBeatmap> DeleteRequested;
+        public Action<BeatmapSetInfo> DeleteRequested;
 
         private readonly SpriteText title;
         private readonly SpriteText artist;
@@ -164,7 +164,7 @@ namespace osu.Game.Beatmaps.Drawables
                 if (State == PanelSelectedState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => State = PanelSelectedState.Selected));
 
-                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke(beatmap)));
+                items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke(beatmap.BeatmapSetInfo)));
 
                 return items.ToArray();
             }
