@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -13,28 +12,16 @@ namespace osu.Game.Screens.Select
     {
         private BeatmapManager manager;
 
-        private readonly Action deleteAction;
-
         [BackgroundDependencyLoader]
         private void load(BeatmapManager beatmapManager)
         {
             manager = beatmapManager;
         }
 
-        public BeatmapDeleteDialog(BeatmapSetInfo beatmap) : this()
+        public BeatmapDeleteDialog(BeatmapSetInfo beatmap)
         {
-            BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title} (ALL DIFFICULTIES)";
-            deleteAction = () => manager.Delete(beatmap);
-        }
+            BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
 
-        public BeatmapDeleteDialog(BeatmapInfo beatmap) : this()
-        {
-            BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title} [{beatmap.Version}]";
-            deleteAction = () => manager.Delete(beatmap);
-        }
-
-        public BeatmapDeleteDialog()
-        {
             Icon = FontAwesome.fa_trash_o;
             HeaderText = @"Confirm deletion of";
             Buttons = new PopupDialogButton[]
@@ -42,7 +29,7 @@ namespace osu.Game.Screens.Select
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Totally. Delete it.",
-                    Action = () => deleteAction(),
+                    Action = () => manager.Delete(beatmap),
                 },
                 new PopupDialogCancelButton
                 {
