@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             base.Reset();
 
-            Health.Value = 1;
+            Health.Value = 0.5;
             Accuracy.Value = 1;
 
             scoreResultCounts.Clear();
@@ -56,13 +56,21 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     scoreResultCounts[judgement.Score] = scoreResultCounts.GetOrDefault(judgement.Score) + 1;
                     comboResultCounts[judgement.Combo] = comboResultCounts.GetOrDefault(judgement.Combo) + 1;
                 }
-
-                switch (judgement.Result)
+                switch (judgement.Score)
                 {
-                    case HitResult.Hit:
-                        Health.Value += 0.1f;
+                    case OsuScoreResult.Hit300:
+                        Health.Value += 0.01f;
                         break;
-                    case HitResult.Miss:
+
+                    case OsuScoreResult.Hit100:
+                        Health.Value -= 0.01f;
+                        break;
+
+                    case OsuScoreResult.Hit50:
+                        Health.Value -= 0.05f;
+                        break;
+
+                    case OsuScoreResult.Miss:
                         Health.Value -= 0.2f;
                         break;
                 }
