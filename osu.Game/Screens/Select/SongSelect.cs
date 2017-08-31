@@ -107,7 +107,8 @@ namespace osu.Game.Screens.Select
                 SelectionChanged = carouselSelectionChanged,
                 BeatmapsChanged = carouselBeatmapsLoaded,
                 DeleteRequested = b => promptDelete(b),
-                DeleteDifficultyRequested = b => promptDelete(b),
+                RestoreRequested = s => { foreach (var b in s.Beatmaps) manager.Restore(b); },
+                DeleteDifficultyRequested = b => manager.Hide(b),
                 StartRequested = () => carouselRaisedStart(),
             });
             Add(FilterControl = new FilterControl
@@ -176,6 +177,8 @@ namespace osu.Game.Screens.Select
 
             manager.BeatmapSetAdded += onBeatmapSetAdded;
             manager.BeatmapSetRemoved += onBeatmapSetRemoved;
+            manager.BeatmapHidden += onBeatmapHidden;
+            manager.BeatmapRestored += onBeatmapRestored;
 
             dialogOverlay = dialog;
 
@@ -191,6 +194,9 @@ namespace osu.Game.Screens.Select
             Beatmap.DisabledChanged += disabled => carousel.AllowSelection = !disabled;
             carousel.AllowSelection = !Beatmap.Disabled;
         }
+
+        private void onBeatmapRestored(BeatmapInfo b) => carousel.UpdateBeatmap(b);
+        private void onBeatmapHidden(BeatmapInfo b) => carousel.UpdateBeatmap(b);
 
         private void carouselBeatmapsLoaded()
         {
@@ -380,10 +386,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet)
-        {
-            carousel.AddBeatmap(beatmapSet);
-        }
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet) => carousel.AddBeatmap(beatmapSet);
 
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
         {
@@ -393,14 +396,6 @@ namespace osu.Game.Screens.Select
         }
 
         private void promptDelete(BeatmapSetInfo beatmap)
-        {
-            if (beatmap == null)
-                return;
-
-            dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
-        }
-
-        private void promptDelete(BeatmapInfo beatmap)
         {
             if (beatmap == null)
                 return;

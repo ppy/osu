@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -24,6 +25,8 @@ namespace osu.Game.Beatmaps.Drawables
         public Action<BeatmapSetHeader> GainedSelection;
 
         public Action<BeatmapSetInfo> DeleteRequested;
+
+        public Action<BeatmapSetInfo> RestoreHiddenRequested;
 
         private readonly SpriteText title;
         private readonly SpriteText artist;
@@ -163,6 +166,9 @@ namespace osu.Game.Beatmaps.Drawables
 
                 if (State == PanelSelectedState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => State = PanelSelectedState.Selected));
+
+                if (beatmap.BeatmapSetInfo.Beatmaps.Any(b => b.Hidden))
+                    items.Add(new OsuMenuItem("Restore all hidden", MenuItemType.Standard, () => RestoreHiddenRequested?.Invoke(beatmap.BeatmapSetInfo)));
 
                 items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteRequested?.Invoke(beatmap.BeatmapSetInfo)));
 

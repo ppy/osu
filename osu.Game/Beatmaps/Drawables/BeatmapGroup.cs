@@ -25,6 +25,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public Action<BeatmapSetInfo> DeleteRequested;
 
+        public Action<BeatmapSetInfo> RestoreHiddenRequested;
+
         public Action<BeatmapInfo> DeleteDifficultyRequested;
 
         public BeatmapSetHeader Header;
@@ -71,10 +73,11 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 GainedSelection = headerGainedSelection,
                 DeleteRequested = b => DeleteRequested(b),
+                RestoreHiddenRequested = b => RestoreHiddenRequested(b),
                 RelativeSizeAxes = Axes.X,
             };
 
-            BeatmapSet.Beatmaps = BeatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
+            BeatmapSet.Beatmaps = BeatmapSet.Beatmaps.Where(b => !b.Hidden).OrderBy(b => b.StarDifficulty).ToList();
             BeatmapPanels = BeatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
             {
                 Alpha = 0,
