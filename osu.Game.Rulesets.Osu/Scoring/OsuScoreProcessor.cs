@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         }
 
         
-        float beatmapHp = 0;
+        float beatmapHp;
 
         protected override void ComputeTargets(Game.Beatmaps.Beatmap<OsuHitObject> beatmap)
         {
@@ -76,6 +76,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
                     case OsuScoreResult.Hit50:
                         Health.Value += (4 - beatmapHp) * 0.02;
+                        break;
+
+                    case OsuScoreResult.SliderTick:
+                        Health.Value += System.Math.Max(7 - beatmapHp, 0) * 0.01;
                         break;
 
                     case OsuScoreResult.Miss:
