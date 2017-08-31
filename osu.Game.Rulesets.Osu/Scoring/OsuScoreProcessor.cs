@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             base.Reset();
 
-            Health.Value = 0.5;
+            Health.Value = 1;
             Accuracy.Value = 1;
 
             scoreResultCounts.Clear();
