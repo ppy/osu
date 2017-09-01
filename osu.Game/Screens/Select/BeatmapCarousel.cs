@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Select
 
         public void SelectBeatmap(BeatmapInfo beatmap, bool animated = true)
         {
-            if (beatmap == null)
+            if (beatmap == null || beatmap.Hidden)
             {
                 SelectNext();
                 return;
