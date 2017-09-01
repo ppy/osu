@@ -13,7 +13,6 @@ using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -98,15 +97,13 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private OsuGameBase loadOsu(GameHost host)
         {
+            host.Storage.DeleteDatabase(@"client");
+
             var osu = new OsuGameBase();
             Task.Run(() => host.Run(osu));
 
             while (!osu.IsLoaded)
                 Thread.Sleep(1);
-
-            //reset beatmap database (sqlite and storage backing)
-            osu.Dependencies.Get<RulesetStore>().Reset();
-            osu.Dependencies.Get<BeatmapManager>().Reset();
 
             return osu;
         }

@@ -257,9 +257,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         private class UserDropdown : OsuEnumDropdown<UserAction>
         {
-            protected override DropdownHeader CreateHeader() => new UserDropdownHeader { AccentColour = AccentColour };
-            protected override Menu CreateMenu() => new UserDropdownMenu();
-            protected override DropdownMenuItem<UserAction> CreateMenuItem(string text, UserAction value) => new UserDropdownMenuItem(text, value) { AccentColour = AccentColour };
+            protected override DropdownHeader CreateHeader() => new UserDropdownHeader();
+
+            protected override DropdownMenu CreateMenu() => new UserDropdownMenu();
 
             public Color4 StatusColour
             {
@@ -275,6 +275,49 @@ namespace osu.Game.Overlays.Settings.Sections.General
             private void load(OsuColour colours)
             {
                 AccentColour = colours.Gray5;
+            }
+
+            private class UserDropdownMenu : OsuDropdownMenu
+            {
+                public UserDropdownMenu()
+                {
+                    Masking = true;
+                    CornerRadius = 5;
+
+                    Margin = new MarginPadding { Bottom = 5 };
+
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Shadow,
+                        Colour = Color4.Black.Opacity(0.25f),
+                        Radius = 4,
+                    };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    BackgroundColour = colours.Gray3;
+                }
+
+                protected override MarginPadding ItemFlowContainerPadding => new MarginPadding();
+
+                protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
+
+                private class DrawableUserDropdownMenuItem : DrawableOsuDropdownMenuItem
+                {
+                    public DrawableUserDropdownMenuItem(MenuItem item)
+                        : base(item)
+                    {
+                        Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 5 };
+                        CornerRadius = 5;
+                    }
+
+                    protected override Drawable CreateContent() => new Content
+                    {
+                        Label = { Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 } }
+                    };
+                }
             }
 
             private class UserDropdownHeader : OsuDropdownHeader
@@ -324,38 +367,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 }
             }
 
-            private class UserDropdownMenu : OsuMenu
-            {
-                public UserDropdownMenu()
-                {
-                    Margin = new MarginPadding { Bottom = 5 };
-                    CornerRadius = 5;
-                    ItemsContainer.Padding = new MarginPadding(0);
-                    Masking = true;
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Black.Opacity(0.25f),
-                        Radius = 4,
-                    };
-                }
 
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
-                {
-                    Background.Colour = colours.Gray3;
-                }
-            }
 
-            private class UserDropdownMenuItem : OsuDropdownMenuItem
-            {
-                public UserDropdownMenuItem(string text, UserAction current) : base(text, current)
-                {
-                    Foreground.Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 5 };
-                    Label.Margin = new MarginPadding { Left = UserDropdownHeader.LABEL_LEFT_MARGIN - 11 };
-                    CornerRadius = 5;
-                }
-            }
+
         }
 
         private enum UserAction
