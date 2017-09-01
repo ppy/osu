@@ -23,7 +23,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
-        
         float beatmapHp;
 
         protected override void ComputeTargets(Game.Beatmaps.Beatmap<OsuHitObject> beatmap)
