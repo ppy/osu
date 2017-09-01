@@ -70,6 +70,8 @@ namespace osu.Game.Configuration
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
+
+            Set(OsuSetting.Version, string.Empty);
         }
 
         public OsuConfigManager(Storage storage) : base(storage)
@@ -106,6 +108,7 @@ namespace osu.Game.Configuration
         SnakingInSliders,
         SnakingOutSliders,
         ShowFpsDisplay,
-        ChatDisplayHeight
+        ChatDisplayHeight,
+        Version
     }
 }

@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Scoring
                 frames.Add(new ReplayFrame(
                     lastTime,
                     float.Parse(split[1]),
-                    384 - float.Parse(split[2]),
+                    float.Parse(split[2]),
                     (ReplayButtonState)int.Parse(split[3])
                 ));
             }
