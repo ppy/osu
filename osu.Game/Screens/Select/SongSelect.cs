@@ -244,7 +244,7 @@ namespace osu.Game.Screens.Select
                     ensurePlayingSelected(preview);
                 }
 
-                changeBackground(Beatmap.Value);
+                UpdateBeatmap(Beatmap.Value);
             };
 
             selectionChangedDebounce?.Cancel();
@@ -312,7 +312,7 @@ namespace osu.Game.Screens.Select
         {
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
-                changeBackground(Beatmap);
+                UpdateBeatmap(Beatmap);
                 ensurePlayingSelected();
             }
 
@@ -358,7 +358,12 @@ namespace osu.Game.Screens.Select
             initialAddSetsTask?.Cancel();
         }
 
-        private void changeBackground(WorkingBeatmap beatmap)
+        /// <summary>
+        /// Allow components in SongSelect to update their loaded beatmap details.
+        /// This is a debounced call (unlike directly binding to WorkingBeatmap.ValueChanged).
+        /// </summary>
+        /// <param name="beatmap">The working beatmap.</param>
+        protected virtual void UpdateBeatmap(WorkingBeatmap beatmap)
         {
             var backgroundModeBeatmap = Background as BackgroundScreenBeatmap;
             if (backgroundModeBeatmap != null)
