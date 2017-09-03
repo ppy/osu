@@ -224,7 +224,8 @@ namespace osu.Game.Screens.Select
             if (!visibleGroups.Any())
                 return;
 
-            randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
+            if (selectedGroup != null)
+                randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
 
             BeatmapGroup group;
 
