@@ -353,6 +353,8 @@ namespace osu.Game.Screens.Select
             {
                 manager.BeatmapSetAdded -= onBeatmapSetAdded;
                 manager.BeatmapSetRemoved -= onBeatmapSetRemoved;
+                manager.BeatmapHidden -= onBeatmapHidden;
+                manager.BeatmapRestored -= onBeatmapRestored;
             }
 
             initialAddSetsTask?.Cancel();
