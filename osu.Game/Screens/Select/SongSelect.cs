@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Select
                 BeatmapsChanged = carouselBeatmapsLoaded,
                 DeleteRequested = b => promptDelete(b),
                 RestoreRequested = s => { foreach (var b in s.Beatmaps) manager.Restore(b); },
-                DeleteDifficultyRequested = b => manager.Hide(b),
+                HideDifficultyRequested = b => manager.Hide(b),
                 StartRequested = () => carouselRaisedStart(),
             });
             Add(FilterControl = new FilterControl

@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public Action<BeatmapSetInfo> RestoreHiddenRequested;
 
-        public Action<BeatmapInfo> DeleteDifficultyRequested;
+        public Action<BeatmapInfo> HideDifficultyRequested;
 
         public BeatmapSetHeader Header;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 Alpha = 0,
                 GainedSelection = panelGainedSelection,
-                DeleteRequested = p => DeleteDifficultyRequested?.Invoke(p),
+                HideRequested = p => HideDifficultyRequested?.Invoke(p),
                 StartRequested = p => { StartRequested?.Invoke(p.Beatmap); },
                 RelativeSizeAxes = Axes.X,
             }).ToList();

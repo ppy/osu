@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Select
 
         public Action<BeatmapSetInfo> RestoreRequested;
 
-        public Action<BeatmapInfo> DeleteDifficultyRequested;
+        public Action<BeatmapInfo> HideDifficultyRequested;
 
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
@@ -341,7 +341,7 @@ namespace osu.Game.Screens.Select
                 StartRequested = b => StartRequested?.Invoke(),
                 DeleteRequested = b => DeleteRequested?.Invoke(b),
                 RestoreHiddenRequested = s => RestoreRequested?.Invoke(s),
-                DeleteDifficultyRequested = b => DeleteDifficultyRequested?.Invoke(b),
+                HideDifficultyRequested = b => HideDifficultyRequested?.Invoke(b),
                 State = BeatmapGroupState.Collapsed
             };
         }

@@ -27,7 +27,7 @@ namespace osu.Game.Beatmaps.Drawables
         public Action<BeatmapPanel> GainedSelection;
         public Action<BeatmapPanel> StartRequested;
         public Action<BeatmapPanel> EditRequested;
-        public Action<BeatmapInfo> DeleteRequested;
+        public Action<BeatmapInfo> HideRequested;
 
         private readonly Triangles triangles;
         private readonly StarCounter starCounter;
@@ -158,7 +158,7 @@ namespace osu.Game.Beatmaps.Drawables
         {
             new OsuMenuItem("Play", MenuItemType.Highlighted, () => StartRequested?.Invoke(this)),
             new OsuMenuItem("Edit", MenuItemType.Standard, () => EditRequested?.Invoke(this)),
-            new OsuMenuItem("Hide", MenuItemType.Destructive, () => DeleteRequested?.Invoke(Beatmap)),
+            new OsuMenuItem("Hide", MenuItemType.Destructive, () => HideRequested?.Invoke(Beatmap)),
         };
     }
 }
