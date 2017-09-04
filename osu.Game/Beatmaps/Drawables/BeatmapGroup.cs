@@ -11,6 +11,8 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public class BeatmapGroup : IStateful<BeatmapGroupState>
     {
+        public event Action<BeatmapGroupState> StateChanged;
+
         public BeatmapPanel SelectedPanel;
 
         /// <summary>
@@ -42,6 +44,10 @@ namespace osu.Game.Beatmaps.Drawables
             get { return state; }
             set
             {
+                if (state == value)
+                    return;
+                state = value;
+
                 switch (value)
                 {
                     case BeatmapGroupState.Expanded:
@@ -60,7 +66,8 @@ namespace osu.Game.Beatmaps.Drawables
                             panel.State = PanelSelectedState.Hidden;
                         break;
                 }
-                state = value;
+
+                StateChanged?.Invoke(state);
             }
         }
 

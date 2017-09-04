@@ -204,7 +204,7 @@ namespace osu.Game.Overlays
 
             beatmapBacking.BindTo(game.Beatmap);
 
-            playlist.StateChanged += (c, s) => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
+            playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
         protected override void LoadComplete()
