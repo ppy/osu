@@ -137,46 +137,87 @@ namespace osu.Game.Overlays.Music
             {
                 if (draggedItem == null)
                     return base.OnDrag(state);
+                return true;
+            }
 
-                // Mouse position in the position space of the items container
-                Vector2 itemsPos = items.ToLocalSpace(state.Mouse.NativeState.Position);
+            protected override bool OnDragEnd(InputState state)
+            {
+                var handled = draggedItem != null || base.OnDragEnd(state);
+                draggedItem = null;
 
-                int src = (int)draggedItem.Depth;
+                return handled;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (draggedItem == null)
+                    return;
+
+                var mouseState = GetContainingInputManager().CurrentState.Mouse;
+
+                updateScrollPosition(mouseState);
+                updateDragPosition(mouseState);
+            }
+
+            private void updateScrollPosition(IMouseState mouseState)
+            {
+                const float start_offset = 10;
+                const double max_power = 50;
+                const double exp_base = 1.05;
+
+                var localPos = ToLocalSpace(mouseState.Position);
+
+                if (localPos.Y < start_offset)
+                {
+                    var power = Math.Min(max_power, Math.Abs(start_offset - localPos.Y));
+                    ScrollBy(-(float)Math.Pow(exp_base, power));
+                }
+                else if (localPos.Y > DrawHeight - start_offset)
+                {
+                    var power = Math.Min(max_power, Math.Abs(DrawHeight - start_offset - localPos.Y));
+                    ScrollBy((float)Math.Pow(exp_base, power));
+                }
+            }
+
+            private void updateDragPosition(IMouseState mouseState)
+            {
+                var itemsPos = items.ToLocalSpace(mouseState.Position);
+
+                int srcIndex = (int)draggedItem.Depth;
 
                 // Find the last item with position < mouse position. Note we can't directly use
                 // the item positions as they are being transformed
                 float heightAccumulator = 0;
-                int dst = 0;
-                for (; dst < items.Count; dst++)
+                int dstIndex = 0;
+                for (; dstIndex < items.Count; dstIndex++)
                 {
                     // Using BoundingBox here takes care of scale, paddings, etc...
-                    heightAccumulator += items[dst].BoundingBox.Height;
+                    heightAccumulator += items[dstIndex].BoundingBox.Height;
                     if (heightAccumulator > itemsPos.Y)
                         break;
                 }
 
-                dst = MathHelper.Clamp(dst, 0, items.Count - 1);
+                dstIndex = MathHelper.Clamp(dstIndex, 0, items.Count - 1);
 
-                if (src == dst)
-                    return true;
+                if (srcIndex == dstIndex)
+                    return;
 
-                if (src < dst)
+                if (srcIndex < dstIndex)
                 {
-                    for (int i = src + 1; i <= dst; i++)
+                    for (int i = srcIndex + 1; i <= dstIndex; i++)
                         items.ChangeChildDepth(items[i], i - 1);
                 }
                 else
                 {
-                    for (int i = dst; i < src; i++)
+                    for (int i = dstIndex; i < srcIndex; i++)
                         items.ChangeChildDepth(items[i], i + 1);
                 }
 
-                items.ChangeChildDepth(draggedItem, dst);
-
-                return true;
+                items.ChangeChildDepth(draggedItem, dstIndex);
             }
 
-            protected override bool OnDragEnd(InputState state) => draggedItem != null || base.OnDragEnd(state);
 
             private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
             {
