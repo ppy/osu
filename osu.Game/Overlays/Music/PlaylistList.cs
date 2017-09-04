@@ -59,8 +59,8 @@ namespace osu.Game.Overlays.Music
         {
             get
             {
-                var available = items.Children.Reverse();
-                return (available.SkipWhile(i => !i.Selected).Skip(1).FirstOrDefault() ?? available.FirstOrDefault())?.BeatmapSetInfo;
+                var available = items.Children;
+                return (available.TakeWhile(i => !i.Selected).LastOrDefault() ?? available.LastOrDefault())?.BeatmapSetInfo;
             }
         }
 
