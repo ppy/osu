@@ -57,6 +57,9 @@ namespace osu.Game.Graphics.UserInterface
             {
                 CornerRadius = 4;
                 BackgroundColour = Color4.Black.Opacity(0.5f);
+
+                // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
+                ItemsContainer.Padding = new MarginPadding(5);
             }
 
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
@@ -64,14 +67,7 @@ namespace osu.Game.Graphics.UserInterface
             protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
 
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
-            protected override MarginPadding ItemFlowContainerPadding => new MarginPadding(5);
-
-            // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
-            protected override void UpdateMenuHeight()
-            {
-                var actualHeight = (RelativeSizeAxes & Axes.Y) > 0 ? 1 : ContentHeight;
-                this.ResizeHeightTo(State == MenuState.Opened ? actualHeight : 0, 300, Easing.OutQuint);
-            }
+            protected override void UpdateSize(Vector2 newSize) => this.ResizeTo(newSize, 300, Easing.OutQuint);
 
             private Color4 accentColour;
             public Color4 AccentColour
@@ -141,7 +137,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 protected override Drawable CreateContent() => new Content();
 
-                protected class Content : FillFlowContainer, IHasText
+                protected new class Content : FillFlowContainer, IHasText
                 {
                     public string Text
                     {

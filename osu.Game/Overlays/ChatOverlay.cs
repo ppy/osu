@@ -169,7 +169,7 @@ namespace osu.Game.Overlays
 
             channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
             channelTabs.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
-            channelSelection.StateChanged += (overlay, state) =>
+            channelSelection.StateChanged += state =>
             {
                 channelTabs.ChannelSelectorActive.Value = state == Visibility.Visible;
 

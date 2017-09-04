@@ -12,27 +12,25 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
+using OpenTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuMenu : Menu
     {
-        public OsuMenu()
+        public OsuMenu(Direction direction)
+            : base(direction)
         {
-            CornerRadius = 4;
             BackgroundColour = Color4.Black.Opacity(0.5f);
+
+            MaskingContainer.CornerRadius = 4;
+            ItemsContainer.Padding = new MarginPadding(5);
         }
 
         protected override void AnimateOpen() => this.FadeIn(300, Easing.OutQuint);
         protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
 
-        protected override void UpdateMenuHeight()
-        {
-            var actualHeight = (RelativeSizeAxes & Axes.Y) > 0 ? 1 : ContentHeight;
-            this.ResizeHeightTo(State == MenuState.Opened ? actualHeight : 0, 300, Easing.OutQuint);
-        }
-
-        protected override MarginPadding ItemFlowContainerPadding => new MarginPadding(5);
+        protected override void UpdateSize(Vector2 newSize) => this.ResizeTo(newSize, 300, Easing.OutQuint);
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuMenuItem(item);
 
