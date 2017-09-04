@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -150,9 +151,6 @@ namespace osu.Game.Overlays.Music
         {
             private readonly FillFlowContainer<PlaylistItem> playlist;
 
-            private const int line_height = 22;
-            private const int rearrange_buffer = 3;
-
             public PlaylistItemHandle(FillFlowContainer<PlaylistItem> playlist)
             {
                 this.playlist = playlist;
@@ -169,7 +167,23 @@ namespace osu.Game.Overlays.Music
             protected override bool OnDrag(InputState state)
             {
                 int src = (int)Parent.Depth;
-                int dst = getIndex(state.Mouse.Position.Y + Parent.Position.Y);
+
+                var matchingItem = playlist.Children.LastOrDefault(c => c.Position.Y < state.Mouse.Position.Y + Parent.Position.Y);
+                if (matchingItem == null)
+                    return true;
+
+                int dst = (int)matchingItem.Depth;
+
+                // Due to the position predicate above, there is an edge case to consider when an item is moved upwards:
+                // At the point where the two items cross there will be two items sharing the same condition, and the items will jump back
+                // and forth between the two positions because of this. This is accentuated if the items span differing line heights.
+                // The easiest way to avoid this is to ensure the movement direction matches the expected mouse delta
+
+                if (state.Mouse.Delta.Y <= 0 && dst > src)
+                    return true;
+
+                if (state.Mouse.Delta.Y >= 0 && dst < src)
+                    return true;
 
                 if (src == dst)
                     return true;
@@ -187,29 +201,6 @@ namespace osu.Game.Overlays.Music
 
                 playlist.ChangeChildDepth(Parent as PlaylistItem, dst);
                 return true;
-            }
-
-            private int getIndex(float position) {
-                IReadOnlyList<PlaylistItem> items = playlist.Children;
-
-                // Binary Search without matching exact
-                int min = 0;
-                int max = items.Count - 1;
-                while (min <= max)
-                {
-                    int m = (min + max) / 2;
-                    if (items[m].Y < position)
-                        min = m + 1;
-                    else if (items[m].Y > position)
-                        max = m - 1;
-                }
-
-                int index = Math.Max(0, min - 1);
-                // Only move if mouse falls within buffer
-                if (position - items[index].Y > rearrange_buffer && position - items[index].Y < line_height - rearrange_buffer) {
-                    return (int)items[index].Depth;
-                }
-                return (int)Parent.Depth;
             }
         }
     }
