@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -18,7 +17,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
-    internal class PlaylistItem : Container, IFilterable
+    internal class PlaylistItem : Container, IFilterable, IDraggable
     {
         private const float fade_duration = 100;
 
@@ -31,10 +30,11 @@ namespace osu.Game.Overlays.Music
         private UnicodeBindableString titleBind;
         private UnicodeBindableString artistBind;
 
-        private readonly FillFlowContainer<PlaylistItem> playlist;
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         public Action<BeatmapSetInfo> OnSelect;
+
+        public bool IsDraggable => handle.IsHovered;
 
         private bool selected;
         public bool Selected
@@ -51,9 +51,8 @@ namespace osu.Game.Overlays.Music
             }
         }
 
-        public PlaylistItem(FillFlowContainer<PlaylistItem> playlist, BeatmapSetInfo setInfo)
+        public PlaylistItem(BeatmapSetInfo setInfo)
         {
-            this.playlist = playlist;
             BeatmapSetInfo = setInfo;
 
             RelativeSizeAxes = Axes.X;
@@ -72,9 +71,9 @@ namespace osu.Game.Overlays.Music
 
             Children = new Drawable[]
             {
-                handle = new PlaylistItemHandle(playlist)
+                handle = new PlaylistItemHandle
                 {
-                    Colour = colours.Gray5,
+                    Colour = colours.Gray5
                 },
                 text = new OsuTextFlowContainer
                 {
@@ -149,11 +148,9 @@ namespace osu.Game.Overlays.Music
 
         private class PlaylistItemHandle : SpriteIcon
         {
-            private readonly FillFlowContainer<PlaylistItem> playlist;
 
-            public PlaylistItemHandle(FillFlowContainer<PlaylistItem> playlist)
+            public PlaylistItemHandle()
             {
-                this.playlist = playlist;
                 Anchor = Anchor.TopLeft;
                 Origin = Anchor.TopLeft;
                 Size = new Vector2(12);
@@ -161,47 +158,14 @@ namespace osu.Game.Overlays.Music
                 Alpha = 0f;
                 Margin = new MarginPadding { Left = 5, Top = 2 };
             }
-
-            protected override bool OnDragStart(InputState state) => true;
-
-            protected override bool OnDrag(InputState state)
-            {
-                int src = (int)Parent.Depth;
-
-                var matchingItem = playlist.Children.LastOrDefault(c => c.Position.Y < state.Mouse.Position.Y + Parent.Position.Y);
-                if (matchingItem == null)
-                    return true;
-
-                int dst = (int)matchingItem.Depth;
-
-                // Due to the position predicate above, there is an edge case to consider when an item is moved upwards:
-                // At the point where the two items cross there will be two items sharing the same condition, and the items will jump back
-                // and forth between the two positions because of this. This is accentuated if the items span differing line heights.
-                // The easiest way to avoid this is to ensure the movement direction matches the expected mouse delta
-
-                if (state.Mouse.Delta.Y <= 0 && dst > src)
-                    return true;
-
-                if (state.Mouse.Delta.Y >= 0 && dst < src)
-                    return true;
-
-                if (src == dst)
-                    return true;
-
-                if (src < dst)
-                {
-                    for (int i = src + 1; i <= dst; i++)
-                        playlist.ChangeChildDepth(playlist[i], i - 1);
-                }
-                else
-                {
-                    for (int i = dst; i < src; i++)
-                        playlist.ChangeChildDepth(playlist[i], i + 1);
-                }
-
-                playlist.ChangeChildDepth(Parent as PlaylistItem, dst);
-                return true;
-            }
         }
+    }
+
+    public interface IDraggable : IDrawable
+    {
+        /// <summary>
+        /// Whether this <see cref="IDraggable"/> can be dragged in its current state.
+        /// </summary>
+        bool IsDraggable { get; }
     }
 }
