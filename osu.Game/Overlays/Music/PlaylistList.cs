@@ -8,7 +8,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
-using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using OpenTK;
