@@ -143,22 +143,19 @@ namespace osu.Game.Overlays.Music
 
                 int src = (int)draggedItem.Depth;
 
-                var matchingItem = items.LastOrDefault(c => c.Position.Y < itemsPos.Y);
-                if (matchingItem == null)
-                    return true;
+                // Find the last item with position < mouse position. Note we can't directly use
+                // the item positions as they are being transformed
+                float heightAccumulator = 0;
+                int dst = 0;
+                for (; dst < items.Count; dst++)
+                {
+                    // Using BoundingBox here takes care of scale, paddings, etc...
+                    heightAccumulator += items[dst].BoundingBox.Height;
+                    if (heightAccumulator > itemsPos.Y)
+                        break;
+                }
 
-                int dst = (int)matchingItem.Depth;
-
-                // Due to the position predicate above, there is an edge case to consider when an item is moved upwards:
-                // At the point where the two items cross there will be two items sharing the same condition, and the items will jump back
-                // and forth between the two positions because of this. This is accentuated if the items span differing line heights.
-                // The easiest way to avoid this is to ensure the movement direction matches the expected mouse delta
-
-                if (state.Mouse.Delta.Y <= 0 && dst > src)
-                    return true;
-
-                if (state.Mouse.Delta.Y >= 0 && dst < src)
-                    return true;
+                dst = MathHelper.Clamp(dst, 0, items.Count - 1);
 
                 if (src == dst)
                     return true;
