@@ -30,7 +30,19 @@ namespace osu.Game.Graphics.UserInterface
         protected override void AnimateOpen() => this.FadeIn(300, Easing.OutQuint);
         protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
 
-        protected override void UpdateSize(Vector2 newSize) => this.ResizeTo(newSize, 300, Easing.OutQuint);
+        protected override void UpdateSize(Vector2 newSize)
+        {
+            if (Direction == Direction.Vertical)
+            {
+                Width = newSize.X;
+                this.ResizeHeightTo(newSize.Y, 300, Easing.OutQuint);
+            }
+            else
+            {
+                Height = newSize.Y;
+                this.ResizeWidthTo(newSize.X, 300, Easing.OutQuint);
+            }
+        }
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuMenuItem(item);
 

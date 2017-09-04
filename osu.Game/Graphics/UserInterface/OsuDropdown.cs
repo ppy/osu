@@ -67,7 +67,19 @@ namespace osu.Game.Graphics.UserInterface
             protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
 
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
-            protected override void UpdateSize(Vector2 newSize) => this.ResizeTo(newSize, 300, Easing.OutQuint);
+            protected override void UpdateSize(Vector2 newSize)
+            {
+                if (Direction == Direction.Vertical)
+                {
+                    Width = newSize.X;
+                    this.ResizeHeightTo(newSize.Y, 300, Easing.OutQuint);
+                }
+                else
+                {
+                    Height = newSize.Y;
+                    this.ResizeWidthTo(newSize.X, 300, Easing.OutQuint);
+                }
+            }
 
             private Color4 accentColour;
             public Color4 AccentColour
