@@ -8,6 +8,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using OpenTK;
@@ -171,11 +172,17 @@ namespace osu.Game.Overlays.Music
 
                 if (localPos.Y < start_offset)
                 {
+                    if (Current <= 0)
+                        return;
+
                     var power = Math.Min(max_power, Math.Abs(start_offset - localPos.Y));
                     ScrollBy(-(float)Math.Pow(exp_base, power));
                 }
                 else if (localPos.Y > DrawHeight - start_offset)
                 {
+                    if (IsScrolledToEnd())
+                        return;
+
                     var power = Math.Min(max_power, Math.Abs(DrawHeight - start_offset - localPos.Y));
                     ScrollBy((float)Math.Pow(exp_base, power));
                 }
