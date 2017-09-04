@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Music
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            beatmapBacking.ValueChanged += b => list.SelectedItem = b?.BeatmapSetInfo;
+            beatmapBacking.ValueChanged += b => list.SelectedSet = b?.BeatmapSetInfo;
             beatmapBacking.TriggerChange();
         }
 
@@ -126,23 +126,23 @@ namespace osu.Game.Overlays.Music
 
         public void PlayPrevious()
         {
-            var playable = list.PreviousItem;
+            var playable = list.PreviousSet;
 
             if (playable != null)
             {
                 playSpecified(playable.Beatmaps[0]);
-                list.SelectedItem = playable;
+                list.SelectedSet = playable;
             }
         }
 
         public void PlayNext()
         {
-            var playable = list.NextItem;
+            var playable = list.NextSet;
 
             if (playable != null)
             {
                 playSpecified(playable.Beatmaps[0]);
-                list.SelectedItem = playable;
+                list.SelectedSet = playable;
             }
         }
 
