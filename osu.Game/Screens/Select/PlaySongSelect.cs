@@ -54,13 +54,11 @@ namespace osu.Game.Screens.Select
                 ValidForResume = false;
                 Push(new Editor());
             }, Key.Number3);
-
-            Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
-        private void beatmap_ValueChanged(WorkingBeatmap beatmap)
+        protected override void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            if (!IsCurrentScreen) return;
+            base.UpdateBeatmap(beatmap);
 
             beatmap.Mods.BindTo(modSelect.SelectedMods);
 
