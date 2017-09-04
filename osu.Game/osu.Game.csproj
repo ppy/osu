@@ -91,7 +91,7 @@
     <Compile Include="Graphics\UserInterface\LineGraph.cs" />
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
     <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
-    <Compile Include="Graphics\UserInterface\OsuContextMenuItem.cs" />
+    <Compile Include="Graphics\UserInterface\OsuMenuItem.cs" />
     <Compile Include="Input\Bindings\DatabasedKeyBinding.cs" />
     <Compile Include="Input\Bindings\DatabasedKeyBindingInputManager.cs" />
     <Compile Include="Input\KeyBindingStore.cs" />
