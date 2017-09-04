@@ -16,11 +16,14 @@ namespace osu.Game.Beatmaps
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
 
+        public event Action<BeatmapInfo> BeatmapHidden;
+        public event Action<BeatmapInfo> BeatmapRestored;
+
         /// <summary>
         /// The current version of this store. Used for migrations (see <see cref="PerformMigration(int, int)"/>).
         /// The initial version is 1.
         /// </summary>
-        protected override int StoreVersion => 3;
+        protected override int StoreVersion => 4;
 
         public BeatmapStore(SQLiteConnection connection)
             : base(connection)
@@ -81,6 +84,10 @@ namespace osu.Game.Beatmaps
                         // Added MD5Hash column to BeatmapInfo
                         Connection.MigrateTable<BeatmapInfo>();
                         break;
+                    case 4:
+                        // Added Hidden column to BeatmapInfo
+                        Connection.MigrateTable<BeatmapInfo>();
+                        break;
                 }
             }
         }
@@ -100,7 +107,7 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Delete a <see cref="BeatmapSetInfo"/> to the database.
+        /// Delete a <see cref="BeatmapSetInfo"/> from the database.
         /// </summary>
         /// <param name="beatmapSet">The beatmap to delete.</param>
         /// <returns>Whether the beatmap's <see cref="BeatmapSetInfo.DeletePending"/> was changed.</returns>
@@ -128,6 +135,38 @@ namespace osu.Game.Beatmaps
             Connection.Update(beatmapSet);
 
             BeatmapSetAdded?.Invoke(beatmapSet);
+            return true;
+        }
+
+        /// <summary>
+        /// Hide a <see cref="BeatmapInfo"/> in the database.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to hide.</param>
+        /// <returns>Whether the beatmap's <see cref="BeatmapInfo.Hidden"/> was changed.</returns>
+        public bool Hide(BeatmapInfo beatmap)
+        {
+            if (beatmap.Hidden) return false;
+
+            beatmap.Hidden = true;
+            Connection.Update(beatmap);
+
+            BeatmapHidden?.Invoke(beatmap);
+            return true;
+        }
+
+        /// <summary>
+        /// Restore a previously hidden <see cref="BeatmapInfo"/>.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to restore.</param>
+        /// <returns>Whether the beatmap's <see cref="BeatmapInfo.Hidden"/> was changed.</returns>
+        public bool Restore(BeatmapInfo beatmap)
+        {
+            if (!beatmap.Hidden) return false;
+
+            beatmap.Hidden = false;
+            Connection.Update(beatmap);
+
+            BeatmapRestored?.Invoke(beatmap);
             return true;
         }
 
