@@ -125,19 +125,19 @@ namespace osu.Game.Overlays.Music
             public BeatmapSetInfo NextSet => (items.SkipWhile(i => !i.Selected).Skip(1).FirstOrDefault() ?? items.FirstOrDefault())?.BeatmapSetInfo;
             public BeatmapSetInfo PreviousSet => (items.TakeWhile(i => !i.Selected).LastOrDefault() ?? items.LastOrDefault())?.BeatmapSetInfo;
 
-            private InputState dragInputState;
+            private Vector2 nativeDragPosition;
             private PlaylistItem draggedItem;
 
             protected override bool OnDragStart(InputState state)
             {
-                dragInputState = state;
+                nativeDragPosition = state.Mouse.NativeState.Position;
                 draggedItem = items.FirstOrDefault(d => d.IsDraggable);
                 return draggedItem != null || base.OnDragStart(state);
             }
 
             protected override bool OnDrag(InputState state)
             {
-                dragInputState = state;
+                nativeDragPosition = state.Mouse.NativeState.Position;
                 if (draggedItem == null)
                     return base.OnDrag(state);
                 return true;
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Music
 
             protected override bool OnDragEnd(InputState state)
             {
-                dragInputState = state;
+                nativeDragPosition = state.Mouse.NativeState.Position;
                 var handled = draggedItem != null || base.OnDragEnd(state);
                 draggedItem = null;
 
@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Music
                 const double max_power = 50;
                 const double exp_base = 1.05;
 
-                var localPos = ToLocalSpace(dragInputState.Mouse.NativeState.Position);
+                var localPos = ToLocalSpace(nativeDragPosition);
 
                 if (localPos.Y < start_offset)
                 {
@@ -191,7 +191,7 @@ namespace osu.Game.Overlays.Music
 
             private void updateDragPosition()
             {
-                var itemsPos = items.ToLocalSpace(dragInputState.Mouse.NativeState.Position);
+                var itemsPos = items.ToLocalSpace(nativeDragPosition);
 
                 int srcIndex = (int)draggedItem.Depth;
 
