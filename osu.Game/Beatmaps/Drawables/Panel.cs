@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,6 +15,8 @@ namespace osu.Game.Beatmaps.Drawables
     public class Panel : Container, IStateful<PanelSelectedState>
     {
         public const float MAX_HEIGHT = 80;
+
+        public event Action<PanelSelectedState> StateChanged;
 
         public override bool RemoveWhenNotAlive => false;
 
@@ -77,11 +80,15 @@ namespace osu.Game.Beatmaps.Drawables
 
             set
             {
-                if (state == value) return;
+                if (state == value)
+                    return;
 
                 var last = state;
                 state = value;
+
                 ApplyState(last);
+
+                StateChanged?.Invoke(State);
             }
         }
 

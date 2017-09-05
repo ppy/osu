@@ -133,6 +133,8 @@ namespace osu.Game.Screens.Play
 
         private class FadeContainer : Container, IStateful<Visibility>
         {
+            public event Action<Visibility> StateChanged;
+
             private Visibility state;
             private ScheduledDelegate scheduledHide;
 
@@ -144,8 +146,10 @@ namespace osu.Game.Screens.Play
                 }
                 set
                 {
-                    var lastState = state;
+                    if (state == value)
+                        return;
 
+                    var lastState = state;
                     state = value;
 
                     scheduledHide?.Cancel();
@@ -164,6 +168,8 @@ namespace osu.Game.Screens.Play
                             this.FadeOut(1000, Easing.OutExpo);
                             break;
                     }
+
+                    StateChanged?.Invoke(State);
                 }
             }
 

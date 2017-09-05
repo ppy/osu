@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework;
 using OpenTK;
@@ -19,6 +20,9 @@ namespace osu.Game.Overlays.Settings
         private readonly FillFlowContainer<SidebarButton> content;
         internal const float DEFAULT_WIDTH = ToolbarButton.WIDTH;
         internal const int EXPANDED_WIDTH = 200;
+
+        public event Action<ExpandedState> StateChanged;
+
         protected override Container<SidebarButton> Content => content;
 
         public Sidebar()
@@ -102,6 +106,8 @@ namespace osu.Game.Overlays.Settings
                         this.ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, Easing.OutQuint);
                         break;
                 }
+
+                StateChanged?.Invoke(State);
             }
         }
 

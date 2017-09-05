@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Menu
     /// </summary>
     public class Button : BeatSyncedContainer, IStateful<ButtonState>
     {
+        public event Action<ButtonState> StateChanged;
+
         private readonly Container iconText;
         private readonly Container box;
         private readonly Box boxHoverLayer;
@@ -266,6 +268,8 @@ namespace osu.Game.Screens.Menu
                         this.FadeOut(explode_duration / 4f * 3);
                         break;
                 }
+
+                StateChanged?.Invoke(State);
             }
         }
     }

@@ -230,13 +230,13 @@ namespace osu.Game
             var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
             foreach (var overlay in singleDisplayOverlays)
             {
-                overlay.StateChanged += (container, state) =>
+                overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
 
                     foreach (var c in singleDisplayOverlays)
                     {
-                        if (c == container) continue;
+                        if (c == overlay) continue;
                         c.State = Visibility.Hidden;
                     }
                 };

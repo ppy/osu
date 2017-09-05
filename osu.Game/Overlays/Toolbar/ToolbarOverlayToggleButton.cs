@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Toolbar
                 stateContainer.StateChanged -= stateChanged;
         }
 
-        private void stateChanged(VisibilityContainer c, Visibility state)
+        private void stateChanged(Visibility state)
         {
             switch (state)
             {
