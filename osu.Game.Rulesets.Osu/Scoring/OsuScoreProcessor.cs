@@ -110,8 +110,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
             }
 
             calculateScore();
-
-            calculateScore();
         }
 
         private void calculateScore()
