@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using osu.Framework;
 using osu.Framework.Graphics;
@@ -35,6 +36,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
+            public event Action<Visibility> StateChanged;
+
             public readonly SpriteIcon Chevron;
 
             //don't allow clicking between transitions and don't make the chevron clickable
@@ -42,6 +45,7 @@ namespace osu.Game.Graphics.UserInterface
             public override bool HandleInput => State == Visibility.Visible;
 
             private Visibility state;
+
             public Visibility State
             {
                 get { return state; }
@@ -62,6 +66,8 @@ namespace osu.Game.Graphics.UserInterface
                         this.FadeOut(transition_duration, Easing.OutQuint);
                         this.ScaleTo(new Vector2(0.8f, 1f), transition_duration, Easing.OutQuint);
                     }
+
+                    StateChanged?.Invoke(State);
                 }
             }
 
