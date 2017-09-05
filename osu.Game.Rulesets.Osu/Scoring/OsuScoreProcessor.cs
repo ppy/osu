@@ -44,13 +44,16 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             foreach (var h in beatmap.HitObjects)
             {
-                // TODO: add support for other object types.
-                AddJudgement(new OsuJudgement
+                if (h != null)
                 {
-                    MaxScore = OsuScoreResult.Hit300,
-                    Score = OsuScoreResult.Hit300,
-                    Result = HitResult.Hit
-                });
+                    // TODO: add support for other object types.
+                    AddJudgement(new OsuJudgement
+                    {
+                        MaxScore = OsuScoreResult.Hit300,
+                        Score = OsuScoreResult.Hit300,
+                        Result = HitResult.Hit
+                    });
+                }
             }
         }
 
