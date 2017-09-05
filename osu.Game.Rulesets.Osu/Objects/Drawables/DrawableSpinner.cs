@@ -129,26 +129,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered && Time.Current >= spinner.EndTime)
             {
                 if (Progress >= 1)
-                {
-                    Judgement.Score = OsuScoreResult.Hit300;
-                    Judgement.Result = HitResult.Hit;
-                }
+                    Judgement.Result = HitResult.Great;
                 else if (Progress > .9)
-                {
-                    Judgement.Score = OsuScoreResult.Hit100;
-                    Judgement.Result = HitResult.Hit;
-                }
+                    Judgement.Result = HitResult.Good;
                 else if (Progress > .75)
-                {
-                    Judgement.Score = OsuScoreResult.Hit50;
-                    Judgement.Result = HitResult.Hit;
-                }
-                else
-                {
-                    Judgement.Score = OsuScoreResult.Miss;
-                    if (Time.Current >= spinner.EndTime)
-                        Judgement.Result = HitResult.Miss;
-                }
+                    Judgement.Result = HitResult.Meh;
+                else if (Time.Current >= spinner.EndTime)
+                    Judgement.Result = HitResult.Miss;
             }
         }
 

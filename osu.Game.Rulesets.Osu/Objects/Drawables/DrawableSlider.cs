@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             bouncer2.Position = slider.Curve.PositionAt(body.SnakedEnd ?? 0);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (initialCircle.Judgement?.Result != HitResult.Hit)
+            if (initialCircle.Judgement?.Result <= HitResult.Miss)
                 initialCircle.Position = slider.Curve.PositionAt(progress);
 
             foreach (var c in components) c.UpdateProgress(progress, repeat);
@@ -126,21 +126,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
                 var ticksCount = ticks.Children.Count + 1;
-                var ticksHit = ticks.Children.Count(t => t.Judgement.Result == HitResult.Hit);
-                if (initialCircle.Judgement.Result == HitResult.Hit)
+                var ticksHit = ticks.Children.Count(t => t.Judgement.Result > HitResult.Miss);
+                if (initialCircle.Judgement.Result > HitResult.Miss)
                     ticksHit++;
 
                 var hitFraction = (double)ticksHit / ticksCount;
-                if (hitFraction == 1 && initialCircle.Judgement.Score == OsuScoreResult.Hit300)
-                    Judgement.Score = OsuScoreResult.Hit300;
-                else if (hitFraction >= 0.5 && initialCircle.Judgement.Score >= OsuScoreResult.Hit100)
-                    Judgement.Score = OsuScoreResult.Hit100;
+                if (hitFraction == 1 && initialCircle.Judgement.Result == HitResult.Great)
+                    Judgement.Result = HitResult.Great;
+                else if (hitFraction >= 0.5 && initialCircle.Judgement.Result >= HitResult.Good)
+                    Judgement.Result = HitResult.Good;
                 else if (hitFraction > 0)
-                    Judgement.Score = OsuScoreResult.Hit50;
+                    Judgement.Result = HitResult.Meh;
                 else
-                    Judgement.Score = OsuScoreResult.Miss;
-
-                Judgement.Result = Judgement.Score != OsuScoreResult.Miss ? HitResult.Hit : HitResult.Miss;
+                    Judgement.Result = HitResult.Miss;
             }
         }
 

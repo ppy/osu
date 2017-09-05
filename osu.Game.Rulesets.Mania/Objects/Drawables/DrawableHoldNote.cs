@@ -192,7 +192,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Y = 0;
             }
 
-            protected override ManiaJudgement CreateJudgement() => new HoldNoteTailJudgement();
+            protected ManiaJudgement CreateJudgement() => new HoldNoteTailJudgement();
 
             protected override void CheckJudgement(bool userTriggered)
             {

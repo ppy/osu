@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
@@ -153,10 +152,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (userHits == HitObject.RequiredHits)
-                {
-                    Judgement.Result = HitResult.Hit;
-                    Judgement.TaikoResult = TaikoHitResult.Great;
-                }
+                    Judgement.Result = HitResult.Great;
             }
             else
             {
@@ -165,10 +161,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 //TODO: THIS IS SHIT AND CAN'T EXIST POST-TAIKO WORLD CUP
                 if (userHits > HitObject.RequiredHits / 2)
-                {
-                    Judgement.Result = HitResult.Hit;
-                    Judgement.TaikoResult = TaikoHitResult.Good;
-                }
+                    Judgement.Result = HitResult.Good;
                 else
                     Judgement.Result = HitResult.Miss;
             }

@@ -29,28 +29,19 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             switch (Judgement.Result)
             {
-                case HitResult.Hit:
-                    switch (Judgement.TaikoResult)
-                    {
-                        case TaikoHitResult.Good:
-                            Colour = colours.GreenLight;
-                            break;
-                        case TaikoHitResult.Great:
-                            Colour = colours.BlueLight;
-                            break;
-                    }
+                case HitResult.Good:
+                    Colour = colours.GreenLight;
+                    break;
+                case HitResult.Great:
+                    Colour = colours.BlueLight;
                     break;
             }
         }
 
         protected override void LoadComplete()
         {
-            switch (Judgement.Result)
-            {
-                case HitResult.Hit:
-                    this.MoveToY(-100, 500);
-                    break;
-            }
+            if (Judgement.IsHit)
+                this.MoveToY(-100, 500);
 
             base.LoadComplete();
         }

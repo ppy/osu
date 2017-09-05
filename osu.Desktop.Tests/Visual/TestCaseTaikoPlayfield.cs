@@ -128,7 +128,7 @@ namespace osu.Desktop.Tests.Visual
 
         private void addHitJudgement(bool kiai)
         {
-            TaikoHitResult hitResult = RNG.Next(2) == 0 ? TaikoHitResult.Good : TaikoHitResult.Great;
+            HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
 
             var cpi = new ControlPointInfo();
             cpi.EffectPoints.Add(new EffectControlPoint
@@ -141,11 +141,10 @@ namespace osu.Desktop.Tests.Visual
 
             var h = new DrawableTestHit(hit)
             {
-                X = RNG.NextSingle(hitResult == TaikoHitResult.Good ? -0.1f : -0.05f, hitResult == TaikoHitResult.Good ? 0.1f : 0.05f),
+                X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f),
                 Judgement = new TaikoJudgement
                 {
-                    Result = HitResult.Hit,
-                    TaikoResult = hitResult,
+                    Result = hitResult,
                     TimeOffset = 0
                 }
             };
@@ -237,7 +236,7 @@ namespace osu.Desktop.Tests.Visual
             {
             }
 
-            protected override TaikoJudgement CreateJudgement() => new TaikoJudgement();
+            protected TaikoJudgement CreateJudgement() => new TaikoJudgement();
 
             protected override void UpdateState(ArmedState state)
             {

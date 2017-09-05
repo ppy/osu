@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override ManiaJudgement CreateJudgement() => new HoldNoteTickJudgement();
+        protected ManiaJudgement CreateJudgement() => new HoldNoteTickJudgement();
 
         protected override void CheckJudgement(bool userTriggered)
         {
@@ -93,8 +93,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (HoldStartTime?.Invoke() > HitObject.StartTime)
                 return;
 
-            Judgement.ManiaResult = ManiaHitResult.Perfect;
-            Judgement.Result = HitResult.Hit;
+            Judgement.Result = HitResult.Perfect;
         }
 
         protected override void UpdateState(ArmedState state)

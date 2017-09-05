@@ -36,12 +36,12 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         private const double combo_base = 4;
 
         /// <summary>
-        /// The HP awarded by a <see cref="TaikoHitResult.Great"/> hit.
+        /// The HP awarded by a <see cref="HitResult.Great"/> hit.
         /// </summary>
         private const double hp_hit_great = 0.03;
 
         /// <summary>
-        /// The HP awarded for a <see cref="TaikoHitResult.Good"/> hit.
+        /// The HP awarded for a <see cref="HitResult.Good"/> hit.
         /// </summary>
         private const double hp_hit_good = 0.011;
 
@@ -140,8 +140,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                 {
                     AddJudgement(new TaikoJudgement
                     {
-                        Result = HitResult.Hit,
-                        TaikoResult = TaikoHitResult.Great,
+                        Result = HitResult.Great,
                         SecondHit = obj.IsStrong
                     });
                 }
@@ -151,26 +150,20 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                     {
                         AddJudgement(new TaikoDrumRollTickJudgement
                         {
-                            Result = HitResult.Hit,
-                            TaikoResult = TaikoHitResult.Great,
+                            Result = HitResult.Great,
                             SecondHit = obj.IsStrong
                         });
                     }
 
                     AddJudgement(new TaikoJudgement
                     {
-                        Result = HitResult.Hit,
-                        TaikoResult = TaikoHitResult.Great,
+                        Result = HitResult.Great,
                         SecondHit = obj.IsStrong
                     });
                 }
                 else if (obj is Swell)
                 {
-                    AddJudgement(new TaikoJudgement
-                    {
-                        Result = HitResult.Hit,
-                        TaikoResult = TaikoHitResult.Great
-                    });
+                    AddJudgement(new TaikoJudgement { Result = HitResult.Great });
                 }
             }
 
@@ -197,19 +190,14 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                     if (!isTick)
                         Health.Value += hpIncreaseMiss;
                     break;
-                case HitResult.Hit:
-                    switch (judgement.TaikoResult)
-                    {
-                        case TaikoHitResult.Good:
-                            Health.Value += hpIncreaseGood;
-                            break;
-                        case TaikoHitResult.Great:
-                            if (isTick)
-                                Health.Value += hpIncreaseTick;
-                            else
-                                Health.Value += hpIncreaseGreat;
-                            break;
-                    }
+                case HitResult.Good:
+                    Health.Value += hpIncreaseGood;
+                    break;
+                case HitResult.Great:
+                    if (isTick)
+                        Health.Value += hpIncreaseTick;
+                    else
+                        Health.Value += hpIncreaseGreat;
                     break;
             }
 
@@ -226,10 +214,10 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
         private void addHitScore(TaikoJudgement judgement)
         {
-            if (judgement.Result != HitResult.Hit)
+            if (!judgement.IsHit)
                 return;
 
-            double baseValue = judgement.ResultValueForScore;
+            double baseValue = judgement.NumericResult;
 
             // Add increased score for hitting a strong hit object with the second key
             if (judgement.SecondHit)
@@ -255,7 +243,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
             foreach (var j in Judgements)
             {
-                scoreForAccuracy += j.ResultValueForAccuracy;
+                scoreForAccuracy += j.ResultNumericForAccuracy;
                 maxScoreForAccuracy += j.MaxResultValueForAccuracy;
             }
 

@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Alpha = 0;
         }
 
-        protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.Hit300 };
-
         protected sealed override void UpdateState(ArmedState state)
         {
             FinishTransforms();
@@ -64,19 +62,5 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         Good,
         [Description(@"Amazing")]
         Perfect
-    }
-
-    public enum OsuScoreResult
-    {
-        [Description(@"Miss")]
-        Miss,
-        [Description(@"50")]
-        Hit50,
-        [Description(@"100")]
-        Hit100,
-        [Description(@"300")]
-        Hit300,
-        [Description(@"10")]
-        SliderTick
     }
 }

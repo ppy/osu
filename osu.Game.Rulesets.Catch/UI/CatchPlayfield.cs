@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private void Fruit_OnJudgement(DrawableHitObject<CatchBaseHit, CatchJudgement> obj)
         {
-            if (obj.Judgement.Result == HitResult.Hit)
+            if (obj.Judgement.Result > HitResult.Miss)
             {
                 Vector2 screenPosition = obj.ScreenSpaceDrawQuad.Centre;
                 Remove(obj);

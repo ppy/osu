@@ -181,10 +181,12 @@ namespace osu.Game.Rulesets.Scoring
                 {
                     switch (judgement.Result)
                     {
+                        case HitResult.None:
+                            break;
                         case HitResult.Miss:
                             Combo.Value = 0;
                             break;
-                        case HitResult.Hit:
+                        default:
                             Combo.Value++;
                             break;
                     }
