@@ -268,6 +268,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             base.Reset();
 
             Health.Value = 0;
+            Accuracy.Value = 1;
 
             bonusScore = 0;
             comboPortion = 0;
