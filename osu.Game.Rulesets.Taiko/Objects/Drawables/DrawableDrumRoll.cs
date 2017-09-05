@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override TaikoJudgement CreateJudgement() => new TaikoJudgement { SecondHit = HitObject.IsStrong };
+        protected TaikoJudgement CreateJudgement() => new TaikoJudgement { SecondHit = HitObject.IsStrong };
 
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
 
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
         {
-            if (obj.Judgement.Result == HitResult.Hit)
+            if (obj.Judgement.Result > HitResult.Miss)
                 rollingHits++;
             else
                 rollingHits--;
@@ -86,12 +86,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (Judgement.TimeOffset < 0)
                 return;
 
-            int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
+            int countHit = NestedHitObjects.Count(o => o.Judgement.Result > HitResult.Miss);
 
             if (countHit > HitObject.RequiredGoodHits)
             {
-                Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = countHit >= HitObject.RequiredGreatHits ? TaikoHitResult.Great : TaikoHitResult.Good;
+                Judgement.Result = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good;
             }
             else
                 Judgement.Result = HitResult.Miss;

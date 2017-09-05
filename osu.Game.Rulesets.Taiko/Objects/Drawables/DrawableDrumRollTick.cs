@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Filled = HitObject.FirstTick
         };
 
-        protected override TaikoJudgement CreateJudgement() => new TaikoDrumRollTickJudgement { SecondHit = HitObject.IsStrong };
+        protected TaikoJudgement CreateJudgement() => new TaikoDrumRollTickJudgement { SecondHit = HitObject.IsStrong };
 
         protected override void CheckJudgement(bool userTriggered)
         {
@@ -42,10 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             if (Math.Abs(Judgement.TimeOffset) < HitObject.HitWindow)
-            {
-                Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = TaikoHitResult.Great;
-            }
+                Judgement.Result = HitResult.Great;
         }
 
         protected override void UpdateState(ArmedState state)

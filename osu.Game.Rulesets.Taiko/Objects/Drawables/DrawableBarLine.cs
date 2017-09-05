@@ -58,8 +58,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             };
         }
 
-        protected override TaikoJudgement CreateJudgement() => null;
-
         protected override void UpdateState(ArmedState state)
         {
         }

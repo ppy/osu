@@ -7,8 +7,6 @@ namespace osu.Game.Rulesets.Catch.Judgements
 {
     public class CatchJudgement : Judgement
     {
-        public override string ResultString => string.Empty;
-
-        public override string MaxResultString => string.Empty;
+        // todo: wangs
     }
 }

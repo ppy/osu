@@ -178,10 +178,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 channel.Volume.Value = sample.Volume;
                 Samples.Add(channel);
             }
-
-            //we may be setting a custom judgement in test cases or what not.
-            if (Judgement == null)
-                Judgement = CreateJudgement();
         }
 
         private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
@@ -196,7 +192,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             nestedHitObjects.Add(h);
         }
 
-        protected abstract TJudgement CreateJudgement();
         protected abstract void UpdateState(ArmedState state);
     }
 }

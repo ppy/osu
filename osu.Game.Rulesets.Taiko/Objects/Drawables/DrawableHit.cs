@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -45,10 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!validKeyPressed)
                 Judgement.Result = HitResult.Miss;
             else if (hitOffset < HitObject.HitWindowGood)
-            {
-                Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = hitOffset < HitObject.HitWindowGreat ? TaikoHitResult.Great : TaikoHitResult.Good;
-            }
+                Judgement.Result = hitOffset < HitObject.HitWindowGreat ? HitResult.Great : HitResult.Good;
             else
                 Judgement.Result = HitResult.Miss;
         }

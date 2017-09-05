@@ -36,7 +36,5 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 base.AccentColour = value;
             }
         }
-
-        protected override ManiaJudgement CreateJudgement() => new ManiaJudgement();
     }
 }

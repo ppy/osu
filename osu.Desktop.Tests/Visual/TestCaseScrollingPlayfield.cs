@@ -185,7 +185,7 @@ namespace osu.Desktop.Tests.Visual
                 });
             }
 
-            protected override TestJudgement CreateJudgement() => new TestJudgement();
+            protected TestJudgement CreateJudgement() => new TestJudgement();
 
             protected override void UpdateState(ArmedState state)
             {
@@ -221,8 +221,6 @@ namespace osu.Desktop.Tests.Visual
 
         private class TestJudgement : Judgement
         {
-            public override string ResultString { get { throw new NotImplementedException(); } }
-            public override string MaxResultString { get { throw new NotImplementedException(); } }
         }
     }
 }

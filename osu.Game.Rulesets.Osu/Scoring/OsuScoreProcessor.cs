@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private int totalAccurateJudgements;
 
-        private readonly Dictionary<OsuScoreResult, int> scoreResultCounts = new Dictionary<OsuScoreResult, int>();
+        private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
         private readonly Dictionary<ComboResult, int> comboResultCounts = new Dictionary<ComboResult, int>();
 
         private double comboMaxScore;
@@ -45,12 +45,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             foreach (var h in beatmap.HitObjects)
             {
                 // TODO: add support for other object types.
-                AddJudgement(new OsuJudgement
-                {
-                    MaxScore = OsuScoreResult.Hit300,
-                    Score = OsuScoreResult.Hit300,
-                    Result = HitResult.Hit
-                });
+                AddJudgement(new OsuJudgement { Result = HitResult.Great });
             }
         }
 
@@ -69,10 +64,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             base.PopulateScore(score);
 
-            score.Statistics[@"300"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit300);
-            score.Statistics[@"100"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit100);
-            score.Statistics[@"50"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit50);
-            score.Statistics[@"x"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Miss);
+            score.Statistics[@"300"] = scoreResultCounts.GetOrDefault(HitResult.Great);
+            score.Statistics[@"100"] = scoreResultCounts.GetOrDefault(HitResult.Good);
+            score.Statistics[@"50"] = scoreResultCounts.GetOrDefault(HitResult.Meh);
+            score.Statistics[@"x"] = scoreResultCounts.GetOrDefault(HitResult.Miss);
         }
 
         protected override void OnNewJudgement(OsuJudgement judgement)
@@ -81,29 +76,29 @@ namespace osu.Game.Rulesets.Osu.Scoring
             {
                 if (judgement.Result != HitResult.None)
                 {
-                    scoreResultCounts[judgement.Score] = scoreResultCounts.GetOrDefault(judgement.Score) + 1;
+                    scoreResultCounts[judgement.Result] = scoreResultCounts.GetOrDefault(judgement.Result) + 1;
                     comboResultCounts[judgement.Combo] = comboResultCounts.GetOrDefault(judgement.Combo) + 1;
                 }
 
-                switch (judgement.Score)
+                switch (judgement.Result)
                 {
-                    case OsuScoreResult.Hit300:
+                    case HitResult.Great:
                         Health.Value += (10.2 - hpDrainRate) * 0.02;
                         break;
 
-                    case OsuScoreResult.Hit100:
+                    case HitResult.Good:
                         Health.Value += (8 - hpDrainRate) * 0.02;
                         break;
 
-                    case OsuScoreResult.Hit50:
+                    case HitResult.Meh:
                         Health.Value += (4 - hpDrainRate) * 0.02;
                         break;
 
-                    case OsuScoreResult.SliderTick:
+                    /*case HitResult.SliderTick:
                         Health.Value += Math.Max(7 - hpDrainRate, 0) * 0.01;
-                        break;
+                        break;*/
 
-                    case OsuScoreResult.Miss:
+                    case HitResult.Miss:
                         Health.Value -= hpDrainRate * 0.04;
                         break;
                 }
@@ -123,10 +118,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             foreach (var j in Judgements)
             {
-                baseScore += j.ScoreValue;
-                baseMaxScore += j.MaxScoreValue;
+                baseScore += j.NumericResult;
+                baseMaxScore += j.MaxNumericResult;
 
-                comboScore += j.ScoreValue * (1 + Combo.Value / 10d);
+                comboScore += j.NumericResult * (1 + Combo.Value / 10d);
             }
 
             Accuracy.Value = (double)baseScore / baseMaxScore;

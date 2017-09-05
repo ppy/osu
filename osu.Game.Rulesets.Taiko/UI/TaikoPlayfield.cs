@@ -220,7 +220,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> judgedObject)
         {
-            bool wasHit = judgedObject.Judgement.Result == HitResult.Hit;
+            bool wasHit = judgedObject.Judgement.Result > HitResult.Miss;
             bool secondHit = judgedObject.Judgement.SecondHit;
 
             judgementContainer.Add(new DrawableTaikoJudgement(judgedObject.Judgement)

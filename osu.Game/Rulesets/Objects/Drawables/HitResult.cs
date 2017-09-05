@@ -10,17 +10,34 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Indicates that the object has not been judged yet.
         /// </summary>
-        [Description("")]
+        [Description(@"")]
         None,
+
         /// <summary>
         /// Indicates that the object has been judged as a miss.
         /// </summary>
         [Description(@"Miss")]
         Miss,
+
+        [Description(@"Meh")]
+        Meh,
+
         /// <summary>
-        /// Indicates that the object has been judged as a hit.
+        /// Optional judgement.
         /// </summary>
-        [Description(@"Hit")]
-        Hit,
+        [Description(@"OK")]
+        Ok,
+
+        [Description(@"Good")]
+        Good,
+
+        [Description(@"Great")]
+        Great,
+
+        /// <summary>
+        /// Optional judgement.
+        /// </summary>
+        [Description(@"Perfect")]
+        Perfect,
     }
 }

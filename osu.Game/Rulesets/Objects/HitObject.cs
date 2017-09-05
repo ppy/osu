@@ -1,9 +1,11 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects
@@ -29,6 +31,10 @@ namespace osu.Game.Rulesets.Objects
         /// </para>
         /// </summary>
         public SampleInfoList Samples = new SampleInfoList();
+
+        public virtual IEnumerable<Judgement> CreateJudgements() => new[] { new Judgement() };
+
+        public readonly List<HitObject> Children = new List<HitObject>();
 
         /// <summary>
         /// Applies default values to this HitObject.

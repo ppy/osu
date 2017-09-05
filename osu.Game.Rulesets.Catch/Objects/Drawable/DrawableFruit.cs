@@ -98,14 +98,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             };
         }
 
-        protected override CatchJudgement CreateJudgement() => new CatchJudgement();
-
         private const float preempt = 1000;
 
         protected override void CheckJudgement(bool userTriggered)
         {
             if (Judgement.TimeOffset > 0)
-                Judgement.Result = CheckPosition?.Invoke(HitObject) ?? false ? HitResult.Hit : HitResult.Miss;
+                Judgement.Result = CheckPosition?.Invoke(HitObject) ?? false ? HitResult.Perfect : HitResult.Miss;
         }
 
         protected override void UpdateState(ArmedState state)

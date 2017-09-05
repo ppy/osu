@@ -69,20 +69,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HitObject.HitWindowFor(OsuScoreResult.Hit50))
+                if (Judgement.TimeOffset > HitObject.HitWindowFor(HitResult.Meh))
                     Judgement.Result = HitResult.Miss;
                 return;
             }
 
-            double hitOffset = Math.Abs(Judgement.TimeOffset);
-
-            if (hitOffset < HitObject.HitWindowFor(OsuScoreResult.Hit50))
-            {
-                Judgement.Result = HitResult.Hit;
-                Judgement.Score = HitObject.ScoreResultForOffset(hitOffset);
-            }
-            else
-                Judgement.Result = HitResult.Miss;
+            Judgement.Result = HitObject.ScoreResultForOffset(Math.Abs(Judgement.TimeOffset));
         }
 
         protected override void UpdateInitialState()

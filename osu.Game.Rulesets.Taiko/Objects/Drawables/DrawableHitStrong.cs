@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
         }
 
-        protected override TaikoJudgement CreateJudgement() => new TaikoStrongHitJudgement();
+        protected TaikoJudgement CreateJudgement() => new TaikoStrongHitJudgement();
 
         protected override void CheckJudgement(bool userTriggered)
         {

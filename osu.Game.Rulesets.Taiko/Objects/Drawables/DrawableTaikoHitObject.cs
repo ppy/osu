@@ -37,8 +37,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.KiaiMode = HitObject.Kiai;
         }
 
-        protected override TaikoJudgement CreateJudgement() => new TaikoJudgement();
-
         protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
 
         public abstract bool OnPressed(TaikoAction action);
