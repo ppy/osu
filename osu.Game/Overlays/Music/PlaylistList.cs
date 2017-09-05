@@ -59,8 +59,6 @@ namespace osu.Game.Overlays.Music
             private readonly SearchContainer search;
             private readonly FillFlowContainer<PlaylistItem> items;
 
-            private PlaylistItem draggedItem;
-
             public ItemsScrollContainer()
             {
                 Children = new Drawable[]
@@ -127,14 +125,19 @@ namespace osu.Game.Overlays.Music
             public BeatmapSetInfo NextSet => (items.SkipWhile(i => !i.Selected).Skip(1).FirstOrDefault() ?? items.FirstOrDefault())?.BeatmapSetInfo;
             public BeatmapSetInfo PreviousSet => (items.TakeWhile(i => !i.Selected).LastOrDefault() ?? items.LastOrDefault())?.BeatmapSetInfo;
 
+            private InputState dragInputState;
+            private PlaylistItem draggedItem;
+
             protected override bool OnDragStart(InputState state)
             {
+                dragInputState = state;
                 draggedItem = items.FirstOrDefault(d => d.IsDraggable);
                 return draggedItem != null || base.OnDragStart(state);
             }
 
             protected override bool OnDrag(InputState state)
             {
+                dragInputState = state;
                 if (draggedItem == null)
                     return base.OnDrag(state);
                 return true;
@@ -142,6 +145,7 @@ namespace osu.Game.Overlays.Music
 
             protected override bool OnDragEnd(InputState state)
             {
+                dragInputState = state;
                 var handled = draggedItem != null || base.OnDragEnd(state);
                 draggedItem = null;
 
@@ -155,19 +159,17 @@ namespace osu.Game.Overlays.Music
                 if (draggedItem == null)
                     return;
 
-                var mouseState = GetContainingInputManager().CurrentState.Mouse;
-
-                updateScrollPosition(mouseState);
-                updateDragPosition(mouseState);
+                updateScrollPosition();
+                updateDragPosition();
             }
 
-            private void updateScrollPosition(IMouseState mouseState)
+            private void updateScrollPosition()
             {
                 const float start_offset = 10;
                 const double max_power = 50;
                 const double exp_base = 1.05;
 
-                var localPos = ToLocalSpace(mouseState.Position);
+                var localPos = ToLocalSpace(dragInputState.Mouse.NativeState.Position);
 
                 if (localPos.Y < start_offset)
                 {
@@ -187,9 +189,9 @@ namespace osu.Game.Overlays.Music
                 }
             }
 
-            private void updateDragPosition(IMouseState mouseState)
+            private void updateDragPosition()
             {
-                var itemsPos = items.ToLocalSpace(mouseState.Position);
+                var itemsPos = items.ToLocalSpace(dragInputState.Mouse.NativeState.Position);
 
                 int srcIndex = (int)draggedItem.Depth;
 
