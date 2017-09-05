@@ -33,19 +33,16 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapSetHeader Header;
 
-        private BeatmapGroupState state;
-
         public List<BeatmapPanel> BeatmapPanels;
 
         public BeatmapSetInfo BeatmapSet;
 
+        private BeatmapGroupState state;
         public BeatmapGroupState State
         {
             get { return state; }
             set
             {
-                if (state == value)
-                    return;
                 state = value;
 
                 switch (value)
@@ -96,6 +93,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             Header.AddDifficultyIcons(BeatmapPanels);
         }
+
 
         private void headerGainedSelection(BeatmapSetHeader panel)
         {
