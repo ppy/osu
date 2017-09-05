@@ -23,6 +23,13 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
+        private float hpDrainRate;
+
+        protected override void ComputeTargets(Game.Beatmaps.Beatmap<OsuHitObject> beatmap)
+        {
+            hpDrainRate = beatmap.BeatmapInfo.Difficulty.DrainRate;
+        }
+
         protected override void Reset()
         {
             base.Reset();
@@ -56,14 +63,26 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     scoreResultCounts[judgement.Score] = scoreResultCounts.GetOrDefault(judgement.Score) + 1;
                     comboResultCounts[judgement.Combo] = comboResultCounts.GetOrDefault(judgement.Combo) + 1;
                 }
-
-                switch (judgement.Result)
+                switch (judgement.Score)
                 {
-                    case HitResult.Hit:
-                        Health.Value += 0.1f;
+                    case OsuScoreResult.Hit300:
+                        Health.Value += (10.2 - hpDrainRate) * 0.02;
                         break;
-                    case HitResult.Miss:
-                        Health.Value -= 0.2f;
+
+                    case OsuScoreResult.Hit100:
+                        Health.Value += (8 - hpDrainRate) * 0.02;
+                        break;
+
+                    case OsuScoreResult.Hit50:
+                        Health.Value += (4 - hpDrainRate) * 0.02;
+                        break;
+
+                    case OsuScoreResult.SliderTick:
+                        Health.Value += System.Math.Max(7 - hpDrainRate, 0) * 0.01;
+                        break;
+
+                    case OsuScoreResult.Miss:
+                        Health.Value -= hpDrainRate * 0.04;
                         break;
                 }
             }
