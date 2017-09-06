@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Chat
                 SelectTab(item);
         }
 
-        protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value) { OnRequestClose = onTabClose };
+        protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
 
         protected override void SelectTab(TabItem<Channel> tab)
         {
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Chat
             base.SelectTab(tab);
         }
 
-        private void onTabClose(TabItem<Channel> tab)
+        private void tabCloseRequested(TabItem<Channel> tab)
         {
             int totalTabs = TabContainer.Count - 1; // account for selectorTab
             int currentIndex = MathHelper.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);
