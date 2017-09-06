@@ -14,14 +14,17 @@ namespace osu.Game.Graphics.UserInterface
         private const int fade_duration = 250;
 
         public OsuContextMenu()
+            : base(Direction.Vertical)
         {
-            CornerRadius = 5;
-            EdgeEffect = new EdgeEffectParameters
+            MaskingContainer.CornerRadius = 5;
+            MaskingContainer.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Shadow,
                 Colour = Color4.Black.Opacity(0.1f),
                 Radius = 4,
             };
+
+            ItemsContainer.Padding = new MarginPadding { Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL };
         }
 
         [BackgroundDependencyLoader]
@@ -32,7 +35,5 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void AnimateOpen() => this.FadeIn(fade_duration, Easing.OutQuint);
         protected override void AnimateClose() => this.FadeOut(fade_duration, Easing.OutQuint);
-
-        protected override MarginPadding ItemFlowContainerPadding => new MarginPadding { Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL };
     }
 }

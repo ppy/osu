@@ -52,6 +52,8 @@ namespace osu.Game.Beatmaps
         [JsonProperty("file_sha2")]
         public string Hash { get; set; }
 
+        public bool Hidden { get; set; }
+
         /// <summary>
         /// MD5 is kept for legacy support (matching against replays, osu-web-10 etc.).
         /// </summary>

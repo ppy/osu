@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -16,7 +17,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Music
 {
-    internal class PlaylistItem : Container, IFilterable
+    internal class PlaylistItem : Container, IFilterable, IDraggable
     {
         private const float fade_duration = 100;
 
@@ -32,6 +33,8 @@ namespace osu.Game.Overlays.Music
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
         public Action<BeatmapSetInfo> OnSelect;
+
+        public bool IsDraggable => handle.IsHovered;
 
         private bool selected;
         public bool Selected
@@ -68,15 +71,9 @@ namespace osu.Game.Overlays.Music
 
             Children = new Drawable[]
             {
-                handle = new SpriteIcon
+                handle = new PlaylistItemHandle
                 {
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
-                    Size = new Vector2(12),
-                    Colour = colours.Gray5,
-                    Icon = FontAwesome.fa_bars,
-                    Alpha = 0f,
-                    Margin = new MarginPadding { Left = 5, Top = 2 },
+                    Colour = colours.Gray5
                 },
                 text = new OsuTextFlowContainer
                 {
@@ -114,19 +111,19 @@ namespace osu.Game.Overlays.Music
             });
         }
 
-        protected override bool OnHover(Framework.Input.InputState state)
+        protected override bool OnHover(InputState state)
         {
             handle.FadeIn(fade_duration);
 
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(Framework.Input.InputState state)
+        protected override void OnHoverLost(InputState state)
         {
             handle.FadeOut(fade_duration);
         }
 
-        protected override bool OnClick(Framework.Input.InputState state)
+        protected override bool OnClick(InputState state)
         {
             OnSelect?.Invoke(BeatmapSetInfo);
             return true;
@@ -148,5 +145,27 @@ namespace osu.Game.Overlays.Music
                 this.FadeTo(matching ? 1 : 0, 200);
             }
         }
+
+        private class PlaylistItemHandle : SpriteIcon
+        {
+
+            public PlaylistItemHandle()
+            {
+                Anchor = Anchor.TopLeft;
+                Origin = Anchor.TopLeft;
+                Size = new Vector2(12);
+                Icon = FontAwesome.fa_bars;
+                Alpha = 0f;
+                Margin = new MarginPadding { Left = 5, Top = 2 };
+            }
+        }
+    }
+
+    public interface IDraggable : IDrawable
+    {
+        /// <summary>
+        /// Whether this <see cref="IDraggable"/> can be dragged in its current state.
+        /// </summary>
+        bool IsDraggable { get; }
     }
 }
