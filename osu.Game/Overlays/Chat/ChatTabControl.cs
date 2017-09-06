@@ -62,13 +62,7 @@ namespace osu.Game.Overlays.Chat
                 SelectTab(item);
         }
 
-        protected override TabItem<Channel> CreateTabItem(Channel value)
-        {
-            ChannelTabItem tab = new ChannelTabItem(value);
-            tab.OnRequestClose = () => onTabClose(tab);
-
-            return tab;
-        }
+        protected override TabItem<Channel> CreateTabItem(Channel value) => new ChannelTabItem(value) { OnRequestClose = onTabClose };
 
         protected override void SelectTab(TabItem<Channel> tab)
         {
@@ -113,7 +107,7 @@ namespace osu.Game.Overlays.Chat
             private readonly Box highlightBox;
             private readonly SpriteIcon icon;
 
-            public Action OnRequestClose;
+            public Action<ChannelTabItem> OnRequestClose;
 
             private void updateState()
             {
@@ -257,7 +251,7 @@ namespace osu.Game.Overlays.Chat
                                 Anchor = Anchor.CentreRight,
                                 Action = delegate
                                 {
-                                    if (IsRemovable) OnRequestClose?.Invoke();
+                                    if (IsRemovable) OnRequestClose?.Invoke(this);
                                 },
                             },
                         },
