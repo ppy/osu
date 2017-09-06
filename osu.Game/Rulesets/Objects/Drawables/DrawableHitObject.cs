@@ -33,23 +33,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
     public abstract class DrawableHitObject<TObject> : DrawableHitObject
         where TObject : HitObject
     {
-        public new readonly TObject HitObject;
-
-        protected DrawableHitObject(TObject hitObject)
-            : base(hitObject)
-        {
-            HitObject = hitObject;
-        }
-    }
-
-    public abstract class DrawableHitObject<TObject, TJudgement> : DrawableHitObject<TObject>
-        where TObject : HitObject
-        where TJudgement : Judgement
-    {
         public event Action<DrawableHitObject, Judgement> OnJudgement;
 
-        public override bool HandleInput => Interactive;
+        public new readonly TObject HitObject;
 
+        public override bool HandleInput => Interactive;
         public bool Interactive = true;
 
         /// <summary>
@@ -65,6 +53,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected DrawableHitObject(TObject hitObject)
             : base(hitObject)
         {
+            HitObject = hitObject;
         }
 
         private ArmedState state;
@@ -202,13 +191,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        private List<DrawableHitObject<TObject, TJudgement>> nestedHitObjects;
-        protected IEnumerable<DrawableHitObject<TObject, TJudgement>> NestedHitObjects => nestedHitObjects;
+        private List<DrawableHitObject<TObject>> nestedHitObjects;
+        protected IEnumerable<DrawableHitObject<TObject>> NestedHitObjects => nestedHitObjects;
 
-        protected virtual void AddNested(DrawableHitObject<TObject, TJudgement> h)
+        protected virtual void AddNested(DrawableHitObject<TObject> h)
         {
             if (nestedHitObjects == null)
-                nestedHitObjects = new List<DrawableHitObject<TObject, TJudgement>>();
+                nestedHitObjects = new List<DrawableHitObject<TObject>>();
 
             h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
             nestedHitObjects.Add(h);

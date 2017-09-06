@@ -214,14 +214,12 @@ namespace osu.Desktop.Tests.Visual
                 rulesetContainer.Playfield.Add(new DrawableRimHit(h));
         }
 
-        private class DrawableTestHit : DrawableHitObject<TaikoHitObject, TaikoJudgement>
+        private class DrawableTestHit : DrawableHitObject<TaikoHitObject>
         {
             public DrawableTestHit(TaikoHitObject hitObject)
                 : base(hitObject)
             {
             }
-
-            protected TaikoJudgement CreateJudgement() => new TaikoJudgement();
 
             protected override void UpdateState(ArmedState state)
             {

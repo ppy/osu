@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.UI;
 using OpenTK;
-using osu.Game.Rulesets.Catch.Judgements;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
@@ -13,7 +12,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchPlayfield : ScrollingPlayfield<CatchBaseHit, CatchJudgement>
+    public class CatchPlayfield : ScrollingPlayfield<CatchBaseHit>
     {
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
@@ -45,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        public override void Add(DrawableHitObject<CatchBaseHit, CatchJudgement> h)
+        public override void Add(DrawableHitObject<CatchBaseHit> h)
         {
             base.Add(h);
 

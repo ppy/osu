@@ -13,7 +13,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Scoring
 {
-    internal class ManiaScoreProcessor : ScoreProcessor<ManiaHitObject, ManiaJudgement>
+    internal class ManiaScoreProcessor : ScoreProcessor<ManiaHitObject>
     {
         /// <summary>
         /// The maximum score achievable.
@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
         {
         }
 
-        public ManiaScoreProcessor(RulesetContainer<ManiaHitObject, ManiaJudgement> rulesetContainer)
+        public ManiaScoreProcessor(RulesetContainer<ManiaHitObject> rulesetContainer)
             : base(rulesetContainer)
         {
         }

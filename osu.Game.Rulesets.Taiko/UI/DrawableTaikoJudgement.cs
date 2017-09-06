@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
@@ -13,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// <summary>
     /// Text that is shown as judgement when a hit object is hit or missed.
     /// </summary>
-    public class DrawableTaikoJudgement : DrawableJudgement<TaikoJudgement>
+    public class DrawableTaikoJudgement : DrawableJudgement
     {
         public readonly DrawableHitObject JudgedObject;
 

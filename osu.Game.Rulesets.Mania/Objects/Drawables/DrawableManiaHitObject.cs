@@ -2,12 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
-    public abstract class DrawableManiaHitObject<TObject> : DrawableScrollingHitObject<ManiaHitObject, ManiaJudgement>
+    public abstract class DrawableManiaHitObject<TObject> : DrawableScrollingHitObject<ManiaHitObject>
         where TObject : ManiaHitObject
     {
         /// <summary>

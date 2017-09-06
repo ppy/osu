@@ -16,9 +16,7 @@ namespace osu.Game.Rulesets.Judgements
     /// <summary>
     /// A drawable object which visualises the hit result of a <see cref="Judgements.Judgement"/>.
     /// </summary>
-    /// <typeparam name="TJudgement">The type of judgement to visualise.</typeparam>
-    public class DrawableJudgement<TJudgement> : Container
-        where TJudgement : Judgement
+    public class DrawableJudgement : Container
     {
         protected readonly Judgement Judgement;
 

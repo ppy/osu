@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Osu.UI.Cursor;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuPlayfield : Playfield<OsuHitObject, OsuJudgement>
+    public class OsuPlayfield : Playfield<OsuHitObject>
     {
         private readonly Container approachCircles;
         private readonly Container judgementLayer;
@@ -68,11 +68,11 @@ namespace osu.Game.Rulesets.Osu.UI
             AddInternal(new GameplayCursor());
         }
 
-        public override void Add(DrawableHitObject<OsuHitObject, OsuJudgement> h)
+        public override void Add(DrawableHitObject<OsuHitObject> h)
         {
             h.Depth = (float)h.HitObject.StartTime;
 
-            IDrawableHitObjectWithProxiedApproach c = h as IDrawableHitObjectWithProxiedApproach;
+            var c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null)
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
 

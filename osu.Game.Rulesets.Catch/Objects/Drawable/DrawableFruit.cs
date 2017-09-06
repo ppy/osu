@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
@@ -17,7 +16,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
-    public class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit, CatchJudgement>
+    public class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit>
     {
         private const float pulp_size = 30;
 

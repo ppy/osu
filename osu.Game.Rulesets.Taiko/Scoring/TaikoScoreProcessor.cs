@@ -13,7 +13,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Taiko.Scoring
 {
-    internal class TaikoScoreProcessor : ScoreProcessor<TaikoHitObject, TaikoJudgement>
+    internal class TaikoScoreProcessor : ScoreProcessor<TaikoHitObject>
     {
         /// <summary>
         /// The maximum score achievable.
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
         }
 
-        public TaikoScoreProcessor(RulesetContainer<TaikoHitObject, TaikoJudgement> rulesetContainer)
+        public TaikoScoreProcessor(RulesetContainer<TaikoHitObject> rulesetContainer)
             : base(rulesetContainer)
         {
         }

@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Graphics.Containers;
 using System;
 using osu.Game.Graphics;
@@ -21,7 +20,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ScrollingPlayfield<ManiaHitObject, ManiaJudgement>
+    public class ManiaPlayfield : ScrollingPlayfield<ManiaHitObject>
     {
         public const float HIT_TARGET_POSITION = 50;
 
@@ -203,7 +202,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
+        public override void Add(DrawableHitObject<ManiaHitObject> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
         public void Add(DrawableBarLine barline) => HitObjects.Add(barline);
 
         protected override void Update()
