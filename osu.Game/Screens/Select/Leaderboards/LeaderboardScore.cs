@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
@@ -20,6 +21,8 @@ namespace osu.Game.Screens.Select.Leaderboards
     public class LeaderboardScore : OsuClickableContainer, IStateful<Visibility>
     {
         public static readonly float HEIGHT = 60;
+
+        public event Action<Visibility> StateChanged;
 
         public readonly int RankPosition;
         public readonly Score Score;
@@ -41,11 +44,14 @@ namespace osu.Game.Screens.Select.Leaderboards
         private readonly FillFlowContainer<ScoreModIcon> modsContainer;
 
         private Visibility state;
+
         public Visibility State
         {
             get { return state; }
             set
             {
+                if (state == value)
+                    return;
                 state = value;
 
                 switch (state)
@@ -88,6 +94,8 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                         break;
                 }
+
+                StateChanged?.Invoke(State);
             }
         }
 

@@ -53,7 +53,7 @@ namespace osu.Game.Overlays
 
         private const float hidden_width = 120;
 
-        private void keyBindingOverlay_StateChanged(VisibilityContainer container, Visibility visibility)
+        private void keyBindingOverlay_StateChanged(Visibility visibility)
         {
             switch (visibility)
             {
