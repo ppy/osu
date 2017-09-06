@@ -19,11 +19,6 @@ namespace osu.Game.Rulesets.Taiko.Judgements
         public int MaxResultValueForAccuracy => NumericResultForAccuracy(HitResult.Great);
 
         /// <summary>
-        /// Whether this Judgement has a secondary hit in the case of strong hits.
-        /// </summary>
-        public virtual bool SecondHit { get; set; }
-
-        /// <summary>
         /// Computes the numeric result value for the combo portion of the score.
         /// For the accuracy portion of the score (including accuracy percentage), see <see cref="NumericResultForAccuracy(HitResult)"/>.
         /// </summary>

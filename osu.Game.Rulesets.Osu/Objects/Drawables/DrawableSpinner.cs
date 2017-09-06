@@ -11,6 +11,7 @@ using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -107,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / spinner.SpinsRequired, 0, 1);
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (Time.Current < HitObject.StartTime) return;
 
@@ -129,13 +130,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered && Time.Current >= spinner.EndTime)
             {
                 if (Progress >= 1)
-                    Judgement.Result = HitResult.Great;
+                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
                 else if (Progress > .9)
-                    Judgement.Result = HitResult.Good;
+                    AddJudgement(new OsuJudgement { Result = HitResult.Good });
                 else if (Progress > .75)
-                    Judgement.Result = HitResult.Meh;
+                    AddJudgement(new OsuJudgement { Result = HitResult.Meh });
                 else if (Time.Current >= spinner.EndTime)
-                    Judgement.Result = HitResult.Miss;
+                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
             }
         }
 

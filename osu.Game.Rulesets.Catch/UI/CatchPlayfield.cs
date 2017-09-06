@@ -8,6 +8,7 @@ using OpenTK;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.UI
@@ -53,13 +54,13 @@ namespace osu.Game.Rulesets.Catch.UI
             fruit.OnJudgement += Fruit_OnJudgement;
         }
 
-        private void Fruit_OnJudgement(DrawableHitObject<CatchBaseHit, CatchJudgement> obj)
+        private void Fruit_OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            if (obj.Judgement.Result > HitResult.Miss)
+            if (judgement.Result > HitResult.Miss)
             {
-                Vector2 screenPosition = obj.ScreenSpaceDrawQuad.Centre;
-                Remove(obj);
-                catcherArea.Add(obj, screenPosition);
+                Vector2 screenPosition = judgedObject.ScreenSpaceDrawQuad.Centre;
+                Remove(judgedObject);
+                catcherArea.Add(judgedObject, screenPosition);
             }
         }
     }

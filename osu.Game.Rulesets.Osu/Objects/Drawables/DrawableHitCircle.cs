@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -38,9 +39,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Colour = AccentColour,
                     Hit = () =>
                     {
-                        if (Judgement.Result != HitResult.None) return false;
+                        if (AllJudged)
+                            return false;
 
-                        Judgement.PositionOffset = Vector2.Zero; //todo: set to correct value
                         UpdateJudgement(true);
                         return true;
                     },
@@ -65,16 +66,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = circle.DrawSize;
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HitObject.HitWindowFor(HitResult.Meh))
-                    Judgement.Result = HitResult.Miss;
+                if (timeOffset > HitObject.HitWindowFor(HitResult.Meh))
+                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
                 return;
             }
 
-            Judgement.Result = HitObject.ScoreResultForOffset(Math.Abs(Judgement.TimeOffset));
+            AddJudgement(new OsuJudgement
+            {
+                Result = HitObject.ScoreResultForOffset(Math.Abs(timeOffset)),
+                PositionOffset = Vector2.Zero //todo: set to correct value
+            });
         }
 
         protected override void UpdateInitialState()

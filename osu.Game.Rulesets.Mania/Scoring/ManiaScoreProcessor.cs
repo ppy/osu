@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -203,7 +204,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
             maxComboPortion = comboPortion;
         }
 
-        protected override void OnNewJudgement(ManiaJudgement judgement)
+        protected override void OnNewJudgement(Judgement judgement)
         {
             bool isTick = judgement is HoldNoteTickJudgement;
 
@@ -254,8 +255,10 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
             foreach (var j in Judgements)
             {
-                scoreForAccuracy += j.NumericAccuracyResult;
-                maxScoreForAccuracy += j.MaxNumericAccuracyResult;
+                var maniaJudgement = (ManiaJudgement)j;
+
+                scoreForAccuracy += maniaJudgement.NumericAccuracyResult;
+                maxScoreForAccuracy += maniaJudgement.MaxNumericAccuracyResult;
             }
 
             Accuracy.Value = (double)scoreForAccuracy / maxScoreForAccuracy;

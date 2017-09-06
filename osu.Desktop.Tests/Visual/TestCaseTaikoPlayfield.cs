@@ -139,35 +139,20 @@ namespace osu.Desktop.Tests.Visual
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            var h = new DrawableTestHit(hit)
-            {
-                X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f),
-                Judgement = new TaikoJudgement
-                {
-                    Result = hitResult,
-                    TimeOffset = 0
-                }
-            };
+            var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            rulesetContainer.Playfield.OnJudgement(h);
+            rulesetContainer.Playfield.OnJudgement(h, new TaikoJudgement { Result = hitResult });
 
             if (RNG.Next(10) == 0)
             {
-                h.Judgement.SecondHit = true;
-                rulesetContainer.Playfield.OnJudgement(h);
+                rulesetContainer.Playfield.OnJudgement(h, new TaikoJudgement { Result = hitResult });
+                rulesetContainer.Playfield.OnJudgement(h, new TaikoStrongHitJudgement());
             }
         }
 
         private void addMissJudgement()
         {
-            rulesetContainer.Playfield.OnJudgement(new DrawableTestHit(new Hit())
-            {
-                Judgement = new TaikoJudgement
-                {
-                    Result = HitResult.Miss,
-                    TimeOffset = 0
-                }
-            });
+            rulesetContainer.Playfield.OnJudgement(new DrawableTestHit(new Hit()), new TaikoJudgement { Result = HitResult.Miss });
         }
 
         private void addBarLine(bool major, double delay = scroll_time)

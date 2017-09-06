@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -114,31 +115,31 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             bouncer2.Position = slider.Curve.PositionAt(body.SnakedEnd ?? 0);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (initialCircle.Judgement?.Result <= HitResult.Miss)
+            if (!initialCircle.Judgements.Any(j => j.IsHit))
                 initialCircle.Position = slider.Curve.PositionAt(progress);
 
             foreach (var c in components) c.UpdateProgress(progress, repeat);
             foreach (var t in ticks.Children) t.Tracking = ball.Tracking;
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
                 var ticksCount = ticks.Children.Count + 1;
-                var ticksHit = ticks.Children.Count(t => t.Judgement.Result > HitResult.Miss);
-                if (initialCircle.Judgement.Result > HitResult.Miss)
+                var ticksHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit));
+                if (initialCircle.Judgements.Any(j => j.IsHit))
                     ticksHit++;
 
                 var hitFraction = (double)ticksHit / ticksCount;
-                if (hitFraction == 1 && initialCircle.Judgement.Result == HitResult.Great)
-                    Judgement.Result = HitResult.Great;
-                else if (hitFraction >= 0.5 && initialCircle.Judgement.Result >= HitResult.Good)
-                    Judgement.Result = HitResult.Good;
+                if (hitFraction == 1 && initialCircle.Judgements.Any(j => j.Result == HitResult.Great))
+                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
+                else if (hitFraction >= 0.5 && initialCircle.Judgements.Any(j => j.Result >= HitResult.Good))
+                    AddJudgement(new OsuJudgement { Result = HitResult.Good });
                 else if (hitFraction > 0)
-                    Judgement.Result = HitResult.Meh;
+                    AddJudgement(new OsuJudgement { Result = HitResult.Meh });
                 else
-                    Judgement.Result = HitResult.Miss;
+                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
             }
         }
 

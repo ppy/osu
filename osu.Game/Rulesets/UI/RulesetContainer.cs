@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.UI
         where TObject : HitObject
         where TJudgement : Judgement
     {
-        public event Action<TJudgement> OnJudgement;
+        public event Action<Judgement> OnJudgement;
 
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
@@ -239,7 +239,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public new IEnumerable<TObject> Objects => Beatmap.HitObjects;
 
-        protected override bool AllObjectsJudged => drawableObjects.All(h => h.Judged);
+        protected override bool AllObjectsJudged => drawableObjects.All(h => h.AllJudged);
 
         /// <summary>
         /// The playfield.
@@ -298,7 +298,12 @@ namespace osu.Game.Rulesets.UI
                 if (drawableObject == null)
                     continue;
 
-                drawableObject.OnJudgement += onJudgement;
+                drawableObject.OnJudgement += (d, j) =>
+                {
+                    Playfield.OnJudgement(d, j);
+                    OnJudgement?.Invoke(j);
+                    CheckAllJudged();
+                };
 
                 drawableObjects.Add(drawableObject);
                 Playfield.Add(drawableObject);
@@ -319,19 +324,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <returns></returns>
         protected virtual Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f); //a sane default
-
-        /// <summary>
-        /// Triggered when an object's Judgement is updated.
-        /// </summary>
-        /// <param name="judgedObject">The object that Judgement has been updated for.</param>
-        private void onJudgement(DrawableHitObject<TObject, TJudgement> judgedObject)
-        {
-            Playfield.OnJudgement(judgedObject);
-
-            OnJudgement?.Invoke(judgedObject.Judgement);
-
-            CheckAllJudged();
-        }
 
         /// <summary>
         /// Creates a DrawableHitObject from a HitObject.

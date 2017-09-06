@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Judgements
     public class DrawableJudgement<TJudgement> : Container
         where TJudgement : Judgement
     {
-        protected readonly TJudgement Judgement;
+        protected readonly Judgement Judgement;
 
         protected readonly SpriteText JudgementText;
 
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Judgements
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
-        public DrawableJudgement(TJudgement judgement)
+        public DrawableJudgement(Judgement judgement)
         {
             Judgement = judgement;
 

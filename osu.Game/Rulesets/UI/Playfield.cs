@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.UI
         /// Triggered when an object's Judgement is updated.
         /// </summary>
         /// <param name="judgedObject">The object that Judgement has been updated for.</param>
-        public virtual void OnJudgement(DrawableHitObject<TObject, TJudgement> judgedObject) { }
+        public virtual void OnJudgement(DrawableHitObject judgedObject, Judgement judgement) { }
 
         public class HitObjectContainer : CompositeDrawable
         {

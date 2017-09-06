@@ -5,6 +5,7 @@ using System;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -43,21 +44,21 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HitObject.HitWindows.Bad / 2)
-                    Judgement.Result = HitResult.Miss;
+                if (timeOffset > HitObject.HitWindows.Bad / 2)
+                    AddJudgement(new ManiaJudgement { Result = HitResult.Miss });
                 return;
             }
 
-            double offset = Math.Abs(Judgement.TimeOffset);
+            double offset = Math.Abs(timeOffset);
 
             if (offset > HitObject.HitWindows.Miss / 2)
                 return;
 
-            Judgement.Result = HitObject.HitWindows.ResultFor(offset) ?? HitResult.Miss;
+            AddJudgement(new ManiaJudgement { Result = HitObject.HitWindows.ResultFor(offset) ?? HitResult.Miss });
         }
 
         protected override void UpdateState(ArmedState state)

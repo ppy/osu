@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -134,7 +135,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Width *= Parent.RelativeChildSize.X;
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (userTriggered)
             {
@@ -152,18 +153,17 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (userHits == HitObject.RequiredHits)
-                    Judgement.Result = HitResult.Great;
+                    AddJudgement(new TaikoJudgement { Result = HitResult.Great });
             }
             else
             {
-                if (Judgement.TimeOffset < 0)
+                if (timeOffset < 0)
                     return;
 
                 //TODO: THIS IS SHIT AND CAN'T EXIST POST-TAIKO WORLD CUP
-                if (userHits > HitObject.RequiredHits / 2)
-                    Judgement.Result = HitResult.Good;
-                else
-                    Judgement.Result = HitResult.Miss;
+                AddJudgement(userHits > HitObject.RequiredHits / 2
+                    ? new TaikoJudgement { Result = HitResult.Good }
+                    : new TaikoJudgement { Result = HitResult.Miss });
             }
         }
 
@@ -172,8 +172,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             const float preempt = 100;
             const float out_transition_time = 300;
 
+            var offset = Time.Current - HitObject.EndTime;
             double untilStartTime = HitObject.StartTime - Time.Current;
-            double untilJudgement = untilStartTime + Judgement.TimeOffset + HitObject.Duration;
+            double untilJudgement = untilStartTime + offset + HitObject.Duration;
 
             targetRing.Delay(untilStartTime - preempt).ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
             this.Delay(untilJudgement).FadeOut(out_transition_time, Easing.Out);
@@ -207,9 +208,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(TaikoAction action)
         {
-            if (Judgement.Result != HitResult.None)
-                return false;
-
             // Don't handle keys before the swell starts
             if (Time.Current < HitObject.StartTime)
                 return false;
