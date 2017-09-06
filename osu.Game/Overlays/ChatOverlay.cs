@@ -160,6 +160,7 @@ namespace osu.Game.Overlays
                                 channelTabs = new ChatTabControl
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    OnRequestLeave = removeChannel,
                                 },
                             }
                         },
@@ -305,6 +306,7 @@ namespace osu.Game.Overlays
                     addChannel(channels.Find(c => c.Name == @"#lobby"));
 
                     channelSelection.OnRequestJoin = addChannel;
+                    channelSelection.OnRequestLeave = removeChannel;
                     channelSelection.Sections = new[]
                     {
                         new ChannelSection
@@ -332,7 +334,15 @@ namespace osu.Game.Overlays
 
             set
             {
-                if (currentChannel == value || value == null) return;
+                if (currentChannel == value) return;
+
+                if (value == null)
+                {
+                    currentChannel = null;
+                    textbox.Current.Disabled = true;
+                    currentChannelContainer.Clear(false);
+                    return;
+                }
 
                 currentChannel = value;
 
@@ -389,6 +399,19 @@ namespace osu.Game.Overlays
                 CurrentChannel = channel;
 
             channel.Joined.Value = true;
+        }
+
+        private void removeChannel(Channel channel)
+        {
+            if (channel == null) return;
+
+            if (channel == CurrentChannel) CurrentChannel = null;
+
+            careChannels.Remove(channel);
+            loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
+            channelTabs.RemoveItem(channel);
+
+            channel.Joined.Value = false;
         }
 
         private void fetchInitialMessages(Channel channel)
