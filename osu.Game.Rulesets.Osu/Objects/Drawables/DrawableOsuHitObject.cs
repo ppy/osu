@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 UpdatePreemptState();
 
-                var offset = Time.Current - ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime);
+                var offset = !AllJudged ? 0 : Time.Current - ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime);
                 using (BeginDelayedSequence(TIME_PREEMPT + offset, true))
                     UpdateCurrentState(state);
             }

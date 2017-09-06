@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             const float preempt = 100;
             const float out_transition_time = 300;
 
-            var offset = Time.Current - HitObject.EndTime;
+            var offset = !AllJudged ? 0 : Time.Current - HitObject.EndTime;
             double untilStartTime = HitObject.StartTime - Time.Current;
             double untilJudgement = untilStartTime + offset + HitObject.Duration;
 
