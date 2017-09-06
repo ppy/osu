@@ -3,13 +3,12 @@
 
 using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject, OsuJudgement>
+    public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
         public const float TIME_PREEMPT = 600;
         public const float TIME_FADEIN = 400;

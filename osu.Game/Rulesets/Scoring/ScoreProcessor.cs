@@ -135,9 +135,8 @@ namespace osu.Game.Rulesets.Scoring
         }
     }
 
-    public abstract class ScoreProcessor<TObject, TJudgement> : ScoreProcessor
+    public abstract class ScoreProcessor<TObject> : ScoreProcessor
         where TObject : HitObject
-        where TJudgement : Judgement
     {
         /// <summary>
         /// All judgements held by this ScoreProcessor.
@@ -150,7 +149,7 @@ namespace osu.Game.Rulesets.Scoring
         {
         }
 
-        protected ScoreProcessor(RulesetContainer<TObject, TJudgement> rulesetContainer)
+        protected ScoreProcessor(RulesetContainer<TObject> rulesetContainer)
         {
             Judgements.Capacity = rulesetContainer.Beatmap.HitObjects.Count;
 

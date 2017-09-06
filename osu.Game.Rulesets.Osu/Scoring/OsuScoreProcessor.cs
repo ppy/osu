@@ -16,7 +16,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject, OsuJudgement>
+    internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject>
     {
         public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>(ScoringMode.Exponential);
 
@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
-        public OsuScoreProcessor(RulesetContainer<OsuHitObject, OsuJudgement> rulesetContainer)
+        public OsuScoreProcessor(RulesetContainer<OsuHitObject> rulesetContainer)
             : base(rulesetContainer)
         {
         }
