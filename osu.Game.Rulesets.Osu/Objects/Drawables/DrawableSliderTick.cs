@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -46,10 +47,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (Judgement.TimeOffset >= 0)
-                Judgement.Result = Tracking ? HitResult.Perfect : HitResult.Miss;
+            if (timeOffset >= 0)
+                AddJudgement(new SliderTickJudgement { Result = Tracking ? HitResult.Perfect : HitResult.Miss });
         }
 
         protected override void UpdatePreemptState()

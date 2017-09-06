@@ -3,6 +3,7 @@
 
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
             Accuracy.Value = 1;
         }
 
-        protected override void OnNewJudgement(CatchJudgement judgement)
+        protected override void OnNewJudgement(Judgement judgement)
         {
         }
     }

@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
 using System.Linq;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -218,18 +219,22 @@ namespace osu.Game.Rulesets.Taiko.UI
                 swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
         }
 
-        public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> judgedObject)
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            bool wasHit = judgedObject.Judgement.Result > HitResult.Miss;
-            bool secondHit = judgedObject.Judgement.SecondHit;
+            bool wasHit = judgement.Result > HitResult.Miss;
+            bool secondHit = judgement is TaikoStrongHitJudgement;
+            var taikoObject = (TaikoHitObject)judgedObject.HitObject;
 
-            judgementContainer.Add(new DrawableTaikoJudgement(judgedObject.Judgement)
+            if (judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
-                Anchor = wasHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                Origin = wasHit ? Anchor.BottomCentre : Anchor.Centre,
-                RelativePositionAxes = Axes.X,
-                X = wasHit ? judgedObject.Position.X : 0,
-            });
+                judgementContainer.Add(new DrawableTaikoJudgement(judgedObject, judgement)
+                {
+                    Anchor = wasHit ? Anchor.TopLeft : Anchor.CentreLeft,
+                    Origin = wasHit ? Anchor.BottomCentre : Anchor.Centre,
+                    RelativePositionAxes = Axes.X,
+                    X = wasHit ? judgedObject.Position.X : 0,
+                });
+            }
 
             if (!wasHit)
                 return;
@@ -244,13 +249,13 @@ namespace osu.Game.Rulesets.Taiko.UI
                     topLevelHitContainer.Add(judgedObject.CreateProxy());
                 }
 
-                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement, isRim));
+                hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
 
-                if (judgedObject.HitObject.Kiai)
-                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject.Judgement, isRim));
+                if (taikoObject.Kiai)
+                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
             }
             else
-                hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
+                hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
         }
     }
 }

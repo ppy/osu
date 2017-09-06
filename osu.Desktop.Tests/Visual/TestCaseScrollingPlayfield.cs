@@ -154,7 +154,7 @@ namespace osu.Desktop.Tests.Visual
 
         private class TestScoreProcessor : ScoreProcessor<TestHitObject, TestJudgement>
         {
-            protected override void OnNewJudgement(TestJudgement judgement)
+            protected override void OnNewJudgement(Judgement judgement)
             {
             }
         }

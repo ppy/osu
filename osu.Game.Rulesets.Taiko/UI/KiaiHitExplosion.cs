@@ -7,22 +7,22 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Taiko.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
     public class KiaiHitExplosion : CircularContainer
     {
-        public readonly TaikoJudgement Judgement;
+        public readonly DrawableHitObject JudgedObject;
 
         private readonly bool isRim;
 
-        public KiaiHitExplosion(TaikoJudgement judgement, bool isRim)
+        public KiaiHitExplosion(DrawableHitObject judgedObject, bool isRim)
         {
             this.isRim = isRim;
 
-            Judgement = judgement;
+            JudgedObject = judgedObject;
 
             Anchor = Anchor.CentreLeft;
             Origin = Anchor.Centre;

@@ -15,13 +15,16 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     public class DrawableTaikoJudgement : DrawableJudgement<TaikoJudgement>
     {
+        public readonly DrawableHitObject JudgedObject;
+
         /// <summary>
         /// Creates a new judgement text.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
-        public DrawableTaikoJudgement(TaikoJudgement judgement)
+        public DrawableTaikoJudgement(DrawableHitObject judgedObject, Judgement judgement)
             : base(judgement)
         {
+            JudgedObject = judgedObject;
         }
 
         [BackgroundDependencyLoader]

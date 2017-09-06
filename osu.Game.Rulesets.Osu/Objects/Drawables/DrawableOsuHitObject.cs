@@ -5,6 +5,7 @@ using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -31,7 +32,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 UpdatePreemptState();
 
-                using (BeginDelayedSequence(TIME_PREEMPT + Judgement.TimeOffset, true))
+                var offset = Time.Current - ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime);
+                using (BeginDelayedSequence(TIME_PREEMPT + offset, true))
                     UpdateCurrentState(state);
             }
         }

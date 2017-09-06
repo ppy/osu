@@ -11,7 +11,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuJudgement : DrawableJudgement<OsuJudgement>
     {
-        public DrawableOsuJudgement(OsuJudgement judgement) : base(judgement)
+        public DrawableOsuJudgement(OsuJudgement judgement)
+            : base(judgement)
         {
         }
 

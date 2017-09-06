@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Catch.Judgements;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
@@ -100,10 +101,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         private const float preempt = 1000;
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (Judgement.TimeOffset > 0)
-                Judgement.Result = CheckPosition?.Invoke(HitObject) ?? false ? HitResult.Perfect : HitResult.Miss;
+            if (timeOffset > 0)
+                AddJudgement(new Judgement { Result = CheckPosition?.Invoke(HitObject) ?? false ? HitResult.Perfect : HitResult.Miss });
         }
 
         protected override void UpdateState(ArmedState state)
