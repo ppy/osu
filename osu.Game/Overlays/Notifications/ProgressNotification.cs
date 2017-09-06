@@ -152,10 +152,13 @@ namespace osu.Game.Overlays.Notifications
                     break;
                 case ProgressNotificationState.Active:
                 case ProgressNotificationState.Queued:
-                    State = ProgressNotificationState.Cancelled;
+                    if (CancelRequested?.Invoke() != false)
+                        State = ProgressNotificationState.Cancelled;
                     break;
             }
         }
+
+        public Func<bool> CancelRequested { get; set; }
 
         /// <summary>
         /// The function to post completion notifications back to.

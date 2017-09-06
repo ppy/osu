@@ -1,52 +1,39 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuContextMenu<TItem> : ContextMenu<TItem>
-        where TItem : ContextMenuItem
+    public class OsuContextMenu : OsuMenu
     {
-        protected override Menu<TItem> CreateMenu() => new CustomMenu();
+        private const int fade_duration = 250;
 
-        public class CustomMenu : Menu<TItem>
+        public OsuContextMenu()
+            : base(Direction.Vertical)
         {
-            private const int fade_duration = 250;
-
-            public CustomMenu()
+            MaskingContainer.CornerRadius = 5;
+            MaskingContainer.EdgeEffect = new EdgeEffectParameters
             {
-                CornerRadius = 5;
-                ItemsContainer.Padding = new MarginPadding { Vertical = OsuContextMenuItem.MARGIN_VERTICAL };
-                Masking = true;
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Shadow,
-                    Colour = Color4.Black.Opacity(0.1f),
-                    Radius = 4,
-                };
-            }
+                Type = EdgeEffectType.Shadow,
+                Colour = Color4.Black.Opacity(0.1f),
+                Radius = 4,
+            };
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Background.Colour = colours.ContextMenuGray;
-            }
-
-            protected override void AnimateOpen() => this.FadeIn(fade_duration, Easing.OutQuint);
-            protected override void AnimateClose() => this.FadeOut(fade_duration, Easing.OutQuint);
-
-            protected override void UpdateContentHeight()
-            {
-                var actualHeight = (RelativeSizeAxes & Axes.Y) > 0 ? 1 : ContentHeight;
-                this.ResizeTo(new Vector2(1, State == MenuState.Opened ? actualHeight : 0), 300, Easing.OutQuint);
-            }
+            ItemsContainer.Padding = new MarginPadding { Vertical = DrawableOsuMenuItem.MARGIN_VERTICAL };
         }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            BackgroundColour = colours.ContextMenuGray;
+        }
+
+        protected override void AnimateOpen() => this.FadeIn(fade_duration, Easing.OutQuint);
+        protected override void AnimateClose() => this.FadeOut(fade_duration, Easing.OutQuint);
     }
 }

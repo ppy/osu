@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Menu
 {
     public class ButtonSystem : Container, IStateful<MenuState>
     {
+        public event Action<MenuState> StateChanged;
+
         public Action OnEdit;
         public Action OnExit;
         public Action OnDirect;
@@ -294,6 +296,8 @@ namespace osu.Game.Screens.Menu
                     backButton.State = state == MenuState.Play ? ButtonState.Expanded : ButtonState.Contracted;
                     settingsButton.State = state == MenuState.TopLevel ? ButtonState.Expanded : ButtonState.Contracted;
                 }
+
+                StateChanged?.Invoke(State);
             }
         }
 
