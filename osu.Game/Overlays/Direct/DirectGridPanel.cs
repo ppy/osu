@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -25,23 +26,11 @@ namespace osu.Game.Overlays.Direct
         public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
-            CornerRadius = 4;
-            Masking = true;
-
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Shadow,
-                Offset = new Vector2(0f, 1f),
-                Radius = 3f,
-                Colour = Color4.Black.Opacity(0.25f),
-            };
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            this.FadeInFromZero(200, Easing.Out);
             bottomPanel.LayoutDuration = 200;
             bottomPanel.LayoutEasing = Easing.Out;
             bottomPanel.Origin = Anchor.BottomLeft;
@@ -50,14 +39,10 @@ namespace osu.Game.Overlays.Direct
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, LocalisationEngine localisation)
         {
-            Children = new[]
+            Content.CornerRadius = 4;
+
+            AddRange(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
-                CreateBackground(),
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -185,7 +170,13 @@ namespace osu.Game.Overlays.Direct
                         new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
-            };
+            });
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            StartDownload();
+            return true;
         }
     }
 }

@@ -11,6 +11,8 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public class BeatmapGroup : IStateful<BeatmapGroupState>
     {
+        public event Action<BeatmapGroupState> StateChanged;
+
         public BeatmapPanel SelectedPanel;
 
         /// <summary>
@@ -23,19 +25,26 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         public Action<BeatmapInfo> StartRequested;
 
-        public BeatmapSetHeader Header;
+        public Action<BeatmapSetInfo> DeleteRequested;
 
-        private BeatmapGroupState state;
+        public Action<BeatmapSetInfo> RestoreHiddenRequested;
+
+        public Action<BeatmapInfo> HideDifficultyRequested;
+
+        public BeatmapSetHeader Header;
 
         public List<BeatmapPanel> BeatmapPanels;
 
         public BeatmapSetInfo BeatmapSet;
 
+        private BeatmapGroupState state;
         public BeatmapGroupState State
         {
             get { return state; }
             set
             {
+                state = value;
+
                 switch (value)
                 {
                     case BeatmapGroupState.Expanded:
@@ -54,7 +63,8 @@ namespace osu.Game.Beatmaps.Drawables
                             panel.State = PanelSelectedState.Hidden;
                         break;
                 }
-                state = value;
+
+                StateChanged?.Invoke(state);
             }
         }
 
@@ -66,20 +76,24 @@ namespace osu.Game.Beatmaps.Drawables
             Header = new BeatmapSetHeader(beatmap)
             {
                 GainedSelection = headerGainedSelection,
+                DeleteRequested = b => DeleteRequested(b),
+                RestoreHiddenRequested = b => RestoreHiddenRequested(b),
                 RelativeSizeAxes = Axes.X,
             };
 
-            BeatmapSet.Beatmaps = BeatmapSet.Beatmaps.OrderBy(b => b.StarDifficulty).ToList();
+            BeatmapSet.Beatmaps = BeatmapSet.Beatmaps.Where(b => !b.Hidden).OrderBy(b => b.StarDifficulty).ToList();
             BeatmapPanels = BeatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
             {
                 Alpha = 0,
                 GainedSelection = panelGainedSelection,
+                HideRequested = p => HideDifficultyRequested?.Invoke(p),
                 StartRequested = p => { StartRequested?.Invoke(p.Beatmap); },
                 RelativeSizeAxes = Axes.X,
             }).ToList();
 
             Header.AddDifficultyIcons(BeatmapPanels);
         }
+
 
         private void headerGainedSelection(BeatmapSetHeader panel)
         {

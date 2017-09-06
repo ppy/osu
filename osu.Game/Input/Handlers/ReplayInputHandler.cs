@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using osu.Framework.Input;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Platform;
 using OpenTK;
@@ -29,5 +31,18 @@ namespace osu.Game.Input.Handlers
         public override bool IsActive => true;
 
         public override int Priority => 0;
+
+        public class ReplayState<T> : InputState
+            where T : struct
+        {
+            public List<T> PressedActions;
+
+            public override InputState Clone()
+            {
+                var clone = (ReplayState<T>)base.Clone();
+                clone.PressedActions = new List<T>(PressedActions);
+                return clone;
+            }
+        }
     }
 }
