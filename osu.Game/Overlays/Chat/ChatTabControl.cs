@@ -267,7 +267,7 @@ namespace osu.Game.Overlays.Chat
 
             public class CloseButton : ClickableContainer
             {
-                private SpriteIcon icon;
+                private readonly SpriteIcon icon;
 
                 public CloseButton()
                 {
