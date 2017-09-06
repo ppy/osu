@@ -46,6 +46,11 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuMenuItem(item);
 
+        protected override Menu CreateSubMenu() => new OsuMenu(Direction.Vertical)
+        {
+            Anchor = Direction == Direction.Horizontal ? Anchor.BottomLeft : Anchor.TopRight
+        };
+
         protected class DrawableOsuMenuItem : DrawableMenuItem
         {
             private const int margin_horizontal = 17;
@@ -61,7 +66,6 @@ namespace osu.Game.Graphics.UserInterface
             public DrawableOsuMenuItem(MenuItem item)
                 : base(item)
             {
-
             }
 
             [BackgroundDependencyLoader]

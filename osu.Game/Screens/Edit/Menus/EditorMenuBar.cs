@@ -5,125 +5,119 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Menus
 {
-    public class EditorMenuBar : MenuBar
+    public class EditorMenuBar : OsuMenu
     {
-        protected override DrawableMenuBarItem CreateDrawableMenuBarItem(MenuItem item) => new DrawableEditorMenuBarItem(item);
-
-        private class DrawableEditorMenuBarItem : DrawableMenuBarItem
+        public EditorMenuBar()
+            : base(Direction.Horizontal)
         {
-            private const int fade_duration = 250;
-            private const float text_size = 14;
+            AlwaysOpen = true;
+            RequireClickToOpen = true;
 
-            private readonly Container background;
+            ItemsContainer.Padding = new MarginPadding(0);
+            BackgroundColour = Color4.Transparent;
+        }
 
-            private Color4 normalColour;
+        protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
 
-            public DrawableEditorMenuBarItem(MenuItem item)
+        protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableEditorBarMenuItem(item);
+
+        private class DrawableEditorBarMenuItem : DrawableOsuMenuItem
+        {
+            private Color4 openedForegroundColour;
+            private Color4 openedBackgroundColour;
+
+            public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
             {
-                Text.Padding = new MarginPadding(8);
-
-                AddInternal(background = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Depth = float.MaxValue,
-                    Alpha = 0,
-                    Child = new Container<Box>
-                    {
-                        // The following is done so we can have top rounded corners but not bottom corners
-                        RelativeSizeAxes = Axes.Both,
-                        Height = 2,
-                        Masking = true,
-                        CornerRadius = 5,
-                        Child = new Box { RelativeSizeAxes = Axes.Both }
-                    }
-                });
-
-                Menu.OnOpen += menuOpen;
-                Menu.OnClose += menuClose;
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                background.Colour = colours.Gray3;
-                Text.Colour = normalColour = colours.BlueLight;
+                ForegroundColour = ForegroundColourHover = colours.BlueLight;
+                BackgroundColour = BackgroundColourHover = Color4.Transparent;
+                openedForegroundColour = Color4.White;
+                openedBackgroundColour = colours.Gray3;
             }
 
-            private void menuOpen()
+            protected override void UpdateBackgroundColour()
             {
-                background.FadeIn(fade_duration, Easing.OutQuint);
-                Text.FadeColour(Color4.White, fade_duration, Easing.OutQuint);
+                if (State == MenuItemState.Selected)
+                    Background.FadeColour(openedBackgroundColour);
+                else
+                    base.UpdateBackgroundColour();
             }
 
-            private void menuClose()
+            protected override void UpdateForegroundColour()
             {
-                background.FadeOut(fade_duration, Easing.OutQuint);
-                Text.FadeColour(normalColour, fade_duration, Easing.OutQuint);
+                if (State == MenuItemState.Selected)
+                    Foreground.FadeColour(openedForegroundColour);
+                else
+                    base.UpdateForegroundColour();
             }
 
-            protected override SpriteText CreateText() => new OsuSpriteText { TextSize = text_size };
-
-            protected override Framework.Graphics.UserInterface.Menu CreateMenu() => new EditorMenu();
-
-            private class EditorMenu : OsuMenu
+            protected override Drawable CreateBackground() => new Container
             {
-                public EditorMenu()
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Child = new Container
                 {
-                    Anchor = Anchor.BottomLeft;
-                    BypassAutoSizeAxes = Axes.Both;
-                    OriginPosition = new Vector2(8, 0);
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 2,
+                    Masking = true,
+                    CornerRadius = 4,
+                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                }
+            };
+        }
+
+        private class SubMenu : OsuMenu
+        {
+            public SubMenu()
+                : base(Direction.Vertical)
+            {
+                OriginPosition = new Vector2(5, 1);
+                ItemsContainer.Padding = new MarginPadding { Top = 5, Bottom = 5 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = colours.Gray3;
+            }
+
+            protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
+
+            protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableSubMenuItem(item);
+
+            private class DrawableSubMenuItem : DrawableOsuMenuItem
+            {
+                public DrawableSubMenuItem(MenuItem item)
+                    : base(item)
+                {
                 }
 
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
+                protected override bool OnHover(InputState state)
                 {
-                    BackgroundColour = colours.Gray3;
+                    if (Item is EditorMenuSpacer)
+                        return true;
+                    return base.OnHover(state);
                 }
 
-                protected override MarginPadding ItemFlowContainerPadding => new MarginPadding { Top = 5, Bottom = 5 };
-
-                protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableEditorMenuItem(item);
-
-                private class DrawableEditorMenuItem : DrawableOsuMenuItem
+                protected override bool OnClick(InputState state)
                 {
-                    public override bool HandleInput => !isSpacer;
-                    private readonly bool isSpacer;
-
-                    public DrawableEditorMenuItem(MenuItem item)
-                        : base(item)
-                    {
-                        isSpacer = item is EditorMenuSpacer;
-                    }
-
-                    [BackgroundDependencyLoader]
-                    private void load(OsuColour colours)
-                    {
-                        BackgroundColour = colours.Gray3;
-                        BackgroundColourHover = colours.Gray2;
-                    }
-
-                    protected override TextContainer CreateTextContainer() => new EditorTextContainer();
-
-                    private class EditorTextContainer : TextContainer
-                    {
-                        public EditorTextContainer()
-                        {
-                            BoldText.TextSize = text_size;
-                            NormalText.TextSize = text_size;
-                        }
-                    }
+                    if (Item is EditorMenuSpacer)
+                        return true;
+                    return base.OnClick(state);
                 }
             }
         }
