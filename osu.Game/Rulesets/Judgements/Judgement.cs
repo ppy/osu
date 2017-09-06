@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// The offset at which this judgement occurred.
         /// </summary>
-        public double TimeOffset;
+        public double TimeOffset { get; internal set; }
 
         public virtual bool AffectsCombo => true;
 
