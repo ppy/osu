@@ -64,10 +64,10 @@ namespace osu.Game.Overlays.Chat
 
         protected override TabItem<Channel> CreateTabItem(Channel value)
         {
-             ChannelTabItem tab = new ChannelTabItem(value);
-             tab.OnRequestClose = () => onTabClose(tab);
+            ChannelTabItem tab = new ChannelTabItem(value);
+            tab.OnRequestClose = () => onTabClose(tab);
 
-             return tab;
+            return tab;
         }
 
         protected override void SelectTab(TabItem<Channel> tab)
@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Chat
 
             private readonly SpriteText text;
             private readonly SpriteText textBold;
-            private readonly Button closeButton;
+            private readonly ClickableContainer closeButton;
             private readonly Box box;
             private readonly Box highlightBox;
             private readonly SpriteIcon icon;
@@ -129,7 +129,6 @@ namespace osu.Game.Overlays.Chat
             {
                 this.ResizeTo(new Vector2(Width, 1.1f), transition_length, Easing.OutQuint);
 
-                closeButton.MoveToX(-5f, 0.5f, Easing.OutElastic);
                 box.FadeColour(backgroundActive, transition_length, Easing.OutQuint);
                 highlightBox.FadeIn(transition_length, Easing.OutQuint);
 
@@ -141,7 +140,6 @@ namespace osu.Game.Overlays.Chat
             {
                 this.ResizeTo(new Vector2(Width, 1), transition_length, Easing.OutQuint);
 
-                closeButton.MoveToX(5f, 0.5f, Easing.InElastic);
                 box.FadeColour(backgroundInactive, transition_length, Easing.OutQuint);
                 highlightBox.FadeOut(transition_length, Easing.OutQuint);
 
@@ -152,7 +150,7 @@ namespace osu.Game.Overlays.Chat
             protected override bool OnHover(InputState state)
             {
                 if (IsRemovable)
-                    closeButton.FadeIn(1f, Easing.InBounce);
+                    closeButton.FadeIn(200, Easing.OutQuint);
 
                 if (!Active)
                     box.FadeColour(backgroundHover, transition_length, Easing.OutQuint);
@@ -161,9 +159,7 @@ namespace osu.Game.Overlays.Chat
 
             protected override void OnHoverLost(InputState state)
             {
-                if (closeButton.IsPresent)
-                    closeButton.FadeOut(1f, Easing.OutBounce);
-
+                closeButton.FadeOut(200, Easing.OutQuint);
                 updateState();
             }
 
@@ -253,21 +249,63 @@ namespace osu.Game.Overlays.Chat
                                 Font = @"Exo2.0-Bold",
                                 TextSize = 18,
                             },
-                            closeButton  = new Button
+                            closeButton = new CloseButton
                             {
                                 Alpha = 0,
-                                Width = 20,
-                                Height = 20,
-                                Margin = new MarginPadding { Right = 10 },
+                                Margin = new MarginPadding { Right = 20 },
                                 Origin = Anchor.CentreRight,
                                 Anchor = Anchor.CentreRight,
-                                Text = @"x",
-                                BackgroundColour = Color4.Transparent,
-                                Action = delegate { if (IsRemovable) OnRequestClose?.Invoke(); },
+                                Action = delegate
+                                {
+                                    if (IsRemovable) OnRequestClose?.Invoke();
+                                },
                             },
                         },
                     },
                 };
+            }
+
+            public class CloseButton : ClickableContainer
+            {
+                private SpriteIcon icon;
+
+                public CloseButton()
+                {
+                    Size = new Vector2(20);
+
+                    Child = icon = new SpriteIcon
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Scale = new Vector2(0.75f),
+                        Icon = FontAwesome.fa_close,
+                        RelativeSizeAxes = Axes.Both,
+                    };
+                }
+
+                protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+                {
+                    icon.ScaleTo(0.5f, 1000, Easing.OutQuint);
+                    return base.OnMouseDown(state, args);
+                }
+
+                protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+                {
+                    icon.ScaleTo(0.75f, 1000, Easing.OutElastic);
+                    return base.OnMouseUp(state, args);
+                }
+
+                protected override bool OnHover(InputState state)
+                {
+                    icon.FadeColour(Color4.Red, 200, Easing.OutQuint);
+                    return base.OnHover(state);
+                }
+
+                protected override void OnHoverLost(InputState state)
+                {
+                    icon.FadeColour(Color4.White, 200, Easing.OutQuint);
+                    base.OnHoverLost(state);
+                }
             }
 
             public class ChannelSelectorTabItem : ChannelTabItem
