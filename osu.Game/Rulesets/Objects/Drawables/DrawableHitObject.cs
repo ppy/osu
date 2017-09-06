@@ -124,6 +124,18 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             judgements.Add(judgement);
 
+            switch (judgement.Result)
+            {
+                case HitResult.None:
+                    break;
+                case HitResult.Miss:
+                    State = ArmedState.Miss;
+                    break;
+                default:
+                    State = ArmedState.Hit;
+                    break;
+            }
+
             OnJudgement?.Invoke(this, judgement);
         }
 
