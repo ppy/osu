@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select.Details
 {
     public class AdvancedStats : Container
     {
-        private readonly StatRow firstValue, hpDrain, accuracy, approachRate, starDifficulty;
+        private readonly StatisticRow firstValue, hpDrain, accuracy, approachRate, starDifficulty;
 
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
@@ -56,11 +56,11 @@ namespace osu.Game.Screens.Select.Details
                 Spacing = new Vector2(4f),
                 Children = new[]
                 {
-                    firstValue = new StatRow(), //circle size/key amount
-                    hpDrain = new StatRow { Title = "HP Drain" },
-                    accuracy = new StatRow { Title = "Accuracy" },
-                    approachRate = new StatRow { Title = "Approach Rate" },
-                    starDifficulty = new StatRow(10, true) { Title = "Star Difficulty" },
+                    firstValue = new StatisticRow(), //circle size/key amount
+                    hpDrain = new StatisticRow { Title = "HP Drain" },
+                    accuracy = new StatisticRow { Title = "Accuracy" },
+                    approachRate = new StatisticRow { Title = "Approach Rate" },
+                    starDifficulty = new StatisticRow(10, true) { Title = "Star Difficulty" },
                 },
             };
         }
@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Select.Details
             starDifficulty.AccentColour = colours.Yellow;
         }
 
-        private class StatRow : Container, IHasAccentColour
+        private class StatisticRow : Container, IHasAccentColour
         {
             private const float value_width = 25;
             private const float name_width = 70;
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Select.Details
                 set { bar.AccentColour = value; }
             }
 
-            public StatRow(float maxValue = 10, bool forceDecimalPlaces = false)
+            public StatisticRow(float maxValue = 10, bool forceDecimalPlaces = false)
             {
                 this.maxValue = maxValue;
                 this.forceDecimalPlaces = forceDecimalPlaces;
