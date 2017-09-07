@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO.Serialization;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -39,6 +40,11 @@ namespace osu.Game.Beatmaps
         /// Total amount of break time in the beatmap.
         /// </summary>
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
+
+        /// <summary>
+        /// The Beatmap's Storyboard.
+        /// </summary>
+        public StoryboardDefinition Storyboard = new StoryboardDefinition();
 
         /// <summary>
         /// Constructs a new beatmap.

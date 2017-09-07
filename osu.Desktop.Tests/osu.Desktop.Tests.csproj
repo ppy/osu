@@ -91,6 +91,7 @@
     <Compile Include="Visual\TestCaseMenuButtonSystem.cs" />
     <Compile Include="Visual\TestCaseMenuOverlays.cs" />
     <Compile Include="Visual\TestCaseMods.cs" />
+    <Compile Include="Visual\TestCaseStoryboard.cs" />
     <Compile Include="Visual\TestCaseMusicController.cs" />
     <Compile Include="Visual\TestCaseNotificationOverlay.cs" />
     <Compile Include="Visual\TestCaseOnScreenDisplay.cs" />
