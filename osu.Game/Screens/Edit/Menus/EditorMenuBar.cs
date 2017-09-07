@@ -17,11 +17,8 @@ namespace osu.Game.Screens.Edit.Menus
     public class EditorMenuBar : OsuMenu
     {
         public EditorMenuBar()
-            : base(Direction.Horizontal)
+            : base(Direction.Horizontal, true)
         {
-            AlwaysOpen = true;
-            RequireClickToOpen = true;
-
             ItemsContainer.Padding = new MarginPadding(0);
             BackgroundColour = Color4.Transparent;
         }
