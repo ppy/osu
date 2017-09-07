@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using System;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
-using OpenTK.Input;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
@@ -24,12 +23,6 @@ namespace osu.Game.Rulesets.Mania.UI
     public class ManiaPlayfield : ScrollingPlayfield<ManiaHitObject, ManiaJudgement>
     {
         public const float HIT_TARGET_POSITION = 50;
-
-        /// <summary>
-        /// Default column keys, expanding outwards from the middle as more column are added.
-        /// E.g. 2 columns use FJ, 4 columns use DFJK, 6 use SDFJKL, etc...
-        /// </summary>
-        private static readonly Key[] default_keys = { Key.A, Key.S, Key.D, Key.F, Key.J, Key.K, Key.L, Key.Semicolon };
 
         private SpecialColumnPosition specialColumnPosition;
         /// <summary>
