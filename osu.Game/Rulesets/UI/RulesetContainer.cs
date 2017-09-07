@@ -75,7 +75,11 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
         }
