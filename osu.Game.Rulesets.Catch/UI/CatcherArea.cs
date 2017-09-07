@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 var additive = createCatcherSprite();
 
                 additive.RelativePositionAxes = Axes.Both;
-                additive.BlendingMode = BlendingMode.Additive;
+                additive.Blending = BlendingMode.Additive;
                 additive.Position = Position;
                 additive.Scale = Scale;
 
