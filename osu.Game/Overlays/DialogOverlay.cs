@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
             dialogContainer.Add(currentDialog);
 
             currentDialog.Show();
-            currentDialog.StateChanged += onDialogOnStateChanged;
+            currentDialog.StateChanged += state => onDialogOnStateChanged(dialog, state);
             State = Visibility.Visible;
         }
 
