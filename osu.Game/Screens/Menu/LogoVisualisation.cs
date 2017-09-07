@@ -201,10 +201,10 @@ namespace osu.Game.Screens.Menu
                             var amplitudeOffset = new Vector2(rotationCos * barSize.Y, rotationSin * barSize.Y);
 
                             var rectangle = new Quad(
-                                (barPosition - bottomOffset) * DrawInfo.Matrix,
-                                (barPosition - bottomOffset + amplitudeOffset) * DrawInfo.Matrix,
-                                (barPosition + bottomOffset) * DrawInfo.Matrix,
-                                (barPosition + bottomOffset + amplitudeOffset) * DrawInfo.Matrix
+                                DrawInfo.Matrix * (barPosition - bottomOffset),
+                                DrawInfo.Matrix * (barPosition - bottomOffset + amplitudeOffset),
+                                DrawInfo.Matrix * (barPosition + bottomOffset),
+                                DrawInfo.Matrix * (barPosition + bottomOffset + amplitudeOffset)
                             );
 
                             Texture.DrawQuad(

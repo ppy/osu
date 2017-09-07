@@ -228,9 +228,9 @@ namespace osu.Game.Graphics.Backgrounds
                     var size = new Vector2(2 * offset.X, offset.Y);
 
                     var triangle = new Triangle(
-                        particle.Position * Size * DrawInfo.Matrix,
-                        (particle.Position * Size + offset) * DrawInfo.Matrix,
-                        (particle.Position * Size + new Vector2(-offset.X, offset.Y)) * DrawInfo.Matrix
+                        DrawInfo.Matrix * Size * particle.Position,
+                        DrawInfo.Matrix * (particle.Position * Size + offset),
+                        DrawInfo.Matrix * (particle.Position * Size + new Vector2(-offset.X, offset.Y))
                     );
 
                     ColourInfo colourInfo = DrawInfo.Colour;
