@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
@@ -28,27 +27,9 @@ namespace osu.Game.Rulesets.Scoring
 
         public int Combo { get; set; }
 
-        [JsonProperty(@"mods")]
-        private string[] modStrings { get; set; }
-
         public RulesetInfo Ruleset;
 
-        private Mod[] mods;
-        public Mod[] Mods
-        {
-            get
-            {
-                // Evaluate the mod strings if necessary
-                return mods ?? (mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray());
-            }
-            set
-            {
-                mods = value;
-
-                // Assign the mod strings
-                modStrings = mods.Select(mod => mod.ShortenedName).ToArray();
-            }
-        }
+        public Mod[] Mods;
 
         [JsonProperty(@"user")]
         public User User;

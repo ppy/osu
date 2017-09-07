@@ -22,11 +22,8 @@ namespace osu.Game.Online.API.Requests
 
         private void onSuccess(GetScoresResponse r)
         {
-            foreach (Score score in r.Scores)
-            {
-                score.Beatmap = beatmap;
-                score.Ruleset = beatmap.Ruleset;
-            }
+            foreach (OnlineScore score in r.Scores)
+                score.GetModsFor(beatmap.Ruleset);
         }
 
         protected override WebRequest CreateWebRequest()
@@ -43,6 +40,6 @@ namespace osu.Game.Online.API.Requests
     public class GetScoresResponse
     {
         [JsonProperty(@"scores")]
-        public IEnumerable<Score> Scores;
+        public IEnumerable<OnlineScore> Scores;
     }
 }
