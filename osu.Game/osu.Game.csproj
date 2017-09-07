@@ -539,9 +539,7 @@
     <Compile Include="Screens\Multiplayer\ModeTypeInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Screens\Select\Details\AdvancedStats.cs" />
-    <Compile Include="Screens\Select\Details\BasicStats.cs" />
     <Compile Include="Screens\Select\Details\FailRetryGraph.cs" />
-    <Compile Include="Screens\Select\Details\SuccessRate.cs" />
     <Compile Include="Screens\Select\Details\UserRatings.cs" />
   </ItemGroup>
   <ItemGroup>
