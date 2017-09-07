@@ -106,6 +106,9 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.CentreRight,
                 SelectionChanged = carouselSelectionChanged,
                 BeatmapsChanged = carouselBeatmapsLoaded,
+                DeleteRequested = b => promptDelete(b),
+                RestoreRequested = s => { foreach (var b in s.Beatmaps) manager.Restore(b); },
+                HideDifficultyRequested = b => manager.Hide(b),
                 StartRequested = () => carouselRaisedStart(),
             });
             Add(FilterControl = new FilterControl
@@ -163,7 +166,7 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions.ToggleVisibility, Key.F3);
 
-                BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, promptDelete, Key.Number4, float.MaxValue);
+                BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, () => promptDelete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
             }
 
             if (manager == null)
@@ -174,6 +177,8 @@ namespace osu.Game.Screens.Select
 
             manager.BeatmapSetAdded += onBeatmapSetAdded;
             manager.BeatmapSetRemoved += onBeatmapSetRemoved;
+            manager.BeatmapHidden += onBeatmapHidden;
+            manager.BeatmapRestored += onBeatmapRestored;
 
             dialogOverlay = dialog;
 
@@ -189,6 +194,9 @@ namespace osu.Game.Screens.Select
             Beatmap.DisabledChanged += disabled => carousel.AllowSelection = !disabled;
             carousel.AllowSelection = !Beatmap.Disabled;
         }
+
+        private void onBeatmapRestored(BeatmapInfo b) => carousel.UpdateBeatmap(b);
+        private void onBeatmapHidden(BeatmapInfo b) => carousel.UpdateBeatmap(b);
 
         private void carouselBeatmapsLoaded()
         {
@@ -236,7 +244,7 @@ namespace osu.Game.Screens.Select
                     ensurePlayingSelected(preview);
                 }
 
-                changeBackground(Beatmap.Value);
+                UpdateBeatmap(Beatmap.Value);
             };
 
             selectionChangedDebounce?.Cancel();
@@ -248,7 +256,8 @@ namespace osu.Game.Screens.Select
 
             if (beatmap == null)
             {
-                performLoad();
+                if (!Beatmap.IsDefault)
+                    performLoad();
             }
             else
             {
@@ -303,7 +312,7 @@ namespace osu.Game.Screens.Select
         {
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
-                changeBackground(Beatmap);
+                UpdateBeatmap(Beatmap);
                 ensurePlayingSelected();
             }
 
@@ -344,12 +353,19 @@ namespace osu.Game.Screens.Select
             {
                 manager.BeatmapSetAdded -= onBeatmapSetAdded;
                 manager.BeatmapSetRemoved -= onBeatmapSetRemoved;
+                manager.BeatmapHidden -= onBeatmapHidden;
+                manager.BeatmapRestored -= onBeatmapRestored;
             }
 
             initialAddSetsTask?.Cancel();
         }
 
-        private void changeBackground(WorkingBeatmap beatmap)
+        /// <summary>
+        /// Allow components in SongSelect to update their loaded beatmap details.
+        /// This is a debounced call (unlike directly binding to WorkingBeatmap.ValueChanged).
+        /// </summary>
+        /// <param name="beatmap">The working beatmap.</param>
+        protected virtual void UpdateBeatmap(WorkingBeatmap beatmap)
         {
             var backgroundModeBeatmap = Background as BackgroundScreenBeatmap;
             if (backgroundModeBeatmap != null)
@@ -377,10 +393,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void addBeatmapSet(BeatmapSetInfo beatmapSet)
-        {
-            carousel.AddBeatmap(beatmapSet);
-        }
+        private void addBeatmapSet(BeatmapSetInfo beatmapSet) => carousel.AddBeatmap(beatmapSet);
 
         private void removeBeatmapSet(BeatmapSetInfo beatmapSet)
         {
@@ -389,10 +402,12 @@ namespace osu.Game.Screens.Select
                 Beatmap.SetDefault();
         }
 
-        private void promptDelete()
+        private void promptDelete(BeatmapSetInfo beatmap)
         {
-            if (Beatmap != null && !Beatmap.IsDefault)
-                dialogOverlay?.Push(new BeatmapDeleteDialog(Beatmap));
+            if (beatmap == null)
+                return;
+
+            dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -408,7 +423,8 @@ namespace osu.Game.Screens.Select
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
                     {
-                        promptDelete();
+                        if (!Beatmap.IsDefault)
+                            promptDelete(Beatmap.Value.BeatmapSetInfo);
                         return true;
                     }
                     break;

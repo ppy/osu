@@ -34,9 +34,19 @@ namespace osu.Game.Beatmaps
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
 
         /// <summary>
+        /// Fired when a single difficulty has been hidden.
+        /// </summary>
+        public event Action<BeatmapInfo> BeatmapHidden;
+
+        /// <summary>
         /// Fired when a <see cref="BeatmapSetInfo"/> is removed from the database.
         /// </summary>
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
+
+        /// <summary>
+        /// Fired when a single difficulty has been restored.
+        /// </summary>
+        public event Action<BeatmapInfo> BeatmapRestored;
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -71,6 +81,8 @@ namespace osu.Game.Beatmaps
             beatmaps = new BeatmapStore(connection);
             beatmaps.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
             beatmaps.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
+            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
+            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
 
             this.storage = storage;
             this.files = files;
@@ -162,23 +174,33 @@ namespace osu.Game.Beatmaps
             // If we have an ID then we already exist in the database.
             if (beatmapSetInfo.ID != 0) return;
 
-            lock (beatmaps)
-                beatmaps.Add(beatmapSetInfo);
+            beatmaps.Add(beatmapSetInfo);
         }
 
         /// <summary>
         /// Delete a beatmap from the manager.
         /// Is a no-op for already deleted beatmaps.
         /// </summary>
-        /// <param name="beatmapSet">The beatmap to delete.</param>
+        /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            lock (beatmaps)
-                if (!beatmaps.Delete(beatmapSet)) return;
+            if (!beatmaps.Delete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
                 files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
         }
+
+        /// <summary>
+        /// Delete a beatmap difficulty.
+        /// </summary>
+        /// <param name="beatmap">The beatmap difficulty to hide.</param>
+        public void Hide(BeatmapInfo beatmap) => beatmaps.Hide(beatmap);
+
+        /// <summary>
+        /// Restore a beatmap difficulty.
+        /// </summary>
+        /// <param name="beatmap">The beatmap difficulty to restore.</param>
+        public void Restore(BeatmapInfo beatmap) => beatmaps.Restore(beatmap);
 
         /// <summary>
         /// Returns a <see cref="BeatmapSetInfo"/> to a usable state if it has previously been deleted but not yet purged.
@@ -187,8 +209,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to restore.</param>
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
-            lock (beatmaps)
-                if (!beatmaps.Undelete(beatmapSet)) return;
+            if (!beatmaps.Undelete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
                 files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
@@ -249,13 +270,20 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
+        /// Refresh an existing instance of a <see cref="BeatmapSetInfo"/> from the store.
+        /// </summary>
+        /// <param name="beatmapSet">A stale instance.</param>
+        /// <returns>A fresh instance.</returns>
+        public BeatmapSetInfo Refresh(BeatmapSetInfo beatmapSet) => QueryBeatmapSet(s => s.ID == beatmapSet.ID);
+
+        /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
         public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
         {
-            lock (beatmaps) return beatmaps.QueryAndPopulate(query);
+            return beatmaps.QueryAndPopulate(query);
         }
 
         /// <summary>
@@ -265,15 +293,12 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
         {
-            lock (beatmaps)
-            {
-                BeatmapInfo set = beatmaps.Query<BeatmapInfo>().FirstOrDefault(query);
+            BeatmapInfo set = beatmaps.Query<BeatmapInfo>().FirstOrDefault(query);
 
-                if (set != null)
-                    beatmaps.Populate(set);
+            if (set != null)
+                beatmaps.Populate(set);
 
-                return set;
-            }
+            return set;
         }
 
         /// <summary>
