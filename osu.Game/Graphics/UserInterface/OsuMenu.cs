@@ -18,8 +18,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuMenu : Menu
     {
-        public OsuMenu(Direction direction)
-            : base(direction)
+        public OsuMenu(Direction direction, bool topLevelMenu = false)
+            : base(direction, topLevelMenu)
         {
             BackgroundColour = Color4.Black.Opacity(0.5f);
 
