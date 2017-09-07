@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Select
         private APIAccess api;
 
         private ScheduledDelegate pendingBeatmapSwitch;
+
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
         {
@@ -226,11 +227,14 @@ namespace osu.Game.Screens.Select
             }
             else if (failOnMissing)
             {
-                ratings.FadeTo(0.25f, transition_duration);
                 ratings.Metrics = new BeatmapMetrics
                 {
                     Ratings = new int[10],
                 };
+            }
+            else
+            {
+                ratings.FadeTo(0.25f, transition_duration);
             }
 
             if (hasRetriesFails)
@@ -240,12 +244,15 @@ namespace osu.Game.Screens.Select
             }
             else if (failOnMissing)
             {
-                failRetryContainer.FadeTo(0.25f, transition_duration);
                 failRetryGraph.Metrics = new BeatmapMetrics
                 {
                     Fails = new int[100],
                     Retries = new int[100],
                 };
+            }
+            else
+            {
+                failRetryContainer.FadeTo(0.25f, transition_duration);
             }
         }
 
