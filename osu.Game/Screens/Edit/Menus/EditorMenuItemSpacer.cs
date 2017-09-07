@@ -3,9 +3,9 @@
 
 namespace osu.Game.Screens.Edit.Menus
 {
-    public class EditorMenuSpacer : EditorMenuItem
+    public class EditorMenuItemSpacer : EditorMenuItem
     {
-        public EditorMenuSpacer()
+        public EditorMenuItemSpacer()
             : base(" ")
         {
         }
