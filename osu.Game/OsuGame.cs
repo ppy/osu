@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -245,7 +246,26 @@ namespace osu.Game
             LoadComponentAsync(Toolbar = new Toolbar
             {
                 Depth = -4,
-                OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
+                OnHome = delegate
+                {
+                    //Create variable double step home exit
+                    //If overlay was visible, home button will only close it
+                    //Pressing home twice will go to main menu. This behavior should match Key.Escape
+                    var overlayWasVisible = false;
+                    foreach (var container in overlayContainers())
+                    {
+                        if(container.State == Visibility.Visible)
+                        {
+                            container.State = Visibility.Hidden;
+                            overlayWasVisible = true;
+                        }
+                    }
+                    //Execute double exit if overlay was active
+                    if (!overlayWasVisible)
+                    {
+                        intro?.ChildScreen?.MakeCurrent();
+                    }
+                },
             }, overlayContent.Add);
 
             settings.StateChanged += delegate
@@ -323,14 +343,10 @@ namespace osu.Game
             //central game screen change logic.
             if (!currentScreen.ShowOverlays)
             {
-                settings.State = Visibility.Hidden;
-                Toolbar.State = Visibility.Hidden;
-                musicController.State = Visibility.Hidden;
-                chat.State = Visibility.Hidden;
-                direct.State = Visibility.Hidden;
-                social.State = Visibility.Hidden;
-                userProfile.State = Visibility.Hidden;
-                notificationOverlay.State = Visibility.Hidden;
+                foreach (var container in overlayContainers(true))
+                {
+                    container.State = Visibility.Hidden;
+                }
             }
             else
             {
@@ -394,6 +410,27 @@ namespace osu.Game
         private void screenRemoved(Screen newScreen)
         {
             screenChanged(newScreen);
+        }
+
+        /// <summary>
+        /// Enumerates over all overlay containers that can be found in the game,
+        /// </summary>
+        /// <param name="includeToolbar">Should enumerable reutrn toolbar</param>
+        /// <returns>Enumerable of all overlays</returns>
+        private IEnumerable<VisibilityContainer> overlayContainers(bool includeToolbar = false)
+        {
+            if (includeToolbar)
+            {
+                yield return Toolbar;
+            }
+
+            yield return settings;
+            yield return musicController;
+            yield return chat;
+            yield return direct;
+            yield return social;
+            yield return userProfile;
+            yield return notificationOverlay;
         }
     }
 }
