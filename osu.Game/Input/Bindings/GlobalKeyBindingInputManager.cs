@@ -26,7 +26,10 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
             new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
-            new KeyBinding(new[] { InputKey.Control, InputKey.D }, GlobalAction.ToggleDirect),
+            new KeyBinding(new[] { InputKey.Up }, GlobalAction.IncreaseVolume),
+            new KeyBinding(new[] { InputKey.MouseWheelUp }, GlobalAction.IncreaseVolume),
+            new KeyBinding(new[] { InputKey.Down }, GlobalAction.DecreaseVolume),
+            new KeyBinding(new[] { InputKey.MouseWheelDown }, GlobalAction.DecreaseVolume),
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
@@ -47,5 +50,9 @@ namespace osu.Game.Input.Bindings
         ToggleSettings,
         [Description("Toggle osu!direct")]
         ToggleDirect,
+        [Description("Increase Volume")]
+        IncreaseVolume,
+        [Description("Decrease Volume")]
+        DecreaseVolume,
     }
 }

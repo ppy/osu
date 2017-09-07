@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
-using OpenTK.Input;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -59,7 +58,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override bool HandleKeyPress(Key key)
+        public override bool OnPressed(TaikoAction action)
         {
             return Judgement.Result == HitResult.None && UpdateJudgement(true);
         }

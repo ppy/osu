@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -117,27 +118,36 @@ namespace osu.Game.Screens.Play
             return receptor ?? (receptor = new Receptor(this));
         }
 
+        public void SetReceptor(Receptor receptor)
+        {
+            if (this.receptor != null)
+                throw new InvalidOperationException("Cannot set a new receptor when one is already active");
+
+            this.receptor = receptor;
+        }
+
         public class Receptor : Drawable
         {
-            private readonly KeyCounterCollection target;
+            protected readonly KeyCounterCollection Target;
 
             public Receptor(KeyCounterCollection target)
             {
                 RelativeSizeAxes = Axes.Both;
-                this.target = target;
+                Depth = float.MinValue;
+                Target = target;
             }
 
             public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
             public override bool HandleInput => true;
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => target.Children.Any(c => c.TriggerOnKeyDown(state, args));
+            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyDown(state, args));
 
-            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => target.Children.Any(c => c.TriggerOnKeyUp(state, args));
+            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyUp(state, args));
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => target.Children.Any(c => c.TriggerOnMouseDown(state, args));
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseDown(state, args));
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => target.Children.Any(c => c.TriggerOnMouseUp(state, args));
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseUp(state, args));
         }
     }
 }

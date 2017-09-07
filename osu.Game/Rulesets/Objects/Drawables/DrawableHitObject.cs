@@ -106,6 +106,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <returns>Whether a hit was processed.</returns>
         protected bool UpdateJudgement(bool userTriggered)
         {
+            if (Judgement == null)
+                return false;
+
             var partial = Judgement as IPartialJudgement;
 
             // Never re-process non-partial hits

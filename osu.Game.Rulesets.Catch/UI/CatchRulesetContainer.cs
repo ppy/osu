@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override Playfield<CatchBaseHit, CatchJudgement> CreatePlayfield() => new CatchPlayfield();
 
-        public override PassThroughInputManager CreateKeyBindingInputManager() => new CatchInputManager(Ruleset?.RulesetInfo);
+        public override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
         protected override DrawableHitObject<CatchBaseHit, CatchJudgement> GetVisualRepresentation(CatchBaseHit h)
         {

@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using OpenTK.Input;
-using osu.Framework.Configuration;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -15,17 +13,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// <summary>
         /// The key that will trigger input for this hit object.
         /// </summary>
-        protected Bindable<Key> Key { get; private set; } = new Bindable<Key>();
+        protected ManiaAction Action { get; }
 
         public new TObject HitObject;
 
-        protected DrawableManiaHitObject(TObject hitObject, Bindable<Key> key = null)
+        protected DrawableManiaHitObject(TObject hitObject, ManiaAction? action = null)
             : base(hitObject)
         {
             HitObject = hitObject;
 
-            if (key != null)
-                Key.BindTo(key);
+            if (action != null)
+                Action = action.Value;
         }
 
         public override Color4 AccentColour

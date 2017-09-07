@@ -56,6 +56,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
 
+        public override bool OnPressed(TaikoAction action) => false;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {

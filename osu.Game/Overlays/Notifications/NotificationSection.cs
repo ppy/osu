@@ -24,10 +24,9 @@ namespace osu.Game.Overlays.Notifications
 
         private FlowContainer<Notification> notifications;
 
-        public void Add(Notification notification)
-        {
-            notifications.Add(notification);
-        }
+        public int DisplayedCount => notifications.Count(n => !n.WasClosed);
+
+        public void Add(Notification notification) => notifications.Add(notification);
 
         public IEnumerable<Type> AcceptTypes;
 

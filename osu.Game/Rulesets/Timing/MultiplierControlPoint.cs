@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// The multiplier which this <see cref="MultiplierControlPoint"/> provides.
         /// </summary>
-        public double Multiplier => 1000 / TimingPoint.BeatLength / DifficultyPoint.SpeedMultiplier;
+        public double Multiplier => 1000 / TimingPoint.BeatLength * DifficultyPoint.SpeedMultiplier;
 
         /// <summary>
         /// The <see cref="TimingControlPoint"/> that provides the timing information for this <see cref="MultiplierControlPoint"/>.

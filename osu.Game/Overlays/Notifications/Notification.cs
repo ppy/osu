@@ -19,9 +19,9 @@ namespace osu.Game.Overlays.Notifications
     public abstract class Notification : Container
     {
         /// <summary>
-        /// Use requested close.
+        /// User requested close.
         /// </summary>
-        public Action Closed;
+        public event Action Closed;
 
         /// <summary>
         /// Run on user activating the notification. Return true to close.
@@ -142,12 +142,12 @@ namespace osu.Game.Overlays.Notifications
             NotificationContent.MoveToX(0, 500, Easing.OutQuint);
         }
 
-        private bool wasClosed;
+        public bool WasClosed;
 
         public virtual void Close()
         {
-            if (wasClosed) return;
-            wasClosed = true;
+            if (WasClosed) return;
+            WasClosed = true;
 
             Closed?.Invoke();
             this.FadeOut(100);

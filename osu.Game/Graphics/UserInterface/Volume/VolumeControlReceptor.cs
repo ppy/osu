@@ -3,32 +3,16 @@
 
 using System;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
-using OpenTK.Input;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
-    internal class VolumeControlReceptor : Container
+    internal class VolumeControlReceptor : Container, IKeyBindingHandler<GlobalAction>
     {
-        public Action<InputState> ActionRequested;
+        public Func<GlobalAction, bool> ActionRequested;
 
-        protected override bool OnWheel(InputState state)
-        {
-            ActionRequested?.Invoke(state);
-            return true;
-        }
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            switch (args.Key)
-            {
-                case Key.Up:
-                case Key.Down:
-                    ActionRequested?.Invoke(state);
-                    return true;
-            }
-
-            return base.OnKeyDown(state, args);
-        }
+        public bool OnPressed(GlobalAction action) => ActionRequested?.Invoke(action) ?? false;
+        public bool OnReleased(GlobalAction action) => false;
     }
 }

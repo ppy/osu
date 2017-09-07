@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
 
 namespace osu.Game.Beatmaps
 {
@@ -73,8 +72,6 @@ namespace osu.Game.Beatmaps
                 }
 
                 public override string Description => "dummy";
-
-                public override IEnumerable<KeyCounter> CreateGameplayKeys() => new List<KeyCounter>();
 
                 public DummyRuleset(RulesetInfo rulesetInfo)
                     : base(rulesetInfo)

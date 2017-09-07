@@ -94,20 +94,22 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
+        private SQLiteConnection connection;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
+            connection = Host.Storage.GetDatabase(@"client");
 
             connection.CreateTable<StoreVersion>();
 
             dependencies.Cache(RulesetStore = new RulesetStore(connection));
             dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
             dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(connection, RulesetStore));
             dependencies.Cache(new OsuColour());
 
@@ -150,14 +152,10 @@ namespace osu.Game
 
             Beatmap.ValueChanged += b =>
             {
-                // compare to last baetmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
+                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
                 if (lastBeatmap?.Track != b.Track)
                 {
-                    // this disposal is done to stop the audio track.
-                    // it may not be exactly what we want for cases beatmaps are reused, as it will
-                    // trigger a fresh load of contained resources.
-                    lastBeatmap?.Dispose();
-
+                    lastBeatmap?.Track?.Dispose();
                     Audio.Track.AddItem(b.Track);
                 }
 
@@ -236,6 +234,8 @@ namespace osu.Game
                 LocalConfig.Set(OsuSetting.Token, LocalConfig.Get<bool>(OsuSetting.SavePassword) ? API.Token : string.Empty);
                 LocalConfig.Save();
             }
+
+            connection.Dispose();
 
             base.Dispose(isDisposing);
         }

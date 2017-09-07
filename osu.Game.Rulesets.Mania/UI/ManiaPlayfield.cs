@@ -11,9 +11,9 @@ using osu.Framework.Graphics.Containers;
 using System;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
-using OpenTK.Input;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Framework.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
@@ -23,12 +23,6 @@ namespace osu.Game.Rulesets.Mania.UI
     public class ManiaPlayfield : ScrollingPlayfield<ManiaHitObject, ManiaJudgement>
     {
         public const float HIT_TARGET_POSITION = 50;
-
-        /// <summary>
-        /// Default column keys, expanding outwards from the middle as more column are added.
-        /// E.g. 2 columns use FJ, 4 columns use DFJK, 6 use SDFJKL, etc...
-        /// </summary>
-        private static readonly Key[] default_keys = { Key.A, Key.S, Key.D, Key.F, Key.J, Key.K, Key.L, Key.Semicolon };
 
         private SpecialColumnPosition specialColumnPosition;
         /// <summary>
@@ -44,6 +38,11 @@ namespace osu.Game.Rulesets.Mania.UI
                 specialColumnPosition = value;
             }
         }
+
+        /// <summary>
+        /// Whether this playfield should be inverted. This flips everything inside the playfield.
+        /// </summary>
+        public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
         private readonly FlowContainer<Column> columns;
         public IEnumerable<Column> Columns => columns.Children;
@@ -63,6 +62,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             if (columnCount <= 0)
                 throw new ArgumentException("Can't have zero or fewer columns.");
+
+            Inverted.Value = true;
 
             InternalChildren = new Drawable[]
             {
@@ -122,14 +123,26 @@ namespace osu.Game.Rulesets.Mania.UI
                 }
             };
 
+            var currentAction = ManiaAction.Key1;
             for (int i = 0; i < columnCount; i++)
             {
                 var c = new Column();
                 c.VisibleTimeRange.BindTo(VisibleTimeRange);
 
+                c.IsSpecial = isSpecialColumn(i);
+                c.Action = c.IsSpecial ? ManiaAction.Special : currentAction++;
+
                 columns.Add(c);
                 AddNested(c);
             }
+
+            Inverted.ValueChanged += invertedChanged;
+            Inverted.TriggerChange();
+        }
+
+        private void invertedChanged(bool newValue)
+        {
+            Scale = new Vector2(1, newValue ? -1 : 1);
         }
 
         [BackgroundDependencyLoader]
@@ -144,15 +157,11 @@ namespace osu.Game.Rulesets.Mania.UI
             specialColumnColour = colours.BlueDark;
 
             // Set the special column + colour + key
-            for (int i = 0; i < columnCount; i++)
+            foreach (var column in Columns)
             {
-                Column column = Columns.ElementAt(i);
-                column.IsSpecial = isSpecialColumn(i);
-
                 if (!column.IsSpecial)
                     continue;
 
-                column.Key.Value = Key.Space;
                 column.AccentColour = specialColumnColour;
             }
 
@@ -165,21 +174,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 Color4 colour = normalColumnColours[i % normalColumnColours.Count];
                 nonSpecialColumns[i].AccentColour = colour;
                 nonSpecialColumns[nonSpecialColumns.Count - 1 - i].AccentColour = colour;
-            }
-
-            // We'll set the keys for non-special columns in another separate loop because it's not mirrored like the above colours
-            // Todo: This needs to go when we get to bindings and use Button1, ..., ButtonN instead
-            for (int i = 0; i < nonSpecialColumns.Count; i++)
-            {
-                Column column = nonSpecialColumns[i];
-
-                int keyOffset = default_keys.Length / 2 - nonSpecialColumns.Count / 2 + i;
-                if (keyOffset >= 0 && keyOffset < default_keys.Length)
-                    column.Key.Value = default_keys[keyOffset];
-                else
-                    // There is no default key defined for this column. Let's set this to Unknown for now
-                    // however note that this will be gone after bindings are in place
-                    column.Key.Value = Key.Unknown;
             }
         }
 

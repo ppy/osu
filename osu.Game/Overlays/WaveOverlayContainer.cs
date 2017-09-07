@@ -167,6 +167,8 @@ namespace osu.Game.Overlays
 
         private class Wave : Container, IStateful<Visibility>
         {
+            public event Action<Visibility> StateChanged;
+
             public float FinalPosition;
 
             public Wave()
@@ -200,6 +202,7 @@ namespace osu.Game.Overlays
             }
 
             private Visibility state;
+
             public Visibility State
             {
                 get { return state; }
@@ -216,6 +219,8 @@ namespace osu.Game.Overlays
                             this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show);
                             break;
                     }
+
+                    StateChanged?.Invoke(State);
                 }
             }
         }
