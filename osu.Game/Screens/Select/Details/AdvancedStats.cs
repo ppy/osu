@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Select.Details
                 {
                     difficultyValue = value;
                     bar.Length = value / maxValue;
-                    this.value.Text = value.ToString(forceDecimalPlaces ? "#.00" : "0.##");
+                    this.value.Text = value.ToString(forceDecimalPlaces ? "0.00" : "0.##");
                 }
             }
 
