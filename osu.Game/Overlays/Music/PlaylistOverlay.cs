@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Music
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            beatmapBacking.ValueChanged += b => list.SelectedItem = b?.BeatmapSetInfo;
+            beatmapBacking.ValueChanged += b => list.SelectedSet = b?.BeatmapSetInfo;
             beatmapBacking.TriggerChange();
         }
 
@@ -126,24 +126,24 @@ namespace osu.Game.Overlays.Music
 
         public void PlayPrevious()
         {
-            var currentID = beatmapBacking.Value?.BeatmapSetInfo.ID ?? -1;
-            var available = BeatmapSets.Reverse();
-
-            var playable = available.SkipWhile(b => b.ID != currentID).Skip(1).FirstOrDefault() ?? available.FirstOrDefault();
+            var playable = list.PreviousSet;
 
             if (playable != null)
+            {
                 playSpecified(playable.Beatmaps[0]);
+                list.SelectedSet = playable;
+            }
         }
 
         public void PlayNext()
         {
-            var currentID = beatmapBacking.Value?.BeatmapSetInfo.ID ?? -1;
-            var available = BeatmapSets;
-
-            var playable = available.SkipWhile(b => b.ID != currentID).Skip(1).FirstOrDefault() ?? available.FirstOrDefault();
+            var playable = list.NextSet;
 
             if (playable != null)
+            {
                 playSpecified(playable.Beatmaps[0]);
+                list.SelectedSet = playable;
+            }
         }
 
         private void playSpecified(BeatmapInfo info)

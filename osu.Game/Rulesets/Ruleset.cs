@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
@@ -57,8 +57,6 @@ namespace osu.Game.Rulesets
 
         public abstract string Description { get; }
 
-        public abstract IEnumerable<KeyCounter> CreateGameplayKeys();
-
         public virtual SettingsSubsection CreateSettings() => null;
 
         /// <summary>
@@ -77,5 +75,12 @@ namespace osu.Game.Rulesets
         /// <param name="variant">A variant.</param>
         /// <returns>A list of valid <see cref="KeyBinding"/>s.</returns>
         public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new KeyBinding[] { };
+
+        /// <summary>
+        /// Gets the name for a key binding variant. This is used for display in the settings overlay.
+        /// </summary>
+        /// <param name="variant">The variant.</param>
+        /// <returns>A descriptive name of the variant.</returns>
+        public virtual string GetVariantName(int variant) => string.Empty;
     }
 }

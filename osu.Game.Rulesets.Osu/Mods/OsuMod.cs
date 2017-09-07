@@ -7,8 +7,13 @@ using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -28,10 +33,23 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.06;
     }
 
-    public class OsuModHardRock : ModHardRock
+    public class OsuModHardRock : ModHardRock, IApplicableMod<OsuHitObject>
     {
         public override double ScoreMultiplier => 1.06;
         public override bool Ranked => true;
+
+        public void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
+        {
+            rulesetContainer.Objects.OfType<OsuHitObject>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Y));
+            rulesetContainer.Objects.OfType<Slider>().ForEach(s =>
+            {
+                var newControlPoints = new List<Vector2>();
+                s.ControlPoints.ForEach(c => newControlPoints.Add(new Vector2(c.X, OsuPlayfield.BASE_SIZE.Y - c.Y)));
+
+                s.ControlPoints = newControlPoints;
+                s.Curve?.Calculate(); // Recalculate the slider curve
+            });
+        }
     }
 
     public class OsuModSuddenDeath : ModSuddenDeath

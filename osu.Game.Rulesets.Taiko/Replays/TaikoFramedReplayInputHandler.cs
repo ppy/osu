@@ -4,7 +4,6 @@
 using osu.Game.Rulesets.Replays;
 using System.Collections.Generic;
 using osu.Framework.Input;
-using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
@@ -17,21 +16,18 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
         public override List<InputState> GetPendingStates()
         {
-            var keys = new List<Key>();
+            var actions = new List<TaikoAction>();
 
             if (CurrentFrame?.MouseRight1 == true)
-                keys.Add(Key.F);
+                actions.Add(TaikoAction.LeftCentre);
             if (CurrentFrame?.MouseRight2 == true)
-                keys.Add(Key.J);
+                actions.Add(TaikoAction.RightCentre);
             if (CurrentFrame?.MouseLeft1 == true)
-                keys.Add(Key.D);
+                actions.Add(TaikoAction.LeftRim);
             if (CurrentFrame?.MouseLeft2 == true)
-                keys.Add(Key.K);
+                actions.Add(TaikoAction.RightRim);
 
-            return new List<InputState>
-            {
-                new InputState { Keyboard = new ReplayKeyboardState(keys) }
-            };
+            return new List<InputState> { new ReplayState<TaikoAction> { PressedActions = actions } };
         }
     }
 }
