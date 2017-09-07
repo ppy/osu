@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Scoring
 
         public int Combo { get; set; }
 
-        public RulesetInfo Ruleset;
+        public RulesetInfo Ruleset { get; set; }
 
-        public Mod[] Mods;
+        public Mod[] Mods { get; set; }
 
         [JsonProperty(@"user")]
         public User User;
