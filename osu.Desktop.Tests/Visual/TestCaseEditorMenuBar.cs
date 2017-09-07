@@ -2,13 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Menus;
 
 namespace osu.Desktop.Tests.Visual
 {
-    public class TestCaseEditorMenuBar : TestCase
+    public class TestCaseEditorMenuBar : OsuTestCase
     {
         public TestCaseEditorMenuBar()
         {
