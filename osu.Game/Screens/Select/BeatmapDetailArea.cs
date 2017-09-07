@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Select
         {
             base.UpdateAfterChildren();
 
-            Details.Height = Math.Min(DrawHeight - (details_padding * 3) - BeatmapDetailAreaTabControl.HEIGHT, 450);
+            Details.Height = Math.Min(DrawHeight - details_padding * 3 - BeatmapDetailAreaTabControl.HEIGHT, 450);
         }
     }
 }

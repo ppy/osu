@@ -306,7 +306,6 @@ namespace osu.Game.Screens.Select
 
         private class MetadataSection : Container
         {
-            private readonly OsuSpriteText title;
             private readonly TextFlowContainer textFlow;
 
             public string Text
@@ -347,7 +346,7 @@ namespace osu.Game.Screens.Select
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Child = this.title = new OsuSpriteText
+                            Child = new OsuSpriteText
                             {
                                 Text = title,
                                 Font = @"Exo2.0-Bold",
