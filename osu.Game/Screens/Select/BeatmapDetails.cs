@@ -215,8 +215,8 @@ namespace osu.Game.Screens.Select
 
         private void displayMetrics(BeatmapMetrics metrics, bool failOnMissing = true)
         {
-            var hasRatings = metrics?.Ratings.Any() ?? false;
-            var hasRetriesFails = (metrics?.Retries.Any() ?? false) && metrics.Fails.Any();
+            var hasRatings = metrics?.Ratings?.Any() ?? false;
+            var hasRetriesFails = (metrics?.Retries?.Any() ?? false) && (metrics?.Fails?.Any() ?? false);
 
             if (failOnMissing) loading.Hide();
 
