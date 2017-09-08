@@ -5,9 +5,9 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Storyboards
 {
-    public class SampleDefinition : ElementDefinition
+    public class SampleDefinition : IElementDefinition
     {
-        public string Path { get; private set; }
+        public string Path { get; set; }
         public double Time;
         public float Volume;
 

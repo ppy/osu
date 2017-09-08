@@ -21,8 +21,7 @@ namespace osu.Desktop.Tests.Visual
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-        private MusicController musicController;
-        private Container<Storyboard> storyboardContainer;
+        private readonly Container<Storyboard> storyboardContainer;
         private Storyboard storyboard;
 
         public TestCaseStoryboard()
@@ -45,7 +44,7 @@ namespace osu.Desktop.Tests.Visual
                     },
                 },
             });
-            Add(musicController = new MusicController
+            Add(new MusicController
             {
                 Origin = Anchor.TopRight,
                 Anchor = Anchor.TopRight,

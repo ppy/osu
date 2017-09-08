@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace osu.Game.Storyboards
 {
-    public class CommandTimeline<T> : CommandTimeline
+    public class CommandTimeline<T> : ICommandTimeline
     {
         private readonly List<TypedCommand> commands = new List<TypedCommand>();
         public IEnumerable<TypedCommand> Commands => commands.OrderBy(c => c.StartTime);
@@ -37,7 +37,7 @@ namespace osu.Game.Storyboards
         public override string ToString()
             => $"{commands.Count} command(s)";
 
-        public class TypedCommand : Command
+        public class TypedCommand : ICommand
         {
             public Easing Easing { get; set; }
             public double StartTime { get; set; }
@@ -52,14 +52,14 @@ namespace osu.Game.Storyboards
         }
     }
 
-    public interface CommandTimeline
+    public interface ICommandTimeline
     {
         double StartTime { get; }
         double EndTime { get; }
         bool HasCommands { get; }
     }
 
-    public interface Command
+    public interface ICommand
     {
         Easing Easing { get; set; }
         double StartTime { get; set; }

@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.File;
 using System.Linq;
 
 namespace osu.Game.Storyboards.Drawables

@@ -13,8 +13,8 @@ namespace osu.Game.Storyboards
         public bool EnabledWhenPassing = true;
         public bool EnabledWhenFailing = true;
 
-        private List<ElementDefinition> elements = new List<ElementDefinition>();
-        public IEnumerable<ElementDefinition> Elements => elements;
+        private readonly List<IElementDefinition> elements = new List<IElementDefinition>();
+        public IEnumerable<IElementDefinition> Elements => elements;
 
         public LayerDefinition(string name, int depth)
         {
@@ -22,7 +22,7 @@ namespace osu.Game.Storyboards
             Depth = depth;
         }
 
-        public void Add(ElementDefinition element)
+        public void Add(IElementDefinition element)
         {
             elements.Add(element);
         }

@@ -5,20 +5,20 @@ namespace osu.Game.Storyboards
 {
     public class CommandTrigger : CommandTimelineGroup
     {
-        private string triggerName;
-        private double startTime;
-        private double endTime;
-        private int groupNumber;
+        public string TriggerName;
+        public double TriggerStartTime;
+        public double TriggerEndTime;
+        public int GroupNumber;
 
         public CommandTrigger(string triggerName, double startTime, double endTime, int groupNumber)
         {
-            this.triggerName = triggerName;
-            this.startTime = startTime;
-            this.endTime = endTime;
-            this.groupNumber = groupNumber;
+            TriggerName = triggerName;
+            TriggerStartTime = startTime;
+            TriggerEndTime = endTime;
+            GroupNumber = groupNumber;
         }
 
         public override string ToString()
-            => $"{triggerName} {startTime} -> {endTime} ({groupNumber})";
+            => $"{TriggerName} {TriggerStartTime} -> {TriggerEndTime} ({GroupNumber})";
     }
 }
