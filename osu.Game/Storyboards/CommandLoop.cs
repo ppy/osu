@@ -1,8 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Transforms;
+using System.Collections.Generic;
 
 namespace osu.Game.Storyboards
 {
@@ -20,11 +19,15 @@ namespace osu.Game.Storyboards
             LoopCount = loopCount;
         }
 
-        public override void ApplyTransforms(Drawable drawable, double offset = 0)
-            => base.ApplyTransforms(drawable, offset + LoopStartTime);
-
-        protected override void PostProcess(ICommand command, TransformSequence<Drawable> sequence)
-            => sequence.Loop(CommandsDuration - command.Duration, LoopCount);
+        public override IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)
+        {
+            for (var loop = 0; loop < LoopCount; loop++)
+            {
+                var loopOffset = LoopStartTime + loop * CommandsDuration;
+                foreach (var command in base.GetCommands(timelineSelector, offset + loopOffset))
+                    yield return command;
+            }
+        }
 
         public override string ToString()
             => $"{LoopStartTime} x{LoopCount}";
