@@ -115,23 +115,8 @@ namespace osu.Game.Overlays.Direct
             base.OnHoverLost(state);
         }
 
-        // this should eventually be moved to a more central place, like BeatmapManager.
-        private DownloadBeatmapSetRequest downloadRequest;
-
         protected void StartDownload()
         {
-            if (api == null) return;
-
-            // we already have an active download running.
-            if (downloadRequest != null)
-            {
-                content.MoveToX(-5, 50, Easing.OutSine).Then()
-                       .MoveToX(5, 100, Easing.InOutSine).Then()
-                       .MoveToX(-5, 100, Easing.InOutSine).Then()
-                       .MoveToX(0, 50, Easing.InSine).Then();
-                return;
-            }
-
             if (!api.LocalUser.Value.IsSupporter)
             {
                 notifications.Post(new SimpleNotification
@@ -142,25 +127,28 @@ namespace osu.Game.Overlays.Direct
                 return;
             }
 
+            // we already have an active download running.
+            if (beatmaps.IsDownloading(SetInfo))
+            {
+                content.MoveToX(-5, 50, Easing.OutSine).Then()
+                       .MoveToX(5, 100, Easing.InOutSine).Then()
+                       .MoveToX(-5, 100, Easing.InOutSine).Then()
+                       .MoveToX(0, 50, Easing.InSine).Then();
+                return;
+            }
+
+            var downloadRequest = beatmaps.Download(SetInfo);
+
             progressBar.FadeIn(400, Easing.OutQuint);
             progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
 
             progressBar.Current.Value = 0;
 
-            ProgressNotification downloadNotification = new ProgressNotification
-            {
-                Text = $"Downloading {SetInfo.Metadata.Artist} - {SetInfo.Metadata.Title}",
-            };
-
-            downloadRequest = new DownloadBeatmapSetRequest(SetInfo);
             downloadRequest.Failure += e =>
             {
                 progressBar.Current.Value = 0;
                 progressBar.FadeOut(500);
-                downloadNotification.State = ProgressNotificationState.Completed;
                 Logger.Error(e, "Failed to get beatmap download information");
-
-                downloadRequest = null;
             };
 
             downloadRequest.Progress += (current, total) =>
@@ -169,45 +157,13 @@ namespace osu.Game.Overlays.Direct
 
                 progressBar.Current.Value = progress;
 
-                downloadNotification.State = ProgressNotificationState.Active;
-                downloadNotification.Progress = progress;
             };
 
             downloadRequest.Success += data =>
             {
                 progressBar.Current.Value = 1;
                 progressBar.FadeOut(500);
-
-                downloadNotification.State = ProgressNotificationState.Completed;
-
-                using (var stream = new MemoryStream(data))
-                using (var archive = new OszArchiveReader(stream))
-                    beatmaps.Import(archive);
             };
-
-            downloadNotification.CancelRequested += () =>
-            {
-                downloadRequest.Cancel();
-                downloadRequest = null;
-                return true;
-            };
-
-            notifications.Post(downloadNotification);
-
-            // don't run in the main api queue as this is a long-running task.
-            Task.Run(() => downloadRequest.Perform(api));
-        }
-
-        public class DownloadBeatmapSetRequest : APIDownloadRequest
-        {
-            private readonly BeatmapSetInfo beatmapSet;
-
-            public DownloadBeatmapSetRequest(BeatmapSetInfo beatmapSet)
-            {
-                this.beatmapSet = beatmapSet;
-            }
-
-            protected override string Target => $@"beatmapsets/{beatmapSet.OnlineBeatmapSetID}/download";
         }
 
         protected override void LoadComplete()

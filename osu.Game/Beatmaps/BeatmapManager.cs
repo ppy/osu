@@ -20,6 +20,9 @@ using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using SQLite.Net;
+using osu.Game.Online.API.Requests;
+using System.Threading.Tasks;
+using osu.Game.Online.API;
 
 namespace osu.Game.Beatmaps
 {
@@ -63,6 +66,10 @@ namespace osu.Game.Beatmaps
 
         private readonly BeatmapStore beatmaps;
 
+        private readonly APIAccess api;
+
+        private readonly Dictionary<BeatmapSetInfo, DownloadBeatmapSetRequest> downloadsMap;
+
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
 
@@ -76,7 +83,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
-        public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, IIpcHost importHost = null)
+        public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
         {
             beatmaps = new BeatmapStore(connection);
             beatmaps.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
@@ -88,9 +95,12 @@ namespace osu.Game.Beatmaps
             this.files = files;
             this.connection = connection;
             this.rulesets = rulesets;
+            this.api = api;
 
             if (importHost != null)
                 ipc = new BeatmapIPCChannel(importHost, this);
+
+            downloadsMap = new Dictionary<BeatmapSetInfo, DownloadBeatmapSetRequest>();
         }
 
         /// <summary>
@@ -176,6 +186,68 @@ namespace osu.Game.Beatmaps
 
             beatmaps.Add(beatmapSetInfo);
         }
+
+        /// <summary>
+        /// Download a beatmap
+        /// </summary>
+        /// <param name="beatmapSetInfo">The beatmap to be downloaded</param>
+        public DownloadBeatmapSetRequest Download(BeatmapSetInfo beatmapSetInfo)
+        {
+            if (api == null || downloadsMap.ContainsKey(beatmapSetInfo)) return null;
+
+            ProgressNotification downloadNotification = new ProgressNotification
+            {
+                Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
+            };
+
+            var request = new DownloadBeatmapSetRequest(beatmapSetInfo);
+
+            request.DownloadProgressed += progress =>
+            {
+                downloadNotification.State = ProgressNotificationState.Active;
+                downloadNotification.Progress = progress;
+            };
+
+            request.Success += data =>
+            {
+                downloadNotification.State = ProgressNotificationState.Completed;
+
+                using (var stream = new MemoryStream(data))
+                using (var archive = new OszArchiveReader(stream))
+                    Import(archive);
+
+                downloadsMap.Remove(beatmapSetInfo);
+            };
+
+            request.Failure += data =>
+            {
+                downloadNotification.State = ProgressNotificationState.Completed;
+                Logger.Error(data, "Failed to get beatmap download information");
+                downloadsMap.Remove(beatmapSetInfo);
+            };
+
+            downloadNotification.CancelRequested += () =>
+            {
+                Logger.Log("Cancel requested");
+                downloadsMap.Remove(beatmapSetInfo);
+                return true;
+            };
+
+            downloadsMap[beatmapSetInfo] = request;
+            PostNotification?.Invoke(downloadNotification);
+
+            // don't run in the main api queue as this is a long-running task.
+            Task.Run(() => request.Perform(api));
+
+            return request;
+        }
+
+        /// <summary>
+        /// Check if a beatmap is already downloading.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="BeatmapSetInfo"/>to check against.</param>
+        /// <returns>true if a download request already exists, false if it doesn't.</returns>
+        public bool IsDownloading(BeatmapSetInfo beatmap) => downloadsMap.ContainsKey(beatmap);
 
         /// <summary>
         /// Delete a beatmap from the manager.
