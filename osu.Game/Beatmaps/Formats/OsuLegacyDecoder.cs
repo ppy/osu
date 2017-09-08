@@ -376,7 +376,7 @@ namespace osu.Game.Beatmaps.Formats
                                         var startY = float.Parse(split[5], CultureInfo.InvariantCulture);
                                         var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
                                         var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
-                                        timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(startX, endY));
+                                        timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
                                     }
                                     break;
                                 case "R":
