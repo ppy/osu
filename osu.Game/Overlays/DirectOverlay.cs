@@ -63,6 +63,10 @@ namespace osu.Game.Overlays
                 }
 
                 ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));
+
+                if (beatmapSets.Any() && panels == null)
+                    // real use case? currently only seems to be for test case
+                    recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             }
         }
 
@@ -256,7 +260,7 @@ namespace osu.Game.Overlays
             {
                 BeatmapSets = r?.
                                 Select(response => response.ToBeatmapSet(rulesets)).
-                                Where(b => (beatmaps.QueryBeatmapSet(q => q.OnlineBeatmapSetID == b.OnlineBeatmapSetID) == null));
+                                Where(b => beatmaps.QueryBeatmapSet(q => q.OnlineBeatmapSetID == b.OnlineBeatmapSetID) == null);
 
                 recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             };
