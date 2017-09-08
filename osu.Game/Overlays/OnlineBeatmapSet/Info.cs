@@ -129,6 +129,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                         Font = @"Exo2.0-Bold",
                         TextSize = 14,
                         Text = title,
+                        Shadow = false,
                         Margin = new MarginPadding { Top = 20 },
                     },
                     content = new TextFlowContainer
