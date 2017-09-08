@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Direct
             get { return downloadRequest; }
             set
             {
-                if (value == null) return;
+                if (value == null || downloadRequest == value) return;
 
                 downloadRequest = value;
 
