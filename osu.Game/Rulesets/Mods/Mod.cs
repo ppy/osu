@@ -17,6 +17,11 @@ namespace osu.Game.Rulesets.Mods
         public abstract string Name { get; }
 
         /// <summary>
+        /// The shortened name of this mod.
+        /// </summary>
+        public abstract string ShortenedName { get; }
+
+        /// <summary>
         /// The icon of this mod.
         /// </summary>
         public virtual FontAwesome Icon => FontAwesome.fa_question;
