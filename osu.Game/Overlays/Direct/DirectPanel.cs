@@ -60,13 +60,7 @@ namespace osu.Game.Overlays.Direct
                     Logger.Error(e, "Failed to get beatmap download information");
                 };
 
-                downloadRequest.Progress += (current, total) =>
-                {
-                    float progress = (float)current / total;
-
-                    progressBar.Current.Value = progress;
-
-                };
+                downloadRequest.DownloadProgressed += progress => progressBar.Current.Value = progress;
 
                 downloadRequest.Success += data =>
                 {
