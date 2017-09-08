@@ -4,7 +4,6 @@
 using osu.Game.Storyboards.Drawables;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace osu.Game.Storyboards
 {
@@ -12,12 +11,12 @@ namespace osu.Game.Storyboards
     {
         private Dictionary<string, LayerDefinition> layers = new Dictionary<string, LayerDefinition>();
         public IEnumerable<LayerDefinition> Layers => layers.Values;
-        
+
         public StoryboardDefinition()
         {
             layers.Add("Background", new LayerDefinition("Background", 3));
             layers.Add("Fail", new LayerDefinition("Fail", 2) { EnabledWhenPassing = false, });
-            layers.Add("Pass", new LayerDefinition("Pass", 1) { ShowWhenFailing = false, });
+            layers.Add("Pass", new LayerDefinition("Pass", 1) { EnabledWhenFailing = false, });
             layers.Add("Foreground", new LayerDefinition("Foreground", 0));
         }
 

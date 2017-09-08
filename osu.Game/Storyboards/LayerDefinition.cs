@@ -11,11 +11,11 @@ namespace osu.Game.Storyboards
         public string Name;
         public int Depth;
         public bool EnabledWhenPassing = true;
-        public bool ShowWhenFailing = true;
+        public bool EnabledWhenFailing = true;
 
         private List<ElementDefinition> elements = new List<ElementDefinition>();
         public IEnumerable<ElementDefinition> Elements => elements;
-        
+
         public LayerDefinition(string name, int depth)
         {
             Name = name;
