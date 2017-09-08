@@ -188,9 +188,9 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Download a beatmap
+        /// Downloads a beatmap.
         /// </summary>
-        /// <param name="beatmapSetInfo">The beatmap to be downloaded</param>
+        /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to be downloaded.</param>
         /// <returns>The new <see cref="DownloadBeatmapSetRequest"/>, or null if a download already exists for the same beatmap.</returns>
         public DownloadBeatmapSetRequest Download(BeatmapSetInfo beatmapSetInfo)
         {
