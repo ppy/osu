@@ -9,7 +9,7 @@ namespace osu.Game.Storyboards
 {
     public class StoryboardDefinition
     {
-        private Dictionary<string, LayerDefinition> layers = new Dictionary<string, LayerDefinition>();
+        private readonly Dictionary<string, LayerDefinition> layers = new Dictionary<string, LayerDefinition>();
         public IEnumerable<LayerDefinition> Layers => layers.Values;
 
         public StoryboardDefinition()

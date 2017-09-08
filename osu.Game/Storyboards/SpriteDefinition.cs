@@ -19,8 +19,8 @@ namespace osu.Game.Storyboards
         private readonly List<CommandLoop> loops = new List<CommandLoop>();
         private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();
 
-        private delegate void DrawablePropertyInitializer<T>(Drawable drawable, T value);
-        private delegate void DrawableTransformer<T>(Drawable drawable, T value, double duration, Easing easing);
+        private delegate void DrawablePropertyInitializer<in T>(Drawable drawable, T value);
+        private delegate void DrawableTransformer<in T>(Drawable drawable, T value, double duration, Easing easing);
 
         public SpriteDefinition(string path, Anchor origin, Vector2 initialPosition)
         {
