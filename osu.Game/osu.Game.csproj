@@ -538,6 +538,9 @@
     <Compile Include="Screens\Multiplayer\ParticipantInfo.cs" />
     <Compile Include="Screens\Multiplayer\ModeTypeInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSetOverlay.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\Info.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\Header.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
