@@ -96,6 +96,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModSpunOut : Mod
     {
         public override string Name => "Spun Out";
+        public override string ShortenedName => "SO";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_spunout;
         public override string Description => @"Spinners will be automatically completed";
         public override double ScoreMultiplier => 0.9;
@@ -106,6 +107,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModAutopilot : Mod
     {
         public override string Name => "Autopilot";
+        public override string ShortenedName => "AP";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_autopilot;
         public override string Description => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier => 0;
@@ -126,6 +128,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModTarget : Mod
     {
         public override string Name => "Target";
+        public override string ShortenedName => "TP";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_target;
         public override string Description => @"";
         public override double ScoreMultiplier => 1;
