@@ -23,7 +23,7 @@ namespace osu.Game.Storyboards
         public CommandTimeline<bool> FlipH = new CommandTimeline<bool>();
         public CommandTimeline<bool> FlipV = new CommandTimeline<bool>();
 
-        public IEnumerable<CommandTimeline> Timelines
+        public IEnumerable<ICommandTimeline> Timelines
         {
             get
             {
@@ -99,7 +99,7 @@ namespace osu.Game.Storyboards
             }
         }
 
-        protected virtual void PostProcess(Command command, TransformSequence<Drawable> sequence)
+        protected virtual void PostProcess(ICommand command, TransformSequence<Drawable> sequence)
         {
         }
     }

@@ -86,7 +86,7 @@
     <Compile Include="Storyboards\Drawables\StoryboardAnimation.cs" />
     <Compile Include="Storyboards\Drawables\StoryboardSprite.cs" />
     <Compile Include="Storyboards\AnimationDefinition.cs" />
-    <Compile Include="Storyboards\ElementDefinition.cs" />
+    <Compile Include="Storyboards\IElementDefinition.cs" />
     <Compile Include="Storyboards\CommandTimeline.cs" />
     <Compile Include="Storyboards\CommandTimelineGroup.cs" />
     <Compile Include="Storyboards\CommandTrigger.cs" />

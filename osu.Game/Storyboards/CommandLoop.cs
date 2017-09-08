@@ -20,7 +20,7 @@ namespace osu.Game.Storyboards
         public override void ApplyTransforms(Drawable drawable, double offset = 0)
             => base.ApplyTransforms(drawable, offset + LoopStartTime);
 
-        protected override void PostProcess(Command command, TransformSequence<Drawable> sequence)
+        protected override void PostProcess(ICommand command, TransformSequence<Drawable> sequence)
             => sequence.Loop(Duration - command.Duration, LoopCount);
 
         public override string ToString()

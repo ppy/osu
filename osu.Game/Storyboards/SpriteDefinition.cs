@@ -9,14 +9,14 @@ using System.Linq;
 
 namespace osu.Game.Storyboards
 {
-    public class SpriteDefinition : CommandTimelineGroup, ElementDefinition
+    public class SpriteDefinition : CommandTimelineGroup, IElementDefinition
     {
-        public string Path { get; private set; }
+        public string Path { get; set; }
         public Anchor Origin;
         public Vector2 InitialPosition;
 
-        private List<CommandLoop> loops = new List<CommandLoop>();
-        private List<CommandTrigger> triggers = new List<CommandTrigger>();
+        private readonly List<CommandLoop> loops = new List<CommandLoop>();
+        private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();
 
         public SpriteDefinition(string path, Anchor origin, Vector2 initialPosition)
         {
