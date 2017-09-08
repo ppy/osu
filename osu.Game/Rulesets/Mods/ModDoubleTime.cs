@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public class ModDoubleTime : Mod, IApplicableToClock
     {
         public override string Name => "Double Time";
+        public override string ShortenedName => "DT";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_doubletime;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Zoooooooooom";
