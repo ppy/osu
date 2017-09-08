@@ -212,7 +212,13 @@ namespace osu.Game.Overlays
             {
                 Trace.Assert(state.Mouse.PositionMouseDown != null);
 
-                chatHeight.Value = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
+                double targetChatHeight = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
+
+                // If the channel selection screen is shown, mind its minimum height
+                if (channelSelection.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
+                    targetChatHeight = 1f - channel_selection_min_height;
+
+                chatHeight.Value = targetChatHeight;
             }
 
             return true;
