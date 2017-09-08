@@ -248,7 +248,7 @@ namespace osu.Game.Beatmaps.Formats
             while (line.StartsWith(" ") || line.StartsWith("_"))
             {
                 ++depth;
-                line = line.Substring(depth);
+                line = line.Substring(1);
             }
 
             decodeVariables(ref line);
@@ -305,7 +305,7 @@ namespace osu.Game.Beatmaps.Formats
                             var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
                             var frameCount = int.Parse(split[6]);
                             var frameDelay = double.Parse(split[7], NumberFormatInfo.InvariantInfo);
-                            var loopType = (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]);
+                            var loopType = split.Length > 8 ? (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]) : AnimationLoopType.LoopForever;
                             spriteDefinition = new AnimationDefinition(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
                             beatmap.Storyboard.GetLayer(layer).Add(spriteDefinition);
                         }
@@ -315,7 +315,7 @@ namespace osu.Game.Beatmaps.Formats
                             var time = double.Parse(split[1], CultureInfo.InvariantCulture);
                             var layer = split[2];
                             var path = cleanFilename(split[3]);
-                            var volume = float.Parse(split[4], CultureInfo.InvariantCulture);
+                            var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
                             beatmap.Storyboard.GetLayer(layer).Add(new SampleDefinition(path, time, volume));
                         }
                         break;
@@ -326,13 +326,14 @@ namespace osu.Game.Beatmaps.Formats
                 if (depth < 2)
                     timelineGroup = spriteDefinition;
 
-                switch (split[0])
+                var commandType = split[0];
+                switch (commandType)
                 {
                     case "T":
                         {
                             var triggerName = split[1];
-                            var startTime = double.Parse(split[2], CultureInfo.InvariantCulture);
-                            var endTime = double.Parse(split[3], CultureInfo.InvariantCulture);
+                            var startTime = split.Length > 2 ? double.Parse(split[2], CultureInfo.InvariantCulture) : double.MinValue;
+                            var endTime = split.Length > 3 ? double.Parse(split[3], CultureInfo.InvariantCulture) : double.MaxValue;
                             var groupNumber = split.Length > 4 ? int.Parse(split[4]) : 0;
                             timelineGroup = spriteDefinition?.AddTrigger(triggerName, startTime, endTime, groupNumber);
                         }
@@ -349,7 +350,6 @@ namespace osu.Game.Beatmaps.Formats
                             if (string.IsNullOrEmpty(split[3]))
                                 split[3] = split[2];
 
-                            var commandType = split[0];
                             var easing = (Easing)int.Parse(split[1]);
                             var startTime = double.Parse(split[2], CultureInfo.InvariantCulture);
                             var endTime = double.Parse(split[3], CultureInfo.InvariantCulture);
@@ -434,6 +434,8 @@ namespace osu.Game.Beatmaps.Formats
                                         }
                                     }
                                     break;
+                                default:
+                                    throw new InvalidDataException($@"Unknown command type: {commandType}");
                             }
                         }
                         break;
