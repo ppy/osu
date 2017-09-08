@@ -23,12 +23,7 @@ namespace osu.Game.Online.API.Requests
         private void onSuccess(GetScoresResponse r)
         {
             foreach (OnlineScore score in r.Scores)
-            {
-                score.Beatmap = beatmap;
-                score.Ruleset = beatmap.Ruleset;
-
-                score.ResolveModString();
-            }
+                score.ApplyBeatmap(beatmap);
         }
 
         protected override WebRequest CreateWebRequest()
