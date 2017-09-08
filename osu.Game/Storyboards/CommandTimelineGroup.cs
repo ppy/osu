@@ -39,9 +39,14 @@ namespace osu.Game.Storyboards
             }
         }
 
-        public double StartTime => Timelines.Where(t => t.HasCommands).Min(t => t.StartTime);
-        public double EndTime => Timelines.Where(t => t.HasCommands).Max(t => t.EndTime);
+        public double CommandsStartTime => Timelines.Where(t => t.HasCommands).Min(t => t.StartTime);
+        public double CommandsEndTime => Timelines.Where(t => t.HasCommands).Max(t => t.EndTime);
+        public double CommandsDuration => CommandsEndTime - CommandsStartTime;
+
+        public virtual double StartTime => CommandsStartTime;
+        public virtual double EndTime => CommandsEndTime;
         public double Duration => EndTime - StartTime;
+
         public bool HasCommands => Timelines.Any(t => t.HasCommands);
 
         public virtual void ApplyTransforms(Drawable drawable, double offset = 0)

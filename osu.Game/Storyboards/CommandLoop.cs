@@ -11,6 +11,9 @@ namespace osu.Game.Storyboards
         public double LoopStartTime;
         public int LoopCount;
 
+        public override double StartTime => LoopStartTime;
+        public override double EndTime => LoopStartTime + CommandsDuration * LoopCount;
+
         public CommandLoop(double startTime, int loopCount)
         {
             LoopStartTime = startTime;
@@ -21,7 +24,7 @@ namespace osu.Game.Storyboards
             => base.ApplyTransforms(drawable, offset + LoopStartTime);
 
         protected override void PostProcess(ICommand command, TransformSequence<Drawable> sequence)
-            => sequence.Loop(Duration - command.Duration, LoopCount);
+            => sequence.Loop(CommandsDuration - command.Duration, LoopCount);
 
         public override string ToString()
             => $"{LoopStartTime} x{LoopCount}";
