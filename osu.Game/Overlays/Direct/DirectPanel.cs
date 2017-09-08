@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using System.IO;
-using System.Threading.Tasks;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,7 +18,6 @@ using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Online.API.Requests;
 
@@ -175,7 +172,6 @@ namespace osu.Game.Overlays.Direct
                        .MoveToX(5, 100, Easing.InOutSine).Then()
                        .MoveToX(-5, 100, Easing.InOutSine).Then()
                        .MoveToX(0, 50, Easing.InSine).Then();
-                return;
             }
         }
 
