@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Game.Beatmaps;
 using osu.Game.Users;
 using osu.Game.Rulesets.Replays;
 
@@ -82,8 +83,12 @@ namespace osu.Game.Rulesets.Scoring
         [JsonProperty(@"mods")]
         private string[] modStrings { get; set; }
 
-        public void ResolveModString()
+        public void ApplyBeatmap(BeatmapInfo beatmap)
         {
+            Beatmap = beatmap;
+            Ruleset = beatmap.Ruleset;
+
+            // Evaluate the mod string
             Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
         }
     }
