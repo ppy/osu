@@ -12,10 +12,9 @@ namespace osu.Desktop.Tests.Visual
     {
         public override string Description => "BeatmapDetails tab of BeatmapDetailArea";
 
-        private readonly BeatmapDetails details;
-
         public TestCaseBeatmapDetails()
         {
+            BeatmapDetails details;
             Add(details = new BeatmapDetails
             {
                 RelativeSizeAxes = Axes.Both,
