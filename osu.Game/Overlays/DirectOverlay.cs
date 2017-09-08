@@ -27,6 +27,7 @@ namespace osu.Game.Overlays
 
         private APIAccess api;
         private RulesetStore rulesets;
+        private BeatmapManager beatmaps;
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
@@ -147,6 +148,8 @@ namespace osu.Game.Overlays
         {
             this.api = api;
             this.rulesets = rulesets;
+            this.beatmaps = beatmaps;
+
             resultCountsContainer.Colour = colours.Yellow;
 
             beatmaps.BeatmapSetAdded += setAdded;
@@ -237,7 +240,10 @@ namespace osu.Game.Overlays
 
             getSetsRequest.Success += r =>
             {
-                BeatmapSets = r?.Select(response => response.ToBeatmapSet(rulesets));
+                BeatmapSets = r?.
+                                Select(response => response.ToBeatmapSet(rulesets)).
+                                Where(b => (beatmaps.QueryBeatmapSet(q => q.OnlineBeatmapSetID == b.OnlineBeatmapSetID) == null));
+
                 if (BeatmapSets == null) return;
 
                 var artists = new List<string>();
