@@ -4,6 +4,7 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Transforms;
 using osu.Game.Storyboards.Drawables;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,45 +41,52 @@ namespace osu.Game.Storyboards
 
         public double StartTime => Timelines.Where(t => t.HasCommands).Min(t => t.StartTime);
         public double EndTime => Timelines.Where(t => t.HasCommands).Max(t => t.EndTime);
+        public double Duration => EndTime - StartTime;
         public bool HasCommands => Timelines.Any(t => t.HasCommands);
 
-        public virtual void ApplyTransforms(Drawable drawable)
+        public virtual void ApplyTransforms(Drawable drawable, double offset = 0)
         {
             if (X.HasCommands) drawable.X = X.StartValue;
             foreach (var command in X.Commands)
-                using (drawable.BeginAbsoluteSequence(command.StartTime))
-                    drawable.MoveToX(command.StartValue)
-                            .MoveToX(command.EndValue, command.Duration, command.Easing);
+                using (drawable.BeginAbsoluteSequence(offset + command.StartTime))
+                    PostProcess(command,
+                        drawable.MoveToX(command.StartValue)
+                                .MoveToX(command.EndValue, command.Duration, command.Easing));
 
             if (Y.HasCommands) drawable.Y = Y.StartValue;
             foreach (var command in Y.Commands)
-                using (drawable.BeginAbsoluteSequence(command.StartTime))
-                    drawable.MoveToY(command.StartValue)
-                            .MoveToY(command.EndValue, command.Duration, command.Easing);
+                using (drawable.BeginAbsoluteSequence(offset + command.StartTime))
+                    PostProcess(command,
+                        drawable.MoveToY(command.StartValue)
+                                .MoveToY(command.EndValue, command.Duration, command.Easing));
 
             if (Scale.HasCommands) drawable.Scale = Scale.StartValue;
             foreach (var command in Scale.Commands)
-                using (drawable.BeginAbsoluteSequence(command.StartTime))
-                    drawable.ScaleTo(command.StartValue)
-                            .ScaleTo(command.EndValue, command.Duration, command.Easing);
+                using (drawable.BeginAbsoluteSequence(offset + command.StartTime))
+                    PostProcess(command,
+                        drawable.ScaleTo(command.StartValue)
+                                .ScaleTo(command.EndValue, command.Duration, command.Easing));
 
             if (Rotation.HasCommands) drawable.Rotation = Rotation.StartValue;
             foreach (var command in Rotation.Commands)
-                using (drawable.BeginAbsoluteSequence(command.StartTime))
-                    drawable.RotateTo(command.StartValue)
-                            .RotateTo(command.EndValue, command.Duration, command.Easing);
+                using (drawable.BeginAbsoluteSequence(offset + command.StartTime))
+                    PostProcess(command,
+                        drawable.RotateTo(command.StartValue)
+                                .RotateTo(command.EndValue, command.Duration, command.Easing));
 
             if (Colour.HasCommands) drawable.Colour = Colour.StartValue;
             foreach (var command in Colour.Commands)
-                using (drawable.BeginAbsoluteSequence(command.StartTime))
-                    drawable.FadeColour(command.StartValue)
-                            .FadeColour(command.EndValue, command.Duration, command.Easing);
+                using (drawable.BeginAbsoluteSequence(offset + command.StartTime))
+                    PostProcess(command,
+                        drawable.FadeColour(command.StartValue)
+                                .FadeColour(command.EndValue, command.Duration, command.Easing));
 
             if (Alpha.HasCommands) drawable.Alpha = Alpha.StartValue;
             foreach (var command in Alpha.Commands)
-                using (drawable.BeginAbsoluteSequence(command.StartTime))
-                    drawable.FadeTo(command.StartValue)
-                            .FadeTo(command.EndValue, command.Duration, command.Easing);
+                using (drawable.BeginAbsoluteSequence(offset + command.StartTime))
+                    PostProcess(command,
+                        drawable.FadeTo(command.StartValue)
+                                .FadeTo(command.EndValue, command.Duration, command.Easing));
 
             if (Additive.HasCommands)
                 drawable.BlendingMode = BlendingMode.Additive;
@@ -89,6 +97,10 @@ namespace osu.Game.Storyboards
                 flippable.FlipH = FlipH.HasCommands;
                 flippable.FlipV = FlipV.HasCommands;
             }
+        }
+
+        protected virtual void PostProcess(Command command, TransformSequence<Drawable> sequence)
+        {
         }
     }
 }

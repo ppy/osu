@@ -5,6 +5,7 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Game.Storyboards.Drawables;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Storyboards
 {
@@ -16,7 +17,7 @@ namespace osu.Game.Storyboards
 
         private List<CommandLoop> loops = new List<CommandLoop>();
         private List<CommandTrigger> triggers = new List<CommandTrigger>();
-        
+
         public SpriteDefinition(string path, Anchor origin, Vector2 initialPosition)
         {
             Path = path;
@@ -41,16 +42,11 @@ namespace osu.Game.Storyboards
         public virtual Drawable CreateDrawable()
             => new StoryboardSprite(this);
 
-        public override void ApplyTransforms(Drawable target)
+        public override void ApplyTransforms(Drawable target, double offset = 0)
         {
-            base.ApplyTransforms(target);
-            foreach (var loop in loops)
-                loop.ApplyTransforms(target);
-
-            // TODO
-            return;
-            foreach (var trigger in triggers)
-                trigger.ApplyTransforms(target);
+            base.ApplyTransforms(target, offset);
+            foreach (var loop in loops.OrderBy(l => l.StartTime))
+                loop.ApplyTransforms(target, offset);
         }
 
         public override string ToString()
