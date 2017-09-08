@@ -56,6 +56,7 @@ namespace osu.Game.Beatmaps
             ControlPointInfo = original?.ControlPointInfo ?? ControlPointInfo;
             Breaks = original?.Breaks ?? Breaks;
             ComboColors = original?.ComboColors ?? ComboColors;
+            Storyboard = original?.Storyboard ?? Storyboard;
         }
     }
 
