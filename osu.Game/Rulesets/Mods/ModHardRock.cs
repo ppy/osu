@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModHardRock : Mod, IApplicableToDifficulty
     {
         public override string Name => "Hard Rock";
+        public override string ShortenedName => "HR";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hardrock;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Everything just got a bit harder...";
