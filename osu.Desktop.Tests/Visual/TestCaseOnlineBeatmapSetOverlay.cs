@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Desktop.VisualTests.Tests
 {
@@ -41,6 +43,13 @@ namespace osu.Desktop.VisualTests.Tests
                         Preview = @"https://b.ppy.sh/preview/415886.mp3",
                         PlayCount = 681380,
                         FavouriteCount = 356,
+                        Submitted = new DateTime(2016, 2, 10),
+                        Ranked = new DateTime(2016, 6, 19),
+                        Author = new User
+                        {
+                            Username = @"Fresh Chicken",
+                            Id = 3984370,
+                        },
                         Covers = new BeatmapSetOnlineCovers
                         {
                             Cover = @"https://assets.ppy.sh/beatmaps/415886/covers/cover.jpg?1465651778",
@@ -107,7 +116,7 @@ namespace osu.Desktop.VisualTests.Tests
                         new BeatmapInfo
                         {
                             OnlineBeatmapID = 901050,
-                            StarDifficulty = 901050,
+                            StarDifficulty = 5.26,
                             Version = @"GRAVITY",
                             Ruleset = r,
                             Difficulty = new BeatmapDifficulty
