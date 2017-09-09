@@ -102,9 +102,9 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                 {
                                     new Container
                                     {
-                                        Name = @"beatmap picker",
                                         RelativeSizeAxes = Axes.X,
                                         Height = 113,
+                                        Child = new BeatmapPicker(set),
                                     },
                                     new OsuSpriteText
                                     {
@@ -120,7 +120,6 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                     },
                                     new Container
                                     {
-                                        Name = "mapper",
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Margin = new MarginPadding { Top = 20 },
