@@ -8,17 +8,17 @@ namespace osu.Game.Online.API.Requests
 {
     public class DownloadBeatmapSetRequest : APIDownloadRequest
     {
-        private readonly BeatmapSetInfo beatmapSet;
+        public readonly BeatmapSetInfo BeatmapSet;
 
         public Action<float> DownloadProgressed;
 
-        public DownloadBeatmapSetRequest(BeatmapSetInfo beatmapSet)
+        public DownloadBeatmapSetRequest(BeatmapSetInfo set)
         {
-            this.beatmapSet = beatmapSet;
+            BeatmapSet = set;
 
             Progress += (current, total) => DownloadProgressed?.Invoke((float) current / total);
         }
 
-        protected override string Target => $@"beatmapsets/{beatmapSet.OnlineBeatmapSetID}/download";
+        protected override string Target => $@"beatmapsets/{BeatmapSet.OnlineBeatmapSetID}/download";
     }
 }
