@@ -3,6 +3,7 @@
 
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -47,6 +48,13 @@ namespace osu.Game.Storyboards
             public T StartValue;
             public T EndValue;
 
+            public int CompareTo(ICommand other)
+            {
+                var result = StartTime.CompareTo(other.StartTime);
+                if (result != 0) return result;
+                return EndTime.CompareTo(other.EndTime);
+            }
+
             public override string ToString()
                 => $"{StartTime} -> {EndTime}, {StartValue} -> {EndValue} {Easing}";
         }
@@ -59,7 +67,7 @@ namespace osu.Game.Storyboards
         bool HasCommands { get; }
     }
 
-    public interface ICommand
+    public interface ICommand : IComparable<ICommand>
     {
         Easing Easing { get; set; }
         double StartTime { get; set; }

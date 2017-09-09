@@ -78,7 +78,7 @@ namespace osu.Game.Storyboards
             CommandTimelineSelector<T> timelineSelector, DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform)
         {
             var initialized = false;
-            foreach (var command in getAggregatedCommands(timelineSelector, triggeredGroups))
+            foreach (var command in getAggregatedCommands(timelineSelector, triggeredGroups).OrderBy(l => l))
             {
                 if (!initialized)
                 {
@@ -99,7 +99,7 @@ namespace osu.Game.Storyboards
             if (triggeredGroups != null)
                 foreach (var pair in triggeredGroups)
                     commands = commands.Concat(pair.Item1.GetCommands(timelineSelector, pair.Item2));
-            return commands.OrderBy(l => l.StartTime);
+            return commands;
         }
 
         public override string ToString()
