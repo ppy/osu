@@ -38,38 +38,6 @@ namespace osu.Game.Overlays.Direct
         private BeatmapManager beatmaps;
         private NotificationOverlay notifications;
 
-        private DownloadBeatmapSetRequest downloadRequest;
-        protected DownloadBeatmapSetRequest DownloadRequest
-        {
-            get { return downloadRequest; }
-            set
-            {
-                if (value == null || downloadRequest == value) return;
-
-                downloadRequest = value;
-
-                progressBar.FadeIn(400, Easing.OutQuint);
-                progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
-
-                progressBar.Current.Value = 0;
-
-                downloadRequest.Failure += e =>
-                {
-                    progressBar.Current.Value = 0;
-                    progressBar.FadeOut(500);
-                    Logger.Error(e, "Failed to get beatmap download information");
-                };
-
-                downloadRequest.DownloadProgressed += progress => progressBar.Current.Value = progress;
-
-                downloadRequest.Success += data =>
-                {
-                    progressBar.Current.Value = 1;
-                    progressBar.FadeOut(500);
-                };
-            }
-        }
-
         protected override Container<Drawable> Content => content;
 
         protected DirectPanel(BeatmapSetInfo setInfo)
@@ -128,7 +96,10 @@ namespace osu.Game.Overlays.Direct
                 }
             });
 
-            DownloadRequest = beatmaps.GetExistingDownload(SetInfo);
+            var downloadRequest = beatmaps.GetExistingDownload(SetInfo);
+
+            if (downloadRequest != null)
+                attachDownload(downloadRequest);
         }
 
         protected override bool OnHover(InputState state)
@@ -159,9 +130,9 @@ namespace osu.Game.Overlays.Direct
                 return;
             }
 
-            // we already have an active download running.
             if (beatmaps.GetExistingDownload(SetInfo) != null)
             {
+                // we already have an active download running.
                 content.MoveToX(-5, 50, Easing.OutSine).Then()
                        .MoveToX(5, 100, Easing.InOutSine).Then()
                        .MoveToX(-5, 100, Easing.InOutSine).Then()
@@ -170,7 +141,32 @@ namespace osu.Game.Overlays.Direct
                 return;
             }
 
-            DownloadRequest = beatmaps.Download(SetInfo);
+            var request = beatmaps.Download(SetInfo);
+
+            attachDownload(request);
+        }
+
+        private void attachDownload(DownloadBeatmapSetRequest request)
+        {
+            progressBar.FadeIn(400, Easing.OutQuint);
+            progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
+
+            progressBar.Current.Value = 0;
+
+            request.Failure += e =>
+            {
+                progressBar.Current.Value = 0;
+                progressBar.FadeOut(500);
+                Logger.Error(e, "Failed to get beatmap download information");
+            };
+
+            request.DownloadProgressed += progress => progressBar.Current.Value = progress;
+
+            request.Success += data =>
+            {
+                progressBar.Current.Value = 1;
+                progressBar.FadeOut(500);
+            };
         }
 
         protected override void LoadComplete()
