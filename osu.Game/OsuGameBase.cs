@@ -106,9 +106,15 @@ namespace osu.Game
 
             connection.CreateTable<StoreVersion>();
 
+            dependencies.Cache(API = new APIAccess
+            {
+                Username = LocalConfig.Get<string>(OsuSetting.Username),
+                Token = LocalConfig.Get<string>(OsuSetting.Token)
+            });
+
             dependencies.Cache(RulesetStore = new RulesetStore(connection));
             dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, Host));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, API, Host));
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(connection, RulesetStore));
             dependencies.Cache(new OsuColour());
@@ -143,12 +149,6 @@ namespace osu.Game
             var defaultBeatmap = new DummyWorkingBeatmap(this);
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
             BeatmapManager.DefaultBeatmap = defaultBeatmap;
-
-            dependencies.Cache(API = new APIAccess
-            {
-                Username = LocalConfig.Get<string>(OsuSetting.Username),
-                Token = LocalConfig.Get<string>(OsuSetting.Token)
-            });
 
             Beatmap.ValueChanged += b =>
             {
