@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps
 
         private readonly APIAccess api;
 
-        private readonly Dictionary<int?, DownloadBeatmapSetRequest> downloadsMap;
+        private readonly List<DownloadBeatmapSetRequest> downloadsList;
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
@@ -100,7 +100,7 @@ namespace osu.Game.Beatmaps
             if (importHost != null)
                 ipc = new BeatmapIPCChannel(importHost, this);
 
-            downloadsMap = new Dictionary<int?, DownloadBeatmapSetRequest>();
+            downloadsList = new List<DownloadBeatmapSetRequest>();
         }
 
         /// <summary>
@@ -194,7 +194,8 @@ namespace osu.Game.Beatmaps
         /// <returns>The new <see cref="DownloadBeatmapSetRequest"/>, or null if a download already exists for the same beatmap.</returns>
         public DownloadBeatmapSetRequest Download(BeatmapSetInfo beatmapSetInfo)
         {
-            if (api == null || downloadsMap.ContainsKey(beatmapSetInfo.OnlineBeatmapSetID)) return null;
+            if (api == null || downloadsList.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmapSetInfo.OnlineBeatmapSetID) != null)
+                return null;
 
             ProgressNotification downloadNotification = new ProgressNotification
             {
@@ -217,29 +218,29 @@ namespace osu.Game.Beatmaps
                 using (var archive = new OszArchiveReader(stream))
                     Import(archive);
 
-                downloadsMap.Remove(beatmapSetInfo.OnlineBeatmapSetID);
+                downloadsList.Remove(request);
             };
 
             request.Failure += data =>
             {
                 downloadNotification.State = ProgressNotificationState.Completed;
                 Logger.Error(data, "Failed to get beatmap download information");
-                downloadsMap.Remove(beatmapSetInfo.OnlineBeatmapSetID);
+                downloadsList.Remove(request);
             };
 
             downloadNotification.CancelRequested += () =>
             {
-                Logger.Log("Cancel requested");
-                downloadsMap[beatmapSetInfo.OnlineBeatmapSetID].Cancel();
-                downloadsMap.Remove(beatmapSetInfo.OnlineBeatmapSetID);
+                request.Cancel();
+                downloadsList.Remove(request);
                 downloadNotification.State = ProgressNotificationState.Cancelled;
                 return true;
             };
 
-            downloadsMap[beatmapSetInfo.OnlineBeatmapSetID] = request;
+            downloadsList.Add(request);
             PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
+            // TODO: ensure the Success/Failure callbacks are being scheduled to the main thread for thread safety.
             Task.Run(() => request.Perform(api));
 
             return request;
@@ -250,7 +251,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmap">The <see cref="BeatmapSetInfo"/> whose download request is wanted.</param>
         /// <returns>The <see cref="DownloadBeatmapSetRequest"/> object if it exists, or null.</returns>
-        public DownloadBeatmapSetRequest GetExistingDownload(BeatmapSetInfo beatmap) => downloadsMap.GetOrDefault(beatmap.OnlineBeatmapSetID);
+        public DownloadBeatmapSetRequest GetExistingDownload(BeatmapSetInfo beatmap) => downloadsList.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
 
         /// <summary>
         /// Delete a beatmap from the manager.
