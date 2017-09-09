@@ -18,8 +18,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuMenu : Menu
     {
-        public OsuMenu(Direction direction)
-            : base(direction)
+        public OsuMenu(Direction direction, bool topLevelMenu = false)
+            : base(direction, topLevelMenu)
         {
             BackgroundColour = Color4.Black.Opacity(0.5f);
 
@@ -46,6 +46,11 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuMenuItem(item);
 
+        protected override Menu CreateSubMenu() => new OsuMenu(Direction.Vertical)
+        {
+            Anchor = Direction == Direction.Horizontal ? Anchor.BottomLeft : Anchor.TopRight
+        };
+
         protected class DrawableOsuMenuItem : DrawableMenuItem
         {
             private const int margin_horizontal = 17;
@@ -61,7 +66,6 @@ namespace osu.Game.Graphics.UserInterface
             public DrawableOsuMenuItem(MenuItem item)
                 : base(item)
             {
-
             }
 
             [BackgroundDependencyLoader]
@@ -114,9 +118,10 @@ namespace osu.Game.Graphics.UserInterface
                 return base.OnClick(state);
             }
 
-            protected override Drawable CreateContent() => text = new TextContainer();
+            protected sealed override Drawable CreateContent() => text = CreateTextContainer();
+            protected virtual TextContainer CreateTextContainer() => new TextContainer();
 
-            private class TextContainer : Container, IHasText
+            protected class TextContainer : Container, IHasText
             {
                 public string Text
                 {
