@@ -176,7 +176,7 @@ namespace osu.Game.Overlays
         {
             // if a new map was imported, we should remove it from search results (download completed etc.)
             panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID)?.FadeOut(400).Expire();
-            BeatmapSets = BeatmapSets.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
+            BeatmapSets = BeatmapSets?.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
         }
 
         private void updateResultCounts()
