@@ -428,9 +428,9 @@ namespace osu.Game.Beatmaps.Formats
                                         var type = split[4];
                                         switch (type)
                                         {
-                                            case "A": timelineGroup?.Additive.Add(easing, startTime, endTime, true, true); break;
-                                            case "H": timelineGroup?.FlipH.Add(easing, startTime, endTime, true, true); break;
-                                            case "V": timelineGroup?.FlipV.Add(easing, startTime, endTime, true, true); break;
+                                            case "A": timelineGroup?.BlendingMode.Add(easing, startTime, endTime, BlendingMode.Additive, startTime == endTime ? BlendingMode.Additive : BlendingMode.Inherit); break;
+                                            case "H": timelineGroup?.FlipH.Add(easing, startTime, endTime, true, startTime == endTime); break;
+                                            case "V": timelineGroup?.FlipV.Add(easing, startTime, endTime, true, startTime == endTime); break;
                                         }
                                     }
                                     break;
