@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps
 
         private readonly APIAccess api;
 
-        private readonly List<DownloadBeatmapSetRequest> currentDownloads;
+        private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
@@ -99,8 +99,6 @@ namespace osu.Game.Beatmaps
 
             if (importHost != null)
                 ipc = new BeatmapIPCChannel(importHost, this);
-
-            currentDownloads = new List<DownloadBeatmapSetRequest>();
         }
 
         /// <summary>
@@ -194,7 +192,7 @@ namespace osu.Game.Beatmaps
         /// <returns>A new <see cref="DownloadBeatmapSetRequest"/>, or an existing one if a download is already in progress.</returns>
         public DownloadBeatmapSetRequest Download(BeatmapSetInfo beatmapSetInfo)
         {
-            var existing = currentDownloads.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmapSetInfo.OnlineBeatmapSetID);
+            var existing = GetExistingDownload(beatmapSetInfo);
 
             if (existing != null) return existing;
 
@@ -243,7 +241,6 @@ namespace osu.Game.Beatmaps
             PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            // TODO: ensure the Success/Failure callbacks are being scheduled to the main thread for thread safety.
             Task.Run(() => request.Perform(api));
 
             return request;
