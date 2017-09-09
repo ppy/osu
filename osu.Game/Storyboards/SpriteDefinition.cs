@@ -62,27 +62,27 @@ namespace osu.Game.Storyboards
             applyCommands(drawable, triggeredGroups, g => g.Rotation, (d, value) => d.Rotation = value, (d, value, duration, easing) => d.RotateTo(value, duration, easing));
             applyCommands(drawable, triggeredGroups, g => g.Colour, (d, value) => d.Colour = value, (d, value, duration, easing) => d.FadeColour(value, duration, easing));
             applyCommands(drawable, triggeredGroups, g => g.Alpha, (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
-
-            if (getAggregatedCommands(g => g.Additive, triggeredGroups).Any())
-                drawable.BlendingMode = BlendingMode.Additive;
+            applyCommands(drawable, triggeredGroups, g => g.BlendingMode, (d, value) => d.BlendingMode = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration), false);
 
             var flippable = drawable as IFlippable;
             if (flippable != null)
             {
-                flippable.FlipH = getAggregatedCommands(g => g.FlipH, triggeredGroups).Any();
-                flippable.FlipV = getAggregatedCommands(g => g.FlipV, triggeredGroups).Any();
+                applyCommands(drawable, triggeredGroups, g => g.FlipH, (d, value) => flippable.FlipH = value, (d, value, duration, easing) => flippable.TransformFlipH(value, duration), false);
+                applyCommands(drawable, triggeredGroups, g => g.FlipV, (d, value) => flippable.FlipV = value, (d, value, duration, easing) => flippable.TransformFlipV(value, duration), false);
             }
         }
 
         private void applyCommands<T>(Drawable drawable, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups,
-            CommandTimelineSelector<T> timelineSelector, DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform)
+            CommandTimelineSelector<T> timelineSelector, DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform, bool alwaysInitialize = true)
+            where T : struct
         {
             var initialized = false;
             foreach (var command in getAggregatedCommands(timelineSelector, triggeredGroups).OrderBy(l => l))
             {
                 if (!initialized)
                 {
-                    initializeProperty(drawable, command.StartValue);
+                    if (alwaysInitialize || command.StartTime == command.EndTime)
+                        initializeProperty.Invoke(drawable, command.StartValue);
                     initialized = true;
                 }
                 using (drawable.BeginAbsoluteSequence(command.StartTime))
