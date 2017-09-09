@@ -191,11 +191,14 @@ namespace osu.Game.Beatmaps
         /// Downloads a beatmap.
         /// </summary>
         /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to be downloaded.</param>
-        /// <returns>The new <see cref="DownloadBeatmapSetRequest"/>, or null if a download already exists for the same beatmap.</returns>
+        /// <returns>A new <see cref="DownloadBeatmapSetRequest"/>, or an existing one if a download is already in progress.</returns>
         public DownloadBeatmapSetRequest Download(BeatmapSetInfo beatmapSetInfo)
         {
-            if (api == null || downloadsList.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmapSetInfo.OnlineBeatmapSetID) != null)
-                return null;
+            var existing = downloadsList.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmapSetInfo.OnlineBeatmapSetID);
+
+            if (existing != null) return existing;
+
+            if (api == null) return null;
 
             ProgressNotification downloadNotification = new ProgressNotification
             {

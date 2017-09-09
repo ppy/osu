@@ -160,13 +160,17 @@ namespace osu.Game.Overlays.Direct
             }
 
             // we already have an active download running.
-            if ((DownloadRequest = beatmaps.Download(SetInfo)) == null)
+            if (beatmaps.GetExistingDownload(SetInfo) != null)
             {
                 content.MoveToX(-5, 50, Easing.OutSine).Then()
                        .MoveToX(5, 100, Easing.InOutSine).Then()
                        .MoveToX(-5, 100, Easing.InOutSine).Then()
                        .MoveToX(0, 50, Easing.InSine).Then();
+
+                return;
             }
+
+            DownloadRequest = beatmaps.Download(SetInfo);
         }
 
         protected override void LoadComplete()
