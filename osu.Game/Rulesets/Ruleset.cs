@@ -1,15 +1,17 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.UI;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets
 {
@@ -19,9 +21,18 @@ namespace osu.Game.Rulesets
 
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
+        public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
+                                                // Get all mod types as an IEnumerable<ModType>
+                                                .SelectMany(GetModsFor)
+                                                // Confine all mods of each mod type into a single IEnumerable<Mod>
+                                                .Where(mod => mod != null)
+                                                // Filter out all null mods
+                                                .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
+                                                // Resolve MultiMods as their .Mods property
+
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
-        public abstract Mod GetAutoplayMod();
+        public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
 
         protected Ruleset(RulesetInfo rulesetInfo)
         {
