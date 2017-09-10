@@ -245,7 +245,11 @@ namespace osu.Game
             LoadComponentAsync(Toolbar = new Toolbar
             {
                 Depth = -4,
-                OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
+                OnHome = delegate
+                {
+                    hideAllOverlays();
+                    intro?.ChildScreen?.MakeCurrent();
+                },
             }, overlayContent.Add);
 
             settings.StateChanged += delegate
@@ -310,6 +314,16 @@ namespace osu.Game
         private OsuScreen currentScreen;
         private FrameworkConfigManager frameworkConfig;
 
+        private void hideAllOverlays()
+        {
+            settings.State = Visibility.Hidden;
+            chat.State = Visibility.Hidden;
+            direct.State = Visibility.Hidden;
+            social.State = Visibility.Hidden;
+            userProfile.State = Visibility.Hidden;
+            notificationOverlay.State = Visibility.Hidden;
+        }
+
         private void screenChanged(Screen newScreen)
         {
             currentScreen = newScreen as OsuScreen;
@@ -323,19 +337,12 @@ namespace osu.Game
             //central game screen change logic.
             if (!currentScreen.ShowOverlays)
             {
-                settings.State = Visibility.Hidden;
-                Toolbar.State = Visibility.Hidden;
+                hideAllOverlays();
                 musicController.State = Visibility.Hidden;
-                chat.State = Visibility.Hidden;
-                direct.State = Visibility.Hidden;
-                social.State = Visibility.Hidden;
-                userProfile.State = Visibility.Hidden;
-                notificationOverlay.State = Visibility.Hidden;
+                Toolbar.State = Visibility.Hidden;
             }
             else
-            {
                 Toolbar.State = Visibility.Visible;
-            }
 
             ScreenChanged?.Invoke(newScreen);
         }

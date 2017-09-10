@@ -98,6 +98,7 @@
     <Compile Include="Input\Bindings\GlobalKeyBindingInputManager.cs" />
     <Compile Include="IO\FileStore.cs" />
     <Compile Include="IO\FileInfo.cs" />
+    <Compile Include="Online\API\Requests\DownloadBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
@@ -133,6 +134,10 @@
     <Compile Include="Overlays\Toolbar\ToolbarDirectButton.cs" />
     <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
     <Compile Include="Rulesets\UI\RulesetInputManager.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuItemSpacer.cs" />
     <Compile Include="Screens\Play\KeyCounterAction.cs" />
     <Compile Include="Users\UserCoverBackground.cs" />
     <Compile Include="Overlays\UserProfileOverlay.cs" />

@@ -87,6 +87,7 @@
     <Compile Include="Visual\TestCaseManiaHitObjects.cs" />
     <Compile Include="Visual\TestCaseManiaPlayfield.cs" />
     <Compile Include="Visual\TestCaseMedalOverlay.cs" />
+    <Compile Include="Visual\TestCaseEditorMenuBar.cs" />
     <Compile Include="Visual\TestCaseMenuButtonSystem.cs" />
     <Compile Include="Visual\TestCaseMenuOverlays.cs" />
     <Compile Include="Visual\TestCaseMods.cs" />
