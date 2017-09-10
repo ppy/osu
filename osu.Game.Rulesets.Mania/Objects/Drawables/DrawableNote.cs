@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             : base(hitObject, action)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 100;
+            AutoSizeAxes = Axes.Y;
 
             Add(headPiece = new NotePiece
             {
