@@ -324,7 +324,7 @@ namespace osu.Game.Beatmaps.Formats
             else
             {
                 if (depth < 2)
-                    timelineGroup = spriteDefinition;
+                    timelineGroup = spriteDefinition?.TimelineGroup;
 
                 var commandType = split[0];
                 switch (commandType)
