@@ -96,7 +96,7 @@ namespace osu.Game.Graphics.UserInterface
             protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item) { AccentColour = accentColour };
 
             #region DrawableOsuDropdownMenuItem
-            protected class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem, IHasAccentColour
+            public class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem, IHasAccentColour
             {
                 private Color4? accentColour;
                 public Color4 AccentColour
