@@ -2,8 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Extensions.Color4Extensions;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
@@ -16,6 +18,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
+        /// <summary>
+        /// Whether the glow for this <see cref="DrawableNote"/> is handled by a <see cref="DrawableHitObject"/> containing it.
+        /// </summary>
+        protected bool HasOwnGlow = true;
+
         private readonly NotePiece headPiece;
 
         public DrawableNote(Note hitObject, ManiaAction action)
@@ -23,12 +30,20 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            Masking = true;
 
             Add(headPiece = new NotePiece
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            UpdateGlow();
         }
 
         public override Color4 AccentColour
@@ -41,6 +56,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 base.AccentColour = value;
 
                 headPiece.AccentColour = value;
+
+                UpdateGlow();
             }
         }
 
@@ -77,6 +94,23 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Colour = Color4.Green;
                     break;
             }
+        }
+
+        protected virtual void UpdateGlow()
+        {
+            if (!IsLoaded)
+                return;
+
+            if (!HasOwnGlow)
+                return;
+
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = AccentColour.Opacity(0.5f),
+                Radius = 10,
+                Hollow = true
+            };
         }
 
         public virtual bool OnPressed(ManiaAction action)
