@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
@@ -9,6 +10,7 @@ using OpenTK;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -23,6 +25,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private readonly BodyPiece bodyPiece;
         private readonly Container<DrawableHoldNoteTick> tickContainer;
+        private readonly Container glowContainer;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -66,6 +69,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre
+                },
+                glowContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Masking = true,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true
+                    }
                 }
             });
 
@@ -111,6 +125,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             bodyPiece.Y = head.Height;
             bodyPiece.Height = DrawHeight - head.Height;
+
+            glowContainer.Height = DrawHeight + tail.Height;
+            glowContainer.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = AccentColour.Opacity(0.5f),
+                Radius = 10,
+                Hollow = true,
+            };
         }
 
         public bool OnPressed(ManiaAction action)
@@ -162,6 +185,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 RelativePositionAxes = Axes.None;
                 Y = 0;
+
+                HasOwnGlow = false;
             }
 
             public override bool OnPressed(ManiaAction action)
@@ -199,6 +224,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 RelativePositionAxes = Axes.None;
                 Y = 0;
+
+                HasOwnGlow = false;
             }
 
             protected override ManiaJudgement CreateJudgement() => new HoldNoteTailJudgement();
