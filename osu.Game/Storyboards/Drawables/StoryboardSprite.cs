@@ -68,8 +68,8 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, TextureStore textureStore)
         {
-            var spritePath = Definition.Path;
-            var path = game.Beatmap.Value.BeatmapSetInfo.Files.FirstOrDefault(f => f.Filename == spritePath)?.FileInfo.StoragePath;
+            var spritePath = Definition.Path.ToLowerInvariant();
+            var path = game.Beatmap.Value.BeatmapSetInfo.Files.FirstOrDefault(f => f.Filename.ToLowerInvariant() == spritePath)?.FileInfo.StoragePath;
             if (path == null)
                 return;
 
