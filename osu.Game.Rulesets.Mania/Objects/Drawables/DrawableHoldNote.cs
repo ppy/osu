@@ -207,6 +207,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 RelativePositionAxes = Axes.None;
                 Y = 0;
 
+                // Life time managed by the parent DrawableHoldNote
+                LifetimeStart = double.MinValue;
+                LifetimeEnd = double.MaxValue;
+
                 HasOwnGlow = false;
             }
 
@@ -245,6 +249,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 RelativePositionAxes = Axes.None;
                 Y = 0;
+
+                // Life time managed by the parent DrawableHoldNote
+                LifetimeStart = double.MinValue;
+                LifetimeEnd = double.MaxValue;
 
                 HasOwnGlow = false;
             }
