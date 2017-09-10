@@ -70,6 +70,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre
                 },
+                // The hit object itself cannot be used for the glow because the tail overshoots it
+                // So a specialized container that is updated to contain the tail height is used
                 glowContainer = new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -98,6 +100,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             AddNested(tail);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateGlow();
+        }
+
         public override Color4 AccentColour
         {
             get { return base.AccentColour; }
@@ -112,7 +121,23 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 bodyPiece.AccentColour = value;
                 head.AccentColour = value;
                 tail.AccentColour = value;
+
+                updateGlow();
             }
+        }
+
+        private void updateGlow()
+        {
+            if (!IsLoaded)
+                return;
+
+            glowContainer.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = AccentColour.Opacity(0.5f),
+                Radius = 10,
+                Hollow = true
+            };
         }
 
         protected override void UpdateState(ArmedState state)
@@ -123,17 +148,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.Update();
 
+            // Make the body piece not lie under the head note
             bodyPiece.Y = head.Height;
             bodyPiece.Height = DrawHeight - head.Height;
 
+            // Make the glowContainer "contain" the height of the tail note, keeping in mind
+            // that the tail note overshoots the height of this hit object
             glowContainer.Height = DrawHeight + tail.Height;
-            glowContainer.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = AccentColour.Opacity(0.5f),
-                Radius = 10,
-                Hollow = true,
-            };
         }
 
         public bool OnPressed(ManiaAction action)

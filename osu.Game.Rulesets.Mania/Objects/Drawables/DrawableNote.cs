@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             base.LoadComplete();
 
-            UpdateGlow();
+            updateGlow();
         }
 
         public override Color4 AccentColour
@@ -57,8 +57,25 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 headPiece.AccentColour = value;
 
-                UpdateGlow();
+                updateGlow();
             }
+        }
+
+        private void updateGlow()
+        {
+            if (!IsLoaded)
+                return;
+
+            if (!HasOwnGlow)
+                return;
+
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = AccentColour.Opacity(0.5f),
+                Radius = 10,
+                Hollow = true
+            };
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -94,23 +111,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Colour = Color4.Green;
                     break;
             }
-        }
-
-        protected virtual void UpdateGlow()
-        {
-            if (!IsLoaded)
-                return;
-
-            if (!HasOwnGlow)
-                return;
-
-            EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = AccentColour.Opacity(0.5f),
-                Radius = 10,
-                Hollow = true
-            };
         }
 
         public virtual bool OnPressed(ManiaAction action)
