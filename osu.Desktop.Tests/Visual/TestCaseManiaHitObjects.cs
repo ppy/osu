@@ -43,7 +43,6 @@ namespace osu.Desktop.Tests.Visual
                                 {
                                     new DrawableNote(new Note(), ManiaAction.Key1)
                                     {
-                                        RelativePositionAxes = Axes.Y,
                                         Y = 5000,
                                         LifetimeStart = double.MinValue,
                                         LifetimeEnd = double.MaxValue,
@@ -51,7 +50,6 @@ namespace osu.Desktop.Tests.Visual
                                     },
                                     new DrawableNote(new Note(), ManiaAction.Key1)
                                     {
-                                        RelativePositionAxes = Axes.Y,
                                         Y = 6000,
                                         LifetimeStart = double.MinValue,
                                         LifetimeEnd = double.MaxValue,
@@ -79,9 +77,8 @@ namespace osu.Desktop.Tests.Visual
                                 {
                                     new DrawableHoldNote(new HoldNote(), ManiaAction.Key1)
                                     {
-                                        RelativePositionAxes = Axes.Y,
                                         Y = 5000,
-                                        Height = 3000,
+                                        Height = 1000,
                                         LifetimeStart = double.MinValue,
                                         LifetimeEnd = double.MaxValue,
                                         AccentColour = Color4.Red
