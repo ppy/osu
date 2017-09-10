@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.UI
         private readonly SpriteIcon modIcon;
         private readonly SpriteIcon background;
 
-        private const float icon_size = 80;
+        private const float background_size = 80;
 
         public FontAwesome Icon
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.UI
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Size = new Vector2(icon_size),
+                    Size = new Vector2(background_size),
                     Icon = FontAwesome.fa_osu_mod_bg,
                     Shadow = true,
                 },
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.UI
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
                     Colour = OsuColour.Gray(84),
-                    Size = new Vector2(icon_size - 35),
+                    Size = new Vector2(background_size - 35),
                     Y = 25,
                     Icon = mod.Icon
                 },

@@ -20,6 +20,9 @@ using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using SQLite.Net;
+using osu.Game.Online.API.Requests;
+using System.Threading.Tasks;
+using osu.Game.Online.API;
 
 namespace osu.Game.Beatmaps
 {
@@ -63,6 +66,10 @@ namespace osu.Game.Beatmaps
 
         private readonly BeatmapStore beatmaps;
 
+        private readonly APIAccess api;
+
+        private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
+
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
 
@@ -76,7 +83,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
-        public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, IIpcHost importHost = null)
+        public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
         {
             beatmaps = new BeatmapStore(connection);
             beatmaps.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
@@ -88,6 +95,7 @@ namespace osu.Game.Beatmaps
             this.files = files;
             this.connection = connection;
             this.rulesets = rulesets;
+            this.api = api;
 
             if (importHost != null)
                 ipc = new BeatmapIPCChannel(importHost, this);
@@ -176,6 +184,74 @@ namespace osu.Game.Beatmaps
 
             beatmaps.Add(beatmapSetInfo);
         }
+
+        /// <summary>
+        /// Downloads a beatmap.
+        /// </summary>
+        /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to be downloaded.</param>
+        /// <returns>A new <see cref="DownloadBeatmapSetRequest"/>, or an existing one if a download is already in progress.</returns>
+        public DownloadBeatmapSetRequest Download(BeatmapSetInfo beatmapSetInfo)
+        {
+            var existing = GetExistingDownload(beatmapSetInfo);
+
+            if (existing != null) return existing;
+
+            if (api == null) return null;
+
+            ProgressNotification downloadNotification = new ProgressNotification
+            {
+                Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
+            };
+
+            var request = new DownloadBeatmapSetRequest(beatmapSetInfo);
+
+            request.DownloadProgressed += progress =>
+            {
+                downloadNotification.State = ProgressNotificationState.Active;
+                downloadNotification.Progress = progress;
+            };
+
+            request.Success += data =>
+            {
+                downloadNotification.State = ProgressNotificationState.Completed;
+
+                using (var stream = new MemoryStream(data))
+                using (var archive = new OszArchiveReader(stream))
+                    Import(archive);
+
+                currentDownloads.Remove(request);
+            };
+
+            request.Failure += data =>
+            {
+                downloadNotification.State = ProgressNotificationState.Completed;
+                Logger.Error(data, "Failed to get beatmap download information");
+                currentDownloads.Remove(request);
+            };
+
+            downloadNotification.CancelRequested += () =>
+            {
+                request.Cancel();
+                currentDownloads.Remove(request);
+                downloadNotification.State = ProgressNotificationState.Cancelled;
+                return true;
+            };
+
+            currentDownloads.Add(request);
+            PostNotification?.Invoke(downloadNotification);
+
+            // don't run in the main api queue as this is a long-running task.
+            Task.Run(() => request.Perform(api));
+
+            return request;
+        }
+
+        /// <summary>
+        /// Get an existing download request if it exists.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="BeatmapSetInfo"/> whose download request is wanted.</param>
+        /// <returns>The <see cref="DownloadBeatmapSetRequest"/> object if it exists, or null.</returns>
+        public DownloadBeatmapSetRequest GetExistingDownload(BeatmapSetInfo beatmap) => currentDownloads.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
 
         /// <summary>
         /// Delete a beatmap from the manager.

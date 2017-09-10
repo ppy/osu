@@ -27,6 +27,7 @@ namespace osu.Game.Overlays
 
         private APIAccess api;
         private RulesetStore rulesets;
+        private BeatmapManager beatmaps;
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
@@ -46,9 +47,26 @@ namespace osu.Game.Overlays
             set
             {
                 if (beatmapSets?.Equals(value) ?? false) return;
+
                 beatmapSets = value;
 
-                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                if (beatmapSets == null) return;
+
+                var artists = new List<string>();
+                var songs = new List<string>();
+                var tags = new List<string>();
+                foreach (var s in beatmapSets)
+                {
+                    artists.Add(s.Metadata.Artist);
+                    songs.Add(s.Metadata.Title);
+                    tags.AddRange(s.Metadata.Tags.Split(' '));
+                }
+
+                ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));
+
+                if (beatmapSets.Any() && panels == null)
+                    // real use case? currently only seems to be for test case
+                    recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             }
         }
 
@@ -147,6 +165,8 @@ namespace osu.Game.Overlays
         {
             this.api = api;
             this.rulesets = rulesets;
+            this.beatmaps = beatmaps;
+
             resultCountsContainer.Colour = colours.Yellow;
 
             beatmaps.BeatmapSetAdded += setAdded;
@@ -156,6 +176,7 @@ namespace osu.Game.Overlays
         {
             // if a new map was imported, we should remove it from search results (download completed etc.)
             panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID)?.FadeOut(400).Expire();
+            BeatmapSets = BeatmapSets?.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
         }
 
         private void updateResultCounts()
@@ -237,20 +258,11 @@ namespace osu.Game.Overlays
 
             getSetsRequest.Success += r =>
             {
-                BeatmapSets = r?.Select(response => response.ToBeatmapSet(rulesets));
-                if (BeatmapSets == null) return;
+                BeatmapSets = r?.
+                                Select(response => response.ToBeatmapSet(rulesets)).
+                                Where(b => beatmaps.QueryBeatmapSet(q => q.OnlineBeatmapSetID == b.OnlineBeatmapSetID) == null);
 
-                var artists = new List<string>();
-                var songs = new List<string>();
-                var tags = new List<string>();
-                foreach (var s in BeatmapSets)
-                {
-                    artists.Add(s.Metadata.Artist);
-                    songs.Add(s.Metadata.Title);
-                    tags.AddRange(s.Metadata.Tags.Split(' '));
-                }
-
-                ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));
+                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             };
 
             api.Queue(getSetsRequest);
