@@ -10,14 +10,26 @@ using System.Linq;
 
 namespace osu.Game.Storyboards
 {
-    public class SpriteDefinition : CommandTimelineGroup, IElementDefinition
+    public class SpriteDefinition : IElementDefinition
     {
+        private readonly List<CommandLoop> loops = new List<CommandLoop>();
+        private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();
+
         public string Path { get; set; }
         public Anchor Origin;
         public Vector2 InitialPosition;
 
-        private readonly List<CommandLoop> loops = new List<CommandLoop>();
-        private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();
+        public readonly CommandTimelineGroup TimelineGroup = new CommandTimelineGroup();
+
+        public double StartTime => Math.Min(
+            TimelineGroup.HasCommands ? TimelineGroup.CommandsStartTime : double.MaxValue,
+            loops.Any(l => l.HasCommands) ? loops.Where(l => l.HasCommands).Min(l => l.StartTime) : double.MaxValue);
+
+        public double EndTime => Math.Max(
+            TimelineGroup.HasCommands ? TimelineGroup.CommandsEndTime : double.MinValue,
+            loops.Any(l => l.HasCommands) ? loops.Where(l => l.HasCommands).Max(l => l.EndTime) : double.MinValue);
+
+        public bool HasCommands => TimelineGroup.HasCommands || loops.Any(l => l.HasCommands);
 
         private delegate void DrawablePropertyInitializer<in T>(Drawable drawable, T value);
         private delegate void DrawableTransformer<in T>(Drawable drawable, T value, double duration, Easing easing);
@@ -46,38 +58,29 @@ namespace osu.Game.Storyboards
         public virtual Drawable CreateDrawable()
             => new StoryboardSprite(this);
 
-        public override IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)
-        {
-            var result = base.GetCommands(timelineSelector, offset);
-            foreach (var loop in loops)
-                result = result.Concat(loop.GetCommands(timelineSelector, offset));
-            return result;
-        }
-
         public void ApplyTransforms(Drawable drawable, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups = null)
         {
-            applyCommands(drawable, triggeredGroups, g => g.X, (d, value) => d.X = value, (d, value, duration, easing) => d.MoveToX(value, duration, easing));
-            applyCommands(drawable, triggeredGroups, g => g.Y, (d, value) => d.Y = value, (d, value, duration, easing) => d.MoveToY(value, duration, easing));
-            applyCommands(drawable, triggeredGroups, g => g.Scale, (d, value) => d.Scale = value, (d, value, duration, easing) => d.ScaleTo(value, duration, easing));
-            applyCommands(drawable, triggeredGroups, g => g.Rotation, (d, value) => d.Rotation = value, (d, value, duration, easing) => d.RotateTo(value, duration, easing));
-            applyCommands(drawable, triggeredGroups, g => g.Colour, (d, value) => d.Colour = value, (d, value, duration, easing) => d.FadeColour(value, duration, easing));
-            applyCommands(drawable, triggeredGroups, g => g.Alpha, (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
-            applyCommands(drawable, triggeredGroups, g => g.BlendingMode, (d, value) => d.BlendingMode = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration), false);
+            applyCommands(drawable, getCommands(g => g.X, triggeredGroups), (d, value) => d.X = value, (d, value, duration, easing) => d.MoveToX(value, duration, easing));
+            applyCommands(drawable, getCommands(g => g.Y, triggeredGroups), (d, value) => d.Y = value, (d, value, duration, easing) => d.MoveToY(value, duration, easing));
+            applyCommands(drawable, getCommands(g => g.Scale, triggeredGroups), (d, value) => d.Scale = value, (d, value, duration, easing) => d.ScaleTo(value, duration, easing));
+            applyCommands(drawable, getCommands(g => g.Rotation, triggeredGroups), (d, value) => d.Rotation = value, (d, value, duration, easing) => d.RotateTo(value, duration, easing));
+            applyCommands(drawable, getCommands(g => g.Colour, triggeredGroups), (d, value) => d.Colour = value, (d, value, duration, easing) => d.FadeColour(value, duration, easing));
+            applyCommands(drawable, getCommands(g => g.Alpha, triggeredGroups), (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
+            applyCommands(drawable, getCommands(g => g.BlendingMode, triggeredGroups), (d, value) => d.BlendingMode = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration), false);
 
             var flippable = drawable as IFlippable;
             if (flippable != null)
             {
-                applyCommands(drawable, triggeredGroups, g => g.FlipH, (d, value) => flippable.FlipH = value, (d, value, duration, easing) => flippable.TransformFlipH(value, duration), false);
-                applyCommands(drawable, triggeredGroups, g => g.FlipV, (d, value) => flippable.FlipV = value, (d, value, duration, easing) => flippable.TransformFlipV(value, duration), false);
+                applyCommands(drawable, getCommands(g => g.FlipH, triggeredGroups), (d, value) => flippable.FlipH = value, (d, value, duration, easing) => flippable.TransformFlipH(value, duration), false);
+                applyCommands(drawable, getCommands(g => g.FlipV, triggeredGroups), (d, value) => flippable.FlipV = value, (d, value, duration, easing) => flippable.TransformFlipV(value, duration), false);
             }
         }
 
-        private void applyCommands<T>(Drawable drawable, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups,
-            CommandTimelineSelector<T> timelineSelector, DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform, bool alwaysInitialize = true)
+        private void applyCommands<T>(Drawable drawable, IEnumerable<CommandTimeline<T>.TypedCommand> commands, DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform, bool alwaysInitialize = true)
             where T : struct
         {
             var initialized = false;
-            foreach (var command in getAggregatedCommands(timelineSelector, triggeredGroups).OrderBy(l => l))
+            foreach (var command in commands.OrderBy(l => l))
             {
                 if (!initialized)
                 {
@@ -93,9 +96,11 @@ namespace osu.Game.Storyboards
             }
         }
 
-        private IEnumerable<CommandTimeline<T>.TypedCommand> getAggregatedCommands<T>(CommandTimelineSelector<T> timelineSelector, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups)
+        private IEnumerable<CommandTimeline<T>.TypedCommand> getCommands<T>(CommandTimelineSelector<T> timelineSelector, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups)
         {
-            var commands = GetCommands(timelineSelector);
+            var commands = TimelineGroup.GetCommands(timelineSelector);
+            foreach (var loop in loops)
+                commands = commands.Concat(loop.GetCommands(timelineSelector));
             if (triggeredGroups != null)
                 foreach (var pair in triggeredGroups)
                     commands = commands.Concat(pair.Item1.GetCommands(timelineSelector, pair.Item2));
