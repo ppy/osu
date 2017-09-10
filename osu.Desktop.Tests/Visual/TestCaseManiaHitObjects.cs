@@ -41,8 +41,22 @@ namespace osu.Desktop.Tests.Visual
                                 RelativeChildSize = new Vector2(1, 10000),
                                 Children = new[]
                                 {
-                                    new DrawableNote(new Note { StartTime = 5000 }, ManiaAction.Key1) { AccentColour = Color4.Red },
-                                    new DrawableNote(new Note { StartTime = 6000 }, ManiaAction.Key1) { AccentColour = Color4.Red }
+                                    new DrawableNote(new Note(), ManiaAction.Key1)
+                                    {
+                                        RelativePositionAxes = Axes.Y,
+                                        Y = 5000,
+                                        LifetimeStart = double.MinValue,
+                                        LifetimeEnd = double.MaxValue,
+                                        AccentColour = Color4.Red
+                                    },
+                                    new DrawableNote(new Note(), ManiaAction.Key1)
+                                    {
+                                        RelativePositionAxes = Axes.Y,
+                                        Y = 6000,
+                                        LifetimeStart = double.MinValue,
+                                        LifetimeEnd = double.MaxValue,
+                                        AccentColour = Color4.Red
+                                    }
                                 }
                             }
                         }
@@ -63,11 +77,15 @@ namespace osu.Desktop.Tests.Visual
                                 RelativeChildSize = new Vector2(1, 10000),
                                 Children = new[]
                                 {
-                                    new DrawableHoldNote(new HoldNote
+                                    new DrawableHoldNote(new HoldNote(), ManiaAction.Key1)
                                     {
-                                        StartTime = 5000,
-                                        Duration = 1000
-                                    }, ManiaAction.Key1) { AccentColour = Color4.Red }
+                                        RelativePositionAxes = Axes.Y,
+                                        Y = 5000,
+                                        Height = 3000,
+                                        LifetimeStart = double.MinValue,
+                                        LifetimeEnd = double.MaxValue,
+                                        AccentColour = Color4.Red
+                                    }
                                 }
                             }
                         }
