@@ -7,7 +7,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -42,10 +41,7 @@ namespace osu.Game.Beatmaps
             this.game = game;
         }
 
-        protected override Beatmap GetBeatmap() => new Beatmap
-        {
-            HitObjects = new List<HitObject>(),
-        };
+        protected override Beatmap GetBeatmap() => new Beatmap();
 
         protected override Texture GetBackground() => game.Textures.Get(@"Backgrounds/bg4");
 
@@ -58,8 +54,6 @@ namespace osu.Game.Beatmaps
             private class DummyRuleset : Ruleset
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
-
-                public override Mod GetAutoplayMod() => new ModAutoplay();
 
                 public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset)
                 {
