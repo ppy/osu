@@ -45,9 +45,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             AddRange(new Drawable[]
             {
-                // For now the body piece covers the entire height of the container
-                // whereas possibly in the future we don't want to extend under the head/tail.
-                // This will be fixed when new designs are given or the current design is finalized.
                 bodyPiece = new BodyPiece
                 {
                     Anchor = Anchor.TopCentre,
