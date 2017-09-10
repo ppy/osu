@@ -98,6 +98,7 @@
     <Compile Include="Input\Bindings\GlobalKeyBindingInputManager.cs" />
     <Compile Include="IO\FileStore.cs" />
     <Compile Include="IO\FileInfo.cs" />
+    <Compile Include="Online\API\Requests\DownloadBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
