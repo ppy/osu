@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.X,
                 },
                 tickContainer = new Container<DrawableHoldNoteTick>
                 {
@@ -102,6 +103,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            bodyPiece.Y = head.Height;
+            bodyPiece.Height = DrawHeight - head.Height;
         }
 
         public bool OnPressed(ManiaAction action)
