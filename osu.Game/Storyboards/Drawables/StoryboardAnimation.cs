@@ -49,6 +49,9 @@ namespace osu.Game.Storyboards.Drawables
             }
         }
 
+        public override bool IsPresent
+            => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
+
         public StoryboardAnimation(AnimationDefinition definition)
         {
             Definition = definition;
