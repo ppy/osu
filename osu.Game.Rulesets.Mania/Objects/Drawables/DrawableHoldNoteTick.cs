@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -22,11 +23,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// References the time at which the user started holding the hold note.
         /// </summary>
         public Func<double?> HoldStartTime;
-
-        /// <summary>
-        /// References whether the user is currently holding the hold note.
-        /// </summary>
-        public Func<bool> IsHolding;
 
         private readonly Container glowContainer;
 
@@ -118,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Judgement.Result != HitResult.None)
                 return;
 
-            if (IsHolding?.Invoke() != true)
+            if (HoldStartTime?.Invoke() == null)
                 return;
 
             UpdateJudgement(true);
