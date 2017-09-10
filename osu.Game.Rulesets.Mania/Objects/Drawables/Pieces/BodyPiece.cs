@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                             BackgroundColour = Color4.White.Opacity(0),
                             CacheDrawnFrameBuffer = true,
                             // The 'hole' is achieved by subtracting the result of this container with the parent
-                            Blending = new BlendingModeParameters { AlphaEquation = BlendingEquation.ReverseSubtract },
+                            Blending = new BlendingParameters { AlphaEquation = BlendingEquation.ReverseSubtract },
                             Child = subtractionLayer = new CircularContainer
                             {
                                 Anchor = Anchor.Centre,
