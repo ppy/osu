@@ -180,6 +180,8 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        public override void OnJudgement(DrawableHitObject<ManiaHitObject, ManiaJudgement> judgedObject) => columns[judgedObject.HitObject.Column].OnJudgement(judgedObject);
+
         /// <summary>
         /// Whether the column index is a special column for this playfield.
         /// </summary>
