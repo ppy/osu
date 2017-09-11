@@ -19,12 +19,12 @@ namespace osu.Game.Graphics.Containers
             samplePopIn = audio.Sample.Get(@"UI/melodic-5");
             samplePopOut = audio.Sample.Get(@"UI/melodic-4");
 
-            StateChanged += OsuFocusedOverlayContainer_StateChanged;
+            StateChanged += onStateChanged;
         }
 
-        private void OsuFocusedOverlayContainer_StateChanged(VisibilityContainer arg1, Visibility arg2)
+        private void onStateChanged(Visibility visibility)
         {
-            switch (arg2)
+            switch (visibility)
             {
                 case Visibility.Visible:
                     samplePopIn?.Play();

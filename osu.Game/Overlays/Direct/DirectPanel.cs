@@ -4,8 +4,6 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using System.IO;
-using System.Threading.Tasks;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,8 +18,8 @@ using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Framework.Logging;
-using osu.Game.Beatmaps.IO;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -97,6 +95,11 @@ namespace osu.Game.Overlays.Direct
                     },
                 }
             });
+
+            var downloadRequest = beatmaps.GetExistingDownload(SetInfo);
+
+            if (downloadRequest != null)
+                attachDownload(downloadRequest);
         }
 
         protected override bool OnHover(InputState state)
@@ -115,23 +118,8 @@ namespace osu.Game.Overlays.Direct
             base.OnHoverLost(state);
         }
 
-        // this should eventually be moved to a more central place, like BeatmapManager.
-        private DownloadBeatmapSetRequest downloadRequest;
-
         protected void StartDownload()
         {
-            if (api == null) return;
-
-            // we already have an active download running.
-            if (downloadRequest != null)
-            {
-                content.MoveToX(-5, 50, Easing.OutSine).Then()
-                       .MoveToX(5, 100, Easing.InOutSine).Then()
-                       .MoveToX(-5, 100, Easing.InOutSine).Then()
-                       .MoveToX(0, 50, Easing.InSine).Then();
-                return;
-            }
-
             if (!api.LocalUser.Value.IsSupporter)
             {
                 notifications.Post(new SimpleNotification
@@ -142,72 +130,43 @@ namespace osu.Game.Overlays.Direct
                 return;
             }
 
+            if (beatmaps.GetExistingDownload(SetInfo) != null)
+            {
+                // we already have an active download running.
+                content.MoveToX(-5, 50, Easing.OutSine).Then()
+                       .MoveToX(5, 100, Easing.InOutSine).Then()
+                       .MoveToX(-5, 100, Easing.InOutSine).Then()
+                       .MoveToX(0, 50, Easing.InSine).Then();
+
+                return;
+            }
+
+            var request = beatmaps.Download(SetInfo);
+
+            attachDownload(request);
+        }
+
+        private void attachDownload(DownloadBeatmapSetRequest request)
+        {
             progressBar.FadeIn(400, Easing.OutQuint);
             progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
 
             progressBar.Current.Value = 0;
 
-            ProgressNotification downloadNotification = new ProgressNotification
-            {
-                Text = $"Downloading {SetInfo.Metadata.Artist} - {SetInfo.Metadata.Title}",
-            };
-
-            downloadRequest = new DownloadBeatmapSetRequest(SetInfo);
-            downloadRequest.Failure += e =>
+            request.Failure += e =>
             {
                 progressBar.Current.Value = 0;
                 progressBar.FadeOut(500);
-                downloadNotification.State = ProgressNotificationState.Completed;
                 Logger.Error(e, "Failed to get beatmap download information");
-
-                downloadRequest = null;
             };
 
-            downloadRequest.Progress += (current, total) =>
-            {
-                float progress = (float)current / total;
+            request.DownloadProgressed += progress => progressBar.Current.Value = progress;
 
-                progressBar.Current.Value = progress;
-
-                downloadNotification.State = ProgressNotificationState.Active;
-                downloadNotification.Progress = progress;
-            };
-
-            downloadRequest.Success += data =>
+            request.Success += data =>
             {
                 progressBar.Current.Value = 1;
                 progressBar.FadeOut(500);
-
-                downloadNotification.State = ProgressNotificationState.Completed;
-
-                using (var stream = new MemoryStream(data))
-                using (var archive = new OszArchiveReader(stream))
-                    beatmaps.Import(archive);
             };
-
-            downloadNotification.CancelRequested += () =>
-            {
-                downloadRequest.Cancel();
-                downloadRequest = null;
-                return true;
-            };
-
-            notifications.Post(downloadNotification);
-
-            // don't run in the main api queue as this is a long-running task.
-            Task.Run(() => downloadRequest.Perform(api));
-        }
-
-        public class DownloadBeatmapSetRequest : APIDownloadRequest
-        {
-            private readonly BeatmapSetInfo beatmapSet;
-
-            public DownloadBeatmapSetRequest(BeatmapSetInfo beatmapSet)
-            {
-                this.beatmapSet = beatmapSet;
-            }
-
-            protected override string Target => $@"beatmapsets/{beatmapSet.OnlineBeatmapSetID}/download";
         }
 
         protected override void LoadComplete()

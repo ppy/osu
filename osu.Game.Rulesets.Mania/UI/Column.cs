@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             if (action == Action)
             {
-                background.FadeTo(background.Alpha + 0.2f, 50, Easing.OutQuint);
+                background.FadeTo(0.6f, 50, Easing.OutQuint);
                 keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint);
             }
 
