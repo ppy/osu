@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Play
 
         public override void Add(KeyCounter key)
         {
+            if (key == null) throw new ArgumentNullException(nameof(key));
+
             base.Add(key);
             key.IsCounting = IsCounting;
             key.FadeTime = FadeTime;
