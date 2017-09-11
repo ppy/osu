@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.UI
             Size = new Vector2(isTick ? 0.5f : 1);
             FillMode = FillMode.Fit;
 
-            BlendingMode = BlendingMode.Additive;
+            Blending = BlendingMode.Additive;
 
             Color4 accent = isTick ? Color4.White : judgedObject.AccentColour;
 
