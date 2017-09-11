@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// <summary>
         /// Creates a new judgement text.
         /// </summary>
+        /// <param name="judgedObject">The object which is being judged.</param>
         /// <param name="judgement">The judgement to visualise.</param>
         public DrawableTaikoJudgement(DrawableHitObject judgedObject, Judgement judgement)
             : base(judgement)
