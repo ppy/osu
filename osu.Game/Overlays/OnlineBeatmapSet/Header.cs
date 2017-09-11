@@ -22,6 +22,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
         private readonly Box tabsBg;
 
+        public readonly BeatmapPicker Picker;
+
         public Header(BeatmapSetInfo set)
         {
             RelativeSizeAxes = Axes.X;
@@ -35,6 +37,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 Offset = new Vector2(0f, 1f),
             };
 
+            FillFlowContainer buttons;
+            Details details;
             Children = new Drawable[]
             {
                 new Container
@@ -101,7 +105,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Height = 113,
-                                        Child = new BeatmapPicker(set),
+                                        Child = Picker = new BeatmapPicker(set),
                                     },
                                     new OsuSpriteText
                                     {
@@ -122,7 +126,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                         Margin = new MarginPadding { Top = 20 },
                                         Child = new AuthorInfo(set.OnlineInfo),
                                     },
-                                    new FillFlowContainer
+                                    buttons = new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Height = 45,
@@ -131,14 +135,12 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                         Children = new HeaderButton[]
                                         {
                                             new FavouriteButton(),
-                                            new DownloadButton("Download", ""),
-                                            new DownloadButton("osu!direct", ""),
                                         },
                                     },
                                 },
                             },
                         },
-                        new Details
+                        details = new Details(set)
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
@@ -146,6 +148,25 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                         },
                     },
                 },
+            };
+
+            Picker.Beatmap.ValueChanged += b =>
+            {
+                details.Beatmap = b;
+
+                buttons.Child = new FavouriteButton();
+                if (b.OnlineInfo.HasVideo)
+                {
+                    buttons.AddRange(new[]
+                    {
+                        new DownloadButton("Download", "with Video"),
+                        new DownloadButton("Download", "without Video"),
+                    });
+                }
+                else
+                {
+                    buttons.Add(new DownloadButton("Download", @""));
+                }
             };
         }
 

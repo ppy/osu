@@ -7,12 +7,32 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
+using osu.Game.Screens.Select.Details;
 
 namespace osu.Game.Overlays.OnlineBeatmapSet
 {
     public class Details : FillFlowContainer
     {
-        public Details()
+        private readonly BasicStats basic;
+        private readonly AdvancedStats advanced;
+        private readonly UserRatings ratings;
+
+        private BeatmapInfo beatmap;
+        public BeatmapInfo Beatmap
+        {
+            get { return beatmap; }
+            set
+            {
+                if (value == beatmap) return;
+                beatmap = value;
+
+                basic.Beatmap = advanced.Beatmap = Beatmap;
+                ratings.Metrics = Beatmap.Metrics;
+            }
+        }
+
+        public Details(BeatmapSetInfo set)
         {
             Width = OnlineBeatmapSetOverlay.RIGHT_WIDTH;
             AutoSizeAxes = Axes.Y;
@@ -20,36 +40,40 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
             Children = new Drawable[]
             {
+                new AsyncLoadWrapper(new PreviewButton(set)
+                {
+                    RelativeSizeAxes = Axes.X,
+                })
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                },
                 new DetailBox
                 {
-                    Child = new Container
+                    Child = basic = new BasicStats(set)
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 42,
+                        AutoSizeAxes = Axes.Y,
+                        Margin = new MarginPadding { Vertical = 10 },
+                        Padding = new MarginPadding { Horizontal = 15 },
                     },
                 },
                 new DetailBox
                 {
-                    Child = new Container
+                    Child = advanced = new AdvancedStats
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 35,
+                        AutoSizeAxes = Axes.Y,
+                        Margin = new MarginPadding { Vertical = 7.5f },
                     },
                 },
                 new DetailBox
                 {
-                    Child = new Container
+                    Child = ratings = new UserRatings
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 110,
-                    },
-                },
-                new DetailBox
-                {
-                    Child = new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 115,
+                        Height = 95,
+                        Margin = new MarginPadding { Top = 10 },
                     },
                 },
             };

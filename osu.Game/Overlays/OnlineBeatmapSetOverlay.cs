@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -68,11 +69,15 @@ namespace osu.Game.Overlays
 
         public void ShowBeatmapSet(BeatmapSetInfo set)
         {
+            Header header;
+            Info info;
             scrollContent.Children = new Drawable[]
             {
-                new Header(set),
-                new Info(set),
+                header = new Header(set),
+                info = new Info(set),
             };
+
+            header.Picker.Beatmap.ValueChanged += b => info.Beatmap = b;
 
             Show();
         }

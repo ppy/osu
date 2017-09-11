@@ -545,6 +545,15 @@
     <Compile Include="Screens\Select\Details\AdvancedStats.cs" />
     <Compile Include="Screens\Select\Details\FailRetryGraph.cs" />
     <Compile Include="Screens\Select\Details\UserRatings.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\AuthorInfo.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\BeatmapPicker.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\HeaderButton.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\Details.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\FavouriteButton.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\DownloadButton.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\BasicStats.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\SuccessRate.cs" />
+    <Compile Include="Overlays\OnlineBeatmapSet\PreviewButton.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
