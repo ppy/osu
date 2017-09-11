@@ -77,13 +77,6 @@ namespace osu.Game.Rulesets.UI
             Ruleset = ruleset;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            KeyBindingInputManager = CreateInputManager();
-            KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
-        }
-
         /// <summary>
         /// Checks whether all HitObjects have been judged, and invokes OnAllJudged.
         /// </summary>
@@ -193,6 +186,9 @@ namespace osu.Game.Rulesets.UI
 
             // Post-process the beatmap
             processor.PostProcess(Beatmap);
+
+            KeyBindingInputManager = CreateInputManager();
+            KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
 
             // Add mods, should always be the last thing applied to give full control to mods
             applyMods(Mods);
