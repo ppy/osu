@@ -37,6 +37,17 @@ namespace osu.Game.Rulesets.Mania.Objects
             }
         }
 
+        public override int Column
+        {
+            get { return base.Column; }
+            set
+            {
+                base.Column = value;
+                Head.Column = value;
+                Tail.Column = value;
+            }
+        }
+
         /// <summary>
         /// The head note of the hold.
         /// </summary>
