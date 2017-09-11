@@ -36,6 +36,9 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
+        internal readonly Container TopLevelContainer;
+        private readonly Container explosionContainer;
+
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 
@@ -98,6 +101,11 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             Pressed = onPressed,
                             Released = onReleased
+                        },
+                        explosionContainer = new Container
+                        {
+                            Name = "Hit explosions",
+                            RelativeSizeAxes = Axes.Both
                         }
                     }
                 },
@@ -136,8 +144,11 @@ namespace osu.Game.Rulesets.Mania.UI
                             }
                         }
                     }
-                }
+                },
+                TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
+
+            TopLevelContainer.Add(explosionContainer.CreateProxy());
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
@@ -192,6 +203,14 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             hitObject.AccentColour = AccentColour;
             HitObjects.Add(hitObject);
+        }
+
+        public override void OnJudgement(DrawableHitObject<ManiaHitObject, ManiaJudgement> judgedObject)
+        {
+            if (judgedObject.Judgement.Result != HitResult.Hit)
+                return;
+
+            explosionContainer.Add(new HitExplosion(judgedObject));
         }
 
         private bool onPressed(ManiaAction action)

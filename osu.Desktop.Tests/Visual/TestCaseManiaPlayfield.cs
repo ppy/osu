@@ -13,6 +13,9 @@ using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
+using OpenTK.Graphics;
 
 namespace osu.Desktop.Tests.Visual
 {
@@ -43,6 +46,19 @@ namespace osu.Desktop.Tests.Visual
             AddStep("Notes with input (reversed)", () => createPlayfieldWithNotes(false, true));
             AddStep("Notes with gravity", () => createPlayfieldWithNotes(true));
             AddStep("Notes with gravity (reversed)", () => createPlayfieldWithNotes(true, true));
+
+            AddStep("Hit explosion", () =>
+            {
+                var playfield = createPlayfield(4, SpecialColumnPosition.Normal);
+
+                var note = new DrawableNote(new Note(), ManiaAction.Key1)
+                {
+                    Judgement = new ManiaJudgement { Result = HitResult.Hit },
+                    AccentColour = Color4.Green
+                };
+
+                playfield.OnJudgement(note);
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -56,7 +72,7 @@ namespace osu.Desktop.Tests.Visual
             TimingPoint = { BeatLength = 1000 }
         }, gravity ? ScrollingAlgorithm.Gravity : ScrollingAlgorithm.Basic);
 
-        private void createPlayfield(int cols, SpecialColumnPosition specialPos, bool inverted = false)
+        private ManiaPlayfield createPlayfield(int cols, SpecialColumnPosition specialPos, bool inverted = false)
         {
             Clear();
 
@@ -72,6 +88,8 @@ namespace osu.Desktop.Tests.Visual
             });
 
             playfield.Inverted.Value = inverted;
+
+            return playfield;
         }
 
         private void createPlayfieldWithNotes(bool gravity, bool inverted = false)

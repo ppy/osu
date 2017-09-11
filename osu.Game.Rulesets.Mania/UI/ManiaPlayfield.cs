@@ -14,6 +14,7 @@ using osu.Framework.Allocation;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
@@ -50,8 +51,6 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 
-        private readonly Container topLevelContainer;
-
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
@@ -67,6 +66,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Inverted.Value = true;
 
+            Container topLevelContainer;
             InternalChildren = new Drawable[]
             {
                 new Container
@@ -134,6 +134,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 c.IsSpecial = isSpecialColumn(i);
                 c.Action = c.IsSpecial ? ManiaAction.Special : currentAction++;
+
+                topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
 
                 columns.Add(c);
                 AddNested(c);
