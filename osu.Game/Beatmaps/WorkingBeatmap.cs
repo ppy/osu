@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
                 {
                     if (beatmap != null) return beatmap;
 
-                    beatmap = GetBeatmap();
+                    beatmap = GetBeatmap() ?? new Beatmap();
 
                     // use the database-backed info.
                     beatmap.BeatmapInfo = BeatmapInfo;
