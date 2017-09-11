@@ -1,4 +1,7 @@
-﻿using osu.Framework.Graphics;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Storyboards.Drawables
@@ -6,7 +9,7 @@ namespace osu.Game.Storyboards.Drawables
     public static class DrawablesExtensions
     {
         /// <summary>
-        /// Adjusts <see cref="Drawable.BlendingMode"/> after a delay.
+        /// Adjusts <see cref="Drawable.Blending"/> after a delay.
         /// </summary>
         /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
         public static TransformSequence<T> TransformBlendingMode<T>(this T drawable, BlendingMode newValue, double delay = 0)
