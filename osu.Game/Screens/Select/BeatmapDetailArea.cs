@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -10,6 +11,8 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapDetailArea : Container
     {
+        private const float details_padding = 10;
+
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
@@ -66,15 +69,21 @@ namespace osu.Game.Screens.Select
                 Details = new BeatmapDetails
                 {
                     RelativeSizeAxes = Axes.X,
-                    Masking = true,
-                    Height = 352,
                     Alpha = 0,
+                    Margin = new MarginPadding { Top = details_padding },
                 },
                 Leaderboard = new Leaderboard
                 {
                     RelativeSizeAxes = Axes.Both,
                 }
             });
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            Details.Height = Math.Min(DrawHeight - details_padding * 3 - BeatmapDetailAreaTabControl.HEIGHT, 450);
         }
     }
 }

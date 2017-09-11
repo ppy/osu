@@ -12,29 +12,44 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
+using OpenTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuMenu : Menu
     {
-        public OsuMenu()
+        public OsuMenu(Direction direction, bool topLevelMenu = false)
+            : base(direction, topLevelMenu)
         {
-            CornerRadius = 4;
             BackgroundColour = Color4.Black.Opacity(0.5f);
+
+            MaskingContainer.CornerRadius = 4;
+            ItemsContainer.Padding = new MarginPadding(5);
         }
 
         protected override void AnimateOpen() => this.FadeIn(300, Easing.OutQuint);
         protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
 
-        protected override void UpdateMenuHeight()
+        protected override void UpdateSize(Vector2 newSize)
         {
-            var actualHeight = (RelativeSizeAxes & Axes.Y) > 0 ? 1 : ContentHeight;
-            this.ResizeHeightTo(State == MenuState.Opened ? actualHeight : 0, 300, Easing.OutQuint);
+            if (Direction == Direction.Vertical)
+            {
+                Width = newSize.X;
+                this.ResizeHeightTo(newSize.Y, 300, Easing.OutQuint);
+            }
+            else
+            {
+                Height = newSize.Y;
+                this.ResizeWidthTo(newSize.X, 300, Easing.OutQuint);
+            }
         }
 
-        protected override MarginPadding ItemFlowContainerPadding => new MarginPadding(5);
-
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuMenuItem(item);
+
+        protected override Menu CreateSubMenu() => new OsuMenu(Direction.Vertical)
+        {
+            Anchor = Direction == Direction.Horizontal ? Anchor.BottomLeft : Anchor.TopRight
+        };
 
         protected class DrawableOsuMenuItem : DrawableMenuItem
         {
@@ -51,7 +66,6 @@ namespace osu.Game.Graphics.UserInterface
             public DrawableOsuMenuItem(MenuItem item)
                 : base(item)
             {
-
             }
 
             [BackgroundDependencyLoader]
@@ -104,9 +118,10 @@ namespace osu.Game.Graphics.UserInterface
                 return base.OnClick(state);
             }
 
-            protected override Drawable CreateContent() => text = new TextContainer();
+            protected sealed override Drawable CreateContent() => text = CreateTextContainer();
+            protected virtual TextContainer CreateTextContainer() => new TextContainer();
 
-            private class TextContainer : Container, IHasText
+            protected class TextContainer : Container, IHasText
             {
                 public string Text
                 {
