@@ -12,10 +12,11 @@ using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Audio;
 using System.Linq;
+using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
-    public abstract class DrawableHitObject : Container
+    public abstract class DrawableHitObject : Container, IHasAccentColour
     {
         public readonly HitObject HitObject;
 
