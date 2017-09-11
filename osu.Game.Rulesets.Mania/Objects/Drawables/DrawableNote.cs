@@ -71,12 +71,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            switch (State)
-            {
-                case ArmedState.Hit:
-                    Colour = Color4.Green;
-                    break;
-            }
         }
 
         public virtual bool OnPressed(ManiaAction action)
