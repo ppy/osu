@@ -15,11 +15,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
     {
         private readonly VolumeMeter volumeMeterMaster;
 
-        private void volumeChanged(double newVolume)
-        {
-            Show();
-            schedulePopOut();
-        }
+        protected override bool BlockPassThroughMouse => false;
 
         public VolumeControl()
         {
@@ -83,6 +79,12 @@ namespace osu.Game.Graphics.UserInterface.Volume
             }
 
             return false;
+        }
+
+        private void volumeChanged(double newVolume)
+        {
+            Show();
+            schedulePopOut();
         }
 
         [BackgroundDependencyLoader]
