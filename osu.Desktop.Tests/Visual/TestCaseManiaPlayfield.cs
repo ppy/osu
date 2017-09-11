@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -32,6 +33,8 @@ namespace osu.Desktop.Tests.Visual
 
         public TestCaseManiaPlayfield()
         {
+            var rng = new Random(1337);
+
             AddStep("1 column", () => createPlayfield(1, SpecialColumnPosition.Normal));
             AddStep("4 columns", () => createPlayfield(4, SpecialColumnPosition.Normal));
             AddStep("Left special style", () => createPlayfield(4, SpecialColumnPosition.Left));
@@ -51,10 +54,12 @@ namespace osu.Desktop.Tests.Visual
             {
                 var playfield = createPlayfield(4, SpecialColumnPosition.Normal);
 
-                var note = new DrawableNote(new Note(), ManiaAction.Key1)
+                int col = rng.Next(0, 4);
+
+                var note = new DrawableNote(new Note { Column = col }, ManiaAction.Key1)
                 {
                     Judgement = new ManiaJudgement { Result = HitResult.Hit },
-                    AccentColour = Color4.Green
+                    AccentColour = playfield.Columns.ElementAt(col).AccentColour
                 };
 
                 playfield.OnJudgement(note);
