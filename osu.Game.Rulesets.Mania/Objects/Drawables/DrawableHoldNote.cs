@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
@@ -9,6 +10,7 @@ using OpenTK;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
@@ -23,6 +25,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         private readonly BodyPiece bodyPiece;
         private readonly Container<DrawableHoldNoteTick> tickContainer;
+        private readonly Container glowContainer;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -42,13 +45,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             AddRange(new Drawable[]
             {
-                // For now the body piece covers the entire height of the container
-                // whereas possibly in the future we don't want to extend under the head/tail.
-                // This will be fixed when new designs are given or the current design is finalized.
                 bodyPiece = new BodyPiece
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.X,
                 },
                 tickContainer = new Container<DrawableHoldNoteTick>
                 {
@@ -65,6 +66,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre
+                },
+                // The hit object itself cannot be used for the glow because the tail overshoots it
+                // So a specialized container that is updated to contain the tail height is used
+                glowContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Masking = true,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true
+                    }
                 }
             });
 
@@ -83,6 +97,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             AddNested(tail);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateGlow();
+        }
+
         public override Color4 AccentColour
         {
             get { return base.AccentColour; }
@@ -97,11 +118,40 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 bodyPiece.AccentColour = value;
                 head.AccentColour = value;
                 tail.AccentColour = value;
+
+                updateGlow();
             }
+        }
+
+        private void updateGlow()
+        {
+            if (!IsLoaded)
+                return;
+
+            glowContainer.EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = AccentColour.Opacity(0.5f),
+                Radius = 10,
+                Hollow = true
+            };
         }
 
         protected override void UpdateState(ArmedState state)
         {
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Make the body piece not lie under the head note
+            bodyPiece.Y = head.Height;
+            bodyPiece.Height = DrawHeight - head.Height;
+
+            // Make the glowContainer "contain" the height of the tail note, keeping in mind
+            // that the tail note overshoots the height of this hit object
+            glowContainer.Height = DrawHeight + tail.Height;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -153,6 +203,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 RelativePositionAxes = Axes.None;
                 Y = 0;
+
+                // Life time managed by the parent DrawableHoldNote
+                LifetimeStart = double.MinValue;
+                LifetimeEnd = double.MaxValue;
+
+                ApplyGlow = false;
             }
 
             public override bool OnPressed(ManiaAction action)
@@ -190,6 +246,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 RelativePositionAxes = Axes.None;
                 Y = 0;
+
+                // Life time managed by the parent DrawableHoldNote
+                LifetimeStart = double.MinValue;
+                LifetimeEnd = double.MaxValue;
+
+                ApplyGlow = false;
             }
 
             protected override ManiaJudgement CreateJudgement() => new HoldNoteTailJudgement();

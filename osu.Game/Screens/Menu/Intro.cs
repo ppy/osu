@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Menu
                         {
                             Alpha = 0,
                             Triangles = false,
-                            BlendingMode = BlendingMode.Additive,
+                            Blending = BlendingMode.Additive,
                             Interactive = false,
                             Colour = Color4.DarkGray,
                             Ripple = false

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>osu.Game</RootNamespace>
     <AssemblyName>osu.Game</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -114,6 +114,7 @@
     <Compile Include="Input\Bindings\GlobalKeyBindingInputManager.cs" />
     <Compile Include="IO\FileStore.cs" />
     <Compile Include="IO\FileInfo.cs" />
+    <Compile Include="Online\API\Requests\DownloadBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
@@ -554,6 +555,9 @@
     <Compile Include="Screens\Multiplayer\ParticipantInfo.cs" />
     <Compile Include="Screens\Multiplayer\ModeTypeInfo.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
+    <Compile Include="Screens\Select\Details\AdvancedStats.cs" />
+    <Compile Include="Screens\Select\Details\FailRetryGraph.cs" />
+    <Compile Include="Screens\Select\Details\UserRatings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">

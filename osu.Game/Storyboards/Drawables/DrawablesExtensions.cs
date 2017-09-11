@@ -19,9 +19,9 @@ namespace osu.Game.Storyboards.Drawables
         private BlendingMode valueAt(double time)
             => time < EndTime ? StartValue : EndValue;
 
-        public override string TargetMember => nameof(Drawable.BlendingMode);
+        public override string TargetMember => nameof(Drawable.Blending);
 
-        protected override void Apply(Drawable d, double time) => d.BlendingMode = valueAt(time);
-        protected override void ReadIntoStartValue(Drawable d) => StartValue = d.BlendingMode;
+        protected override void Apply(Drawable d, double time) => d.Blending = valueAt(time);
+        protected override void ReadIntoStartValue(Drawable d) => StartValue = d.Blending.Mode;
     }
 }

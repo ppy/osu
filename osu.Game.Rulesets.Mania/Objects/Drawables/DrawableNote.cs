@@ -2,8 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Extensions.Color4Extensions;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
@@ -16,19 +18,32 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
+        /// <summary>
+        /// Gets or sets whether this <see cref="DrawableNote"/> should apply glow to itself.
+        /// </summary>
+        protected bool ApplyGlow = true;
+
         private readonly NotePiece headPiece;
 
         public DrawableNote(Note hitObject, ManiaAction action)
             : base(hitObject, action)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 100;
+            AutoSizeAxes = Axes.Y;
+            Masking = true;
 
             Add(headPiece = new NotePiece
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre
             });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            updateGlow();
         }
 
         public override Color4 AccentColour
@@ -41,7 +56,26 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 base.AccentColour = value;
 
                 headPiece.AccentColour = value;
+
+                updateGlow();
             }
+        }
+
+        private void updateGlow()
+        {
+            if (!IsLoaded)
+                return;
+
+            if (!ApplyGlow)
+                return;
+
+            EdgeEffect = new EdgeEffectParameters
+            {
+                Type = EdgeEffectType.Glow,
+                Colour = AccentColour.Opacity(0.5f),
+                Radius = 10,
+                Hollow = true
+            };
         }
 
         protected override void CheckJudgement(bool userTriggered)
@@ -71,12 +105,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            switch (State)
-            {
-                case ArmedState.Hit:
-                    Colour = Color4.Green;
-                    break;
-            }
         }
 
         public virtual bool OnPressed(ManiaAction action)
