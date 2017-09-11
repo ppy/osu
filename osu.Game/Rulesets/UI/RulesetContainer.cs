@@ -75,9 +75,6 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
-
-            KeyBindingInputManager = CreateInputManager();
-            KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
         }
 
         /// <summary>
@@ -189,6 +186,9 @@ namespace osu.Game.Rulesets.UI
 
             // Post-process the beatmap
             processor.PostProcess(Beatmap);
+
+            KeyBindingInputManager = CreateInputManager();
+            KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
 
             // Add mods, should always be the last thing applied to give full control to mods
             applyMods(Mods);
