@@ -66,7 +66,7 @@ namespace osu.Game.Storyboards
             applyCommands(drawable, getCommands(g => g.Rotation, triggeredGroups), (d, value) => d.Rotation = value, (d, value, duration, easing) => d.RotateTo(value, duration, easing));
             applyCommands(drawable, getCommands(g => g.Colour, triggeredGroups), (d, value) => d.Colour = value, (d, value, duration, easing) => d.FadeColour(value, duration, easing));
             applyCommands(drawable, getCommands(g => g.Alpha, triggeredGroups), (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
-            applyCommands(drawable, getCommands(g => g.BlendingMode, triggeredGroups), (d, value) => d.BlendingMode = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration), false);
+            applyCommands(drawable, getCommands(g => g.BlendingMode, triggeredGroups), (d, value) => d.Blending = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration), false);
 
             var flippable = drawable as IFlippable;
             if (flippable != null)
