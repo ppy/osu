@@ -11,6 +11,11 @@ namespace osu.Game.Beatmaps
     public class BeatmapOnlineInfo
     {
         /// <summary>
+        /// The length in milliseconds of this beatmap's song.
+        /// </summary>
+        public double Length { get; set; }
+
+        /// <summary>
         /// Whether or not this beatmap has a background video.
         /// </summary>
         public bool HasVideo { get; set; }

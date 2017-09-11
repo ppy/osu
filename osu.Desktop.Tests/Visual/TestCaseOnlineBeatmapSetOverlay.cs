@@ -46,7 +46,6 @@ namespace osu.Desktop.VisualTests.Tests
                         FavouriteCount = 356,
                         Submitted = new DateTime(2016, 2, 10),
                         Ranked = new DateTime(2016, 6, 19),
-                        Length = 118000,
                         BPM = 236,
                         Author = new User
                         {
@@ -75,6 +74,7 @@ namespace osu.Desktop.VisualTests.Tests
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
+                                Length = 115000,
                                 HasVideo = false,
                                 CircleCount = 265,
                                 SliderCount = 71,
@@ -103,6 +103,7 @@ namespace osu.Desktop.VisualTests.Tests
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
+                                Length = 118000,
                                 HasVideo = false,
                                 CircleCount = 592,
                                 SliderCount = 62,
@@ -131,6 +132,7 @@ namespace osu.Desktop.VisualTests.Tests
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
+                                Length = 118000,
                                 HasVideo = false,
                                 CircleCount = 1042,
                                 SliderCount = 79,
@@ -159,6 +161,7 @@ namespace osu.Desktop.VisualTests.Tests
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
+                                Length = 118000,
                                 HasVideo = false,
                                 CircleCount = 1352,
                                 SliderCount = 69,
@@ -187,6 +190,7 @@ namespace osu.Desktop.VisualTests.Tests
                             },
                             OnlineInfo = new BeatmapOnlineInfo
                             {
+                                Length = 118000,
                                 HasVideo = false,
                                 CircleCount = 1730,
                                 SliderCount = 115,
