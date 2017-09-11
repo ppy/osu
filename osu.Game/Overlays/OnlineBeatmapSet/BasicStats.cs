@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             {
                 if (value == beatmap) return;
                 beatmap = value;
+
+                length.Value = TimeSpan.FromMilliseconds(beatmap.OnlineInfo.Length).ToString(@"m\:ss");
                 circleCount.Value = string.Format(@"{0:n0}", beatmap.OnlineInfo.CircleCount);
                 sliderCount.Value = string.Format(@"{0:n0}", beatmap.OnlineInfo.SliderCount);
             }
@@ -40,11 +42,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 Direction = FillDirection.Horizontal,
                 Children = new[]
                 {
-                    length = new Statistic(FontAwesome.fa_clock_o, "Length")
-                    {
-                        Width = statWidth,
-                        Value = TimeSpan.FromMilliseconds(set.OnlineInfo.Length).ToString(@"m\:ss"),
-                    },
+                    length = new Statistic(FontAwesome.fa_clock_o, "Length") { Width = statWidth },
                     bpm = new Statistic(FontAwesome.fa_circle, "BPM")
                     {
                         Width = statWidth,

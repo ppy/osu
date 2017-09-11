@@ -45,11 +45,6 @@ namespace osu.Game.Beatmaps
         public string Preview { get; set; }
 
         /// <summary>
-        /// The length in milliseconds of this beatmap's song.
-        /// </summary>
-        public double Length { get; set; }
-
-        /// <summary>
         /// The beats per minute of this beatmap set's song.
         /// </summary>
         public double BPM { get; set; }
