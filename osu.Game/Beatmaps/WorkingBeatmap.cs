@@ -87,7 +87,9 @@ namespace osu.Game.Beatmaps
                 {
                     if (track != null) return track;
 
-                    track = GetTrack();
+                    // we want to ensure that we always have a track, even if it's a fake one.
+                    track = GetTrack() ?? new TrackVirtual();
+
                     applyRateAdjustments();
                     return track;
                 }
