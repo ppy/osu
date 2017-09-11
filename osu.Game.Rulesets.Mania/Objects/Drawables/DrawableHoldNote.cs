@@ -208,7 +208,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 LifetimeStart = double.MinValue;
                 LifetimeEnd = double.MaxValue;
 
-                HasOwnGlow = false;
+                ApplyGlow = false;
             }
 
             public override bool OnPressed(ManiaAction action)
@@ -251,7 +251,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 LifetimeStart = double.MinValue;
                 LifetimeEnd = double.MaxValue;
 
-                HasOwnGlow = false;
+                ApplyGlow = false;
             }
 
             protected override ManiaJudgement CreateJudgement() => new HoldNoteTailJudgement();

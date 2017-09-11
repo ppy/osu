@@ -19,9 +19,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
         /// <summary>
-        /// Whether the glow for this <see cref="DrawableNote"/> is handled by a <see cref="DrawableHitObject"/> containing it.
+        /// Gets or sets whether this <see cref="DrawableNote"/> should apply glow to itself.
         /// </summary>
-        protected bool HasOwnGlow = true;
+        protected bool ApplyGlow = true;
 
         private readonly NotePiece headPiece;
 
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!IsLoaded)
                 return;
 
-            if (!HasOwnGlow)
+            if (!ApplyGlow)
                 return;
 
             EdgeEffect = new EdgeEffectParameters
