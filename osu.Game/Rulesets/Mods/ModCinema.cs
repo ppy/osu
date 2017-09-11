@@ -8,6 +8,7 @@ namespace osu.Game.Rulesets.Mods
     public class ModCinema : ModAutoplay
     {
         public override string Name => "Cinema";
+        public override string ShortenedName => "CN";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_cinema;
     }
 }
