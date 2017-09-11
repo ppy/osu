@@ -22,8 +22,15 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
         private readonly BeatmapSetInfo set;
 
         private readonly Box successRateBackground;
+        private readonly SuccessRate successRate;
         private readonly FillFlowContainer metadataFlow;
         private readonly ScrollContainer descriptionScroll;
+
+        public BeatmapInfo Beatmap
+        {
+            get { return successRate.Beatmap; }
+            set { successRate.Beatmap = value; }
+        }
 
         public Info(BeatmapSetInfo set)
         {
@@ -85,11 +92,16 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.Y,
                             Width = OnlineBeatmapSetOverlay.RIGHT_WIDTH,
-                            Children = new[]
+                            Children = new Drawable[]
                             {
                                 successRateBackground = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                },
+                                successRate = new SuccessRate
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Top = 20, Horizontal = 15 },
                                 },
                             },
                         },

@@ -107,14 +107,20 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                     starRating.FadeIn(100);
                 },
             });
-
-            Beatmap.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             starRating.Colour = colours.Yellow;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // done here so everything can bind in intialization and get the first trigger
+            Beatmap.TriggerChange();
         }
 
         private void showBeatmap(BeatmapInfo beatmap) => version.Text = beatmap.Version;

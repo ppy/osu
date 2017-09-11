@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
@@ -45,6 +46,8 @@ namespace osu.Desktop.VisualTests.Tests
                         FavouriteCount = 356,
                         Submitted = new DateTime(2016, 2, 10),
                         Ranked = new DateTime(2016, 6, 19),
+                        Length = 118000,
+                        BPM = 236,
                         Author = new User
                         {
                             Username = @"Fresh Chicken",
@@ -70,6 +73,20 @@ namespace osu.Desktop.VisualTests.Tests
                                 OverallDifficulty = 6.5f,
                                 ApproachRate = 5,
                             },
+                            OnlineInfo = new BeatmapOnlineInfo
+                            {
+                                HasVideo = false,
+                                CircleCount = 265,
+                                SliderCount = 71,
+                                PlayCount = 47906,
+                                PassCount = 19899,
+                            },
+                            Metrics = new BeatmapMetrics
+                            {
+                                Ratings = Enumerable.Range(0, 10),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                            },
                         },
                         new BeatmapInfo
                         {
@@ -83,6 +100,20 @@ namespace osu.Desktop.VisualTests.Tests
                                 DrainRate = 7,
                                 OverallDifficulty = 7,
                                 ApproachRate = 5,
+                            },
+                            OnlineInfo = new BeatmapOnlineInfo
+                            {
+                                HasVideo = false,
+                                CircleCount = 592,
+                                SliderCount = 62,
+                                PlayCount = 162021,
+                                PassCount = 72116,
+                            },
+                            Metrics = new BeatmapMetrics
+                            {
+                                Ratings = Enumerable.Range(0, 10),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
                         },
                         new BeatmapInfo
@@ -98,6 +129,20 @@ namespace osu.Desktop.VisualTests.Tests
                                 OverallDifficulty = 7.5f,
                                 ApproachRate = 5,
                             },
+                            OnlineInfo = new BeatmapOnlineInfo
+                            {
+                                HasVideo = false,
+                                CircleCount = 1042,
+                                SliderCount = 79,
+                                PlayCount = 225178,
+                                PassCount = 73001,
+                            },
+                            Metrics = new BeatmapMetrics
+                            {
+                                Ratings = Enumerable.Range(0, 10),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                            },
                         },
                         new BeatmapInfo
                         {
@@ -112,6 +157,20 @@ namespace osu.Desktop.VisualTests.Tests
                                 OverallDifficulty = 8,
                                 ApproachRate = 5,
                             },
+                            OnlineInfo = new BeatmapOnlineInfo
+                            {
+                                HasVideo = false,
+                                CircleCount = 1352,
+                                SliderCount = 69,
+                                PlayCount = 131545,
+                                PassCount = 42703,
+                            },
+                            Metrics = new BeatmapMetrics
+                            {
+                                Ratings = Enumerable.Range(0, 10),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                            },
                         },
                         new BeatmapInfo
                         {
@@ -125,6 +184,20 @@ namespace osu.Desktop.VisualTests.Tests
                                 DrainRate = 8.5f,
                                 OverallDifficulty = 8.5f,
                                 ApproachRate = 5,
+                            },
+                            OnlineInfo = new BeatmapOnlineInfo
+                            {
+                                HasVideo = false,
+                                CircleCount = 1730,
+                                SliderCount = 115,
+                                PlayCount = 117673,
+                                PassCount = 24241,
+                            },
+                            Metrics = new BeatmapMetrics
+                            {
+                                Ratings = Enumerable.Range(0, 10),
+                                Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
+                                Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
                             },
                         },
                     },
