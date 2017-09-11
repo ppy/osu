@@ -59,9 +59,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     }
                 }
             };
-
-            // Set the default glow
-            AccentColour = Color4.White;
         }
 
         public override Color4 AccentColour
