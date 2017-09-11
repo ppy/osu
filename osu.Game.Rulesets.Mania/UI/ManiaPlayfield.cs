@@ -50,6 +50,8 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 
+        private readonly Container topLevelContainer;
+
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
@@ -69,17 +71,16 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 new Container
                 {
+                    Name = "Playfield elements",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         new Container
                         {
-                            Name = "Masked elements",
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
+                            Name = "Columns mask",
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
                             Masking = true,
@@ -87,6 +88,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             {
                                 new Box
                                 {
+                                    Name = "Background",
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black
                                 },
@@ -98,27 +100,28 @@ namespace osu.Game.Rulesets.Mania.UI
                                     Direction = FillDirection.Horizontal,
                                     Padding = new MarginPadding { Left = 1, Right = 1 },
                                     Spacing = new Vector2(1, 0)
-                                }
+                                },
                             }
                         },
                         new Container
                         {
+                            Name = "Barlines mask",
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
-                            Children = new[]
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 1366, // Bar lines should only be masked on the vertical axis
+                            BypassAutoSizeAxes = Axes.Both,
+                            Masking = true,
+                            Child = content = new Container
                             {
-                                content = new Container
-                                {
-                                    Name = "Bar lines",
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    RelativeSizeAxes = Axes.Y,
-                                    // Width is set in the Update method
-                                }
+                                Name = "Bar lines",
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.Y,
+                                Padding = new MarginPadding { Top = HIT_TARGET_POSITION }
                             }
-                        }
+                        },
+                        topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
                 }
             };
