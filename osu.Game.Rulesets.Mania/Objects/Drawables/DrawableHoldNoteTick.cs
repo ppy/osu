@@ -23,11 +23,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         public Func<double?> HoldStartTime;
 
-        /// <summary>
-        /// References whether the user is currently holding the hold note.
-        /// </summary>
-        public Func<bool> IsHolding;
-
         private readonly Container glowContainer;
 
         public DrawableHoldNoteTick(HoldNoteTick hitObject)
@@ -36,8 +31,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
+            Y = (float)HitObject.StartTime;
+
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1);
+
+            // Life time managed by the parent DrawableHoldNote
+            LifetimeStart = double.MinValue;
+            LifetimeEnd = double.MaxValue;
 
             Children = new[]
             {
@@ -109,7 +110,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Judgement.Result != HitResult.None)
                 return;
 
-            if (IsHolding?.Invoke() != true)
+            if (HoldStartTime?.Invoke() == null)
                 return;
 
             UpdateJudgement(true);
