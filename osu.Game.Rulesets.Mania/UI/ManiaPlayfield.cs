@@ -53,6 +53,8 @@ namespace osu.Game.Rulesets.Mania.UI
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
+        private readonly Container<DrawableManiaJudgement> judgements;
+
         private readonly int columnCount;
 
         public ManiaPlayfield(int columnCount)
@@ -120,6 +122,14 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Padding = new MarginPadding { Top = HIT_TARGET_POSITION }
                             }
                         },
+                        judgements = new Container<DrawableManiaJudgement>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                            Y = HIT_TARGET_POSITION + 150,
+                            BypassAutoSizeAxes = Axes.Both
+                        },
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
                 }
@@ -147,6 +157,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private void invertedChanged(bool newValue)
         {
             Scale = new Vector2(1, newValue ? -1 : 1);
+            judgements.Scale = Scale;
         }
 
         [BackgroundDependencyLoader]
@@ -181,7 +192,17 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void OnJudgement(DrawableHitObject<ManiaHitObject, ManiaJudgement> judgedObject) => columns[judgedObject.HitObject.Column].OnJudgement(judgedObject);
+        public override void OnJudgement(DrawableHitObject<ManiaHitObject, ManiaJudgement> judgedObject)
+        {
+            columns[judgedObject.HitObject.Column].OnJudgement(judgedObject);
+
+            judgements.Clear();
+            judgements.Add(new DrawableManiaJudgement(judgedObject.Judgement)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+        }
 
         /// <summary>
         /// Whether the column index is a special column for this playfield.

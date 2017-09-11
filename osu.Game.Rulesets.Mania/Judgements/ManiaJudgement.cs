@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Extensions;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -33,9 +34,9 @@ namespace osu.Game.Rulesets.Mania.Judgements
         /// </summary>
         public int MaxResultValueForAccuracy => NumericResultForAccuracy(MAX_HIT_RESULT);
 
-        public override string ResultString => string.Empty;
+        public override string ResultString => ManiaResult.GetDescription();
 
-        public override string MaxResultString => string.Empty;
+        public override string MaxResultString => MAX_HIT_RESULT.GetDescription();
 
         /// <summary>
         /// The hit result.
