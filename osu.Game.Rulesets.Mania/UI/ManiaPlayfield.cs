@@ -14,7 +14,6 @@ using osu.Framework.Allocation;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;

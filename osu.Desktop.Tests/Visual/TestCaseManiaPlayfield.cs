@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK.Graphics;
 
 namespace osu.Desktop.Tests.Visual
 {

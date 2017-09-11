@@ -91,7 +91,8 @@ namespace osu.Game.Rulesets.Mania.Objects
             {
                 ret.Add(new HoldNoteTick
                 {
-                    StartTime = t
+                    StartTime = t,
+                    Column = Column
                 });
             }
 
