@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Mania.Objects
 {
     public abstract class ManiaHitObject : HitObject, IHasColumn
     {
-        public int Column { get; set; }
+        public virtual int Column { get; set; }
     }
 }
