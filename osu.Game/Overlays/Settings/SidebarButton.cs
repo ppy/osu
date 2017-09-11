@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Settings
                 backgroundBox = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    BlendingMode = BlendingMode.Additive,
+                    Blending = BlendingMode.Additive,
                     Colour = OsuColour.Gray(60),
                     Alpha = 0,
                 },

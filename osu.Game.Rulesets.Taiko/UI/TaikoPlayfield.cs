@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit,
-                                    BlendingMode = BlendingMode.Additive,
+                                    Blending = BlendingMode.Additive,
                                 },
                                 new HitTarget
                                 {
@@ -126,14 +126,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fit,
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            BlendingMode = BlendingMode.Additive
+                            Blending = BlendingMode.Additive
                         },
                         judgementContainer = new Container<DrawableTaikoJudgement>
                         {
                             Name = "Judgements",
                             RelativeSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            BlendingMode = BlendingMode.Additive
+                            Blending = BlendingMode.Additive
                         },
                     }
                 },
