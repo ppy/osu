@@ -172,9 +172,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             const float preempt = 100;
             const float out_transition_time = 300;
 
-            var offset = !AllJudged ? 0 : Time.Current - HitObject.EndTime;
             double untilStartTime = HitObject.StartTime - Time.Current;
-            double untilJudgement = untilStartTime + offset + HitObject.Duration;
+            double untilJudgement = untilStartTime + (Judgements.FirstOrDefault()?.TimeOffset ?? 0) + HitObject.Duration;
 
             targetRing.Delay(untilStartTime - preempt).ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
             this.Delay(untilJudgement).FadeOut(out_transition_time, Easing.Out);
