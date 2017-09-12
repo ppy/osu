@@ -73,8 +73,6 @@ namespace osu.Game.Rulesets.Scoring
         protected ScoreProcessor()
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-
-            Reset();
         }
 
         private ScoreRank rankFrom(double acc)
@@ -95,7 +93,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Resets this ScoreProcessor to a default state.
         /// </summary>
-        protected virtual void Reset()
+        /// <param name="storeResults">Whether to store the current state of the <see cref="ScoreProcessor"/> for future use.</param>
+        protected virtual void Reset(bool storeResults)
         {
             TotalScore.Value = 0;
             Accuracy.Value = 1;
@@ -160,10 +159,11 @@ namespace osu.Game.Rulesets.Scoring
         protected virtual double ComboPortion => 0.5f;
         protected virtual double AccuracyPortion => 0.5f;
 
-        protected readonly int MaxHits;
+        protected int MaxHits { get; private set; }
         protected int Hits { get; private set; }
 
-        private readonly double maxComboScore;
+        private double maxHighestCombo;
+        private double maxComboScore;
         private double comboScore;
 
         protected ScoreProcessor()
@@ -175,11 +175,7 @@ namespace osu.Game.Rulesets.Scoring
             rulesetContainer.OnJudgement += AddJudgement;
 
             SimulateAutoplay(rulesetContainer.Beatmap);
-
-            maxComboScore = comboScore;
-            MaxHits = Hits;
-
-            Reset();
+            Reset(true);
         }
 
         /// <summary>
@@ -252,9 +248,16 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
-        protected override void Reset()
+        protected override void Reset(bool storeResults)
         {
-            base.Reset();
+            if (storeResults)
+            {
+                maxHighestCombo = HighestCombo;
+                maxComboScore = comboScore;
+                MaxHits = Hits;
+            }
+
+            base.Reset(storeResults);
 
             Hits = 0;
             comboScore = 0;

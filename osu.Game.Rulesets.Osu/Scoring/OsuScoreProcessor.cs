@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     AddJudgement(new OsuJudgement { Result = HitResult.Great });
 
                     // Ticks
-                    foreach (var tick in slider.Ticks)
+                    foreach (var unused in slider.Ticks)
                         AddJudgement(new OsuJudgement { Result = HitResult.Great });
                 }
 
@@ -54,9 +54,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
             }
         }
 
-        protected override void Reset()
+        protected override void Reset(bool storeResults)
         {
-            base.Reset();
+            base.Reset(storeResults);
 
             scoreResultCounts.Clear();
             comboResultCounts.Clear();

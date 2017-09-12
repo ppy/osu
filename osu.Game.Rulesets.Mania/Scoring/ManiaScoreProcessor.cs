@@ -113,11 +113,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
                 {
                     var holdNote = obj as HoldNote;
 
-                    if (obj is Note)
-                    {
-                        AddJudgement(new ManiaJudgement { Result = HitResult.Perfect });
-                    }
-                    else if (holdNote != null)
+                    if (holdNote != null)
                     {
                         // Head
                         AddJudgement(new ManiaJudgement { Result = HitResult.Perfect });
@@ -126,9 +122,9 @@ namespace osu.Game.Rulesets.Mania.Scoring
                         int tickCount = holdNote.Ticks.Count();
                         for (int i = 0; i < tickCount; i++)
                             AddJudgement(new HoldNoteTickJudgement { Result = HitResult.Perfect });
-
-                        AddJudgement(new HoldNoteTailJudgement { Result = HitResult.Perfect });
                     }
+
+                    AddJudgement(new ManiaJudgement { Result = HitResult.Perfect });
                 }
 
                 if (!HasFailed)
@@ -137,7 +133,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
                 hpMultiplier *= 1.01;
                 hpMissMultiplier *= 0.98;
 
-                Reset();
+                Reset(false);
             }
         }
 
