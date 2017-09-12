@@ -181,7 +181,6 @@ namespace osu.Game.Overlays
                     {
                         chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, Easing.OutQuint);
                         channelSelectionContainer.ResizeHeightTo(channel_selection_min_height, 800, Easing.OutQuint);
-                        channelSelection.Show();
                         chatHeight.Value = 1f - channel_selection_min_height;
                     }
                 }
