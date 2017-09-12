@@ -14,10 +14,16 @@ namespace osu.Game.Rulesets.Scoring
     public abstract class ScoreProcessor
     {
         /// <summary>
-        /// Invoked when the ScoreProcessor is in a failed state.
+        /// Invoked when the <see cref="ScoreProcessor"/> is in a failed state.
+        /// This may occur regardless of whether an <see cref="AllJudged"/> event is invoked.
         /// Return true if the fail was permitted.
         /// </summary>
         public event Func<bool> Failed;
+
+        /// <summary>
+        /// Invoked when all <see cref="HitObject"/>s have been judged.
+        /// </summary>
+        public event Action AllJudged;
 
         /// <summary>
         /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by the <see cref="ScoreProcessor"/>.
@@ -48,6 +54,11 @@ namespace osu.Game.Rulesets.Scoring
         /// THe highest combo achieved by this score.
         /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
+
+        /// <summary>
+        /// Whether all <see cref="Judgement"/>s have been processed.
+        /// </summary>
+        protected virtual bool HasCompleted => false;
 
         /// <summary>
         /// Whether the score is in a failed state.
@@ -117,6 +128,9 @@ namespace osu.Game.Rulesets.Scoring
         protected void NotifyNewJudgement(Judgement judgement)
         {
             NewJudgement?.Invoke(judgement);
+
+            if (HasCompleted)
+                AllJudged?.Invoke();
         }
 
         /// <summary>
@@ -140,6 +154,8 @@ namespace osu.Game.Rulesets.Scoring
         private const double max_score = 1000000;
 
         public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>(ScoringMode.Exponential);
+
+        protected sealed override bool HasCompleted => Hits == MaxHits;
 
         protected virtual double ComboPortion => 0.5f;
         protected virtual double AccuracyPortion => 0.5f;

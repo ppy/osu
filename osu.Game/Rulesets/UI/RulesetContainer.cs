@@ -30,11 +30,6 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer : Container
     {
         /// <summary>
-        /// Invoked when all the judgeable HitObjects have been judged.
-        /// </summary>
-        public event Action OnAllJudged;
-
-        /// <summary>
         /// Whether to apply adjustments to the child <see cref="Playfield"/> based on our own size.
         /// </summary>
         public bool AspectAdjust = true;
@@ -75,15 +70,6 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
-        }
-
-        /// <summary>
-        /// Checks whether all HitObjects have been judged, and invokes OnAllJudged.
-        /// </summary>
-        protected void CheckAllJudged()
-        {
-            if (AllObjectsJudged)
-                OnAllJudged?.Invoke();
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -263,7 +249,6 @@ namespace osu.Game.Rulesets.UI
                 {
                     Playfield.OnJudgement(d, j);
                     OnJudgement?.Invoke(j);
-                    CheckAllJudged();
                 };
 
                 drawableObjects.Add(drawableObject);
