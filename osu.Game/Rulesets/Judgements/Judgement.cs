@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Judgements
 
         /// <summary>
         /// The offset at which this judgement occurred.
+        /// Populated when added via <see cref="DrawableHitObject{TObject}.AddJudgement"/>.
         /// </summary>
         public double TimeOffset { get; internal set; }
 
