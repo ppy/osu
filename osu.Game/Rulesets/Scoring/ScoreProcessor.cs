@@ -225,7 +225,8 @@ namespace osu.Game.Rulesets.Scoring
             if (judgement.AffectsAccuracy)
                 Hits++;
 
-            Accuracy.Value = comboScore / rollingMaxComboScore;
+            if (rollingMaxComboScore != 0)
+                Accuracy.Value = comboScore / rollingMaxComboScore;
 
             switch (Mode.Value)
             {
