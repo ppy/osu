@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         public double TimeOffset { get; internal set; }
 
+        public virtual bool AffectsAccuracy => true;
+
         public virtual bool AffectsCombo => true;
 
         /// <summary>
