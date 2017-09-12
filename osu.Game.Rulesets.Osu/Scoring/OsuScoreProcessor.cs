@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -38,9 +37,19 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             hpDrainRate = beatmap.BeatmapInfo.Difficulty.DrainRate;
 
-            foreach (var unused in beatmap.HitObjects)
+            foreach (var obj in beatmap.HitObjects)
             {
-                // TODO: add support for other object types.
+                var slider = obj as Slider;
+                if (slider != null)
+                {
+                    // Head
+                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
+
+                    // Ticks
+                    foreach (var tick in slider.Ticks)
+                        AddJudgement(new OsuJudgement { Result = HitResult.Great });
+                }
+
                 AddJudgement(new OsuJudgement { Result = HitResult.Great });
             }
         }
