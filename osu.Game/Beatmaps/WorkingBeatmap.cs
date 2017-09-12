@@ -109,10 +109,17 @@ namespace osu.Game.Beatmaps
 
         public virtual void Dispose()
         {
-            track?.Dispose();
-            track = null;
             background?.Dispose();
             background = null;
+        }
+
+        public void DisposeTrack()
+        {
+            lock (trackLock)
+            {
+                track?.Dispose();
+                track = null;
+            }
         }
     }
 }
