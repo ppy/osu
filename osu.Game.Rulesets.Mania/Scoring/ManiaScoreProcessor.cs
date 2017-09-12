@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
         {
         }
 
-        protected override void ComputeTargets(Beatmap<ManiaHitObject> beatmap)
+        protected override void SimulateAutoplay(Beatmap<ManiaHitObject> beatmap)
         {
             BeatmapDifficulty difficulty = beatmap.BeatmapInfo.Difficulty;
             hpMultiplier = BeatmapDifficulty.DifficultyRange(difficulty.DrainRate, hp_multiplier_min, hp_multiplier_mid, hp_multiplier_max);
