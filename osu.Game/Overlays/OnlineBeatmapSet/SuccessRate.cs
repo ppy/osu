@@ -70,6 +70,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopCentre,
+                                Text = @"0%",
                                 TextSize = 13,
                             },
                         },

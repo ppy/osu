@@ -110,6 +110,12 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             }
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            Playing = false;
+            base.Dispose(isDisposing);
+        }
+
         protected override bool OnHover(InputState state)
         {
             bg.FadeColour(Color4.Black.Opacity(0.5f), 100);
