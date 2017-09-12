@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Mania.UI
