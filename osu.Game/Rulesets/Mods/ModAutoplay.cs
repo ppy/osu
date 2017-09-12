@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
     {
         protected abstract Score CreateReplayScore(Beatmap<T> beatmap);
 
-        public void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer)
+        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer)
         {
             rulesetContainer.SetReplay(CreateReplayScore(rulesetContainer.Beatmap)?.Replay);
         }
