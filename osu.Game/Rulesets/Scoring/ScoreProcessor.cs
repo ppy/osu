@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -140,18 +139,13 @@ namespace osu.Game.Rulesets.Scoring
     {
         private const double max_score = 1000000;
 
-        /// <summary>
-        /// All judgements held by this ScoreProcessor.
-        /// </summary>
-        protected readonly List<Judgement> Judgements = new List<Judgement>();
-
         protected virtual double ComboPortion => 0.5f;
         protected virtual double AccuracyPortion => 0.5f;
 
-        protected int MaxHits { get; private set; }
+        protected readonly int MaxHits;
         protected int Hits { get; private set; }
 
-        private double maxComboScore;
+        private readonly double maxComboScore;
         private double comboScore;
 
         protected ScoreProcessor()
@@ -160,8 +154,6 @@ namespace osu.Game.Rulesets.Scoring
 
         protected ScoreProcessor(RulesetContainer<TObject> rulesetContainer)
         {
-            Judgements.Capacity = rulesetContainer.Beatmap.HitObjects.Count;
-
             rulesetContainer.OnJudgement += AddJudgement;
 
             ComputeTargets(rulesetContainer.Beatmap);
@@ -197,7 +189,6 @@ namespace osu.Game.Rulesets.Scoring
                 }
             }
 
-            Judgements.Add(judgement);
             OnNewJudgement(judgement);
             NotifyNewJudgement(judgement);
 
@@ -239,8 +230,6 @@ namespace osu.Game.Rulesets.Scoring
         protected override void Reset()
         {
             base.Reset();
-
-            Judgements.Clear();
 
             Hits = 0;
             comboScore = 0;
