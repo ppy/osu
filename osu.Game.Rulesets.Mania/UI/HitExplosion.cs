@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             base.LoadComplete();
 
-            this.ScaleTo(2f, 600, Easing.OutQuint).FadeOut(500);
+            this.ScaleTo(2f, 600, Easing.OutQuint).FadeOut(500).Expire();
             inner.FadeOut(250);
         }
     }
