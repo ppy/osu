@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Judgements
         public bool IsHit => Result > HitResult.Miss;
 
         /// <summary>
-        /// The offset at which this judgement occurred.
+        /// The offset from a perfect hit at which this judgement occurred.
         /// Populated when added via <see cref="DrawableHitObject{TObject}.AddJudgement"/>.
         /// </summary>
         public double TimeOffset { get; internal set; }
