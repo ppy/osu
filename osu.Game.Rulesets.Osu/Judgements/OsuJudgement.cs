@@ -10,6 +10,8 @@ namespace osu.Game.Rulesets.Osu.Judgements
 {
     public class OsuJudgement : Judgement
     {
+        public override HitResult MaxResult => HitResult.Great;
+
         /// <summary>
         /// The positional hit offset.
         /// </summary>
