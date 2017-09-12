@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beatmaps\ManiaBeatmap.cs" />
     <Compile Include="Beatmaps\Patterns\Legacy\EndTimeObjectPatternGenerator.cs" />
     <Compile Include="Beatmaps\Patterns\Legacy\DistanceObjectPatternGenerator.cs" />
     <Compile Include="Beatmaps\Patterns\Legacy\PatternGenerator.cs" />
@@ -72,6 +73,8 @@
     <Compile Include="Objects\Drawables\Pieces\BodyPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\NotePiece.cs" />
     <Compile Include="Objects\Types\IHasColumn.cs" />
+    <Compile Include="Replays\ManiaAutoGenerator.cs" />
+    <Compile Include="Replays\ManiaFramedReplayInputHandler.cs" />
     <Compile Include="Scoring\ManiaScoreProcessor.cs" />
     <Compile Include="Objects\BarLine.cs" />
     <Compile Include="Objects\HoldNote.cs" />
