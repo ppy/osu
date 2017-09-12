@@ -137,9 +137,9 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             }
         }
 
-        protected override void Reset()
+        protected override void Reset(bool storeResults)
         {
-            base.Reset();
+            base.Reset(storeResults);
 
             Health.Value = 0;
         }

@@ -25,8 +25,15 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         public double TimeOffset { get; internal set; }
 
+        /// <summary>
+        /// Whether the <see cref="Result"/> should be considered as a factor in the accuracy percentage and portion.
+        /// </summary>
         public virtual bool AffectsAccuracy => true;
 
+        /// <summary>
+        /// Whether the <see cref="Result"/> should affect the combo portion of the score.
+        /// If false, the <see cref="Result"/> will be considered for the bonus portion of the score.
+        /// </summary>
         public virtual bool AffectsCombo => true;
 
         /// <summary>
