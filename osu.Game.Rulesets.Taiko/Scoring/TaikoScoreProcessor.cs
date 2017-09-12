@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
         }
 
-        protected override void ComputeTargets(Beatmap<TaikoHitObject> beatmap)
+        protected override void SimulateAutoplay(Beatmap<TaikoHitObject> beatmap)
         {
             double hpMultiplierNormal = 1 / (hp_hit_great * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, 0.5, 0.75, 0.98));
 

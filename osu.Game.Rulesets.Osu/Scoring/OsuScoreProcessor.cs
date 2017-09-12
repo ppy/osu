@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
         private readonly Dictionary<ComboResult, int> comboResultCounts = new Dictionary<ComboResult, int>();
 
-        protected override void ComputeTargets(Beatmap<OsuHitObject> beatmap)
+        protected override void SimulateAutoplay(Beatmap<OsuHitObject> beatmap)
         {
             hpDrainRate = beatmap.BeatmapInfo.Difficulty.DrainRate;
 

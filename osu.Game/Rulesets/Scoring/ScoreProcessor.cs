@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Scoring
         {
             rulesetContainer.OnJudgement += AddJudgement;
 
-            ComputeTargets(rulesetContainer.Beatmap);
+            SimulateAutoplay(rulesetContainer.Beatmap);
 
             maxComboScore = comboScore;
             MaxHits = Hits;
@@ -165,10 +165,11 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Computes target scoring values for this ScoreProcessor. This is equivalent to performing an auto-play of the score to find the values.
+        /// Simulates an autoplay of <see cref="HitObject"/>s that will be judged by this <see cref="ScoreProcessor{TObject}"/>
+        /// by adding <see cref="Judgement"/>s for each <see cref="HitObject"/> in the <see cref="Beatmap{TObject}"/>.
         /// </summary>
-        /// <param name="beatmap">The Beatmap containing the objects that will be judged by this ScoreProcessor.</param>
-        protected virtual void ComputeTargets(Beatmap<TObject> beatmap) { }
+        /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> containing the <see cref="HitObject"/>s that will be judged by this <see cref="ScoreProcessor{TObject}"/>.</param>
+        protected virtual void SimulateAutoplay(Beatmap<TObject> beatmap) { }
 
         /// <summary>
         /// Adds a judgement to this ScoreProcessor.
