@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModNightcore : ModDoubleTime
     {
         public override string Name => "Nightcore";
+        public override string ShortenedName => "NC";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_nightcore;
         public override string Description => "uguuuuuuuu";
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -13,6 +14,8 @@ using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Desktop.Tests.Visual
 {
@@ -29,6 +32,8 @@ namespace osu.Desktop.Tests.Visual
 
         public TestCaseManiaPlayfield()
         {
+            var rng = new Random(1337);
+
             AddStep("1 column", () => createPlayfield(1, SpecialColumnPosition.Normal));
             AddStep("4 columns", () => createPlayfield(4, SpecialColumnPosition.Normal));
             AddStep("Left special style", () => createPlayfield(4, SpecialColumnPosition.Left));
@@ -43,6 +48,20 @@ namespace osu.Desktop.Tests.Visual
             AddStep("Notes with input (reversed)", () => createPlayfieldWithNotes(false, true));
             AddStep("Notes with gravity", () => createPlayfieldWithNotes(true));
             AddStep("Notes with gravity (reversed)", () => createPlayfieldWithNotes(true, true));
+
+            AddStep("Hit explosion", () =>
+            {
+                var playfield = createPlayfield(4, SpecialColumnPosition.Normal);
+
+                int col = rng.Next(0, 4);
+
+                var note = new DrawableNote(new Note { Column = col }, ManiaAction.Key1)
+                {
+                    AccentColour = playfield.Columns.ElementAt(col).AccentColour
+                };
+
+                playfield.OnJudgement(note, new ManiaJudgement { Result = HitResult.Perfect });
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -56,7 +75,7 @@ namespace osu.Desktop.Tests.Visual
             TimingPoint = { BeatLength = 1000 }
         }, gravity ? ScrollingAlgorithm.Gravity : ScrollingAlgorithm.Basic);
 
-        private void createPlayfield(int cols, SpecialColumnPosition specialPos, bool inverted = false)
+        private ManiaPlayfield createPlayfield(int cols, SpecialColumnPosition specialPos, bool inverted = false)
         {
             Clear();
 
@@ -72,6 +91,8 @@ namespace osu.Desktop.Tests.Visual
             });
 
             playfield.Inverted.Value = inverted;
+
+            return playfield;
         }
 
         private void createPlayfieldWithNotes(bool gravity, bool inverted = false)

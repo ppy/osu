@@ -4,17 +4,19 @@
 using System;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
-using osu.Framework;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -41,7 +43,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private readonly ScoreComponentLabel maxCombo;
         private readonly ScoreComponentLabel accuracy;
         private readonly Container flagBadgeContainer;
-        private readonly FillFlowContainer<ScoreModIcon> modsContainer;
+        private readonly FillFlowContainer<ModIcon> modsContainer;
 
         private Visibility state;
 
@@ -247,7 +249,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                         },
                                     },
                                 },
-                                modsContainer = new FillFlowContainer<ScoreModIcon>
+                                modsContainer = new FillFlowContainer<ModIcon>
                                 {
                                     Anchor = Anchor.BottomRight,
                                     Origin = Anchor.BottomRight,
@@ -260,13 +262,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                 },
             };
 
-            if (Score.Mods != null)
+            foreach (Mod mod in Score.Mods)
             {
-                foreach (Mod mod in Score.Mods)
+                modsContainer.Add(new ModIcon(mod)
                 {
-                    // TODO: Get actual mod colours
-                    modsContainer.Add(new ScoreModIcon(mod.Icon, OsuColour.FromHex(@"ffcc22")));
-                }
+                    AutoSizeAxes = Axes.Both,
+                    Scale = new Vector2(0.375f)
+                });
             }
         }
 
@@ -275,13 +277,13 @@ namespace osu.Game.Screens.Select.Leaderboards
         public override void Hide() => State = Visibility.Hidden;
         public override void Show() => State = Visibility.Visible;
 
-        protected override bool OnHover(Framework.Input.InputState state)
+        protected override bool OnHover(InputState state)
         {
             background.FadeTo(0.5f, 300, Easing.OutQuint);
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(Framework.Input.InputState state)
+        protected override void OnHoverLost(InputState state)
         {
             background.FadeTo(background_alpha, 200, Easing.OutQuint);
             base.OnHoverLost(state);
@@ -302,7 +304,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         BlurSigma = new Vector2(4),
                         CacheDrawnFrameBuffer = true,
                         RelativeSizeAxes = Axes.Both,
-                        BlendingMode = BlendingMode.Additive,
+                        Blending = BlendingMode.Additive,
                         Size = new Vector2(3f),
                         Children = new[]
                         {
@@ -311,8 +313,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Font = font,
-                                TextSize = textSize,
                                 FixedWidth = true,
+                                TextSize = textSize,
                                 Text = text,
                                 Colour = glowColour,
                                 Shadow = false,
@@ -329,36 +331,6 @@ namespace osu.Game.Screens.Select.Leaderboards
                         Text = text,
                         Colour = textColour,
                         Shadow = false,
-                    },
-                };
-            }
-        }
-
-        private class ScoreModIcon : Container
-        {
-            public ScoreModIcon(FontAwesome icon, Color4 colour)
-            {
-                AutoSizeAxes = Axes.Both;
-
-                Children = new[]
-                {
-                    new SpriteIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Icon = FontAwesome.fa_osu_mod_bg,
-                        Colour = colour,
-                        Shadow = true,
-                        Size = new Vector2(30),
-                    },
-                    new SpriteIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Icon = icon,
-                        Colour = OsuColour.Gray(84),
-                        Size = new Vector2(18),
-                        Position = new Vector2(0f, 2f),
                     },
                 };
             }

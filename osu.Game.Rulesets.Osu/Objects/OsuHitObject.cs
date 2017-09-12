@@ -4,10 +4,10 @@
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using OpenTK;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -42,30 +42,30 @@ namespace osu.Game.Rulesets.Osu.Objects
         public virtual bool NewCombo { get; set; }
         public int ComboIndex { get; set; }
 
-        public double HitWindowFor(OsuScoreResult result)
+        public double HitWindowFor(HitResult result)
         {
             switch (result)
             {
                 default:
                     return 300;
-                case OsuScoreResult.Hit50:
+                case HitResult.Meh:
                     return 150;
-                case OsuScoreResult.Hit100:
+                case HitResult.Good:
                     return 80;
-                case OsuScoreResult.Hit300:
+                case HitResult.Great:
                     return 30;
             }
         }
 
-        public OsuScoreResult ScoreResultForOffset(double offset)
+        public HitResult ScoreResultForOffset(double offset)
         {
-            if (offset < HitWindowFor(OsuScoreResult.Hit300))
-                return OsuScoreResult.Hit300;
-            if (offset < HitWindowFor(OsuScoreResult.Hit100))
-                return OsuScoreResult.Hit100;
-            if (offset < HitWindowFor(OsuScoreResult.Hit50))
-                return OsuScoreResult.Hit50;
-            return OsuScoreResult.Miss;
+            if (offset < HitWindowFor(HitResult.Great))
+                return HitResult.Great;
+            if (offset < HitWindowFor(HitResult.Good))
+                return HitResult.Good;
+            if (offset < HitWindowFor(HitResult.Meh))
+                return HitResult.Meh;
+            return HitResult.Miss;
         }
 
         public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)

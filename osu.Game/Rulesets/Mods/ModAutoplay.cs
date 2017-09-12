@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
     {
         protected abstract Score CreateReplayScore(Beatmap<T> beatmap);
 
-        public void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer)
+        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer)
         {
             rulesetContainer.SetReplay(CreateReplayScore(rulesetContainer.Beatmap)?.Replay);
         }
@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Mods
     public class ModAutoplay : Mod
     {
         public override string Name => "Autoplay";
+        public override string ShortenedName => "AT";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_auto;
         public override string Description => "Watch a perfect automated play through the song";
         public override double ScoreMultiplier => 0;

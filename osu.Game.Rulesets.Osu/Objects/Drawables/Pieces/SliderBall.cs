@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             this.slider = slider;
             Masking = true;
             AutoSizeAxes = Axes.Both;
-            BlendingMode = BlendingMode.Additive;
+            Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
             BorderThickness = 10;
             BorderColour = Color4.Orange;

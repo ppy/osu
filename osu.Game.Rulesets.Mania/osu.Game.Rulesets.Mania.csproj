@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>osu.Game.Rulesets.Mania</RootNamespace>
     <AssemblyName>osu.Game.Rulesets.Mania</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -60,7 +60,6 @@
     <Compile Include="Judgements\HitWindows.cs" />
     <Compile Include="Judgements\HoldNoteTailJudgement.cs" />
     <Compile Include="Judgements\HoldNoteTickJudgement.cs" />
-    <Compile Include="Judgements\ManiaHitResult.cs" />
     <Compile Include="Judgements\ManiaJudgement.cs" />
     <Compile Include="ManiaDifficultyCalculator.cs" />
     <Compile Include="Mods\IGenerateSpeedAdjustments.cs" />
@@ -70,8 +69,12 @@
     <Compile Include="Objects\Drawables\DrawableManiaHitObject.cs" />
     <Compile Include="Objects\Drawables\DrawableNote.cs" />
     <Compile Include="Objects\Drawables\Pieces\BodyPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\LaneGlowPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\NotePiece.cs" />
     <Compile Include="Objects\Types\IHasColumn.cs" />
+    <Compile Include="Replays\ManiaAutoGenerator.cs" />
+    <Compile Include="Replays\ManiaFramedReplayInputHandler.cs" />
     <Compile Include="Scoring\ManiaScoreProcessor.cs" />
     <Compile Include="Objects\BarLine.cs" />
     <Compile Include="Objects\HoldNote.cs" />
@@ -83,6 +86,8 @@
     <Compile Include="Timing\GravityScrollingContainer.cs" />
     <Compile Include="Timing\ScrollingAlgorithm.cs" />
     <Compile Include="UI\Column.cs" />
+    <Compile Include="UI\DrawableManiaJudgement.cs" />
+    <Compile Include="UI\HitExplosion.cs" />
     <Compile Include="UI\ManiaRulesetContainer.cs" />
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />
@@ -95,14 +100,6 @@
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
       <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
       <Name>osu.Framework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
-      <Project>{C92A607B-1FDD-4954-9F92-03FF547D9080}</Project>
-      <Name>osu.Game.Rulesets.Osu</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
-      <Project>{F167E17A-7DE6-4AF5-B920-A5112296C695}</Project>
-      <Name>osu.Game.Rulesets.Taiko</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>

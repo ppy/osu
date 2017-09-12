@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>osu.Desktop.Tests</RootNamespace>
     <AssemblyName>osu.Desktop.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -87,6 +87,7 @@
     <Compile Include="Visual\TestCaseManiaHitObjects.cs" />
     <Compile Include="Visual\TestCaseManiaPlayfield.cs" />
     <Compile Include="Visual\TestCaseMedalOverlay.cs" />
+    <Compile Include="Visual\TestCaseEditorMenuBar.cs" />
     <Compile Include="Visual\TestCaseMenuButtonSystem.cs" />
     <Compile Include="Visual\TestCaseMenuOverlays.cs" />
     <Compile Include="Visual\TestCaseMods.cs" />

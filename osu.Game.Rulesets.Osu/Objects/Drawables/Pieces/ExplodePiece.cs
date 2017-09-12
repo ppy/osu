@@ -16,14 +16,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            BlendingMode = BlendingMode.Additive;
+            Blending = BlendingMode.Additive;
             Alpha = 0;
 
             Children = new Drawable[]
             {
                 new TrianglesPiece
                 {
-                    BlendingMode = BlendingMode.Additive,
+                    Blending = BlendingMode.Additive,
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.2f,
                 }
