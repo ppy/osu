@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Mania
                         {
                             Mods = new Mod[]
                             {
-                                new ModAutoplay(),
+                                new ManiaModAutoplay(),
                                 new ModCinema(),
                             },
                         },
