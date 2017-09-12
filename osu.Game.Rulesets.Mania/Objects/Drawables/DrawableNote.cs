@@ -2,10 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Extensions.Color4Extensions;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
@@ -18,10 +16,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
-        /// <summary>
-        /// Gets or sets whether this <see cref="DrawableNote"/> should apply glow to itself.
-        /// </summary>
-        protected bool ApplyGlow = true;
+        protected readonly GlowPiece GlowPiece;
 
         private readonly NotePiece headPiece;
 
@@ -31,19 +26,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Add(headPiece = new NotePiece
+            Children = new Drawable[]
             {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Masking = true
-            });
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            updateGlow();
+                GlowPiece = new GlowPiece(),
+                headPiece = new NotePiece
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre
+                }
+            };
         }
 
         public override Color4 AccentColour
@@ -55,27 +46,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return;
                 base.AccentColour = value;
 
+                GlowPiece.AccentColour = value;
                 headPiece.AccentColour = value;
-
-                updateGlow();
             }
-        }
-
-        private void updateGlow()
-        {
-            if (!IsLoaded)
-                return;
-
-            if (!ApplyGlow)
-                return;
-
-            headPiece.EdgeEffect = new EdgeEffectParameters
-            {
-                Type = EdgeEffectType.Glow,
-                Colour = AccentColour.Opacity(0.5f),
-                Radius = 10,
-                Hollow = true
-            };
         }
 
         protected override void CheckJudgement(bool userTriggered)
