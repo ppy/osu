@@ -30,12 +30,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Masking = true;
 
             Add(headPiece = new NotePiece
             {
                 Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre
+                Origin = Anchor.TopCentre,
+                Masking = true
             });
         }
 
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!ApplyGlow)
                 return;
 
-            EdgeEffect = new EdgeEffectParameters
+            headPiece.EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = AccentColour.Opacity(0.5f),
