@@ -194,19 +194,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="judgement">The judgement to add.</param>
         protected void AddJudgement(Judgement judgement)
         {
-            if (judgement.AffectsCombo)
-            {
-                switch (judgement.Result)
-                {
-                    case HitResult.Miss:
-                        Combo.Value = 0;
-                        break;
-                    default:
-                        Combo.Value++;
-                        break;
-                }
-            }
-
             OnNewJudgement(judgement);
             NotifyNewJudgement(judgement);
 
