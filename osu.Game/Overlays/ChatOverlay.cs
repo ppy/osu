@@ -12,8 +12,10 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -56,7 +58,7 @@ namespace osu.Game.Overlays
         private readonly Box chatBackground;
         private readonly Box tabBackground;
 
-        private Bindable<double> chatHeight;
+        public Bindable<double> ChatHeight { get; internal set; }
 
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
@@ -177,17 +179,11 @@ namespace osu.Game.Overlays
                 if (state == Visibility.Visible)
                 {
                     textbox.HoldFocus = false;
-                    if (1f - chatHeight.Value < channel_selection_min_height)
-                    {
-                        chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, Easing.OutQuint);
-                        channelSelectionContainer.ResizeHeightTo(channel_selection_min_height, 800, Easing.OutQuint);
-                        chatHeight.Value = 1f - channel_selection_min_height;
-                    }
+                    if (1f - ChatHeight.Value < channel_selection_min_height)
+                        transformChatHeightTo(1f - channel_selection_min_height, 800, Easing.OutQuint);
                 }
                 else
-                {
                     textbox.HoldFocus = true;
-                }
             };
         }
 
@@ -201,7 +197,7 @@ namespace osu.Game.Overlays
             if (!isDragging)
                 return base.OnDragStart(state);
 
-            startDragChatHeight = chatHeight.Value;
+            startDragChatHeight = ChatHeight.Value;
             return true;
         }
 
@@ -217,7 +213,7 @@ namespace osu.Game.Overlays
                 if (channelSelection.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
                     targetChatHeight = 1f - channel_selection_min_height;
 
-                chatHeight.Value = targetChatHeight;
+                ChatHeight.Value = targetChatHeight;
             }
 
             return true;
@@ -277,14 +273,14 @@ namespace osu.Game.Overlays
             this.api = api;
             api.Register(this);
 
-            chatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
-            chatHeight.ValueChanged += h =>
+            ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
+            ChatHeight.ValueChanged += h =>
             {
                 chatContainer.Height = (float)h;
                 channelSelectionContainer.Height = 1f - (float)h;
                 tabBackground.FadeTo(h == 1 ? 1 : 0.8f, 200);
             };
-            chatHeight.TriggerChange();
+            ChatHeight.TriggerChange();
 
             chatBackground.Colour = colours.ChatBlue;
         }
@@ -505,6 +501,27 @@ namespace osu.Game.Overlays
             req.Success += m => target.ReplaceMessage(message, m);
 
             api.Queue(req);
+        }
+
+        private void transformChatHeightTo(double newChatHeight, double duration = 0, Easing easing = Easing.None)
+        {
+            this.TransformTo(this.PopulateTransform(new TransformChatHeight(), newChatHeight, duration, easing));
+        }
+
+        private class TransformChatHeight : Transform<double, ChatOverlay>
+        {
+            private double valueAt(double time)
+            {
+                if (time < StartTime) return StartValue;
+                if (time >= EndTime) return EndValue;
+
+                return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+            }
+
+            public override string TargetMember => "ChatHeight.Value";
+
+            protected override void Apply(ChatOverlay d, double time) => d.ChatHeight.Value = valueAt(time);
+            protected override void ReadIntoStartValue(ChatOverlay d) => StartValue = d.ChatHeight.Value;
         }
     }
 }
