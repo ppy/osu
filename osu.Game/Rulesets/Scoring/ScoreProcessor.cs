@@ -162,11 +162,9 @@ namespace osu.Game.Rulesets.Scoring
         protected int MaxHits { get; private set; }
         protected int Hits { get; private set; }
 
-        private int maxAccurateHits;
-        private int accurateHits;
-
         private double maxHighestCombo;
         private double maxComboScore;
+        private double rollingMaxComboScore;
         private double comboScore;
 
         protected ScoreProcessor()
@@ -219,16 +217,15 @@ namespace osu.Game.Rulesets.Scoring
                 }
 
                 comboScore += judgement.NumericResult;
+                rollingMaxComboScore += judgement.MaxNumericResult;
             }
             else if (judgement.IsHit)
                 bonusScore += judgement.NumericResult;
 
             if (judgement.AffectsAccuracy)
-            {
                 Hits++;
-                if (judgement.IsHit)
-                    accurateHits++;
-            }
+
+            Accuracy.Value = comboScore / rollingMaxComboScore;
 
             switch (Mode.Value)
             {
@@ -236,15 +233,13 @@ namespace osu.Game.Rulesets.Scoring
                     TotalScore.Value =
                         max_score *
                             (ComboPortion * (comboScore * Math.Log(HighestCombo + 1, 2)) / (maxComboScore * Math.Log(maxHighestCombo + 1, 2))
-                            + AccuracyPortion * accurateHits / maxAccurateHits)
+                            + AccuracyPortion * Accuracy)
                         + bonusScore;
                     break;
                 case ScoringMode.Exponential:
                     TotalScore.Value = (comboScore + bonusScore) * Math.Log(HighestCombo + 1, 2);
                     break;
             }
-
-            Accuracy.Value = (double)accurateHits / Hits;
         }
 
         protected override void Reset(bool storeResults)
@@ -252,7 +247,6 @@ namespace osu.Game.Rulesets.Scoring
             if (storeResults)
             {
                 MaxHits = Hits;
-                maxAccurateHits = accurateHits;
                 maxHighestCombo = HighestCombo;
                 maxComboScore = comboScore;
             }
@@ -260,8 +254,8 @@ namespace osu.Game.Rulesets.Scoring
             base.Reset(storeResults);
 
             Hits = 0;
-            accurateHits = 0;
             comboScore = 0;
+            rollingMaxComboScore = 0;
         }
     }
 
