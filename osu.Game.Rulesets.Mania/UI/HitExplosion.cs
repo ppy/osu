@@ -6,8 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -17,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         private readonly Box inner;
 
-        public HitExplosion(DrawableHitObject<ManiaHitObject, ManiaJudgement> judgedObject)
+        public HitExplosion(DrawableHitObject judgedObject)
         {
             bool isTick = judgedObject is DrawableHoldNoteTick;
 

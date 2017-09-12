@@ -9,7 +9,6 @@ using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO.Serialization;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
@@ -17,17 +16,16 @@ using osu.Game.Rulesets.Timing;
 namespace osu.Game.Rulesets.UI
 {
     /// <summary>
-    /// A type of <see cref="RulesetContainer{TPlayfield,TObject,TJudgement}"/> that supports a <see cref="ScrollingPlayfield{TObject, TJudgement}"/>.
-    /// <see cref="HitObject"/>s inside this <see cref="RulesetContainer{TPlayfield,TObject,TJudgement}"/> will scroll within the playfield.
+    /// A type of <see cref="RulesetContainer{TPlayfield,TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
+    /// <see cref="HitObject"/>s inside this <see cref="RulesetContainer{TPlayfield,TObject}"/> will scroll within the playfield.
     /// </summary>
-    public abstract class ScrollingRulesetContainer<TPlayfield, TObject, TJudgement> : RulesetContainer<TPlayfield, TObject, TJudgement>
+    public abstract class ScrollingRulesetContainer<TPlayfield, TObject> : RulesetContainer<TPlayfield, TObject>
         where TObject : HitObject
-        where TJudgement : Judgement
-        where TPlayfield : ScrollingPlayfield<TObject, TJudgement>
+        where TPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
-        /// inside this <see cref="RulesetContainer{TPlayfield,TObject,TJudgement}"/>.
+        /// inside this <see cref="RulesetContainer{TPlayfield,TObject}"/>.
         /// </summary>
         /// <returns></returns>
         protected readonly SortedList<MultiplierControlPoint> DefaultControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
@@ -88,7 +86,7 @@ namespace osu.Game.Rulesets.UI
             DefaultControlPoints.ForEach(c => applySpeedAdjustment(c, Playfield));
         }
 
-        private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield<TObject, TJudgement> playfield)
+        private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield playfield)
         {
             playfield.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint));
             playfield.NestedPlayfields.ForEach(p => applySpeedAdjustment(controlPoint, p));

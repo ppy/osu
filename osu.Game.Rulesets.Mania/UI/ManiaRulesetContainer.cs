@@ -15,7 +15,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
@@ -30,7 +29,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject, ManiaJudgement>
+    public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject>
     {
         /// <summary>
         /// The number of columns which the <see cref="ManiaPlayfield"/> should display, and which
@@ -77,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected sealed override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(AvailableColumns)
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(AvailableColumns)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -107,7 +106,7 @@ namespace osu.Game.Rulesets.Mania.UI
             return new ManiaBeatmapConverter(IsForCurrentRuleset, AvailableColumns);
         }
 
-        protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
+        protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
             ManiaAction action = Playfield.Columns.ElementAt(h.Column).Action;
 
