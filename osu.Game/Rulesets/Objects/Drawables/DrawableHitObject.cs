@@ -157,6 +157,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 }
             }
 
+            if (!ProvidesJudgement || hasJudgementResult || judgementOccurred)
+                return judgementOccurred;
+
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             CheckForJudgements(userTriggered, Time.Current - endTime);
 
