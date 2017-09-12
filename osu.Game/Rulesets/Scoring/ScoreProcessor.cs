@@ -138,15 +138,21 @@ namespace osu.Game.Rulesets.Scoring
     public abstract class ScoreProcessor<TObject> : ScoreProcessor
         where TObject : HitObject
     {
+        private const double max_score = 1000000;
+
         /// <summary>
         /// All judgements held by this ScoreProcessor.
         /// </summary>
         protected readonly List<Judgement> Judgements = new List<Judgement>();
 
-        private int maxHits;
-        private int maxCombo;
+        protected virtual double ComboPortion => 0.5f;
+        protected virtual double AccuracyPortion => 0.5f;
 
-        private int hits;
+        protected int MaxHits { get; private set; }
+        protected int Hits { get; private set; }
+
+        private double maxComboScore;
+        private double comboScore;
 
         protected ScoreProcessor()
         {
@@ -160,8 +166,8 @@ namespace osu.Game.Rulesets.Scoring
 
             ComputeTargets(rulesetContainer.Beatmap);
 
-            maxCombo = HighestCombo;
-            maxHits = hits;
+            maxComboScore = comboScore;
+            MaxHits = Hits;
 
             Reset();
         }
@@ -191,15 +197,43 @@ namespace osu.Game.Rulesets.Scoring
                 }
             }
 
-            if (judgement.AffectsCombo && judgement.IsHit)
-                hits++;
-
             Judgements.Add(judgement);
             OnNewJudgement(judgement);
-
             NotifyNewJudgement(judgement);
 
             UpdateFailed();
+        }
+
+        protected virtual void OnNewJudgement(Judgement judgement)
+        {
+            double bonusScore = 0;
+
+            if (judgement.AffectsCombo)
+            {
+                switch (judgement.Result)
+                {
+                    case HitResult.None:
+                        break;
+                    case HitResult.Miss:
+                        Combo.Value = 0;
+                        break;
+                    default:
+                        Combo.Value++;
+                        break;
+                }
+
+                comboScore += judgement.NumericResult;
+            }
+            else if (judgement.IsHit)
+                bonusScore += judgement.NumericResult;
+
+            if (judgement.AffectsAccuracy && judgement.IsHit)
+                Hits++;
+
+            TotalScore.Value =
+                max_score * (ComboPortion * comboScore / maxComboScore
+                                + AccuracyPortion * Hits / MaxHits)
+                + bonusScore;
         }
 
         protected override void Reset()
@@ -207,12 +241,9 @@ namespace osu.Game.Rulesets.Scoring
             base.Reset();
 
             Judgements.Clear();
-        }
 
-        /// <summary>
-        /// Updates any values that need post-processing. Invoked when a new judgement has occurred.
-        /// </summary>
-        /// <param name="judgement">The judgement that triggered this calculation.</param>
-        protected abstract void OnNewJudgement(Judgement judgement);
+            Hits = 0;
+            comboScore = 0;
+        }
     }
 }

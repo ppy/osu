@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Catch.Scoring
 
         protected override void OnNewJudgement(Judgement judgement)
         {
+            base.OnNewJudgement(judgement);
         }
     }
 }

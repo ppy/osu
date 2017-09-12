@@ -9,18 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
     public class TaikoJudgement : Judgement
     {
         /// <summary>
-        /// The result value for the accuracy portion of the score.
-        /// </summary>
-        public int ResultNumericForAccuracy => Result == HitResult.Miss ? 0 : NumericResultForAccuracy(Result);
-
-        /// <summary>
-        /// The maximum result value for the accuracy portion of the score.
-        /// </summary>
-        public int MaxResultValueForAccuracy => NumericResultForAccuracy(HitResult.Great);
-
-        /// <summary>
         /// Computes the numeric result value for the combo portion of the score.
-        /// For the accuracy portion of the score (including accuracy percentage), see <see cref="NumericResultForAccuracy(HitResult)"/>.
         /// </summary>
         /// <param name="result">The result to compute the value for.</param>
         /// <returns>The numeric result value.</returns>
@@ -32,25 +21,6 @@ namespace osu.Game.Rulesets.Taiko.Judgements
                     return 0;
                 case HitResult.Good:
                     return 100;
-                case HitResult.Great:
-                    return 300;
-            }
-        }
-
-        /// <summary>
-        /// Computes the numeric result value for the accuracy portion of the score.
-        /// For the combo portion of the score, see <see cref="NumericResultFor(HitResult)"/>.
-        /// </summary>
-        /// <param name="result">The result to compute the value for.</param>
-        /// <returns>The numeric result value.</returns>
-        protected virtual int NumericResultForAccuracy(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-                case HitResult.Good:
-                    return 150;
                 case HitResult.Great:
                     return 300;
             }
