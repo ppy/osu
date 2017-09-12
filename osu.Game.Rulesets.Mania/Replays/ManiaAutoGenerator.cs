@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Mania.Replays
 {
     internal class ManiaAutoGenerator : AutoGenerator<ManiaHitObject>
     {
+        private const double release_delay = 20;
+
         private readonly int availableColumns;
 
         public ManiaAutoGenerator(Beatmap<ManiaHitObject> beatmap, int availableColumns)
@@ -58,7 +60,7 @@ namespace osu.Game.Rulesets.Mania.Replays
                 Replay.Frames.Add(new ReplayFrame(groupTime, activeColumns, null, ReplayButtonState.None));
 
                 // Add the release frames. We can't do this with the loop above because we need activeColumns to be fully populated
-                foreach (var obj in objGroup.GroupBy(h => (h as IHasEndTime)?.EndTime ?? h.StartTime + 1).OrderBy(h => h.Key))
+                foreach (var obj in objGroup.GroupBy(h => (h as IHasEndTime)?.EndTime ?? h.StartTime + release_delay).OrderBy(h => h.Key))
                 {
                     var groupEndTime = obj.Key;
 
