@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         Origin = Anchor.Centre,
                         Alpha = 0,
                         RelativeSizeAxes = Axes.Both,
-                        BlendingMode = BlendingMode.Additive,
+                        Blending = BlendingMode.Additive,
                         Masking = true,
                         Children = new[]
                         {
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         BorderThickness = target_ring_thick_border,
-                        BlendingMode = BlendingMode.Additive,
+                        Blending = BlendingMode.Additive,
                         Children = new Drawable[]
                         {
                             new Box

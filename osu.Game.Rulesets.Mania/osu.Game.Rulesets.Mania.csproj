@@ -69,6 +69,8 @@
     <Compile Include="Objects\Drawables\DrawableManiaHitObject.cs" />
     <Compile Include="Objects\Drawables\DrawableNote.cs" />
     <Compile Include="Objects\Drawables\Pieces\BodyPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
+    <Compile Include="Objects\Drawables\Pieces\LaneGlowPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\NotePiece.cs" />
     <Compile Include="Objects\Types\IHasColumn.cs" />
     <Compile Include="Scoring\ManiaScoreProcessor.cs" />
@@ -82,6 +84,8 @@
     <Compile Include="Timing\GravityScrollingContainer.cs" />
     <Compile Include="Timing\ScrollingAlgorithm.cs" />
     <Compile Include="UI\Column.cs" />
+    <Compile Include="UI\DrawableManiaJudgement.cs" />
+    <Compile Include="UI\HitExplosion.cs" />
     <Compile Include="UI\ManiaRulesetContainer.cs" />
     <Compile Include="UI\ManiaPlayfield.cs" />
     <Compile Include="ManiaRuleset.cs" />

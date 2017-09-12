@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Objects
@@ -29,19 +27,5 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// Strong hit objects give more points for hitting the hit object with both keys.
         /// </summary>
         public bool IsStrong;
-
-        /// <summary>
-        /// Whether this HitObject is in Kiai time.
-        /// </summary>
-        public bool Kiai { get; protected set; }
-
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
-        {
-            base.ApplyDefaults(controlPointInfo, difficulty);
-
-            EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
-
-            Kiai |= effectPoint.KiaiMode;
-        }
     }
 }

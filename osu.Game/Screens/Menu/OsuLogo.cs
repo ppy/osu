@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Menu
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            BlendingMode = BlendingMode.Additive,
+                                            Blending = BlendingMode.Additive,
                                             Alpha = 0
                                         }
                                     }
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Menu
                                                                 flashLayer = new Box
                                                                 {
                                                                     RelativeSizeAxes = Axes.Both,
-                                                                    BlendingMode = BlendingMode.Additive,
+                                                                    Blending = BlendingMode.Additive,
                                                                     Colour = Color4.White,
                                                                     Alpha = 0,
                                                                 },
@@ -272,14 +272,22 @@ namespace osu.Game.Screens.Menu
 
             const float scale_adjust_cutoff = 0.4f;
             const float velocity_adjust_cutoff = 0.98f;
+            const float paused_velocity = 0.5f;
 
-            var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track?.CurrentAmplitudes.Maximum ?? 0 : 0;
-            logoAmplitudeContainer.ScaleTo(1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 75, Easing.OutQuint);
+            if (Beatmap.Value.Track.IsRunning)
+            {
+                var maxAmplitude = lastBeatIndex >= 0 ? Beatmap.Value.Track.CurrentAmplitudes.Maximum : 0;
+                logoAmplitudeContainer.ScaleTo(1 - Math.Max(0, maxAmplitude - scale_adjust_cutoff) * 0.04f, 75, Easing.OutQuint);
 
-            if (maxAmplitude > velocity_adjust_cutoff)
-                triangles.Velocity = 1 + Math.Max(0, maxAmplitude - velocity_adjust_cutoff) * 50;
+                if (maxAmplitude > velocity_adjust_cutoff)
+                    triangles.Velocity = 1 + Math.Max(0, maxAmplitude - velocity_adjust_cutoff) * 50;
+                else
+                    triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, 1, 0.995f, Time.Elapsed);
+            }
             else
-                triangles.Velocity = (float)Interpolation.Damp(triangles.Velocity, 1, 0.995f, Time.Elapsed);
+            {
+                triangles.Velocity = paused_velocity;
+            }
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)

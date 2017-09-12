@@ -304,7 +304,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         BlurSigma = new Vector2(4),
                         CacheDrawnFrameBuffer = true,
                         RelativeSizeAxes = Axes.Both,
-                        BlendingMode = BlendingMode.Additive,
+                        Blending = BlendingMode.Additive,
                         Size = new Vector2(3f),
                         Children = new[]
                         {

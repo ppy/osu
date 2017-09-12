@@ -57,6 +57,12 @@ namespace osu.Game.Graphics
         private void load(FontStore store)
         {
             this.store = store;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
             updateTexture();
         }
 

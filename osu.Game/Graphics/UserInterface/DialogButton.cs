@@ -99,7 +99,8 @@ namespace osu.Game.Graphics.UserInterface
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
             flash();
 
-            this.Delay(click_duration).Schedule(delegate {
+            this.Delay(click_duration).Schedule(delegate
+            {
                 colourContainer.ResizeTo(new Vector2(0.8f, 1f));
                 spriteText.Spacing = Vector2.Zero;
                 glowContainer.FadeOut();
@@ -140,7 +141,7 @@ namespace osu.Game.Graphics.UserInterface
             colourContainer.Add(flash);
 
             flash.Colour = ButtonColour;
-            flash.BlendingMode = BlendingMode.Additive;
+            flash.Blending = BlendingMode.Additive;
             flash.Alpha = 0.3f;
             flash.FadeOutFromOne(click_duration);
             flash.Expire();

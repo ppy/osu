@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Menu
                     RelativeSizeAxes = Axes.Y,
                     Width = box_width,
                     Alpha = 0,
-                    BlendingMode = BlendingMode.Additive,
+                    Blending = BlendingMode.Additive,
                 },
                 rightBox = new Box
                 {
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Menu
                     RelativeSizeAxes = Axes.Y,
                     Width = box_width,
                     Alpha = 0,
-                    BlendingMode = BlendingMode.Additive,
+                    Blending = BlendingMode.Additive,
                 }
             };
         }
