@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             judgementOccurred = false;
 
-            if (AllJudged)
+            if (AllJudged || State != ArmedState.Idle)
                 return false;
 
             if (NestedHitObjects != null)
