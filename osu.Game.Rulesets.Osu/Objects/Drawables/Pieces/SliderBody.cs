@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     {
                         path = new Path
                         {
-                            BlendingMode = BlendingMode.None,
+                            Blending = BlendingMode.None,
                         },
                     }
                 },

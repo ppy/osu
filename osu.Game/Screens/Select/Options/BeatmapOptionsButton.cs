@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Select.Options
                         {
                             RelativeSizeAxes = Axes.Both,
                             EdgeSmoothness = new Vector2(1.5f, 0),
-                            BlendingMode = BlendingMode.Additive,
+                            Blending = BlendingMode.Additive,
                             Colour = Color4.White,
                             Alpha = 0,
                         },

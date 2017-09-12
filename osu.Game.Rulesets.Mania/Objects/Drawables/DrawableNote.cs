@@ -16,19 +16,31 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
+        protected readonly GlowPiece GlowPiece;
+
+        private readonly LaneGlowPiece laneGlowPiece;
         private readonly NotePiece headPiece;
 
         public DrawableNote(Note hitObject, ManiaAction action)
             : base(hitObject, action)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 100;
+            AutoSizeAxes = Axes.Y;
 
-            Add(headPiece = new NotePiece
+            Children = new Drawable[]
             {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre
-            });
+                laneGlowPiece = new LaneGlowPiece
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                },
+                GlowPiece = new GlowPiece(),
+                headPiece = new NotePiece
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre
+                }
+            };
         }
 
         public override Color4 AccentColour
@@ -40,6 +52,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return;
                 base.AccentColour = value;
 
+                laneGlowPiece.AccentColour = value;
+                GlowPiece.AccentColour = value;
                 headPiece.AccentColour = value;
             }
         }
@@ -63,12 +77,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
-            switch (State)
-            {
-                case ArmedState.Hit:
-                    Colour = Color4.Green;
-                    break;
-            }
         }
 
         public virtual bool OnPressed(ManiaAction action)

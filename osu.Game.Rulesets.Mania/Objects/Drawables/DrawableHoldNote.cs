@@ -23,8 +23,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         private readonly DrawableNote head;
         private readonly DrawableNote tail;
 
+        private readonly GlowPiece glowPiece;
         private readonly BodyPiece bodyPiece;
         private readonly Container<DrawableHoldNoteTick> tickContainer;
+        private readonly Container fullHeightContainer;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -44,13 +46,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             AddRange(new Drawable[]
             {
-                // For now the body piece covers the entire height of the container
-                // whereas possibly in the future we don't want to extend under the head/tail.
-                // This will be fixed when new designs are given or the current design is finalized.
+                // The hit object itself cannot be used for various elements because the tail overshoots it
+                // So a specialized container that is updated to contain the tail height is used
+                fullHeightContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Child = glowPiece = new GlowPiece()
+                },
                 bodyPiece = new BodyPiece
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.X,
                 },
                 tickContainer = new Container<DrawableHoldNoteTick>
                 {
@@ -96,6 +103,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 tickContainer.Children.ForEach(t => t.AccentColour = value);
 
+                glowPiece.AccentColour = value;
                 bodyPiece.AccentColour = value;
                 head.AccentColour = value;
                 tail.AccentColour = value;
@@ -104,6 +112,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void UpdateState(ArmedState state)
         {
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            // Make the body piece not lie under the head note
+            bodyPiece.Y = head.Height;
+            bodyPiece.Height = DrawHeight - head.Height;
+
+            // Make the fullHeightContainer "contain" the height of the tail note, keeping in mind
+            // that the tail note overshoots the height of this hit object
+            fullHeightContainer.Height = DrawHeight + tail.Height;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -155,6 +176,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 RelativePositionAxes = Axes.None;
                 Y = 0;
+
+                // Life time managed by the parent DrawableHoldNote
+                LifetimeStart = double.MinValue;
+                LifetimeEnd = double.MaxValue;
+
+                GlowPiece.Alpha = 0;
             }
 
             public override bool OnPressed(ManiaAction action)
@@ -188,6 +215,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 RelativePositionAxes = Axes.None;
                 Y = 0;
+
+                // Life time managed by the parent DrawableHoldNote
+                LifetimeStart = double.MinValue;
+                LifetimeEnd = double.MaxValue;
+
+                GlowPiece.Alpha = 0;
             }
 
             protected override void CheckForJudgements(bool userTriggered, double timeOffset)
