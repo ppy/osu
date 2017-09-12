@@ -287,8 +287,8 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                     case EventType.Sprite:
                         {
-                            var layer = split[1];
-                            var origin = (Anchor)Enum.Parse(typeof(Anchor), split[2]);
+                            var layer = parseLayer(split[1]);
+                            var origin = parseOrigin(split[2]);
                             var path = cleanFilename(split[3]);
                             var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
                             var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
@@ -298,8 +298,8 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                     case EventType.Animation:
                         {
-                            var layer = split[1];
-                            var origin = (Anchor)Enum.Parse(typeof(Anchor), split[2]);
+                            var layer = parseLayer(split[1]);
+                            var origin = parseOrigin(split[2]);
                             var path = cleanFilename(split[3]);
                             var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
                             var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
@@ -313,7 +313,7 @@ namespace osu.Game.Beatmaps.Formats
                     case EventType.Sample:
                         {
                             var time = double.Parse(split[1], CultureInfo.InvariantCulture);
-                            var layer = split[2];
+                            var layer = parseLayer(split[2]);
                             var path = cleanFilename(split[3]);
                             var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
                             beatmap.Storyboard.GetLayer(layer).Add(new SampleDefinition(path, time, volume));
@@ -445,6 +445,27 @@ namespace osu.Game.Beatmaps.Formats
 
         private static string cleanFilename(string path)
             => FileSafety.PathStandardise(path.Trim('\"'));
+
+        private static Anchor parseOrigin(string value)
+        {
+            var origin = (LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value);
+            switch (origin)
+            {
+                case LegacyOrigins.TopLeft: return Anchor.TopLeft;
+                case LegacyOrigins.TopCentre: return Anchor.TopCentre;
+                case LegacyOrigins.TopRight: return Anchor.TopRight;
+                case LegacyOrigins.CentreLeft: return Anchor.CentreLeft;
+                case LegacyOrigins.Centre: return Anchor.Centre;
+                case LegacyOrigins.CentreRight: return Anchor.CentreRight;
+                case LegacyOrigins.BottomLeft: return Anchor.BottomLeft;
+                case LegacyOrigins.BottomCentre: return Anchor.BottomCentre;
+                case LegacyOrigins.BottomRight: return Anchor.BottomRight;
+            }
+            throw new InvalidDataException($@"Unknown origin: {value}");
+        }
+
+        private static string parseLayer(string value)
+            => Enum.Parse(typeof(StoryLayer), value).ToString();
 
         private void handleTimingPoints(Beatmap beatmap, string line)
         {
@@ -682,6 +703,28 @@ namespace osu.Game.Beatmaps.Formats
             Sprite = 4,
             Sample = 5,
             Animation = 6
+        }
+
+        internal enum LegacyOrigins
+        {
+            TopLeft,
+            Centre,
+            CentreLeft,
+            TopRight,
+            BottomCentre,
+            TopCentre,
+            Custom,
+            CentreRight,
+            BottomLeft,
+            BottomRight
+        };
+
+        internal enum StoryLayer
+        {
+            Background = 0,
+            Fail = 1,
+            Pass = 2,
+            Foreground = 3
         }
     }
 }
