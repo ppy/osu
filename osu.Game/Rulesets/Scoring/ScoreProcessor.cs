@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The current accuracy.
         /// </summary>
-        public readonly BindableDouble Accuracy = new BindableDouble { MinValue = 0, MaxValue = 1 };
+        public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
         /// The current health.
@@ -88,8 +88,8 @@ namespace osu.Game.Rulesets.Scoring
         protected virtual void Reset()
         {
             TotalScore.Value = 0;
-            Accuracy.Value = 0;
-            Health.Value = 0;
+            Accuracy.Value = 1;
+            Health.Value = 1;
             Combo.Value = 0;
             HighestCombo.Value = 0;
 

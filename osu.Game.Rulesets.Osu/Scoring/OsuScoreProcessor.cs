@@ -54,9 +54,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             base.Reset();
 
-            Health.Value = 1;
-            Accuracy.Value = 1;
-
             scoreResultCounts.Clear();
             comboResultCounts.Clear();
         }

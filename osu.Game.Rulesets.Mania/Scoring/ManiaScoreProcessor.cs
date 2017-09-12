@@ -265,12 +265,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
             TotalScore.Value = comboScore + accuracyScore + bonusScore;
         }
 
-        protected override void Reset()
-        {
             base.Reset();
-
-            Health.Value = 1;
-            Accuracy.Value = 1;
 
             bonusScore = 0;
             comboPortion = 0;
