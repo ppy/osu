@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         protected readonly GlowPiece GlowPiece;
 
+        private readonly LaneGlowPiece laneGlowPiece;
         private readonly NotePiece headPiece;
 
         public DrawableNote(Note hitObject, ManiaAction action)
@@ -28,6 +29,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             Children = new Drawable[]
             {
+                laneGlowPiece = new LaneGlowPiece
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                },
                 GlowPiece = new GlowPiece(),
                 headPiece = new NotePiece
                 {
@@ -46,6 +52,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return;
                 base.AccentColour = value;
 
+                laneGlowPiece.AccentColour = value;
                 GlowPiece.AccentColour = value;
                 headPiece.AccentColour = value;
             }
