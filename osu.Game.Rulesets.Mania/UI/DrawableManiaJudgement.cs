@@ -3,14 +3,12 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    internal class DrawableManiaJudgement : DrawableJudgement<ManiaJudgement>
+    internal class DrawableManiaJudgement : DrawableJudgement
     {
-        public DrawableManiaJudgement(ManiaJudgement judgement)
+        public DrawableManiaJudgement(Judgement judgement)
         : base(judgement)
         {
             JudgementText.TextSize = 25;
@@ -22,14 +20,12 @@ namespace osu.Game.Rulesets.Mania.UI
 
             this.FadeInFromZero(50, Easing.OutQuint);
 
-            switch (Judgement.Result)
+            if (Judgement.IsHit)
             {
-                case HitResult.Hit:
-                    this.ScaleTo(0.8f);
-                    this.ScaleTo(1, 250, Easing.OutElastic);
+                this.ScaleTo(0.8f);
+                this.ScaleTo(1, 250, Easing.OutElastic);
 
-                    this.Delay(50).FadeOut(200).ScaleTo(0.75f, 250);
-                    break;
+                this.Delay(50).FadeOut(200).ScaleTo(0.75f, 250);
             }
 
             Expire();

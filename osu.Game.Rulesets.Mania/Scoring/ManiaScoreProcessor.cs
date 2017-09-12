@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -12,7 +13,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Scoring
 {
-    internal class ManiaScoreProcessor : ScoreProcessor<ManiaHitObject, ManiaJudgement>
+    internal class ManiaScoreProcessor : ScoreProcessor<ManiaHitObject>
     {
         /// <summary>
         /// The maximum score achievable.
@@ -155,7 +156,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
         {
         }
 
-        public ManiaScoreProcessor(RulesetContainer<ManiaHitObject, ManiaJudgement> rulesetContainer)
+        public ManiaScoreProcessor(RulesetContainer<ManiaHitObject> rulesetContainer)
             : base(rulesetContainer)
         {
         }
@@ -174,37 +175,19 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
                     if (obj is Note)
                     {
-                        AddJudgement(new ManiaJudgement
-                        {
-                            Result = HitResult.Hit,
-                            ManiaResult = ManiaHitResult.Perfect
-                        });
+                        AddJudgement(new ManiaJudgement { Result = HitResult.Perfect });
                     }
                     else if (holdNote != null)
                     {
                         // Head
-                        AddJudgement(new ManiaJudgement
-                        {
-                            Result = HitResult.Hit,
-                            ManiaResult = ManiaJudgement.MAX_HIT_RESULT
-                        });
+                        AddJudgement(new ManiaJudgement { Result = HitResult.Perfect });
 
                         // Ticks
                         int tickCount = holdNote.Ticks.Count();
                         for (int i = 0; i < tickCount; i++)
-                        {
-                            AddJudgement(new HoldNoteTickJudgement
-                            {
-                                Result = HitResult.Hit,
-                                ManiaResult = ManiaJudgement.MAX_HIT_RESULT,
-                            });
-                        }
+                            AddJudgement(new HoldNoteTickJudgement { Result = HitResult.Perfect });
 
-                        AddJudgement(new HoldNoteTailJudgement
-                        {
-                            Result = HitResult.Hit,
-                            ManiaResult = ManiaJudgement.MAX_HIT_RESULT
-                        });
+                        AddJudgement(new HoldNoteTailJudgement { Result = HitResult.Perfect });
                     }
                 }
 
@@ -221,50 +204,50 @@ namespace osu.Game.Rulesets.Mania.Scoring
             maxComboPortion = comboPortion;
         }
 
-        protected override void OnNewJudgement(ManiaJudgement judgement)
+        protected override void OnNewJudgement(Judgement judgement)
         {
             bool isTick = judgement is HoldNoteTickJudgement;
 
-            if (!isTick)
+            if (isTick)
+            {
+                if (judgement.IsHit)
+                {
+                    Health.Value += hpMultiplier * hp_increase_tick;
+                    bonusScore += judgement.NumericResult;
+                }
+            }
+            else
+            {
                 totalHits++;
 
-            switch (judgement.Result)
-            {
-                case HitResult.Miss:
-                    Health.Value += hpMissMultiplier * hp_increase_miss;
-                    break;
-                case HitResult.Hit:
-                    if (isTick)
-                    {
-                        Health.Value += hpMultiplier * hp_increase_tick;
-                        bonusScore += judgement.ResultValueForScore;
-                    }
-                    else
-                    {
-                        switch (judgement.ManiaResult)
-                        {
-                            case ManiaHitResult.Bad:
-                                Health.Value += hpMultiplier * hp_increase_bad;
-                                break;
-                            case ManiaHitResult.Ok:
-                                Health.Value += hpMultiplier * hp_increase_ok;
-                                break;
-                            case ManiaHitResult.Good:
-                                Health.Value += hpMultiplier * hp_increase_good;
-                                break;
-                            case ManiaHitResult.Great:
-                                Health.Value += hpMultiplier * hp_increase_great;
-                                break;
-                            case ManiaHitResult.Perfect:
-                                Health.Value += hpMultiplier * hp_increase_perfect;
-                                break;
-                        }
+                switch (judgement.Result)
+                {
+                    case HitResult.Miss:
+                        Health.Value += hpMissMultiplier * hp_increase_miss;
+                        break;
+                    case HitResult.Meh:
+                        Health.Value += hpMultiplier * hp_increase_bad;
+                        break;
+                    case HitResult.Ok:
+                        Health.Value += hpMultiplier * hp_increase_ok;
+                        break;
+                    case HitResult.Good:
+                        Health.Value += hpMultiplier * hp_increase_good;
+                        break;
+                    case HitResult.Great:
+                        Health.Value += hpMultiplier * hp_increase_great;
+                        break;
+                    case HitResult.Perfect:
+                        Health.Value += hpMultiplier * hp_increase_perfect;
+                        break;
+                }
 
-                        // A factor that is applied to make higher combos more relevant
-                        double comboRelevance = Math.Min(Math.Max(0.5, Math.Log(Combo.Value, combo_base)), Math.Log(combo_relevance_cap, combo_base));
-                        comboPortion += judgement.ResultValueForScore * comboRelevance;
-                    }
-                    break;
+                if (judgement.IsHit)
+                {
+                    // A factor that is applied to make higher combos more relevant
+                    double comboRelevance = Math.Min(Math.Max(0.5, Math.Log(Combo.Value, combo_base)), Math.Log(combo_relevance_cap, combo_base));
+                    comboPortion += judgement.NumericResult * comboRelevance;
+                }
             }
 
             int scoreForAccuracy = 0;
@@ -272,8 +255,10 @@ namespace osu.Game.Rulesets.Mania.Scoring
 
             foreach (var j in Judgements)
             {
-                scoreForAccuracy += j.ResultValueForAccuracy;
-                maxScoreForAccuracy += j.MaxResultValueForAccuracy;
+                var maniaJudgement = (ManiaJudgement)j;
+
+                scoreForAccuracy += maniaJudgement.NumericAccuracyResult;
+                maxScoreForAccuracy += maniaJudgement.MaxNumericAccuracyResult;
             }
 
             Accuracy.Value = (double)scoreForAccuracy / maxScoreForAccuracy;

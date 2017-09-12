@@ -57,11 +57,10 @@ namespace osu.Desktop.Tests.Visual
 
                 var note = new DrawableNote(new Note { Column = col }, ManiaAction.Key1)
                 {
-                    Judgement = new ManiaJudgement { Result = HitResult.Hit },
                     AccentColour = playfield.Columns.ElementAt(col).AccentColour
                 };
 
-                playfield.OnJudgement(note);
+                playfield.OnJudgement(note, new ManiaJudgement { Result = HitResult.Perfect });
             });
         }
 

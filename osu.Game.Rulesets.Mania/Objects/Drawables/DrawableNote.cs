@@ -58,29 +58,21 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HitObject.HitWindows.Bad / 2)
-                    Judgement.Result = HitResult.Miss;
+                if (timeOffset > HitObject.HitWindows.Bad / 2)
+                    AddJudgement(new ManiaJudgement { Result = HitResult.Miss });
                 return;
             }
 
-            double offset = Math.Abs(Judgement.TimeOffset);
+            double offset = Math.Abs(timeOffset);
 
             if (offset > HitObject.HitWindows.Miss / 2)
                 return;
 
-            ManiaHitResult? tmpResult = HitObject.HitWindows.ResultFor(offset);
-
-            if (tmpResult.HasValue)
-            {
-                Judgement.Result = HitResult.Hit;
-                Judgement.ManiaResult = tmpResult.Value;
-            }
-            else
-                Judgement.Result = HitResult.Miss;
+            AddJudgement(new ManiaJudgement { Result = HitObject.HitWindows.ResultFor(offset) ?? HitResult.Miss });
         }
 
         protected override void UpdateState(ArmedState state)

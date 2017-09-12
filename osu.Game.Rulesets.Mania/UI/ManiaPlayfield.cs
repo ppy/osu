@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Graphics.Containers;
 using System;
 using osu.Game.Graphics;
@@ -17,10 +16,11 @@ using osu.Framework.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ScrollingPlayfield<ManiaHitObject, ManiaJudgement>
+    public class ManiaPlayfield : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
@@ -192,12 +192,13 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void OnJudgement(DrawableHitObject<ManiaHitObject, ManiaJudgement> judgedObject)
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            columns[judgedObject.HitObject.Column].OnJudgement(judgedObject);
+            var maniaObject = (ManiaHitObject)judgedObject.HitObject;
+            columns[maniaObject.Column].OnJudgement(judgedObject, judgement);
 
             judgements.Clear();
-            judgements.Add(new DrawableManiaJudgement(judgedObject.Judgement)
+            judgements.Add(new DrawableManiaJudgement(judgement)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -223,7 +224,8 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
+        public override void Add(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column).Add(h);
+
         public void Add(DrawableBarLine barline) => HitObjects.Add(barline);
 
         protected override void Update()

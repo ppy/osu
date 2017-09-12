@@ -135,14 +135,13 @@ namespace osu.Game.Rulesets.Scoring
         }
     }
 
-    public abstract class ScoreProcessor<TObject, TJudgement> : ScoreProcessor
+    public abstract class ScoreProcessor<TObject> : ScoreProcessor
         where TObject : HitObject
-        where TJudgement : Judgement
     {
         /// <summary>
         /// All judgements held by this ScoreProcessor.
         /// </summary>
-        protected readonly List<TJudgement> Judgements = new List<TJudgement>();
+        protected readonly List<Judgement> Judgements = new List<Judgement>();
 
         public override bool HasFailed => Health.Value == Health.MinValue;
 
@@ -150,7 +149,7 @@ namespace osu.Game.Rulesets.Scoring
         {
         }
 
-        protected ScoreProcessor(RulesetContainer<TObject, TJudgement> rulesetContainer)
+        protected ScoreProcessor(RulesetContainer<TObject> rulesetContainer)
         {
             Judgements.Capacity = rulesetContainer.Beatmap.HitObjects.Count;
 
@@ -171,7 +170,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Adds a judgement to this ScoreProcessor.
         /// </summary>
         /// <param name="judgement">The judgement to add.</param>
-        protected void AddJudgement(TJudgement judgement)
+        protected void AddJudgement(Judgement judgement)
         {
             bool exists = Judgements.Contains(judgement);
 
@@ -181,10 +180,12 @@ namespace osu.Game.Rulesets.Scoring
                 {
                     switch (judgement.Result)
                     {
+                        case HitResult.None:
+                            break;
                         case HitResult.Miss:
                             Combo.Value = 0;
                             break;
-                        case HitResult.Hit:
+                        default:
                             Combo.Value++;
                             break;
                     }
@@ -195,8 +196,6 @@ namespace osu.Game.Rulesets.Scoring
 
                 NotifyNewJudgement(judgement);
             }
-            else
-                OnJudgementChanged(judgement);
 
             UpdateFailed();
         }
@@ -210,20 +209,8 @@ namespace osu.Game.Rulesets.Scoring
 
         /// <summary>
         /// Updates any values that need post-processing. Invoked when a new judgement has occurred.
-        /// <para>
-        /// This is not triggered when existing judgements are changed - for that see <see cref="OnJudgementChanged(TJudgement)"/>.
-        /// </para>
         /// </summary>
         /// <param name="judgement">The judgement that triggered this calculation.</param>
-        protected abstract void OnNewJudgement(TJudgement judgement);
-
-        /// <summary>
-        /// Updates any values that need post-processing. Invoked when an existing judgement has changed.
-        /// <para>
-        /// This is not triggered when a new judgement has occurred - for that see <see cref="OnNewJudgement(TJudgement)"/>.
-        /// </para>
-        /// </summary>
-        /// <param name="judgement">The judgement that triggered this calculation.</param>
-        protected virtual void OnJudgementChanged(TJudgement judgement) { }
+        protected abstract void OnNewJudgement(Judgement judgement);
     }
 }

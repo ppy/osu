@@ -52,7 +52,6 @@
     <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
     <Compile Include="Judgements\TaikoStrongHitJudgement.cs" />
     <Compile Include="Judgements\TaikoJudgement.cs" />
-    <Compile Include="Judgements\TaikoHitResult.cs" />
     <Compile Include="Objects\BarLine.cs" />
     <Compile Include="Objects\Drawables\DrawableBarLine.cs" />
     <Compile Include="Objects\Drawables\DrawableBarLineMajor.cs" />
