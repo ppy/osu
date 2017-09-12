@@ -29,19 +29,5 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// Strong hit objects give more points for hitting the hit object with both keys.
         /// </summary>
         public bool IsStrong;
-
-        /// <summary>
-        /// Whether this HitObject is in Kiai time.
-        /// </summary>
-        public bool Kiai { get; protected set; }
-
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
-        {
-            base.ApplyDefaults(controlPointInfo, difficulty);
-
-            EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
-
-            Kiai |= effectPoint.KiaiMode;
-        }
     }
 }
