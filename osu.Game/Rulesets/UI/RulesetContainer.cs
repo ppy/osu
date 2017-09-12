@@ -56,11 +56,6 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
-        /// <summary>
-        /// Whether all the HitObjects have been judged.
-        /// </summary>
-        protected abstract bool AllObjectsJudged { get; }
-
         protected readonly Ruleset Ruleset;
 
         /// <summary>
@@ -138,8 +133,6 @@ namespace osu.Game.Rulesets.UI
 
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
-        protected override bool AllObjectsJudged => drawableObjects.All(h => h.AllJudged);
-
         /// <summary>
         /// The playfield.
         /// </summary>
@@ -147,8 +140,6 @@ namespace osu.Game.Rulesets.UI
 
         protected override Container<Drawable> Content => content;
         private Container content;
-
-        private readonly List<DrawableHitObject<TObject>> drawableObjects = new List<DrawableHitObject<TObject>>();
 
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
@@ -236,8 +227,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         private void loadObjects()
         {
-            drawableObjects.Capacity = Beatmap.HitObjects.Count;
-
             foreach (TObject h in Beatmap.HitObjects)
             {
                 var drawableObject = GetVisualRepresentation(h);
@@ -251,8 +240,6 @@ namespace osu.Game.Rulesets.UI
                     OnJudgement?.Invoke(j);
                 };
 
-                drawableObjects.Add(drawableObject);
-                Playfield.Add(drawableObject);
             }
 
             Playfield.PostProcess();
