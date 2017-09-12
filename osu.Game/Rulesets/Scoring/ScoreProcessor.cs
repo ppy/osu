@@ -240,7 +240,10 @@ namespace osu.Game.Rulesets.Scoring
             {
                 case ScoringMode.Standardised:
                     TotalScore.Value =
-                        max_score * (ComboPortion * comboScore / maxComboScore + AccuracyPortion * Hits / MaxHits) + bonusScore;
+                        max_score *
+                            (ComboPortion * (comboScore * Math.Log(HighestCombo + 1, 2)) / (maxComboScore * Math.Log(maxHighestCombo + 1, 2))
+                            + AccuracyPortion * Hits / MaxHits)
+                        + bonusScore;
                     break;
                 case ScoringMode.Exponential:
                     TotalScore.Value = (comboScore + bonusScore) * Math.Log(HighestCombo + 1, 2);
