@@ -29,6 +29,9 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         public override Replay Generate()
         {
+            // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
+            Replay.Frames.Add(new ReplayFrame(-100000, null, null, ReplayButtonState.None));
+
             double[] holdEndTimes = new double[availableColumns];
             for (int i = 0; i < availableColumns; i++)
                 holdEndTimes[i] = double.NegativeInfinity;
@@ -78,11 +81,53 @@ namespace osu.Game.Rulesets.Mania.Replays
             Replay.Frames = Replay.Frames
                                   // Pick the maximum activeColumns for all frames at the same time
                                   .GroupBy(f => f.Time)
-                                  .Select(g => new ReplayFrame(g.First().Time, g.Max(gf => gf.MouseX), 0, ReplayButtonState.None))
+                                  .Select(g => new ReplayFrame(g.First().Time, maxMouseX(g), 0, ReplayButtonState.None))
+                                  // The addition of release frames above maybe result in unordered frames, but we need them ordered
                                   .OrderBy(f => f.Time)
                                   .ToList();
 
             return Replay;
+        }
+
+        /// <summary>
+        /// Finds the maximum <see cref="ReplayFrame.MouseX"/> by count of bits from a grouping of <see cref="ReplayFrame"/>s.
+        /// </summary>
+        /// <param name="group">The <see cref="ReplayFrame"/> grouping to search.</param>
+        /// <returns>The maximum <see cref="ReplayFrame.MouseX"/> by count of bits.</returns>
+        private float maxMouseX(IGrouping<double, ReplayFrame> group)
+        {
+            int currentCount = -1;
+            int currentMax = 0;
+
+            foreach (var val in group)
+            {
+                int newCount = countBits((int)(val.MouseX ?? 0));
+                if (newCount > currentCount)
+                {
+                    currentCount = newCount;
+                    currentMax = (int)(val.MouseX ?? 0);
+                }
+            }
+
+            return currentMax;
+        }
+
+        /// <summary>
+        /// Counts the number of bits set in a value.
+        /// </summary>
+        /// <param name="value">The value to count.</param>
+        /// <returns>The number of set bits.</returns>
+        private int countBits(int value)
+        {
+            int count = 0;
+            while (value > 0)
+            {
+                if ((value & 1) > 0)
+                    count++;
+                value >>= 1;
+            }
+
+            return count;
         }
     }
 }
