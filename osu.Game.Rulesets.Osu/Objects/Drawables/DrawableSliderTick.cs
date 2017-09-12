@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (timeOffset >= 0)
-                AddJudgement(new SliderTickJudgement { Result = Tracking ? HitResult.Perfect : HitResult.Miss });
+                AddJudgement(new OsuJudgement { Result = Tracking ? HitResult.Perfect : HitResult.Miss });
         }
 
         protected override void UpdatePreemptState()
