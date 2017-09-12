@@ -146,15 +146,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (NestedHitObjects != null)
             {
                 foreach (var d in NestedHitObjects)
-                {
-                    if (d.AllJudged)
-                        continue;
-
-                    d.UpdateJudgement(userTriggered);
-
-                    if (d.AllJudged)
-                        return true;
-                }
+                    judgementOccurred |= d.UpdateJudgement(userTriggered);
             }
 
             if (!ProvidesJudgement || hasJudgementResult || judgementOccurred)
