@@ -4,7 +4,6 @@
 using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects.Types;
 using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -32,9 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 UpdatePreemptState();
 
-                var judgement = Judgements.FirstOrDefault();
-                var offset = judgement != null ? judgement.TimeOffset : 0;
-                using (BeginDelayedSequence(TIME_PREEMPT + offset, true))
+                using (BeginDelayedSequence(TIME_PREEMPT + (Judgements.FirstOrDefault()?.TimeOffset ?? 0), true))
                     UpdateCurrentState(state);
             }
         }
