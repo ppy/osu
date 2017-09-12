@@ -152,10 +152,19 @@ namespace osu.Game
 
             Beatmap.ValueChanged += b =>
             {
+                var trackLoaded = lastBeatmap?.TrackLoaded ?? false;
+
                 // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
-                if (lastBeatmap?.Track != b.Track)
+                if (!trackLoaded || lastBeatmap?.Track != b.Track)
                 {
-                    lastBeatmap?.Track?.Dispose();
+                    if (trackLoaded)
+                    {
+                        Debug.Assert(lastBeatmap != null);
+                        Debug.Assert(lastBeatmap.Track != null);
+
+                        lastBeatmap.DisposeTrack();
+                    }
+
                     Audio.Track.AddItem(b.Track);
                 }
 
