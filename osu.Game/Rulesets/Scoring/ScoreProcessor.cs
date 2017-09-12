@@ -139,6 +139,8 @@ namespace osu.Game.Rulesets.Scoring
     {
         private const double max_score = 1000000;
 
+        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>(ScoringMode.Exponential);
+
         protected virtual double ComboPortion => 0.5f;
         protected virtual double AccuracyPortion => 0.5f;
 
@@ -222,10 +224,16 @@ namespace osu.Game.Rulesets.Scoring
             if (judgement.AffectsAccuracy && judgement.IsHit)
                 Hits++;
 
-            TotalScore.Value =
-                max_score * (ComboPortion * comboScore / maxComboScore
-                                + AccuracyPortion * Hits / MaxHits)
-                + bonusScore;
+            switch (Mode.Value)
+            {
+                case ScoringMode.Standardised:
+                    TotalScore.Value =
+                        max_score * (ComboPortion * comboScore / maxComboScore + AccuracyPortion * Hits / MaxHits) + bonusScore;
+                    break;
+                case ScoringMode.Exponential:
+                    TotalScore.Value = (comboScore + bonusScore) * Math.Log(HighestCombo + 1, 2);
+                    break;
+            }
         }
 
         protected override void Reset()
@@ -235,5 +243,11 @@ namespace osu.Game.Rulesets.Scoring
             Hits = 0;
             comboScore = 0;
         }
+    }
+
+    public enum ScoringMode
+    {
+        Standardised,
+        Exponential
     }
 }

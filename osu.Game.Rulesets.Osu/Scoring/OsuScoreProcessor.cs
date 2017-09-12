@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject>
     {
-        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>(ScoringMode.Exponential);
-
         protected override double ComboPortion => 0.7;
         protected override double AccuracyPortion => 0.3;
 
@@ -99,12 +97,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     Health.Value -= hpDrainRate * 0.04;
                     break;
             }
-        }
-
-        public enum ScoringMode
-        {
-            Standardised,
-            Exponential
         }
     }
 }
