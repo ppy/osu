@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether the score is in a failed state.
         /// </summary>
-        public virtual bool HasFailed => false;
+        public virtual bool HasFailed => Health.Value == Health.MinValue;
 
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
@@ -143,8 +143,6 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected readonly List<Judgement> Judgements = new List<Judgement>();
 
-        public override bool HasFailed => Health.Value == Health.MinValue;
-
         protected ScoreProcessor()
         {
         }
@@ -156,7 +154,6 @@ namespace osu.Game.Rulesets.Scoring
             rulesetContainer.OnJudgement += AddJudgement;
 
             ComputeTargets(rulesetContainer.Beatmap);
-
             Reset();
         }
 
