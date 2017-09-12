@@ -240,6 +240,7 @@ namespace osu.Game.Rulesets.UI
                     OnJudgement?.Invoke(j);
                 };
 
+                Playfield.Add(drawableObject);
             }
 
             Playfield.PostProcess();
