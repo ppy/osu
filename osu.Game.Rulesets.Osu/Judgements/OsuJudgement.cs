@@ -8,10 +8,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Judgements
 {
-    public class SliderTickJudgement : OsuJudgement
-    {
-    }
-
     public class OsuJudgement : Judgement
     {
         /// <summary>
