@@ -11,6 +11,5 @@ namespace osu.Game.Rulesets.Mania.Judgements
         public override bool AffectsAccuracy => false;
 
         protected override int NumericResultFor(HitResult result) => 20;
-        protected override int NumericResultForAccuracy(HitResult result) => 0; // Don't count ticks into accuracy
     }
 }
