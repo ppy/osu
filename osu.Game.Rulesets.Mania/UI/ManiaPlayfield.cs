@@ -6,30 +6,23 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Graphics.Containers;
 using System;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
-using OpenTK.Input;
 using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ScrollingPlayfield<ManiaHitObject, ManiaJudgement>
+    public class ManiaPlayfield : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
-
-        /// <summary>
-        /// Default column keys, expanding outwards from the middle as more column are added.
-        /// E.g. 2 columns use FJ, 4 columns use DFJK, 6 use SDFJKL, etc...
-        /// </summary>
-        private static readonly Key[] default_keys = { Key.A, Key.S, Key.D, Key.F, Key.J, Key.K, Key.L, Key.Semicolon };
 
         private SpecialColumnPosition specialColumnPosition;
         /// <summary>
@@ -60,6 +53,8 @@ namespace osu.Game.Rulesets.Mania.UI
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
 
+        private readonly Container<DrawableManiaJudgement> judgements;
+
         private readonly int columnCount;
 
         public ManiaPlayfield(int columnCount)
@@ -72,21 +67,21 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Inverted.Value = true;
 
+            Container topLevelContainer;
             InternalChildren = new Drawable[]
             {
                 new Container
                 {
+                    Name = "Playfield elements",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
                         new Container
                         {
-                            Name = "Masked elements",
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
+                            Name = "Columns mask",
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
                             Masking = true,
@@ -94,6 +89,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             {
                                 new Box
                                 {
+                                    Name = "Background",
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black
                                 },
@@ -105,27 +101,36 @@ namespace osu.Game.Rulesets.Mania.UI
                                     Direction = FillDirection.Horizontal,
                                     Padding = new MarginPadding { Left = 1, Right = 1 },
                                     Spacing = new Vector2(1, 0)
-                                }
+                                },
                             }
                         },
                         new Container
                         {
+                            Name = "Barlines mask",
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = HIT_TARGET_POSITION },
-                            Children = new[]
+                            RelativeSizeAxes = Axes.Y,
+                            Width = 1366, // Bar lines should only be masked on the vertical axis
+                            BypassAutoSizeAxes = Axes.Both,
+                            Masking = true,
+                            Child = content = new Container
                             {
-                                content = new Container
-                                {
-                                    Name = "Bar lines",
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    RelativeSizeAxes = Axes.Y,
-                                    // Width is set in the Update method
-                                }
+                                Name = "Bar lines",
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.Y,
+                                Padding = new MarginPadding { Top = HIT_TARGET_POSITION }
                             }
-                        }
+                        },
+                        judgements = new Container<DrawableManiaJudgement>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                            Y = HIT_TARGET_POSITION + 150,
+                            BypassAutoSizeAxes = Axes.Both
+                        },
+                        topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
                 }
             };
@@ -139,6 +144,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 c.IsSpecial = isSpecialColumn(i);
                 c.Action = c.IsSpecial ? ManiaAction.Special : currentAction++;
 
+                topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
+
                 columns.Add(c);
                 AddNested(c);
             }
@@ -150,6 +157,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private void invertedChanged(bool newValue)
         {
             Scale = new Vector2(1, newValue ? -1 : 1);
+            judgements.Scale = Scale;
         }
 
         [BackgroundDependencyLoader]
@@ -184,6 +192,19 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        {
+            var maniaObject = (ManiaHitObject)judgedObject.HitObject;
+            columns[maniaObject.Column].OnJudgement(judgedObject, judgement);
+
+            judgements.Clear();
+            judgements.Add(new DrawableManiaJudgement(judgement)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+        }
+
         /// <summary>
         /// Whether the column index is a special column for this playfield.
         /// </summary>
@@ -203,7 +224,8 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
+        public override void Add(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column).Add(h);
+
         public void Add(DrawableBarLine barline) => HitObjects.Add(barline);
 
         protected override void Update()

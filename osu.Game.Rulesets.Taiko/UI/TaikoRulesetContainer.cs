@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Beatmaps;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Scoring;
@@ -22,7 +21,7 @@ using osu.Framework.Input;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoRulesetContainer : ScrollingRulesetContainer<TaikoPlayfield, TaikoHitObject, TaikoJudgement>
+    public class TaikoRulesetContainer : ScrollingRulesetContainer<TaikoPlayfield, TaikoHitObject>
     {
         public TaikoRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
@@ -95,13 +94,13 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
-        protected override Playfield<TaikoHitObject, TaikoJudgement> CreatePlayfield() => new TaikoPlayfield
+        protected override Playfield CreatePlayfield() => new TaikoPlayfield
         {
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft
         };
 
-        protected override DrawableHitObject<TaikoHitObject, TaikoJudgement> GetVisualRepresentation(TaikoHitObject h)
+        protected override DrawableHitObject<TaikoHitObject> GetVisualRepresentation(TaikoHitObject h)
         {
             var centreHit = h as CentreHit;
             if (centreHit != null)

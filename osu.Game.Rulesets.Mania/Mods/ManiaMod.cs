@@ -4,6 +4,13 @@
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using System;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Replays;
+using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
@@ -68,6 +75,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModFadeIn : Mod
     {
         public override string Name => "FadeIn";
+        public override string ShortenedName => "FI";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override double ScoreMultiplier => 1;
@@ -78,12 +86,14 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModRandom : Mod
     {
         public override string Name => "Random";
+        public override string ShortenedName => "RD";
         public override string Description => @"Shuffle around the notes!";
         public override double ScoreMultiplier => 1;
     }
 
     public abstract class ManiaKeyMod : Mod
     {
+        public override string ShortenedName => Name;
         public abstract int KeyCount { get; }
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
         public override bool Ranked => true;
@@ -146,8 +156,29 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModKeyCoop : Mod
     {
         public override string Name => "KeyCoop";
+        public override string ShortenedName => "2P";
         public override string Description => @"Double the key amount, double the fun!";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
+    }
+
+    public class ManiaModAutoplay : ModAutoplay<ManiaHitObject>
+    {
+        private int availableColumns;
+
+        public override void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
+        {
+            // Todo: This shouldn't be done, we should be getting a ManiaBeatmap which should store AvailableColumns
+            // But this is dependent on a _lot_ of refactoring
+            var maniaRulesetContainer = (ManiaRulesetContainer)rulesetContainer;
+            availableColumns = maniaRulesetContainer.AvailableColumns;
+
+            base.ApplyToRulesetContainer(rulesetContainer);
+        }
+        protected override Score CreateReplayScore(Beatmap<ManiaHitObject> beatmap) => new Score
+        {
+            User = new User { Username = "osu!topus!" },
+            Replay = new ManiaAutoGenerator(beatmap, availableColumns).Generate(),
+        };
     }
 }
