@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class Column : ScrollingPlayfield<ManiaHitObject>, IHasAccentColour
+    public class Column : ScrollingPlayfield, IHasAccentColour
     {
         private const float key_icon_size = 10;
         private const float key_icon_corner_radius = 3;
@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
         /// <param name="hitObject">The DrawableHitObject to add.</param>
-        public override void Add(DrawableHitObject<ManiaHitObject> hitObject)
+        public override void Add(DrawableHitObject hitObject)
         {
             hitObject.AccentColour = AccentColour;
             HitObjects.Add(hitObject);

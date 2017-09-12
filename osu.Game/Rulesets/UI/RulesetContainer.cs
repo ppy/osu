@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The playfield.
         /// </summary>
-        public Playfield<TObject> Playfield { get; private set; }
+        public Playfield Playfield { get; private set; }
 
         protected override Container<Drawable> Content => content;
         private Container content;
@@ -310,7 +310,7 @@ namespace osu.Game.Rulesets.UI
         /// Creates a Playfield.
         /// </summary>
         /// <returns>The Playfield.</returns>
-        protected abstract Playfield<TObject> CreatePlayfield();
+        protected abstract Playfield CreatePlayfield();
     }
 
     /// <summary>
@@ -320,7 +320,7 @@ namespace osu.Game.Rulesets.UI
     /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
     public abstract class RulesetContainer<TPlayfield, TObject> : RulesetContainer<TObject>
         where TObject : HitObject
-        where TPlayfield : Playfield<TObject>
+        where TPlayfield : Playfield
     {
         /// <summary>
         /// The playfield.

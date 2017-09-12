@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected sealed override Playfield<ManiaHitObject> CreatePlayfield() => new ManiaPlayfield(availableColumns)
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(availableColumns)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,

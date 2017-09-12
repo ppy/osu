@@ -20,8 +20,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// A type of <see cref="Playfield{TObject}"/> specialized towards scrolling <see cref="DrawableHitObject"/>s.
     /// </summary>
-    public class ScrollingPlayfield<TObject> : Playfield<TObject>
-        where TObject : HitObject
+    public class ScrollingPlayfield : Playfield
     {
         /// <summary>
         /// The default span of time visible by the length of the scrolling axes.
@@ -75,21 +74,21 @@ namespace osu.Game.Rulesets.UI
             HitObjects.Reversed.BindTo(Reversed);
         }
 
-        private List<ScrollingPlayfield<TObject>> nestedPlayfields;
+        private List<ScrollingPlayfield> nestedPlayfields;
         /// <summary>
         /// All the <see cref="ScrollingPlayfield{TObject}"/>s nested inside this playfield.
         /// </summary>
-        public IEnumerable<ScrollingPlayfield<TObject>> NestedPlayfields => nestedPlayfields;
+        public IEnumerable<ScrollingPlayfield> NestedPlayfields => nestedPlayfields;
 
         /// <summary>
         /// Adds a <see cref="ScrollingPlayfield{TObject}"/> to this playfield. The nested <see cref="ScrollingPlayfield{TObject}"/>
         /// will be given all of the same speed adjustments as this playfield.
         /// </summary>
         /// <param name="otherPlayfield">The <see cref="ScrollingPlayfield{TObject}"/> to add.</param>
-        protected void AddNested(ScrollingPlayfield<TObject> otherPlayfield)
+        protected void AddNested(ScrollingPlayfield otherPlayfield)
         {
             if (nestedPlayfields == null)
-                nestedPlayfields = new List<ScrollingPlayfield<TObject>>();
+                nestedPlayfields = new List<ScrollingPlayfield>();
 
             nestedPlayfields.Add(otherPlayfield);
         }
@@ -117,7 +116,7 @@ namespace osu.Game.Rulesets.UI
             this.TransformTo(this.PopulateTransform(new TransformVisibleTimeRange(), newTimeRange, duration, easing));
         }
 
-        private class TransformVisibleTimeRange : Transform<double, ScrollingPlayfield<TObject>>
+        private class TransformVisibleTimeRange : Transform<double, ScrollingPlayfield>
         {
             private double valueAt(double time)
             {
@@ -129,8 +128,8 @@ namespace osu.Game.Rulesets.UI
 
             public override string TargetMember => "VisibleTimeRange.Value";
 
-            protected override void Apply(ScrollingPlayfield<TObject> d, double time) => d.VisibleTimeRange.Value = valueAt(time);
-            protected override void ReadIntoStartValue(ScrollingPlayfield<TObject> d) => StartValue = d.VisibleTimeRange.Value;
+            protected override void Apply(ScrollingPlayfield d, double time) => d.VisibleTimeRange.Value = valueAt(time);
+            protected override void ReadIntoStartValue(ScrollingPlayfield d) => StartValue = d.VisibleTimeRange.Value;
         }
 
         /// <summary>

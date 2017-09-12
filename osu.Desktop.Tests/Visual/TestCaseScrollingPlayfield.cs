@@ -72,7 +72,7 @@ namespace osu.Desktop.Tests.Visual
         [Test]
         public void TestSpeedAdjustmentOrdering()
         {
-            var hitObjectContainer = new ScrollingPlayfield<TestHitObject>.ScrollingHitObjectContainer(Axes.X);
+            var hitObjectContainer = new ScrollingPlayfield.ScrollingHitObjectContainer(Axes.X);
 
             var speedAdjustments = new[]
             {
@@ -147,7 +147,7 @@ namespace osu.Desktop.Tests.Visual
 
             protected override BeatmapConverter<TestHitObject> CreateBeatmapConverter() => new TestBeatmapConverter();
 
-            protected override Playfield<TestHitObject> CreatePlayfield() => new TestPlayfield(scrollingAxes);
+            protected override Playfield CreatePlayfield() => new TestPlayfield(scrollingAxes);
 
             protected override DrawableHitObject<TestHitObject> GetVisualRepresentation(TestHitObject h) => new DrawableTestHitObject(scrollingAxes, h);
         }
@@ -190,7 +190,7 @@ namespace osu.Desktop.Tests.Visual
             }
         }
 
-        private class TestPlayfield : ScrollingPlayfield<TestHitObject>
+        private class TestPlayfield : ScrollingPlayfield
         {
             protected override Container<Drawable> Content => content;
             private readonly Container<Drawable> content;

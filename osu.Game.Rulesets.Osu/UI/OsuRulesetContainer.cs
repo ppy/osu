@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override BeatmapProcessor<OsuHitObject> CreateBeatmapProcessor() => new OsuBeatmapProcessor();
 
-        protected override Playfield<OsuHitObject> CreatePlayfield() => new OsuPlayfield();
+        protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
         public override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 

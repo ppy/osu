@@ -19,7 +19,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoPlayfield : ScrollingPlayfield<TaikoHitObject>
+    public class TaikoPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoRulesetContainer"/>.
@@ -203,10 +203,8 @@ namespace osu.Game.Rulesets.Taiko.UI
             background.Colour = colours.Gray0;
         }
 
-        public override void Add(DrawableHitObject<TaikoHitObject> h)
+        public override void Add(DrawableHitObject h)
         {
-            h.Depth = (float)h.HitObject.StartTime;
-
             base.Add(h);
 
             var barline = h as DrawableBarLine;
