@@ -19,14 +19,6 @@ namespace osu.Game.Rulesets.Catch.Scoring
         {
         }
 
-        protected override void Reset()
-        {
-            base.Reset();
-
-            Health.Value = 1;
-            Accuracy.Value = 1;
-        }
-
         protected override void OnNewJudgement(Judgement judgement)
         {
         }
