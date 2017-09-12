@@ -143,6 +143,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected readonly List<Judgement> Judgements = new List<Judgement>();
 
+        private int maxHits;
+        private int maxCombo;
+
+        private int hits;
+
         protected ScoreProcessor()
         {
         }
@@ -154,6 +159,10 @@ namespace osu.Game.Rulesets.Scoring
             rulesetContainer.OnJudgement += AddJudgement;
 
             ComputeTargets(rulesetContainer.Beatmap);
+
+            maxCombo = HighestCombo;
+            maxHits = hits;
+
             Reset();
         }
 
@@ -173,8 +182,6 @@ namespace osu.Game.Rulesets.Scoring
             {
                 switch (judgement.Result)
                 {
-                    case HitResult.None:
-                        break;
                     case HitResult.Miss:
                         Combo.Value = 0;
                         break;
@@ -183,6 +190,9 @@ namespace osu.Game.Rulesets.Scoring
                         break;
                 }
             }
+
+            if (judgement.AffectsCombo && judgement.IsHit)
+                hits++;
 
             Judgements.Add(judgement);
             OnNewJudgement(judgement);
