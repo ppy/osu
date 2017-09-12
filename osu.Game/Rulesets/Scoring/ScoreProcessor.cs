@@ -169,30 +169,25 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="judgement">The judgement to add.</param>
         protected void AddJudgement(Judgement judgement)
         {
-            bool exists = Judgements.Contains(judgement);
-
-            if (!exists)
+            if (judgement.AffectsCombo)
             {
-                if (judgement.AffectsCombo)
+                switch (judgement.Result)
                 {
-                    switch (judgement.Result)
-                    {
-                        case HitResult.None:
-                            break;
-                        case HitResult.Miss:
-                            Combo.Value = 0;
-                            break;
-                        default:
-                            Combo.Value++;
-                            break;
-                    }
+                    case HitResult.None:
+                        break;
+                    case HitResult.Miss:
+                        Combo.Value = 0;
+                        break;
+                    default:
+                        Combo.Value++;
+                        break;
                 }
-
-                Judgements.Add(judgement);
-                OnNewJudgement(judgement);
-
-                NotifyNewJudgement(judgement);
             }
+
+            Judgements.Add(judgement);
+            OnNewJudgement(judgement);
+
+            NotifyNewJudgement(judgement);
 
             UpdateFailed();
         }
