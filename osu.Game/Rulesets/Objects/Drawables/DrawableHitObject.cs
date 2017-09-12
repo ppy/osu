@@ -55,6 +55,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             : base(hitObject)
         {
             HitObject = hitObject;
+
+            Depth = (float)hitObject.StartTime;
         }
 
         private ArmedState state;

@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     public abstract class ScrollingRulesetContainer<TPlayfield, TObject> : RulesetContainer<TPlayfield, TObject>
         where TObject : HitObject
-        where TPlayfield : ScrollingPlayfield<TObject>
+        where TPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.UI
             DefaultControlPoints.ForEach(c => applySpeedAdjustment(c, Playfield));
         }
 
-        private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield<TObject> playfield)
+        private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield playfield)
         {
             playfield.HitObjects.AddSpeedAdjustment(CreateSpeedAdjustmentContainer(controlPoint));
             playfield.NestedPlayfields.ForEach(p => applySpeedAdjustment(controlPoint, p));

@@ -160,7 +160,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 fruit.Origin = Anchor.BottomCentre;
                 fruit.Scale *= 0.7f;
                 fruit.LifetimeEnd = double.MaxValue;
-                fruit.Depth = (float)Time.Current;
 
                 float distance = fruit.DrawSize.X / 2 * fruit.Scale.X;
 

@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class CatchPlayfield : ScrollingPlayfield<CatchBaseHit>
+    public class CatchPlayfield : ScrollingPlayfield
     {
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.UI
             };
         }
 
-        public override void Add(DrawableHitObject<CatchBaseHit> h)
+        public override void Add(DrawableHitObject h)
         {
             base.Add(h);
 
