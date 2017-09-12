@@ -151,11 +151,18 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                     },
                 };
 
-                content.AddText(body, t =>
+                if (!string.IsNullOrEmpty(body))
                 {
-                    t.TextSize = 14;
-                    t.Colour = textColour;
-                });
+                    content.AddText(body, t =>
+                    {
+                        t.TextSize = 14;
+                        t.Colour = textColour;
+                    });
+                }
+                else
+                {
+                    Hide();
+                }
             }
 
             [BackgroundDependencyLoader]

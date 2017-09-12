@@ -88,8 +88,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                             Margin = new MarginPadding { Top = 5 },
                             Children = new[]
                             {
-                                new Statistic(FontAwesome.fa_play_circle, 682712),
-                                new Statistic(FontAwesome.fa_heart, 357),
+                                new Statistic(FontAwesome.fa_play_circle, set.OnlineInfo.PlayCount),
+                                new Statistic(FontAwesome.fa_heart, set.OnlineInfo.FavouriteCount),
                             },
                         },
                     },
