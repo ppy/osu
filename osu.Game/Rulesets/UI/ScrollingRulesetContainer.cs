@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Timing;
 namespace osu.Game.Rulesets.UI
 {
     /// <summary>
-    /// A type of <see cref="RulesetContainer{TPlayfield,TObject}"/> that supports a <see cref="ScrollingPlayfield{TObject}"/>.
+    /// A type of <see cref="RulesetContainer{TPlayfield,TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
     /// <see cref="HitObject"/>s inside this <see cref="RulesetContainer{TPlayfield,TObject}"/> will scroll within the playfield.
     /// </summary>
     public abstract class ScrollingRulesetContainer<TPlayfield, TObject> : RulesetContainer<TPlayfield, TObject>

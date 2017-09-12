@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.UI
         public event Action OnAllJudged;
 
         /// <summary>
-        /// Whether to apply adjustments to the child <see cref="Playfield{TObject}"/> based on our own size.
+        /// Whether to apply adjustments to the child <see cref="Playfield"/> based on our own size.
         /// </summary>
         public bool AspectAdjust = true;
 
@@ -288,7 +288,7 @@ namespace osu.Game.Rulesets.UI
         protected virtual BeatmapProcessor<TObject> CreateBeatmapProcessor() => new BeatmapProcessor<TObject>();
 
         /// <summary>
-        /// In some cases we want to apply changes to the relative size of our contained <see cref="Playfield{TObject}"/> based on custom conditions.
+        /// In some cases we want to apply changes to the relative size of our contained <see cref="Playfield"/> based on custom conditions.
         /// </summary>
         /// <returns></returns>
         protected virtual Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f); //a sane default

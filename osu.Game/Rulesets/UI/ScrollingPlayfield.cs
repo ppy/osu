@@ -17,7 +17,7 @@ using osu.Game.Rulesets.Timing;
 namespace osu.Game.Rulesets.UI
 {
     /// <summary>
-    /// A type of <see cref="Playfield{TObject}"/> specialized towards scrolling <see cref="DrawableHitObject"/>s.
+    /// A type of <see cref="Playfield"/> specialized towards scrolling <see cref="DrawableHitObject"/>s.
     /// </summary>
     public class ScrollingPlayfield : Playfield
     {
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.UI
         public new readonly ScrollingHitObjectContainer HitObjects;
 
         /// <summary>
-        /// Creates a new <see cref="ScrollingPlayfield{TObject}"/>.
+        /// Creates a new <see cref="ScrollingPlayfield"/>.
         /// </summary>
         /// <param name="scrollingAxes">The axes on which <see cref="DrawableHitObject"/>s in this container should scroll.</param>
         /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width</param>
@@ -75,15 +75,15 @@ namespace osu.Game.Rulesets.UI
 
         private List<ScrollingPlayfield> nestedPlayfields;
         /// <summary>
-        /// All the <see cref="ScrollingPlayfield{TObject}"/>s nested inside this playfield.
+        /// All the <see cref="ScrollingPlayfield"/>s nested inside this playfield.
         /// </summary>
         public IEnumerable<ScrollingPlayfield> NestedPlayfields => nestedPlayfields;
 
         /// <summary>
-        /// Adds a <see cref="ScrollingPlayfield{TObject}"/> to this playfield. The nested <see cref="ScrollingPlayfield{TObject}"/>
+        /// Adds a <see cref="ScrollingPlayfield"/> to this playfield. The nested <see cref="ScrollingPlayfield"/>
         /// will be given all of the same speed adjustments as this playfield.
         /// </summary>
-        /// <param name="otherPlayfield">The <see cref="ScrollingPlayfield{TObject}"/> to add.</param>
+        /// <param name="otherPlayfield">The <see cref="ScrollingPlayfield"/> to add.</param>
         protected void AddNested(ScrollingPlayfield otherPlayfield)
         {
             if (nestedPlayfields == null)
