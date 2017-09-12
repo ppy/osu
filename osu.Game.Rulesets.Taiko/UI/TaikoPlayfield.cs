@@ -219,27 +219,25 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            bool wasHit = judgement.Result > HitResult.Miss;
-            bool secondHit = judgement is TaikoStrongHitJudgement;
-            var taikoObject = (TaikoHitObject)judgedObject.HitObject;
-
             if (judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
                 judgementContainer.Add(new DrawableTaikoJudgement(judgedObject, judgement)
                 {
-                    Anchor = wasHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                    Origin = wasHit ? Anchor.BottomCentre : Anchor.Centre,
+                    Anchor = judgement.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
+                    Origin = judgement.IsHit ? Anchor.BottomCentre : Anchor.Centre,
                     RelativePositionAxes = Axes.X,
-                    X = wasHit ? judgedObject.Position.X : 0,
+                    X = judgement.IsHit ? judgedObject.Position.X : 0,
                 });
             }
 
-            if (!wasHit)
+            if (!judgement.IsHit)
                 return;
 
             bool isRim = judgedObject.HitObject is RimHit;
 
-            if (!secondHit)
+            if (judgement is TaikoStrongHitJudgement)
+                hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
+            else
             {
                 if (judgedObject.X >= -0.05f && judgedObject is DrawableHit)
                 {
@@ -249,11 +247,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                 hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
 
-                if (taikoObject.Kiai)
+                if (judgedObject.HitObject.Kiai)
                     kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
             }
-            else
-                hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
         }
     }
 }
