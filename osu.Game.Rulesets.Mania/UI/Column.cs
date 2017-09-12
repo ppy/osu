@@ -42,6 +42,9 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 
+        private const float opacity_released = 0.1f;
+        private const float opacity_pressed = 0.25f;
+
         public Column()
             : base(Axes.Y)
         {
@@ -51,9 +54,9 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 background = new Box
                 {
-                    Name = "Foreground",
+                    Name = "Background",
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.2f
+                    Alpha = opacity_released
                 },
                 new Container
                 {
@@ -217,7 +220,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             if (action == Action)
             {
-                background.FadeTo(0.6f, 50, Easing.OutQuint);
+                background.FadeTo(opacity_pressed, 50, Easing.OutQuint);
                 keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint);
             }
 
@@ -228,7 +231,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             if (action == Action)
             {
-                background.FadeTo(0.2f, 800, Easing.OutQuart);
+                background.FadeTo(opacity_released, 800, Easing.OutQuart);
                 keyIcon.ScaleTo(1f, 400, Easing.OutQuart);
             }
 
