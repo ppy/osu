@@ -249,6 +249,8 @@ namespace osu.Game.Rulesets.Scoring
                     TotalScore.Value = (comboScore + bonusScore) * Math.Log(HighestCombo + 1, 2);
                     break;
             }
+
+            Accuracy.Value = (double)Hits / MaxHits;
         }
 
         protected override void Reset(bool storeResults)
