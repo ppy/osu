@@ -10,34 +10,28 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
-    public class FollowPoint : Container
+    public class FollowPoint : CircularContainer
     {
         private const float width = 8;
 
         public FollowPoint()
         {
             Origin = Anchor.Centre;
-
+            Size = new Vector2(width);
             Masking = true;
-            AutoSizeAxes = Axes.Both;
-            CornerRadius = width / 2;
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = Color4.White.Opacity(0.2f),
                 Radius = 4,
             };
-
-            Children = new Drawable[]
+            Child = new Box
             {
-                new Box
-                {
-                    Size = new Vector2(width),
-                    Blending = BlendingMode.Additive,
-                    Origin = Anchor.Centre,
-                    Anchor = Anchor.Centre,
-                    Alpha = 0.5f,
-                },
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Blending = BlendingMode.Additive,
+                Alpha = 0.5f,
             };
         }
     }
