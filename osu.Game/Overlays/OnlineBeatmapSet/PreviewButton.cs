@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
         private AudioManager audio;
         private Track preview;
 
-        private bool playing = false;
+        private bool playing;
         public bool Playing
         {
             get { return playing; }
@@ -125,6 +125,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
         protected override void OnHoverLost(InputState state)
         {
             bg.FadeColour(Color4.Black.Opacity(0.25f), 100);
+            base.OnHoverLost(state);
         }
 
         private void loadPreview()
