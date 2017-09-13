@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             };
             Child = new Box
             {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Blending = BlendingMode.Additive,
                 Alpha = 0.5f,
