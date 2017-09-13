@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
         private void loadPreview()
         {
-            if (preview == null || (preview?.HasCompleted ?? true) && BeatmapSet != null)
+            if (preview == null || preview.HasCompleted && BeatmapSet != null)
             {
                 preview = audio.Track.Get(BeatmapSet.OnlineInfo.Preview);
                 preview.Volume.Value = 0.5;

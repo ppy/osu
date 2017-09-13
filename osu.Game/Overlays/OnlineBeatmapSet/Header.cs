@@ -46,9 +46,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 title.Text = BeatmapSet.Metadata.Title;
                 artist.Text = BeatmapSet.Metadata.Artist;
 
-                if (cover != null)
-                    cover.FadeOut(400, Easing.Out);
-
+                cover?.FadeOut(400, Easing.Out);
                 coverContainer.Add(cover = new DelayedLoadWrapper(new BeatmapSetCover(BeatmapSet)
                 {
                     Anchor = Anchor.Centre,
