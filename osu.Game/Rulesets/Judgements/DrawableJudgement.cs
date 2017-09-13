@@ -16,11 +16,9 @@ namespace osu.Game.Rulesets.Judgements
     /// <summary>
     /// A drawable object which visualises the hit result of a <see cref="Judgements.Judgement"/>.
     /// </summary>
-    /// <typeparam name="TJudgement">The type of judgement to visualise.</typeparam>
-    public class DrawableJudgement<TJudgement> : Container
-        where TJudgement : Judgement
+    public class DrawableJudgement : Container
     {
-        protected readonly TJudgement Judgement;
+        protected readonly Judgement Judgement;
 
         protected readonly SpriteText JudgementText;
 
@@ -28,13 +26,11 @@ namespace osu.Game.Rulesets.Judgements
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
         /// <param name="judgement">The judgement to visualise.</param>
-        public DrawableJudgement(TJudgement judgement)
+        public DrawableJudgement(Judgement judgement)
         {
             Judgement = judgement;
 
             AutoSizeAxes = Axes.Both;
-
-            string resultString = judgement.Result == HitResult.Hit ? judgement.ResultString : judgement.Result.GetDescription();
 
             Children = new[]
             {
@@ -42,7 +38,7 @@ namespace osu.Game.Rulesets.Judgements
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Text = resultString.ToUpper(),
+                    Text = judgement.Result.GetDescription().ToUpper(),
                     Font = @"Venera",
                     TextSize = 16
                 }
@@ -68,6 +64,8 @@ namespace osu.Game.Rulesets.Judgements
 
             switch (Judgement.Result)
             {
+                case HitResult.None:
+                    break;
                 case HitResult.Miss:
                     this.ScaleTo(1.6f);
                     this.ScaleTo(1, 100, Easing.In);
@@ -77,7 +75,7 @@ namespace osu.Game.Rulesets.Judgements
 
                     this.Delay(600).FadeOut(200);
                     break;
-                case HitResult.Hit:
+                default:
                     this.ScaleTo(0.9f);
                     this.ScaleTo(1, 500, Easing.OutElastic);
 
