@@ -25,12 +25,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The date this beatmap set was ranked.
         /// </summary>
-        public DateTimeOffset Ranked { get; set; }
+        public DateTimeOffset? Ranked { get; set; }
 
         /// <summary>
         /// The date this beatmap set was last updated.
         /// </summary>
-        public DateTimeOffset LastUpdated { get; set; }
+        public DateTimeOffset? LastUpdated { get; set; }
 
         /// <summary>
         /// The different sizes of cover art for this beatmap set.
