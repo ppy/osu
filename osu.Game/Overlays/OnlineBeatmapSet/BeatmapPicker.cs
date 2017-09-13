@@ -186,7 +186,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
             public DifficultySelectorButton(BeatmapInfo beatmap)
             {
-                this.Beatmap = beatmap;
+                Beatmap = beatmap;
                 Size = new Vector2(size);
                 Margin = new MarginPadding { Horizontal = tile_spacing / 2 };
 
