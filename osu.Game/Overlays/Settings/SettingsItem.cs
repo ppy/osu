@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -53,7 +54,7 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        public string[] FilterTerms => new[] { LabelText };
+        public IEnumerable<string> FilterTerms => new[] { LabelText };
 
         public bool MatchingFilter
         {
