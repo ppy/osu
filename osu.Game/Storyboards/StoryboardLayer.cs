@@ -6,28 +6,28 @@ using System.Collections.Generic;
 
 namespace osu.Game.Storyboards
 {
-    public class LayerDefinition
+    public class StoryboardLayer
     {
         public string Name;
         public int Depth;
         public bool EnabledWhenPassing = true;
         public bool EnabledWhenFailing = true;
 
-        private readonly List<IElementDefinition> elements = new List<IElementDefinition>();
-        public IEnumerable<IElementDefinition> Elements => elements;
+        private readonly List<IStoryboardElement> elements = new List<IStoryboardElement>();
+        public IEnumerable<IStoryboardElement> Elements => elements;
 
-        public LayerDefinition(string name, int depth)
+        public StoryboardLayer(string name, int depth)
         {
             Name = name;
             Depth = depth;
         }
 
-        public void Add(IElementDefinition element)
+        public void Add(IStoryboardElement element)
         {
             elements.Add(element);
         }
 
-        public StoryboardLayer CreateDrawable()
-            => new StoryboardLayer(this) { Depth = Depth, };
+        public DrawableStoryboardLayer CreateDrawable()
+            => new DrawableStoryboardLayer(this) { Depth = Depth, };
     }
 }

@@ -21,8 +21,8 @@ namespace osu.Desktop.Tests.Visual
 
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-        private readonly Container<Storyboard> storyboardContainer;
-        private Storyboard storyboard;
+        private readonly Container<DrawableStoryboard> storyboardContainer;
+        private DrawableStoryboard storyboard;
 
         public TestCaseStoryboard()
         {
@@ -38,7 +38,7 @@ namespace osu.Desktop.Tests.Visual
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                     },
-                    storyboardContainer = new Container<Storyboard>
+                    storyboardContainer = new Container<DrawableStoryboard>
                     {
                         RelativeSizeAxes = Axes.Both,
                     },

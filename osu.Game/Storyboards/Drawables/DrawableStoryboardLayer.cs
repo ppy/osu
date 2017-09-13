@@ -7,26 +7,26 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class StoryboardLayer : Container
+    public class DrawableStoryboardLayer : Container
     {
-        public LayerDefinition Definition { get; private set; }
+        public StoryboardLayer Layer { get; private set; }
         public bool Enabled;
 
         public override bool IsPresent => Enabled && base.IsPresent;
 
-        public StoryboardLayer(LayerDefinition definition)
+        public DrawableStoryboardLayer(StoryboardLayer layer)
         {
-            Definition = definition;
+            Layer = layer;
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-            Enabled = definition.EnabledWhenPassing;
+            Enabled = layer.EnabledWhenPassing;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            foreach (var element in Definition.Elements)
+            foreach (var element in Layer.Elements)
             {
                 var drawable = element.CreateDrawable();
                 if (drawable != null)

@@ -5,13 +5,13 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Storyboards
 {
-    public class SampleDefinition : IElementDefinition
+    public class StoryboardSample : IStoryboardElement
     {
         public string Path { get; set; }
         public double Time;
         public float Volume;
 
-        public SampleDefinition(string path, double time, float volume)
+        public StoryboardSample(string path, double time, float volume)
         {
             Path = path;
             Time = time;

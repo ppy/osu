@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Storyboards
 {
-    public interface IElementDefinition
+    public interface IStoryboardElement
     {
         string Path { get; }
         Drawable CreateDrawable();

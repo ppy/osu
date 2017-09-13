@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The Beatmap's Storyboard.
         /// </summary>
-        public StoryboardDefinition Storyboard = new StoryboardDefinition();
+        public Storyboard Storyboard = new Storyboard();
 
         /// <summary>
         /// Constructs a new beatmap.
