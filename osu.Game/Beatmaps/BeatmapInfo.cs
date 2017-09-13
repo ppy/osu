@@ -100,6 +100,11 @@ namespace osu.Game.Beatmaps
 
         public bool Equals(BeatmapInfo other)
         {
+            if (ID == 0 || other?.ID == 0)
+                // one of the two BeatmapInfos we are comparing isn't sourced from a database.
+                // fall back to reference equality.
+                return ReferenceEquals(this, other);
+
             return ID == other?.ID;
         }
 
