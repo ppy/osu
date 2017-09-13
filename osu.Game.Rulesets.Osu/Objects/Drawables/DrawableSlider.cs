@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
                     Samples = s.Samples,
-                }),
+                })
             };
 
             components.Add(body);
