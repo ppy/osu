@@ -15,9 +15,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class IconButton : OsuClickableContainer
     {
-        private readonly SpriteIcon icon;
-        private readonly Box hover;
-        private readonly Container content;
+        private const float default_size = 30;
 
         public FontAwesome Icon
         {
@@ -25,18 +23,27 @@ namespace osu.Game.Graphics.UserInterface
             set { icon.Icon = value; }
         }
 
-        private const float button_size = 30;
-        private Color4 flashColour;
-
         public Vector2 IconScale
         {
             get { return icon.Scale; }
             set { icon.Scale = value; }
         }
 
+        public Color4 IconColour
+        {
+            get { return icon.Colour; }
+            set { icon.Colour = value; }
+        }
+
+        private Color4 flashColour;
+
+        private readonly SpriteIcon icon;
+        private readonly Box hover;
+        private readonly Container content;
+
         public IconButton()
         {
-            AutoSizeAxes = Axes.Both;
+            Size = new Vector2(default_size);
 
             Origin = Anchor.Centre;
             Anchor = Anchor.Centre;
@@ -47,8 +54,7 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Size = new Vector2(button_size),
-
+                    RelativeSizeAxes = Axes.Both,
                     CornerRadius = 5,
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
