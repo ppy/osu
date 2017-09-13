@@ -49,10 +49,9 @@ namespace osu.Game.Rulesets.Catch.UI
 
             var fruit = (DrawableFruit)h;
             fruit.CheckPosition = catcherArea.CheckIfWeCanCatch;
-            fruit.OnJudgement += Fruit_OnJudgement;
         }
 
-        private void Fruit_OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
             if (judgement.IsHit)
             {
