@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                         },
                                     },
                                 },
-                                panel = new UserPanel(api.LocalUser.Value)
+                                panel = new LocalUserPanel(api.LocalUser.Value)
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Action = RequestHide
@@ -182,6 +182,18 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             if (form != null) GetContainingInputManager().ChangeFocus(form);
             base.OnFocus(state);
+        }
+
+        private class LocalUserPanel : UserPanel
+        {
+            public LocalUserPanel(User user) : base(user)
+            {
+            }
+
+            public override MenuItem[] ContextMenuItems => new OsuMenuItem[]
+            {
+                new OsuMenuItem("View Profile", MenuItemType.Highlighted, ViewProfile.Invoke),
+            };
         }
 
         private class LoginForm : FillFlowContainer

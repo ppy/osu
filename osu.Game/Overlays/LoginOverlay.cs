@@ -9,6 +9,8 @@ using osu.Game.Overlays.Settings.Sections.General;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Overlays
 {
@@ -78,6 +80,30 @@ namespace osu.Game.Overlays
 
             settingsSection.Bounding = false;
             this.FadeOut(transition_time);
+        }
+
+        protected override bool OnDragStart(InputState state)
+        {
+            if (!state.Mouse.IsPressed(MouseButton.Left)) return false;
+            return base.OnDragStart(state);
+        }
+
+        protected override bool OnDrag(InputState state)
+        {
+            if (!state.Mouse.IsPressed(MouseButton.Left)) return false;
+            return base.OnDrag(state);
+        }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            if (args.Button != MouseButton.Left) return false;
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            if (args.Button != MouseButton.Left) return false;
+            return base.OnMouseUp(state, args);
         }
     }
 }
