@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             this.isEnd = isEnd;
 
             AutoSizeAxes = Axes.Both;
-            BlendingMode = BlendingMode.Additive;
+            Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
 
             Children = new Drawable[]

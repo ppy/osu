@@ -128,7 +128,7 @@ namespace osu.Desktop.Tests.Visual
 
         private void addHitJudgement(bool kiai)
         {
-            TaikoHitResult hitResult = RNG.Next(2) == 0 ? TaikoHitResult.Good : TaikoHitResult.Great;
+            HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
 
             var cpi = new ControlPointInfo();
             cpi.EffectPoints.Add(new EffectControlPoint
@@ -139,36 +139,20 @@ namespace osu.Desktop.Tests.Visual
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
 
-            var h = new DrawableTestHit(hit)
-            {
-                X = RNG.NextSingle(hitResult == TaikoHitResult.Good ? -0.1f : -0.05f, hitResult == TaikoHitResult.Good ? 0.1f : 0.05f),
-                Judgement = new TaikoJudgement
-                {
-                    Result = HitResult.Hit,
-                    TaikoResult = hitResult,
-                    TimeOffset = 0
-                }
-            };
+            var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            rulesetContainer.Playfield.OnJudgement(h);
+            rulesetContainer.Playfield.OnJudgement(h, new TaikoJudgement { Result = hitResult });
 
             if (RNG.Next(10) == 0)
             {
-                h.Judgement.SecondHit = true;
-                rulesetContainer.Playfield.OnJudgement(h);
+                rulesetContainer.Playfield.OnJudgement(h, new TaikoJudgement { Result = hitResult });
+                rulesetContainer.Playfield.OnJudgement(h, new TaikoStrongHitJudgement());
             }
         }
 
         private void addMissJudgement()
         {
-            rulesetContainer.Playfield.OnJudgement(new DrawableTestHit(new Hit())
-            {
-                Judgement = new TaikoJudgement
-                {
-                    Result = HitResult.Miss,
-                    TimeOffset = 0
-                }
-            });
+            rulesetContainer.Playfield.OnJudgement(new DrawableTestHit(new Hit()), new TaikoJudgement { Result = HitResult.Miss });
         }
 
         private void addBarLine(bool major, double delay = scroll_time)
@@ -230,14 +214,12 @@ namespace osu.Desktop.Tests.Visual
                 rulesetContainer.Playfield.Add(new DrawableRimHit(h));
         }
 
-        private class DrawableTestHit : DrawableHitObject<TaikoHitObject, TaikoJudgement>
+        private class DrawableTestHit : DrawableHitObject<TaikoHitObject>
         {
             public DrawableTestHit(TaikoHitObject hitObject)
                 : base(hitObject)
             {
             }
-
-            protected override TaikoJudgement CreateJudgement() => new TaikoJudgement();
 
             protected override void UpdateState(ArmedState state)
             {

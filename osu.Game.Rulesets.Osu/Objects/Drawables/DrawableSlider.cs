@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -64,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Scale = s.Scale,
                     ComboColour = s.ComboColour,
                     Samples = s.Samples,
-                }),
+                })
             };
 
             components.Add(body);
@@ -114,33 +115,31 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             bouncer2.Position = slider.Curve.PositionAt(body.SnakedEnd ?? 0);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
-            if (initialCircle.Judgement?.Result != HitResult.Hit)
+            if (!initialCircle.Judgements.Any(j => j.IsHit))
                 initialCircle.Position = slider.Curve.PositionAt(progress);
 
             foreach (var c in components) c.UpdateProgress(progress, repeat);
             foreach (var t in ticks.Children) t.Tracking = ball.Tracking;
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
                 var ticksCount = ticks.Children.Count + 1;
-                var ticksHit = ticks.Children.Count(t => t.Judgement.Result == HitResult.Hit);
-                if (initialCircle.Judgement.Result == HitResult.Hit)
+                var ticksHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit));
+                if (initialCircle.Judgements.Any(j => j.IsHit))
                     ticksHit++;
 
                 var hitFraction = (double)ticksHit / ticksCount;
-                if (hitFraction == 1 && initialCircle.Judgement.Score == OsuScoreResult.Hit300)
-                    Judgement.Score = OsuScoreResult.Hit300;
-                else if (hitFraction >= 0.5 && initialCircle.Judgement.Score >= OsuScoreResult.Hit100)
-                    Judgement.Score = OsuScoreResult.Hit100;
+                if (hitFraction == 1 && initialCircle.Judgements.Any(j => j.Result == HitResult.Great))
+                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
+                else if (hitFraction >= 0.5 && initialCircle.Judgements.Any(j => j.Result >= HitResult.Good))
+                    AddJudgement(new OsuJudgement { Result = HitResult.Good });
                 else if (hitFraction > 0)
-                    Judgement.Score = OsuScoreResult.Hit50;
+                    AddJudgement(new OsuJudgement { Result = HitResult.Meh });
                 else
-                    Judgement.Score = OsuScoreResult.Miss;
-
-                Judgement.Result = Judgement.Score != OsuScoreResult.Miss ? HitResult.Hit : HitResult.Miss;
+                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
             }
         }
 

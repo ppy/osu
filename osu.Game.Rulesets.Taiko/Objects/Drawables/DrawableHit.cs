@@ -28,36 +28,30 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HitObject.HitWindowGood)
-                    Judgement.Result = HitResult.Miss;
+                if (timeOffset > HitObject.HitWindowGood)
+                    AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
                 return;
             }
 
-            double hitOffset = Math.Abs(Judgement.TimeOffset);
+            double hitOffset = Math.Abs(timeOffset);
 
             if (hitOffset > HitObject.HitWindowMiss)
                 return;
 
             if (!validKeyPressed)
-                Judgement.Result = HitResult.Miss;
+                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
             else if (hitOffset < HitObject.HitWindowGood)
-            {
-                Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = hitOffset < HitObject.HitWindowGreat ? TaikoHitResult.Great : TaikoHitResult.Good;
-            }
+                AddJudgement(new TaikoJudgement { Result = hitOffset < HitObject.HitWindowGreat ? HitResult.Great : HitResult.Good });
             else
-                Judgement.Result = HitResult.Miss;
+                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
         }
 
         public override bool OnPressed(TaikoAction action)
         {
-            if (Judgement.Result != HitResult.None)
-                return false;
-
             validKeyPressed = HitActions.Contains(action);
 
             return UpdateJudgement(true);
@@ -75,7 +69,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             var circlePiece = MainPiece as CirclePiece;
             circlePiece?.FlashBox.FinishTransforms();
 
-            using (BeginDelayedSequence(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true))
+            var offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
+            using (BeginDelayedSequence(HitObject.StartTime - Time.Current + offset, true))
             {
                 switch (State)
                 {

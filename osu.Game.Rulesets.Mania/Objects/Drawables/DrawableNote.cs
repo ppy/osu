@@ -16,19 +16,31 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
+        protected readonly GlowPiece GlowPiece;
+
+        private readonly LaneGlowPiece laneGlowPiece;
         private readonly NotePiece headPiece;
 
         public DrawableNote(Note hitObject, ManiaAction action)
             : base(hitObject, action)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 100;
+            AutoSizeAxes = Axes.Y;
 
-            Add(headPiece = new NotePiece
+            Children = new Drawable[]
             {
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre
-            });
+                laneGlowPiece = new LaneGlowPiece
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre
+                },
+                GlowPiece = new GlowPiece(),
+                headPiece = new NotePiece
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre
+                }
+            };
         }
 
         public override Color4 AccentColour
@@ -40,43 +52,31 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return;
                 base.AccentColour = value;
 
+                laneGlowPiece.AccentColour = value;
+                GlowPiece.AccentColour = value;
                 headPiece.AccentColour = value;
             }
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HitObject.HitWindows.Bad / 2)
-                    Judgement.Result = HitResult.Miss;
+                if (timeOffset > HitObject.HitWindows.Bad / 2)
+                    AddJudgement(new ManiaJudgement { Result = HitResult.Miss });
                 return;
             }
 
-            double offset = Math.Abs(Judgement.TimeOffset);
+            double offset = Math.Abs(timeOffset);
 
             if (offset > HitObject.HitWindows.Miss / 2)
                 return;
 
-            ManiaHitResult? tmpResult = HitObject.HitWindows.ResultFor(offset);
-
-            if (tmpResult.HasValue)
-            {
-                Judgement.Result = HitResult.Hit;
-                Judgement.ManiaResult = tmpResult.Value;
-            }
-            else
-                Judgement.Result = HitResult.Miss;
+            AddJudgement(new ManiaJudgement { Result = HitObject.HitWindows.ResultFor(offset) ?? HitResult.Miss });
         }
 
         protected override void UpdateState(ArmedState state)
         {
-            switch (State)
-            {
-                case ArmedState.Hit:
-                    Colour = Color4.Green;
-                    break;
-            }
         }
 
         public virtual bool OnPressed(ManiaAction action)

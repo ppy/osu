@@ -14,11 +14,12 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
 using System.Linq;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoPlayfield : ScrollingPlayfield<TaikoHitObject, TaikoJudgement>
+    public class TaikoPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoRulesetContainer"/>.
@@ -97,7 +98,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit,
-                                    BlendingMode = BlendingMode.Additive,
+                                    Blending = BlendingMode.Additive,
                                 },
                                 new HitTarget
                                 {
@@ -126,14 +127,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fit,
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            BlendingMode = BlendingMode.Additive
+                            Blending = BlendingMode.Additive
                         },
                         judgementContainer = new Container<DrawableTaikoJudgement>
                         {
                             Name = "Judgements",
                             RelativeSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            BlendingMode = BlendingMode.Additive
+                            Blending = BlendingMode.Additive
                         },
                     }
                 },
@@ -202,7 +203,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             background.Colour = colours.Gray0;
         }
 
-        public override void Add(DrawableHitObject<TaikoHitObject, TaikoJudgement> h)
+        public override void Add(DrawableHitObject h)
         {
             h.Depth = (float)h.HitObject.StartTime;
 
@@ -218,25 +219,27 @@ namespace osu.Game.Rulesets.Taiko.UI
                 swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
         }
 
-        public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> judgedObject)
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            bool wasHit = judgedObject.Judgement.Result == HitResult.Hit;
-            bool secondHit = judgedObject.Judgement.SecondHit;
-
-            judgementContainer.Add(new DrawableTaikoJudgement(judgedObject.Judgement)
+            if (judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
-                Anchor = wasHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                Origin = wasHit ? Anchor.BottomCentre : Anchor.Centre,
-                RelativePositionAxes = Axes.X,
-                X = wasHit ? judgedObject.Position.X : 0,
-            });
+                judgementContainer.Add(new DrawableTaikoJudgement(judgedObject, judgement)
+                {
+                    Anchor = judgement.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
+                    Origin = judgement.IsHit ? Anchor.BottomCentre : Anchor.Centre,
+                    RelativePositionAxes = Axes.X,
+                    X = judgement.IsHit ? judgedObject.Position.X : 0,
+                });
+            }
 
-            if (!wasHit)
+            if (!judgement.IsHit)
                 return;
 
             bool isRim = judgedObject.HitObject is RimHit;
 
-            if (!secondHit)
+            if (judgement is TaikoStrongHitJudgement)
+                hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
+            else
             {
                 if (judgedObject.X >= -0.05f && judgedObject is DrawableHit)
                 {
@@ -244,13 +247,11 @@ namespace osu.Game.Rulesets.Taiko.UI
                     topLevelHitContainer.Add(judgedObject.CreateProxy());
                 }
 
-                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement, isRim));
+                hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
 
                 if (judgedObject.HitObject.Kiai)
-                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject.Judgement, isRim));
+                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
             }
-            else
-                hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
         }
     }
 }

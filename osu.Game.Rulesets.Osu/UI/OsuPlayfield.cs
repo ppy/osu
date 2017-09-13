@@ -10,12 +10,13 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuPlayfield : Playfield<OsuHitObject, OsuJudgement>
+    public class OsuPlayfield : Playfield
     {
         private readonly Container approachCircles;
         private readonly Container judgementLayer;
@@ -67,11 +68,11 @@ namespace osu.Game.Rulesets.Osu.UI
             AddInternal(new GameplayCursor());
         }
 
-        public override void Add(DrawableHitObject<OsuHitObject, OsuJudgement> h)
+        public override void Add(DrawableHitObject h)
         {
             h.Depth = (float)h.HitObject.StartTime;
 
-            IDrawableHitObjectWithProxiedApproach c = h as IDrawableHitObjectWithProxiedApproach;
+            var c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null)
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
 
@@ -85,12 +86,15 @@ namespace osu.Game.Rulesets.Osu.UI
                 .OrderBy(h => h.StartTime).OfType<OsuHitObject>();
         }
 
-        public override void OnJudgement(DrawableHitObject<OsuHitObject, OsuJudgement> judgedObject)
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            DrawableOsuJudgement explosion = new DrawableOsuJudgement(judgedObject.Judgement)
+            var osuJudgement = (OsuJudgement)judgement;
+            var osuObject = (OsuHitObject)judgedObject.HitObject;
+
+            DrawableOsuJudgement explosion = new DrawableOsuJudgement(osuJudgement)
             {
                 Origin = Anchor.Centre,
-                Position = judgedObject.HitObject.StackedEndPosition + judgedObject.Judgement.PositionOffset
+                Position = osuObject.StackedEndPosition + osuJudgement.PositionOffset
             };
 
             judgementLayer.Add(explosion);
