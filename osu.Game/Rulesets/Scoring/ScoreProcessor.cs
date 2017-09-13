@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Scoring
         }
     }
 
-    public abstract class ScoreProcessor<TObject> : ScoreProcessor
+    public class ScoreProcessor<TObject> : ScoreProcessor
         where TObject : HitObject
     {
         private const double base_portion = 0.3;
@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Scoring
         {
         }
 
-        protected ScoreProcessor(RulesetContainer<TObject> rulesetContainer)
+        public ScoreProcessor(RulesetContainer<TObject> rulesetContainer)
         {
             Debug.Assert(base_portion + combo_portion == 1.0);
 
@@ -180,11 +180,20 @@ namespace osu.Game.Rulesets.Scoring
 
             SimulateAutoplay(rulesetContainer.Beatmap);
             Reset(true);
+
+            if (maxBaseScore == 0 || maxHighestCombo == 0)
+            {
+                Mode.Value = ScoringMode.Exponential;
+                Mode.Disabled = true;
+            }
         }
 
         /// <summary>
         /// Simulates an autoplay of <see cref="HitObject"/>s that will be judged by this <see cref="ScoreProcessor{TObject}"/>
         /// by adding <see cref="Judgement"/>s for each <see cref="HitObject"/> in the <see cref="Beatmap{TObject}"/>.
+        /// <para>
+        /// This is required for <see cref="ScoringMode.Standardised"/> to work, otherwise <see cref="ScoringMode.Exponential"/> will be used.
+        /// </para>
         /// </summary>
         /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> containing the <see cref="HitObject"/>s that will be judged by this <see cref="ScoreProcessor{TObject}"/>.</param>
         protected virtual void SimulateAutoplay(Beatmap<TObject> beatmap) { }
