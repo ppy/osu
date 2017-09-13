@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Scoring
     {
         private const double max_score = 1000000;
 
-        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>(ScoringMode.Exponential);
+        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>(ScoringMode.Standardised);
 
         protected sealed override bool HasCompleted => Hits == MaxHits;
 
@@ -219,12 +219,11 @@ namespace osu.Game.Rulesets.Scoring
 
                 baseScore += judgement.NumericResult;
                 rollingMaxBaseScore += judgement.MaxNumericResult;
+
+                Hits++;
             }
             else if (judgement.IsHit)
                 bonusScore += judgement.NumericResult;
-
-            if (judgement.AffectsAccuracy)
-                Hits++;
 
             if (rollingMaxBaseScore != 0)
                 Accuracy.Value = baseScore / rollingMaxBaseScore;
