@@ -55,9 +55,18 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
             Favourited.ValueChanged += value =>
             {
-                pink.FadeTo(value ? 1 : 0, 200);
-                icon.Icon = value ? FontAwesome.fa_heart : FontAwesome.fa_heart_o;
+                if (value)
+                {
+                    pink.FadeIn(200);
+                    icon.Icon = FontAwesome.fa_heart;
+                }
+                else
+                {
+                    pink.FadeOut(200);
+                    icon.Icon = FontAwesome.fa_heart_o;
+                }
             };
+
             Action = () => Favourited.Value = !Favourited.Value;
         }
 

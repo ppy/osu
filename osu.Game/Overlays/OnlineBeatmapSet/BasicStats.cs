@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 {
     public class BasicStats : Container
     {
-        private readonly Statistic length, bpm, circleCount, sliderCount;
+        private readonly Statistic length, circleCount, sliderCount;
 
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 Children = new[]
                 {
                     length = new Statistic(FontAwesome.fa_clock_o, "Length") { Width = statWidth },
-                    bpm = new Statistic(FontAwesome.fa_circle, "BPM")
+                    new Statistic(FontAwesome.fa_circle, "BPM")
                     {
                         Width = statWidth,
                         Value = set.OnlineInfo.BPM.ToString(@"0.##"),

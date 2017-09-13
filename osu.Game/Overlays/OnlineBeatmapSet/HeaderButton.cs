@@ -14,32 +14,32 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
     {
         private readonly Container content;
 
-            protected override Container<Drawable> Content => content;
+        protected override Container<Drawable> Content => content;
 
-            public HeaderButton()
+        public HeaderButton()
+        {
+            CornerRadius = 3;
+            Masking = true;
+
+            InternalChildren = new Drawable[]
             {
-                CornerRadius = 3;
-                Masking = true;
-
-                InternalChildren = new Drawable[]
+                new Box
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex(@"094c5f"),
-                    },
-                    new Triangles
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        ColourLight = OsuColour.FromHex(@"0f7c9b"),
-                        ColourDark = OsuColour.FromHex(@"094c5f"),
-                        TriangleScale = 1.5f,
-                    },
-                    content = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                };
-            }
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.FromHex(@"094c5f"),
+                },
+                new Triangles
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    ColourLight = OsuColour.FromHex(@"0f7c9b"),
+                    ColourDark = OsuColour.FromHex(@"094c5f"),
+                    TriangleScale = 1.5f,
+                },
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+            };
+        }
     }
 }

@@ -152,7 +152,6 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             public BeatmapTile(BeatmapInfo beatmap, Bindable<BeatmapInfo> bindable)
             {
                 this.beatmap = beatmap;
-                this.bindable.BindTo(bindable);
                 Size = new Vector2(size);
                 Margin = new MarginPadding { Horizontal = tile_spacing / 2 };
 
@@ -179,7 +178,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 };
 
                 Action = () => this.bindable.Value = beatmap;
-                this.bindable.ValueChanged += bindable_ValueChanged;
+                this.bindable.ValueChanged += beatmapChanged;
+                this.bindable.BindTo(bindable);
             }
 
             protected override bool OnHover(InputState state)
@@ -193,9 +193,10 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             {
                 if (bindable.Value != beatmap)
                     fadeOut();
+                base.OnHoverLost(state);
             }
 
-            private void bindable_ValueChanged(BeatmapInfo value)
+            private void beatmapChanged(BeatmapInfo value)
             {
                 if (value == beatmap)
                     fadeIn();

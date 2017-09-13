@@ -106,12 +106,6 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             base.UpdateAfterChildren();
 
             graph.Padding = new MarginPadding { Top = header.DrawHeight };
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
             percentContainer.Width = successRate.Length;
         }
     }
