@@ -133,6 +133,8 @@ namespace osu.Game.Rulesets.UI
 
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
+        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
+
         /// <summary>
         /// The playfield.
         /// </summary>
