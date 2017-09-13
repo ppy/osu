@@ -103,7 +103,7 @@ namespace osu.Desktop.Tests.Visual
                             OnlineInfo = new BeatmapOnlineInfo
                             {
                                 Length = 118000,
-                                HasVideo = false,
+                                HasVideo = true,
                                 CircleCount = 592,
                                 SliderCount = 62,
                                 PlayCount = 162021,
