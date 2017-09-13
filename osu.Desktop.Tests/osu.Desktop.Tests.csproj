@@ -78,7 +78,7 @@
     <Compile Include="Visual\TestCaseDirect.cs" />
     <Compile Include="Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Visual\TestCaseDrawings.cs" />
-    <Compile Include="Visual\TestCaseEditorBeatSnapDivisor.cs" />
+    <Compile Include="Visual\TestCaseBeatSnapVisualiser.cs" />
     <Compile Include="Visual\TestCaseGamefield.cs" />
     <Compile Include="Visual\TestCaseGraph.cs" />
     <Compile Include="Visual\TestCaseHitObjects.cs" />
