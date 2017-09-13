@@ -14,9 +14,23 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 {
     public class Details : FillFlowContainer
     {
+        private readonly PreviewButton preview;
         private readonly BasicStats basic;
         private readonly AdvancedStats advanced;
         private readonly UserRatings ratings;
+
+        private BeatmapSetInfo beatmapSet;
+        public BeatmapSetInfo BeatmapSet
+        {
+            get { return beatmapSet; }
+            set
+            {
+                if (value == beatmapSet) return;
+                beatmapSet = value;
+
+                basic.BeatmapSet = preview.BeatmapSet = BeatmapSet;
+            }
+        }
 
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
@@ -32,7 +46,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             }
         }
 
-        public Details(BeatmapSetInfo set)
+        public Details()
         {
             Width = OnlineBeatmapSetOverlay.RIGHT_WIDTH;
             AutoSizeAxes = Axes.Y;
@@ -40,17 +54,13 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
             Children = new Drawable[]
             {
-                new AsyncLoadWrapper(new PreviewButton(set)
+                preview = new PreviewButton
                 {
                     RelativeSizeAxes = Axes.X,
-                })
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
                 },
                 new DetailBox
                 {
-                    Child = basic = new BasicStats(set)
+                    Child = basic = new BasicStats()
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,

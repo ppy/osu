@@ -28,10 +28,42 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
         private readonly DifficultiesContainer difficulties;
         private readonly OsuSpriteText version, starRating;
+        private readonly Statistic plays, favourites;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
-        public BeatmapPicker(BeatmapSetInfo set)
+        private BeatmapSetInfo beatmapSet;
+        public BeatmapSetInfo BeatmapSet
+        {
+            get { return beatmapSet; }
+            set
+            {
+                if (value == beatmapSet) return;
+                beatmapSet = value;
+
+                Beatmap.Value = BeatmapSet.Beatmaps.First();
+                plays.Value = BeatmapSet.OnlineInfo.PlayCount;
+                favourites.Value = BeatmapSet.OnlineInfo.FavouriteCount;
+                difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Select(b => new DifficultySelectorButton(b)
+                {
+                    State = DifficultySelectorState.NotSelected,
+                    OnHovered = beatmap =>
+                    {
+                        showBeatmap(beatmap);
+                        starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
+                        starRating.FadeIn(100);
+                    },
+                    OnClicked = beatmap =>
+                    {
+                        Beatmap.Value = beatmap;
+                    },
+                });
+
+                updateDifficultyButtons();
+            }
+        }
+
+        public BeatmapPicker()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -89,36 +121,19 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                             Margin = new MarginPadding { Top = 5 },
                             Children = new[]
                             {
-                                new Statistic(FontAwesome.fa_play_circle, set.OnlineInfo.PlayCount),
-                                new Statistic(FontAwesome.fa_heart, set.OnlineInfo.FavouriteCount),
+                                plays = new Statistic(FontAwesome.fa_play_circle),
+                                favourites = new Statistic(FontAwesome.fa_heart),
                             },
                         },
                     },
                 },
             };
 
-            Beatmap.Value = set.Beatmaps.First();
-
             Beatmap.ValueChanged += b =>
             {
                 showBeatmap(b);
                 updateDifficultyButtons();
             };
-
-            difficulties.ChildrenEnumerable = set.Beatmaps.Select(b => new DifficultySelectorButton(b)
-            {
-                State = DifficultySelectorState.NotSelected,
-                OnHovered = beatmap =>
-                {
-                    showBeatmap(beatmap);
-                    starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
-                    starRating.FadeIn(100);
-                },
-                OnClicked = beatmap =>
-                {
-                    Beatmap.Value = beatmap;
-                },
-            });
         }
 
         [BackgroundDependencyLoader]
@@ -261,7 +276,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 }
             }
 
-            public Statistic(FontAwesome icon, int value = 0)
+            public Statistic(FontAwesome icon)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
@@ -285,8 +300,6 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                         TextSize = 14,
                     },
                 };
-
-                Value = value;
             }
         }
 

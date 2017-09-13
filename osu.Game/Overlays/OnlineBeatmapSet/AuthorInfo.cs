@@ -16,20 +16,53 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
     {
         private const float height = 50;
 
-        public AuthorInfo(BeatmapSetOnlineInfo info)
+        private readonly UpdateableAvatar avatar;
+        private readonly FillFlowContainer fields;
+
+        private BeatmapSetInfo beatmapSet;
+        public BeatmapSetInfo BeatmapSet
+        {
+            get { return beatmapSet; }
+            set
+            {
+                if (value == beatmapSet) return;
+                beatmapSet = value;
+
+                var i = BeatmapSet.OnlineInfo;
+
+                avatar.User = i.Author;
+                fields.Children = new Drawable[]
+                {
+                    new Field("made by", i.Author.Username, @"Exo2.0-RegularItalic"),
+                    new Field("submitted on", i.Submitted.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold")
+                    {
+                        Margin = new MarginPadding { Top = 5 },
+                    },
+                };
+
+                if (i.Ranked.HasValue)
+                {
+                    fields.Add(new Field("ranked on ", i.Ranked.Value.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"));
+                }
+                else if (i.LastUpdated.HasValue)
+                {
+                    fields.Add(new Field("last updated on ", i.LastUpdated.Value.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"));
+                }
+            }
+        }
+
+        public AuthorInfo()
         {
             RelativeSizeAxes = Axes.X;
             Height = height;
 
-            FillFlowContainer fields;
             Children = new Drawable[]
             {
-                new UpdateableAvatar
+                avatar = new UpdateableAvatar
                 {
                     Size = new Vector2(height),
                     CornerRadius = 3,
                     Masking = true,
-                    User = info.Author,
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = Color4.Black.Opacity(0.25f),
@@ -43,25 +76,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Left = height + 5 },
-                    Children = new Drawable[]
-                    {
-                        new Field("made by", info.Author.Username, @"Exo2.0-RegularItalic"),
-                        new Field("submitted on", info.Submitted.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold")
-                        {
-                            Margin = new MarginPadding { Top = 5 },
-                        },
-                    },
                 },
             };
-
-            if (info.Ranked.HasValue)
-            {
-                fields.Add(new Field("ranked on ", info.Ranked.Value.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"));
-            }
-            else if (info.LastUpdated.HasValue)
-            {
-                fields.Add(new Field("last updated on ", info.LastUpdated.Value.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"));
-            }
         }
 
         private class Field : FillFlowContainer

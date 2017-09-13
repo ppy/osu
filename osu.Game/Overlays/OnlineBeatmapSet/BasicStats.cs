@@ -15,7 +15,20 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 {
     public class BasicStats : Container
     {
-        private readonly Statistic length, circleCount, sliderCount;
+        private readonly Statistic length, bpm, circleCount, sliderCount;
+
+        private BeatmapSetInfo beatmapSet;
+        public BeatmapSetInfo BeatmapSet
+        {
+            get { return beatmapSet; }
+            set
+            {
+                if (value == beatmapSet) return;
+                beatmapSet = value;
+
+                bpm.Value = BeatmapSet.OnlineInfo.BPM.ToString(@"0.##");
+            }
+        }
 
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
@@ -32,7 +45,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             }
         }
 
-        public BasicStats(BeatmapSetInfo set)
+        public BasicStats()
         {
             Child = new FillFlowContainer
             {
@@ -42,11 +55,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 Children = new[]
                 {
                     length = new Statistic(FontAwesome.fa_clock_o, "Length") { Width = 0.25f },
-                    new Statistic(FontAwesome.fa_circle, "BPM")
-                    {
-                        Width = 0.25f,
-                        Value = set.OnlineInfo.BPM.ToString(@"0.##"),
-                    },
+                    bpm = new Statistic(FontAwesome.fa_circle, "BPM") { Width = 0.25f },
                     circleCount = new Statistic(FontAwesome.fa_circle_o, "Circle Count") { Width = 0.25f },
                     sliderCount = new Statistic(FontAwesome.fa_circle, "Slider Count") { Width = 0.25f },
                 },
