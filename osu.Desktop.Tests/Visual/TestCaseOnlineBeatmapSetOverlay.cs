@@ -378,6 +378,9 @@ namespace osu.Desktop.VisualTests.Tests
                     },
                 });
             });
+
+            AddStep(@"hide", overlay.Hide);
+            AddStep(@"show without reload", overlay.Show);
         }
     }
 }

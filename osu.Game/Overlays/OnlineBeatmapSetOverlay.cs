@@ -6,6 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -41,15 +42,23 @@ namespace osu.Game.Overlays
                 Offset = new Vector2(0f, 1f),
             };
 
-            Child = new ScrollContainer
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                ScrollbarVisible = false,
-                Child = scrollContent = new ReverseChildIDFillFlowContainer<Drawable>
+                new Box
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.2f)
+                },
+                new ScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    ScrollbarVisible = false,
+                    Child = scrollContent = new ReverseChildIDFillFlowContainer<Drawable>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                    },
                 },
             };
         }
