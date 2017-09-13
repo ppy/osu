@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 },
                 new DetailBox
                 {
-                    Child = basic = new BasicStats()
+                    Child = basic = new BasicStats
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
