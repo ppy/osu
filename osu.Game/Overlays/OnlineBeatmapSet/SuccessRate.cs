@@ -33,6 +33,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 var rate = (float)beatmap.OnlineInfo.PassCount / beatmap.OnlineInfo.PlayCount;
                 successPercent.Text = $"{Math.Round(rate * 100)}%";
                 successRate.Length = rate;
+                percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
                 graph.Metrics = Beatmap.Metrics;
             }
@@ -106,7 +107,6 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             base.UpdateAfterChildren();
 
             graph.Padding = new MarginPadding { Top = header.DrawHeight };
-            percentContainer.Width = successRate.Length;
         }
     }
 }
