@@ -10,12 +10,12 @@ using System.Linq;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class StoryboardSprite : Sprite, IFlippable
+    public class DrawableStoryboardSprite : Sprite, IFlippable
     {
-        public SpriteDefinition Definition { get; private set; }
+        public StoryboardSprite Sprite { get; private set; }
 
-        protected override bool ShouldBeAlive => Definition.HasCommands && base.ShouldBeAlive;
-        public override bool RemoveWhenNotAlive => !Definition.HasCommands || base.RemoveWhenNotAlive;
+        protected override bool ShouldBeAlive => Sprite.HasCommands && base.ShouldBeAlive;
+        public override bool RemoveWhenNotAlive => !Sprite.HasCommands || base.RemoveWhenNotAlive;
 
         public bool FlipH { get; set; }
         public bool FlipV { get; set; }
@@ -52,29 +52,29 @@ namespace osu.Game.Storyboards.Drawables
         public override bool IsPresent
             => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
 
-        public StoryboardSprite(SpriteDefinition definition)
+        public DrawableStoryboardSprite(StoryboardSprite sprite)
         {
-            Definition = definition;
-            Origin = definition.Origin;
-            Position = definition.InitialPosition;
+            Sprite = sprite;
+            Origin = sprite.Origin;
+            Position = sprite.InitialPosition;
 
-            if (definition.HasCommands)
+            if (sprite.HasCommands)
             {
-                LifetimeStart = definition.StartTime;
-                LifetimeEnd = definition.EndTime;
+                LifetimeStart = sprite.StartTime;
+                LifetimeEnd = sprite.EndTime;
             }
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, TextureStore textureStore)
         {
-            var spritePath = Definition.Path.ToLowerInvariant();
+            var spritePath = Sprite.Path.ToLowerInvariant();
             var path = game.Beatmap.Value.BeatmapSetInfo.Files.FirstOrDefault(f => f.Filename.ToLowerInvariant() == spritePath)?.FileInfo.StoragePath;
             if (path == null)
                 return;
 
             Texture = textureStore.Get(path);
-            Definition.ApplyTransforms(this);
+            Sprite.ApplyTransforms(this);
         }
     }
 }

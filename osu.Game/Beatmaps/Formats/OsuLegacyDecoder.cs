@@ -242,7 +242,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleEvents(Beatmap beatmap, string line, ref SpriteDefinition spriteDefinition, ref CommandTimelineGroup timelineGroup)
+        private void handleEvents(Beatmap beatmap, string line, ref StoryboardSprite storyboardSprite, ref CommandTimelineGroup timelineGroup)
         {
             var depth = 0;
             while (line.StartsWith(" ") || line.StartsWith("_"))
@@ -257,7 +257,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (depth == 0)
             {
-                spriteDefinition = null;
+                storyboardSprite = null;
 
                 EventType type;
                 if (!Enum.TryParse(split[0], out type))
@@ -292,8 +292,8 @@ namespace osu.Game.Beatmaps.Formats
                             var path = cleanFilename(split[3]);
                             var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
                             var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
-                            spriteDefinition = new SpriteDefinition(path, origin, new Vector2(x, y));
-                            beatmap.Storyboard.GetLayer(layer).Add(spriteDefinition);
+                            storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
+                            beatmap.Storyboard.GetLayer(layer).Add(storyboardSprite);
                         }
                         break;
                     case EventType.Animation:
@@ -306,8 +306,8 @@ namespace osu.Game.Beatmaps.Formats
                             var frameCount = int.Parse(split[6]);
                             var frameDelay = double.Parse(split[7], NumberFormatInfo.InvariantInfo);
                             var loopType = split.Length > 8 ? (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]) : AnimationLoopType.LoopForever;
-                            spriteDefinition = new AnimationDefinition(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
-                            beatmap.Storyboard.GetLayer(layer).Add(spriteDefinition);
+                            storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
+                            beatmap.Storyboard.GetLayer(layer).Add(storyboardSprite);
                         }
                         break;
                     case EventType.Sample:
@@ -316,7 +316,7 @@ namespace osu.Game.Beatmaps.Formats
                             var layer = parseLayer(split[2]);
                             var path = cleanFilename(split[3]);
                             var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
-                            beatmap.Storyboard.GetLayer(layer).Add(new SampleDefinition(path, time, volume));
+                            beatmap.Storyboard.GetLayer(layer).Add(new StoryboardSample(path, time, volume));
                         }
                         break;
                 }
@@ -324,7 +324,7 @@ namespace osu.Game.Beatmaps.Formats
             else
             {
                 if (depth < 2)
-                    timelineGroup = spriteDefinition?.TimelineGroup;
+                    timelineGroup = storyboardSprite?.TimelineGroup;
 
                 var commandType = split[0];
                 switch (commandType)
@@ -335,14 +335,14 @@ namespace osu.Game.Beatmaps.Formats
                             var startTime = split.Length > 2 ? double.Parse(split[2], CultureInfo.InvariantCulture) : double.MinValue;
                             var endTime = split.Length > 3 ? double.Parse(split[3], CultureInfo.InvariantCulture) : double.MaxValue;
                             var groupNumber = split.Length > 4 ? int.Parse(split[4]) : 0;
-                            timelineGroup = spriteDefinition?.AddTrigger(triggerName, startTime, endTime, groupNumber);
+                            timelineGroup = storyboardSprite?.AddTrigger(triggerName, startTime, endTime, groupNumber);
                         }
                         break;
                     case "L":
                         {
                             var startTime = double.Parse(split[1], CultureInfo.InvariantCulture);
                             var loopCount = int.Parse(split[2]);
-                            timelineGroup = spriteDefinition?.AddLoop(startTime, loopCount);
+                            timelineGroup = storyboardSprite?.AddLoop(startTime, loopCount);
                         }
                         break;
                     default:
@@ -607,7 +607,7 @@ namespace osu.Game.Beatmaps.Formats
 
             Section section = Section.None;
             bool hasCustomColours = false;
-            SpriteDefinition spriteDefinition = null;
+            StoryboardSprite storyboardSprite = null;
             CommandTimelineGroup timelineGroup = null;
 
             string line;
@@ -647,7 +647,7 @@ namespace osu.Game.Beatmaps.Formats
                         handleDifficulty(beatmap, line);
                         break;
                     case Section.Events:
-                        handleEvents(beatmap, line, ref spriteDefinition, ref timelineGroup);
+                        handleEvents(beatmap, line, ref storyboardSprite, ref timelineGroup);
                         break;
                     case Section.TimingPoints:
                         handleTimingPoints(beatmap, line);

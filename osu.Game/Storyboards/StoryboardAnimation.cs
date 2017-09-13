@@ -7,13 +7,13 @@ using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards
 {
-    public class AnimationDefinition : SpriteDefinition
+    public class StoryboardAnimation : StoryboardSprite
     {
         public int FrameCount;
         public double FrameDelay;
         public AnimationLoopType LoopType;
 
-        public AnimationDefinition(string path, Anchor origin, Vector2 initialPosition, int frameCount, double frameDelay, AnimationLoopType loopType)
+        public StoryboardAnimation(string path, Anchor origin, Vector2 initialPosition, int frameCount, double frameDelay, AnimationLoopType loopType)
             : base(path, origin, initialPosition)
         {
             FrameCount = frameCount;
@@ -22,7 +22,7 @@ namespace osu.Game.Storyboards
         }
 
         public override Drawable CreateDrawable()
-            => new StoryboardAnimation(this);
+            => new DrawableStoryboardAnimation(this);
     }
 
     public enum AnimationLoopType

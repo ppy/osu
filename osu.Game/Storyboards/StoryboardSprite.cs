@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace osu.Game.Storyboards
 {
-    public class SpriteDefinition : IElementDefinition
+    public class StoryboardSprite : IStoryboardElement
     {
         private readonly List<CommandLoop> loops = new List<CommandLoop>();
         private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();
@@ -34,7 +34,7 @@ namespace osu.Game.Storyboards
         private delegate void DrawablePropertyInitializer<in T>(Drawable drawable, T value);
         private delegate void DrawableTransformer<in T>(Drawable drawable, T value, double duration, Easing easing);
 
-        public SpriteDefinition(string path, Anchor origin, Vector2 initialPosition)
+        public StoryboardSprite(string path, Anchor origin, Vector2 initialPosition)
         {
             Path = path;
             Origin = origin;
@@ -56,7 +56,7 @@ namespace osu.Game.Storyboards
         }
 
         public virtual Drawable CreateDrawable()
-            => new StoryboardSprite(this);
+            => new DrawableStoryboardSprite(this);
 
         public void ApplyTransforms(Drawable drawable, IEnumerable<Tuple<CommandTimelineGroup, double>> triggeredGroups = null)
         {

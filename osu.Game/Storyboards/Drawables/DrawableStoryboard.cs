@@ -10,9 +10,9 @@ using osu.Game.IO;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class Storyboard : Container<StoryboardLayer>
+    public class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
-        public StoryboardDefinition Definition { get; private set; }
+        public Storyboard Storyboard { get; private set; }
 
         protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
         public override bool HandleInput => false;
@@ -33,9 +33,9 @@ namespace osu.Game.Storyboards.Drawables
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-        public Storyboard(StoryboardDefinition definition)
+        public DrawableStoryboard(Storyboard storyboard)
         {
-            Definition = definition;
+            Storyboard = storyboard;
             Size = new Vector2(640, 480);
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
@@ -46,14 +46,14 @@ namespace osu.Game.Storyboards.Drawables
         {
             dependencies.Cache(new TextureStore(new RawTextureLoaderStore(fileStore.Store), false) { ScaleAdjust = 1, });
 
-            foreach (var layerDefinition in Definition.Layers)
-                Add(layerDefinition.CreateDrawable());
+            foreach (var layer in Storyboard.Layers)
+                Add(layer.CreateDrawable());
         }
 
         private void updateLayerVisibility()
         {
             foreach (var layer in Children)
-                layer.Enabled = passing ? layer.Definition.EnabledWhenPassing : layer.Definition.EnabledWhenFailing;
+                layer.Enabled = passing ? layer.Layer.EnabledWhenPassing : layer.Layer.EnabledWhenFailing;
         }
     }
 }

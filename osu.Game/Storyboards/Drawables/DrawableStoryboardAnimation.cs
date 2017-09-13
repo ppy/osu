@@ -10,12 +10,12 @@ using System.Linq;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class StoryboardAnimation : TextureAnimation, IFlippable
+    public class DrawableStoryboardAnimation : TextureAnimation, IFlippable
     {
-        public AnimationDefinition Definition { get; private set; }
+        public StoryboardAnimation Animation { get; private set; }
 
-        protected override bool ShouldBeAlive => Definition.HasCommands && base.ShouldBeAlive;
-        public override bool RemoveWhenNotAlive => !Definition.HasCommands || base.RemoveWhenNotAlive;
+        protected override bool ShouldBeAlive => Animation.HasCommands && base.ShouldBeAlive;
+        public override bool RemoveWhenNotAlive => !Animation.HasCommands || base.RemoveWhenNotAlive;
 
         public bool FlipH { get; set; }
         public bool FlipV { get; set; }
@@ -52,25 +52,25 @@ namespace osu.Game.Storyboards.Drawables
         public override bool IsPresent
             => !float.IsNaN(DrawPosition.X) && !float.IsNaN(DrawPosition.Y) && base.IsPresent;
 
-        public StoryboardAnimation(AnimationDefinition definition)
+        public DrawableStoryboardAnimation(StoryboardAnimation animation)
         {
-            Definition = definition;
-            Origin = definition.Origin;
-            Position = definition.InitialPosition;
-            Repeat = definition.LoopType == AnimationLoopType.LoopForever;
+            Animation = animation;
+            Origin = animation.Origin;
+            Position = animation.InitialPosition;
+            Repeat = animation.LoopType == AnimationLoopType.LoopForever;
 
-            if (definition.HasCommands)
+            if (animation.HasCommands)
             {
-                LifetimeStart = definition.StartTime;
-                LifetimeEnd = definition.EndTime;
+                LifetimeStart = animation.StartTime;
+                LifetimeEnd = animation.EndTime;
             }
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, TextureStore textureStore)
         {
-            var basePath = Definition.Path.ToLowerInvariant();
-            for (var frame = 0; frame < Definition.FrameCount; frame++)
+            var basePath = Animation.Path.ToLowerInvariant();
+            for (var frame = 0; frame < Animation.FrameCount; frame++)
             {
                 var framePath = basePath.Replace(".", frame + ".");
 
@@ -79,9 +79,9 @@ namespace osu.Game.Storyboards.Drawables
                     continue;
 
                 var texture = textureStore.Get(path);
-                AddFrame(texture, Definition.FrameDelay);
+                AddFrame(texture, Animation.FrameDelay);
             }
-            Definition.ApplyTransforms(this);
+            Animation.ApplyTransforms(this);
         }
     }
 }
