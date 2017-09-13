@@ -27,14 +27,13 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 beatmap = value;
 
                 length.Value = TimeSpan.FromMilliseconds(beatmap.OnlineInfo.Length).ToString(@"m\:ss");
-                circleCount.Value = string.Format(@"{0:n0}", beatmap.OnlineInfo.CircleCount);
-                sliderCount.Value = string.Format(@"{0:n0}", beatmap.OnlineInfo.SliderCount);
+                circleCount.Value = beatmap.OnlineInfo.CircleCount.ToString("N0");
+                sliderCount.Value = beatmap.OnlineInfo.SliderCount.ToString("N0");
             }
         }
 
         public BasicStats(BeatmapSetInfo set)
         {
-            var statWidth = 0.25f;
             Child = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -42,14 +41,14 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 Direction = FillDirection.Horizontal,
                 Children = new[]
                 {
-                    length = new Statistic(FontAwesome.fa_clock_o, "Length") { Width = statWidth },
+                    length = new Statistic(FontAwesome.fa_clock_o, "Length") { Width = 0.25f },
                     new Statistic(FontAwesome.fa_circle, "BPM")
                     {
-                        Width = statWidth,
+                        Width = 0.25f,
                         Value = set.OnlineInfo.BPM.ToString(@"0.##"),
                     },
-                    circleCount = new Statistic(FontAwesome.fa_circle_o, "Circle Count") { Width = statWidth },
-                    sliderCount = new Statistic(FontAwesome.fa_circle, "Slider Count") { Width = statWidth },
+                    circleCount = new Statistic(FontAwesome.fa_circle_o, "Circle Count") { Width = 0.25f },
+                    sliderCount = new Statistic(FontAwesome.fa_circle, "Slider Count") { Width = 0.25f },
                 },
             };
         }

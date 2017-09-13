@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 OnHovered = beatmap =>
                 {
                     showBeatmap(beatmap);
-                    starRating.Text = string.Format("Star Difficulty {0:N2}", beatmap.StarDifficulty);
+                    starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
                     starRating.FadeIn(100);
                 },
             });

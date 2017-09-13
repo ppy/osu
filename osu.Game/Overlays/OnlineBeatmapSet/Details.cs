@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
         private class DetailBox : Container
         {
-            private Container content;
+            private readonly Container content;
             protected override Container<Drawable> Content => content;
 
             public DetailBox()

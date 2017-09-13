@@ -21,6 +21,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             RelativeSizeAxes = Axes.X;
             Height = height;
 
+            FillFlowContainer fields;
             Children = new Drawable[]
             {
                 new UpdateableAvatar
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                         Offset = new Vector2(0f, 1f),
                     },
                 },
-                new FillFlowContainer
+                fields = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -49,10 +50,18 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                         {
                             Margin = new MarginPadding { Top = 5 },
                         },
-                        new Field(info.Ranked == null ? "last updated on " : "ranked on ", (info.Ranked == null ? info.Submitted : info.Ranked).ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"),
                     },
                 },
             };
+
+            if (info.Ranked.HasValue)
+            {
+                fields.Add(new Field("ranked on ", info.Ranked.Value.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"));
+            }
+            else if (info.LastUpdated.HasValue)
+            {
+                fields.Add(new Field("last updated on ", info.LastUpdated.Value.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"));
+            }
         }
 
         private class Field : FillFlowContainer

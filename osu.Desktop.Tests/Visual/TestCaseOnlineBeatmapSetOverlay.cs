@@ -5,15 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 
-namespace osu.Desktop.VisualTests.Tests
+namespace osu.Desktop.Tests.Visual
 {
-    internal class TestCaseOnlineBeatmapSetOverlay : TestCase
+    internal class TestCaseOnlineBeatmapSetOverlay : OsuTestCase
     {
         public override string Description => @"view online beatmap sets";
 
