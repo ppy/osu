@@ -156,16 +156,17 @@ namespace osu.Game.Rulesets.Scoring
 
         protected sealed override bool HasCompleted => Hits == MaxHits;
 
+        protected virtual double BasePortion => 0.5f;
         protected virtual double ComboPortion => 0.5f;
-        protected virtual double AccuracyPortion => 0.5f;
 
         protected int MaxHits { get; private set; }
         protected int Hits { get; private set; }
 
         private double maxHighestCombo;
-        private double maxComboScore;
-        private double rollingMaxComboScore;
-        private double comboScore;
+
+        private double maxBaseScore;
+        private double rollingMaxBaseScore;
+        private double baseScore;
 
         protected ScoreProcessor()
         {
@@ -216,8 +217,8 @@ namespace osu.Game.Rulesets.Scoring
                         break;
                 }
 
-                comboScore += judgement.NumericResult;
-                rollingMaxComboScore += judgement.MaxNumericResult;
+                baseScore += judgement.NumericResult;
+                rollingMaxBaseScore += judgement.MaxNumericResult;
             }
             else if (judgement.IsHit)
                 bonusScore += judgement.NumericResult;
@@ -225,20 +226,16 @@ namespace osu.Game.Rulesets.Scoring
             if (judgement.AffectsAccuracy)
                 Hits++;
 
-            if (rollingMaxComboScore != 0)
-                Accuracy.Value = comboScore / rollingMaxComboScore;
+            if (rollingMaxBaseScore != 0)
+                Accuracy.Value = baseScore / rollingMaxBaseScore;
 
             switch (Mode.Value)
             {
                 case ScoringMode.Standardised:
-                    TotalScore.Value =
-                        max_score *
-                            (ComboPortion * (comboScore * Math.Log(HighestCombo + 1, 2)) / (maxComboScore * Math.Log(maxHighestCombo + 1, 2))
-                            + AccuracyPortion * Accuracy)
-                        + bonusScore;
+                    TotalScore.Value = max_score * (BasePortion * baseScore / maxBaseScore + ComboPortion * HighestCombo / maxHighestCombo) + bonusScore;
                     break;
                 case ScoringMode.Exponential:
-                    TotalScore.Value = (comboScore + bonusScore) * Math.Log(HighestCombo + 1, 2);
+                    TotalScore.Value = (baseScore + bonusScore) * Math.Log(HighestCombo + 1, 2);
                     break;
             }
         }
@@ -249,14 +246,14 @@ namespace osu.Game.Rulesets.Scoring
             {
                 MaxHits = Hits;
                 maxHighestCombo = HighestCombo;
-                maxComboScore = comboScore;
+                maxBaseScore = baseScore;
             }
 
             base.Reset(storeResults);
 
             Hits = 0;
-            comboScore = 0;
-            rollingMaxComboScore = 0;
+            baseScore = 0;
+            rollingMaxBaseScore = 0;
         }
     }
 

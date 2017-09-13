@@ -89,8 +89,8 @@ namespace osu.Game.Rulesets.Mania.Scoring
         /// </summary>
         private double hpMultiplier = 1;
 
-        protected override double ComboPortion => 0.2f;
-        protected override double AccuracyPortion => 0.8f;
+        protected override double BasePortion => 0.8;
+        protected override double ComboPortion => 0.2;
 
         public ManiaScoreProcessor()
         {
