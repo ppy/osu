@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 {
     public class Header : Container
     {
+        private const float transition_duration = 250;
         private const float tabs_height = 50;
 
         private readonly Box tabsBg;
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 Offset = new Vector2(0f, 1f),
             };
 
-            FillFlowContainer buttons;
+            DownloadButton noVideo, withVideo, withoutVideo;
             Details details;
             Children = new Drawable[]
             {
@@ -126,15 +127,20 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                         Margin = new MarginPadding { Top = 20 },
                                         Child = new AuthorInfo(set.OnlineInfo),
                                     },
-                                    buttons = new FillFlowContainer
+                                    new FillFlowContainer
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Height = 45,
                                         Spacing = new Vector2(5f),
                                         Margin = new MarginPadding { Top = 10 },
+                                        LayoutDuration = transition_duration,
+                                        LayoutEasing = Easing.Out,
                                         Children = new HeaderButton[]
                                         {
                                             new FavouriteButton(),
+                                            noVideo = new DownloadButton("Download", @""),
+                                            withVideo = new DownloadButton("Download", "with Video"),
+                                            withoutVideo = new DownloadButton("Download", "without Video"),
                                         },
                                     },
                                 },
@@ -154,18 +160,17 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             {
                 details.Beatmap = b;
 
-                buttons.Child = new FavouriteButton();
                 if (b.OnlineInfo.HasVideo)
                 {
-                    buttons.AddRange(new[]
-                    {
-                        new DownloadButton("Download", "with Video"),
-                        new DownloadButton("Download", "without Video"),
-                    });
+                    noVideo.FadeOut(transition_duration);
+                    withVideo.FadeIn(transition_duration);
+                    withoutVideo.FadeIn(transition_duration);
                 }
                 else
                 {
-                    buttons.Add(new DownloadButton("Download", @""));
+                    noVideo.FadeIn(transition_duration);
+                    withVideo.FadeOut(transition_duration);
+                    withoutVideo.FadeOut(transition_duration);
                 }
             };
         }
