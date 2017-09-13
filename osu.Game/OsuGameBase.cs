@@ -106,9 +106,15 @@ namespace osu.Game
 
             connection.CreateTable<StoreVersion>();
 
+            dependencies.Cache(API = new APIAccess
+            {
+                Username = LocalConfig.Get<string>(OsuSetting.Username),
+                Token = LocalConfig.Get<string>(OsuSetting.Token)
+            });
+
             dependencies.Cache(RulesetStore = new RulesetStore(connection));
             dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, Host));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, API, Host));
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(connection, RulesetStore));
             dependencies.Cache(new OsuColour());
@@ -144,18 +150,21 @@ namespace osu.Game
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
             BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
-            dependencies.Cache(API = new APIAccess
-            {
-                Username = LocalConfig.Get<string>(OsuSetting.Username),
-                Token = LocalConfig.Get<string>(OsuSetting.Token)
-            });
-
             Beatmap.ValueChanged += b =>
             {
+                var trackLoaded = lastBeatmap?.TrackLoaded ?? false;
+
                 // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
-                if (lastBeatmap?.Track != b.Track)
+                if (!trackLoaded || lastBeatmap?.Track != b.Track)
                 {
-                    lastBeatmap?.Track?.Dispose();
+                    if (trackLoaded)
+                    {
+                        Debug.Assert(lastBeatmap != null);
+                        Debug.Assert(lastBeatmap.Track != null);
+
+                        lastBeatmap.DisposeTrack();
+                    }
+
                     Audio.Track.AddItem(b.Track);
                 }
 

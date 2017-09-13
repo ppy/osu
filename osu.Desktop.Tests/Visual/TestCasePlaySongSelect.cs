@@ -32,7 +32,7 @@ namespace osu.Desktop.Tests.Visual
                 backingDatabase.CreateTable<StoreVersion>();
 
                 rulesets = new RulesetStore(backingDatabase);
-                manager = new BeatmapManager(storage, null, backingDatabase, rulesets);
+                manager = new BeatmapManager(storage, null, backingDatabase, rulesets, null);
 
                 for (int i = 0; i < 100; i += 10)
                     manager.Import(createTestBeatmapSet(i));

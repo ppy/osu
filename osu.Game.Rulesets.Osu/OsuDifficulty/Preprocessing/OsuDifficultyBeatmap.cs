@@ -51,6 +51,7 @@ namespace osu.Game.Rulesets.Osu.OsuDifficulty.Preprocessing
 
                     foreach (OsuDifficultyHitObject h in onScreen)
                     {
+                        // ReSharper disable once PossibleNullReferenceException (resharper not smart enough to understand IEnumerator.MoveNext())
                         h.TimeUntilHit -= latest.DeltaTime;
                         // Calculate reading strain here
                     }

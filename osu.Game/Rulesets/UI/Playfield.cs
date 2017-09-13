@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Game.Rulesets.Judgements;
@@ -14,9 +13,7 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class Playfield<TObject, TJudgement> : Container
-        where TObject : HitObject
-        where TJudgement : Judgement
+    public abstract class Playfield : Container
     {
         /// <summary>
         /// The HitObjects contained in this Playfield.
@@ -70,7 +67,7 @@ namespace osu.Game.Rulesets.UI
         public override Axes RelativeSizeAxes
         {
             get { return Axes.Both; }
-            set { throw new InvalidOperationException($@"{nameof(Playfield<TObject, TJudgement>)}'s {nameof(RelativeSizeAxes)} should never be changed from {Axes.Both}"); }
+            set { throw new InvalidOperationException($@"{nameof(Playfield)}'s {nameof(RelativeSizeAxes)} should never be changed from {Axes.Both}"); }
         }
 
         /// <summary>
@@ -82,19 +79,20 @@ namespace osu.Game.Rulesets.UI
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to add.</param>
-        public virtual void Add(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Add(h);
+        public virtual void Add(DrawableHitObject h) => HitObjects.Add(h);
 
         /// <summary>
         /// Remove a DrawableHitObject from this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
-        public virtual void Remove(DrawableHitObject<TObject, TJudgement> h) => HitObjects.Remove(h);
+        public virtual void Remove(DrawableHitObject h) => HitObjects.Remove(h);
 
         /// <summary>
-        /// Triggered when an object's Judgement is updated.
+        /// Triggered when a new <see cref="Judgement"/> occurs on a <see cref="DrawableHitObject"/>.
         /// </summary>
-        /// <param name="judgedObject">The object that Judgement has been updated for.</param>
-        public virtual void OnJudgement(DrawableHitObject<TObject, TJudgement> judgedObject) { }
+        /// <param name="judgedObject">The object that <paramref name="judgement"/> occured for.</param>
+        /// <param name="judgement">The <see cref="Judgement"/> that occurred.</param>
+        public virtual void OnJudgement(DrawableHitObject judgedObject, Judgement judgement) { }
 
         public class HitObjectContainer : CompositeDrawable
         {
