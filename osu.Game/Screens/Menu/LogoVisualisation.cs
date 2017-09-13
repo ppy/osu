@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Menu
         {
             texture = Texture.WhitePixel;
             AccentColour = new Color4(1, 1, 1, 0.2f);
-            BlendingMode = BlendingMode.Additive;
+            Blending = BlendingMode.Additive;
         }
 
         [BackgroundDependencyLoader]

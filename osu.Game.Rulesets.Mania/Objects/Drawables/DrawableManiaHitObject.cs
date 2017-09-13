@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Graphics;
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
-    public abstract class DrawableManiaHitObject<TObject> : DrawableScrollingHitObject<ManiaHitObject, ManiaJudgement>
+    public abstract class DrawableManiaHitObject<TObject> : DrawableScrollingHitObject<ManiaHitObject>
         where TObject : ManiaHitObject
     {
         /// <summary>
@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected DrawableManiaHitObject(TObject hitObject, ManiaAction? action = null)
             : base(hitObject)
         {
+            RelativePositionAxes = Axes.Y;
             HitObject = hitObject;
 
             if (action != null)
@@ -36,7 +37,5 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 base.AccentColour = value;
             }
         }
-
-        protected override ManiaJudgement CreateJudgement() => new ManiaJudgement();
     }
 }

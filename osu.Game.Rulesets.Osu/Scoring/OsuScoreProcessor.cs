@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
@@ -15,7 +16,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject, OsuJudgement>
+    internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject>
     {
         public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>(ScoringMode.Exponential);
 
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
         }
 
-        public OsuScoreProcessor(RulesetContainer<OsuHitObject, OsuJudgement> rulesetContainer)
+        public OsuScoreProcessor(RulesetContainer<OsuHitObject> rulesetContainer)
             : base(rulesetContainer)
         {
         }
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private int totalAccurateJudgements;
 
-        private readonly Dictionary<OsuScoreResult, int> scoreResultCounts = new Dictionary<OsuScoreResult, int>();
+        private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
         private readonly Dictionary<ComboResult, int> comboResultCounts = new Dictionary<ComboResult, int>();
 
         private double comboMaxScore;
@@ -42,18 +43,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
             hpDrainRate = beatmap.BeatmapInfo.Difficulty.DrainRate;
             totalAccurateJudgements = beatmap.HitObjects.Count;
 
-            foreach (var h in beatmap.HitObjects)
+            foreach (var unused in beatmap.HitObjects)
             {
-                if (h != null)
-                {
-                    // TODO: add support for other object types.
-                    AddJudgement(new OsuJudgement
-                    {
-                        MaxScore = OsuScoreResult.Hit300,
-                        Score = OsuScoreResult.Hit300,
-                        Result = HitResult.Hit
-                    });
-                }
+                // TODO: add support for other object types.
+                AddJudgement(new OsuJudgement { Result = HitResult.Great });
             }
         }
 
@@ -72,44 +65,43 @@ namespace osu.Game.Rulesets.Osu.Scoring
         {
             base.PopulateScore(score);
 
-            score.Statistics[@"300"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit300);
-            score.Statistics[@"100"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit100);
-            score.Statistics[@"50"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Hit50);
-            score.Statistics[@"x"] = scoreResultCounts.GetOrDefault(OsuScoreResult.Miss);
+            score.Statistics[@"300"] = scoreResultCounts.GetOrDefault(HitResult.Great);
+            score.Statistics[@"100"] = scoreResultCounts.GetOrDefault(HitResult.Good);
+            score.Statistics[@"50"] = scoreResultCounts.GetOrDefault(HitResult.Meh);
+            score.Statistics[@"x"] = scoreResultCounts.GetOrDefault(HitResult.Miss);
         }
 
-        protected override void OnNewJudgement(OsuJudgement judgement)
+        protected override void OnNewJudgement(Judgement judgement)
         {
-            if (judgement != null)
+            var osuJudgement = (OsuJudgement)judgement;
+
+            if (judgement.Result != HitResult.None)
             {
-                if (judgement.Result != HitResult.None)
-                {
-                    scoreResultCounts[judgement.Score] = scoreResultCounts.GetOrDefault(judgement.Score) + 1;
-                    comboResultCounts[judgement.Combo] = comboResultCounts.GetOrDefault(judgement.Combo) + 1;
-                }
+                scoreResultCounts[judgement.Result] = scoreResultCounts.GetOrDefault(judgement.Result) + 1;
+                comboResultCounts[osuJudgement.Combo] = comboResultCounts.GetOrDefault(osuJudgement.Combo) + 1;
+            }
 
-                switch (judgement.Score)
-                {
-                    case OsuScoreResult.Hit300:
-                        Health.Value += (10.2 - hpDrainRate) * 0.02;
-                        break;
+            switch (judgement.Result)
+            {
+                case HitResult.Great:
+                    Health.Value += (10.2 - hpDrainRate) * 0.02;
+                    break;
 
-                    case OsuScoreResult.Hit100:
-                        Health.Value += (8 - hpDrainRate) * 0.02;
-                        break;
+                case HitResult.Good:
+                    Health.Value += (8 - hpDrainRate) * 0.02;
+                    break;
 
-                    case OsuScoreResult.Hit50:
-                        Health.Value += (4 - hpDrainRate) * 0.02;
-                        break;
+                case HitResult.Meh:
+                    Health.Value += (4 - hpDrainRate) * 0.02;
+                    break;
 
-                    case OsuScoreResult.SliderTick:
-                        Health.Value += Math.Max(7 - hpDrainRate, 0) * 0.01;
-                        break;
+                /*case HitResult.SliderTick:
+                    Health.Value += Math.Max(7 - hpDrainRate, 0) * 0.01;
+                    break;*/
 
-                    case OsuScoreResult.Miss:
-                        Health.Value -= hpDrainRate * 0.04;
-                        break;
-                }
+                case HitResult.Miss:
+                    Health.Value -= hpDrainRate * 0.04;
+                    break;
             }
 
             calculateScore();
@@ -124,10 +116,10 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
             foreach (var j in Judgements)
             {
-                baseScore += j.ScoreValue;
-                baseMaxScore += j.MaxScoreValue;
+                baseScore += j.NumericResult;
+                baseMaxScore += j.MaxNumericResult;
 
-                comboScore += j.ScoreValue * (1 + Combo.Value / 10d);
+                comboScore += j.NumericResult * (1 + Combo.Value / 10d);
             }
 
             Accuracy.Value = (double)baseScore / baseMaxScore;
