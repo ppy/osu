@@ -67,6 +67,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Width = 0f,
                             Child = successPercent = new OsuSpriteText
                             {
                                 Anchor = Anchor.TopRight,

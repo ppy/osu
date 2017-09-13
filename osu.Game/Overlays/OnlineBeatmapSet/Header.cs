@@ -20,6 +20,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
     {
         private const float transition_duration = 250;
         private const float tabs_height = 50;
+        private const float buttons_height = 45;
+        private const float buttons_spacing = 5;
 
         private readonly Box tabsBg;
 
@@ -38,7 +40,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 Offset = new Vector2(0f, 1f),
             };
 
-            DownloadButton noVideo, withVideo, withoutVideo;
+            Container noVideoButtons;
+            FillFlowContainer videoButtons;
             Details details;
             Children = new Drawable[]
             {
@@ -127,20 +130,39 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                         Margin = new MarginPadding { Top = 20 },
                                         Child = new AuthorInfo(set.OnlineInfo),
                                     },
-                                    new FillFlowContainer
+                                    new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
-                                        Height = 45,
-                                        Spacing = new Vector2(5f),
+                                        Height = buttons_height,
                                         Margin = new MarginPadding { Top = 10 },
-                                        LayoutDuration = transition_duration,
-                                        LayoutEasing = Easing.Out,
-                                        Children = new HeaderButton[]
+                                        Children = new Drawable[]
                                         {
                                             new FavouriteButton(),
-                                            noVideo = new DownloadButton("Download", @""),
-                                            withVideo = new DownloadButton("Download", "with Video"),
-                                            withoutVideo = new DownloadButton("Download", "without Video"),
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Left = buttons_height + buttons_spacing },
+                                                Children = new Drawable[]
+                                                {
+                                                    noVideoButtons = new Container
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Alpha = 0f,
+                                                        Child = new DownloadButton("Download", @""),
+                                                    },
+                                                    videoButtons = new FillFlowContainer
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Spacing = new Vector2(buttons_spacing),
+                                                        Alpha = 0f,
+                                                        Children = new[]
+                                                        {
+                                                            new DownloadButton("Download", "with Video"),
+                                                            new DownloadButton("Download", "without Video"),
+                                                        },
+                                                    },
+                                                },
+                                            },
                                         },
                                     },
                                 },
@@ -162,15 +184,13 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
                 if (b.OnlineInfo.HasVideo)
                 {
-                    noVideo.FadeOut(transition_duration);
-                    withVideo.FadeIn(transition_duration);
-                    withoutVideo.FadeIn(transition_duration);
+                    noVideoButtons.FadeOut(transition_duration);
+                    videoButtons.FadeIn(transition_duration);
                 }
                 else
                 {
-                    noVideo.FadeIn(transition_duration);
-                    withVideo.FadeOut(transition_duration);
-                    withoutVideo.FadeOut(transition_duration);
+                    noVideoButtons.FadeIn(transition_duration);
+                    videoButtons.FadeOut(transition_duration);
                 }
             };
         }
