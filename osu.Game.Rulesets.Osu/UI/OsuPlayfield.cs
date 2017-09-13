@@ -70,6 +70,8 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void Add(DrawableHitObject h)
         {
+            h.Depth = (float)h.HitObject.StartTime;
+
             var c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null)
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
