@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -62,14 +61,14 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            // header = new Header(),
+                            header = new Header(),
                             info = new Info(),
                         },
                     },
                 },
             };
 
-            // header.Picker.Beatmap.ValueChanged += b => info.Beatmap = b;
+            header.Picker.Beatmap.ValueChanged += b => info.Beatmap = b;
         }
 
         protected override void PopIn()
@@ -86,8 +85,7 @@ namespace osu.Game.Overlays
 
         public void ShowBeatmapSet(BeatmapSetInfo set)
         {
-            /*header.BeatmapSet = */info.BeatmapSet = set;
-            info.Beatmap = set.Beatmaps.Last();
+            header.BeatmapSet = info.BeatmapSet = set;
 
             Show();
         }

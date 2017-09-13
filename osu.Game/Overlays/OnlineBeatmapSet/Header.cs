@@ -24,10 +24,50 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
         private const float buttons_spacing = 5;
 
         private readonly Box tabsBg;
+        private readonly Container coverContainer;
+        private readonly OsuSpriteText title, artist;
+        private readonly AuthorInfo author;
+        private readonly Details details;
+
+        private DelayedLoadWrapper cover;
 
         public readonly BeatmapPicker Picker;
 
-        public Header(BeatmapSetInfo set)
+        private BeatmapSetInfo beatmapSet;
+        public BeatmapSetInfo BeatmapSet
+        {
+            get { return beatmapSet; }
+            set
+            {
+                if (value == beatmapSet) return;
+                beatmapSet = value;
+
+                Picker.BeatmapSet = author.BeatmapSet = details.BeatmapSet = BeatmapSet;
+                title.Text = BeatmapSet.Metadata.Title;
+                artist.Text = BeatmapSet.Metadata.Artist;
+
+                if (cover != null)
+                    cover.FadeOut(400, Easing.Out);
+
+                coverContainer.Add(cover = new DelayedLoadWrapper(new BeatmapSetCover(BeatmapSet)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fill,
+                    OnLoadComplete = d =>
+                    {
+                        d.FadeInFromZero(400, Easing.Out);
+                    },
+                })
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    TimeBeforeLoad = 300
+                });
+            }
+        }
+
+        public Header()
         {
             RelativeSizeAxes = Axes.X;
             Height = 400;
@@ -42,7 +82,6 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
             Container noVideoButtons;
             FillFlowContainer videoButtons;
-            Details details;
             Children = new Drawable[]
             {
                 new Container
@@ -73,20 +112,9 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black,
                                 },
-                                new DelayedLoadWrapper(new BeatmapSetCover(set)
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    FillMode = FillMode.Fill,
-                                    OnLoadComplete = d =>
-                                    {
-                                        d.FadeInFromZero(400, Easing.Out);
-                                    },
-                                })
+                                coverContainer = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    TimeBeforeLoad = 300
                                 },
                                 new Box
                                 {
@@ -109,17 +137,15 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         Height = 113,
-                                        Child = Picker = new BeatmapPicker(set),
+                                        Child = Picker = new BeatmapPicker(),
                                     },
-                                    new OsuSpriteText
+                                    title = new OsuSpriteText
                                     {
-                                        Text = set.Metadata.Title,
                                         Font = @"Exo2.0-BoldItalic",
                                         TextSize = 37,
                                     },
-                                    new OsuSpriteText
+                                    artist = new OsuSpriteText
                                     {
-                                        Text = set.Metadata.Artist,
                                         Font = @"Exo2.0-SemiBoldItalic",
                                         TextSize = 25,
                                     },
@@ -128,7 +154,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Margin = new MarginPadding { Top = 20 },
-                                        Child = new AuthorInfo(set.OnlineInfo),
+                                        Child = author = new AuthorInfo(),
                                     },
                                     new Container
                                     {
@@ -168,7 +194,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                                 },
                             },
                         },
-                        details = new Details(set)
+                        details = new Details
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,

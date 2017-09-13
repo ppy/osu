@@ -19,12 +19,26 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 {
     public class PreviewButton : OsuClickableContainer
     {
-        private readonly BeatmapSetInfo set;
         private readonly Box bg, progress;
         private readonly SpriteIcon icon;
 
         private AudioManager audio;
         private Track preview;
+
+        private BeatmapSetInfo beatmapSet;
+        public BeatmapSetInfo BeatmapSet
+        {
+            get { return beatmapSet; }
+            set
+            {
+                if (value == beatmapSet) return;
+                beatmapSet = value;
+
+                Playing = false;
+                preview = null;
+                loadPreview();
+            }
+        }
 
         private bool playing;
         public bool Playing
@@ -34,6 +48,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             {
                 if (value == playing) return;
                 playing = value;
+
+                if (progress == null) return;
 
                 if (Playing)
                 {
@@ -52,9 +68,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             }
         }
 
-        public PreviewButton(BeatmapSetInfo set)
+        public PreviewButton()
         {
-            this.set = set;
             Height = 42;
 
             Children = new Drawable[]
@@ -95,8 +110,6 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
         {
             this.audio = audio;
             progress.Colour = colours.Yellow;
-
-            loadPreview();
         }
 
         protected override void Update()
@@ -130,9 +143,9 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
         private void loadPreview()
         {
-            if (preview?.HasCompleted ?? true)
+            if (preview == null || (preview?.HasCompleted ?? true) && BeatmapSet != null)
             {
-                preview = audio.Track.Get(set.OnlineInfo.Preview);
+                preview = audio.Track.Get(BeatmapSet.OnlineInfo.Preview);
                 preview.Volume.Value = 0.5;
             }
             else
