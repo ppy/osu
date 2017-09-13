@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -150,14 +151,13 @@ namespace osu.Game.Rulesets.Scoring
     public abstract class ScoreProcessor<TObject> : ScoreProcessor
         where TObject : HitObject
     {
+        private const double base_portion = 0.3;
+        private const double combo_portion = 0.7;
         private const double max_score = 1000000;
 
         public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
 
         protected sealed override bool HasCompleted => Hits == MaxHits;
-
-        protected virtual double BasePortion => 0.5f;
-        protected virtual double ComboPortion => 0.5f;
 
         protected int MaxHits { get; private set; }
         protected int Hits { get; private set; }
@@ -174,6 +174,8 @@ namespace osu.Game.Rulesets.Scoring
 
         protected ScoreProcessor(RulesetContainer<TObject> rulesetContainer)
         {
+            Debug.Assert(base_portion + combo_portion == 1.0);
+
             rulesetContainer.OnJudgement += AddJudgement;
 
             SimulateAutoplay(rulesetContainer.Beatmap);
@@ -231,7 +233,7 @@ namespace osu.Game.Rulesets.Scoring
             switch (Mode.Value)
             {
                 case ScoringMode.Standardised:
-                    TotalScore.Value = max_score * (BasePortion * baseScore / maxBaseScore + ComboPortion * HighestCombo / maxHighestCombo) + bonusScore;
+                    TotalScore.Value = max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo / maxHighestCombo) + bonusScore;
                     break;
                 case ScoringMode.Exponential:
                     TotalScore.Value = (baseScore + bonusScore) * Math.Log(HighestCombo + 1, 2);
