@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -19,7 +20,8 @@ namespace osu.Game.Overlays
         public const float X_PADDING = 40;
         public const float RIGHT_WIDTH = 275;
 
-        private readonly ReverseChildIDFillFlowContainer<Drawable> scrollContent;
+        private readonly Header header;
+        private readonly Info info;
 
         public OnlineBeatmapSetOverlay()
         {
@@ -53,14 +55,21 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
-                    Child = scrollContent = new ReverseChildIDFillFlowContainer<Drawable>
+                    Child = new ReverseChildIDFillFlowContainer<Drawable>
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            // header = new Header(),
+                            info = new Info(),
+                        },
                     },
                 },
             };
+
+            // header.Picker.Beatmap.ValueChanged += b => info.Beatmap = b;
         }
 
         protected override void PopIn()
@@ -77,15 +86,8 @@ namespace osu.Game.Overlays
 
         public void ShowBeatmapSet(BeatmapSetInfo set)
         {
-            Header header;
-            Info info;
-            scrollContent.Children = new Drawable[]
-            {
-                header = new Header(set),
-                info = new Info(set),
-            };
-
-            header.Picker.Beatmap.ValueChanged += b => info.Beatmap = b;
+            /*header.BeatmapSet = */info.BeatmapSet = set;
+            info.Beatmap = set.Beatmaps.Last();
 
             Show();
         }

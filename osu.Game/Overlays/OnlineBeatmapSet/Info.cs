@@ -16,15 +16,27 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 {
     public class Info : Container
     {
+        private const float transition_duration = 250;
         private const float metadata_width = 225;
         private const float spacing = 20;
 
-        private readonly BeatmapSetInfo set;
-
+        private readonly MetadataSection description, source, tags;
         private readonly Box successRateBackground;
         private readonly SuccessRate successRate;
-        private readonly FillFlowContainer metadataFlow;
-        private readonly ScrollContainer descriptionScroll;
+
+        private BeatmapSetInfo beatmapSet;
+        public BeatmapSetInfo BeatmapSet
+        {
+            get { return beatmapSet; }
+            set
+            {
+                if (value == beatmapSet) return;
+                beatmapSet = value;
+
+                source.Text = BeatmapSet.Metadata.Source;
+                tags.Text = BeatmapSet.Metadata.Tags;
+            }
+        }
 
         public BeatmapInfo Beatmap
         {
@@ -32,10 +44,8 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             set { successRate.Beatmap = value; }
         }
 
-        public Info(BeatmapSetInfo set)
+        public Info()
         {
-            this.set = set;
-
             RelativeSizeAxes = Axes.X;
             Height = 220;
             Masking = true;
@@ -64,10 +74,11 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Right = metadata_width + OnlineBeatmapSetOverlay.RIGHT_WIDTH + spacing * 2 },
-                            Child = descriptionScroll = new ScrollContainer
+                            Child = new ScrollContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 ScrollbarVisible = false,
+                                Child = description = new MetadataSection("Description"),
                             },
                         },
                         new ScrollContainer
@@ -79,11 +90,17 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                             ScrollbarVisible = false,
                             Padding = new MarginPadding { Horizontal = 10 },
                             Margin = new MarginPadding { Right = OnlineBeatmapSetOverlay.RIGHT_WIDTH + spacing },
-                            Child = metadataFlow = new FillFlowContainer
+                            Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical,
+                                LayoutDuration = transition_duration,
+                                Children = new[]
+                                {
+                                    source = new MetadataSection("Source"),
+                                    tags = new MetadataSection("Tags"),
+                                },
                             },
                         },
                         new Container
@@ -114,55 +131,59 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
         private void load(OsuColour colours)
         {
             successRateBackground.Colour = colours.GrayE;
-            descriptionScroll.Child = new MetadataSection("Description", "", colours.Gray5);
-            metadataFlow.Children = new[]
-            {
-                new MetadataSection("Source", set.Metadata.Source, colours.Gray5),
-                new MetadataSection("Tags", set.Metadata.Tags, colours.BlueDark),
-            };
+            source.TextColour = description.TextColour = colours.Gray5;
+            tags.TextColour = colours.BlueDark;
         }
 
         private class MetadataSection : FillFlowContainer
         {
             private readonly OsuSpriteText header;
+            private readonly TextFlowContainer textFlow;
 
-            public MetadataSection(string title, string body, Color4 textColour)
+            public string Text
+            {
+                set
+                {
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        this.FadeOut(transition_duration);
+                        return;
+                    }
+
+                    this.FadeIn(transition_duration);
+                    textFlow.Clear();
+                    textFlow.AddText(value, s => s.TextSize = 14);
+                }
+            }
+
+            public Color4 TextColour
+            {
+                get { return textFlow.Colour; }
+                set { textFlow.Colour = value; }
+            }
+
+            public MetadataSection(string title)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Direction = FillDirection.Vertical;
                 Spacing = new Vector2(5f);
 
-                TextFlowContainer content;
-                Children = new Drawable[]
+                InternalChildren = new Drawable[]
                 {
                     header = new OsuSpriteText
                     {
+                        Text = title,
                         Font = @"Exo2.0-Bold",
                         TextSize = 14,
-                        Text = title,
                         Shadow = false,
                         Margin = new MarginPadding { Top = 20 },
                     },
-                    content = new TextFlowContainer
+                    textFlow = new TextFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                     },
                 };
-
-                if (!string.IsNullOrEmpty(body))
-                {
-                    content.AddText(body, t =>
-                    {
-                        t.TextSize = 14;
-                        t.Colour = textColour;
-                    });
-                }
-                else
-                {
-                    Hide();
-                }
             }
 
             [BackgroundDependencyLoader]
