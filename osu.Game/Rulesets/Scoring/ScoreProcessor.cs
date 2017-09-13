@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Scoring
     {
         private const double max_score = 1000000;
 
-        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>(ScoringMode.Standardised);
+        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
 
         protected sealed override bool HasCompleted => Hits == MaxHits;
 
