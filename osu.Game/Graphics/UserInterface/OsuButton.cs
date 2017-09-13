@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.UserInterface
                 hover = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    BlendingMode = BlendingMode.Additive,
+                    Blending = BlendingMode.Additive,
                     Colour = Color4.White.Opacity(0.1f),
                     Alpha = 0,
                 },

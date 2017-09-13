@@ -3,12 +3,12 @@
 
 using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Framework.Graphics;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject, OsuJudgement>
+    public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
         public const float TIME_PREEMPT = 600;
         public const float TIME_FADEIN = 400;
@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Alpha = 0;
         }
 
-        protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.Hit300 };
-
         protected sealed override void UpdateState(ArmedState state)
         {
             FinishTransforms();
@@ -33,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                 UpdatePreemptState();
 
-                using (BeginDelayedSequence(TIME_PREEMPT + Judgement.TimeOffset, true))
+                using (BeginDelayedSequence(TIME_PREEMPT + (Judgements.FirstOrDefault()?.TimeOffset ?? 0), true))
                     UpdateCurrentState(state);
             }
         }
@@ -64,19 +62,5 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         Good,
         [Description(@"Amazing")]
         Perfect
-    }
-
-    public enum OsuScoreResult
-    {
-        [Description(@"Miss")]
-        Miss,
-        [Description(@"50")]
-        Hit50,
-        [Description(@"100")]
-        Hit100,
-        [Description(@"300")]
-        Hit300,
-        [Description(@"10")]
-        SliderTick
     }
 }
