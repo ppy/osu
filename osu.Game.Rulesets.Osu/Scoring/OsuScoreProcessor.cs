@@ -16,9 +16,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject>
     {
-        protected override double BasePortion => 0.3;
-        protected override double ComboPortion => 0.7;
-
         public OsuScoreProcessor()
         {
         }

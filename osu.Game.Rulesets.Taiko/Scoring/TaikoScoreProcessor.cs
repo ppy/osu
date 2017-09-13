@@ -55,9 +55,6 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// </summary>
         public override bool HasFailed => Hits == MaxHits && Health.Value <= 0.5;
 
-        protected override double BasePortion => 0.8;
-        protected override double ComboPortion => 0.2;
-
         private double hpIncreaseTick;
         private double hpIncreaseGreat;
         private double hpIncreaseGood;
