@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Screens.Play;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,7 +24,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// Base RulesetContainer. Doesn't hold objects.
     /// <para>
-    /// Should not be derived - derive <see cref="RulesetContainer{TObject,TJudgement}"/> instead.
+    /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
     /// </para>
     /// </summary>
     public abstract class RulesetContainer : Container
@@ -36,14 +35,14 @@ namespace osu.Game.Rulesets.UI
         public event Action OnAllJudged;
 
         /// <summary>
-        /// Whether to apply adjustments to the child <see cref="Playfield{TObject,TJudgement}"/> based on our own size.
+        /// Whether to apply adjustments to the child <see cref="Playfield"/> based on our own size.
         /// </summary>
         public bool AspectAdjust = true;
 
         /// <summary>
         /// The input manager for this RulesetContainer.
         /// </summary>
-        internal readonly PlayerInputManager InputManager = new PlayerInputManager();
+        internal IHasReplayHandler ReplayInputManager => KeyBindingInputManager as IHasReplayHandler;
 
         /// <summary>
         /// The key conversion input manager for this RulesetContainer.
@@ -58,7 +57,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Whether we have a replay loaded currently.
         /// </summary>
-        public bool HasReplayLoaded => InputManager.ReplayInputHandler != null;
+        public bool HasReplayLoaded => ReplayInputManager?.ReplayInputHandler != null;
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
@@ -78,13 +77,6 @@ namespace osu.Game.Rulesets.UI
             Ruleset = ruleset;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            KeyBindingInputManager = CreateInputManager();
-            KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
-        }
-
         /// <summary>
         /// Checks whether all HitObjects have been judged, and invokes OnAllJudged.
         /// </summary>
@@ -102,7 +94,7 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The input manager.</returns>
         public abstract PassThroughInputManager CreateInputManager();
 
-        protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new FramedReplayInputHandler(replay);
+        protected virtual FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
         public Replay Replay { get; private set; }
 
@@ -112,8 +104,11 @@ namespace osu.Game.Rulesets.UI
         /// <param name="replay">The replay, null for local input.</param>
         public virtual void SetReplay(Replay replay)
         {
+            if (ReplayInputManager == null)
+                throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports replay loading is not available");
+
             Replay = replay;
-            InputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
+            ReplayInputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
         }
     }
 
@@ -121,13 +116,15 @@ namespace osu.Game.Rulesets.UI
     /// RulesetContainer that applies conversion to Beatmaps. Does not contain a Playfield
     /// and does not load drawable hit objects.
     /// <para>
-    /// Should not be derived - derive <see cref="RulesetContainer{TObject,TJudgement}"/> instead.
+    /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
     /// </para>
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
     public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
+        public event Action<Judgement> OnJudgement;
+
         /// <summary>
         /// The Beatmap
         /// </summary>
@@ -153,6 +150,20 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected readonly bool IsForCurrentRuleset;
 
+        public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
+
+        protected override bool AllObjectsJudged => drawableObjects.All(h => h.AllJudged);
+
+        /// <summary>
+        /// The playfield.
+        /// </summary>
+        public Playfield Playfield { get; private set; }
+
+        protected override Container<Drawable> Content => content;
+        private Container content;
+
+        private readonly List<DrawableHitObject<TObject>> drawableObjects = new List<DrawableHitObject<TObject>>();
+
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
         /// Creates a hit renderer for a beatmap.
@@ -160,7 +171,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        internal RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap, bool isForCurrentRuleset)
+        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap, bool isForCurrentRuleset)
             : base(ruleset)
         {
             Debug.Assert(workingBeatmap != null, "RulesetContainer initialized with a null beatmap.");
@@ -192,8 +203,25 @@ namespace osu.Game.Rulesets.UI
             // Post-process the beatmap
             processor.PostProcess(Beatmap);
 
+            KeyBindingInputManager = CreateInputManager();
+            KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
+
             // Add mods, should always be the last thing applied to give full control to mods
             applyMods(Mods);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            KeyBindingInputManager.Add(content = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+
+            AddInternal(KeyBindingInputManager);
+            KeyBindingInputManager.Add(Playfield = CreatePlayfield());
+
+            loadObjects();
         }
 
         /// <summary>
@@ -209,82 +237,12 @@ namespace osu.Game.Rulesets.UI
                 mod.ApplyToRulesetContainer(this);
         }
 
-        /// <summary>
-        /// Creates a processor to perform post-processing operations
-        /// on HitObjects in converted Beatmaps.
-        /// </summary>
-        /// <returns>The Beatmap processor.</returns>
-        protected virtual BeatmapProcessor<TObject> CreateBeatmapProcessor() => new BeatmapProcessor<TObject>();
-
-        /// <summary>
-        /// Creates a converter to convert Beatmap to a specific mode.
-        /// </summary>
-        /// <returns>The Beatmap converter.</returns>
-        protected abstract BeatmapConverter<TObject> CreateBeatmapConverter();
-    }
-
-    /// <summary>
-    /// A derivable RulesetContainer that manages the Playfield and HitObjects.
-    /// </summary>
-    /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
-    /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this RulesetContainer.</typeparam>
-    public abstract class RulesetContainer<TObject, TJudgement> : RulesetContainer<TObject>
-        where TObject : HitObject
-        where TJudgement : Judgement
-    {
-        public event Action<TJudgement> OnJudgement;
-
-        public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
-
-        /// <summary>
-        /// All the converted hit objects contained by this hit renderer.
-        /// </summary>
-        public new IEnumerable<TObject> Objects => Beatmap.HitObjects;
-
-        protected override bool AllObjectsJudged => drawableObjects.All(h => h.Judged);
-
-        /// <summary>
-        /// The playfield.
-        /// </summary>
-        public Playfield<TObject, TJudgement> Playfield { get; private set; }
-
-        protected override Container<Drawable> Content => content;
-        private Container content;
-
-        private readonly List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
-
-        /// <summary>
-        /// Creates a hit renderer for a beatmap.
-        /// </summary>
-        /// <param name="ruleset">The ruleset being repesented.</param>
-        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
-        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
-        {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            InputManager.Add(content = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Children = new[] { KeyBindingInputManager }
-            });
-
-            AddInternal(InputManager);
-            KeyBindingInputManager.Add(Playfield = CreatePlayfield());
-
-            loadObjects();
-        }
-
         public override void SetReplay(Replay replay)
         {
             base.SetReplay(replay);
 
-            if (InputManager?.ReplayInputHandler != null)
-                InputManager.ReplayInputHandler.ToScreenSpace = Playfield.ScaledContent.ToScreenSpace;
+            if (ReplayInputManager?.ReplayInputHandler != null)
+                ReplayInputManager.ReplayInputHandler.ToScreenSpace = input => Playfield.ScaledContent.ToScreenSpace(input);
         }
 
         /// <summary>
@@ -301,7 +259,12 @@ namespace osu.Game.Rulesets.UI
                 if (drawableObject == null)
                     continue;
 
-                drawableObject.OnJudgement += onJudgement;
+                drawableObject.OnJudgement += (d, j) =>
+                {
+                    Playfield.OnJudgement(d, j);
+                    OnJudgement?.Invoke(j);
+                    CheckAllJudged();
+                };
 
                 drawableObjects.Add(drawableObject);
                 Playfield.Add(drawableObject);
@@ -318,36 +281,36 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// In some cases we want to apply changes to the relative size of our contained <see cref="Playfield{TObject, TJudgement}"/> based on custom conditions.
+        /// Creates a processor to perform post-processing operations
+        /// on HitObjects in converted Beatmaps.
+        /// </summary>
+        /// <returns>The Beatmap processor.</returns>
+        protected virtual BeatmapProcessor<TObject> CreateBeatmapProcessor() => new BeatmapProcessor<TObject>();
+
+        /// <summary>
+        /// In some cases we want to apply changes to the relative size of our contained <see cref="Playfield"/> based on custom conditions.
         /// </summary>
         /// <returns></returns>
         protected virtual Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f); //a sane default
 
         /// <summary>
-        /// Triggered when an object's Judgement is updated.
+        /// Creates a converter to convert Beatmap to a specific mode.
         /// </summary>
-        /// <param name="judgedObject">The object that Judgement has been updated for.</param>
-        private void onJudgement(DrawableHitObject<TObject, TJudgement> judgedObject)
-        {
-            Playfield.OnJudgement(judgedObject);
-
-            OnJudgement?.Invoke(judgedObject.Judgement);
-
-            CheckAllJudged();
-        }
+        /// <returns>The Beatmap converter.</returns>
+        protected abstract BeatmapConverter<TObject> CreateBeatmapConverter();
 
         /// <summary>
         /// Creates a DrawableHitObject from a HitObject.
         /// </summary>
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
-        protected abstract DrawableHitObject<TObject, TJudgement> GetVisualRepresentation(TObject h);
+        protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
 
         /// <summary>
         /// Creates a Playfield.
         /// </summary>
         /// <returns>The Playfield.</returns>
-        protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
+        protected abstract Playfield CreatePlayfield();
     }
 
     /// <summary>
@@ -355,11 +318,9 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     /// <typeparam name="TPlayfield">The type of Playfield contained by this RulesetContainer.</typeparam>
     /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
-    /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this RulesetContainer.</typeparam>
-    public abstract class RulesetContainer<TPlayfield, TObject, TJudgement> : RulesetContainer<TObject, TJudgement>
+    public abstract class RulesetContainer<TPlayfield, TObject> : RulesetContainer<TObject>
         where TObject : HitObject
-        where TJudgement : Judgement
-        where TPlayfield : Playfield<TObject, TJudgement>
+        where TPlayfield : Playfield
     {
         /// <summary>
         /// The playfield.

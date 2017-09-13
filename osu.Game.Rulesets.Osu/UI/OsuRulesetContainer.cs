@@ -7,16 +7,17 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Beatmaps;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuRulesetContainer : RulesetContainer<OsuHitObject, OsuJudgement>
+    public class OsuRulesetContainer : RulesetContainer<OsuHitObject>
     {
         public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
             : base(ruleset, beatmap, isForCurrentRuleset)
@@ -29,11 +30,11 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override BeatmapProcessor<OsuHitObject> CreateBeatmapProcessor() => new OsuBeatmapProcessor();
 
-        protected override Playfield<OsuHitObject, OsuJudgement> CreatePlayfield() => new OsuPlayfield();
+        protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
         public override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
-        protected override DrawableHitObject<OsuHitObject, OsuJudgement> GetVisualRepresentation(OsuHitObject h)
+        protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
             var circle = h as HitCircle;
             if (circle != null)
@@ -48,6 +49,8 @@ namespace osu.Game.Rulesets.Osu.UI
                 return new DrawableSpinner(spinner);
             return null;
         }
+
+        protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuReplayInputHandler(replay);
 
         protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f);
     }

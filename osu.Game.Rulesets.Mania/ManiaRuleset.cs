@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Mania
                         {
                             Mods = new Mod[]
                             {
-                                new ModAutoplay(),
+                                new ManiaModAutoplay(),
                                 new ModCinema(),
                             },
                         },
@@ -104,8 +104,6 @@ namespace osu.Game.Rulesets.Mania
                     return new Mod[] { };
             }
         }
-
-        public override Mod GetAutoplayMod() => new ModAutoplay();
 
         public override string Description => "osu!mania";
 

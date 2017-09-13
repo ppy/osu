@@ -20,6 +20,9 @@ using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using SQLite.Net;
+using osu.Game.Online.API.Requests;
+using System.Threading.Tasks;
+using osu.Game.Online.API;
 
 namespace osu.Game.Beatmaps
 {
@@ -34,9 +37,19 @@ namespace osu.Game.Beatmaps
         public event Action<BeatmapSetInfo> BeatmapSetAdded;
 
         /// <summary>
+        /// Fired when a single difficulty has been hidden.
+        /// </summary>
+        public event Action<BeatmapInfo> BeatmapHidden;
+
+        /// <summary>
         /// Fired when a <see cref="BeatmapSetInfo"/> is removed from the database.
         /// </summary>
         public event Action<BeatmapSetInfo> BeatmapSetRemoved;
+
+        /// <summary>
+        /// Fired when a single difficulty has been restored.
+        /// </summary>
+        public event Action<BeatmapInfo> BeatmapRestored;
 
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
@@ -53,6 +66,10 @@ namespace osu.Game.Beatmaps
 
         private readonly BeatmapStore beatmaps;
 
+        private readonly APIAccess api;
+
+        private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
+
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private BeatmapIPCChannel ipc;
 
@@ -66,16 +83,19 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
-        public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, IIpcHost importHost = null)
+        public BeatmapManager(Storage storage, FileStore files, SQLiteConnection connection, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
         {
             beatmaps = new BeatmapStore(connection);
             beatmaps.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
             beatmaps.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
+            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
+            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
 
             this.storage = storage;
             this.files = files;
             this.connection = connection;
             this.rulesets = rulesets;
+            this.api = api;
 
             if (importHost != null)
                 ipc = new BeatmapIPCChannel(importHost, this);
@@ -162,23 +182,101 @@ namespace osu.Game.Beatmaps
             // If we have an ID then we already exist in the database.
             if (beatmapSetInfo.ID != 0) return;
 
-            lock (beatmaps)
-                beatmaps.Add(beatmapSetInfo);
+            beatmaps.Add(beatmapSetInfo);
         }
+
+        /// <summary>
+        /// Downloads a beatmap.
+        /// </summary>
+        /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to be downloaded.</param>
+        /// <returns>A new <see cref="DownloadBeatmapSetRequest"/>, or an existing one if a download is already in progress.</returns>
+        public DownloadBeatmapSetRequest Download(BeatmapSetInfo beatmapSetInfo)
+        {
+            var existing = GetExistingDownload(beatmapSetInfo);
+
+            if (existing != null) return existing;
+
+            if (api == null) return null;
+
+            ProgressNotification downloadNotification = new ProgressNotification
+            {
+                Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
+            };
+
+            var request = new DownloadBeatmapSetRequest(beatmapSetInfo);
+
+            request.DownloadProgressed += progress =>
+            {
+                downloadNotification.State = ProgressNotificationState.Active;
+                downloadNotification.Progress = progress;
+            };
+
+            request.Success += data =>
+            {
+                downloadNotification.State = ProgressNotificationState.Completed;
+
+                using (var stream = new MemoryStream(data))
+                using (var archive = new OszArchiveReader(stream))
+                    Import(archive);
+
+                currentDownloads.Remove(request);
+            };
+
+            request.Failure += data =>
+            {
+                downloadNotification.State = ProgressNotificationState.Completed;
+                Logger.Error(data, "Failed to get beatmap download information");
+                currentDownloads.Remove(request);
+            };
+
+            downloadNotification.CancelRequested += () =>
+            {
+                request.Cancel();
+                currentDownloads.Remove(request);
+                downloadNotification.State = ProgressNotificationState.Cancelled;
+                return true;
+            };
+
+            currentDownloads.Add(request);
+            PostNotification?.Invoke(downloadNotification);
+
+            // don't run in the main api queue as this is a long-running task.
+            Task.Run(() => request.Perform(api));
+
+            return request;
+        }
+
+        /// <summary>
+        /// Get an existing download request if it exists.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="BeatmapSetInfo"/> whose download request is wanted.</param>
+        /// <returns>The <see cref="DownloadBeatmapSetRequest"/> object if it exists, or null.</returns>
+        public DownloadBeatmapSetRequest GetExistingDownload(BeatmapSetInfo beatmap) => currentDownloads.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
 
         /// <summary>
         /// Delete a beatmap from the manager.
         /// Is a no-op for already deleted beatmaps.
         /// </summary>
-        /// <param name="beatmapSet">The beatmap to delete.</param>
+        /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            lock (beatmaps)
-                if (!beatmaps.Delete(beatmapSet)) return;
+            if (!beatmaps.Delete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
                 files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
         }
+
+        /// <summary>
+        /// Delete a beatmap difficulty.
+        /// </summary>
+        /// <param name="beatmap">The beatmap difficulty to hide.</param>
+        public void Hide(BeatmapInfo beatmap) => beatmaps.Hide(beatmap);
+
+        /// <summary>
+        /// Restore a beatmap difficulty.
+        /// </summary>
+        /// <param name="beatmap">The beatmap difficulty to restore.</param>
+        public void Restore(BeatmapInfo beatmap) => beatmaps.Restore(beatmap);
 
         /// <summary>
         /// Returns a <see cref="BeatmapSetInfo"/> to a usable state if it has previously been deleted but not yet purged.
@@ -187,8 +285,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to restore.</param>
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
-            lock (beatmaps)
-                if (!beatmaps.Undelete(beatmapSet)) return;
+            if (!beatmaps.Undelete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
                 files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
@@ -249,13 +346,20 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
+        /// Refresh an existing instance of a <see cref="BeatmapSetInfo"/> from the store.
+        /// </summary>
+        /// <param name="beatmapSet">A stale instance.</param>
+        /// <returns>A fresh instance.</returns>
+        public BeatmapSetInfo Refresh(BeatmapSetInfo beatmapSet) => QueryBeatmapSet(s => s.ID == beatmapSet.ID);
+
+        /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
         public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
         {
-            lock (beatmaps) return beatmaps.QueryAndPopulate(query);
+            return beatmaps.QueryAndPopulate(query);
         }
 
         /// <summary>
@@ -265,15 +369,12 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
         {
-            lock (beatmaps)
-            {
-                BeatmapInfo set = beatmaps.Query<BeatmapInfo>().FirstOrDefault(query);
+            BeatmapInfo set = beatmaps.Query<BeatmapInfo>().FirstOrDefault(query);
 
-                if (set != null)
-                    beatmaps.Populate(set);
+            if (set != null)
+                beatmaps.Populate(set);
 
-                return set;
-            }
+            return set;
         }
 
         /// <summary>

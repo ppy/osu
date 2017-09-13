@@ -219,20 +219,37 @@ namespace osu.Game
 
             dependencies.Cache(settings);
             dependencies.Cache(social);
+            dependencies.Cache(direct);
             dependencies.Cache(chat);
             dependencies.Cache(userProfile);
             dependencies.Cache(musicController);
             dependencies.Cache(notificationOverlay);
             dependencies.Cache(dialogOverlay);
 
-            // ensure both overlays aren't presented at the same time
-            chat.StateChanged += (container, state) => social.State = state == Visibility.Visible ? Visibility.Hidden : social.State;
-            social.StateChanged += (container, state) => chat.State = state == Visibility.Visible ? Visibility.Hidden : chat.State;
+            // ensure only one of these overlays are open at once.
+            var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
+            foreach (var overlay in singleDisplayOverlays)
+            {
+                overlay.StateChanged += state =>
+                {
+                    if (state == Visibility.Hidden) return;
+
+                    foreach (var c in singleDisplayOverlays)
+                    {
+                        if (c == overlay) continue;
+                        c.State = Visibility.Hidden;
+                    }
+                };
+            }
 
             LoadComponentAsync(Toolbar = new Toolbar
             {
                 Depth = -4,
-                OnHome = delegate { intro?.ChildScreen?.MakeCurrent(); },
+                OnHome = delegate
+                {
+                    hideAllOverlays();
+                    intro?.ChildScreen?.MakeCurrent();
+                },
             }, overlayContent.Add);
 
             settings.StateChanged += delegate
@@ -297,6 +314,16 @@ namespace osu.Game
         private OsuScreen currentScreen;
         private FrameworkConfigManager frameworkConfig;
 
+        private void hideAllOverlays()
+        {
+            settings.State = Visibility.Hidden;
+            chat.State = Visibility.Hidden;
+            direct.State = Visibility.Hidden;
+            social.State = Visibility.Hidden;
+            userProfile.State = Visibility.Hidden;
+            notificationOverlay.State = Visibility.Hidden;
+        }
+
         private void screenChanged(Screen newScreen)
         {
             currentScreen = newScreen as OsuScreen;
@@ -310,19 +337,12 @@ namespace osu.Game
             //central game screen change logic.
             if (!currentScreen.ShowOverlays)
             {
-                settings.State = Visibility.Hidden;
-                Toolbar.State = Visibility.Hidden;
+                hideAllOverlays();
                 musicController.State = Visibility.Hidden;
-                chat.State = Visibility.Hidden;
-                direct.State = Visibility.Hidden;
-                social.State = Visibility.Hidden;
-                userProfile.State = Visibility.Hidden;
-                notificationOverlay.State = Visibility.Hidden;
+                Toolbar.State = Visibility.Hidden;
             }
             else
-            {
                 Toolbar.State = Visibility.Visible;
-            }
 
             ScreenChanged?.Invoke(newScreen);
         }

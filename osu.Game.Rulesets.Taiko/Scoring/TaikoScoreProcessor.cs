@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -12,7 +13,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Taiko.Scoring
 {
-    internal class TaikoScoreProcessor : ScoreProcessor<TaikoHitObject, TaikoJudgement>
+    internal class TaikoScoreProcessor : ScoreProcessor<TaikoHitObject>
     {
         /// <summary>
         /// The maximum score achievable.
@@ -36,12 +37,12 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         private const double combo_base = 4;
 
         /// <summary>
-        /// The HP awarded by a <see cref="TaikoHitResult.Great"/> hit.
+        /// The HP awarded by a <see cref="HitResult.Great"/> hit.
         /// </summary>
         private const double hp_hit_great = 0.03;
 
         /// <summary>
-        /// The HP awarded for a <see cref="TaikoHitResult.Good"/> hit.
+        /// The HP awarded for a <see cref="HitResult.Good"/> hit.
         /// </summary>
         private const double hp_hit_good = 0.011;
 
@@ -113,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
         }
 
-        public TaikoScoreProcessor(RulesetContainer<TaikoHitObject, TaikoJudgement> rulesetContainer)
+        public TaikoScoreProcessor(RulesetContainer<TaikoHitObject> rulesetContainer)
             : base(rulesetContainer)
         {
         }
@@ -138,39 +139,28 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             {
                 if (obj is Hit)
                 {
-                    AddJudgement(new TaikoJudgement
-                    {
-                        Result = HitResult.Hit,
-                        TaikoResult = TaikoHitResult.Great,
-                        SecondHit = obj.IsStrong
-                    });
+                    AddJudgement(new TaikoJudgement { Result = HitResult.Great });
+                    if (obj.IsStrong)
+                        AddJudgement(new TaikoStrongHitJudgement());
                 }
                 else if (obj is DrumRoll)
                 {
                     for (int i = 0; i < ((DrumRoll)obj).TotalTicks; i++)
                     {
-                        AddJudgement(new TaikoDrumRollTickJudgement
-                        {
-                            Result = HitResult.Hit,
-                            TaikoResult = TaikoHitResult.Great,
-                            SecondHit = obj.IsStrong
-                        });
+                        AddJudgement(new TaikoDrumRollTickJudgement { Result = HitResult.Great });
+
+                        if (obj.IsStrong)
+                            AddJudgement(new TaikoStrongHitJudgement());
                     }
 
-                    AddJudgement(new TaikoJudgement
-                    {
-                        Result = HitResult.Hit,
-                        TaikoResult = TaikoHitResult.Great,
-                        SecondHit = obj.IsStrong
-                    });
+                    AddJudgement(new TaikoJudgement { Result = HitResult.Great });
+
+                    if (obj.IsStrong)
+                        AddJudgement(new TaikoStrongHitJudgement());
                 }
                 else if (obj is Swell)
                 {
-                    AddJudgement(new TaikoJudgement
-                    {
-                        Result = HitResult.Hit,
-                        TaikoResult = TaikoHitResult.Great
-                    });
+                    AddJudgement(new TaikoJudgement { Result = HitResult.Great });
                 }
             }
 
@@ -178,16 +168,40 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             maxComboPortion = comboPortion;
         }
 
-        protected override void OnNewJudgement(TaikoJudgement judgement)
+        protected override void OnNewJudgement(Judgement judgement)
         {
+            bool isStrong = judgement is TaikoStrongHitJudgement;
             bool isTick = judgement is TaikoDrumRollTickJudgement;
 
-            // Don't consider ticks as a type of hit that counts towards map completion
-            if (!isTick)
+            // Don't consider ticks and strong hits as a type of hit that counts towards map completion
+            if (!isTick && !isStrong)
                 totalHits++;
 
             // Apply score changes
-            addHitScore(judgement);
+            if (judgement.IsHit)
+            {
+                double baseValue = judgement.NumericResult;
+
+                if (isStrong)
+                {
+                    // Add increased score for the previous judgement by hitting a strong hit object with the second key
+                    var prevJudgement = Judgements[Judgements.Count - 1];
+                    baseValue = prevJudgement.NumericResult * strongHitScale;
+
+                }
+
+                // Add score to portions
+                if (judgement is TaikoDrumRollTickJudgement)
+                    bonusScore += baseValue;
+                else
+                {
+                    // A relevance factor that needs to be applied to make higher combos more relevant
+                    // Value is capped at 400 combo
+                    double comboRelevance = Math.Min(Math.Log(400, combo_base), Math.Max(0.5, Math.Log(Combo.Value, combo_base)));
+
+                    comboPortion += baseValue * comboRelevance;
+                }
+            }
 
             // Apply HP changes
             switch (judgement.Result)
@@ -197,66 +211,26 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                     if (!isTick)
                         Health.Value += hpIncreaseMiss;
                     break;
-                case HitResult.Hit:
-                    switch (judgement.TaikoResult)
-                    {
-                        case TaikoHitResult.Good:
-                            Health.Value += hpIncreaseGood;
-                            break;
-                        case TaikoHitResult.Great:
-                            if (isTick)
-                                Health.Value += hpIncreaseTick;
-                            else
-                                Health.Value += hpIncreaseGreat;
-                            break;
-                    }
+                case HitResult.Good:
+                    Health.Value += hpIncreaseGood;
+                    break;
+                case HitResult.Great:
+                    if (isTick)
+                        Health.Value += hpIncreaseTick;
+                    else
+                        Health.Value += hpIncreaseGreat;
                     break;
             }
 
-            calculateScore();
-        }
-
-        protected override void OnJudgementChanged(TaikoJudgement judgement)
-        {
-            // Apply score changes
-            addHitScore(judgement);
-
-            calculateScore();
-        }
-
-        private void addHitScore(TaikoJudgement judgement)
-        {
-            if (judgement.Result != HitResult.Hit)
-                return;
-
-            double baseValue = judgement.ResultValueForScore;
-
-            // Add increased score for hitting a strong hit object with the second key
-            if (judgement.SecondHit)
-                baseValue *= strongHitScale;
-
-            // Add score to portions
-            if (judgement is TaikoDrumRollTickJudgement)
-                bonusScore += baseValue;
-            else
-            {
-                // A relevance factor that needs to be applied to make higher combos more relevant
-                // Value is capped at 400 combo
-                double comboRelevance = Math.Min(Math.Log(400, combo_base), Math.Max(0.5, Math.Log(Combo.Value, combo_base)));
-
-                comboPortion += baseValue * comboRelevance;
-            }
-        }
-
-        private void calculateScore()
-        {
             int scoreForAccuracy = 0;
             int maxScoreForAccuracy = 0;
 
             foreach (var j in Judgements)
             {
-                scoreForAccuracy += j.ResultValueForAccuracy;
-                maxScoreForAccuracy += j.MaxResultValueForAccuracy;
+                var taikoJudgement = (TaikoJudgement)j;
+
+                scoreForAccuracy += taikoJudgement.ResultNumericForAccuracy;
+                maxScoreForAccuracy += taikoJudgement.MaxResultValueForAccuracy;
             }
 
             Accuracy.Value = (double)scoreForAccuracy / maxScoreForAccuracy;
@@ -268,6 +242,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             base.Reset();
 
             Health.Value = 0;
+            Accuracy.Value = 1;
 
             bonusScore = 0;
             comboPortion = 0;

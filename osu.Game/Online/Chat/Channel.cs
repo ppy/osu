@@ -30,7 +30,7 @@ namespace osu.Game.Online.Chat
 
         public Bindable<bool> Joined = new Bindable<bool>();
 
-        public bool ReadOnly => Name != "#lazer";
+        public bool ReadOnly => false;
 
         public const int MAX_HISTORY = 300;
 

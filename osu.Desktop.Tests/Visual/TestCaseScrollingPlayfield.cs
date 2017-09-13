@@ -72,7 +72,7 @@ namespace osu.Desktop.Tests.Visual
         [Test]
         public void TestSpeedAdjustmentOrdering()
         {
-            var hitObjectContainer = new ScrollingPlayfield<TestHitObject, TestJudgement>.ScrollingHitObjectContainer(Axes.X);
+            var hitObjectContainer = new ScrollingPlayfield.ScrollingHitObjectContainer(Axes.X);
 
             var speedAdjustments = new[]
             {
@@ -129,7 +129,7 @@ namespace osu.Desktop.Tests.Visual
             Assert.IsTrue(hitObjectContainer.SpeedAdjustments[3].Contains(hitObjects[1]));
         }
 
-        private class TestRulesetContainer : ScrollingRulesetContainer<TestPlayfield, TestHitObject, TestJudgement>
+        private class TestRulesetContainer : ScrollingRulesetContainer<TestPlayfield, TestHitObject>
         {
             private readonly Axes scrollingAxes;
 
@@ -147,14 +147,14 @@ namespace osu.Desktop.Tests.Visual
 
             protected override BeatmapConverter<TestHitObject> CreateBeatmapConverter() => new TestBeatmapConverter();
 
-            protected override Playfield<TestHitObject, TestJudgement> CreatePlayfield() => new TestPlayfield(scrollingAxes);
+            protected override Playfield CreatePlayfield() => new TestPlayfield(scrollingAxes);
 
-            protected override DrawableHitObject<TestHitObject, TestJudgement> GetVisualRepresentation(TestHitObject h) => new DrawableTestHitObject(scrollingAxes, h);
+            protected override DrawableHitObject<TestHitObject> GetVisualRepresentation(TestHitObject h) => new DrawableTestHitObject(scrollingAxes, h);
         }
 
-        private class TestScoreProcessor : ScoreProcessor<TestHitObject, TestJudgement>
+        private class TestScoreProcessor : ScoreProcessor<TestHitObject>
         {
-            protected override void OnNewJudgement(TestJudgement judgement)
+            protected override void OnNewJudgement(Judgement judgement)
             {
             }
         }
@@ -169,7 +169,7 @@ namespace osu.Desktop.Tests.Visual
             }
         }
 
-        private class DrawableTestHitObject : DrawableScrollingHitObject<TestHitObject, TestJudgement>
+        private class DrawableTestHitObject : DrawableScrollingHitObject<TestHitObject>
         {
             public DrawableTestHitObject(Axes scrollingAxes, TestHitObject hitObject)
                 : base(hitObject)
@@ -185,14 +185,12 @@ namespace osu.Desktop.Tests.Visual
                 });
             }
 
-            protected override TestJudgement CreateJudgement() => new TestJudgement();
-
             protected override void UpdateState(ArmedState state)
             {
             }
         }
 
-        private class TestPlayfield : ScrollingPlayfield<TestHitObject, TestJudgement>
+        private class TestPlayfield : ScrollingPlayfield
         {
             protected override Container<Drawable> Content => content;
             private readonly Container<Drawable> content;
@@ -217,12 +215,6 @@ namespace osu.Desktop.Tests.Visual
 
         private class TestHitObject : HitObject
         {
-        }
-
-        private class TestJudgement : Judgement
-        {
-            public override string ResultString { get { throw new NotImplementedException(); } }
-            public override string MaxResultString { get { throw new NotImplementedException(); } }
         }
     }
 }

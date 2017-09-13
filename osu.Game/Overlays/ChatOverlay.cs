@@ -12,8 +12,10 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
+using osu.Framework.MathUtils;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -56,7 +58,7 @@ namespace osu.Game.Overlays
         private readonly Box chatBackground;
         private readonly Box tabBackground;
 
-        private Bindable<double> chatHeight;
+        public Bindable<double> ChatHeight { get; internal set; }
 
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
@@ -160,6 +162,7 @@ namespace osu.Game.Overlays
                                 channelTabs = new ChatTabControl
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    OnRequestLeave = removeChannel,
                                 },
                             }
                         },
@@ -169,25 +172,18 @@ namespace osu.Game.Overlays
 
             channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
             channelTabs.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
-            channelSelection.StateChanged += (overlay, state) =>
+            channelSelection.StateChanged += state =>
             {
                 channelTabs.ChannelSelectorActive.Value = state == Visibility.Visible;
 
                 if (state == Visibility.Visible)
                 {
                     textbox.HoldFocus = false;
-                    if (1f - chatHeight.Value < channel_selection_min_height)
-                    {
-                        chatContainer.ResizeHeightTo(1f - channel_selection_min_height, 800, Easing.OutQuint);
-                        channelSelectionContainer.ResizeHeightTo(channel_selection_min_height, 800, Easing.OutQuint);
-                        channelSelection.Show();
-                        chatHeight.Value = 1f - channel_selection_min_height;
-                    }
+                    if (1f - ChatHeight.Value < channel_selection_min_height)
+                        transformChatHeightTo(1f - channel_selection_min_height, 800, Easing.OutQuint);
                 }
                 else
-                {
                     textbox.HoldFocus = true;
-                }
             };
         }
 
@@ -201,7 +197,7 @@ namespace osu.Game.Overlays
             if (!isDragging)
                 return base.OnDragStart(state);
 
-            startDragChatHeight = chatHeight.Value;
+            startDragChatHeight = ChatHeight.Value;
             return true;
         }
 
@@ -211,7 +207,13 @@ namespace osu.Game.Overlays
             {
                 Trace.Assert(state.Mouse.PositionMouseDown != null);
 
-                chatHeight.Value = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
+                double targetChatHeight = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
+
+                // If the channel selection screen is shown, mind its minimum height
+                if (channelSelection.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
+                    targetChatHeight = 1f - channel_selection_min_height;
+
+                ChatHeight.Value = targetChatHeight;
             }
 
             return true;
@@ -271,14 +273,14 @@ namespace osu.Game.Overlays
             this.api = api;
             api.Register(this);
 
-            chatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
-            chatHeight.ValueChanged += h =>
+            ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
+            ChatHeight.ValueChanged += h =>
             {
                 chatContainer.Height = (float)h;
                 channelSelectionContainer.Height = 1f - (float)h;
                 tabBackground.FadeTo(h == 1 ? 1 : 0.8f, 200);
             };
-            chatHeight.TriggerChange();
+            ChatHeight.TriggerChange();
 
             chatBackground.Colour = colours.ChatBlue;
         }
@@ -305,6 +307,7 @@ namespace osu.Game.Overlays
                     addChannel(channels.Find(c => c.Name == @"#lobby"));
 
                     channelSelection.OnRequestJoin = addChannel;
+                    channelSelection.OnRequestLeave = removeChannel;
                     channelSelection.Sections = new[]
                     {
                         new ChannelSection
@@ -332,7 +335,15 @@ namespace osu.Game.Overlays
 
             set
             {
-                if (currentChannel == value || value == null) return;
+                if (currentChannel == value) return;
+
+                if (value == null)
+                {
+                    currentChannel = null;
+                    textbox.Current.Disabled = true;
+                    currentChannelContainer.Clear(false);
+                    return;
+                }
 
                 currentChannel = value;
 
@@ -389,6 +400,19 @@ namespace osu.Game.Overlays
                 CurrentChannel = channel;
 
             channel.Joined.Value = true;
+        }
+
+        private void removeChannel(Channel channel)
+        {
+            if (channel == null) return;
+
+            if (channel == CurrentChannel) CurrentChannel = null;
+
+            careChannels.Remove(channel);
+            loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
+            channelTabs.RemoveItem(channel);
+
+            channel.Joined.Value = false;
         }
 
         private void fetchInitialMessages(Channel channel)
@@ -477,6 +501,27 @@ namespace osu.Game.Overlays
             req.Success += m => target.ReplaceMessage(message, m);
 
             api.Queue(req);
+        }
+
+        private void transformChatHeightTo(double newChatHeight, double duration = 0, Easing easing = Easing.None)
+        {
+            this.TransformTo(this.PopulateTransform(new TransformChatHeight(), newChatHeight, duration, easing));
+        }
+
+        private class TransformChatHeight : Transform<double, ChatOverlay>
+        {
+            private double valueAt(double time)
+            {
+                if (time < StartTime) return StartValue;
+                if (time >= EndTime) return EndValue;
+
+                return Interpolation.ValueAt(time, StartValue, EndValue, StartTime, EndTime, Easing);
+            }
+
+            public override string TargetMember => "ChatHeight.Value";
+
+            protected override void Apply(ChatOverlay d, double time) => d.ChatHeight.Value = valueAt(time);
+            protected override void ReadIntoStartValue(ChatOverlay d) => StartValue = d.ChatHeight.Value;
         }
     }
 }
