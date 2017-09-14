@@ -288,8 +288,8 @@ namespace osu.Game.Screens.Play
 
             (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, Easing.OutQuint);
 
-            dimLevel.ValueChanged += value => updateBackgroundElements();
-            showStoryboard.ValueChanged += value => updateBackgroundElements();
+            dimLevel.ValueChanged += dimLevel_ValueChanged;
+            showStoryboard.ValueChanged += showStoryboard_ValueChanged;
             updateBackgroundElements();
 
             Content.Alpha = 0;
@@ -331,6 +331,12 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
+        private void dimLevel_ValueChanged(double newValue)
+            => updateBackgroundElements();
+
+        private void showStoryboard_ValueChanged(bool newValue)
+            => updateBackgroundElements();
+
         private void updateBackgroundElements()
         {
             var opacity = 1 - (float)dimLevel;
@@ -342,6 +348,9 @@ namespace osu.Game.Screens.Play
 
         private void fadeOut()
         {
+            dimLevel.ValueChanged -= dimLevel_ValueChanged;
+            showStoryboard.ValueChanged -= showStoryboard_ValueChanged;
+
             const float fade_out_duration = 250;
 
             RulesetContainer?.FadeOut(fade_out_duration);
