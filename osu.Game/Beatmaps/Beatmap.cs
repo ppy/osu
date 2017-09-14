@@ -47,9 +47,9 @@ namespace osu.Game.Beatmaps
         public Storyboard Storyboard = new Storyboard();
 
         /// <summary>
-        /// Whether this beatmap's Storyboard uses the background texture in its Background layer.
+        /// Whether this beatmap's background should be hidden while its storyboard is being displayed.
         /// </summary>
-        public bool StoryboardUsesBackground
+        public bool StoryboardReplacesBackground
         {
             get
             {
