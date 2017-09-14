@@ -10,6 +10,10 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Storyboards;
+using OpenTK;
+using osu.Framework.Graphics;
+using osu.Framework.IO.File;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -238,41 +242,230 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private void handleEvents(Beatmap beatmap, string line)
+        private void handleEvents(Beatmap beatmap, string line, ref StoryboardSprite storyboardSprite, ref CommandTimelineGroup timelineGroup)
         {
+            var depth = 0;
+            while (line.StartsWith(" ") || line.StartsWith("_"))
+            {
+                ++depth;
+                line = line.Substring(1);
+            }
+
             decodeVariables(ref line);
 
             string[] split = line.Split(',');
 
-            EventType type;
-            if (!Enum.TryParse(split[0], out type))
-                throw new InvalidDataException($@"Unknown event type {split[0]}");
-
-            // Todo: Implement the rest
-            switch (type)
+            if (depth == 0)
             {
-                case EventType.Video:
-                case EventType.Background:
-                    string filename = split[2].Trim('"');
+                storyboardSprite = null;
 
-                    if (type == EventType.Background)
-                        beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
+                EventType type;
+                if (!Enum.TryParse(split[0], out type))
+                    throw new InvalidDataException($@"Unknown event type {split[0]}");
 
-                    break;
-                case EventType.Break:
-                    var breakEvent = new BreakPeriod
-                    {
-                        StartTime = double.Parse(split[1], NumberFormatInfo.InvariantInfo),
-                        EndTime = double.Parse(split[2], NumberFormatInfo.InvariantInfo)
-                    };
+                switch (type)
+                {
+                    case EventType.Video:
+                    case EventType.Background:
+                        string filename = split[2].Trim('"');
 
-                    if (!breakEvent.HasEffect)
-                        return;
+                        if (type == EventType.Background)
+                            beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
 
-                    beatmap.Breaks.Add(breakEvent);
-                    break;
+                        break;
+                    case EventType.Break:
+                        var breakEvent = new BreakPeriod
+                        {
+                            StartTime = double.Parse(split[1], NumberFormatInfo.InvariantInfo),
+                            EndTime = double.Parse(split[2], NumberFormatInfo.InvariantInfo)
+                        };
+
+                        if (!breakEvent.HasEffect)
+                            return;
+
+                        beatmap.Breaks.Add(breakEvent);
+                        break;
+                    case EventType.Sprite:
+                        {
+                            var layer = parseLayer(split[1]);
+                            var origin = parseOrigin(split[2]);
+                            var path = cleanFilename(split[3]);
+                            var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
+                            var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
+                            storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
+                            beatmap.Storyboard.GetLayer(layer).Add(storyboardSprite);
+                        }
+                        break;
+                    case EventType.Animation:
+                        {
+                            var layer = parseLayer(split[1]);
+                            var origin = parseOrigin(split[2]);
+                            var path = cleanFilename(split[3]);
+                            var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
+                            var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
+                            var frameCount = int.Parse(split[6]);
+                            var frameDelay = double.Parse(split[7], NumberFormatInfo.InvariantInfo);
+                            var loopType = split.Length > 8 ? (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]) : AnimationLoopType.LoopForever;
+                            storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
+                            beatmap.Storyboard.GetLayer(layer).Add(storyboardSprite);
+                        }
+                        break;
+                    case EventType.Sample:
+                        {
+                            var time = double.Parse(split[1], CultureInfo.InvariantCulture);
+                            var layer = parseLayer(split[2]);
+                            var path = cleanFilename(split[3]);
+                            var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
+                            beatmap.Storyboard.GetLayer(layer).Add(new StoryboardSample(path, time, volume));
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                if (depth < 2)
+                    timelineGroup = storyboardSprite?.TimelineGroup;
+
+                var commandType = split[0];
+                switch (commandType)
+                {
+                    case "T":
+                        {
+                            var triggerName = split[1];
+                            var startTime = split.Length > 2 ? double.Parse(split[2], CultureInfo.InvariantCulture) : double.MinValue;
+                            var endTime = split.Length > 3 ? double.Parse(split[3], CultureInfo.InvariantCulture) : double.MaxValue;
+                            var groupNumber = split.Length > 4 ? int.Parse(split[4]) : 0;
+                            timelineGroup = storyboardSprite?.AddTrigger(triggerName, startTime, endTime, groupNumber);
+                        }
+                        break;
+                    case "L":
+                        {
+                            var startTime = double.Parse(split[1], CultureInfo.InvariantCulture);
+                            var loopCount = int.Parse(split[2]);
+                            timelineGroup = storyboardSprite?.AddLoop(startTime, loopCount);
+                        }
+                        break;
+                    default:
+                        {
+                            if (string.IsNullOrEmpty(split[3]))
+                                split[3] = split[2];
+
+                            var easing = (Easing)int.Parse(split[1]);
+                            var startTime = double.Parse(split[2], CultureInfo.InvariantCulture);
+                            var endTime = double.Parse(split[3], CultureInfo.InvariantCulture);
+
+                            switch (commandType)
+                            {
+                                case "F":
+                                    {
+                                        var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                        var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                        timelineGroup?.Alpha.Add(easing, startTime, endTime, startValue, endValue);
+                                    }
+                                    break;
+                                case "S":
+                                    {
+                                        var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                        var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                        timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startValue), new Vector2(endValue));
+                                    }
+                                    break;
+                                case "V":
+                                    {
+                                        var startX = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                        var startY = float.Parse(split[5], CultureInfo.InvariantCulture);
+                                        var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
+                                        var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
+                                        timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
+                                    }
+                                    break;
+                                case "R":
+                                    {
+                                        var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                        var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                        timelineGroup?.Rotation.Add(easing, startTime, endTime, MathHelper.RadiansToDegrees(startValue), MathHelper.RadiansToDegrees(endValue));
+                                    }
+                                    break;
+                                case "M":
+                                    {
+                                        var startX = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                        var startY = float.Parse(split[5], CultureInfo.InvariantCulture);
+                                        var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
+                                        var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
+                                        timelineGroup?.X.Add(easing, startTime, endTime, startX, endX);
+                                        timelineGroup?.Y.Add(easing, startTime, endTime, startY, endY);
+                                    }
+                                    break;
+                                case "MX":
+                                    {
+                                        var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                        var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                        timelineGroup?.X.Add(easing, startTime, endTime, startValue, endValue);
+                                    }
+                                    break;
+                                case "MY":
+                                    {
+                                        var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                        var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
+                                        timelineGroup?.Y.Add(easing, startTime, endTime, startValue, endValue);
+                                    }
+                                    break;
+                                case "C":
+                                    {
+                                        var startRed = float.Parse(split[4], CultureInfo.InvariantCulture);
+                                        var startGreen = float.Parse(split[5], CultureInfo.InvariantCulture);
+                                        var startBlue = float.Parse(split[6], CultureInfo.InvariantCulture);
+                                        var endRed = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startRed;
+                                        var endGreen = split.Length > 8 ? float.Parse(split[8], CultureInfo.InvariantCulture) : startGreen;
+                                        var endBlue = split.Length > 9 ? float.Parse(split[9], CultureInfo.InvariantCulture) : startBlue;
+                                        timelineGroup?.Colour.Add(easing, startTime, endTime,
+                                            new Color4(startRed / 255f, startGreen / 255f, startBlue / 255f, 1),
+                                            new Color4(endRed / 255f, endGreen / 255f, endBlue / 255f, 1));
+                                    }
+                                    break;
+                                case "P":
+                                    {
+                                        var type = split[4];
+                                        switch (type)
+                                        {
+                                            case "A": timelineGroup?.BlendingMode.Add(easing, startTime, endTime, BlendingMode.Additive, startTime == endTime ? BlendingMode.Additive : BlendingMode.Inherit); break;
+                                            case "H": timelineGroup?.FlipH.Add(easing, startTime, endTime, true, startTime == endTime); break;
+                                            case "V": timelineGroup?.FlipV.Add(easing, startTime, endTime, true, startTime == endTime); break;
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    throw new InvalidDataException($@"Unknown command type: {commandType}");
+                            }
+                        }
+                        break;
+                }
             }
         }
+
+        private static string cleanFilename(string path)
+            => FileSafety.PathStandardise(path.Trim('\"'));
+
+        private static Anchor parseOrigin(string value)
+        {
+            var origin = (LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value);
+            switch (origin)
+            {
+                case LegacyOrigins.TopLeft: return Anchor.TopLeft;
+                case LegacyOrigins.TopCentre: return Anchor.TopCentre;
+                case LegacyOrigins.TopRight: return Anchor.TopRight;
+                case LegacyOrigins.CentreLeft: return Anchor.CentreLeft;
+                case LegacyOrigins.Centre: return Anchor.Centre;
+                case LegacyOrigins.CentreRight: return Anchor.CentreRight;
+                case LegacyOrigins.BottomLeft: return Anchor.BottomLeft;
+                case LegacyOrigins.BottomCentre: return Anchor.BottomCentre;
+                case LegacyOrigins.BottomRight: return Anchor.BottomRight;
+            }
+            throw new InvalidDataException($@"Unknown origin: {value}");
+        }
+
+        private static string parseLayer(string value)
+            => Enum.Parse(typeof(StoryLayer), value).ToString();
 
         private void handleTimingPoints(Beatmap beatmap, string line)
         {
@@ -414,6 +607,8 @@ namespace osu.Game.Beatmaps.Formats
 
             Section section = Section.None;
             bool hasCustomColours = false;
+            StoryboardSprite storyboardSprite = null;
+            CommandTimelineGroup timelineGroup = null;
 
             string line;
             while ((line = stream.ReadLine()) != null)
@@ -421,7 +616,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (string.IsNullOrEmpty(line))
                     continue;
 
-                if (line.StartsWith(" ") || line.StartsWith("_") || line.StartsWith("//"))
+                if (line.StartsWith("//"))
                     continue;
 
                 if (line.StartsWith(@"osu file format v"))
@@ -452,7 +647,7 @@ namespace osu.Game.Beatmaps.Formats
                         handleDifficulty(beatmap, line);
                         break;
                     case Section.Events:
-                        handleEvents(beatmap, line);
+                        handleEvents(beatmap, line, ref storyboardSprite, ref timelineGroup);
                         break;
                     case Section.TimingPoints:
                         handleTimingPoints(beatmap, line);
@@ -508,6 +703,28 @@ namespace osu.Game.Beatmaps.Formats
             Sprite = 4,
             Sample = 5,
             Animation = 6
+        }
+
+        internal enum LegacyOrigins
+        {
+            TopLeft,
+            Centre,
+            CentreLeft,
+            TopRight,
+            BottomCentre,
+            TopCentre,
+            Custom,
+            CentreRight,
+            BottomLeft,
+            BottomRight
+        };
+
+        internal enum StoryLayer
+        {
+            Background = 0,
+            Fail = 1,
+            Pass = 2,
+            Foreground = 3
         }
     }
 }

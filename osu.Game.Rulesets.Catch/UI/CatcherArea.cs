@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 float distance = fruit.DrawSize.X / 2 * fruit.Scale.X;
 
-                while (Children.OfType<DrawableFruit>().Any(f => Vector2.DistanceSquared(f.Position, fruit.Position) < distance * distance))
+                while (Children.OfType<DrawableFruit>().Any(f => Vector2Extensions.DistanceSquared(f.Position, fruit.Position) < distance * distance))
                 {
                     fruit.X += RNG.Next(-5, 5);
                     fruit.Y -= RNG.Next(0, 5);

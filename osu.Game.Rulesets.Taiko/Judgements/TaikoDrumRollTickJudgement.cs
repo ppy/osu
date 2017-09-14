@@ -19,10 +19,5 @@ namespace osu.Game.Rulesets.Taiko.Judgements
                     return 200;
             }
         }
-
-        protected override int NumericResultForAccuracy(HitResult result)
-        {
-            return 0;
-        }
     }
 }
