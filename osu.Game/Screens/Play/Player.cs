@@ -61,6 +61,7 @@ namespace osu.Game.Screens.Play
         #region User Settings
 
         private Bindable<double> dimLevel;
+        private Bindable<bool> showStoryboard;
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
 
@@ -82,6 +83,7 @@ namespace osu.Game.Screens.Play
             this.api = api;
 
             dimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            showStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
 
@@ -213,6 +215,7 @@ namespace osu.Game.Screens.Play
             storyboardUsesBackground = beatmap.StoryboardUsesBackground;
             storyboard.Width = storyboard.Height * beatmap.BeatmapInfo.StoryboardAspect;
             storyboard.Masking = true;
+            storyboard.Alpha = showStoryboard ? 1 : 0;
 
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindRulesetContainer(RulesetContainer);
@@ -285,8 +288,9 @@ namespace osu.Game.Screens.Play
 
             (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, Easing.OutQuint);
 
-            applyDim();
-            dimLevel.ValueChanged += newDim => applyDim();
+            dimLevel.ValueChanged += value => updateBackgroundElements();
+            showStoryboard.ValueChanged += value => updateBackgroundElements();
+            updateBackgroundElements();
 
             Content.Alpha = 0;
             Content
@@ -327,13 +331,13 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        private void applyDim()
+        private void updateBackgroundElements()
         {
             var opacity = 1 - (float)dimLevel;
             storyboard.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
-            storyboard.FadeTo(opacity == 0 ? 0 : 1);
+            storyboard.FadeTo(!showStoryboard || opacity == 0 ? 0 : 1, 800);
 
-            Background?.FadeTo(storyboardUsesBackground ? 0 : opacity, 800, Easing.OutQuint);
+            Background?.FadeTo(showStoryboard && storyboardUsesBackground ? 0 : opacity, 800, Easing.OutQuint);
         }
 
         private void fadeOut()
