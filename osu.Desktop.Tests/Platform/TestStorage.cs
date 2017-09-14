@@ -1,12 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework;
 using osu.Framework.Desktop.Platform;
-using SQLite.Net;
-using SQLite.Net.Interop;
-using SQLite.Net.Platform.Generic;
-using SQLite.Net.Platform.Win32;
+using SQLite;
 
 namespace osu.Desktop.Tests.Platform
 {
@@ -16,14 +12,6 @@ namespace osu.Desktop.Tests.Platform
         {
         }
 
-        public override SQLiteConnection GetDatabase(string name)
-        {
-            ISQLitePlatform platform;
-            if (RuntimeInfo.IsWindows)
-                platform = new SQLitePlatformWin32();
-            else
-                platform = new SQLitePlatformGeneric();
-            return new SQLiteConnection(platform, @":memory:");
-        }
+        public override SQLiteConnection GetDatabase(string name) => new SQLiteConnection(@":memory:");
     }
 }

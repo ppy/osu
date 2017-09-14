@@ -3,7 +3,7 @@
 
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets;
-using SQLite.Net.Attributes;
+using SQLite;
 using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Input.Bindings

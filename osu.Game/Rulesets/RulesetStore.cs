@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Game.Database;
-using SQLite.Net;
+using SQLite;
 
 namespace osu.Game.Rulesets
 {

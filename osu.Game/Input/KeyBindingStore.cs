@@ -9,7 +9,7 @@ using osu.Framework.Platform;
 using osu.Game.Database;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
-using SQLite.Net;
+using SQLite;
 
 namespace osu.Game.Input
 {

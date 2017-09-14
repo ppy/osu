@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.IO;
-using SQLite.Net.Attributes;
+using SQLite;
 using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Beatmaps

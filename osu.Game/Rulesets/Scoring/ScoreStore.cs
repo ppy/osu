@@ -11,7 +11,7 @@ using osu.Game.IO.Legacy;
 using osu.Game.IPC;
 using osu.Game.Rulesets.Replays;
 using SharpCompress.Compressors.LZMA;
-using SQLite.Net;
+using SQLite;
 
 namespace osu.Game.Rulesets.Scoring
 {

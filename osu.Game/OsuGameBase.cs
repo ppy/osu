@@ -16,7 +16,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
-using SQLite.Net;
+using SQLite;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Database;
 using osu.Game.Input;
