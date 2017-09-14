@@ -81,6 +81,8 @@
     <Compile Include="Beatmaps\DifficultyCalculator.cs" />
     <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
     <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
+    <Compile Include="Overlays\Settings\Sections\KyzerSection.cs" />
+    <Compile Include="Overlays\Settings\Sections\Kyzer\KyzerSettings.cs" />
     <Compile Include="Storyboards\Drawables\IFlippable.cs" />
     <Compile Include="Storyboards\Drawables\DrawableStoryboardLayer.cs" />
     <Compile Include="Storyboards\Drawables\DrawableStoryboard.cs" />
