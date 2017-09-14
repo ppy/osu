@@ -15,26 +15,27 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject, ManiaJudgement>
+    public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject>
     {
         /// <summary>
         /// The number of columns which the <see cref="ManiaPlayfield"/> should display, and which
         /// the beatmap converter will attempt to convert beatmaps to use.
         /// </summary>
-        private int availableColumns;
+        public int AvailableColumns { get; private set; }
 
         public IEnumerable<DrawableBarLine> BarLines;
 
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
         }
 
-        protected sealed override Playfield<ManiaHitObject, ManiaJudgement> CreatePlayfield() => new ManiaPlayfield(availableColumns)
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(AvailableColumns)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -83,29 +84,29 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, availableColumns);
+        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, AvailableColumns);
 
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter()
         {
             if (IsForCurrentRuleset)
-                availableColumns = (int)Math.Max(1, Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize));
+                AvailableColumns = (int)Math.Max(1, Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize));
             else
             {
                 float percentSliderOrSpinner = (float)WorkingBeatmap.Beatmap.HitObjects.Count(h => h is IHasEndTime) / WorkingBeatmap.Beatmap.HitObjects.Count;
                 if (percentSliderOrSpinner < 0.2)
-                    availableColumns = 7;
+                    AvailableColumns = 7;
                 else if (percentSliderOrSpinner < 0.3 || Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize) >= 5)
-                    availableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) > 5 ? 7 : 6;
+                    AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) > 5 ? 7 : 6;
                 else if (percentSliderOrSpinner > 0.6)
-                    availableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) > 4 ? 5 : 4;
+                    AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) > 4 ? 5 : 4;
                 else
-                    availableColumns = Math.Max(4, Math.Min((int)Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) + 1, 7));
+                    AvailableColumns = Math.Max(4, Math.Min((int)Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) + 1, 7));
             }
 
-            return new ManiaBeatmapConverter(IsForCurrentRuleset, availableColumns);
+            return new ManiaBeatmapConverter(IsForCurrentRuleset, AvailableColumns);
         }
 
-        protected override DrawableHitObject<ManiaHitObject, ManiaJudgement> GetVisualRepresentation(ManiaHitObject h)
+        protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
             ManiaAction action = Playfield.Columns.ElementAt(h.Column).Action;
 
@@ -123,5 +124,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(1, 0.8f);
 
         protected override SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint) => new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Basic);
+
+        protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
     }
 }

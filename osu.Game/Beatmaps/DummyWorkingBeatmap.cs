@@ -7,7 +7,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Beatmaps
@@ -61,11 +60,6 @@ namespace osu.Game.Beatmaps
                 }
 
                 public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => null;
-
-                public override ScoreProcessor CreateScoreProcessor()
-                {
-                    throw new NotImplementedException();
-                }
 
                 public override string Description => "dummy";
 

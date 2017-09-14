@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.Scoring;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania
 {
@@ -93,7 +91,7 @@ namespace osu.Game.Rulesets.Mania
                         {
                             Mods = new Mod[]
                             {
-                                new ModAutoplay(),
+                                new ManiaModAutoplay(),
                                 new ModCinema(),
                             },
                         },
@@ -110,8 +108,6 @@ namespace osu.Game.Rulesets.Mania
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
 
         public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap) => new ManiaDifficultyCalculator(beatmap);
-
-        public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
 
         public override int LegacyID => 3;
 

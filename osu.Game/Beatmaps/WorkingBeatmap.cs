@@ -100,8 +100,11 @@ namespace osu.Game.Beatmaps
 
         public void TransferTo(WorkingBeatmap other)
         {
-            if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
-                other.track = track;
+            lock (trackLock)
+            {
+                if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
+                    other.track = track;
+            }
 
             if (background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
                 other.background = background;
@@ -109,10 +112,17 @@ namespace osu.Game.Beatmaps
 
         public virtual void Dispose()
         {
-            track?.Dispose();
-            track = null;
             background?.Dispose();
             background = null;
+        }
+
+        public void DisposeTrack()
+        {
+            lock (trackLock)
+            {
+                track?.Dispose();
+                track = null;
+            }
         }
     }
 }

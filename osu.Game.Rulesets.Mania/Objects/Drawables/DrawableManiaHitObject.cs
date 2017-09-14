@@ -3,12 +3,11 @@
 
 using osu.Framework.Graphics;
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
-    public abstract class DrawableManiaHitObject<TObject> : DrawableScrollingHitObject<ManiaHitObject, ManiaJudgement>
+    public abstract class DrawableManiaHitObject<TObject> : DrawableScrollingHitObject<ManiaHitObject>
         where TObject : ManiaHitObject
     {
         /// <summary>
@@ -38,7 +37,5 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 base.AccentColour = value;
             }
         }
-
-        protected override ManiaJudgement CreateJudgement() => new ManiaJudgement();
     }
 }

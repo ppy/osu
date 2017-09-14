@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Timing
         }
 
         public override bool RemoveWhenNotAlive => false;
+        protected override bool RequiresChildrenUpdate => true;
 
         /// <summary>
         /// The <see cref="MultiplierControlPoint"/> that defines the speed adjustments.

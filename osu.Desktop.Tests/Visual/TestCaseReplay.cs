@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
+using System.Linq;
 
 namespace osu.Desktop.Tests.Visual
 {
@@ -12,11 +12,10 @@ namespace osu.Desktop.Tests.Visual
     {
         public override string Description => @"Testing replay playback.";
 
-        protected override Player CreatePlayer(WorkingBeatmap beatmap)
+        protected override Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset)
         {
-            beatmap.Mods.Value = new Mod[] { new OsuModAutoplay() };
-
-            return base.CreatePlayer(beatmap);
+            beatmap.Mods.Value = beatmap.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
+            return base.CreatePlayer(beatmap, ruleset);
         }
     }
 }

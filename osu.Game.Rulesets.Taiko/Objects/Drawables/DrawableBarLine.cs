@@ -5,14 +5,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     /// <summary>
     /// A line that scrolls alongside hit objects in the playfield and visualises control points.
     /// </summary>
-    public class DrawableBarLine : DrawableScrollingHitObject<TaikoHitObject, TaikoJudgement>
+    public class DrawableBarLine : DrawableScrollingHitObject<TaikoHitObject>
     {
         /// <summary>
         /// The width of the line tracker.
@@ -57,8 +56,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 }
             };
         }
-
-        protected override TaikoJudgement CreateJudgement() => null;
 
         protected override void UpdateState(ArmedState state)
         {
