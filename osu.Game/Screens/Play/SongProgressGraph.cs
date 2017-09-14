@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,7 +35,7 @@ namespace osu.Game.Screens.Play
 
                 foreach (var h in objects)
                 {
-                    var endTime = Math.Max((h as IHasEndTime)?.EndTime ?? h.StartTime, h.StartTime);
+                    var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
 
                     Debug.Assert(endTime >= h.StartTime);
 
