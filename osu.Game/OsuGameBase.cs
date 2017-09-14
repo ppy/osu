@@ -200,10 +200,9 @@ namespace osu.Game
                     globalBinding = new GlobalKeyBindingInputManager(this)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new OsuTooltipContainer(Cursor)
+                        Child = content = new OsuTooltipContainer(Cursor)
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = content = new OsuContextMenuContainer { RelativeSizeAxes = Axes.Both },
                         }
                     }
                 }
