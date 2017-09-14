@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Scoring
 
         public double Health { get; set; } = 1;
 
-        public double PP { get; set; }
+        public double? PP { get; set; }
 
         public int MaxCombo { get; set; }
 
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Scoring
 
         public RulesetInfo Ruleset { get; set; }
 
-        public Mod[] Mods { get; set; }
+        public Mod[] Mods { get; set; } = { };
 
         public User User;
 

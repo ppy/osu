@@ -174,6 +174,8 @@ namespace osu.Game.Overlays
                 var sec = sections.FirstOrDefault(s => s.Identifier == id);
                 if (sec != null)
                 {
+                    sec.User = user;
+
                     sectionsContainer.Add(sec);
                     tabs.AddItem(sec);
                 }

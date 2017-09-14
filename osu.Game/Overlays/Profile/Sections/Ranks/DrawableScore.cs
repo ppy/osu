@@ -79,26 +79,28 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, LocalisationEngine locale)
         {
-            stats.Add(new OsuSpriteText {
-                Text = score.PP + "pp",
+            stats.Add(new OsuSpriteText
+            {
+                Text = $"{score.PP ?? 0}pp",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 TextSize = 18,
                 Font = "Exo2.0-BoldItalic",
             });
-            if(weight != -1)
+            if (weight != -1)
             {
                 stats.Add(new OsuSpriteText
                 {
-                    Text = $"weighted: {(int)(score.PP * weight)}pp ({weight.ToString("0%", CultureInfo.CurrentCulture)})",
+                    Text = $"weighted: {(int)(score?.PP * weight ?? 0)}pp ({weight.ToString("0%", CultureInfo.CurrentCulture)})",
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,
                     TextSize = 11,
                     Font = "Exo2.0-RegularItalic",
-            });
+                });
             }
-            stats.Add(new OsuSpriteText {
+            stats.Add(new OsuSpriteText
+            {
                 Text = "accuracy: " + score.Accuracy.ToString("0.00%"),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,

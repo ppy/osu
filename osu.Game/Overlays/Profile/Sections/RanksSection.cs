@@ -8,7 +8,13 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Scoring;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -20,6 +26,9 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private readonly ScoreFlowContainer best, first;
         private readonly OsuSpriteText bestMissing, firstMissing;
+
+        private APIAccess api;
+        private RulesetStore rulesets;
 
         public RanksSection()
         {
@@ -62,12 +71,57 @@ namespace osu.Game.Overlays.Profile.Sections
             };
         }
 
-        public Score[] ScoresBest
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api, RulesetStore rulesets)
+        {
+            this.api = api;
+            this.rulesets = rulesets;
+        }
+
+        public override User User
+        {
+            get
+            {
+                return base.User;
+            }
+
+            set
+            {
+                base.User = value;
+
+                // fetch online ranks
+                foreach (ScoreType m in new[] { ScoreType.Best, ScoreType.Firsts })
+                {
+                    ScoreType thisType = m;
+                    var req = new GetUserScoresRequest(User.Id, m);
+                    req.Success += scores =>
+                    {
+                        foreach (var s in scores)
+                            s.ApplyRuleset(rulesets.GetRuleset(s.OnlineRulesetID));
+
+                        switch (thisType)
+                        {
+                            case ScoreType.Best:
+                                ScoresBest = scores;
+                                break;
+                            case ScoreType.Firsts:
+                                ScoresFirst = scores;
+                                break;
+                        }
+                    };
+
+                    Schedule(() => { api.Queue(req); });
+                }
+            }
+        }
+
+
+        public IEnumerable<Score> ScoresBest
         {
             set
             {
                 best.Clear();
-                if (value.Length == 0)
+                if (!value.Any())
                 {
                     bestMissing.Show();
                 }
@@ -90,12 +144,12 @@ namespace osu.Game.Overlays.Profile.Sections
             }
         }
 
-        public Score[] ScoresFirst
+        public IEnumerable<Score> ScoresFirst
         {
             set
             {
                 first.Clear();
-                if (value.Length == 0)
+                if (!value.Any())
                 {
                     firstMissing.Show();
                 }
