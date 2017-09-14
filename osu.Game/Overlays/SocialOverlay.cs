@@ -9,6 +9,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -63,12 +64,17 @@ namespace osu.Game.Overlays
 
             ScrollFlow.Children = new[]
             {
-                panelFlow = new FillFlowContainer<UserPanel>
+                new OsuContextMenuContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding { Top = 20 },
-                    Spacing = new Vector2(10f),
+                    Child = panelFlow = new FillFlowContainer<UserPanel>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Margin = new MarginPadding { Top = 20 },
+                        Spacing = new Vector2(10f),
+                    }
                 },
             };
 
