@@ -10,23 +10,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
 {
     public class DrawableChannel : Container
     {
-        private class ChatLineContainer : FillFlowContainer<ChatLine>
-        {
-            protected override int Compare(Drawable x, Drawable y)
-            {
-                var xC = (ChatLine)x;
-                var yC = (ChatLine)y;
-
-                return xC.Message.CompareTo(yC.Message);
-            }
-        }
-
         public readonly Channel Channel;
         private readonly ChatLineContainer flow;
         private readonly ScrollContainer scroll;
@@ -45,12 +35,17 @@ namespace osu.Game.Overlays.Chat
                     // Some chat lines have effects that slightly protrude to the bottom,
                     // which we do not want to mask away, hence the padding.
                     Padding = new MarginPadding { Bottom = 5 },
-                    Child = flow = new ChatLineContainer
+                    Child = new OsuContextMenuContainer
                     {
-                        Padding = new MarginPadding { Left = 20, Right = 20 },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
+                        Child = flow = new ChatLineContainer
+                        {
+                            Padding = new MarginPadding { Left = 20, Right = 20 },
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                        }
                     },
                 }
             };
@@ -124,5 +119,16 @@ namespace osu.Game.Overlays.Chat
         }
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
+
+        private class ChatLineContainer : FillFlowContainer<ChatLine>
+        {
+            protected override int Compare(Drawable x, Drawable y)
+            {
+                var xC = (ChatLine)x;
+                var yC = (ChatLine)y;
+
+                return xC.Message.CompareTo(yC.Message);
+            }
+        }
     }
 }
