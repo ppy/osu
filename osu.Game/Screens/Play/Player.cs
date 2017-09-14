@@ -69,6 +69,7 @@ namespace osu.Game.Screens.Play
 
         #endregion
 
+        private Container storyboardContainer;
         private DrawableStoryboard storyboard;
         private bool storyboardReplacesBackground;
 
@@ -152,14 +153,10 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                new Container
+                storyboardContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Clock = offsetClock,
-                    Children = new Drawable[]
-                    {
-                        storyboard = beatmap.Storyboard.CreateDrawable(),
-                    }
                 },
                 pauseContainer = new PauseContainer
                 {
@@ -212,10 +209,8 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
 
-            storyboardReplacesBackground = beatmap.StoryboardReplacesBackground;
-            storyboard.Width = storyboard.Height * beatmap.BeatmapInfo.StoryboardAspect;
-            storyboard.Masking = true;
-            storyboard.Alpha = showStoryboard ? 1 : 0;
+            if (showStoryboard)
+                initializeStoryboard();
 
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindRulesetContainer(RulesetContainer);
@@ -230,6 +225,17 @@ namespace osu.Game.Screens.Play
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
+        }
+
+        private void initializeStoryboard()
+        {
+            var beatmap = Beatmap.Value.Beatmap;
+
+            storyboardReplacesBackground = beatmap.StoryboardReplacesBackground;
+
+            storyboardContainer.Add(storyboard = beatmap.Storyboard.CreateDrawable());
+            storyboard.Width = storyboard.Height * beatmap.BeatmapInfo.StoryboardAspect;
+            storyboard.Masking = true;
         }
 
         public void Restart()
@@ -340,10 +346,14 @@ namespace osu.Game.Screens.Play
         private void updateBackgroundElements()
         {
             var opacity = 1 - (float)dimLevel;
-            storyboard.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
-            storyboard.FadeTo(!showStoryboard || opacity == 0 ? 0 : 1, 200);
 
-            Background?.FadeTo(showStoryboard && storyboardReplacesBackground ? 0 : opacity, 800, Easing.OutQuint);
+            if (showStoryboard && storyboard == null)
+                initializeStoryboard();
+
+            storyboard?.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
+            storyboard?.FadeTo(showStoryboard && opacity > 0 ? 1 : 0, 200);
+
+            Background?.FadeTo(!showStoryboard || !storyboardReplacesBackground ? opacity : 0, 800, Easing.OutQuint);
         }
 
         private void fadeOut()
