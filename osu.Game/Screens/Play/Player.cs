@@ -24,6 +24,8 @@ using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Storyboards.Drawables;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -65,6 +67,9 @@ namespace osu.Game.Screens.Play
         private SampleChannel sampleRestart;
 
         #endregion
+
+        private DrawableStoryboard storyboard;
+        private bool storyboardUsesBackground;
 
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
@@ -145,6 +150,15 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Clock = offsetClock,
+                    Children = new Drawable[]
+                    {
+                        storyboard = beatmap.Storyboard.CreateDrawable(),
+                    }
+                },
                 pauseContainer = new PauseContainer
                 {
                     AudioClock = decoupledClock,
@@ -195,6 +209,10 @@ namespace osu.Game.Screens.Play
             };
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
+
+            storyboardUsesBackground = beatmap.StoryboardUsesBackground;
+            storyboard.Width = storyboard.Height * beatmap.BeatmapInfo.StoryboardAspect;
+            storyboard.Masking = true;
 
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindRulesetContainer(RulesetContainer);
@@ -266,12 +284,11 @@ namespace osu.Game.Screens.Play
                 return;
 
             (Background as BackgroundScreenBeatmap)?.BlurTo(Vector2.Zero, 1500, Easing.OutQuint);
-            Background?.FadeTo(1 - (float)dimLevel, 1500, Easing.OutQuint);
+
+            applyDim();
+            dimLevel.ValueChanged += newDim => applyDim();
 
             Content.Alpha = 0;
-
-            dimLevel.ValueChanged += newDim => Background?.FadeTo(1 - (float)newDim, 800);
-
             Content
                 .ScaleTo(0.7f)
                 .ScaleTo(1, 750, Easing.OutQuint)
@@ -308,6 +325,15 @@ namespace osu.Game.Screens.Play
             }
 
             return true;
+        }
+
+        private void applyDim()
+        {
+            var opacity = 1 - (float)dimLevel;
+            storyboard.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
+            storyboard.FadeTo(opacity == 0 ? 0 : 1);
+
+            Background?.FadeTo(storyboardUsesBackground ? 0 : opacity, 800, Easing.OutQuint);
         }
 
         private void fadeOut()

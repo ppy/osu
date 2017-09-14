@@ -47,6 +47,21 @@ namespace osu.Game.Beatmaps
         public Storyboard Storyboard = new Storyboard();
 
         /// <summary>
+        /// Whether this beatmap's Storyboard uses the background texture in its Background layer.
+        /// </summary>
+        public bool StoryboardUsesBackground
+        {
+            get
+            {
+                var backgroundPath = BeatmapInfo.BeatmapSet.Metadata.BackgroundFile?.ToLowerInvariant();
+                if (backgroundPath == null)
+                    return false;
+
+                return Storyboard.GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
+            }
+        }
+
+        /// <summary>
         /// Constructs a new beatmap.
         /// </summary>
         /// <param name="original">The original beatmap to use the parameters of.</param>
