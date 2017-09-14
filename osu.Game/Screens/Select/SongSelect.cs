@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Select
                 Origin = Anchor.CentreRight,
                 SelectionChanged = carouselSelectionChanged,
                 BeatmapsChanged = carouselBeatmapsLoaded,
-                DeleteRequested = b => promptDelete(b),
+                DeleteRequested = promptDelete,
                 RestoreRequested = s => { foreach (var b in s.Beatmaps) manager.Restore(b); },
                 HideDifficultyRequested = b => manager.Hide(b),
                 StartRequested = () => carouselRaisedStart(),
