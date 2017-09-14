@@ -24,7 +24,7 @@ namespace osu.Game.Input.Bindings
         public string KeysString
         {
             get { return KeyCombination.ToString(); }
-            private set { KeyCombination = value; }
+            set { KeyCombination = value; }
         }
 
         [Indexed]
