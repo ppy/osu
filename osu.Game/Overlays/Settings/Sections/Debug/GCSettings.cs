@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Force garbage collection",
-                    Action = () => GC.Collect()
+                    Action = GC.Collect
                 },
             };
         }

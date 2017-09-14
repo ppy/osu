@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private FillFlowContainer<KeyButton> buttons;
 
-        public string[] FilterTerms => new[] { text.Text }.Concat(bindings.Select(b => b.KeyCombination.ReadableString())).ToArray();
+        public IEnumerable<string> FilterTerms => new[] { text.Text }.Concat(bindings.Select(b => b.KeyCombination.ReadableString())).ToArray();
 
         public KeyBindingRow(object action, IEnumerable<Framework.Input.Bindings.KeyBinding> bindings)
         {
