@@ -7,7 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using SQLite.Net;
+using SQLite;
 using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Database
@@ -84,7 +84,8 @@ namespace osu.Game.Database
         public void Reset() => Prepare(true);
 
 
-        public TableQuery<T> Query<T>(Expression<Func<T, bool>> filter = null) where T : class
+        public TableQuery<T> Query<T>(Expression<Func<T, bool>> filter = null)
+            where T : class, new()
         {
             checkType(typeof(T));
 
@@ -102,7 +103,7 @@ namespace osu.Game.Database
         /// <param name="filter">An filter to refine results.</param>
         /// <returns></returns>
         public List<T> QueryAndPopulate<T>(Expression<Func<T, bool>> filter)
-            where T : class
+            where T : class, new()
         {
             checkType(typeof(T));
 

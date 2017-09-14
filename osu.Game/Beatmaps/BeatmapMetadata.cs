@@ -3,7 +3,7 @@
 
 using System.Linq;
 using Newtonsoft.Json;
-using SQLite.Net.Attributes;
+using SQLite;
 
 namespace osu.Game.Beatmaps
 {

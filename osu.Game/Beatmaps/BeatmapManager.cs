@@ -19,7 +19,7 @@ using osu.Game.IO;
 using osu.Game.IPC;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using SQLite.Net;
+using SQLite;
 using osu.Game.Online.API.Requests;
 using System.Threading.Tasks;
 using osu.Game.Online.API;

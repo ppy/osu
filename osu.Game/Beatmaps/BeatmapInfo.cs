@@ -6,7 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
-using SQLite.Net.Attributes;
+using SQLite;
 using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Beatmaps

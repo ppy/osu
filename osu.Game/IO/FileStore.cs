@@ -9,7 +9,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
-using SQLite.Net;
+using SQLite;
 
 namespace osu.Game.IO
 {

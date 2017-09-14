@@ -3,7 +3,7 @@
 
 using System;
 using osu.Game.Database;
-using SQLite.Net;
+using SQLite;
 using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Beatmaps
@@ -82,11 +82,11 @@ namespace osu.Game.Beatmaps
                         break;
                     case 3:
                         // Added MD5Hash column to BeatmapInfo
-                        Connection.MigrateTable<BeatmapInfo>();
+                        //Connection.MigrateTable<BeatmapInfo>();
                         break;
                     case 4:
                         // Added Hidden column to BeatmapInfo
-                        Connection.MigrateTable<BeatmapInfo>();
+                        //Connection.MigrateTable<BeatmapInfo>();
                         break;
                 }
             }
