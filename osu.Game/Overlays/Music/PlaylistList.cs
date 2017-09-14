@@ -229,7 +229,7 @@ namespace osu.Game.Overlays.Music
 
             private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
             {
-                public string[] FilterTerms => new string[] { };
+                public IEnumerable<string> FilterTerms => new string[] { };
                 public bool MatchingFilter
                 {
                     set

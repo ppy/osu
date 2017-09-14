@@ -7,6 +7,8 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoStrongHitJudgement : TaikoJudgement
     {
+        public override bool AffectsCombo => false;
+
         public TaikoStrongHitJudgement()
         {
             base.Result = HitResult.Perfect;

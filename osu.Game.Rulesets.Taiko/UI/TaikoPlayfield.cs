@@ -205,6 +205,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override void Add(DrawableHitObject h)
         {
+            h.Depth = (float)h.HitObject.StartTime;
+
             base.Add(h);
 
             var barline = h as DrawableBarLine;
