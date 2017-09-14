@@ -109,7 +109,10 @@ namespace osu.Game.Screens.Play
         private void pushWhenLoaded()
         {
             if (!player.IsLoaded)
+            {
                 Schedule(pushWhenLoaded);
+                return;
+            }
 
             contentOut();
 
