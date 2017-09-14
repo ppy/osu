@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Music
             return true;
         }
 
-        public string[] FilterTerms { get; private set; }
+        public IEnumerable<string> FilterTerms { get; private set; }
 
         private bool matching = true;
 
