@@ -80,14 +80,6 @@ namespace osu.Game.Beatmaps
                         // cannot migrate; breaking underlying changes.
                         Reset();
                         break;
-                    case 3:
-                        // Added MD5Hash column to BeatmapInfo
-                        //Connection.MigrateTable<BeatmapInfo>();
-                        break;
-                    case 4:
-                        // Added Hidden column to BeatmapInfo
-                        //Connection.MigrateTable<BeatmapInfo>();
-                        break;
                 }
             }
         }
