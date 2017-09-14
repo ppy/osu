@@ -122,25 +122,10 @@ namespace osu.Game.Users
             public int Available;
         }
 
-        [JsonProperty(@"defaultStatistics")]
+        [JsonProperty(@"statistics")]
         public UserStatistics Statistics;
 
-        public class RankHistories
-        {
-            [JsonProperty(@"osu")]
-            public RankHistory Osu;
-
-            [JsonProperty(@"taiko")]
-            public RankHistory Taiko;
-
-            [JsonProperty(@"fruits")]
-            public RankHistory Fruits;
-
-            [JsonProperty(@"mania")]
-            public RankHistory Mania;
-        }
-
-        public class RankHistory
+        public class RankHistoryData
         {
             [JsonProperty(@"mode")]
             public string Mode;
@@ -149,7 +134,7 @@ namespace osu.Game.Users
             public int[] Data;
         }
 
-        [JsonProperty(@"allRankHistories")]
-        public RankHistories AllRankHistories;
+        [JsonProperty(@"rankHistory")]
+        public RankHistoryData RankHistory;
     }
 }
