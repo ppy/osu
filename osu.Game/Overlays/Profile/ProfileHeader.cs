@@ -414,8 +414,8 @@ namespace osu.Game.Overlays.Profile
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalHits.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Max Combo"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.MaxCombo.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Replay Watched by Others"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.ReplayWatched.ToString(@"#,0")));
+                scoreText.Add(createScoreText("Replays Watched by Others"));
+                scoreNumberText.Add(createScoreNumberText(user.Statistics.ReplaysWatched.ToString(@"#,0")));
 
                 gradeSS.DisplayCount = user.Statistics.GradesCount.SS;
                 gradeSS.Show();
