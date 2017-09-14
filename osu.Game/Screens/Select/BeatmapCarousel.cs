@@ -19,6 +19,7 @@ using osu.Framework.Threading;
 using osu.Framework.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Screens.Select
 {
@@ -86,9 +87,14 @@ namespace osu.Game.Screens.Select
 
         public BeatmapCarousel()
         {
-            Add(scrollableContent = new Container<Panel>
+            Add(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Child = scrollableContent = new Container<Panel>
+                {
+                    RelativeSizeAxes = Axes.X,
+                }
             });
         }
 
