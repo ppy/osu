@@ -209,8 +209,9 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
 
+            storyboardReplacesBackground = beatmap.StoryboardReplacesBackground;
             if (showStoryboard)
-                initializeStoryboard();
+                initializeStoryboard(false);
 
             hudOverlay.BindProcessor(scoreProcessor);
             hudOverlay.BindRulesetContainer(RulesetContainer);
@@ -227,15 +228,15 @@ namespace osu.Game.Screens.Play
             scoreProcessor.Failed += onFail;
         }
 
-        private void initializeStoryboard()
+        private void initializeStoryboard(bool asyncLoad)
         {
             var beatmap = Beatmap.Value.Beatmap;
 
-            storyboardReplacesBackground = beatmap.StoryboardReplacesBackground;
-
-            storyboardContainer.Add(storyboard = beatmap.Storyboard.CreateDrawable());
+            storyboard = beatmap.Storyboard.CreateDrawable();
             storyboard.Width = storyboard.Height * beatmap.BeatmapInfo.StoryboardAspect;
             storyboard.Masking = true;
+
+            storyboardContainer.Add(asyncLoad ? new AsyncLoadWrapper(storyboard) { RelativeSizeAxes = Axes.Both } : (Drawable)storyboard);
         }
 
         public void Restart()
@@ -348,7 +349,7 @@ namespace osu.Game.Screens.Play
             var opacity = 1 - (float)dimLevel;
 
             if (showStoryboard && storyboard == null)
-                initializeStoryboard();
+                initializeStoryboard(true);
 
             storyboard?.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
             storyboard?.FadeTo(showStoryboard && opacity > 0 ? 1 : 0, 200);
