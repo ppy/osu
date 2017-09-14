@@ -15,6 +15,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
+using osu.Framework.Input;
+using OpenTK.Input;
 
 namespace osu.Game.Overlays
 {
@@ -109,6 +111,30 @@ namespace osu.Game.Overlays
                     Users = null;
                     break;
             }
+        }
+
+        protected override bool OnDragStart(InputState state)
+        {
+            if (!state.Mouse.IsPressed(MouseButton.Left)) return false;
+            return base.OnDragStart(state);
+        }
+
+        protected override bool OnDrag(InputState state)
+        {
+            if (!state.Mouse.IsPressed(MouseButton.Left)) return false;
+            return base.OnDrag(state);
+        }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            if (args.Button != MouseButton.Left) return false;
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            if (args.Button != MouseButton.Left) return false;
+            return base.OnMouseUp(state, args);
         }
     }
 

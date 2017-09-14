@@ -25,6 +25,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
+using OpenTK.Input;
 
 namespace osu.Game.Overlays
 {
@@ -192,6 +193,8 @@ namespace osu.Game.Overlays
 
         protected override bool OnDragStart(InputState state)
         {
+            if (!state.Mouse.IsPressed(MouseButton.Left)) return false;
+
             isDragging = tabsArea.IsHovered;
 
             if (!isDragging)
@@ -203,6 +206,8 @@ namespace osu.Game.Overlays
 
         protected override bool OnDrag(InputState state)
         {
+            if (!state.Mouse.IsPressed(MouseButton.Left)) return false;
+
             if (isDragging)
             {
                 Trace.Assert(state.Mouse.PositionMouseDown != null);
@@ -223,6 +228,18 @@ namespace osu.Game.Overlays
         {
             isDragging = false;
             return base.OnDragEnd(state);
+        }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            if (args.Button != MouseButton.Left) return false;
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            if (args.Button != MouseButton.Left) return false;
+            return base.OnMouseUp(state, args);
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
