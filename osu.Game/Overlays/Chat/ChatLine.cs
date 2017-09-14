@@ -224,15 +224,9 @@ namespace osu.Game.Overlays.Chat
                 Action = () => profile?.ShowUser(sender);
             }
 
-            public MenuItem[] ContextMenuItems => new OsuMenuItem[]
+            public MenuItem[] ContextMenuItems => new MenuItem[]
             {
-                new OsuMenuItem("Spectate"),
                 new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action.Invoke),
-                new OsuMenuItem("Start Chat"),
-                new OsuMenuItem("Add as Friend"),
-                new OsuMenuItem("Invite to"),
-                new OsuMenuItem("Report"),
-                new OsuMenuItem("Block", MenuItemType.Destructive),
             };
         }
     }

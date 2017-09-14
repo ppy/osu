@@ -209,15 +209,9 @@ namespace osu.Game.Users
             }
         }
 
-        public virtual MenuItem[] ContextMenuItems => new OsuMenuItem[]
+        public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Spectate"),
             new OsuMenuItem("View Profile", MenuItemType.Highlighted, ViewProfile.Invoke),
-            new OsuMenuItem("Start Chat"),
-            new OsuMenuItem("Add as Friend"),
-            new OsuMenuItem("Invite to"),
-            new OsuMenuItem("Report"),
-            new OsuMenuItem("Block", MenuItemType.Destructive),
         };
     }
 }
