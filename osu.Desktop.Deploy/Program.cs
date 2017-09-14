@@ -100,7 +100,7 @@ namespace osu.Desktop.Deploy
             updateAssemblyInfo(version);
 
             write("Running build process...");
-            runCommand(msbuild_path, $"/v:quiet /m /t:{TargetName.Replace('.', '_')} /p:OutputPath={stagingPath};Configuration=Release {SolutionName}.sln");
+            runCommand(msbuild_path, $"/v:quiet /m /t:{TargetName.Replace('.', '_')} /p:OutputPath={stagingPath};Targets=\"Clean;Build\";Configuration=Release {SolutionName}.sln");
 
             write("Creating NuGet deployment package...");
             runCommand(nuget_path, $"pack {NuSpecName} -Version {version} -Properties Configuration=Deploy -OutputDirectory {stagingPath} -BasePath {stagingPath}");
