@@ -3,6 +3,7 @@
 
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Objects;
 
@@ -34,10 +35,12 @@ namespace osu.Game.Screens.Play
 
                 foreach (var h in objects)
                 {
-                    IHasEndTime end = h as IHasEndTime;
+                    var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+
+                    Debug.Assert(endTime >= h.StartTime);
 
                     int startRange = (int)((h.StartTime - firstHit) / interval);
-                    int endRange = (int)(((end?.EndTime > 0 ? end.EndTime : h.StartTime) - firstHit) / interval);
+                    int endRange = (int)((endTime - firstHit) / interval);
                     for (int i = startRange; i <= endRange; i++)
                         Values[i]++;
                 }

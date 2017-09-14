@@ -12,6 +12,7 @@ using OpenTK.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -52,8 +53,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override TaikoJudgement CreateJudgement() => new TaikoJudgement { SecondHit = HitObject.IsStrong };
-
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
 
         public override bool OnPressed(TaikoAction action) => false;
@@ -65,9 +64,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             accentDarkColour = colours.YellowDarker;
         }
 
-        private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
+        private void onTickJudgement(DrawableHitObject obj, Judgement judgement)
         {
-            if (obj.Judgement.Result == HitResult.Hit)
+            if (judgement.Result > HitResult.Miss)
                 rollingHits++;
             else
                 rollingHits--;
@@ -78,23 +77,24 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.FadeAccent(newAccent, 100);
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (userTriggered)
                 return;
 
-            if (Judgement.TimeOffset < 0)
+            if (timeOffset < 0)
                 return;
 
-            int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
+            int countHit = NestedHitObjects.Count(o => o.AllJudged);
 
             if (countHit > HitObject.RequiredGoodHits)
             {
-                Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = countHit >= HitObject.RequiredGreatHits ? TaikoHitResult.Great : TaikoHitResult.Good;
+                AddJudgement(new TaikoJudgement { Result = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good });
+                if (HitObject.IsStrong)
+                    AddJudgement(new TaikoStrongHitJudgement());
             }
             else
-                Judgement.Result = HitResult.Miss;
+                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
         }
 
         protected override void UpdateState(ArmedState state)

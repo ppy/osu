@@ -24,18 +24,13 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// Base RulesetContainer. Doesn't hold objects.
     /// <para>
-    /// Should not be derived - derive <see cref="RulesetContainer{TObject,TJudgement}"/> instead.
+    /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
     /// </para>
     /// </summary>
     public abstract class RulesetContainer : Container
     {
         /// <summary>
-        /// Invoked when all the judgeable HitObjects have been judged.
-        /// </summary>
-        public event Action OnAllJudged;
-
-        /// <summary>
-        /// Whether to apply adjustments to the child <see cref="Playfield{TObject,TJudgement}"/> based on our own size.
+        /// Whether to apply adjustments to the child <see cref="Playfield"/> based on our own size.
         /// </summary>
         public bool AspectAdjust = true;
 
@@ -61,11 +56,6 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
-        /// <summary>
-        /// Whether all the HitObjects have been judged.
-        /// </summary>
-        protected abstract bool AllObjectsJudged { get; }
-
         protected readonly Ruleset Ruleset;
 
         /// <summary>
@@ -75,15 +65,6 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
-        }
-
-        /// <summary>
-        /// Checks whether all HitObjects have been judged, and invokes OnAllJudged.
-        /// </summary>
-        protected void CheckAllJudged()
-        {
-            if (AllObjectsJudged)
-                OnAllJudged?.Invoke();
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -116,13 +97,15 @@ namespace osu.Game.Rulesets.UI
     /// RulesetContainer that applies conversion to Beatmaps. Does not contain a Playfield
     /// and does not load drawable hit objects.
     /// <para>
-    /// Should not be derived - derive <see cref="RulesetContainer{TObject,TJudgement}"/> instead.
+    /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
     /// </para>
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
     public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
+        public event Action<Judgement> OnJudgement;
+
         /// <summary>
         /// The Beatmap
         /// </summary>
@@ -148,6 +131,18 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected readonly bool IsForCurrentRuleset;
 
+        public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
+
+        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
+
+        /// <summary>
+        /// The playfield.
+        /// </summary>
+        public Playfield Playfield { get; private set; }
+
+        protected override Container<Drawable> Content => content;
+        private Container content;
+
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
         /// Creates a hit renderer for a beatmap.
@@ -155,7 +150,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="ruleset">The ruleset being repesented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        internal RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap, bool isForCurrentRuleset)
+        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap, bool isForCurrentRuleset)
             : base(ruleset)
         {
             Debug.Assert(workingBeatmap != null, "RulesetContainer initialized with a null beatmap.");
@@ -194,74 +189,6 @@ namespace osu.Game.Rulesets.UI
             applyMods(Mods);
         }
 
-        /// <summary>
-        /// Applies the active mods to this RulesetContainer.
-        /// </summary>
-        /// <param name="mods"></param>
-        private void applyMods(IEnumerable<Mod> mods)
-        {
-            if (mods == null)
-                return;
-
-            foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
-                mod.ApplyToRulesetContainer(this);
-        }
-
-        /// <summary>
-        /// Creates a processor to perform post-processing operations
-        /// on HitObjects in converted Beatmaps.
-        /// </summary>
-        /// <returns>The Beatmap processor.</returns>
-        protected virtual BeatmapProcessor<TObject> CreateBeatmapProcessor() => new BeatmapProcessor<TObject>();
-
-        /// <summary>
-        /// Creates a converter to convert Beatmap to a specific mode.
-        /// </summary>
-        /// <returns>The Beatmap converter.</returns>
-        protected abstract BeatmapConverter<TObject> CreateBeatmapConverter();
-    }
-
-    /// <summary>
-    /// A derivable RulesetContainer that manages the Playfield and HitObjects.
-    /// </summary>
-    /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
-    /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this RulesetContainer.</typeparam>
-    public abstract class RulesetContainer<TObject, TJudgement> : RulesetContainer<TObject>
-        where TObject : HitObject
-        where TJudgement : Judgement
-    {
-        public event Action<TJudgement> OnJudgement;
-
-        public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
-
-        /// <summary>
-        /// All the converted hit objects contained by this hit renderer.
-        /// </summary>
-        public new IEnumerable<TObject> Objects => Beatmap.HitObjects;
-
-        protected override bool AllObjectsJudged => drawableObjects.All(h => h.Judged);
-
-        /// <summary>
-        /// The playfield.
-        /// </summary>
-        public Playfield<TObject, TJudgement> Playfield { get; private set; }
-
-        protected override Container<Drawable> Content => content;
-        private Container content;
-
-        private readonly List<DrawableHitObject<TObject, TJudgement>> drawableObjects = new List<DrawableHitObject<TObject, TJudgement>>();
-
-        /// <summary>
-        /// Creates a hit renderer for a beatmap.
-        /// </summary>
-        /// <param name="ruleset">The ruleset being repesented.</param>
-        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
-        /// <param name="isForCurrentRuleset">Whether to assume the beatmap is for the current ruleset.</param>
-        protected RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -274,6 +201,19 @@ namespace osu.Game.Rulesets.UI
             KeyBindingInputManager.Add(Playfield = CreatePlayfield());
 
             loadObjects();
+        }
+
+        /// <summary>
+        /// Applies the active mods to this RulesetContainer.
+        /// </summary>
+        /// <param name="mods"></param>
+        private void applyMods(IEnumerable<Mod> mods)
+        {
+            if (mods == null)
+                return;
+
+            foreach (var mod in mods.OfType<IApplicableMod<TObject>>())
+                mod.ApplyToRulesetContainer(this);
         }
 
         public override void SetReplay(Replay replay)
@@ -289,8 +229,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         private void loadObjects()
         {
-            drawableObjects.Capacity = Beatmap.HitObjects.Count;
-
             foreach (TObject h in Beatmap.HitObjects)
             {
                 var drawableObject = GetVisualRepresentation(h);
@@ -298,9 +236,12 @@ namespace osu.Game.Rulesets.UI
                 if (drawableObject == null)
                     continue;
 
-                drawableObject.OnJudgement += onJudgement;
+                drawableObject.OnJudgement += (d, j) =>
+                {
+                    Playfield.OnJudgement(d, j);
+                    OnJudgement?.Invoke(j);
+                };
 
-                drawableObjects.Add(drawableObject);
                 Playfield.Add(drawableObject);
             }
 
@@ -315,36 +256,36 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// In some cases we want to apply changes to the relative size of our contained <see cref="Playfield{TObject, TJudgement}"/> based on custom conditions.
+        /// Creates a processor to perform post-processing operations
+        /// on HitObjects in converted Beatmaps.
+        /// </summary>
+        /// <returns>The Beatmap processor.</returns>
+        protected virtual BeatmapProcessor<TObject> CreateBeatmapProcessor() => new BeatmapProcessor<TObject>();
+
+        /// <summary>
+        /// In some cases we want to apply changes to the relative size of our contained <see cref="Playfield"/> based on custom conditions.
         /// </summary>
         /// <returns></returns>
         protected virtual Vector2 GetPlayfieldAspectAdjust() => new Vector2(0.75f); //a sane default
 
         /// <summary>
-        /// Triggered when an object's Judgement is updated.
+        /// Creates a converter to convert Beatmap to a specific mode.
         /// </summary>
-        /// <param name="judgedObject">The object that Judgement has been updated for.</param>
-        private void onJudgement(DrawableHitObject<TObject, TJudgement> judgedObject)
-        {
-            Playfield.OnJudgement(judgedObject);
-
-            OnJudgement?.Invoke(judgedObject.Judgement);
-
-            CheckAllJudged();
-        }
+        /// <returns>The Beatmap converter.</returns>
+        protected abstract BeatmapConverter<TObject> CreateBeatmapConverter();
 
         /// <summary>
         /// Creates a DrawableHitObject from a HitObject.
         /// </summary>
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
-        protected abstract DrawableHitObject<TObject, TJudgement> GetVisualRepresentation(TObject h);
+        protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
 
         /// <summary>
         /// Creates a Playfield.
         /// </summary>
         /// <returns>The Playfield.</returns>
-        protected abstract Playfield<TObject, TJudgement> CreatePlayfield();
+        protected abstract Playfield CreatePlayfield();
     }
 
     /// <summary>
@@ -352,11 +293,9 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     /// <typeparam name="TPlayfield">The type of Playfield contained by this RulesetContainer.</typeparam>
     /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
-    /// <typeparam name="TJudgement">The type of Judgement of DrawableHitObjects contained by this RulesetContainer.</typeparam>
-    public abstract class RulesetContainer<TPlayfield, TObject, TJudgement> : RulesetContainer<TObject, TJudgement>
+    public abstract class RulesetContainer<TPlayfield, TObject> : RulesetContainer<TObject>
         where TObject : HitObject
-        where TJudgement : Judgement
-        where TPlayfield : Playfield<TObject, TJudgement>
+        where TPlayfield : Playfield
     {
         /// <summary>
         /// The playfield.

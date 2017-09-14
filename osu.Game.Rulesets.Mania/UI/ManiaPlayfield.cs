@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Graphics.Containers;
 using System;
 using osu.Game.Graphics;
@@ -17,10 +16,11 @@ using osu.Framework.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ScrollingPlayfield<ManiaHitObject, ManiaJudgement>
+    public class ManiaPlayfield : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
@@ -52,6 +52,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private List<Color4> normalColumnColours = new List<Color4>();
         private Color4 specialColumnColour;
+
+        private readonly Container<DrawableManiaJudgement> judgements;
 
         private readonly int columnCount;
 
@@ -120,6 +122,14 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Padding = new MarginPadding { Top = HIT_TARGET_POSITION }
                             }
                         },
+                        judgements = new Container<DrawableManiaJudgement>
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                            Y = HIT_TARGET_POSITION + 150,
+                            BypassAutoSizeAxes = Axes.Both
+                        },
                         topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
                     }
                 }
@@ -147,6 +157,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private void invertedChanged(bool newValue)
         {
             Scale = new Vector2(1, newValue ? -1 : 1);
+            judgements.Scale = Scale;
         }
 
         [BackgroundDependencyLoader]
@@ -181,7 +192,18 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void OnJudgement(DrawableHitObject<ManiaHitObject, ManiaJudgement> judgedObject) => columns[judgedObject.HitObject.Column].OnJudgement(judgedObject);
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        {
+            var maniaObject = (ManiaHitObject)judgedObject.HitObject;
+            columns[maniaObject.Column].OnJudgement(judgedObject, judgement);
+
+            judgements.Clear();
+            judgements.Add(new DrawableManiaJudgement(judgement)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
+        }
 
         /// <summary>
         /// Whether the column index is a special column for this playfield.
@@ -202,7 +224,8 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> h) => Columns.ElementAt(h.HitObject.Column).Add(h);
+        public override void Add(DrawableHitObject h) => Columns.ElementAt(((ManiaHitObject)h.HitObject).Column).Add(h);
+
         public void Add(DrawableBarLine barline) => HitObjects.Add(barline);
 
         protected override void Update()

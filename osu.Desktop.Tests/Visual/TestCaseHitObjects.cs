@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using OpenTK;
@@ -110,10 +109,7 @@ namespace osu.Desktop.Tests.Visual
             h.Depth = depth++;
 
             if (auto)
-            {
                 h.State = ArmedState.Hit;
-                h.Judgement = new OsuJudgement { Result = HitResult.Hit };
-            }
 
             playfieldContainer.Add(h);
             var proxyable = h as IDrawableHitObjectWithProxiedApproach;

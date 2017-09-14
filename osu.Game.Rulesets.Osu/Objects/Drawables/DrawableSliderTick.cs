@@ -4,10 +4,10 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Judgements;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -21,8 +21,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public bool Tracking;
 
         public override bool RemoveWhenNotAlive => false;
-
-        protected override OsuJudgement CreateJudgement() => new OsuJudgement { MaxScore = OsuScoreResult.SliderTick };
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
@@ -49,13 +47,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (Judgement.TimeOffset >= 0)
-            {
-                Judgement.Result = Tracking ? HitResult.Hit : HitResult.Miss;
-                Judgement.Score = Tracking ? OsuScoreResult.SliderTick : OsuScoreResult.Miss;
-            }
+            if (timeOffset >= 0)
+                AddJudgement(new OsuJudgement { Result = Tracking ? HitResult.Great : HitResult.Miss });
         }
 
         protected override void UpdatePreemptState()

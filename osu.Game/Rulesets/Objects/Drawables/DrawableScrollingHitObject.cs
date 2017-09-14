@@ -3,19 +3,17 @@
 
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
     /// <summary>
-    /// A basic class that overrides <see cref="DrawableHitObject{TObject, TJudgement}"/> and implements <see cref="IScrollingHitObject"/>.
+    /// A basic class that overrides <see cref="DrawableHitObject{TObject}"/> and implements <see cref="IScrollingHitObject"/>.
     /// This object does not need to have its <see cref="Drawable.RelativePositionAxes"/> set to be able to scroll, as this will
     /// will be set by the scrolling container that contains it.
     /// </summary>
-    public abstract class DrawableScrollingHitObject<TObject, TJudgement> : DrawableHitObject<TObject, TJudgement>, IScrollingHitObject
+    public abstract class DrawableScrollingHitObject<TObject> : DrawableHitObject<TObject>, IScrollingHitObject
         where TObject : HitObject
-        where TJudgement : Judgement
     {
         public BindableDouble LifetimeOffset { get; } = new BindableDouble();
 
@@ -33,6 +31,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         public override bool RemoveWhenNotAlive => false;
+        protected override bool RequiresChildrenUpdate => true;
 
         protected DrawableScrollingHitObject(TObject hitObject)
             : base(hitObject)
@@ -57,7 +56,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             set { lifetimeEnd = value; }
         }
 
-        protected override void AddNested(DrawableHitObject<TObject, TJudgement> h)
+        protected override void AddNested(DrawableHitObject<TObject> h)
         {
             var scrollingHitObject = h as IScrollingHitObject;
             scrollingHitObject?.LifetimeOffset.BindTo(LifetimeOffset);

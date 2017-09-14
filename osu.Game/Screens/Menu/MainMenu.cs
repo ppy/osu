@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate { Push(new Editor()); },
                             OnSolo = delegate { Push(consumeSongSelect()); },
                             OnMulti = delegate { Push(new Lobby()); },
-                            OnExit = delegate { Exit(); },
+                            OnExit = Exit,
                         }
                     }
                 },
