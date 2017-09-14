@@ -7,6 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Users;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
@@ -73,6 +74,9 @@ namespace osu.Game.Online.API.Requests
             set { Replay = value; }
         }
 
+        [JsonProperty(@"mode_int")]
+        public int OnlineRulesetID { get; set; }
+
         [JsonProperty(@"score_id")]
         private long onlineScoreID
         {
@@ -83,6 +87,18 @@ namespace osu.Game.Online.API.Requests
         private DateTimeOffset date
         {
             set { Date = value; }
+        }
+
+        [JsonProperty(@"beatmap")]
+        private BeatmapInfo beatmap
+        {
+            set { Beatmap = value; }
+        }
+
+        [JsonProperty(@"beatmapset")]
+        private BeatmapMetadata metadata
+        {
+            set { Beatmap.Metadata = value; }
         }
 
         [JsonProperty(@"statistics")]
@@ -122,7 +138,12 @@ namespace osu.Game.Online.API.Requests
         public void ApplyBeatmap(BeatmapInfo beatmap)
         {
             Beatmap = beatmap;
-            Ruleset = beatmap.Ruleset;
+            ApplyRuleset(beatmap.Ruleset);
+        }
+
+        public void ApplyRuleset(RulesetInfo ruleset)
+        {
+            Ruleset = ruleset;
 
             // Evaluate the mod string
             Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
