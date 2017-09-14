@@ -92,10 +92,10 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string ShortenedName => "RD";
         public override string Description => @"Shuffle around the notes!";
         public override double ScoreMultiplier => 1;
+
         public void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
         {
             int availableColumns = ((ManiaRulesetContainer)rulesetContainer).AvailableColumns;
-
             var shuffledColumns = Enumerable.Range(0, availableColumns).OrderBy(item => RNG.Next()).ToList();
 
             rulesetContainer.Objects.OfType<ManiaHitObject>().ForEach(h => h.Column = shuffledColumns[h.Column]);
