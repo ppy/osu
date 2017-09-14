@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play
         #endregion
 
         private DrawableStoryboard storyboard;
-        private bool storyboardUsesBackground;
+        private bool storyboardReplacesBackground;
 
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
@@ -212,7 +212,7 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
 
-            storyboardUsesBackground = beatmap.StoryboardUsesBackground;
+            storyboardReplacesBackground = beatmap.StoryboardReplacesBackground;
             storyboard.Width = storyboard.Height * beatmap.BeatmapInfo.StoryboardAspect;
             storyboard.Masking = true;
             storyboard.Alpha = showStoryboard ? 1 : 0;
@@ -341,9 +341,9 @@ namespace osu.Game.Screens.Play
         {
             var opacity = 1 - (float)dimLevel;
             storyboard.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
-            storyboard.FadeTo(!showStoryboard || opacity == 0 ? 0 : 1, 800);
+            storyboard.FadeTo(!showStoryboard || opacity == 0 ? 0 : 1, 200);
 
-            Background?.FadeTo(showStoryboard && storyboardUsesBackground ? 0 : opacity, 800, Easing.OutQuint);
+            Background?.FadeTo(showStoryboard && storyboardReplacesBackground ? 0 : opacity, 800, Easing.OutQuint);
         }
 
         private void fadeOut()
