@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Edit.Menus
 {
@@ -26,6 +27,17 @@ namespace osu.Game.Screens.Edit.Menus
         protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableEditorBarMenuItem(item);
+
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Key.Escape:
+                    return false;
+            }
+
+            return base.OnKeyDown(state, args);
+        }
 
         private class DrawableEditorBarMenuItem : DrawableOsuMenuItem
         {
