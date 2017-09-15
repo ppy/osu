@@ -30,11 +30,8 @@ namespace osu.Game.Screens.Edit.Menus
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            switch (args.Key)
-            {
-                case Key.Escape:
-                    return false;
-            }
+            if (args.Key == Key.Escape)
+                return false;
 
             return base.OnKeyDown(state, args);
         }
