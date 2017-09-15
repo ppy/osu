@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Open osu! folder",
-                    Action = () => storage.OpenInNativeExplorer(),
+                    Action = storage.OpenInNativeExplorer,
                 }
             };
         }

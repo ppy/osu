@@ -206,10 +206,8 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.ModDisplay.Current.BindTo(working.Mods);
 
-            //bind RulesetContainer to ScoreProcessor and ourselves (for a pass situation)
-            RulesetContainer.OnAllJudged += onCompletion;
-
-            //bind ScoreProcessor to ourselves (for a fail situation)
+            // Bind ScoreProcessor to ourselves
+            scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
         }
 

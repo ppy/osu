@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
@@ -64,8 +64,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         //We are no longer within stacking range of the next object.
                         break;
 
-                    if (Vector2.Distance(stackBaseObject.Position, objectN.Position) < stack_distance ||
-                        stackBaseObject is Slider && Vector2.Distance(stackBaseObject.EndPosition, objectN.Position) < stack_distance)
+                    if (Vector2Extensions.Distance(stackBaseObject.Position, objectN.Position) < stack_distance ||
+                        stackBaseObject is Slider && Vector2Extensions.Distance(stackBaseObject.EndPosition, objectN.Position) < stack_distance)
                     {
                         stackBaseIndex = n;
 
@@ -130,14 +130,14 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             *        o <- hitCircle has stack of -1
                             *         o <- hitCircle has stack of -2
                             */
-                        if (objectN is Slider && Vector2.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
+                        if (objectN is Slider && Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
                         {
                             int offset = objectI.StackHeight - objectN.StackHeight + 1;
                             for (int j = n + 1; j <= i; j++)
                             {
                                 //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
                                 OsuHitObject objectJ = beatmap.HitObjects[j];
-                                if (Vector2.Distance(objectN.EndPosition, objectJ.Position) < stack_distance)
+                                if (Vector2Extensions.Distance(objectN.EndPosition, objectJ.Position) < stack_distance)
                                     objectJ.StackHeight -= offset;
                             }
 
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             break;
                         }
 
-                        if (Vector2.Distance(objectN.Position, objectI.Position) < stack_distance)
+                        if (Vector2Extensions.Distance(objectN.Position, objectI.Position) < stack_distance)
                         {
                             //Keep processing as if there are no sliders.  If we come across a slider, this gets cancelled out.
                             //NOTE: Sliders with start positions stacking are a special case that is also handled here.
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             //We are no longer within stacking range of the previous object.
                             break;
 
-                        if (Vector2.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
+                        if (Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
                         {
                             objectN.StackHeight = objectI.StackHeight + 1;
                             objectI = objectN;

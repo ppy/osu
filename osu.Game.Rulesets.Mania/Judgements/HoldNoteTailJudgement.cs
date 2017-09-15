@@ -23,17 +23,5 @@ namespace osu.Game.Rulesets.Mania.Judgements
                     return base.NumericResultFor(HasBroken ? HitResult.Good : result);
             }
         }
-
-        protected override int NumericResultForAccuracy(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return base.NumericResultForAccuracy(result);
-                case HitResult.Great:
-                case HitResult.Perfect:
-                    return base.NumericResultForAccuracy(HasBroken ? HitResult.Good : result);
-            }
-        }
     }
 }
