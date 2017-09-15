@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             yield return new Fruit
             {
                 StartTime = obj.StartTime,
+                NewCombo = (obj as IHasCombo)?.NewCombo ?? false,
                 Position = ((IHasXPosition)obj).X / OsuPlayfield.BASE_SIZE.X
             };
         }
