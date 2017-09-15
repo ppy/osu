@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
 
+        protected override BeatmapProcessor<CatchBaseHit> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
+
         protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield();
