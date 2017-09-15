@@ -80,11 +80,15 @@ namespace osu.Desktop.Tests.Visual
                 storyboardContainer.Remove(storyboard);
 
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
-            decoupledClock.ChangeSource(working.Track);
             storyboardContainer.Clock = decoupledClock;
 
-            storyboardContainer.Add(storyboard = working.Beatmap.Storyboard.CreateDrawable());
+            storyboard = working.Beatmap.Storyboard.CreateDrawable();
             storyboard.Passing = false;
+            if (!working.Beatmap.StoryboardReplacesBackground)
+                storyboard.BackgroundTexture = working.Background;
+
+            storyboardContainer.Add(storyboard);
+            decoupledClock.ChangeSource(working.Track);
         }
     }
 }
