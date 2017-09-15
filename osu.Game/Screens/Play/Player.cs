@@ -161,21 +161,25 @@ namespace osu.Game.Screens.Play
                     },
                     Children = new Drawable[]
                     {
-                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Clock = offsetClock,
-                            Children = new Drawable[]
-                            {
-                                RulesetContainer,
-                            }
+                            Child = RulesetContainer,
                         },
                         hudOverlay = new HUDOverlay
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
+                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Breaks = beatmap.Breaks,
+                            Clock = decoupledClock
+                        },
+                        new SkipButton(firstObjectTime) { AudioClock = decoupledClock },
                     }
                 },
                 failOverlay = new FailOverlay
