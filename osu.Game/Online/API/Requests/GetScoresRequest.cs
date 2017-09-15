@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Framework.IO.Network;
 using osu.Game.Beatmaps;
 using osu.Game.Users;
 using osu.Game.Rulesets.Replays;
@@ -19,6 +18,9 @@ namespace osu.Game.Online.API.Requests
 
         public GetScoresRequest(BeatmapInfo beatmap)
         {
+            if (!beatmap.OnlineBeatmapID.HasValue)
+                throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
+
             this.beatmap = beatmap;
 
             Success += onSuccess;
@@ -28,14 +30,6 @@ namespace osu.Game.Online.API.Requests
         {
             foreach (OnlineScore score in r.Scores)
                 score.ApplyBeatmap(beatmap);
-        }
-
-        protected override WebRequest CreateWebRequest()
-        {
-            var req = base.CreateWebRequest();
-            //req.AddParameter(@"c", beatmap.Hash);
-            //req.AddParameter(@"f", beatmap.Path);
-            return req;
         }
 
         protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores";
