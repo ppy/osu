@@ -14,16 +14,37 @@ using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.OnlineBeatmapSet
 {
     public class PreviewButton : OsuClickableContainer
     {
+        private const float transition_duration = 500;
+
+        private readonly Container audioWrapper;
         private readonly Box bg, progress;
         private readonly SpriteIcon icon;
+        private readonly LoadingAnimation loadingAnimation;
 
-        private AudioManager audio;
         private Track preview;
+
+        private bool loading
+        {
+            set
+            {
+                if (value)
+                {
+                    loadingAnimation.Show();
+                    icon.FadeOut(transition_duration * 5, Easing.OutQuint);
+                }
+                else
+                {
+                    loadingAnimation.Hide();
+                    icon.FadeIn(transition_duration, Easing.OutQuint);
+                }
+            }
+        }
 
         private BeatmapSetInfo beatmapSet;
         public BeatmapSetInfo BeatmapSet
@@ -36,7 +57,6 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
                 Playing = false;
                 preview = null;
-                loadPreview();
             }
         }
 
@@ -49,22 +69,28 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 if (value == playing) return;
                 playing = value;
 
-                if (progress == null) return;
-
-                if (Playing)
+                if (preview == null)
                 {
-                    icon.Icon = FontAwesome.fa_stop;
-                    progress.FadeIn(100);
+                    loading = true;
+                    audioWrapper.Child = new AsyncLoadWrapper(new AudioLoadWrapper(BeatmapSet)
+                    {
+                        OnLoadComplete = d =>
+                        {
+                            loading = false;
 
-                    loadPreview();
-                    preview.Start();
+                            if (d is AudioLoadWrapper)
+                            {
+                                preview = (d as AudioLoadWrapper).Preview;
+                                Playing = Playing;
+                                updatePlayingState();
+                            }
+                        },
+                    });
+
+                    return;
                 }
-                else
-                {
-                    icon.Icon = FontAwesome.fa_play;
-                    progress.FadeOut(100);
-                    preview.Stop();
-                }
+
+                updatePlayingState();
             }
         }
 
@@ -74,6 +100,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
             Children = new Drawable[]
             {
+                audioWrapper = new Container(),
                 bg = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -100,15 +127,19 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                     Size = new Vector2(18),
                     Shadow = false,
                 },
+                loadingAnimation = new LoadingAnimation
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
             };
 
             Action = () => Playing = !Playing;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, AudioManager audio)
+        private void load(OsuColour colours)
         {
-            this.audio = audio;
             progress.Colour = colours.Yellow;
         }
 
@@ -116,10 +147,14 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
         {
             base.Update();
 
-            if (Playing)
+            if (Playing && preview != null)
             {
                 progress.Width = (float)(preview.CurrentTime / preview.Length);
-                if (preview.HasCompleted) Playing = false;
+                if (preview.HasCompleted)
+                {
+                    Playing = false;
+                    preview = null;
+                }
             }
         }
 
@@ -141,16 +176,45 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
             base.OnHoverLost(state);
         }
 
-        private void loadPreview()
+        private void updatePlayingState()
         {
-            if (preview == null || preview.HasCompleted && BeatmapSet != null)
+            if (preview == null) return;
+
+            if (Playing)
             {
-                preview = audio.Track.Get(BeatmapSet.OnlineInfo.Preview);
-                preview.Volume.Value = 0.5;
+                icon.Icon = FontAwesome.fa_stop;
+                progress.FadeIn(100);
+
+                preview.Seek(0);
+                preview.Start();
             }
             else
             {
-                preview.Seek(0);
+                icon.Icon = FontAwesome.fa_play;
+                progress.FadeOut(100);
+                preview.Stop();
+            }
+        }
+
+        private class AudioLoadWrapper : Drawable
+        {
+            private readonly string preview;
+
+            public Track Preview;
+
+            public AudioLoadWrapper(BeatmapSetInfo set)
+            {
+                preview = set.OnlineInfo.Preview;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                if (!string.IsNullOrEmpty(preview))
+                {
+                    Preview = audio.Track.Get(preview);
+                    Preview.Volume.Value = 0.5;
+                }
             }
         }
     }
