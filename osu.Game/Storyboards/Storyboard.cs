@@ -12,6 +12,8 @@ namespace osu.Game.Storyboards
         private readonly Dictionary<string, StoryboardLayer> layers = new Dictionary<string, StoryboardLayer>();
         public IEnumerable<StoryboardLayer> Layers => layers.Values;
 
+        public bool HasDrawable => Layers.Any(l => l.Elements.Any(e => e.IsDrawable));
+
         public Storyboard()
         {
             layers.Add("Background", new StoryboardLayer("Background", 3));

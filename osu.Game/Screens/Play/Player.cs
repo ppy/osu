@@ -71,7 +71,6 @@ namespace osu.Game.Screens.Play
 
         private Container storyboardContainer;
         private DrawableStoryboard storyboard;
-        private bool storyboardReplacesBackground;
 
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
@@ -157,6 +156,7 @@ namespace osu.Game.Screens.Play
                 {
                     RelativeSizeAxes = Axes.Both,
                     Clock = offsetClock,
+                    Alpha = 0,
                 },
                 pauseContainer = new PauseContainer
                 {
@@ -209,7 +209,6 @@ namespace osu.Game.Screens.Play
 
             scoreProcessor = RulesetContainer.CreateScoreProcessor();
 
-            storyboardReplacesBackground = beatmap.StoryboardReplacesBackground;
             if (showStoryboard)
                 initializeStoryboard(false);
 
@@ -236,6 +235,8 @@ namespace osu.Game.Screens.Play
             storyboard.Width = storyboard.Height * beatmap.BeatmapInfo.StoryboardAspect;
             storyboard.Masking = true;
 
+            if (!beatmap.StoryboardReplacesBackground)
+                storyboard.BackgroundTexture = Beatmap.Value.Background;
             storyboardContainer.Add(asyncLoad ? new AsyncLoadWrapper(storyboard) { RelativeSizeAxes = Axes.Both } : (Drawable)storyboard);
         }
 
@@ -351,10 +352,13 @@ namespace osu.Game.Screens.Play
             if (showStoryboard && storyboard == null)
                 initializeStoryboard(true);
 
-            storyboard?.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
-            storyboard?.FadeTo(showStoryboard && opacity > 0 ? 1 : 0, 200);
+            var beatmap = Beatmap.Value;
+            var storyboardVisible = showStoryboard && beatmap.Beatmap.Storyboard.HasDrawable;
 
-            Background?.FadeTo(!showStoryboard || !storyboardReplacesBackground ? opacity : 0, 800, Easing.OutQuint);
+            storyboardContainer.FadeColour(new Color4(opacity, opacity, opacity, 1), 800);
+            storyboardContainer.FadeTo(storyboardVisible && opacity > 0 ? 1 : 0);
+
+            Background?.FadeTo(!storyboardVisible || beatmap.Background == null ? opacity : 0, 800, Easing.OutQuint);
         }
 
         private void fadeOut()

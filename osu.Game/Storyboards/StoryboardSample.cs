@@ -8,6 +8,8 @@ namespace osu.Game.Storyboards
     public class StoryboardSample : IStoryboardElement
     {
         public string Path { get; set; }
+        public bool IsDrawable => false;
+
         public double Time;
         public float Volume;
 

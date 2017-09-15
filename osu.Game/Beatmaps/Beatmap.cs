@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps
         {
             get
             {
-                var backgroundPath = BeatmapInfo.BeatmapSet.Metadata.BackgroundFile?.ToLowerInvariant();
+                var backgroundPath = BeatmapInfo.BeatmapSet.Metadata?.BackgroundFile?.ToLowerInvariant();
                 if (backgroundPath == null)
                     return false;
 
