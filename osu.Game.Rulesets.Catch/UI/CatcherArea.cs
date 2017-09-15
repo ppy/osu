@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Catch.UI
     public class CatcherArea : Container
     {
         private Catcher catcher;
+        private Container explodingFruitContainer;
 
         public void Add(DrawableHitObject fruit, Vector2 screenPosition) => catcher.AddToStack(fruit, screenPosition);
 
@@ -30,9 +31,14 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             Children = new Drawable[]
             {
+                explodingFruitContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 catcher = new Catcher
                 {
                     RelativePositionAxes = Axes.Both,
+                    ExplodingFruitTarget = explodingFruitContainer,
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopCentre,
                     X = 0.5f,
@@ -62,6 +68,8 @@ namespace osu.Game.Rulesets.Catch.UI
             private int currentDirection;
 
             private bool dashing;
+
+            public Container ExplodingFruitTarget;
 
             protected bool Dashing
             {
@@ -168,13 +176,44 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 float distance = fruit.DrawSize.X / 2 * fruit.Scale.X;
 
-                while (Children.OfType<DrawableFruit>().Any(f => Vector2Extensions.DistanceSquared(f.Position, fruit.Position) < distance * distance))
+                while (Children.OfType<DrawableFruit>().Any(f => f.LifetimeEnd == double.PositiveInfinity && Vector2Extensions.DistanceSquared(f.Position, fruit.Position) < distance * distance))
                 {
                     fruit.X += RNG.Next(-5, 5);
                     fruit.Y -= RNG.Next(0, 5);
                 }
 
                 Add(fruit);
+
+                if (((CatchBaseHit)fruit.HitObject).LastInCombo)
+                    explode();
+            }
+
+            private void explode()
+            {
+                foreach (var existingFruit in Children.OfType<DrawableFruit>().ToArray())
+                {
+                    var originalX = existingFruit.X * Scale.X;
+
+                    if (ExplodingFruitTarget != null)
+                    {
+                        existingFruit.Anchor = Anchor.TopLeft;
+                        existingFruit.Position = ToSpaceOfOtherDrawable(existingFruit.DrawPosition, ExplodingFruitTarget);
+
+                        Remove(existingFruit);
+
+                        ExplodingFruitTarget.Add(existingFruit);
+                    }
+
+                    existingFruit
+                        .MoveToY(existingFruit.Y - 50, 250, Easing.OutSine)
+                        .Then()
+                        .MoveToY(existingFruit.Y + 50, 500, Easing.InSine);
+
+                    existingFruit.MoveToX(existingFruit.X + originalX * 6, 1000);
+                    existingFruit.FadeOut(750);
+
+                    existingFruit.Expire();
+                }
             }
         }
     }
