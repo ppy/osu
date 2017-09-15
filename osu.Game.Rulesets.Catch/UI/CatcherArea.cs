@@ -139,16 +139,21 @@ namespace osu.Game.Rulesets.Catch.UI
                 return false;
             }
 
+            /// <summary>
+            /// The relative space to cover in 1 millisecond. based on 1 game pixel per millisecond as in osu-stable.
+            /// </summary>
+            private const double base_speed = 1.0 / 512;
+
             protected override void Update()
             {
                 base.Update();
 
                 if (currentDirection == 0) return;
 
-                float speed = Dashing ? 1.5f : 1;
+                double dashModifier = Dashing ? 1 : 0.5;
 
                 Scale = new Vector2(Math.Sign(currentDirection), 1);
-                X = (float)MathHelper.Clamp(X + Math.Sign(currentDirection) * Clock.ElapsedFrameTime / 1800 * speed, 0, 1);
+                X = (float)MathHelper.Clamp(X + Math.Sign(currentDirection) * Clock.ElapsedFrameTime * base_speed * dashModifier, 0, 1);
             }
 
             public void AddToStack(DrawableHitObject fruit, Vector2 absolutePosition)
