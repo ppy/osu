@@ -28,9 +28,8 @@ namespace osu.Game.Storyboards.Drawables
         {
             foreach (var element in Layer.Elements)
             {
-                var drawable = element.CreateDrawable();
-                if (drawable != null)
-                    Add(drawable);
+                if (element.IsDrawable)
+                    Add(element.CreateDrawable());
             }
         }
     }

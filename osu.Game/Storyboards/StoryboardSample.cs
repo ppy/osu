@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
+using System;
 
 namespace osu.Game.Storyboards
 {
@@ -21,6 +22,8 @@ namespace osu.Game.Storyboards
         }
 
         public Drawable CreateDrawable()
-            => null;
+        {
+            throw new InvalidOperationException();
+        }
     }
 }
