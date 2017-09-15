@@ -30,11 +30,6 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer : Container
     {
         /// <summary>
-        /// Invoked when all the judgeable HitObjects have been judged.
-        /// </summary>
-        public event Action OnAllJudged;
-
-        /// <summary>
         /// Whether to apply adjustments to the child <see cref="Playfield"/> based on our own size.
         /// </summary>
         public bool AspectAdjust = true;
@@ -61,11 +56,6 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
-        /// <summary>
-        /// Whether all the HitObjects have been judged.
-        /// </summary>
-        protected abstract bool AllObjectsJudged { get; }
-
         protected readonly Ruleset Ruleset;
 
         /// <summary>
@@ -75,15 +65,6 @@ namespace osu.Game.Rulesets.UI
         internal RulesetContainer(Ruleset ruleset)
         {
             Ruleset = ruleset;
-        }
-
-        /// <summary>
-        /// Checks whether all HitObjects have been judged, and invokes OnAllJudged.
-        /// </summary>
-        protected void CheckAllJudged()
-        {
-            if (AllObjectsJudged)
-                OnAllJudged?.Invoke();
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -152,7 +133,7 @@ namespace osu.Game.Rulesets.UI
 
         public sealed override bool ProvidingUserCursor => !HasReplayLoaded && Playfield.ProvidingUserCursor;
 
-        protected override bool AllObjectsJudged => drawableObjects.All(h => h.AllJudged);
+        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
         /// <summary>
         /// The playfield.
@@ -161,8 +142,6 @@ namespace osu.Game.Rulesets.UI
 
         protected override Container<Drawable> Content => content;
         private Container content;
-
-        private readonly List<DrawableHitObject<TObject>> drawableObjects = new List<DrawableHitObject<TObject>>();
 
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
@@ -250,8 +229,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         private void loadObjects()
         {
-            drawableObjects.Capacity = Beatmap.HitObjects.Count;
-
             foreach (TObject h in Beatmap.HitObjects)
             {
                 var drawableObject = GetVisualRepresentation(h);
@@ -263,10 +240,8 @@ namespace osu.Game.Rulesets.UI
                 {
                     Playfield.OnJudgement(d, j);
                     OnJudgement?.Invoke(j);
-                    CheckAllJudged();
                 };
 
-                drawableObjects.Add(drawableObject);
                 Playfield.Add(drawableObject);
             }
 
