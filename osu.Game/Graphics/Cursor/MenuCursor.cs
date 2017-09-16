@@ -20,13 +20,16 @@ namespace osu.Game.Graphics.Cursor
     {
         protected override Drawable CreateCursor() => new Cursor();
 
+        private Bindable<bool> cursorRotate;
+        private bool dragRotating;
+
         private bool dragging;
 
         private bool startRotation;
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (((Cursor)ActiveCursor).DragRotating) {
+            if (dragRotating) {
                 if (dragging) {
                     Debug.Assert (state.Mouse.PositionMouseDown != null);
 
@@ -104,17 +107,22 @@ namespace osu.Game.Graphics.Cursor
             ActiveCursor.ScaleTo(0, 500, Easing.In);
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config, TextureStore textures, OsuColour colour)
+        {
+            cursorRotate = config.GetBindable<bool> (OsuSetting.CursorRotation);
+            cursorRotate.ValueChanged += newValue => dragRotating = newValue;
+            cursorRotate.TriggerChange();
+        }
+
         public class Cursor : Container
         {
             private Container cursorContainer;
             private Bindable<double> cursorScale;
-            private Bindable<bool> cursorRotate;
 
             private const float base_scale = 0.15f;
 
             public Sprite AdditiveLayer;
-
-            public bool DragRotating;
 
             public Cursor()
             {
@@ -149,10 +157,6 @@ namespace osu.Game.Graphics.Cursor
                 cursorScale = config.GetBindable<double>(OsuSetting.MenuCursorSize);
                 cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale * base_scale);
                 cursorScale.TriggerChange();
-
-                cursorRotate = config.GetBindable<bool> (OsuSetting.CursorRotation);
-                cursorRotate.ValueChanged += newValue => DragRotating = newValue;
-                cursorRotate.TriggerChange();
             }
         }
     }
