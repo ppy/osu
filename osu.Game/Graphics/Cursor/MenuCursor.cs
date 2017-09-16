@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Cursor
 {
     public class MenuCursor : CursorContainer
     {
-        protected override Drawable CreateCursor() => new Cursor();
+        protected override Drawable CreateCursor () => new Cursor();
 
         private Bindable<bool> cursorRotate;
 
@@ -26,10 +26,9 @@ namespace osu.Game.Graphics.Cursor
 
         private bool startRotation;
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnMouseMove (InputState state)
         {
-            if (cursorRotate && dragging)
-            {
+            if (cursorRotate && dragging) {
                 Debug.Assert (state.Mouse.PositionMouseDown != null);
 
                 // don't start rotating until we're moved a minimum distance away from the mouse down location,
@@ -52,61 +51,60 @@ namespace osu.Game.Graphics.Cursor
                 }
             }
 
-            return base.OnMouseMove(state);
+            return base.OnMouseMove (state);
         }
 
-        protected override bool OnDragStart(InputState state)
+        protected override bool OnDragStart (InputState state)
         {
             dragging = true;
-            return base.OnDragStart(state);
+            return base.OnDragStart (state);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown (InputState state, MouseDownEventArgs args)
         {
-            ActiveCursor.Scale = new Vector2(1);
-            ActiveCursor.ScaleTo(0.90f, 800, Easing.OutQuint);
+            ActiveCursor.Scale = new Vector2 (1);
+            ActiveCursor.ScaleTo (0.90f, 800, Easing.OutQuint);
 
             ((Cursor)ActiveCursor).AdditiveLayer.Alpha = 0;
-            ((Cursor)ActiveCursor).AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
-            return base.OnMouseDown(state, args);
+            ((Cursor)ActiveCursor).AdditiveLayer.FadeInFromZero (800, Easing.OutQuint);
+            return base.OnMouseDown (state, args);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp (InputState state, MouseUpEventArgs args)
         {
-            if (!state.Mouse.HasMainButtonPressed)
-            {
+            if (!state.Mouse.HasMainButtonPressed) {
                 dragging = false;
                 startRotation = false;
 
-                ((Cursor)ActiveCursor).AdditiveLayer.FadeOut(500, Easing.OutQuint);
-                ActiveCursor.RotateTo(0, 600 * (1 + Math.Abs(ActiveCursor.Rotation / 720)), Easing.OutElasticHalf);
-                ActiveCursor.ScaleTo(1, 500, Easing.OutElastic);
+                ((Cursor)ActiveCursor).AdditiveLayer.FadeOut (500, Easing.OutQuint);
+                ActiveCursor.RotateTo (0, 600 * (1 + Math.Abs (ActiveCursor.Rotation / 720)), Easing.OutElasticHalf);
+                ActiveCursor.ScaleTo (1, 500, Easing.OutElastic);
             }
 
-            return base.OnMouseUp(state, args);
+            return base.OnMouseUp (state, args);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick (InputState state)
         {
-            ((Cursor)ActiveCursor).AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
+            ((Cursor)ActiveCursor).AdditiveLayer.FadeOutFromOne (500, Easing.OutQuint);
 
-            return base.OnClick(state);
+            return base.OnClick (state);
         }
 
-        protected override void PopIn()
+        protected override void PopIn ()
         {
-            ActiveCursor.FadeTo(1, 250, Easing.OutQuint);
-            ActiveCursor.ScaleTo(1, 400, Easing.OutQuint);
+            ActiveCursor.FadeTo (1, 250, Easing.OutQuint);
+            ActiveCursor.ScaleTo (1, 400, Easing.OutQuint);
         }
 
-        protected override void PopOut()
+        protected override void PopOut ()
         {
-            ActiveCursor.FadeTo(0, 900, Easing.OutQuint);
-            ActiveCursor.ScaleTo(0, 500, Easing.In);
+            ActiveCursor.FadeTo (0, 900, Easing.OutQuint);
+            ActiveCursor.ScaleTo (0, 500, Easing.In);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load (OsuConfigManager config)
         {
             cursorRotate = config.GetBindable<bool> (OsuSetting.CursorRotation);
         }
@@ -120,7 +118,7 @@ namespace osu.Game.Graphics.Cursor
 
             public Sprite AdditiveLayer;
 
-            public Cursor()
+            public Cursor ()
             {
                 AutoSizeAxes = Axes.Both;
             }
@@ -128,30 +126,25 @@ namespace osu.Game.Graphics.Cursor
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, TextureStore textures, OsuColour colour)
             {
-                Children = new Drawable[]
-                {
-                    cursorContainer = new Container
-                    {
+                Children = new Drawable[] {
+                    cursorContainer = new Container {
                         AutoSizeAxes = Axes.Both,
-                        Children = new Drawable[]
-                        {
-                            new Sprite
-                            {
-                                Texture = textures.Get(@"Cursor/menu-cursor"),
+                        Children = new Drawable[] {
+                            new Sprite {
+                                Texture = textures.Get (@"Cursor/menu-cursor"),
                             },
-                            AdditiveLayer = new Sprite
-                            {
+                            AdditiveLayer = new Sprite {
                                 Blending = BlendingMode.Additive,
                                 Colour = colour.Pink,
                                 Alpha = 0,
-                                Texture = textures.Get(@"Cursor/menu-cursor-additive"),
+                                Texture = textures.Get (@"Cursor/menu-cursor-additive"),
                             },
                         }
                     }
                 };
 
-                cursorScale = config.GetBindable<double>(OsuSetting.MenuCursorSize);
-                cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale * base_scale);
+                cursorScale = config.GetBindable<double> (OsuSetting.MenuCursorSize);
+                cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2 ((float)newScale * base_scale);
                 cursorScale.TriggerChange();
             }
         }
