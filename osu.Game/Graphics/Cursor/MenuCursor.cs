@@ -26,26 +26,28 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (dragging)
-            {
-                Debug.Assert(state.Mouse.PositionMouseDown != null);
+            if (((Cursor)ActiveCursor).DragRotating) {
+                if (dragging) {
+                    Debug.Assert (state.Mouse.PositionMouseDown != null);
 
-                // don't start rotating until we're moved a minimum distance away from the mouse down location,
-                // else it can have an annoying effect.
-                startRotation |= Vector2Extensions.Distance(state.Mouse.Position, state.Mouse.PositionMouseDown.Value) > 30;
+                    // don't start rotating until we're moved a minimum distance away from the mouse down location,
+                    // else it can have an annoying effect.
+                    startRotation |= Vector2Extensions.Distance (state.Mouse.Position, state.Mouse.PositionMouseDown.Value) > 30;
 
-                if (startRotation)
-                {
-                    Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
-                    float degrees = (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y)) + 24.3f;
+                    if (startRotation) {
+                        Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
+                        float degrees = (float)MathHelper.RadiansToDegrees (Math.Atan2 (-offset.X, offset.Y)) + 24.3f;
 
-                    // Always rotate in the direction of least distance
-                    float diff = (degrees - ActiveCursor.Rotation) % 360;
-                    if (diff < -180) diff += 360;
-                    if (diff > 180) diff -= 360;
-                    degrees = ActiveCursor.Rotation + diff;
+                        // Always rotate in the direction of least distance
+                        float diff = (degrees - ActiveCursor.Rotation) % 360;
+                        if (diff < -180)
+                            diff += 360;
+                        if (diff > 180)
+                            diff -= 360;
+                        degrees = ActiveCursor.Rotation + diff;
 
-                    ActiveCursor.RotateTo(degrees, 600, Easing.OutQuint);
+                        ActiveCursor.RotateTo (degrees, 600, Easing.OutQuint);
+                    }
                 }
             }
 
@@ -106,9 +108,13 @@ namespace osu.Game.Graphics.Cursor
         {
             private Container cursorContainer;
             private Bindable<double> cursorScale;
+            public Bindable<bool> cursorRotate;
+
             private const float base_scale = 0.15f;
 
             public Sprite AdditiveLayer;
+
+            public bool DragRotating;
 
             public Cursor()
             {
@@ -143,6 +149,10 @@ namespace osu.Game.Graphics.Cursor
                 cursorScale = config.GetBindable<double>(OsuSetting.MenuCursorSize);
                 cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale * base_scale);
                 cursorScale.TriggerChange();
+
+                cursorRotate = config.GetBindable<bool> (OsuSetting.CursorRotation);
+                cursorRotate.ValueChanged += newValue => this.DragRotating = newValue;
+                cursorRotate.TriggerChange();
             }
         }
     }
