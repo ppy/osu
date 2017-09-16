@@ -109,7 +109,6 @@ namespace osu.Game.Graphics.Cursor
         private void load(OsuConfigManager config)
         {
             cursorRotate = config.GetBindable<bool> (OsuSetting.CursorRotation);
-            cursorRotate.TriggerChange();
         }
 
         public class Cursor : Container
