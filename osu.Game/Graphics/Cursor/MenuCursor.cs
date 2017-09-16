@@ -108,7 +108,7 @@ namespace osu.Game.Graphics.Cursor
         {
             private Container cursorContainer;
             private Bindable<double> cursorScale;
-            public Bindable<bool> cursorRotate;
+            private Bindable<bool> cursorRotate;
 
             private const float base_scale = 0.15f;
 
@@ -151,7 +151,7 @@ namespace osu.Game.Graphics.Cursor
                 cursorScale.TriggerChange();
 
                 cursorRotate = config.GetBindable<bool> (OsuSetting.CursorRotation);
-                cursorRotate.ValueChanged += newValue => this.DragRotating = newValue;
+                cursorRotate.ValueChanged += newValue => DragRotating = newValue;
                 cursorRotate.TriggerChange();
             }
         }
