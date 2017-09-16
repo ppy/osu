@@ -26,7 +26,7 @@ namespace osu.Game.Beatmaps.IO
             // no-op
         }
 
-        public override IEnumerable<string> Filenames => Directory.GetDirectories(path).Select(Path.GetFileName).ToArray();
+        public override IEnumerable<string> Filenames => Directory.GetFiles(path, "*", SearchOption.AllDirectories).Select(Path.GetFileName).ToArray();
 
         public override Stream GetUnderlyingStream() => null;
     }
