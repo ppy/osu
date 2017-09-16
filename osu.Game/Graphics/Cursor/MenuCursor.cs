@@ -21,7 +21,6 @@ namespace osu.Game.Graphics.Cursor
         protected override Drawable CreateCursor() => new Cursor();
 
         private Bindable<bool> cursorRotate;
-        private bool dragRotating;
 
         private bool dragging;
 
@@ -29,28 +28,27 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (dragRotating) {
-                if (dragging) {
-                    Debug.Assert (state.Mouse.PositionMouseDown != null);
+            if (cursorRotate && dragging)
+            {
+                Debug.Assert (state.Mouse.PositionMouseDown != null);
 
-                    // don't start rotating until we're moved a minimum distance away from the mouse down location,
-                    // else it can have an annoying effect.
-                    startRotation |= Vector2Extensions.Distance (state.Mouse.Position, state.Mouse.PositionMouseDown.Value) > 30;
+                // don't start rotating until we're moved a minimum distance away from the mouse down location,
+                // else it can have an annoying effect.
+                startRotation |= Vector2Extensions.Distance (state.Mouse.Position, state.Mouse.PositionMouseDown.Value) > 30;
 
-                    if (startRotation) {
-                        Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
-                        float degrees = (float)MathHelper.RadiansToDegrees (Math.Atan2 (-offset.X, offset.Y)) + 24.3f;
+                if (startRotation) {
+                    Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
+                    float degrees = (float)MathHelper.RadiansToDegrees (Math.Atan2 (-offset.X, offset.Y)) + 24.3f;
 
-                        // Always rotate in the direction of least distance
-                        float diff = (degrees - ActiveCursor.Rotation) % 360;
-                        if (diff < -180)
-                            diff += 360;
-                        if (diff > 180)
-                            diff -= 360;
-                        degrees = ActiveCursor.Rotation + diff;
+                    // Always rotate in the direction of least distance
+                    float diff = (degrees - ActiveCursor.Rotation) % 360;
+                    if (diff < -180)
+                        diff += 360;
+                    if (diff > 180)
+                        diff -= 360;
+                    degrees = ActiveCursor.Rotation + diff;
 
-                        ActiveCursor.RotateTo (degrees, 600, Easing.OutQuint);
-                    }
+                    ActiveCursor.RotateTo (degrees, 600, Easing.OutQuint);
                 }
             }
 
@@ -108,10 +106,9 @@ namespace osu.Game.Graphics.Cursor
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, TextureStore textures, OsuColour colour)
+        private void load(OsuConfigManager config)
         {
             cursorRotate = config.GetBindable<bool> (OsuSetting.CursorRotation);
-            cursorRotate.ValueChanged += newValue => dragRotating = newValue;
             cursorRotate.TriggerChange();
         }
 
