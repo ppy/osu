@@ -237,7 +237,7 @@ namespace osu.Game.Screens.Tournament
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Reset",
-                                            Action = () => reset(false)
+                                            Action = () => reset()
                                         }
                                     }
                                 }

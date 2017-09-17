@@ -13,10 +13,13 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterface;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Users
 {
-    public class UserPanel : ClickableContainer
+    public class UserPanel : ClickableContainer, IHasContextMenu
     {
         private readonly User user;
         private const float height = 100;
@@ -30,6 +33,8 @@ namespace osu.Game.Users
         public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
         public new Action Action;
+
+        protected Action ViewProfile;
 
         public UserPanel(User user)
         {
@@ -171,7 +176,7 @@ namespace osu.Game.Users
             Status.ValueChanged += displayStatus;
             Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
 
-            base.Action = () =>
+            base.Action = ViewProfile = () =>
             {
                 Action?.Invoke();
                 profile?.ShowUser(user);
@@ -203,5 +208,10 @@ namespace osu.Game.Users
                 statusMessage.Text = status.Message;
             }
         }
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem("View Profile", MenuItemType.Highlighted, ViewProfile),
+        };
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -112,7 +113,7 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseUp(state, args);
         }
 
-        public string[] FilterTerms => new[] { Text };
+        public IEnumerable<string> FilterTerms => new[] { Text };
 
         public bool MatchingFilter
         {

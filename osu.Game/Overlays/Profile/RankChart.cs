@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Profile
                 }
             };
 
-            ranks = user.AllRankHistories?.Osu?.Data ?? new[] { user.Statistics.Rank };
+            ranks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
         }
 
         private void updateRankTexts()
