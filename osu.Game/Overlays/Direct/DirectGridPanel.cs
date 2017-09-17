@@ -13,7 +13,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Framework.Input;
-using osu.Framework.Audio;
 using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Direct
@@ -191,7 +190,7 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Top = 5, Left = 10 },
                     Size = new Vector2(30),
                     Alpha = 0,
-                    TrackURL = "https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3",
+                    TrackUrl = "https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3",
                 },
             });
 

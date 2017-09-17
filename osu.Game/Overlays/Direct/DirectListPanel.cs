@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Configuration;
-using osu.Framework.Audio;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -74,7 +73,7 @@ namespace osu.Game.Overlays.Direct
                                     Size = new Vector2(height / 2),
                                     FillMode = FillMode.Fit,
                                     Alpha = 0,
-                                    TrackURL = "https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3",
+                                    TrackUrl = "https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3",
                                 },
                                 new FillFlowContainer
                                 {
