@@ -13,6 +13,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Framework.Input;
+using osu.Framework.Audio;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -22,6 +24,11 @@ namespace osu.Game.Overlays.Direct
         private const float vertical_padding = 5;
 
         private FillFlowContainer bottomPanel;
+        private PlayButton playButton;
+        private Box progressBar;
+
+        protected override PlayButton PlayButton => playButton;
+        public override Bindable<bool> PreviewPlaying { get; } = new Bindable<bool>();
 
         public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
@@ -87,6 +94,15 @@ namespace osu.Game.Overlays.Direct
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                },
+                                progressBar = new Box
+                                {
+                                    Origin = Anchor.BottomLeft,
+                                    RelativeSizeAxes = Axes.X,
+                                    BypassAutoSizeAxes = Axes.Both,
+                                    Size = new Vector2(0, 3),
+                                    Alpha = 0,
+                                    Colour = colours.Yellow,
                                 },
                                 new FillFlowContainer
                                 {
@@ -170,7 +186,25 @@ namespace osu.Game.Overlays.Direct
                         new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
+                playButton = new PlayButton(PreviewPlaying)
+                {
+                    Margin = new MarginPadding { Top = 5, Left = 10 },
+                    Size = new Vector2(30),
+                    Alpha = 0,
+                    TrackURL = "https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3",
+                },
             });
+
+            PreviewPlaying.ValueChanged += newValue => playButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += newValue => progressBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (PreviewPlaying && playButton.Track != null)
+                progressBar.Width = (float)(playButton.Track.CurrentTime / playButton.Track.Length);
         }
 
         protected override bool OnClick(InputState state)
