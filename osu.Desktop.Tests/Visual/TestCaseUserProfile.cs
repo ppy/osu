@@ -33,13 +33,10 @@ namespace osu.Desktop.Tests.Visual
                     Rank = 2148,
                     PP = 4567.89m
                 },
-                AllRankHistories = new User.RankHistories
+                RankHistory = new User.RankHistoryData
                 {
-                    Osu = new User.RankHistory
-                    {
-                        Mode = @"osu",
-                        Data = Enumerable.Range(2345,45).Concat(Enumerable.Range(2109,40)).ToArray()
-                    }
+                    Mode = @"osu",
+                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
                 }
             }, false));
             AddStep("Show ppy", () => profile.ShowUser(new User

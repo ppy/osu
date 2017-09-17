@@ -366,10 +366,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     BackgroundColour = colours.Gray3;
                 }
             }
-
-
-
-
         }
 
         private enum UserAction
