@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Direct
 {
     public class PlayButton : Container
     {
-        public string TrackURL;
+        public string TrackUrl;
 
         public Bindable<bool> Playing;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Direct
         public PlayButton(Bindable<bool> playing)
         {
             Playing = playing;
-            Add(icon = new SpriteIcon()
+            Add(icon = new SpriteIcon
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Direct
 
                 loadTask = Task.Run(() =>
                 {
-                    Track = audio.Track.Get(TrackURL);
+                    Track = audio.Track.Get(TrackUrl);
                     Track.Looping = true;
                     if (Playing)
                         Track.Start();
