@@ -105,6 +105,7 @@
     <Compile Include="Online\Chat\ErrorMessage.cs" />
     <Compile Include="Online\Chat\LocalEchoMessage.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
+    <Compile Include="Overlays\Direct\PlayButton.cs" />
     <Compile Include="Overlays\KeyBinding\GlobalKeyBindingsSection.cs" />
     <Compile Include="Overlays\KeyBinding\KeyBindingRow.cs" />
     <Compile Include="Overlays\KeyBinding\KeyBindingsSubsection.cs" />

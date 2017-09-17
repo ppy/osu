@@ -20,6 +20,7 @@ using osu.Game.Online.API;
 using osu.Framework.Logging;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -37,6 +38,9 @@ namespace osu.Game.Overlays.Direct
         private ProgressBar progressBar;
         private BeatmapManager beatmaps;
         private NotificationOverlay notifications;
+
+        public abstract Bindable<bool> PreviewPlaying { get; }
+        protected abstract PlayButton PlayButton { get; }
 
         protected override Container<Drawable> Content => content;
 
@@ -106,6 +110,7 @@ namespace osu.Game.Overlays.Direct
         {
             content.TweenEdgeEffectTo(edgeEffectHovered, hover_transition_time, Easing.OutQuint);
             content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
+            PlayButton.FadeIn(120, Easing.InOutQuint);
 
             return base.OnHover(state);
         }
@@ -114,6 +119,8 @@ namespace osu.Game.Overlays.Direct
         {
             content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
+            if (!PreviewPlaying)
+                PlayButton.FadeOut(120, Easing.InOutQuint);
 
             base.OnHoverLost(state);
         }
