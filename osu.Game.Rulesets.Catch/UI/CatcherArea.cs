@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
@@ -39,7 +38,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 {
                     RelativePositionAxes = Axes.Both,
                     ExplodingFruitTarget = explodingFruitContainer,
-                    Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopCentre,
                     X = 0.5f,
                 }
@@ -57,12 +55,22 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             private Texture texture;
 
+            private Container<DrawableHitObject> caughtFruit;
+
             [BackgroundDependencyLoader]
             private void load(TextureStore textures)
             {
                 texture = textures.Get(@"Play/Catch/fruit-catcher-idle");
 
-                Child = createCatcherSprite();
+                Children = new Drawable[]
+                {
+                    createCatcherSprite(),
+                    caughtFruit = new Container<DrawableHitObject>
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.BottomCentre,
+                    }
+                };
             }
 
             private int currentDirection;
@@ -176,13 +184,13 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 float distance = fruit.DrawSize.X / 2 * fruit.Scale.X;
 
-                while (Children.OfType<DrawableFruit>().Any(f => f.LifetimeEnd == double.PositiveInfinity && Vector2Extensions.DistanceSquared(f.Position, fruit.Position) < distance * distance))
+                while (caughtFruit.Any(f => f.LifetimeEnd == double.PositiveInfinity && Vector2Extensions.DistanceSquared(f.Position, fruit.Position) < distance * distance))
                 {
                     fruit.X += RNG.Next(-5, 5);
                     fruit.Y -= RNG.Next(0, 5);
                 }
 
-                Add(fruit);
+                caughtFruit.Add(fruit);
 
                 if (((CatchBaseHit)fruit.HitObject).LastInCombo)
                     explode();
@@ -190,29 +198,31 @@ namespace osu.Game.Rulesets.Catch.UI
 
             private void explode()
             {
-                foreach (var existingFruit in Children.OfType<DrawableFruit>().ToArray())
+                var fruit = caughtFruit.ToArray();
+                caughtFruit.Clear(false);
+
+                foreach (var f in fruit)
                 {
-                    var originalX = existingFruit.X * Scale.X;
+                    var originalX = f.X * Scale.X;
 
                     if (ExplodingFruitTarget != null)
                     {
-                        existingFruit.Anchor = Anchor.TopLeft;
-                        existingFruit.Position = ToSpaceOfOtherDrawable(existingFruit.DrawPosition, ExplodingFruitTarget);
+                        f.Anchor = Anchor.TopLeft;
+                        f.Position = ToSpaceOfOtherDrawable(f.DrawPosition, ExplodingFruitTarget);
 
-                        Remove(existingFruit);
+                        caughtFruit.Remove(f);
 
-                        ExplodingFruitTarget.Add(existingFruit);
+                        ExplodingFruitTarget.Add(f);
                     }
 
-                    existingFruit
-                        .MoveToY(existingFruit.Y - 50, 250, Easing.OutSine)
-                        .Then()
-                        .MoveToY(existingFruit.Y + 50, 500, Easing.InSine);
+                    f.MoveToY(f.Y - 50, 250, Easing.OutSine)
+                    .Then()
+                    .MoveToY(f.Y + 50, 500, Easing.InSine);
 
-                    existingFruit.MoveToX(existingFruit.X + originalX * 6, 1000);
-                    existingFruit.FadeOut(750);
+                    f.MoveToX(f.X + originalX * 6, 1000);
+                    f.FadeOut(750);
 
-                    existingFruit.Expire();
+                    f.Expire();
                 }
             }
         }
