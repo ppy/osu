@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework;
-using osu.Framework.Desktop.Platform;
+using osu.Framework.Platform;
 using SQLite.Net;
 using SQLite.Net.Interop;
 using SQLite.Net.Platform.Generic;
