@@ -24,11 +24,6 @@ namespace osu.Desktop
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
-
-            host.UpdateThread.InactiveHz = host.UpdateThread.ActiveHz;
-            host.DrawThread.InactiveHz = host.DrawThread.ActiveHz;
-            host.InputThread.InactiveHz = host.InputThread.ActiveHz;
-
             host.Window.CursorState |= CursorState.Hidden;
         }
     }
