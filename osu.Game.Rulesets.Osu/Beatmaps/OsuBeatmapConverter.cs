@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Types;
 using System;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.Beatmaps;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {

@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
 using OpenTK;
-using osu.Game.Rulesets.Beatmaps;
 using System.Linq;
 using osu.Framework.Input;
 

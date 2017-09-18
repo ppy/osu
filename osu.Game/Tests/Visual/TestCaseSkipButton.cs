@@ -1,0 +1,19 @@
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Game.Screens.Play;
+
+namespace osu.Game.Tests.Visual
+{
+    internal class TestCaseSkipButton : OsuTestCase
+    {
+        public override string Description => @"Skip skip skippediskip";
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Add(new SkipButton(Clock.CurrentTime + 5000));
+        }
+    }
+}

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{230AC4F3-7783-49FB-9AEC-B83CDA3B9F3D}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>osu.Desktop.Tests</RootNamespace>
     <AssemblyName>osu.Desktop.Tests</AssemblyName>
@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -116,14 +119,6 @@
     <Compile Include="Visual\TestCaseUserProfile.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\osu-framework\osu.Framework.Desktop\osu.Framework.Desktop.csproj">
-      <Project>{65DC628F-A640-4111-AB35-3A5652BC1E17}</Project>
-      <Name>osu.Framework.Desktop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu-framework\osu.Framework.Testing\osu.Framework.Testing.csproj">
-      <Project>{007b2356-ab6f-4bd9-96d5-116fc2dce69a}</Project>
-      <Name>osu.Framework.Testing</Name>
-    </ProjectReference>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
       <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
       <Name>osu.Framework</Name>
@@ -149,7 +144,7 @@
       <Name>osu.Game.Rulesets.Taiko</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>
+      <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
       <Name>osu.Game</Name>
     </ProjectReference>
   </ItemGroup>

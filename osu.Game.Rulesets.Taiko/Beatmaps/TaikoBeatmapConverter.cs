@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.IO.Serialization;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Taiko.Beatmaps
