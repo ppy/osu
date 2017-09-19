@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Net.Http;
 using osu.Framework.Allocation;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -68,7 +69,7 @@ namespace osu.Game.Overlays
                                 },
                                 new OsuSpriteText
                                 {
-                                    Colour = game.IsDebug ? colours.Red : Color4.White,
+                                    Colour = DebugUtils.IsDebug ? colours.Red : Color4.White,
                                     Text = game.Version
                                 },
                             }
