@@ -199,7 +199,6 @@ namespace osu.Game.Rulesets.Catch.UI
             private void explode()
             {
                 var fruit = caughtFruit.ToArray();
-                caughtFruit.Clear(false);
 
                 foreach (var f in fruit)
                 {
@@ -208,7 +207,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     if (ExplodingFruitTarget != null)
                     {
                         f.Anchor = Anchor.TopLeft;
-                        f.Position = ToSpaceOfOtherDrawable(f.DrawPosition, ExplodingFruitTarget);
+                        f.Position = caughtFruit.ToSpaceOfOtherDrawable(f.DrawPosition, ExplodingFruitTarget);
 
                         caughtFruit.Remove(f);
 
