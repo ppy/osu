@@ -135,6 +135,6 @@ namespace osu.Game.Rulesets.Taiko
             return difficulty;
         }
 
-        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter();
+        protected override BeatmapConverter<TaikoHitObject> CreateBeatmapConverter() => new TaikoBeatmapConverter(true);
     }
 }

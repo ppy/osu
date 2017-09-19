@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework;
 using OpenTK;
 using osu.Framework.Allocation;
@@ -18,6 +19,8 @@ namespace osu.Game.Overlays.MedalSplash
     {
         private const float scale_when_unlocked = 0.76f;
         private const float scale_when_full = 0.6f;
+
+        public event Action<DisplayState> StateChanged;
 
         private readonly Medal medal;
         private readonly Container medalContainer;
@@ -132,6 +135,8 @@ namespace osu.Game.Overlays.MedalSplash
 
                 state = value;
                 updateState();
+
+                StateChanged?.Invoke(State);
             }
         }
 

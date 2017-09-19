@@ -41,12 +41,14 @@ namespace osu.Desktop.Tests.Visual
             {
                 new BeatmapSetInfo
                 {
+                    OnlineBeatmapSetID = 578332,
                     Metadata = new BeatmapMetadata
                     {
                         Title = @"OrVid",
                         Artist = @"An",
                         Author = @"RLC",
                         Source = @"",
+                        Tags = @"acuticnotes an-fillnote revid tear tearvid encrpted encryption axi axivid quad her hervid recoll",
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
@@ -71,12 +73,14 @@ namespace osu.Desktop.Tests.Visual
                 },
                 new BeatmapSetInfo
                 {
+                    OnlineBeatmapSetID = 599627,
                     Metadata = new BeatmapMetadata
                     {
                         Title = @"tiny lamp",
                         Artist = @"fhana",
                         Author = @"Sotarks",
                         Source = @"ぎんぎつね",
+                        Tags = @"lantis junichi sato yuxuki waga kevin mitsunaga towana gingitsune opening op full ver version kalibe collab collaboration",
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
@@ -101,12 +105,14 @@ namespace osu.Desktop.Tests.Visual
                 },
                 new BeatmapSetInfo
                 {
+                    OnlineBeatmapSetID = 513268,
                     Metadata = new BeatmapMetadata
                     {
                         Title = @"At Gwanghwamun",
                         Artist = @"KYUHYUN",
                         Author = @"Cerulean Veyron",
                         Source = @"",
+                        Tags = @"soul ballad kh super junior sj suju 슈퍼주니어 kt뮤직 sm엔터테인먼트 s.m.entertainment kt music 1st mini album ep",
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
@@ -146,12 +152,14 @@ namespace osu.Desktop.Tests.Visual
                 },
                 new BeatmapSetInfo
                 {
+                    OnlineBeatmapSetID = 586841,
                     Metadata = new BeatmapMetadata
                     {
                         Title = @"RHAPSODY OF BLUE SKY",
                         Artist = @"fhana",
                         Author = @"[Kamiya]",
                         Source = @"小林さんちのメイドラゴン",
+                        Tags = @"kobayashi san chi no maidragon aozora no opening anime maid dragon oblivion karen dynamix imoutosan pata-mon gxytcgxytc",
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {

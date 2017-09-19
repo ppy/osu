@@ -7,8 +7,13 @@ using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -28,10 +33,23 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1.06;
     }
 
-    public class OsuModHardRock : ModHardRock
+    public class OsuModHardRock : ModHardRock, IApplicableMod<OsuHitObject>
     {
         public override double ScoreMultiplier => 1.06;
         public override bool Ranked => true;
+
+        public void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
+        {
+            rulesetContainer.Objects.OfType<OsuHitObject>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Y));
+            rulesetContainer.Objects.OfType<Slider>().ForEach(s =>
+            {
+                var newControlPoints = new List<Vector2>();
+                s.ControlPoints.ForEach(c => newControlPoints.Add(new Vector2(c.X, OsuPlayfield.BASE_SIZE.Y - c.Y)));
+
+                s.ControlPoints = newControlPoints;
+                s.Curve?.Calculate(); // Recalculate the slider curve
+            });
+        }
     }
 
     public class OsuModSuddenDeath : ModSuddenDeath
@@ -78,6 +96,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModSpunOut : Mod
     {
         public override string Name => "Spun Out";
+        public override string ShortenedName => "SO";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_spunout;
         public override string Description => @"Spinners will be automatically completed";
         public override double ScoreMultiplier => 0.9;
@@ -88,6 +107,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModAutopilot : Mod
     {
         public override string Name => "Autopilot";
+        public override string ShortenedName => "AP";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_autopilot;
         public override string Description => @"Automatic cursor movement - just follow the rhythm.";
         public override double ScoreMultiplier => 0;
@@ -108,6 +128,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModTarget : Mod
     {
         public override string Name => "Target";
+        public override string ShortenedName => "TP";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_target;
         public override string Description => @"";
         public override double ScoreMultiplier => 1;

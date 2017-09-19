@@ -4,15 +4,16 @@
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
-    internal class VolumeMeter : Container
+    internal class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
     {
         private readonly Box meterFill;
         public BindableDouble Bindable { get; } = new BindableDouble();
@@ -76,12 +77,35 @@ namespace osu.Game.Graphics.UserInterface.Volume
             }
         }
 
-        protected override bool OnWheel(InputState state)
+        public void Increase()
         {
-            Volume += 0.05f * state.Mouse.WheelDelta;
-            return true;
+            Volume += 0.05f;
+        }
+
+        public void Decrease()
+        {
+            Volume -= 0.05f;
         }
 
         private void updateFill() => meterFill.ScaleTo(new Vector2(1, (float)Volume), 300, Easing.OutQuint);
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (!IsHovered) return false;
+
+            switch (action)
+            {
+                case GlobalAction.DecreaseVolume:
+                    Decrease();
+                    return true;
+                case GlobalAction.IncreaseVolume:
+                    Increase();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => false;
     }
 }

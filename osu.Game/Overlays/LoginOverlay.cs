@@ -3,12 +3,12 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Settings.Sections.General;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Overlays
 {
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays
                     Colour = Color4.Black,
                     Alpha = 0.6f,
                 },
-                new Container
+                new OsuContextMenuContainer
                 {
                     Width = 360,
                     AutoSizeAxes = Axes.Y,

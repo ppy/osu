@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
-using OpenTK.Input;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -15,7 +14,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
+            // Because ticks aren't added by the ScrollingPlayfield, we need to set the following properties ourselves
+            RelativePositionAxes = Axes.X;
+            X = (float)tick.StartTime;
+
             FillMode = FillMode.Fit;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // We need to set this here because RelativeSizeAxes won't/can't set our size by default with a different RelativeChildSize
+            Width *= Parent.RelativeChildSize.X;
         }
 
         protected override TaikoPiece CreateMainPiece() => new TickPiece
@@ -23,18 +34,17 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Filled = HitObject.FirstTick
         };
 
-        protected override TaikoJudgement CreateJudgement() => new TaikoDrumRollTickJudgement { SecondHit = HitObject.IsStrong };
-
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
                 return;
 
-            if (Math.Abs(Judgement.TimeOffset) < HitObject.HitWindow)
-            {
-                Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = TaikoHitResult.Great;
-            }
+            if (!(Math.Abs(timeOffset) < HitObject.HitWindow))
+                return;
+
+            AddJudgement(new TaikoDrumRollTickJudgement { Result = HitResult.Great });
+            if (HitObject.IsStrong)
+                AddJudgement(new TaikoStrongHitJudgement());
         }
 
         protected override void UpdateState(ArmedState state)
@@ -47,14 +57,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override void UpdateScrollPosition(double time)
-        {
-            // Ticks don't move
-        }
-
-        protected override bool HandleKeyPress(Key key)
-        {
-            return Judgement.Result == HitResult.None && UpdateJudgement(true);
-        }
+        public override bool OnPressed(TaikoAction action) => UpdateJudgement(true);
     }
 }

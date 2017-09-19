@@ -31,6 +31,11 @@ namespace osu.Game.Rulesets.Objects
         public SampleInfoList Samples = new SampleInfoList();
 
         /// <summary>
+        /// Whether this <see cref="HitObject"/> is in Kiai time.
+        /// </summary>
+        public bool Kiai { get; private set; }
+
+        /// <summary>
         /// Applies default values to this HitObject.
         /// </summary>
         /// <param name="controlPointInfo">The control points.</param>
@@ -38,6 +43,9 @@ namespace osu.Game.Rulesets.Objects
         public virtual void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             SoundControlPoint soundPoint = controlPointInfo.SoundPointAt(StartTime);
+            EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
+
+            Kiai |= effectPoint.KiaiMode;
 
             // Initialize first sample
             Samples.ForEach(s => initializeSampleInfo(s, soundPoint));

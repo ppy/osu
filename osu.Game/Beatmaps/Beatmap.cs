@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO.Serialization;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Beatmaps
 {
@@ -17,7 +18,7 @@ namespace osu.Game.Beatmaps
     public class Beatmap<T>
         where T : HitObject
     {
-        public BeatmapInfo BeatmapInfo;
+        public BeatmapInfo BeatmapInfo = new BeatmapInfo();
         public ControlPointInfo ControlPointInfo = new ControlPointInfo();
         public List<BreakPeriod> Breaks = new List<BreakPeriod>();
         public readonly List<Color4> ComboColors = new List<Color4>
@@ -33,7 +34,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The HitObjects this Beatmap contains.
         /// </summary>
-        public List<T> HitObjects;
+        public List<T> HitObjects = new List<T>();
 
         /// <summary>
         /// Total amount of break time in the beatmap.
@@ -41,15 +42,22 @@ namespace osu.Game.Beatmaps
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
 
         /// <summary>
+        /// The Beatmap's Storyboard.
+        /// </summary>
+        public Storyboard Storyboard = new Storyboard();
+
+        /// <summary>
         /// Constructs a new beatmap.
         /// </summary>
         /// <param name="original">The original beatmap to use the parameters of.</param>
-        public Beatmap(Beatmap original = null)
+        public Beatmap(Beatmap<T> original = null)
         {
             BeatmapInfo = original?.BeatmapInfo.DeepClone() ?? BeatmapInfo;
             ControlPointInfo = original?.ControlPointInfo ?? ControlPointInfo;
             Breaks = original?.Breaks ?? Breaks;
             ComboColors = original?.ComboColors ?? ComboColors;
+            HitObjects = original?.HitObjects ?? HitObjects;
+            Storyboard = original?.Storyboard ?? Storyboard;
         }
     }
 
@@ -65,7 +73,6 @@ namespace osu.Game.Beatmaps
         public Beatmap(Beatmap original = null)
             : base(original)
         {
-            HitObjects = original?.HitObjects;
         }
     }
 }

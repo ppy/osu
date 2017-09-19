@@ -30,11 +30,15 @@ namespace osu.Game.Beatmaps
 
     public abstract class DifficultyCalculator<T> : DifficultyCalculator where T : HitObject
     {
+        protected readonly Beatmap Beatmap;
+
         protected List<T> Objects;
 
         protected DifficultyCalculator(Beatmap beatmap)
         {
-            Objects = CreateBeatmapConverter().Convert(beatmap, true).HitObjects;
+            Beatmap = beatmap;
+
+            Objects = CreateBeatmapConverter().Convert(beatmap).HitObjects;
 
             foreach (var h in Objects)
                 h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.Difficulty);

@@ -80,7 +80,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 ret.Add(new DrumRollTick
                 {
                     FirstTick = first,
-                    ScrollTime = ScrollTime,
                     TickSpacing = tickSpacing,
                     StartTime = t,
                     IsStrong = IsStrong,

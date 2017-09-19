@@ -11,6 +11,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -31,30 +33,29 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
-            RelativeSizeAxes = Axes.Y;
-            AutoSizeAxes = Axes.X;
+            Width = (float)HitObject.Duration;
+
+            Container<DrawableDrumRollTick> tickContainer;
+            MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick>
+            {
+                RelativeSizeAxes = Axes.Both,
+                RelativeChildOffset = new Vector2((float)HitObject.StartTime, 0),
+                RelativeChildSize = new Vector2((float)HitObject.Duration, 1)
+            });
 
             foreach (var tick in drumRoll.Ticks)
             {
-                var newTick = new DrawableDrumRollTick(tick)
-                {
-                    X = (float)((tick.StartTime - HitObject.StartTime) / HitObject.Duration)
-                };
-
+                var newTick = new DrawableDrumRollTick(tick);
                 newTick.OnJudgement += onTickJudgement;
 
                 AddNested(newTick);
-                MainPiece.Add(newTick);
+                tickContainer.Add(newTick);
             }
         }
 
-        protected override TaikoJudgement CreateJudgement() => new TaikoJudgement { SecondHit = HitObject.IsStrong };
+        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
 
-        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece
-        {
-            Length = (float)(HitObject.Duration / HitObject.ScrollTime),
-            PlayfieldLengthReference = () => Parent.DrawSize.X
-        };
+        public override bool OnPressed(TaikoAction action) => false;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -63,20 +64,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             accentDarkColour = colours.YellowDarker;
         }
 
-        protected override void LoadComplete()
+        private void onTickJudgement(DrawableHitObject obj, Judgement judgement)
         {
-            base.LoadComplete();
-
-            // This is naive, however it's based on the reasoning that the hit target
-            // is further than mid point of the play field, so the time taken to scroll in should always
-            // be greater than the time taken to scroll out to the left of the screen.
-            // Thus, using PreEmpt here is enough for the drum roll to completely scroll out.
-            LifetimeEnd = HitObject.EndTime + HitObject.ScrollTime;
-        }
-
-        private void onTickJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> obj)
-        {
-            if (obj.Judgement.Result == HitResult.Hit)
+            if (judgement.Result > HitResult.Miss)
                 rollingHits++;
             else
                 rollingHits--;
@@ -87,23 +77,24 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.FadeAccent(newAccent, 100);
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (userTriggered)
                 return;
 
-            if (Judgement.TimeOffset < 0)
+            if (timeOffset < 0)
                 return;
 
-            int countHit = NestedHitObjects.Count(o => o.Judgement.Result == HitResult.Hit);
+            int countHit = NestedHitObjects.Count(o => o.AllJudged);
 
             if (countHit > HitObject.RequiredGoodHits)
             {
-                Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = countHit >= HitObject.RequiredGreatHits ? TaikoHitResult.Great : TaikoHitResult.Good;
+                AddJudgement(new TaikoJudgement { Result = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good });
+                if (HitObject.IsStrong)
+                    AddJudgement(new TaikoStrongHitJudgement());
             }
             else
-                Judgement.Result = HitResult.Miss;
+                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
         }
 
         protected override void UpdateState(ArmedState state)

@@ -26,9 +26,11 @@ namespace osu.Game.Online.Chat
 
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
 
+        private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
+
         public Bindable<bool> Joined = new Bindable<bool>();
 
-        public bool ReadOnly => Name != "#lazer";
+        public bool ReadOnly => false;
 
         public const int MAX_HISTORY = 300;
 
@@ -38,6 +40,16 @@ namespace osu.Game.Online.Chat
         }
 
         public event Action<IEnumerable<Message>> NewMessagesArrived;
+        public event Action<LocalEchoMessage, Message> PendingMessageResolved;
+        public event Action<Message> MessageRemoved;
+
+        public void AddLocalEcho(LocalEchoMessage message)
+        {
+            pendingMessages.Add(message);
+            Messages.Add(message);
+
+            NewMessagesArrived?.Invoke(new[] { message });
+        }
 
         public void AddNewMessages(params Message[] messages)
         {
@@ -52,9 +64,40 @@ namespace osu.Game.Online.Chat
 
         private void purgeOldMessages()
         {
-            int messageCount = Messages.Count;
+            // never purge local echos
+            int messageCount = Messages.Count - pendingMessages.Count;
             if (messageCount > MAX_HISTORY)
                 Messages.RemoveRange(0, messageCount - MAX_HISTORY);
+        }
+
+        /// <summary>
+        /// Replace or remove a message from the channel.
+        /// </summary>
+        /// <param name="echo">The local echo message (client-side).</param>
+        /// <param name="final">The response message, or null if the message became invalid.</param>
+        public void ReplaceMessage(LocalEchoMessage echo, Message final)
+        {
+            if (!pendingMessages.Remove(echo))
+                throw new InvalidOperationException("Attempted to remove echo that wasn't present");
+
+            Messages.Remove(echo);
+
+            if (final == null)
+            {
+                MessageRemoved?.Invoke(echo);
+                return;
+            }
+
+            if (Messages.Contains(final))
+            {
+                // message already inserted, so let's throw away this update.
+                // we may want to handle this better in the future, but for the time being api requests are single-threaded so order is assumed.
+                MessageRemoved?.Invoke(echo);
+                return;
+            }
+
+            Messages.Add(final);
+            PendingMessageResolved?.Invoke(echo, final);
         }
 
         public override string ToString() => Name;

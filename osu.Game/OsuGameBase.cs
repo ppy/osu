@@ -94,20 +94,28 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
+        private SQLiteConnection connection;
+
         [BackgroundDependencyLoader]
         private void load()
         {
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            SQLiteConnection connection = Host.Storage.GetDatabase(@"client");
+            connection = Host.Storage.GetDatabase(@"client");
 
             connection.CreateTable<StoreVersion>();
 
+            dependencies.Cache(API = new APIAccess
+            {
+                Username = LocalConfig.Get<string>(OsuSetting.Username),
+                Token = LocalConfig.Get<string>(OsuSetting.Token)
+            });
+
             dependencies.Cache(RulesetStore = new RulesetStore(connection));
             dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, API, Host));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(connection, RulesetStore));
             dependencies.Cache(new OsuColour());
 
@@ -142,21 +150,20 @@ namespace osu.Game
             Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
             BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
-            dependencies.Cache(API = new APIAccess
-            {
-                Username = LocalConfig.Get<string>(OsuSetting.Username),
-                Token = LocalConfig.Get<string>(OsuSetting.Token)
-            });
-
             Beatmap.ValueChanged += b =>
             {
-                // compare to last baetmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
-                if (lastBeatmap?.Track != b.Track)
+                var trackLoaded = lastBeatmap?.TrackLoaded ?? false;
+
+                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
+                if (!trackLoaded || lastBeatmap?.Track != b.Track)
                 {
-                    // this disposal is done to stop the audio track.
-                    // it may not be exactly what we want for cases beatmaps are reused, as it will
-                    // trigger a fresh load of contained resources.
-                    lastBeatmap?.Dispose();
+                    if (trackLoaded)
+                    {
+                        Debug.Assert(lastBeatmap != null);
+                        Debug.Assert(lastBeatmap.Track != null);
+
+                        lastBeatmap.DisposeTrack();
+                    }
 
                     Audio.Track.AddItem(b.Track);
                 }
@@ -193,10 +200,9 @@ namespace osu.Game
                     globalBinding = new GlobalKeyBindingInputManager(this)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new OsuTooltipContainer(Cursor)
+                        Child = content = new OsuTooltipContainer(Cursor)
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = content = new OsuContextMenuContainer { RelativeSizeAxes = Axes.Both },
                         }
                     }
                 }
@@ -236,6 +242,8 @@ namespace osu.Game
                 LocalConfig.Set(OsuSetting.Token, LocalConfig.Get<bool>(OsuSetting.SavePassword) ? API.Token : string.Empty);
                 LocalConfig.Save();
             }
+
+            connection.Dispose();
 
             base.Dispose(isDisposing);
         }

@@ -20,10 +20,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const float triangle_size = 20f;
 
+        private readonly Container triangleContainer;
+
         public DrawableBarLineMajor(BarLine barLine)
             : base(barLine)
         {
-            Add(new Container
+            Add(triangleContainer = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -52,6 +54,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             });
 
             Tracker.Alpha = 1f;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            using (triangleContainer.BeginAbsoluteSequence(HitObject.StartTime))
+                triangleContainer.FadeOut(150);
         }
     }
 }

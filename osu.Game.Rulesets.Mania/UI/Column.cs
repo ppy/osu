@@ -3,24 +3,21 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
-using osu.Framework.Configuration;
+using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.Judgements;
+using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class Column : ScrollingPlayfield<ManiaHitObject, ManiaJudgement>, IHasAccentColour
+    public class Column : ScrollingPlayfield, IHasAccentColour
     {
         private const float key_icon_size = 10;
         private const float key_icon_corner_radius = 3;
@@ -32,17 +29,20 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
-        /// <summary>
-        /// The key that will trigger input actions for this column and hit objects contained inside it.
-        /// </summary>
-        public Bindable<Key> Key = new Bindable<Key>();
+        public ManiaAction Action;
 
         private readonly Box background;
         private readonly Container hitTargetBar;
         private readonly Container keyIcon;
 
+        internal readonly Container TopLevelContainer;
+        private readonly Container explosionContainer;
+
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
+
+        private const float opacity_released = 0.1f;
+        private const float opacity_pressed = 0.25f;
 
         public Column()
             : base(Axes.Y)
@@ -53,9 +53,9 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 background = new Box
                 {
-                    Name = "Foreground",
+                    Name = "Background",
                     RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.2f
+                    Alpha = opacity_released
                 },
                 new Container
                 {
@@ -101,8 +101,13 @@ namespace osu.Game.Rulesets.Mania.UI
                         // For column lighting, we need to capture input events before the notes
                         new InputTarget
                         {
-                            KeyDown = onKeyDown,
-                            KeyUp = onKeyUp
+                            Pressed = onPressed,
+                            Released = onReleased
+                        },
+                        explosionContainer = new Container
+                        {
+                            Name = "Hit explosions",
+                            RelativeSizeAxes = Axes.Both
                         }
                     }
                 },
@@ -141,8 +146,11 @@ namespace osu.Game.Rulesets.Mania.UI
                             }
                         }
                     }
-                }
+                },
+                TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
+
+            TopLevelContainer.Add(explosionContainer.CreateProxy());
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
@@ -193,31 +201,38 @@ namespace osu.Game.Rulesets.Mania.UI
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
         /// <param name="hitObject">The DrawableHitObject to add.</param>
-        public override void Add(DrawableHitObject<ManiaHitObject, ManiaJudgement> hitObject)
+        public override void Add(DrawableHitObject hitObject)
         {
+            hitObject.Depth = (float)hitObject.HitObject.StartTime;
+
             hitObject.AccentColour = AccentColour;
             HitObjects.Add(hitObject);
         }
 
-        private bool onKeyDown(InputState state, KeyDownEventArgs args)
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            if (args.Repeat)
-                return false;
+            if (!judgement.IsHit)
+                return;
 
-            if (args.Key == Key)
+            explosionContainer.Add(new HitExplosion(judgedObject));
+        }
+
+        private bool onPressed(ManiaAction action)
+        {
+            if (action == Action)
             {
-                background.FadeTo(background.Alpha + 0.2f, 50, Easing.OutQuint);
+                background.FadeTo(opacity_pressed, 50, Easing.OutQuint);
                 keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint);
             }
 
             return false;
         }
 
-        private bool onKeyUp(InputState state, KeyUpEventArgs args)
+        private bool onReleased(ManiaAction action)
         {
-            if (args.Key == Key)
+            if (action == Action)
             {
-                background.FadeTo(0.2f, 800, Easing.OutQuart);
+                background.FadeTo(opacity_released, 800, Easing.OutQuart);
                 keyIcon.ScaleTo(1f, 400, Easing.OutQuart);
             }
 
@@ -227,10 +242,10 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <summary>
         /// This is a simple container which delegates various input events that have to be captured before the notes.
         /// </summary>
-        private class InputTarget : Container
+        private class InputTarget : Container, IKeyBindingHandler<ManiaAction>
         {
-            public Func<InputState, KeyDownEventArgs, bool> KeyDown;
-            public Func<InputState, KeyUpEventArgs, bool> KeyUp;
+            public Func<ManiaAction, bool> Pressed;
+            public Func<ManiaAction, bool> Released;
 
             public InputTarget()
             {
@@ -239,8 +254,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 Alpha = 0;
             }
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => KeyDown?.Invoke(state, args) ?? false;
-            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => KeyUp?.Invoke(state, args) ?? false;
+            public bool OnPressed(ManiaAction action) => Pressed?.Invoke(action) ?? false;
+            public bool OnReleased(ManiaAction action) => Released?.Invoke(action) ?? false;
         }
     }
 }

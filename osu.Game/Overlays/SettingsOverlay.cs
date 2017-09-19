@@ -79,6 +79,7 @@ namespace osu.Game.Overlays
                     },
                     SectionsContainer = new SettingsSectionsContainer
                     {
+                        Masking = true,
                         RelativeSizeAxes = Axes.Both,
                         ExpandableHeader = CreateHeader(),
                         FixedHeader = searchTextBox = new SearchTextBox

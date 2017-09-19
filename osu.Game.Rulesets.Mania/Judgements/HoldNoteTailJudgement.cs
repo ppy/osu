@@ -1,6 +1,8 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Rulesets.Objects.Drawables;
+
 namespace osu.Game.Rulesets.Mania.Judgements
 {
     public class HoldNoteTailJudgement : ManiaJudgement
@@ -10,27 +12,15 @@ namespace osu.Game.Rulesets.Mania.Judgements
         /// </summary>
         public bool HasBroken;
 
-        public override int NumericResultForScore(ManiaHitResult result)
+        protected override int NumericResultFor(HitResult result)
         {
             switch (result)
             {
                 default:
-                    return base.NumericResultForScore(result);
-                case ManiaHitResult.Great:
-                case ManiaHitResult.Perfect:
-                    return base.NumericResultForScore(HasBroken ? ManiaHitResult.Good : result);
-            }
-        }
-
-        public override int NumericResultForAccuracy(ManiaHitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return base.NumericResultForAccuracy(result);
-                case ManiaHitResult.Great:
-                case ManiaHitResult.Perfect:
-                    return base.NumericResultForAccuracy(HasBroken ? ManiaHitResult.Good : result);
+                    return base.NumericResultFor(result);
+                case HitResult.Great:
+                case HitResult.Perfect:
+                    return base.NumericResultFor(HasBroken ? HitResult.Good : result);
             }
         }
     }

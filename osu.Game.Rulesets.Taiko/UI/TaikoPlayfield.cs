@@ -14,11 +14,12 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Extensions.Color4Extensions;
 using System.Linq;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class TaikoPlayfield : Playfield<TaikoHitObject, TaikoJudgement>
+    public class TaikoPlayfield : ScrollingPlayfield
     {
         /// <summary>
         /// Default height of a <see cref="TaikoPlayfield"/> when inside a <see cref="TaikoRulesetContainer"/>.
@@ -35,15 +36,17 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         private const float left_area_size = 240;
 
-        protected override Container<Drawable> Content => hitObjectContainer;
 
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
-        private readonly Container<DrawableBarLine> barLineContainer;
         private readonly Container<DrawableTaikoJudgement> judgementContainer;
 
-        private readonly Container hitObjectContainer;
+        protected override Container<Drawable> Content => content;
+        private readonly Container content;
+
         private readonly Container topLevelHitContainer;
+
+        private readonly Container barlineContainer;
 
         private readonly Container overlayBackgroundContainer;
         private readonly Container backgroundContainer;
@@ -52,6 +55,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         public TaikoPlayfield()
+            : base(Axes.X)
         {
             AddRangeInternal(new Drawable[]
             {
@@ -84,7 +88,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     {
                         new Container
                         {
-                            Name = "Masked elements",
+                            Name = "Masked elements before hit objects",
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
                             Masking = true,
@@ -94,11 +98,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit,
-                                    BlendingMode = BlendingMode.Additive,
-                                },
-                                barLineContainer = new Container<DrawableBarLine>
-                                {
-                                    RelativeSizeAxes = Axes.Both,
+                                    Blending = BlendingMode.Additive,
                                 },
                                 new HitTarget
                                 {
@@ -106,12 +106,20 @@ namespace osu.Game.Rulesets.Taiko.UI
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit
-                                },
-                                hitObjectContainer = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
+                                }
                             }
+                        },
+                        barlineContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = HIT_TARGET_OFFSET }
+                        },
+                        content = new Container
+                        {
+                            Name = "Hit objects",
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
+                            Masking = true
                         },
                         kiaiExplosionContainer = new Container<KiaiHitExplosion>
                         {
@@ -119,14 +127,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fit,
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            BlendingMode = BlendingMode.Additive
+                            Blending = BlendingMode.Additive
                         },
                         judgementContainer = new Container<DrawableTaikoJudgement>
                         {
                             Name = "Judgements",
                             RelativeSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            BlendingMode = BlendingMode.Additive
+                            Blending = BlendingMode.Additive
                         },
                     }
                 },
@@ -181,6 +189,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RelativeSizeAxes = Axes.Both,
                 }
             });
+
+            VisibleTimeRange.Value = 6000;
         }
 
         [BackgroundDependencyLoader]
@@ -193,11 +203,15 @@ namespace osu.Game.Rulesets.Taiko.UI
             background.Colour = colours.Gray0;
         }
 
-        public override void Add(DrawableHitObject<TaikoHitObject, TaikoJudgement> h)
+        public override void Add(DrawableHitObject h)
         {
             h.Depth = (float)h.HitObject.StartTime;
 
             base.Add(h);
+
+            var barline = h as DrawableBarLine;
+            if (barline != null)
+                barlineContainer.Add(barline.CreateProxy());
 
             // Swells should be moved at the very top of the playfield when they reach the hit target
             var swell = h as DrawableSwell;
@@ -205,44 +219,39 @@ namespace osu.Game.Rulesets.Taiko.UI
                 swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
         }
 
-        public void AddBarLine(DrawableBarLine barLine)
+        public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            barLineContainer.Add(barLine);
-        }
-
-        public override void OnJudgement(DrawableHitObject<TaikoHitObject, TaikoJudgement> judgedObject)
-        {
-            bool wasHit = judgedObject.Judgement.Result == HitResult.Hit;
-            bool secondHit = judgedObject.Judgement.SecondHit;
-
-            judgementContainer.Add(new DrawableTaikoJudgement(judgedObject.Judgement)
+            if (judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
-                Anchor = wasHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                Origin = wasHit ? Anchor.BottomCentre : Anchor.Centre,
-                RelativePositionAxes = Axes.X,
-                X = wasHit ? judgedObject.Position.X : 0,
-            });
+                judgementContainer.Add(new DrawableTaikoJudgement(judgedObject, judgement)
+                {
+                    Anchor = judgement.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
+                    Origin = judgement.IsHit ? Anchor.BottomCentre : Anchor.Centre,
+                    RelativePositionAxes = Axes.X,
+                    X = judgement.IsHit ? judgedObject.Position.X : 0,
+                });
+            }
 
-            if (!wasHit)
+            if (!judgement.IsHit)
                 return;
 
             bool isRim = judgedObject.HitObject is RimHit;
 
-            if (!secondHit)
+            if (judgement is TaikoStrongHitJudgement)
+                hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
+            else
             {
-                if (judgedObject.X >= -0.05f && !(judgedObject is DrawableSwell))
+                if (judgedObject.X >= -0.05f && judgedObject is DrawableHit)
                 {
                     // If we're far enough away from the left stage, we should bring outselves in front of it
                     topLevelHitContainer.Add(judgedObject.CreateProxy());
                 }
 
-                hitExplosionContainer.Add(new HitExplosion(judgedObject.Judgement, isRim));
+                hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
 
                 if (judgedObject.HitObject.Kiai)
-                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject.Judgement, isRim));
+                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
             }
-            else
-                hitExplosionContainer.Children.FirstOrDefault(e => e.Judgement == judgedObject.Judgement)?.VisualiseSecondHit();
         }
     }
 }

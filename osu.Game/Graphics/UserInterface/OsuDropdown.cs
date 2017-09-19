@@ -14,107 +14,185 @@ using OpenTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuDropdown<T> : Dropdown<T>
+    public class OsuDropdown<T> : Dropdown<T>, IHasAccentColour
     {
-        protected override DropdownHeader CreateHeader() => new OsuDropdownHeader { AccentColour = AccentColour };
-
-        protected override Menu CreateMenu() => new OsuMenu();
-
-        private Color4? accentColour;
-        public virtual Color4 AccentColour
+        private Color4 accentColour;
+        public Color4 AccentColour
         {
-            get { return accentColour.GetValueOrDefault(); }
+            get { return accentColour; }
             set
             {
                 accentColour = value;
-                if (Header != null)
-                    ((OsuDropdownHeader)Header).AccentColour = value;
-                foreach (var item in MenuItems.OfType<OsuDropdownMenuItem>())
-                    item.AccentColour = value;
+                updateAccentColour();
             }
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (accentColour == null)
-                AccentColour = colours.PinkDarker;
+            if (accentColour == default(Color4))
+                accentColour = colours.PinkDarker;
+            updateAccentColour();
+
         }
 
-        protected override DropdownMenuItem<T> CreateMenuItem(string text, T value) => new OsuDropdownMenuItem(text, value) { AccentColour = AccentColour };
-
-        public class OsuDropdownMenuItem : DropdownMenuItem<T>
+        private void updateAccentColour()
         {
-            public OsuDropdownMenuItem(string text, T current) : base(text, current)
+            var header = Header as IHasAccentColour;
+            if (header != null) header.AccentColour = accentColour;
+
+            var menu = Menu as IHasAccentColour;
+            if (menu != null) menu.AccentColour = accentColour;
+        }
+
+        protected override DropdownHeader CreateHeader() => new OsuDropdownHeader();
+
+        protected override DropdownMenu CreateMenu() => new OsuDropdownMenu();
+
+        #region OsuDropdownMenu
+        protected class OsuDropdownMenu : DropdownMenu, IHasAccentColour
+        {
+            // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
+            public OsuDropdownMenu()
             {
-                Foreground.Padding = new MarginPadding(2);
+                CornerRadius = 4;
+                BackgroundColour = Color4.Black.Opacity(0.5f);
 
-                Masking = true;
-                CornerRadius = 6;
+                // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
+                ItemsContainer.Padding = new MarginPadding(5);
+            }
 
-                Children = new[]
+            // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
+            protected override void AnimateOpen() => this.FadeIn(300, Easing.OutQuint);
+            protected override void AnimateClose() => this.FadeOut(300, Easing.OutQuint);
+
+            // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
+            protected override void UpdateSize(Vector2 newSize)
+            {
+                if (Direction == Direction.Vertical)
                 {
-                new FillFlowContainer
-                {
-                    Direction = FillDirection.Horizontal,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
-                    {
-                        Chevron = new SpriteIcon
-                        {
-                            AlwaysPresent = true,
-                            Icon = FontAwesome.fa_chevron_right,
-                            Colour = Color4.Black,
-                            Alpha = 0.5f,
-                            Size = new Vector2(8),
-                            Margin = new MarginPadding { Left = 3, Right = 3 },
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.CentreLeft,
-                        },
-                        Label = new OsuSpriteText {
-                            Text = text,
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.CentreLeft,
-                        }
-                    }
+                    Width = newSize.X;
+                    this.ResizeHeightTo(newSize.Y, 300, Easing.OutQuint);
                 }
-            };
+                else
+                {
+                    Height = newSize.Y;
+                    this.ResizeWidthTo(newSize.X, 300, Easing.OutQuint);
+                }
             }
 
-            private Color4? accentColour;
-
-            protected readonly SpriteIcon Chevron;
-            protected readonly OsuSpriteText Label;
-
-            protected override void FormatForeground(bool hover = false)
-            {
-                base.FormatForeground(hover);
-                Chevron.Alpha = hover ? 1 : 0;
-            }
-
+            private Color4 accentColour;
             public Color4 AccentColour
             {
-                get { return accentColour.GetValueOrDefault(); }
+                get { return accentColour; }
                 set
                 {
                     accentColour = value;
-                    BackgroundColourHover = BackgroundColourSelected = value;
-                    FormatBackground();
-                    FormatForeground();
+                    foreach (var c in Children.OfType<IHasAccentColour>())
+                        c.AccentColour = value;
                 }
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                BackgroundColour = Color4.Transparent;
-                BackgroundColourHover = accentColour ?? colours.PinkDarker;
-                BackgroundColourSelected = Color4.Black.Opacity(0.5f);
-            }
-        }
+            protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item) { AccentColour = accentColour };
 
-        public class OsuDropdownHeader : DropdownHeader
+            #region DrawableOsuDropdownMenuItem
+            public class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem, IHasAccentColour
+            {
+                private Color4? accentColour;
+                public Color4 AccentColour
+                {
+                    get { return accentColour ?? nonAccentSelectedColour; }
+                    set
+                    {
+                        accentColour = value;
+                        updateColours();
+                    }
+                }
+
+                private void updateColours()
+                {
+                    BackgroundColourHover = accentColour ?? nonAccentHoverColour;
+                    BackgroundColourSelected = accentColour ?? nonAccentSelectedColour;
+                    UpdateBackgroundColour();
+                    UpdateForegroundColour();
+                }
+
+                private Color4 nonAccentHoverColour;
+                private Color4 nonAccentSelectedColour;
+
+                public DrawableOsuDropdownMenuItem(MenuItem item)
+                    : base(item)
+                {
+                    Foreground.Padding = new MarginPadding(2);
+
+                    Masking = true;
+                    CornerRadius = 6;
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    BackgroundColour = Color4.Transparent;
+
+                    nonAccentHoverColour = colours.PinkDarker;
+                    nonAccentSelectedColour = Color4.Black.Opacity(0.5f);
+                    updateColours();
+                }
+
+                protected override void UpdateForegroundColour()
+                {
+                    base.UpdateForegroundColour();
+
+                    var content = Foreground.Children.FirstOrDefault() as Content;
+                    if (content != null) content.Chevron.Alpha = IsHovered ? 1 : 0;
+                }
+
+                protected override Drawable CreateContent() => new Content();
+
+                protected new class Content : FillFlowContainer, IHasText
+                {
+                    public string Text
+                    {
+                        get { return Label.Text; }
+                        set { Label.Text = value; }
+                    }
+
+                    public readonly OsuSpriteText Label;
+                    public readonly SpriteIcon Chevron;
+
+                    public Content()
+                    {
+                        RelativeSizeAxes = Axes.X;
+                        AutoSizeAxes = Axes.Y;
+                        Direction = FillDirection.Horizontal;
+
+                        Children = new Drawable[]
+                        {
+                            Chevron = new SpriteIcon
+                            {
+                                AlwaysPresent = true,
+                                Icon = FontAwesome.fa_chevron_right,
+                                Colour = Color4.Black,
+                                Alpha = 0.5f,
+                                Size = new Vector2(8),
+                                Margin = new MarginPadding { Left = 3, Right = 3 },
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                            },
+                            Label = new OsuSpriteText
+                            {
+                                Origin = Anchor.CentreLeft,
+                                Anchor = Anchor.CentreLeft,
+                            }
+                        };
+                    }
+                }
+            }
+            #endregion
+        }
+        #endregion
+
+        public class OsuDropdownHeader : DropdownHeader, IHasAccentColour
         {
             protected readonly SpriteText Text;
             protected override string Label
@@ -125,14 +203,14 @@ namespace osu.Game.Graphics.UserInterface
 
             protected readonly SpriteIcon Icon;
 
-            private Color4? accentColour;
+            private Color4 accentColour;
             public virtual Color4 AccentColour
             {
-                get { return accentColour.GetValueOrDefault(); }
+                get { return accentColour; }
                 set
                 {
                     accentColour = value;
-                    BackgroundColourHover = value;
+                    BackgroundColourHover = accentColour;
                 }
             }
 
@@ -167,7 +245,7 @@ namespace osu.Game.Graphics.UserInterface
             private void load(OsuColour colours)
             {
                 BackgroundColour = Color4.Black.Opacity(0.5f);
-                BackgroundColourHover = accentColour ?? colours.PinkDarker;
+                BackgroundColourHover = colours.PinkDarker;
             }
         }
     }

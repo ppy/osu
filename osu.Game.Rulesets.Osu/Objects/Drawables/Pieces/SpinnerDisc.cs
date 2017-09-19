@@ -66,21 +66,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            Tracking |= state.Mouse.HasMainButtonPressed;
-            return base.OnMouseDown(state, args);
-        }
-
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-        {
-            Tracking &= state.Mouse.HasMainButtonPressed;
-            return base.OnMouseUp(state, args);
-        }
-
         protected override bool OnMouseMove(InputState state)
         {
-            Tracking |= state.Mouse.HasMainButtonPressed;
             mousePosition = Parent.ToLocalSpace(state.Mouse.NativeState.Position);
             return base.OnMouseMove(state);
         }

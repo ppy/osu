@@ -19,6 +19,7 @@ using osu.Framework.Threading;
 using osu.Framework.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Screens.Select
 {
@@ -86,9 +87,14 @@ namespace osu.Game.Screens.Select
 
         public BeatmapCarousel()
         {
-            Add(scrollableContent = new Container<Panel>
+            Add(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Child = scrollableContent = new Container<Panel>
+                {
+                    RelativeSizeAxes = Axes.X,
+                }
             });
         }
 
@@ -107,17 +113,44 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void RemoveBeatmap(BeatmapSetInfo beatmapSet)
+        public void RemoveBeatmap(BeatmapSetInfo beatmapSet) => removeGroup(groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID));
+
+        internal void UpdateBeatmap(BeatmapInfo beatmap)
         {
-            Schedule(delegate
+            // todo: this method should not run more than once for the same BeatmapSetInfo.
+            var set = manager.Refresh(beatmap.BeatmapSet);
+
+            // todo: this method should be smarter as to not recreate panels that haven't changed, etc.
+            var group = groups.Find(b => b.BeatmapSet.ID == set.ID);
+
+            if (group == null)
+                return;
+
+            var newGroup = createGroup(set);
+
+            int i = groups.IndexOf(group);
+            groups.RemoveAt(i);
+            groups.Insert(i, newGroup);
+
+            if (selectedGroup == group && newGroup.BeatmapPanels.Count == 0)
+                selectedGroup = null;
+
+            Filter(null, false);
+
+            //check if we can/need to maintain our current selection.
+            if (selectedGroup == group && newGroup.BeatmapPanels.Count > 0)
             {
-                removeGroup(groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID));
-            });
+                var newSelection =
+                    newGroup.BeatmapPanels.Find(p => p.Beatmap.ID == selectedPanel?.Beatmap.ID) ??
+                    newGroup.BeatmapPanels[Math.Min(newGroup.BeatmapPanels.Count - 1, group.BeatmapPanels.IndexOf(selectedPanel))];
+
+                selectGroup(newGroup, newSelection);
+            }
         }
 
         public void SelectBeatmap(BeatmapInfo beatmap, bool animated = true)
         {
-            if (beatmap == null)
+            if (beatmap == null || beatmap.Hidden)
             {
                 SelectNext();
                 return;
@@ -139,6 +172,12 @@ namespace osu.Game.Screens.Select
         public Action<BeatmapInfo> SelectionChanged;
 
         public Action StartRequested;
+
+        public Action<BeatmapSetInfo> DeleteRequested;
+
+        public Action<BeatmapSetInfo> RestoreRequested;
+
+        public Action<BeatmapInfo> HideDifficultyRequested;
 
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
@@ -191,7 +230,8 @@ namespace osu.Game.Screens.Select
             if (!visibleGroups.Any())
                 return;
 
-            randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
+            if (selectedGroup != null)
+                randomSelectedBeatmaps.Push(new KeyValuePair<BeatmapGroup, BeatmapPanel>(selectedGroup, selectedGroup.SelectedPanel));
 
             BeatmapGroup group;
 
@@ -305,6 +345,9 @@ namespace osu.Game.Screens.Select
             {
                 SelectionChanged = (g, p) => selectGroup(g, p),
                 StartRequested = b => StartRequested?.Invoke(),
+                DeleteRequested = b => DeleteRequested?.Invoke(b),
+                RestoreHiddenRequested = s => RestoreRequested?.Invoke(s),
+                HideDifficultyRequested = b => HideDifficultyRequested?.Invoke(b),
                 State = BeatmapGroupState.Collapsed
             };
         }
