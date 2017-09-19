@@ -27,42 +27,45 @@ namespace osu.Game.Online.API
 
         internal bool AuthenticateWithLogin(string username, string password)
         {
-            var req = new AccessTokenRequestPassword(username, password)
+            using (var req = new AccessTokenRequestPassword(username, password)
             {
                 Url = $@"{endpoint}/oauth/token",
                 Method = HttpMethod.POST,
                 ClientId = clientId,
                 ClientSecret = clientSecret
-            };
-
-            try
+            })
             {
-                req.BlockingPerform();
-            }
-            catch
-            {
-                return false;
-            }
+                try
+                {
+                    req.BlockingPerform();
+                }
+                catch
+                {
+                    return false;
+                }
 
-            Token = req.ResponseObject;
-            return true;
+                Token = req.ResponseObject;
+                return true;
+            }
         }
 
         internal bool AuthenticateWithRefresh(string refresh)
         {
             try
             {
-                var req = new AccessTokenRequestRefresh(refresh)
+                using (var req = new AccessTokenRequestRefresh(refresh)
                 {
                     Url = $@"{endpoint}/oauth/token",
                     Method = HttpMethod.POST,
                     ClientId = clientId,
                     ClientSecret = clientSecret
-                };
-                req.BlockingPerform();
+                })
+                {
+                    req.BlockingPerform();
 
-                Token = req.ResponseObject;
-                return true;
+                    Token = req.ResponseObject;
+                    return true;
+                }
             }
             catch
             {

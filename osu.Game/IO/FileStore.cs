@@ -78,33 +78,33 @@ namespace osu.Game.IO
             }
         }
 
-        public FileInfo Add(Stream data)
+        public FileInfo Add(Stream data, bool reference = true)
         {
             string hash = data.ComputeSHA2Hash();
 
             var existing = Connection.Table<FileInfo>().Where(f => f.Hash == hash).FirstOrDefault();
 
             var info = existing ?? new FileInfo { Hash = hash };
-            if (existing != null)
+
+            string path = Path.Combine(prefix, info.StoragePath);
+
+            // we may be re-adding a file to fix missing store entries.
+            if (!Storage.Exists(path))
             {
-                info = existing;
+                data.Seek(0, SeekOrigin.Begin);
+
+                using (var output = Storage.GetStream(path, FileAccess.Write))
+                    data.CopyTo(output);
+
+                data.Seek(0, SeekOrigin.Begin);
             }
-            else
-            {
-                string path = Path.Combine(prefix, info.StoragePath);
 
-                data.Seek(0, SeekOrigin.Begin);
-
-                if (!Storage.Exists(path))
-                    using (var output = Storage.GetStream(path, FileAccess.Write))
-                        data.CopyTo(output);
-
-                data.Seek(0, SeekOrigin.Begin);
-
+            if (existing == null)
                 Connection.Insert(info);
-            }
 
-            Reference(info);
+            if (reference || existing == null)
+                Reference(info);
+
             return info;
         }
 
