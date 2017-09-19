@@ -58,6 +58,7 @@
     <Compile Include="Objects\Fruit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\TestCaseCatcher.cs" />
+    <Compile Include="Tests\TestCaseCatchPlayer.cs" />
     <Compile Include="UI\CatcherArea.cs" />
     <Compile Include="UI\CatchRulesetContainer.cs" />
     <Compile Include="UI\CatchPlayfield.cs" />

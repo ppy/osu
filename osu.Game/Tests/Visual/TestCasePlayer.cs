@@ -16,7 +16,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCasePlayer : OsuTestCase
+    public class TestCasePlayer : OsuTestCase
     {
         protected Player Player;
         private RulesetStore rulesets;
@@ -45,13 +45,20 @@ namespace osu.Game.Tests.Visual
             loadPlayerFor(rulesets.Query<RulesetInfo>().First());
         }
 
-        private void loadPlayerFor(RulesetInfo r)
+        protected virtual Beatmap CreateBeatmap()
         {
             Beatmap beatmap;
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(test_beatmap_data)))
             using (var reader = new StreamReader(stream))
                 beatmap = BeatmapDecoder.GetDecoder(reader).Decode(reader);
+
+            return beatmap;
+        }
+
+        private void loadPlayerFor(RulesetInfo r)
+        {
+            var beatmap = CreateBeatmap();
 
             beatmap.BeatmapInfo.Ruleset = r;
 
