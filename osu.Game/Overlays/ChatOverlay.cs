@@ -57,7 +57,6 @@ namespace osu.Game.Overlays
         private readonly Container chatContainer;
         private readonly Container tabsArea;
         private readonly Box chatBackground;
-        private readonly Triangles chatBackgroundTriangles;
         private readonly Box tabBackground;
 
         public Bindable<double> ChatHeight { get; internal set; }
@@ -117,7 +116,7 @@ namespace osu.Game.Overlays
                                     Masking = true,
                                     Children = new Drawable[]
                                     {
-                                        chatBackgroundTriangles = new Triangles
+                                        new Triangles
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             ColourDark = OsuColour.FromHex(@"132226"),
