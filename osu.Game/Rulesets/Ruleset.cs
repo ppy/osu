@@ -1,16 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Play;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Settings;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets
 {
@@ -20,9 +20,18 @@ namespace osu.Game.Rulesets
 
         public virtual IEnumerable<BeatmapStatistic> GetBeatmapStatistics(WorkingBeatmap beatmap) => new BeatmapStatistic[] { };
 
+        public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
+                                                // Get all mod types as an IEnumerable<ModType>
+                                                .SelectMany(GetModsFor)
+                                                // Confine all mods of each mod type into a single IEnumerable<Mod>
+                                                .Where(mod => mod != null)
+                                                // Filter out all null mods
+                                                .SelectMany(mod => (mod as MultiMod)?.Mods ?? new[] { mod });
+                                                // Resolve MultiMods as their .Mods property
+
         public abstract IEnumerable<Mod> GetModsFor(ModType type);
 
-        public abstract Mod GetAutoplayMod();
+        public Mod GetAutoplayMod() => GetAllMods().First(mod => mod is ModAutoplay);
 
         protected Ruleset(RulesetInfo rulesetInfo)
         {
@@ -40,13 +49,9 @@ namespace osu.Game.Rulesets
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap);
 
-        public abstract ScoreProcessor CreateScoreProcessor();
-
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_question_circle };
 
         public abstract string Description { get; }
-
-        public abstract IEnumerable<KeyCounter> CreateGameplayKeys();
 
         public virtual SettingsSubsection CreateSettings() => null;
 
@@ -66,5 +71,12 @@ namespace osu.Game.Rulesets
         /// <param name="variant">A variant.</param>
         /// <returns>A list of valid <see cref="KeyBinding"/>s.</returns>
         public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new KeyBinding[] { };
+
+        /// <summary>
+        /// Gets the name for a key binding variant. This is used for display in the settings overlay.
+        /// </summary>
+        /// <param name="variant">The variant.</param>
+        /// <returns>A descriptive name of the variant.</returns>
+        public virtual string GetVariantName(int variant) => string.Empty;
     }
 }

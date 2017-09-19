@@ -49,8 +49,17 @@ namespace osu.Game.Beatmaps
 
         public string Path { get; set; }
 
-        [JsonProperty("file_md5")]
+        [JsonProperty("file_sha2")]
         public string Hash { get; set; }
+
+        public bool Hidden { get; set; }
+
+        /// <summary>
+        /// MD5 is kept for legacy support (matching against replays, osu-web-10 etc.).
+        /// </summary>
+        [Indexed]
+        [JsonProperty("file_md5")]
+        public string MD5Hash { get; set; }
 
         // General
         public int AudioLeadIn { get; set; }
@@ -91,6 +100,11 @@ namespace osu.Game.Beatmaps
 
         public bool Equals(BeatmapInfo other)
         {
+            if (ID == 0 || other?.ID == 0)
+                // one of the two BeatmapInfos we are comparing isn't sourced from a database.
+                // fall back to reference equality.
+                return ReferenceEquals(this, other);
+
             return ID == other?.ID;
         }
 

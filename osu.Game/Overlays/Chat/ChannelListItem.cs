@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -34,7 +35,7 @@ namespace osu.Game.Overlays.Chat
         private Color4 topicColour;
         private Color4 hoverColour;
 
-        public string[] FilterTerms => new[] { channel.Name };
+        public IEnumerable<string> FilterTerms => new[] { channel.Name };
         public bool MatchingFilter
         {
             set
@@ -76,7 +77,6 @@ namespace osu.Game.Overlays.Chat
                                     Size = new Vector2(text_size),
                                     Shadow = false,
                                     Margin = new MarginPadding { Right = 10f },
-                                    Alpha = 0f,
                                 },
                             },
                         },
@@ -109,7 +109,6 @@ namespace osu.Game.Overlays.Chat
                                     TextSize = text_size,
                                     Font = @"Exo2.0-SemiBold",
                                     Shadow = false,
-                                    Alpha = 0.8f,
                                 },
                             },
                         },
@@ -151,6 +150,9 @@ namespace osu.Game.Overlays.Chat
 
             joinedBind.ValueChanged += updateColour;
             joinedBind.BindTo(channel.Joined);
+
+            joinedBind.TriggerChange();
+            FinishTransforms(true);
         }
 
         protected override bool OnHover(InputState state)

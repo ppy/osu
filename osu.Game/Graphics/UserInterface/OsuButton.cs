@@ -1,12 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -16,12 +18,14 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuButton : Button
+    public class OsuButton : Button, IFilterable
     {
         private Box hover;
 
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
+
+        protected Triangles Triangles;
 
         public OsuButton()
         {
@@ -51,7 +55,7 @@ namespace osu.Game.Graphics.UserInterface
 
             AddRange(new Drawable[]
             {
-                new Triangles
+                Triangles = new Triangles
                 {
                     RelativeSizeAxes = Axes.Both,
                     ColourDark = colours.BlueDarker,
@@ -60,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                 hover = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    BlendingMode = BlendingMode.Additive,
+                    Blending = BlendingMode.Additive,
                     Colour = Color4.White.Opacity(0.1f),
                     Alpha = 0,
                 },
@@ -107,6 +111,16 @@ namespace osu.Game.Graphics.UserInterface
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
             return base.OnMouseUp(state, args);
+        }
+
+        public IEnumerable<string> FilterTerms => new[] { Text };
+
+        public bool MatchingFilter
+        {
+            set
+            {
+                this.FadeTo(value ? 1 : 0);
+            }
         }
     }
 }

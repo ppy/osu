@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
@@ -15,6 +16,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModGravity : Mod, IGenerateSpeedAdjustments
     {
         public override string Name => "Gravity";
+        public override string ShortenedName => "GR";
 
         public override double ScoreMultiplier => 0;
 
@@ -23,7 +25,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public void ApplyToRulesetContainer(ManiaRulesetContainer rulesetContainer, ref List<SpeedAdjustmentContainer>[] hitObjectTimingChanges, ref List<SpeedAdjustmentContainer> barlineTimingChanges)
         {
             // We have to generate one speed adjustment per hit object for gravity
-            foreach (ManiaHitObject obj in rulesetContainer.Objects)
+            foreach (ManiaHitObject obj in rulesetContainer.Objects.OfType<ManiaHitObject>())
             {
                 MultiplierControlPoint controlPoint = rulesetContainer.CreateControlPointAt(obj.StartTime);
                 // Beat length has too large of an effect for gravity, so we'll force it to a constant value for now

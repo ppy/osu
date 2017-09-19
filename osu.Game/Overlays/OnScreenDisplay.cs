@@ -258,7 +258,10 @@ namespace osu.Game.Overlays
                     Type = EdgeEffectType.Glow,
                     Radius = 8,
                 };
+            }
 
+            protected override void LoadComplete()
+            {
                 updateGlow();
                 FinishTransforms(true);
             }

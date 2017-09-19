@@ -23,11 +23,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         public Func<double?> HoldStartTime;
 
-        /// <summary>
-        /// References whether the user is currently holding the hold note.
-        /// </summary>
-        public Func<bool> IsHolding;
-
         private readonly Container glowContainer;
 
         public DrawableHoldNoteTick(HoldNoteTick hitObject)
@@ -36,8 +31,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
+            Y = (float)HitObject.StartTime;
+
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1);
+
+            // Life time managed by the parent DrawableHoldNote
+            LifetimeStart = double.MinValue;
+            LifetimeEnd = double.MaxValue;
 
             Children = new[]
             {
@@ -58,9 +59,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     }
                 }
             };
-
-            // Set the default glow
-            AccentColour = Color4.White;
         }
 
         public override Color4 AccentColour
@@ -80,9 +78,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override ManiaJudgement CreateJudgement() => new HoldNoteTickJudgement();
-
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
                 return;
@@ -93,8 +89,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (HoldStartTime?.Invoke() > HitObject.StartTime)
                 return;
 
-            Judgement.ManiaResult = ManiaHitResult.Perfect;
-            Judgement.Result = HitResult.Hit;
+            AddJudgement(new HoldNoteTickJudgement { Result = HitResult.Perfect });
         }
 
         protected override void UpdateState(ArmedState state)
@@ -109,10 +104,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         protected override void Update()
         {
-            if (Judgement.Result != HitResult.None)
+            if (AllJudged)
                 return;
 
-            if (IsHolding?.Invoke() != true)
+            if (HoldStartTime?.Invoke() == null)
                 return;
 
             UpdateJudgement(true);

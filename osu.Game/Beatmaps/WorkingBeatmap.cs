@@ -54,7 +54,7 @@ namespace osu.Game.Beatmaps
                 {
                     if (beatmap != null) return beatmap;
 
-                    beatmap = GetBeatmap();
+                    beatmap = GetBeatmap() ?? new Beatmap();
 
                     // use the database-backed info.
                     beatmap.BeatmapInfo = BeatmapInfo;
@@ -87,7 +87,9 @@ namespace osu.Game.Beatmaps
                 {
                     if (track != null) return track;
 
-                    track = GetTrack();
+                    // we want to ensure that we always have a track, even if it's a fake one.
+                    track = GetTrack() ?? new TrackVirtual();
+
                     applyRateAdjustments();
                     return track;
                 }
@@ -98,8 +100,11 @@ namespace osu.Game.Beatmaps
 
         public void TransferTo(WorkingBeatmap other)
         {
-            if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
-                other.track = track;
+            lock (trackLock)
+            {
+                if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
+                    other.track = track;
+            }
 
             if (background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
                 other.background = background;
@@ -107,10 +112,17 @@ namespace osu.Game.Beatmaps
 
         public virtual void Dispose()
         {
-            track?.Dispose();
-            track = null;
             background?.Dispose();
             background = null;
+        }
+
+        public void DisposeTrack()
+        {
+            lock (trackLock)
+            {
+                track?.Dispose();
+                track = null;
+            }
         }
     }
 }

@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.MathUtils;
-using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -22,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         private Catcher catcher;
 
-        public void Add(DrawableHitObject<CatchBaseHit, CatchJudgement> fruit, Vector2 screenPosition) => catcher.AddToStack(fruit, screenPosition);
+        public void Add(DrawableHitObject fruit, Vector2 screenPosition) => catcher.AddToStack(fruit, screenPosition);
 
         public bool CheckIfWeCanCatch(CatchBaseHit obj) => Math.Abs(catcher.Position.X - obj.Position) < catcher.DrawSize.X / DrawSize.X / 2;
 
@@ -85,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 var additive = createCatcherSprite();
 
                 additive.RelativePositionAxes = Axes.Both;
-                additive.BlendingMode = BlendingMode.Additive;
+                additive.Blending = BlendingMode.Additive;
                 additive.Position = Position;
                 additive.Scale = Scale;
 
@@ -152,7 +151,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 X = (float)MathHelper.Clamp(X + Math.Sign(currentDirection) * Clock.ElapsedFrameTime / 1800 * speed, 0, 1);
             }
 
-            public void AddToStack(DrawableHitObject<CatchBaseHit, CatchJudgement> fruit, Vector2 absolutePosition)
+            public void AddToStack(DrawableHitObject fruit, Vector2 absolutePosition)
             {
                 fruit.RelativePositionAxes = Axes.None;
                 fruit.Position = new Vector2(ToLocalSpace(absolutePosition).X - DrawSize.X / 2, 0);
@@ -161,11 +160,10 @@ namespace osu.Game.Rulesets.Catch.UI
                 fruit.Origin = Anchor.BottomCentre;
                 fruit.Scale *= 0.7f;
                 fruit.LifetimeEnd = double.MaxValue;
-                fruit.Depth = (float)Time.Current;
 
                 float distance = fruit.DrawSize.X / 2 * fruit.Scale.X;
 
-                while (Children.OfType<DrawableFruit>().Any(f => Vector2.DistanceSquared(f.Position, fruit.Position) < distance * distance))
+                while (Children.OfType<DrawableFruit>().Any(f => Vector2Extensions.DistanceSquared(f.Position, fruit.Position) < distance * distance))
                 {
                     fruit.X += RNG.Next(-5, 5);
                     fruit.Y -= RNG.Next(0, 5);

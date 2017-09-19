@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Input;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -22,16 +21,19 @@ namespace osu.Game.Input.Bindings
 
         public override IEnumerable<KeyBinding> DefaultKeyBindings => new[]
         {
-            new KeyBinding(Key.F8, GlobalAction.ToggleChat),
-            new KeyBinding(Key.F9, GlobalAction.ToggleSocial),
-            new KeyBinding(new[] { Key.LControl, Key.LAlt, Key.R }, GlobalAction.ResetInputSettings),
-            new KeyBinding(new[] { Key.LControl, Key.T }, GlobalAction.ToggleToolbar),
-            new KeyBinding(new[] { Key.LControl, Key.O }, GlobalAction.ToggleSettings),
-            new KeyBinding(new[] { Key.LControl, Key.D }, GlobalAction.ToggleDirect),
+            new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
+            new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
+            new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
+            new KeyBinding(new[] { InputKey.Control, InputKey.O }, GlobalAction.ToggleSettings),
+            new KeyBinding(new[] { InputKey.Up }, GlobalAction.IncreaseVolume),
+            new KeyBinding(new[] { InputKey.MouseWheelUp }, GlobalAction.IncreaseVolume),
+            new KeyBinding(new[] { InputKey.Down }, GlobalAction.DecreaseVolume),
+            new KeyBinding(new[] { InputKey.MouseWheelDown }, GlobalAction.DecreaseVolume),
         };
 
-        protected override IEnumerable<Drawable> GetKeyboardInputQueue() =>
-            handler == null ? base.GetKeyboardInputQueue() : new[] { handler }.Concat(base.GetKeyboardInputQueue());
+        protected override IEnumerable<Drawable> KeyBindingInputQueue =>
+            handler == null ? base.KeyBindingInputQueue : new[] { handler }.Concat(base.KeyBindingInputQueue);
     }
 
     public enum GlobalAction
@@ -48,5 +50,9 @@ namespace osu.Game.Input.Bindings
         ToggleSettings,
         [Description("Toggle osu!direct")]
         ToggleDirect,
+        [Description("Increase Volume")]
+        IncreaseVolume,
+        [Description("Decrease Volume")]
+        DecreaseVolume,
     }
 }

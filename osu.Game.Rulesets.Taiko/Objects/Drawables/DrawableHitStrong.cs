@@ -3,10 +3,7 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Input;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
-using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -20,20 +17,21 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private double firstHitTime;
         private bool firstKeyHeld;
-        private Key firstHitKey;
+        private TaikoAction firstHitAction;
 
         protected DrawableHitStrong(Hit hit)
             : base(hit)
         {
         }
 
-        protected override TaikoJudgement CreateJudgement() => new TaikoStrongHitJudgement();
+        private bool processedSecondHit;
+        public override bool AllJudged => processedSecondHit && base.AllJudged;
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (Judgement.Result == HitResult.None)
+            if (!base.AllJudged)
             {
-                base.CheckJudgement(userTriggered);
+                base.CheckForJudgements(userTriggered, timeOffset);
                 return;
             }
 
@@ -43,47 +41,51 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // If we get here, we're assured that the key pressed is the correct secondary key
 
             if (Math.Abs(firstHitTime - Time.Current) < second_hit_window)
-                Judgement.SecondHit = true;
+            {
+                AddJudgement(new TaikoStrongHitJudgement());
+                processedSecondHit = true;
+            }
         }
 
-        protected override bool HandleKeyPress(Key key)
+        public override bool OnReleased(TaikoAction action)
+        {
+            if (action == firstHitAction)
+                firstKeyHeld = false;
+            return base.OnReleased(action);
+        }
+
+        public override bool OnPressed(TaikoAction action)
         {
             // Check if we've handled the first key
-            if (Judgement.Result == HitResult.None)
+            if (!base.AllJudged)
             {
                 // First key hasn't been handled yet, attempt to handle it
-                bool handled = base.HandleKeyPress(key);
+                bool handled = base.OnPressed(action);
 
                 if (handled)
                 {
                     firstHitTime = Time.Current;
-                    firstHitKey = key;
+                    firstHitAction = action;
+                    firstKeyHeld = true;
                 }
 
                 return handled;
             }
 
             // If we've already hit the second key, don't handle this object any further
-            if (Judgement.SecondHit)
+            if (processedSecondHit)
                 return false;
 
             // Don't handle represses of the first key
-            if (firstHitKey == key)
+            if (firstHitAction == action)
                 return false;
 
-            // Don't handle invalid hit key presses
-            if (!HitKeys.Contains(key))
+            // Don't handle invalid hit action presses
+            if (!HitActions.Contains(action))
                 return false;
 
             // Assume the intention was to hit the strong hit with both keys only if the first key is still being held down
             return firstKeyHeld && UpdateJudgement(true);
-        }
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            firstKeyHeld = state.Keyboard.Keys.Contains(firstHitKey);
-
-            return base.OnKeyDown(state, args);
         }
     }
 }

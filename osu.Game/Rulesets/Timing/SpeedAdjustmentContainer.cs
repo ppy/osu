@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,19 +26,26 @@ namespace osu.Game.Rulesets.Timing
         public readonly BindableBool Reversed = new BindableBool();
 
         protected override Container<DrawableHitObject> Content => content;
-        private Container<DrawableHitObject> content;
+        private readonly Container<DrawableHitObject> content;
 
         /// <summary>
         /// The axes which the content of this container will scroll through.
         /// </summary>
-        public Axes ScrollingAxes { get; internal set; }
+        public Axes ScrollingAxes
+        {
+            get { return scrollingContainer.ScrollingAxes; }
+            set { scrollingContainer.ScrollingAxes = value; }
+        }
+
+        public override bool RemoveWhenNotAlive => false;
+        protected override bool RequiresChildrenUpdate => true;
 
         /// <summary>
         /// The <see cref="MultiplierControlPoint"/> that defines the speed adjustments.
         /// </summary>
         public readonly MultiplierControlPoint ControlPoint;
 
-        private ScrollingContainer scrollingContainer;
+        private readonly ScrollingContainer scrollingContainer;
 
         /// <summary>
         /// Creates a new <see cref="SpeedAdjustmentContainer"/>.
@@ -49,17 +55,10 @@ namespace osu.Game.Rulesets.Timing
         {
             ControlPoint = controlPoint;
             RelativeSizeAxes = Axes.Both;
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
             scrollingContainer = CreateScrollingContainer();
-
-            scrollingContainer.ScrollingAxes = ScrollingAxes;
             scrollingContainer.ControlPoint = ControlPoint;
             scrollingContainer.VisibleTimeRange.BindTo(VisibleTimeRange);
-            scrollingContainer.RelativeChildOffset = new Vector2((ScrollingAxes & Axes.X) > 0 ? (float)ControlPoint.StartTime : 0, (ScrollingAxes & Axes.Y) > 0 ? (float)ControlPoint.StartTime : 0);
 
             AddInternal(content = scrollingContainer);
         }
@@ -102,11 +101,6 @@ namespace osu.Game.Rulesets.Timing
         }
 
         /// <summary>
-        /// Whether a <see cref="DrawableHitObject"/> falls within this <see cref="SpeedAdjustmentContainer"/>s affecting timespan.
-        /// </summary>
-        public bool CanContain(DrawableHitObject hitObject) => CanContain(hitObject.HitObject.StartTime);
-
-        /// <summary>
         /// Whether a point in time falls within this <see cref="SpeedAdjustmentContainer"/>s affecting timespan.
         /// </summary>
         public bool CanContain(double startTime) => ControlPoint.StartTime <= startTime;
@@ -115,6 +109,6 @@ namespace osu.Game.Rulesets.Timing
         /// Creates the <see cref="ScrollingContainer"/> which contains the scrolling <see cref="DrawableHitObject"/>s of this container.
         /// </summary>
         /// <returns>The <see cref="ScrollingContainer"/>.</returns>
-        protected virtual ScrollingContainer CreateScrollingContainer() => new LinearScrollingContainer(ScrollingAxes, ControlPoint);
+        protected virtual ScrollingContainer CreateScrollingContainer() => new LinearScrollingContainer(ControlPoint);
     }
 }

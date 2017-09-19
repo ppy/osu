@@ -3,11 +3,11 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Threading;
 using OpenTK;
 using osu.Framework.Audio;
 using osu.Framework.Allocation;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface.Volume
 {
@@ -15,11 +15,7 @@ namespace osu.Game.Graphics.UserInterface.Volume
     {
         private readonly VolumeMeter volumeMeterMaster;
 
-        private void volumeChanged(double newVolume)
-        {
-            Show();
-            schedulePopOut();
-        }
+        protected override bool BlockPassThroughMouse => false;
 
         public VolumeControl()
         {
@@ -64,15 +60,31 @@ namespace osu.Game.Graphics.UserInterface.Volume
             volumeMeterMusic.Bindable.ValueChanged -= volumeChanged;
         }
 
-        public void Adjust(InputState state)
+        public bool Adjust(GlobalAction action)
         {
-            if (State == Visibility.Hidden)
+            switch (action)
             {
-                Show();
-                return;
+                case GlobalAction.DecreaseVolume:
+                    if (State == Visibility.Hidden)
+                        Show();
+                    else
+                        volumeMeterMaster.Decrease();
+                    return true;
+                case GlobalAction.IncreaseVolume:
+                    if (State == Visibility.Hidden)
+                        Show();
+                    else
+                        volumeMeterMaster.Increase();
+                    return true;
             }
 
-            volumeMeterMaster.TriggerOnWheel(state);
+            return false;
+        }
+
+        private void volumeChanged(double newVolume)
+        {
+            Show();
+            schedulePopOut();
         }
 
         [BackgroundDependencyLoader]

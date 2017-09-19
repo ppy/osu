@@ -44,7 +44,7 @@ namespace osu.Game.Users
         public int MaxCombo;
 
         [JsonProperty(@"replays_watched_by_others")]
-        public int ReplayWatched;
+        public int ReplaysWatched;
 
         [JsonProperty(@"grade_counts")]
         public Grades GradesCount;

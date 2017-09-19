@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 {
                     RelativeSizeAxes = Axes.X,
                     Text = "Key Configuration",
-                    Action = () => keyConfig.ToggleVisibility()
+                    Action = keyConfig.ToggleVisibility
                 },
             };
         }

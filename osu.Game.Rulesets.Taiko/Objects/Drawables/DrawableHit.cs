@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
-using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -16,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        protected abstract Key[] HitKeys { get; }
+        protected abstract TaikoAction[] HitActions { get; }
 
         /// <summary>
         /// Whether the last key pressed is a valid hit key.
@@ -29,39 +28,40 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override void CheckJudgement(bool userTriggered)
+        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
-                if (Judgement.TimeOffset > HitObject.HitWindowGood)
-                    Judgement.Result = HitResult.Miss;
+                if (timeOffset > HitObject.HitWindowGood)
+                    AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
                 return;
             }
 
-            double hitOffset = Math.Abs(Judgement.TimeOffset);
+            double hitOffset = Math.Abs(timeOffset);
 
             if (hitOffset > HitObject.HitWindowMiss)
                 return;
 
             if (!validKeyPressed)
-                Judgement.Result = HitResult.Miss;
+                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
             else if (hitOffset < HitObject.HitWindowGood)
-            {
-                Judgement.Result = HitResult.Hit;
-                Judgement.TaikoResult = hitOffset < HitObject.HitWindowGreat ? TaikoHitResult.Great : TaikoHitResult.Good;
-            }
+                AddJudgement(new TaikoJudgement { Result = hitOffset < HitObject.HitWindowGreat ? HitResult.Great : HitResult.Good });
             else
-                Judgement.Result = HitResult.Miss;
+                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
         }
 
-        protected override bool HandleKeyPress(Key key)
+        public override bool OnPressed(TaikoAction action)
         {
-            if (Judgement.Result != HitResult.None)
-                return false;
-
-            validKeyPressed = HitKeys.Contains(key);
+            validKeyPressed = HitActions.Contains(action);
 
             return UpdateJudgement(true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Size = BaseSize * Parent.RelativeChildSize;
         }
 
         protected override void UpdateState(ArmedState state)
@@ -69,7 +69,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             var circlePiece = MainPiece as CirclePiece;
             circlePiece?.FlashBox.FinishTransforms();
 
-            using (BeginDelayedSequence(HitObject.StartTime - Time.Current + Judgement.TimeOffset, true))
+            var offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
+            using (BeginDelayedSequence(HitObject.StartTime - Time.Current + offset, true))
             {
                 switch (State)
                 {
