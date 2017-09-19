@@ -23,7 +23,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             yield return new Fruit
             {
                 StartTime = obj.StartTime,
-                Position = ((IHasXPosition)obj).X / OsuPlayfield.BASE_SIZE.X
+                NewCombo = (obj as IHasCombo)?.NewCombo ?? false,
+                X = ((IHasXPosition)obj).X / OsuPlayfield.BASE_SIZE.X
             };
         }
     }
