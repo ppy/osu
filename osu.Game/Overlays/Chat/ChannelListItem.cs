@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -34,7 +35,7 @@ namespace osu.Game.Overlays.Chat
         private Color4 topicColour;
         private Color4 hoverColour;
 
-        public string[] FilterTerms => new[] { channel.Name };
+        public IEnumerable<string> FilterTerms => new[] { channel.Name };
         public bool MatchingFilter
         {
             set

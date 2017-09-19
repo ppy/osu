@@ -26,7 +26,7 @@ namespace osu.Game.Users
         private void load(TextureStore textures)
         {
             Texture texture = null;
-            if (user?.Id > 1) texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
+            if (user != null && user.Id > 1) texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
             if (texture == null) texture = textures.Get(@"Online/avatar-guest");
 
             Add(new Sprite

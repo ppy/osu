@@ -1,9 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -18,12 +16,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
 {
     internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject>
     {
-        public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>(ScoringMode.Exponential);
-
-        public OsuScoreProcessor()
-        {
-        }
-
         public OsuScoreProcessor(RulesetContainer<OsuHitObject> rulesetContainer)
             : base(rulesetContainer)
         {
@@ -31,31 +23,33 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private float hpDrainRate;
 
-        private int totalAccurateJudgements;
-
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
         private readonly Dictionary<ComboResult, int> comboResultCounts = new Dictionary<ComboResult, int>();
 
-        private double comboMaxScore;
-
-        protected override void ComputeTargets(Beatmap<OsuHitObject> beatmap)
+        protected override void SimulateAutoplay(Beatmap<OsuHitObject> beatmap)
         {
             hpDrainRate = beatmap.BeatmapInfo.Difficulty.DrainRate;
-            totalAccurateJudgements = beatmap.HitObjects.Count;
 
-            foreach (var unused in beatmap.HitObjects)
+            foreach (var obj in beatmap.HitObjects)
             {
-                // TODO: add support for other object types.
+                var slider = obj as Slider;
+                if (slider != null)
+                {
+                    // Head
+                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
+
+                    // Ticks
+                    foreach (var unused in slider.Ticks)
+                        AddJudgement(new OsuJudgement { Result = HitResult.Great });
+                }
+
                 AddJudgement(new OsuJudgement { Result = HitResult.Great });
             }
         }
 
-        protected override void Reset()
+        protected override void Reset(bool storeResults)
         {
-            base.Reset();
-
-            Health.Value = 1;
-            Accuracy.Value = 1;
+            base.Reset(storeResults);
 
             scoreResultCounts.Clear();
             comboResultCounts.Clear();
@@ -73,6 +67,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         protected override void OnNewJudgement(Judgement judgement)
         {
+            base.OnNewJudgement(judgement);
+
             var osuJudgement = (OsuJudgement)judgement;
 
             if (judgement.Result != HitResult.None)
@@ -103,52 +99,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     Health.Value -= hpDrainRate * 0.04;
                     break;
             }
-
-            calculateScore();
-        }
-
-        private void calculateScore()
-        {
-            int baseScore = 0;
-            double comboScore = 0;
-
-            int baseMaxScore = 0;
-
-            foreach (var j in Judgements)
-            {
-                baseScore += j.NumericResult;
-                baseMaxScore += j.MaxNumericResult;
-
-                comboScore += j.NumericResult * (1 + Combo.Value / 10d);
-            }
-
-            Accuracy.Value = (double)baseScore / baseMaxScore;
-
-            if (comboScore > comboMaxScore)
-                comboMaxScore = comboScore;
-
-            if (baseScore == 0)
-                TotalScore.Value = 0;
-            else
-            {
-                // temporary to make scoring feel more like score v1 without being score v1.
-                float exponentialFactor = Mode.Value == ScoringMode.Exponential ? (float)Judgements.Count / 100 : 1;
-
-                TotalScore.Value =
-                    (int)
-                    (
-                        exponentialFactor *
-                        700000 * comboScore / comboMaxScore +
-                        300000 * Math.Pow(Accuracy.Value, 10) * ((double)Judgements.Count / totalAccurateJudgements) +
-                        0 /* bonusScore */
-                    );
-            }
-        }
-
-        public enum ScoringMode
-        {
-            Standardised,
-            Exponential
         }
     }
 }

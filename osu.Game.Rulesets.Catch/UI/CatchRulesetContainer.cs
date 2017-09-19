@@ -3,7 +3,6 @@
 
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
@@ -22,6 +21,8 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
+
+        protected override BeatmapProcessor<CatchBaseHit> CreateBeatmapProcessor() => new CatchBeatmapProcessor();
 
         protected override BeatmapConverter<CatchBaseHit> CreateBeatmapConverter() => new CatchBeatmapConverter();
 

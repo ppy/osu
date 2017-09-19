@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps
         {
             BeatmapInfo = beatmapInfo;
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
-            Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo.Metadata;
+            Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
             Mods.ValueChanged += mods => applyRateAdjustments();
         }
@@ -100,8 +100,11 @@ namespace osu.Game.Beatmaps
 
         public void TransferTo(WorkingBeatmap other)
         {
-            if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
-                other.track = track;
+            lock (trackLock)
+            {
+                if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
+                    other.track = track;
+            }
 
             if (background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
                 other.background = background;

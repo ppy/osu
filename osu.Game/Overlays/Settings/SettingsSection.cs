@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings
         public abstract string Header { get; }
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
-        public string[] FilterTerms => new[] { Header };
+        public IEnumerable<string> FilterTerms => new[] { Header };
 
         private const int header_size = 26;
         private const int header_margin = 25;
