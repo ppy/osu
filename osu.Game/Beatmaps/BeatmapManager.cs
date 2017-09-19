@@ -429,6 +429,15 @@ namespace osu.Game.Beatmaps
             if (beatmapSet != null)
             {
                 Undelete(beatmapSet);
+
+                // ensure all files are present and accessible
+                foreach (var f in beatmapSet.Files)
+                {
+                    if (!storage.Exists(f.FileInfo.StoragePath))
+                        using (Stream s = reader.GetStream(f.Filename))
+                            files.Add(s, false);
+                }
+
                 return beatmapSet;
             }
 
