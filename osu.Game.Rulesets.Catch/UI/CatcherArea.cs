@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public void Add(DrawableHitObject fruit, Vector2 screenPosition) => catcher.AddToStack(fruit, screenPosition);
 
-        public bool CheckIfWeCanCatch(CatchBaseHit obj) => Math.Abs(catcher.Position.X - obj.Position) < catcher.DrawSize.X / DrawSize.X / 2;
+        public bool CheckIfWeCanCatch(CatchBaseHit obj) => Math.Abs(catcher.Position.X - obj.X) < catcher.DrawSize.X / DrawSize.X / 2;
 
         [BackgroundDependencyLoader]
         private void load()

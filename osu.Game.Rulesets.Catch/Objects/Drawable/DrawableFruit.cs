@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Size = new Vector2(pulp_size * 2.2f, pulp_size * 2.8f);
 
             RelativePositionAxes = Axes.Both;
-            X = h.Position;
+            X = h.X;
 
             AccentColour = HitObject.ComboColour;
 
