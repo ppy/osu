@@ -9,7 +9,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Screens.Play;
 using System.Collections.Generic;
 
-namespace osu.Desktop.Tests.Visual
+namespace osu.Game.Tests.Visual
 {
     internal class TestCaseBreakOverlay : OsuTestCase
     {
