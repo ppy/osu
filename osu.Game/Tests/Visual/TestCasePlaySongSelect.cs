@@ -2,9 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
+using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -14,13 +16,20 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCasePlaySongSelect : OsuTestCase
     {
-        private readonly BeatmapManager manager;
+        private BeatmapManager manager;
 
         public override string Description => @"with fake data";
 
-        private readonly RulesetStore rulesets;
+        private RulesetStore rulesets;
 
-        public TestCasePlaySongSelect()
+        private DependencyContainer dependencies;
+
+        private FileStore files;
+
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             PlaySongSelect songSelect;
 
@@ -31,8 +40,9 @@ namespace osu.Game.Tests.Visual
                 var backingDatabase = storage.GetDatabase(@"client");
                 backingDatabase.CreateTable<StoreVersion>();
 
-                rulesets = new RulesetStore(backingDatabase);
-                manager = new BeatmapManager(storage, null, backingDatabase, rulesets, null);
+                dependencies.Cache(rulesets = new RulesetStore(backingDatabase));
+                dependencies.Cache(files = new FileStore(backingDatabase, storage));
+                dependencies.Cache(manager = new BeatmapManager(storage, files, backingDatabase, rulesets, null));
 
                 for (int i = 0; i < 100; i += 10)
                     manager.Import(createTestBeatmapSet(i));
