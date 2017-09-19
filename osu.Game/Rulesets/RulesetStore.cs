@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using osu.Framework.Development;
 using osu.Game.Database;
 using SQLite.Net;
 
@@ -28,16 +27,6 @@ namespace osu.Game.Rulesets
         static RulesetStore()
         {
             AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
-
-            // todo: don't do this on deploy
-            var sln = DebugUtils.GetSolutionPath();
-
-            if (sln != null)
-            {
-                foreach (string dir in Directory.GetDirectories(sln, $"{ruleset_library_prefix}.*"))
-                    foreach (string file in Directory.GetFiles(Path.Combine(dir, "bin", DebugUtils.IsDebug ? "Debug" : "Release"), $"{ruleset_library_prefix}.*.dll"))
-                        loadRulesetFromFile(file);
-            }
 
             foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll"))
                 loadRulesetFromFile(file);
