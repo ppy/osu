@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using System.Collections.Generic;
 using System;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.UI;
 

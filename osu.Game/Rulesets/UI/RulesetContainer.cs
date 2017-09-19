@@ -17,7 +17,6 @@ using osu.Framework.Input;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using OpenTK;
-using osu.Game.Rulesets.Beatmaps;
 
 namespace osu.Game.Rulesets.UI
 {

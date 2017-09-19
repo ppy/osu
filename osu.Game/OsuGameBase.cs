@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -59,25 +60,12 @@ namespace osu.Game
 
         public bool IsDeployedBuild => AssemblyName.Version.Major > 0;
 
-        public bool IsDebug
-        {
-            get
-            {
-                // ReSharper disable once RedundantAssignment
-                bool isDebug = false;
-                // Debug.Assert conditions are only evaluated in debug mode
-                Debug.Assert(isDebug = true);
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                return isDebug;
-            }
-        }
-
         public string Version
         {
             get
             {
                 if (!IsDeployedBuild)
-                    return @"local " + (IsDebug ? @"debug" : @"release");
+                    return @"local " + (DebugUtils.IsDebug ? @"debug" : @"release");
 
                 var assembly = AssemblyName;
                 return $@"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}";
@@ -243,7 +231,7 @@ namespace osu.Game
                 LocalConfig.Save();
             }
 
-            connection.Dispose();
+            connection?.Dispose();
 
             base.Dispose(isDisposing);
         }
