@@ -84,7 +84,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public int[] Bookmarks
         {
-            get { return StoredBookmarks.Split(',').Select(int.Parse).ToArray(); }
+            get { return StoredBookmarks?.Split(',').Select(int.Parse).ToArray() ?? new int[0]; }
             set { StoredBookmarks = string.Join(",", value); }
         }
 
