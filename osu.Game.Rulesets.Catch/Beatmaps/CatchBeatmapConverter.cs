@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             {
                 StartTime = obj.StartTime,
                 NewCombo = (obj as IHasCombo)?.NewCombo ?? false,
-                Position = ((IHasXPosition)obj).X / OsuPlayfield.BASE_SIZE.X
+                X = ((IHasXPosition)obj).X / OsuPlayfield.BASE_SIZE.X
             };
         }
     }

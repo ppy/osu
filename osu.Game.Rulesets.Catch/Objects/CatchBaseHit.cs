@@ -2,13 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public abstract class CatchBaseHit : HitObject
+    public abstract class CatchBaseHit : HitObject, IHasXPosition, IHasCombo
     {
-        public float Position { get; set; }
+        public float X { get; set; }
 
         public Color4 ComboColour { get; set; } = Color4.Gray;
         public int ComboIndex { get; set; }
