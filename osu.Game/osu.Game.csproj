@@ -728,6 +728,7 @@
     <Compile Include="Tests\Visual\TestCaseBeatmapOptionsOverlay.cs" />
     <Compile Include="Tests\Visual\TestCaseBeatSyncedContainer.cs" />
     <Compile Include="Tests\Visual\TestCaseBreadcrumbs.cs" />
+    <Compile Include="Tests\Visual\TestCaseBreakOverlay.cs" />
     <Compile Include="Tests\Visual\TestCaseChatDisplay.cs" />
     <Compile Include="Tests\Visual\TestCaseContextMenu.cs" />
     <Compile Include="Tests\Visual\TestCaseDialogOverlay.cs" />
