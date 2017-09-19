@@ -231,7 +231,7 @@ namespace osu.Game
                 LocalConfig.Save();
             }
 
-            connection.Dispose();
+            connection?.Dispose();
 
             base.Dispose(isDisposing);
         }
