@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Scoring
 
         public RulesetInfo Ruleset { get; set; }
 
-        public Mod[] Mods { get; set; }
+        public Mod[] Mods { get; set; } = { };
 
         public User User;
 

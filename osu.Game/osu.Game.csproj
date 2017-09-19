@@ -1,17 +1,47 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
+    <ProjectGuid>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>osu.Game</RootNamespace>
-    <AssemblyName>osu.Game</AssemblyName>
+    <AssemblyName>osu!</AssemblyName>
+    <ManifestCertificateThumbprint>3CF060CD28877D0E3112948951A64B2A7CEEC909</ManifestCertificateThumbprint>
+    <ManifestKeyFile>codesigning.pfx</ManifestKeyFile>
+    <GenerateManifests>false</GenerateManifests>
+    <SignManifests>false</SignManifests>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <StartupObject>osu.Game.Program</StartupObject>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <SignAssembly>false</SignAssembly>
+    <TargetZone>LocalIntranet</TargetZone>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -20,24 +50,108 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>0</WarningLevel>
+    <NoStdLib>true</NoStdLib>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <Commandlineparameters>
+    </Commandlineparameters>
     <LangVersion>6</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <NoStdLib>true</NoStdLib>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <Win32Resource>
+    </Win32Resource>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>lazer.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'VisualTests|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningLevel>0</WarningLevel>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <LangVersion>6</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <StartArguments>--tests</StartArguments>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DeltaCompressionDotNet, Version=1.1.0.0, Culture=neutral, PublicKeyToken=1d14d6e5194e7f4a, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\DeltaCompressionDotNet.1.1.0\lib\net20\DeltaCompressionDotNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DeltaCompressionDotNet.MsDelta, Version=1.1.0.0, Culture=neutral, PublicKeyToken=46b2138a390abf55, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\DeltaCompressionDotNet.1.1.0\lib\net20\DeltaCompressionDotNet.MsDelta.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DeltaCompressionDotNet.PatchApi, Version=1.1.0.0, Culture=neutral, PublicKeyToken=3e8888ee913ed789, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\DeltaCompressionDotNet.1.1.0\lib\net20\DeltaCompressionDotNet.PatchApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Mdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Pdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Rocks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NuGet.Squirrel, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\squirrel.windows.1.7.8\lib\Net45\NuGet.Squirrel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
@@ -46,6 +160,10 @@
     </Reference>
     <Reference Include="SharpCompress, Version=0.18.1.0, Culture=neutral, PublicKeyToken=afb0a02973931d96, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\SharpCompress.0.18.1\lib\net45\SharpCompress.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Splat, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Splat.2.0.0\lib\Net45\Splat.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SQLite.Net, Version=3.1.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -60,505 +178,55 @@
       <HintPath>$(SolutionDir)\packages\SQLite.Net-PCL.3.1.1\lib\net4\SQLite.Net.Platform.Win32.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="DotNetZip">
-      <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLiteNetExtensions">
+    <Reference Include="SQLiteNetExtensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\SQLiteNetExtensions.1.3.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\SQLiteNetExtensions.dll</HintPath>
+      <Private>True</Private>
     </Reference>
+    <Reference Include="Squirrel, Version=1.7.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\squirrel.windows.1.7.8\lib\Net45\Squirrel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\SampleInfo.cs" />
-    <Compile Include="Audio\SampleInfoList.cs" />
-    <Compile Include="Beatmaps\BeatmapStore.cs" />
-    <Compile Include="Beatmaps\BeatmapSetFileInfo.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
-    <Compile Include="Beatmaps\DifficultyCalculator.cs" />
-    <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
-    <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
-    <Compile Include="Storyboards\Drawables\IFlippable.cs" />
-    <Compile Include="Storyboards\Drawables\DrawableStoryboardLayer.cs" />
-    <Compile Include="Storyboards\Drawables\DrawableStoryboard.cs" />
-    <Compile Include="Storyboards\Drawables\DrawableStoryboardAnimation.cs" />
-    <Compile Include="Storyboards\Drawables\DrawableStoryboardSprite.cs" />
-    <Compile Include="Storyboards\StoryboardAnimation.cs" />
-    <Compile Include="Storyboards\Drawables\DrawablesExtensions.cs" />
-    <Compile Include="Storyboards\IStoryboardElement.cs" />
-    <Compile Include="Storyboards\CommandTimeline.cs" />
-    <Compile Include="Storyboards\CommandTimelineGroup.cs" />
-    <Compile Include="Storyboards\CommandTrigger.cs" />
-    <Compile Include="Storyboards\CommandLoop.cs" />
-    <Compile Include="Storyboards\StoryboardSample.cs" />
-    <Compile Include="Storyboards\StoryboardSprite.cs" />
-    <Compile Include="Storyboards\StoryboardLayer.cs" />
-    <Compile Include="Storyboards\Storyboard.cs" />
-    <Compile Include="Database\StoreVersion.cs" />
-    <Compile Include="Graphics\Containers\OsuClickableContainer.cs" />
-    <Compile Include="Graphics\Containers\OsuFocusedOverlayContainer.cs" />
-    <Compile Include="Graphics\Containers\OsuScrollContainer.cs" />
-    <Compile Include="Graphics\Cursor\OsuContextMenuContainer.cs" />
-    <Compile Include="Graphics\Containers\OsuTextFlowContainer.cs" />
-    <Compile Include="Graphics\UserInterface\IconButton.cs" />
-    <Compile Include="Configuration\SelectionRandomType.cs" />
-    <Compile Include="Graphics\UserInterface\LineGraph.cs" />
-    <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
-    <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
-    <Compile Include="Graphics\UserInterface\OsuMenuItem.cs" />
-    <Compile Include="Input\Bindings\DatabasedKeyBinding.cs" />
-    <Compile Include="Input\Bindings\DatabasedKeyBindingInputManager.cs" />
-    <Compile Include="Input\KeyBindingStore.cs" />
-    <Compile Include="Input\Bindings\GlobalKeyBindingInputManager.cs" />
-    <Compile Include="IO\FileStore.cs" />
-    <Compile Include="IO\FileInfo.cs" />
-    <Compile Include="Online\API\Requests\DownloadBeatmapSetRequest.cs" />
-    <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
-    <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
-    <Compile Include="Online\Chat\ErrorMessage.cs" />
-    <Compile Include="Online\Chat\LocalEchoMessage.cs" />
-    <Compile Include="Overlays\Chat\ChatTabControl.cs" />
-    <Compile Include="Overlays\Direct\PlayButton.cs" />
-    <Compile Include="Overlays\KeyBinding\GlobalKeyBindingsSection.cs" />
-    <Compile Include="Overlays\KeyBinding\KeyBindingRow.cs" />
-    <Compile Include="Overlays\KeyBinding\KeyBindingsSubsection.cs" />
-    <Compile Include="Overlays\KeyBindingOverlay.cs" />
-    <Compile Include="Overlays\KeyBinding\RulesetBindingsSection.cs" />
-    <Compile Include="Overlays\KeyBinding\VariantBindingsSubsection.cs" />
-    <Compile Include="Overlays\MainSettings.cs" />
-    <Compile Include="Overlays\Music\CollectionsDropdown.cs" />
-    <Compile Include="Overlays\Music\FilterControl.cs" />
-    <Compile Include="Overlays\Music\PlaylistItem.cs" />
-    <Compile Include="Overlays\Music\PlaylistList.cs" />
-    <Compile Include="Overlays\OnScreenDisplay.cs" />
-    <Compile Include="Graphics\Containers\SectionsContainer.cs" />
-    <Compile Include="Graphics\UserInterface\ProgressBar.cs" />
-    <Compile Include="Overlays\Settings\Sections\Maintenance\GeneralSettings.cs" />
-    <Compile Include="Overlays\Settings\SettingsHeader.cs" />
-    <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
-    <Compile Include="Overlays\Profile\Sections\AboutSection.cs" />
-    <Compile Include="Overlays\Profile\Sections\BeatmapsSection.cs" />
-    <Compile Include="Overlays\Profile\Sections\HistoricalSection.cs" />
-    <Compile Include="Overlays\Profile\Sections\KudosuSection.cs" />
-    <Compile Include="Overlays\Profile\Sections\MedalsSection.cs" />
-    <Compile Include="Overlays\Profile\RankChart.cs" />
-    <Compile Include="Overlays\Profile\Sections\RanksSection.cs" />
-    <Compile Include="Overlays\Profile\Sections\RecentSection.cs" />
-    <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarDirectButton.cs" />
-    <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
-    <Compile Include="Rulesets\UI\RulesetInputManager.cs" />
-    <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
-    <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
-    <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
-    <Compile Include="Screens\Edit\Menus\EditorMenuItemSpacer.cs" />
-    <Compile Include="Screens\Play\KeyCounterAction.cs" />
-    <Compile Include="Users\UserCoverBackground.cs" />
-    <Compile Include="Overlays\UserProfileOverlay.cs" />
-    <Compile Include="Overlays\Profile\ProfileHeader.cs" />
-    <Compile Include="Overlays\Profile\ProfileSection.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarSocialButton.cs" />
-    <Compile Include="Rulesets\Beatmaps\BeatmapConverter.cs" />
-    <Compile Include="Rulesets\Beatmaps\BeatmapProcessor.cs" />
-    <Compile Include="Beatmaps\ControlPoints\ControlPoint.cs" />
-    <Compile Include="Beatmaps\ControlPoints\ControlPointInfo.cs" />
-    <Compile Include="Beatmaps\ControlPoints\DifficultyControlPoint.cs" />
-    <Compile Include="Beatmaps\ControlPoints\EffectControlPoint.cs" />
-    <Compile Include="Beatmaps\ControlPoints\SoundControlPoint.cs" />
-    <Compile Include="Beatmaps\ControlPoints\TimingControlPoint.cs" />
-    <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
-    <Compile Include="Beatmaps\Timing\BreakPeriod.cs" />
-    <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
-    <Compile Include="Beatmaps\BeatmapMetrics.cs" />
-    <Compile Include="Database\DatabaseBackedStore.cs" />
-    <Compile Include="Rulesets\RulesetInfo.cs" />
-    <Compile Include="Rulesets\Scoring\ScoreStore.cs" />
-    <Compile Include="Graphics\Backgrounds\Triangles.cs" />
-    <Compile Include="Graphics\IHasAccentColour.cs" />
-    <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
-    <Compile Include="Graphics\UserInterface\BackButton.cs" />
-    <Compile Include="Graphics\UserInterface\Bar.cs" />
-    <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
-    <Compile Include="Graphics\UserInterface\Nub.cs" />
-    <Compile Include="Graphics\UserInterface\OsuMenu.cs" />
-    <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
-    <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
-    <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
-    <Compile Include="Graphics\UserInterface\SimpleComboCounter.cs" />
-    <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
-    <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
-    <Compile Include="Input\Handlers\ReplayInputHandler.cs" />
-    <Compile Include="IO\Legacy\ILegacySerializable.cs" />
-    <Compile Include="IO\Legacy\SerializationReader.cs" />
-    <Compile Include="IO\Legacy\SerializationWriter.cs" />
-    <Compile Include="IO\Serialization\IJsonSerializable.cs" />
-    <Compile Include="IPC\ScoreIPCChannel.cs" />
-    <Compile Include="Rulesets\BeatmapStatistic.cs" />
-    <Compile Include="Rulesets\Mods\ModDaycore.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertHit.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertHitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertSlider.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertSpinner.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\ConvertSlider.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHit.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHold.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertSlider.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertSpinner.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertHitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Taiko\ConvertHit.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Taiko\ConvertHitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Taiko\ConvertSlider.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Taiko\ConvertSpinner.cs" />
-    <Compile Include="Rulesets\Mods\IApplicableToClock.cs" />
-    <Compile Include="Rulesets\Mods\ModAutoplay.cs" />
-    <Compile Include="Rulesets\Mods\ModCinema.cs" />
-    <Compile Include="Rulesets\Mods\ModDoubleTime.cs" />
-    <Compile Include="Rulesets\Mods\ModEasy.cs" />
-    <Compile Include="Rulesets\Mods\ModFlashlight.cs" />
-    <Compile Include="Rulesets\Mods\ModHalfTime.cs" />
-    <Compile Include="Rulesets\Mods\ModHardRock.cs" />
-    <Compile Include="Rulesets\Mods\ModHidden.cs" />
-    <Compile Include="Rulesets\Mods\ModNightcore.cs" />
-    <Compile Include="Rulesets\Mods\ModNoFail.cs" />
-    <Compile Include="Rulesets\Mods\ModPerfect.cs" />
-    <Compile Include="Rulesets\Mods\ModRelax.cs" />
-    <Compile Include="Rulesets\Mods\ModSuddenDeath.cs" />
-    <Compile Include="Rulesets\Mods\MultiMod.cs" />
-    <Compile Include="Rulesets\Objects\Types\IHasXPosition.cs" />
-    <Compile Include="Rulesets\Objects\Types\IHasYPosition.cs" />
-    <Compile Include="Rulesets\Replays\Replay.cs" />
-    <Compile Include="Rulesets\Judgements\DrawableJudgement.cs" />
-    <Compile Include="Rulesets\Replays\FramedReplayInputHandler.cs" />
-    <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
-    <Compile Include="Rulesets\Mods\ModType.cs" />
-    <Compile Include="Rulesets\Objects\Drawables\ArmedState.cs" />
-    <Compile Include="Rulesets\Objects\Drawables\HitResult.cs" />
-    <Compile Include="Rulesets\Objects\BezierApproximator.cs" />
-    <Compile Include="Rulesets\Objects\CircularArcApproximator.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertHit.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\ConvertHitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertSlider.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertSpinner.cs" />
-    <Compile Include="Rulesets\Objects\SliderCurve.cs" />
-    <Compile Include="Rulesets\Objects\Types\CurveType.cs" />
-    <Compile Include="Rulesets\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
-    <Compile Include="Rulesets\Objects\Drawables\IScrollingHitObject.cs" />
-    <Compile Include="Rulesets\Judgements\Judgement.cs" />
-    <Compile Include="Rulesets\Objects\HitObjectParser.cs" />
-    <Compile Include="Rulesets\Objects\Types\IHasCombo.cs" />
-    <Compile Include="Rulesets\Objects\Types\IHasEndTime.cs" />
-    <Compile Include="Rulesets\Objects\Types\IHasDistance.cs" />
-    <Compile Include="Rulesets\Objects\Types\IHasCurve.cs" />
-    <Compile Include="Rulesets\Objects\Types\IHasRepeats.cs" />
-    <Compile Include="Rulesets\Objects\Types\IHasPosition.cs" />
-    <Compile Include="Rulesets\Objects\Types\IHasHold.cs" />
-    <Compile Include="Rulesets\Objects\Legacy\ConvertHitObjectType.cs" />
-    <Compile Include="Rulesets\Replays\ReplayButtonState.cs" />
-    <Compile Include="Rulesets\Replays\ReplayFrame.cs" />
-    <Compile Include="Rulesets\RulesetStore.cs" />
-    <Compile Include="Rulesets\Scoring\Score.cs" />
-    <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
-    <Compile Include="Rulesets\Timing\SpeedAdjustmentContainer.cs" />
-    <Compile Include="Rulesets\Timing\LinearScrollingContainer.cs" />
-    <Compile Include="Rulesets\Timing\ScrollingContainer.cs" />
-    <Compile Include="Rulesets\Timing\MultiplierControlPoint.cs" />
-    <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
-    <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />
-    <Compile Include="Screens\Play\HUDOverlay.cs" />
-    <Compile Include="Screens\Play\HUD\StandardHealthDisplay.cs" />
-    <Compile Include="Online\API\IOnlineComponent.cs" />
-    <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
-    <Compile Include="Online\API\Requests\GetBeatmapDetailsRequest.cs" />
-    <Compile Include="Online\API\Requests\GetUserRequest.cs" />
-    <Compile Include="Overlays\LoginOverlay.cs" />
-    <Compile Include="Overlays\MusicController.cs" />
-    <Compile Include="Beatmaps\Beatmap.cs" />
-    <Compile Include="Beatmaps\WorkingBeatmap.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
-    <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
-    <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
-    <Compile Include="Beatmaps\Drawables\Panel.cs" />
-    <Compile Include="Rulesets\Objects\Drawables\DrawableHitObject.cs" />
-    <Compile Include="Rulesets\Objects\Drawables\DrawableScrollingHitObject.cs" />
-    <Compile Include="Rulesets\Objects\HitObject.cs" />
-    <Compile Include="Configuration\OsuConfigManager.cs" />
-    <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
-    <Compile Include="Overlays\Notifications\Notification.cs" />
-    <Compile Include="Overlays\NotificationOverlay.cs" />
-    <Compile Include="Overlays\Notifications\NotificationSection.cs" />
-    <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
-    <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
-    <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
-    <Compile Include="Overlays\Settings\SettingsDropdown.cs" />
-    <Compile Include="Overlays\Settings\SettingsLabel.cs" />
-    <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
-    <Compile Include="Overlays\Settings\SettingsFooter.cs" />
-    <Compile Include="Overlays\Settings\Sections\DebugSection.cs" />
-    <Compile Include="Overlays\Settings\Sections\Debug\GeneralSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\Debug\GCSettings.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarHomeButton.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarNotificationButton.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarSettingsButton.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarOverlayToggleButton.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarUserArea.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarUserButton.cs" />
-    <Compile Include="Screens\BackgroundScreen.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundScreenBeatmap.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundScreenCustom.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundScreenDefault.cs" />
-    <Compile Include="Screens\Backgrounds\BackgroundScreenEmpty.cs" />
-    <Compile Include="Screens\Charts\ChartInfo.cs" />
-    <Compile Include="Screens\Edit\Editor.cs" />
-    <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
-    <Compile Include="Screens\Play\ReplaySettings\CollectionSettings.cs" />
-    <Compile Include="Screens\Play\ReplaySettings\DiscussionSettings.cs" />
-    <Compile Include="Screens\Play\ReplaySettings\ReplayGroup.cs" />
-    <Compile Include="Screens\Play\ReplaySettingsOverlay.cs" />
-    <Compile Include="Screens\Play\ReplaySettings\ReplaySliderBar.cs" />
-    <Compile Include="Screens\Play\ReplaySettings\PlaybackSettings.cs" />
-    <Compile Include="Screens\Play\ReplaySettings\ReplayCheckbox.cs" />
-    <Compile Include="Screens\Play\PauseContainer.cs" />
-    <Compile Include="Screens\Play\SongProgressInfo.cs" />
-    <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
-    <Compile Include="Screens\Play\SquareGraph.cs" />
-    <Compile Include="Screens\Ranking\ResultsPage.cs" />
-    <Compile Include="Screens\Ranking\ResultsPageRanking.cs" />
-    <Compile Include="Screens\Ranking\ResultsPageScore.cs" />
-    <Compile Include="Screens\ScreenWhiteBox.cs" />
-    <Compile Include="Screens\Loader.cs" />
-    <Compile Include="Screens\Menu\Button.cs" />
-    <Compile Include="Screens\Menu\Disclaimer.cs" />
-    <Compile Include="Screens\Menu\FlowContainerWithOrigin.cs" />
-    <Compile Include="Screens\Menu\Intro.cs" />
-    <Compile Include="Screens\Menu\ButtonSystem.cs" />
-    <Compile Include="Screens\Menu\MainMenu.cs" />
-    <Compile Include="Screens\Menu\LogoVisualisation.cs" />
-    <Compile Include="Screens\Menu\OsuLogo.cs" />
-    <Compile Include="Screens\Multiplayer\Lobby.cs" />
-    <Compile Include="Screens\Multiplayer\Match.cs" />
-    <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
-    <Compile Include="Screens\Play\FailOverlay.cs" />
-    <Compile Include="Screens\Play\MenuOverlay.cs" />
-    <Compile Include="Screens\Play\PlayerLoader.cs" />
-    <Compile Include="Screens\Play\ReplayPlayer.cs" />
-    <Compile Include="Screens\Play\SkipButton.cs" />
-    <Compile Include="Screens\Play\HUD\StandardComboCounter.cs" />
-    <Compile Include="Screens\Ranking\AspectContainer.cs" />
-    <Compile Include="Screens\Ranking\ResultMode.cs" />
-    <Compile Include="Screens\Ranking\ResultModeButton.cs" />
-    <Compile Include="Screens\Ranking\ResultModeTabControl.cs" />
-    <Compile Include="Screens\Select\BeatmapCarousel.cs" />
-    <Compile Include="Screens\Select\BeatmapDetails.cs" />
-    <Compile Include="Graphics\UserInterface\BarGraph.cs" />
-    <Compile Include="Screens\Select\FilterCriteria.cs" />
-    <Compile Include="Screens\Select\Filter\GroupMode.cs" />
-    <Compile Include="Screens\Select\Filter\SortMode.cs" />
-    <Compile Include="Screens\Select\MatchSongSelect.cs" />
-    <Compile Include="Screens\OsuScreen.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
-    <Compile Include="Screens\Play\Player.cs" />
-    <Compile Include="Screens\Charts\ChartListing.cs" />
-    <Compile Include="Rulesets\Ruleset.cs" />
-    <Compile Include="Screens\Ranking\Results.cs" />
-    <Compile Include="Screens\Direct\OnlineListing.cs" />
-    <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
-    <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
-    <Compile Include="Screens\Select\PlaySongSelect.cs" />
-    <Compile Include="Screens\Select\SongSelect.cs" />
-    <Compile Include="Rulesets\UI\RulesetContainer.cs" />
-    <Compile Include="Rulesets\UI\Playfield.cs" />
-    <Compile Include="Rulesets\UI\ScrollingRulesetContainer.cs" />
-    <Compile Include="Rulesets\UI\ScrollingPlayfield.cs" />
-    <Compile Include="Screens\Select\EditSongSelect.cs" />
-    <Compile Include="Screens\Play\HUD\ComboCounter.cs" />
-    <Compile Include="Screens\Play\HUD\ComboResultCounter.cs" />
-    <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
-    <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
-    <Compile Include="Graphics\Backgrounds\Background.cs" />
-    <Compile Include="Graphics\Containers\BeatSyncedContainer.cs" />
-    <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
-    <Compile Include="Graphics\Cursor\MenuCursor.cs" />
-    <Compile Include="Graphics\Processing\RatioAdjust.cs" />
-    <Compile Include="Graphics\SpriteIcon.cs" />
-    <Compile Include="Screens\Play\KeyCounter.cs" />
-    <Compile Include="Screens\Play\KeyCounterKeyboard.cs" />
-    <Compile Include="Screens\Play\KeyCounterCollection.cs" />
-    <Compile Include="Screens\Play\KeyCounterMouse.cs" />
-    <Compile Include="Graphics\UserInterface\PercentageCounter.cs" />
-    <Compile Include="Graphics\UserInterface\ScoreCounter.cs" />
-    <Compile Include="Graphics\UserInterface\StarCounter.cs" />
-    <Compile Include="IPC\BeatmapIPCChannel.cs" />
-    <Compile Include="Online\API\APIAccess.cs" />
-    <Compile Include="Online\API\APIRequest.cs" />
-    <Compile Include="Online\API\OAuth.cs" />
-    <Compile Include="Online\API\OAuthToken.cs" />
-    <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
-    <Compile Include="Online\API\Requests\ListChannelsRequest.cs" />
-    <Compile Include="Online\Chat\Channel.cs" />
-    <Compile Include="Overlays\Chat\DrawableChannel.cs" />
-    <Compile Include="Overlays\Chat\ChatLine.cs" />
-    <Compile Include="Online\Chat\Message.cs" />
-    <Compile Include="OsuGame.cs" />
-    <Compile Include="OsuGameBase.cs" />
-    <Compile Include="Overlays\ChatOverlay.cs" />
-    <Compile Include="Overlays\SettingsOverlay.cs" />
-    <Compile Include="Overlays\Toolbar\Toolbar.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarButton.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarModeButton.cs" />
-    <Compile Include="Overlays\Toolbar\ToolbarModeSelector.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
-    <Compile Include="Screens\Select\WedgeBackground.cs" />
-    <Compile Include="Screens\Tournament\Components\DrawingsConfigManager.cs" />
-    <Compile Include="Screens\Tournament\Components\VisualiserContainer.cs" />
-    <Compile Include="Screens\Tournament\Drawings.cs" />
-    <Compile Include="Screens\Tournament\Group.cs" />
-    <Compile Include="Screens\Tournament\GroupContainer.cs" />
-    <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
-    <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
-    <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
-    <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
-    <Compile Include="Users\UpdateableAvatar.cs" />
-    <Compile Include="Users\User.cs" />
-    <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
-    <Compile Include="Beatmaps\BeatmapManager.cs" />
-    <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
-    <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
-    <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
-    <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
-    <Compile Include="Graphics\UserInterface\Volume\VolumeMeter.cs" />
-    <Compile Include="Beatmaps\BeatmapSetInfo.cs" />
-    <Compile Include="Beatmaps\BeatmapMetadata.cs" />
-    <Compile Include="Beatmaps\BeatmapInfo.cs" />
-    <Compile Include="Beatmaps\BeatmapDifficulty.cs" />
-    <Compile Include="Graphics\UserInterface\OsuButton.cs" />
-    <Compile Include="Overlays\Settings\Sections\MaintenanceSection.cs" />
-    <Compile Include="Overlays\Settings\SettingsSection.cs" />
-    <Compile Include="Overlays\Settings\SettingsSubsection.cs" />
-    <Compile Include="Graphics\UserInterface\LoadingAnimation.cs" />
-    <Compile Include="Overlays\Settings\Sidebar.cs" />
-    <Compile Include="Overlays\Settings\Sections\GeneralSection.cs" />
-    <Compile Include="Overlays\Settings\Sections\General\LoginSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\General\UpdateSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\General\LanguageSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\GraphicsSection.cs" />
-    <Compile Include="Overlays\Settings\Sections\Graphics\RendererSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\Graphics\LayoutSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\Graphics\DetailSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\Graphics\MainMenuSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\GameplaySection.cs" />
-    <Compile Include="Overlays\Settings\Sections\Gameplay\GeneralSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\Gameplay\SongSelectSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\AudioSection.cs" />
-    <Compile Include="Overlays\Settings\Sections\Audio\AudioDevicesSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\Audio\VolumeSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\Audio\OffsetSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\InputSection.cs" />
-    <Compile Include="Overlays\Settings\Sections\Input\MouseSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\Input\KeyboardSettings.cs" />
-    <Compile Include="Overlays\Settings\Sections\OnlineSection.cs" />
-    <Compile Include="Overlays\Settings\Sections\SkinSection.cs" />
-    <Compile Include="Graphics\UserInterface\OsuCheckbox.cs" />
-    <Compile Include="Overlays\Settings\SidebarButton.cs" />
-    <Compile Include="Overlays\Settings\SettingsCheckbox.cs" />
-    <Compile Include="Overlays\Settings\SettingsTextBox.cs" />
-    <Compile Include="Overlays\Settings\SettingsSlider.cs" />
-    <Compile Include="Overlays\Settings\SettingsItem.cs" />
-    <Compile Include="Overlays\Settings\SettingsEnumDropdown.cs" />
-    <Compile Include="Configuration\RankingType.cs" />
-    <Compile Include="Configuration\ScoreMeterType.cs" />
-    <Compile Include="Configuration\ReleaseStream.cs" />
-    <Compile Include="Configuration\ScreenshotFormat.cs" />
-    <Compile Include="Graphics\OsuColour.cs" />
-    <Compile Include="Screens\Select\FilterControl.cs" />
-    <Compile Include="Graphics\UserInterface\SearchTextBox.cs" />
-    <Compile Include="Screens\Select\FooterButton.cs" />
-    <Compile Include="Screens\Select\Footer.cs" />
-    <Compile Include="Screens\Play\SongProgress.cs" />
-    <Compile Include="Screens\Play\SongProgressGraph.cs" />
-    <Compile Include="Screens\Play\SongProgressBar.cs" />
-    <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
-    <Compile Include="Rulesets\Mods\Mod.cs" />
-    <Compile Include="Overlays\Mods\ModButtonEmpty.cs" />
-    <Compile Include="Overlays\Mods\ModButton.cs" />
-    <Compile Include="Rulesets\UI\ModIcon.cs" />
-    <Compile Include="Overlays\Mods\ModSection.cs" />
-    <Compile Include="Overlays\Mods\DifficultyReductionSection.cs" />
-    <Compile Include="Overlays\Mods\DifficultyIncreaseSection.cs" />
-    <Compile Include="Overlays\Dialog\PopupDialog.cs" />
-    <Compile Include="Graphics\UserInterface\DialogButton.cs" />
-    <Compile Include="Overlays\Dialog\PopupDialogButton.cs" />
-    <Compile Include="Overlays\Dialog\PopupDialogOkButton.cs" />
-    <Compile Include="Overlays\Dialog\PopupDialogCancelButton.cs" />
-    <Compile Include="Screens\Select\BeatmapDeleteDialog.cs" />
-    <Compile Include="Overlays\DialogOverlay.cs" />
-    <Compile Include="Overlays\Mods\AssistedSection.cs" />
-    <Compile Include="Overlays\WaveOverlayContainer.cs" />
-    <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
-    <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
-    <Compile Include="Users\Country.cs" />
-    <Compile Include="Users\Team.cs" />
-    <Compile Include="Rulesets\Scoring\ScoreRank.cs" />
-    <Compile Include="Users\Avatar.cs" />
-    <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
-    <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
-    <Compile Include="Screens\Select\BeatmapDetailArea.cs" />
-    <Compile Include="Graphics\UserInterface\OsuTabControlCheckbox.cs" />
-    <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
-    <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
-    <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
-    <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
-    <Compile Include="Overlays\Chat\ChannelSelectionOverlay.cs" />
-    <Compile Include="Overlays\Chat\ChannelListItem.cs" />
-    <Compile Include="Overlays\Chat\ChannelSection.cs" />
-    <Compile Include="Screens\Multiplayer\DrawableRoom.cs" />
-    <Compile Include="Online\Multiplayer\Room.cs" />
-    <Compile Include="Online\Multiplayer\RoomStatus.cs" />
-    <Compile Include="Users\UserPanel.cs" />
-    <Compile Include="Users\UserStatistics.cs" />
-    <Compile Include="Users\UserStatus.cs" />
-    <Compile Include="Overlays\DirectOverlay.cs" />
-    <Compile Include="Overlays\Direct\FilterControl.cs" />
-    <Compile Include="Overlays\Direct\Header.cs" />
-    <Compile Include="Graphics\UserInterface\OsuEnumDropdown.cs" />
-    <Compile Include="Overlays\Direct\DirectPanel.cs" />
-    <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
-    <Compile Include="Overlays\Direct\DirectListPanel.cs" />
-    <Compile Include="Beatmaps\BeatmapOnlineInfo.cs" />
-    <Compile Include="Graphics\Containers\ReverseChildIDFillFlowContainer.cs" />
-    <Compile Include="Beatmaps\RankStatus.cs" />
-    <Compile Include="Beatmaps\BeatmapSetOnlineInfo.cs" />
-    <Compile Include="Online\API\Requests\GetBeatmapSetsRequest.cs" />
-    <Compile Include="Overlays\SearchableList\SearchableListHeader.cs" />
-    <Compile Include="Overlays\SearchableList\HeaderTabControl.cs" />
-    <Compile Include="Overlays\Social\FilterControl.cs" />
-    <Compile Include="Overlays\Social\Header.cs" />
-    <Compile Include="Overlays\SearchableList\SearchableListFilterControl.cs" />
-    <Compile Include="Overlays\SearchableList\SearchableListOverlay.cs" />
-    <Compile Include="Graphics\UserInterface\PageTabControl.cs" />
-    <Compile Include="Overlays\SocialOverlay.cs" />
-    <Compile Include="Overlays\SearchableList\SlimEnumDropdown.cs" />
-    <Compile Include="Overlays\SearchableList\DisplayStyleControl.cs" />
-    <Compile Include="Graphics\UserInterface\BreadcrumbControl.cs" />
-    <Compile Include="Overlays\MedalOverlay.cs" />
-    <Compile Include="Users\Medal.cs" />
-    <Compile Include="Overlays\MedalSplash\DrawableMedal.cs" />
-    <Compile Include="Screens\Multiplayer\RoomInspector.cs" />
-    <Compile Include="Online\Multiplayer\GameType.cs" />
-    <Compile Include="Screens\Multiplayer\DrawableGameType.cs" />
-    <Compile Include="Screens\Multiplayer\ParticipantInfo.cs" />
-    <Compile Include="Screens\Multiplayer\ModeTypeInfo.cs" />
-    <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
-    <Compile Include="Screens\Select\Details\AdvancedStats.cs" />
-    <Compile Include="Screens\Select\Details\FailRetryGraph.cs" />
-    <Compile Include="Screens\Select\Details\UserRatings.cs" />
+    <None Include="..\osu.licenseheader">
+      <Link>osu.licenseheader</Link>
+    </None>
+    <None Include="app.config" />
+    <None Include="OpenTK.dll.config" />
+    <None Include="osu!.res" />
+    <None Include="packages.config" />
+    <None Include="Properties\app.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
@@ -571,14 +239,546 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
-    <None Include="app.config" />
-    <None Include="OpenTK.dll.config" />
-    <None Include="packages.config" />
+    <Compile Include="Audio\SampleInfo.cs" />
+    <Compile Include="Audio\SampleInfoList.cs" />
+    <Compile Include="Beatmaps\Beatmap.cs" />
+    <Compile Include="Beatmaps\BeatmapConverter.cs" />
+    <Compile Include="Beatmaps\BeatmapDifficulty.cs" />
+    <Compile Include="Beatmaps\BeatmapInfo.cs" />
+    <Compile Include="Beatmaps\BeatmapManager.cs" />
+    <Compile Include="Beatmaps\BeatmapMetadata.cs" />
+    <Compile Include="Beatmaps\BeatmapMetrics.cs" />
+    <Compile Include="Beatmaps\BeatmapOnlineInfo.cs" />
+    <Compile Include="Beatmaps\BeatmapProcessor.cs" />
+    <Compile Include="Beatmaps\BeatmapSetFileInfo.cs" />
+    <Compile Include="Beatmaps\BeatmapSetInfo.cs" />
+    <Compile Include="Beatmaps\BeatmapSetOnlineInfo.cs" />
+    <Compile Include="Beatmaps\BeatmapStatistic.cs" />
+    <Compile Include="Beatmaps\BeatmapStore.cs" />
+    <Compile Include="Beatmaps\ControlPoints\ControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\ControlPointInfo.cs" />
+    <Compile Include="Beatmaps\ControlPoints\DifficultyControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\EffectControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\SoundControlPoint.cs" />
+    <Compile Include="Beatmaps\ControlPoints\TimingControlPoint.cs" />
+    <Compile Include="Beatmaps\DifficultyCalculator.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapBackgroundSprite.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapGroup.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
+    <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
+    <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
+    <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
+    <Compile Include="Beatmaps\Drawables\Panel.cs" />
+    <Compile Include="Beatmaps\DummyWorkingBeatmap.cs" />
+    <Compile Include="Beatmaps\Formats\BeatmapDecoder.cs" />
+    <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
+    <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
+    <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
+    <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
+    <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
+    <Compile Include="Beatmaps\RankStatus.cs" />
+    <Compile Include="Beatmaps\Timing\BreakPeriod.cs" />
+    <Compile Include="Beatmaps\Timing\TimeSignatures.cs" />
+    <Compile Include="Beatmaps\WorkingBeatmap.cs" />
+    <Compile Include="Configuration\OsuConfigManager.cs" />
+    <Compile Include="Configuration\RankingType.cs" />
+    <Compile Include="Configuration\ReleaseStream.cs" />
+    <Compile Include="Configuration\ScoreMeterType.cs" />
+    <Compile Include="Configuration\ScreenshotFormat.cs" />
+    <Compile Include="Configuration\SelectionRandomType.cs" />
+    <Compile Include="Database\DatabaseBackedStore.cs" />
+    <Compile Include="Database\StoreVersion.cs" />
+    <Compile Include="Graphics\Backgrounds\Background.cs" />
+    <Compile Include="Graphics\Backgrounds\Triangles.cs" />
+    <Compile Include="Graphics\Containers\BeatSyncedContainer.cs" />
+    <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuClickableContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuFocusedOverlayContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuScrollContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuTextFlowContainer.cs" />
+    <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
+    <Compile Include="Graphics\Containers\ReverseChildIDFillFlowContainer.cs" />
+    <Compile Include="Graphics\Containers\SectionsContainer.cs" />
+    <Compile Include="Graphics\Cursor\MenuCursor.cs" />
+    <Compile Include="Graphics\Cursor\OsuContextMenuContainer.cs" />
+    <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
+    <Compile Include="Graphics\IHasAccentColour.cs" />
+    <Compile Include="Graphics\OsuColour.cs" />
+    <Compile Include="Graphics\Processing\RatioAdjust.cs" />
+    <Compile Include="Graphics\SpriteIcon.cs" />
+    <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
+    <Compile Include="Graphics\UserInterface\BackButton.cs" />
+    <Compile Include="Graphics\UserInterface\Bar.cs" />
+    <Compile Include="Graphics\UserInterface\BarGraph.cs" />
+    <Compile Include="Graphics\UserInterface\BreadcrumbControl.cs" />
+    <Compile Include="Graphics\UserInterface\DialogButton.cs" />
+    <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
+    <Compile Include="Graphics\UserInterface\IconButton.cs" />
+    <Compile Include="Graphics\UserInterface\LineGraph.cs" />
+    <Compile Include="Graphics\UserInterface\LoadingAnimation.cs" />
+    <Compile Include="Graphics\UserInterface\MenuItemType.cs" />
+    <Compile Include="Graphics\UserInterface\Nub.cs" />
+    <Compile Include="Graphics\UserInterface\OsuButton.cs" />
+    <Compile Include="Graphics\UserInterface\OsuCheckbox.cs" />
+    <Compile Include="Graphics\UserInterface\OsuContextMenu.cs" />
+    <Compile Include="Graphics\UserInterface\OsuDropdown.cs" />
+    <Compile Include="Graphics\UserInterface\OsuEnumDropdown.cs" />
+    <Compile Include="Graphics\UserInterface\OsuMenu.cs" />
+    <Compile Include="Graphics\UserInterface\OsuMenuItem.cs" />
+    <Compile Include="Graphics\UserInterface\OsuPasswordTextBox.cs" />
+    <Compile Include="Graphics\UserInterface\OsuSliderBar.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabControl.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTabControlCheckbox.cs" />
+    <Compile Include="Graphics\UserInterface\OsuTextBox.cs" />
+    <Compile Include="Graphics\UserInterface\PageTabControl.cs" />
+    <Compile Include="Graphics\UserInterface\PercentageCounter.cs" />
+    <Compile Include="Graphics\UserInterface\ProgressBar.cs" />
+    <Compile Include="Graphics\UserInterface\RollingCounter.cs" />
+    <Compile Include="Graphics\UserInterface\ScoreCounter.cs" />
+    <Compile Include="Graphics\UserInterface\SearchTextBox.cs" />
+    <Compile Include="Graphics\UserInterface\SimpleComboCounter.cs" />
+    <Compile Include="Graphics\UserInterface\StarCounter.cs" />
+    <Compile Include="Graphics\UserInterface\TwoLayerButton.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeControl.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeControlReceptor.cs" />
+    <Compile Include="Graphics\UserInterface\Volume\VolumeMeter.cs" />
+    <Compile Include="Input\Bindings\DatabasedKeyBinding.cs" />
+    <Compile Include="Input\Bindings\DatabasedKeyBindingInputManager.cs" />
+    <Compile Include="Input\Bindings\GlobalKeyBindingInputManager.cs" />
+    <Compile Include="Input\Handlers\ReplayInputHandler.cs" />
+    <Compile Include="Input\KeyBindingStore.cs" />
+    <Compile Include="IO\FileInfo.cs" />
+    <Compile Include="IO\FileStore.cs" />
+    <Compile Include="IO\Legacy\ILegacySerializable.cs" />
+    <Compile Include="IO\Legacy\SerializationReader.cs" />
+    <Compile Include="IO\Legacy\SerializationWriter.cs" />
+    <Compile Include="IO\Serialization\IJsonSerializable.cs" />
+    <Compile Include="IPC\BeatmapIPCChannel.cs" />
+    <Compile Include="IPC\ScoreIPCChannel.cs" />
+    <Compile Include="Online\API\APIAccess.cs" />
+    <Compile Include="Online\API\APIRequest.cs" />
+    <Compile Include="Online\API\IOnlineComponent.cs" />
+    <Compile Include="Online\API\OAuth.cs" />
+    <Compile Include="Online\API\OAuthToken.cs" />
+    <Compile Include="Online\API\Requests\DownloadBeatmapSetRequest.cs" />
+    <Compile Include="Online\API\Requests\GetBeatmapDetailsRequest.cs" />
+    <Compile Include="Online\API\Requests\GetBeatmapSetsRequest.cs" />
+    <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
+    <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
+    <Compile Include="Online\API\Requests\GetUserRequest.cs" />
+    <Compile Include="Online\API\Requests\GetUsersRequest.cs" />
+    <Compile Include="Online\API\Requests\ListChannelsRequest.cs" />
+    <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
+    <Compile Include="Online\Chat\Channel.cs" />
+    <Compile Include="Online\Chat\ErrorMessage.cs" />
+    <Compile Include="Online\Chat\LocalEchoMessage.cs" />
+    <Compile Include="Online\Chat\Message.cs" />
+    <Compile Include="Online\Multiplayer\GameType.cs" />
+    <Compile Include="Online\Multiplayer\Room.cs" />
+    <Compile Include="Online\Multiplayer\RoomStatus.cs" />
+    <Compile Include="OsuGame.cs" />
+    <Compile Include="OsuGameBase.cs" />
+    <Compile Include="OsuGameDesktop.cs" />
+    <Compile Include="OsuTestBrowser.cs" />
+    <Compile Include="Overlays\ChatOverlay.cs" />
+    <Compile Include="Overlays\Chat\ChannelListItem.cs" />
+    <Compile Include="Overlays\Chat\ChannelSection.cs" />
+    <Compile Include="Overlays\Chat\ChannelSelectionOverlay.cs" />
+    <Compile Include="Overlays\Chat\ChatLine.cs" />
+    <Compile Include="Overlays\Chat\ChatTabControl.cs" />
+    <Compile Include="Overlays\Direct\PlayButton.cs" />
+    <Compile Include="Overlays\Chat\DrawableChannel.cs" />
+    <Compile Include="Overlays\DialogOverlay.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialog.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogButton.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogCancelButton.cs" />
+    <Compile Include="Overlays\Dialog\PopupDialogOkButton.cs" />
+    <Compile Include="Overlays\DirectOverlay.cs" />
+    <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
+    <Compile Include="Overlays\Direct\DirectListPanel.cs" />
+    <Compile Include="Overlays\Direct\DirectPanel.cs" />
+    <Compile Include="Overlays\Direct\FilterControl.cs" />
+    <Compile Include="Overlays\Direct\Header.cs" />
+    <Compile Include="Overlays\KeyBindingOverlay.cs" />
+    <Compile Include="Overlays\KeyBinding\GlobalKeyBindingsSection.cs" />
+    <Compile Include="Overlays\KeyBinding\KeyBindingRow.cs" />
+    <Compile Include="Overlays\KeyBinding\KeyBindingsSubsection.cs" />
+    <Compile Include="Overlays\KeyBinding\RulesetBindingsSection.cs" />
+    <Compile Include="Overlays\KeyBinding\VariantBindingsSubsection.cs" />
+    <Compile Include="Overlays\LoginOverlay.cs" />
+    <Compile Include="Overlays\MainSettings.cs" />
+    <Compile Include="Overlays\MedalOverlay.cs" />
+    <Compile Include="Overlays\MedalSplash\DrawableMedal.cs" />
+    <Compile Include="Overlays\Mods\AssistedSection.cs" />
+    <Compile Include="Overlays\Mods\DifficultyIncreaseSection.cs" />
+    <Compile Include="Overlays\Mods\DifficultyReductionSection.cs" />
+    <Compile Include="Overlays\Mods\ModButton.cs" />
+    <Compile Include="Overlays\Mods\ModButtonEmpty.cs" />
+    <Compile Include="Overlays\Mods\ModSection.cs" />
+    <Compile Include="Overlays\Mods\ModSelectOverlay.cs" />
+    <Compile Include="Overlays\MusicController.cs" />
+    <Compile Include="Overlays\Music\CollectionsDropdown.cs" />
+    <Compile Include="Overlays\Music\FilterControl.cs" />
+    <Compile Include="Overlays\Music\PlaylistItem.cs" />
+    <Compile Include="Overlays\Music\PlaylistList.cs" />
+    <Compile Include="Overlays\Music\PlaylistOverlay.cs" />
+    <Compile Include="Overlays\NotificationOverlay.cs" />
+    <Compile Include="Overlays\Notifications\IHasCompletionTarget.cs" />
+    <Compile Include="Overlays\Notifications\Notification.cs" />
+    <Compile Include="Overlays\Notifications\NotificationSection.cs" />
+    <Compile Include="Overlays\Notifications\ProgressCompletionNotification.cs" />
+    <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
+    <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
+    <Compile Include="Overlays\OnScreenDisplay.cs" />
+    <Compile Include="Overlays\Profile\ProfileHeader.cs" />
+    <Compile Include="Overlays\Profile\ProfileSection.cs" />
+    <Compile Include="Overlays\Profile\RankChart.cs" />
+    <Compile Include="Overlays\Profile\Sections\AboutSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\BeatmapsSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\HistoricalSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\KudosuSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\MedalsSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\RanksSection.cs" />
+    <Compile Include="Overlays\Profile\Sections\RecentSection.cs" />
+    <Compile Include="Overlays\SearchableList\DisplayStyleControl.cs" />
+    <Compile Include="Overlays\SearchableList\HeaderTabControl.cs" />
+    <Compile Include="Overlays\SearchableList\SearchableListFilterControl.cs" />
+    <Compile Include="Overlays\SearchableList\SearchableListHeader.cs" />
+    <Compile Include="Overlays\SearchableList\SearchableListOverlay.cs" />
+    <Compile Include="Overlays\SearchableList\SlimEnumDropdown.cs" />
+    <Compile Include="Overlays\SettingsOverlay.cs" />
+    <Compile Include="Overlays\Settings\Sections\AudioSection.cs" />
+    <Compile Include="Overlays\Settings\Sections\Audio\AudioDevicesSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\Audio\MainMenuSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\Audio\OffsetSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\Audio\VolumeSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\DebugSection.cs" />
+    <Compile Include="Overlays\Settings\Sections\Debug\GCSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\Debug\GeneralSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\GameplaySection.cs" />
+    <Compile Include="Overlays\Settings\Sections\Gameplay\GeneralSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\Gameplay\SongSelectSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\GeneralSection.cs" />
+    <Compile Include="Overlays\Settings\Sections\General\LanguageSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\General\LoginSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\General\UpdateSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\GraphicsSection.cs" />
+    <Compile Include="Overlays\Settings\Sections\Graphics\DetailSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\Graphics\LayoutSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\Graphics\MainMenuSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\Graphics\RendererSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\InputSection.cs" />
+    <Compile Include="Overlays\Settings\Sections\Input\KeyboardSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\Input\MouseSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\MaintenanceSection.cs" />
+    <Compile Include="Overlays\Settings\Sections\Maintenance\GeneralSettings.cs" />
+    <Compile Include="Overlays\Settings\Sections\OnlineSection.cs" />
+    <Compile Include="Overlays\Settings\Sections\SkinSection.cs" />
+    <Compile Include="Overlays\Settings\SettingsCheckbox.cs" />
+    <Compile Include="Overlays\Settings\SettingsDropdown.cs" />
+    <Compile Include="Overlays\Settings\SettingsEnumDropdown.cs" />
+    <Compile Include="Overlays\Settings\SettingsFooter.cs" />
+    <Compile Include="Overlays\Settings\SettingsHeader.cs" />
+    <Compile Include="Overlays\Settings\SettingsItem.cs" />
+    <Compile Include="Overlays\Settings\SettingsLabel.cs" />
+    <Compile Include="Overlays\Settings\SettingsSection.cs" />
+    <Compile Include="Overlays\Settings\SettingsSlider.cs" />
+    <Compile Include="Overlays\Settings\SettingsSubsection.cs" />
+    <Compile Include="Overlays\Settings\SettingsTextBox.cs" />
+    <Compile Include="Overlays\Settings\Sidebar.cs" />
+    <Compile Include="Overlays\Settings\SidebarButton.cs" />
+    <Compile Include="Overlays\SocialOverlay.cs" />
+    <Compile Include="Overlays\Social\FilterControl.cs" />
+    <Compile Include="Overlays\Social\Header.cs" />
+    <Compile Include="Overlays\Toolbar\Toolbar.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarChatButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarDirectButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarHomeButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarModeButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarModeSelector.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarMusicButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarNotificationButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarOverlayToggleButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarSettingsButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarSocialButton.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarUserArea.cs" />
+    <Compile Include="Overlays\Toolbar\ToolbarUserButton.cs" />
+    <Compile Include="Overlays\UserProfileOverlay.cs" />
+    <Compile Include="Overlays\VersionManager.cs" />
+    <Compile Include="Overlays\WaveOverlayContainer.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rulesets\Judgements\DrawableJudgement.cs" />
+    <Compile Include="Rulesets\Judgements\Judgement.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableMod.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToClock.cs" />
+    <Compile Include="Rulesets\Mods\IApplicableToDifficulty.cs" />
+    <Compile Include="Rulesets\Mods\Mod.cs" />
+    <Compile Include="Rulesets\Mods\ModAutoplay.cs" />
+    <Compile Include="Rulesets\Mods\ModCinema.cs" />
+    <Compile Include="Rulesets\Mods\ModDaycore.cs" />
+    <Compile Include="Rulesets\Mods\ModDoubleTime.cs" />
+    <Compile Include="Rulesets\Mods\ModEasy.cs" />
+    <Compile Include="Rulesets\Mods\ModFlashlight.cs" />
+    <Compile Include="Rulesets\Mods\ModHalfTime.cs" />
+    <Compile Include="Rulesets\Mods\ModHardRock.cs" />
+    <Compile Include="Rulesets\Mods\ModHidden.cs" />
+    <Compile Include="Rulesets\Mods\ModNightcore.cs" />
+    <Compile Include="Rulesets\Mods\ModNoFail.cs" />
+    <Compile Include="Rulesets\Mods\ModPerfect.cs" />
+    <Compile Include="Rulesets\Mods\ModRelax.cs" />
+    <Compile Include="Rulesets\Mods\ModSuddenDeath.cs" />
+    <Compile Include="Rulesets\Mods\ModType.cs" />
+    <Compile Include="Rulesets\Mods\MultiMod.cs" />
+    <Compile Include="Rulesets\Objects\BezierApproximator.cs" />
+    <Compile Include="Rulesets\Objects\CircularArcApproximator.cs" />
+    <Compile Include="Rulesets\Objects\Drawables\ArmedState.cs" />
+    <Compile Include="Rulesets\Objects\Drawables\DrawableHitObject.cs" />
+    <Compile Include="Rulesets\Objects\Drawables\DrawableScrollingHitObject.cs" />
+    <Compile Include="Rulesets\Objects\Drawables\HitResult.cs" />
+    <Compile Include="Rulesets\Objects\Drawables\IDrawableHitObjectWithProxiedApproach.cs" />
+    <Compile Include="Rulesets\Objects\Drawables\IScrollingHitObject.cs" />
+    <Compile Include="Rulesets\Objects\HitObject.cs" />
+    <Compile Include="Rulesets\Objects\HitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertHit.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertHitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertSlider.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Catch\ConvertSpinner.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\ConvertHitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\ConvertHitObjectType.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\ConvertSlider.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHit.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertHold.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertSlider.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Mania\ConvertSpinner.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertHit.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertHitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertSlider.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Osu\ConvertSpinner.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Taiko\ConvertHit.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Taiko\ConvertHitObjectParser.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Taiko\ConvertSlider.cs" />
+    <Compile Include="Rulesets\Objects\Legacy\Taiko\ConvertSpinner.cs" />
+    <Compile Include="Rulesets\Objects\SliderCurve.cs" />
+    <Compile Include="Rulesets\Objects\Types\CurveType.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasCombo.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasCurve.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasDistance.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasEndTime.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasHold.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasPosition.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasRepeats.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasXPosition.cs" />
+    <Compile Include="Rulesets\Objects\Types\IHasYPosition.cs" />
+    <Compile Include="Rulesets\Replays\AutoGenerator.cs" />
+    <Compile Include="Rulesets\Replays\FramedReplayInputHandler.cs" />
+    <Compile Include="Rulesets\Replays\IAutoGenerator.cs" />
+    <Compile Include="Rulesets\Replays\Replay.cs" />
+    <Compile Include="Rulesets\Replays\ReplayButtonState.cs" />
+    <Compile Include="Rulesets\Replays\ReplayFrame.cs" />
+    <Compile Include="Rulesets\Ruleset.cs" />
+    <Compile Include="Rulesets\RulesetInfo.cs" />
+    <Compile Include="Rulesets\RulesetStore.cs" />
+    <Compile Include="Rulesets\Scoring\Score.cs" />
+    <Compile Include="Rulesets\Scoring\ScoreProcessor.cs" />
+    <Compile Include="Rulesets\Scoring\ScoreRank.cs" />
+    <Compile Include="Rulesets\Scoring\ScoreStore.cs" />
+    <Compile Include="Rulesets\Timing\LinearScrollingContainer.cs" />
+    <Compile Include="Rulesets\Timing\MultiplierControlPoint.cs" />
+    <Compile Include="Rulesets\Timing\ScrollingContainer.cs" />
+    <Compile Include="Rulesets\Timing\SpeedAdjustmentContainer.cs" />
+    <Compile Include="Rulesets\UI\ModIcon.cs" />
+    <Compile Include="Rulesets\UI\Playfield.cs" />
+    <Compile Include="Rulesets\UI\RulesetContainer.cs" />
+    <Compile Include="Rulesets\UI\RulesetInputManager.cs" />
+    <Compile Include="Rulesets\UI\ScrollingPlayfield.cs" />
+    <Compile Include="Rulesets\UI\ScrollingRulesetContainer.cs" />
+    <Compile Include="Screens\BackgroundScreen.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenBeatmap.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenCustom.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenDefault.cs" />
+    <Compile Include="Screens\Backgrounds\BackgroundScreenEmpty.cs" />
+    <Compile Include="Screens\Charts\ChartInfo.cs" />
+    <Compile Include="Screens\Charts\ChartListing.cs" />
+    <Compile Include="Screens\Direct\OnlineListing.cs" />
+    <Compile Include="Screens\Edit\Editor.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
+    <Compile Include="Screens\Edit\Menus\EditorMenuItemSpacer.cs" />
+    <Compile Include="Screens\Loader.cs" />
+    <Compile Include="Screens\Menu\Button.cs" />
+    <Compile Include="Screens\Menu\ButtonSystem.cs" />
+    <Compile Include="Screens\Menu\Disclaimer.cs" />
+    <Compile Include="Screens\Menu\FlowContainerWithOrigin.cs" />
+    <Compile Include="Screens\Menu\Intro.cs" />
+    <Compile Include="Screens\Menu\LogoVisualisation.cs" />
+    <Compile Include="Screens\Menu\MainMenu.cs" />
+    <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
+    <Compile Include="Screens\Menu\OsuLogo.cs" />
+    <Compile Include="Screens\Multiplayer\DrawableGameType.cs" />
+    <Compile Include="Screens\Multiplayer\DrawableRoom.cs" />
+    <Compile Include="Screens\Multiplayer\Lobby.cs" />
+    <Compile Include="Screens\Multiplayer\Match.cs" />
+    <Compile Include="Screens\Multiplayer\MatchCreate.cs" />
+    <Compile Include="Screens\Multiplayer\ModeTypeInfo.cs" />
+    <Compile Include="Screens\Multiplayer\ParticipantInfo.cs" />
+    <Compile Include="Screens\Multiplayer\RoomInspector.cs" />
+    <Compile Include="Screens\OsuScreen.cs" />
+    <Compile Include="Screens\Play\FailOverlay.cs" />
+    <Compile Include="Screens\Play\HotkeyRetryOverlay.cs" />
+    <Compile Include="Screens\Play\HUDOverlay.cs" />
+    <Compile Include="Screens\Play\HUD\ComboCounter.cs" />
+    <Compile Include="Screens\Play\HUD\ComboResultCounter.cs" />
+    <Compile Include="Screens\Play\HUD\HealthDisplay.cs" />
+    <Compile Include="Screens\Play\HUD\ModDisplay.cs" />
+    <Compile Include="Screens\Play\HUD\StandardComboCounter.cs" />
+    <Compile Include="Screens\Play\HUD\StandardHealthDisplay.cs" />
+    <Compile Include="Screens\Play\KeyCounter.cs" />
+    <Compile Include="Screens\Play\KeyCounterAction.cs" />
+    <Compile Include="Screens\Play\KeyCounterCollection.cs" />
+    <Compile Include="Screens\Play\KeyCounterKeyboard.cs" />
+    <Compile Include="Screens\Play\KeyCounterMouse.cs" />
+    <Compile Include="Screens\Play\MenuOverlay.cs" />
+    <Compile Include="Screens\Play\PauseContainer.cs" />
+    <Compile Include="Screens\Play\Player.cs" />
+    <Compile Include="Screens\Play\PlayerLoader.cs" />
+    <Compile Include="Screens\Play\ReplayPlayer.cs" />
+    <Compile Include="Screens\Play\ReplaySettingsOverlay.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\CollectionSettings.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\DiscussionSettings.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\PlaybackSettings.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplayCheckbox.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplayGroup.cs" />
+    <Compile Include="Screens\Play\ReplaySettings\ReplaySliderBar.cs" />
+    <Compile Include="Screens\Play\SkipButton.cs" />
+    <Compile Include="Screens\Play\SongProgress.cs" />
+    <Compile Include="Screens\Play\SongProgressBar.cs" />
+    <Compile Include="Screens\Play\SongProgressGraph.cs" />
+    <Compile Include="Screens\Play\SongProgressInfo.cs" />
+    <Compile Include="Screens\Play\SquareGraph.cs" />
+    <Compile Include="Screens\Ranking\AspectContainer.cs" />
+    <Compile Include="Screens\Ranking\ResultMode.cs" />
+    <Compile Include="Screens\Ranking\ResultModeButton.cs" />
+    <Compile Include="Screens\Ranking\ResultModeTabControl.cs" />
+    <Compile Include="Screens\Ranking\Results.cs" />
+    <Compile Include="Screens\Ranking\ResultsPage.cs" />
+    <Compile Include="Screens\Ranking\ResultsPageRanking.cs" />
+    <Compile Include="Screens\Ranking\ResultsPageScore.cs" />
+    <Compile Include="Screens\ScreenWhiteBox.cs" />
+    <Compile Include="Screens\Select\BeatmapCarousel.cs" />
+    <Compile Include="Screens\Select\BeatmapDeleteDialog.cs" />
+    <Compile Include="Screens\Select\BeatmapDetailArea.cs" />
+    <Compile Include="Screens\Select\BeatmapDetailAreaTabControl.cs" />
+    <Compile Include="Screens\Select\BeatmapDetails.cs" />
+    <Compile Include="Screens\Select\BeatmapInfoWedge.cs" />
+    <Compile Include="Screens\Select\Details\AdvancedStats.cs" />
+    <Compile Include="Screens\Select\Details\FailRetryGraph.cs" />
+    <Compile Include="Screens\Select\Details\UserRatings.cs" />
+    <Compile Include="Screens\Select\EditSongSelect.cs" />
+    <Compile Include="Screens\Select\FilterControl.cs" />
+    <Compile Include="Screens\Select\FilterCriteria.cs" />
+    <Compile Include="Screens\Select\Filter\GroupMode.cs" />
+    <Compile Include="Screens\Select\Filter\SortMode.cs" />
+    <Compile Include="Screens\Select\Footer.cs" />
+    <Compile Include="Screens\Select\FooterButton.cs" />
+    <Compile Include="Screens\Select\Leaderboards\DrawableRank.cs" />
+    <Compile Include="Screens\Select\Leaderboards\Leaderboard.cs" />
+    <Compile Include="Screens\Select\Leaderboards\LeaderboardScore.cs" />
+    <Compile Include="Screens\Select\MatchSongSelect.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsButton.cs" />
+    <Compile Include="Screens\Select\Options\BeatmapOptionsOverlay.cs" />
+    <Compile Include="Screens\Select\PlaySongSelect.cs" />
+    <Compile Include="Screens\Select\SongSelect.cs" />
+    <Compile Include="Screens\Select\WedgeBackground.cs" />
+    <Compile Include="Screens\Tournament\Components\DrawingsConfigManager.cs" />
+    <Compile Include="Screens\Tournament\Components\VisualiserContainer.cs" />
+    <Compile Include="Screens\Tournament\Drawings.cs" />
+    <Compile Include="Screens\Tournament\Group.cs" />
+    <Compile Include="Screens\Tournament\GroupContainer.cs" />
+    <Compile Include="Screens\Tournament\ScrollingTeamContainer.cs" />
+    <Compile Include="Screens\Tournament\Teams\DrawingsTeam.cs" />
+    <Compile Include="Screens\Tournament\Teams\ITeamList.cs" />
+    <Compile Include="Screens\Tournament\Teams\StorageBackedTeamList.cs" />
+    <Compile Include="Storyboards\CommandLoop.cs" />
+    <Compile Include="Storyboards\CommandTimeline.cs" />
+    <Compile Include="Storyboards\CommandTimelineGroup.cs" />
+    <Compile Include="Storyboards\CommandTrigger.cs" />
+    <Compile Include="Storyboards\Drawables\DrawablesExtensions.cs" />
+    <Compile Include="Storyboards\Drawables\DrawableStoryboard.cs" />
+    <Compile Include="Storyboards\Drawables\DrawableStoryboardAnimation.cs" />
+    <Compile Include="Storyboards\Drawables\DrawableStoryboardLayer.cs" />
+    <Compile Include="Storyboards\Drawables\DrawableStoryboardSprite.cs" />
+    <Compile Include="Storyboards\Drawables\IFlippable.cs" />
+    <Compile Include="Storyboards\IStoryboardElement.cs" />
+    <Compile Include="Storyboards\Storyboard.cs" />
+    <Compile Include="Storyboards\StoryboardAnimation.cs" />
+    <Compile Include="Storyboards\StoryboardLayer.cs" />
+    <Compile Include="Storyboards\StoryboardSample.cs" />
+    <Compile Include="Storyboards\StoryboardSprite.cs" />
+    <Compile Include="Tests\Beatmaps\TestWorkingBeatmap.cs" />
+    <Compile Include="Tests\Platform\TestStorage.cs" />
+    <Compile Include="Tests\Visual\OsuTestCase.cs" />
+    <Compile Include="Tests\Visual\TestCaseBeatmapDetailArea.cs" />
+    <Compile Include="Tests\Visual\TestCaseBeatmapDetails.cs" />
+    <Compile Include="Tests\Visual\TestCaseBeatmapOptionsOverlay.cs" />
+    <Compile Include="Tests\Visual\TestCaseBeatSyncedContainer.cs" />
+    <Compile Include="Tests\Visual\TestCaseBreadcrumbs.cs" />
+    <Compile Include="Tests\Visual\TestCaseChatDisplay.cs" />
+    <Compile Include="Tests\Visual\TestCaseContextMenu.cs" />
+    <Compile Include="Tests\Visual\TestCaseDialogOverlay.cs" />
+    <Compile Include="Tests\Visual\TestCaseDirect.cs" />
+    <Compile Include="Tests\Visual\TestCaseDrawableRoom.cs" />
+    <Compile Include="Tests\Visual\TestCaseDrawings.cs" />
+    <Compile Include="Tests\Visual\TestCaseEditorMenuBar.cs" />
+    <Compile Include="Tests\Visual\TestCaseGamefield.cs" />
+    <Compile Include="Tests\Visual\TestCaseGraph.cs" />
+    <Compile Include="Tests\Visual\TestCaseKeyConfiguration.cs" />
+    <Compile Include="Tests\Visual\TestCaseKeyCounter.cs" />
+    <Compile Include="Tests\Visual\TestCaseLeaderboard.cs" />
+    <Compile Include="Tests\Visual\TestCaseMedalOverlay.cs" />
+    <Compile Include="Tests\Visual\TestCaseMenuButtonSystem.cs" />
+    <Compile Include="Tests\Visual\TestCaseMenuOverlays.cs" />
+    <Compile Include="Tests\Visual\TestCaseMods.cs" />
+    <Compile Include="Tests\Visual\TestCaseMusicController.cs" />
+    <Compile Include="Tests\Visual\TestCaseNotificationOverlay.cs" />
+    <Compile Include="Tests\Visual\TestCaseOnScreenDisplay.cs" />
+    <Compile Include="Tests\Visual\TestCasePlayer.cs" />
+    <Compile Include="Tests\Visual\TestCasePlaySongSelect.cs" />
+    <Compile Include="Tests\Visual\TestCaseReplay.cs" />
+    <Compile Include="Tests\Visual\TestCaseReplaySettingsOverlay.cs" />
+    <Compile Include="Tests\Visual\TestCaseResults.cs" />
+    <Compile Include="Tests\Visual\TestCaseRoomInspector.cs" />
+    <Compile Include="Tests\Visual\TestCaseScoreCounter.cs" />
+    <Compile Include="Tests\Visual\TestCaseScrollingPlayfield.cs" />
+    <Compile Include="Tests\Visual\TestCaseSettings.cs" />
+    <Compile Include="Tests\Visual\TestCaseSkipButton.cs" />
+    <Compile Include="Tests\Visual\TestCaseSocial.cs" />
+    <Compile Include="Tests\Visual\TestCaseSongProgress.cs" />
+    <Compile Include="Tests\Visual\TestCaseStoryboard.cs" />
+    <Compile Include="Tests\Visual\TestCaseTabControl.cs" />
+    <Compile Include="Tests\Visual\TestCaseTextAwesome.cs" />
+    <Compile Include="Tests\Visual\TestCaseTwoLayerButton.cs" />
+    <Compile Include="Tests\Visual\TestCaseUserPanel.cs" />
+    <Compile Include="Tests\Visual\TestCaseUserProfile.cs" />
+    <Compile Include="Users\Avatar.cs" />
+    <Compile Include="Users\Country.cs" />
+    <Compile Include="Users\Medal.cs" />
+    <Compile Include="Users\Team.cs" />
+    <Compile Include="Users\UpdateableAvatar.cs" />
+    <Compile Include="Users\User.cs" />
+    <Compile Include="Users\UserCoverBackground.cs" />
+    <Compile Include="Users\UserPanel.cs" />
+    <Compile Include="Users\UserStatistics.cs" />
+    <Compile Include="Users\UserStatus.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <EmbeddedResource Include="lazer.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -586,4 +786,16 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ProjectExtensions>
+    <VisualStudio>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>
