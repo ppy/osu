@@ -3,7 +3,7 @@
 
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.BreaksOverlay;
 using System.Collections.Generic;
 
 namespace osu.Game.Tests.Visual
@@ -22,6 +22,8 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Add 2s break", () => startBreak(2000));
             AddStep("Add 5s break", () => startBreak(5000));
+            AddStep("Add 10s break", () => startBreak(10000));
+            AddStep("Add 15s break", () => startBreak(15000));
             AddStep("Add 2 breaks (2s each)", startMultipleBreaks);
         }
 
