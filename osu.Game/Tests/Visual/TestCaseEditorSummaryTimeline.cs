@@ -2,10 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
@@ -15,8 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
-using osu.Framework.Lists;
-using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -42,7 +38,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, BeatmapManager beatmaps)
+        private void load(OsuGameBase osuGame)
         {
             var beatmap = new Beatmap();
 
@@ -113,14 +109,14 @@ namespace osu.Game.Tests.Visual
                 Masking = true;
                 CornerRadius = 5;
 
-                InternalChildren = new Drawable[]
+                InternalChildren = new[]
                 {
                     background = new Box { RelativeSizeAxes = Axes.Both },
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Left = contents_padding, Right = contents_padding },
-                        Children = new Drawable[]
+                        Children = new[]
                         {
                             markerContainer = new Container
                             {
@@ -303,12 +299,9 @@ namespace osu.Game.Tests.Visual
 
                 private abstract class ControlPointVisualisation : PointVisualisation
                 {
-                    public readonly ControlPoint ControlPoint;
-
-                    public ControlPointVisualisation(ControlPoint controlPoint)
+                    protected ControlPointVisualisation(ControlPoint controlPoint)
                         : base(controlPoint.Time)
                     {
-                        ControlPoint = controlPoint;
                     }
                 }
             }
@@ -366,7 +359,7 @@ namespace osu.Game.Tests.Visual
             {
                 private readonly Container timeline;
 
-                public Timeline()
+                protected Timeline()
                 {
                     AddInternal(timeline = new Container { RelativeSizeAxes = Axes.Both });
                 }
@@ -396,12 +389,8 @@ namespace osu.Game.Tests.Visual
             /// </summary>
             private class PointVisualisation : Box
             {
-                public readonly double StartTime;
-
-                public PointVisualisation(double startTime)
+                protected PointVisualisation(double startTime)
                 {
-                    StartTime = startTime;
-
                     Origin = Anchor.TopCentre;
 
                     RelativeSizeAxes = Axes.Y;
@@ -418,14 +407,8 @@ namespace osu.Game.Tests.Visual
             /// </summary>
             private class DurationVisualisation : Container
             {
-                public readonly double StartTime;
-                public readonly double EndTIme;
-
-                public DurationVisualisation(double startTime, double endTime)
+                protected DurationVisualisation(double startTime, double endTime)
                 {
-                    StartTime = startTime;
-                    EndTIme = endTime;
-
                     Masking = true;
                     CornerRadius = corner_radius;
 
