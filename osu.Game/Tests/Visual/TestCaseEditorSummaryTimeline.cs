@@ -3,22 +3,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
-using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components;
+using OpenTK;
 
 namespace osu.Game.Tests.Visual
 {
@@ -27,7 +19,7 @@ namespace osu.Game.Tests.Visual
         private const int length = 60000;
         private readonly Random random;
 
-        public override IReadOnlyList<Type> RequiredTypes => new Type[] { typeof(SummaryTimeline) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(SummaryTimeline) };
 
         public TestCaseEditorSummaryTimeline()
         {
