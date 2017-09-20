@@ -604,6 +604,7 @@
     <Compile Include="Screens\Charts\ChartListing.cs" />
     <Compile Include="Screens\Direct\OnlineListing.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
+    <Compile Include="Screens\Edit\Components\SummaryTimeline.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
