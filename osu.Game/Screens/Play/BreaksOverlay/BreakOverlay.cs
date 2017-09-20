@@ -82,22 +82,26 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                     Origin = Anchor.CentreRight,
                     Icon = Graphics.FontAwesome.fa_chevron_left,
                     Size = new Vector2(60),
+                    X = 1 + glowing_x_offset,
                 },
                 rightGlowingIcon = new GlowingIcon
                 {
                     Origin = Anchor.CentreLeft,
                     Icon = Graphics.FontAwesome.fa_chevron_right,
                     Size = new Vector2(60),
+                    X = -glowing_x_offset,
                 },
                 leftBlurredIcon = new BlurredIcon
                 {
                     Origin = Anchor.CentreRight,
                     Icon = Graphics.FontAwesome.fa_chevron_left,
+                    X = 1 + blurred_x_offset,
                 },
                 rightBlurredIcon = new BlurredIcon
                 {
                     Origin = Anchor.CentreLeft,
                     Icon = Graphics.FontAwesome.fa_chevron_right,
+                    X = -blurred_x_offset,
                 }
             };
         }
