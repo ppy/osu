@@ -11,13 +11,16 @@ using OpenTK.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
 using osu.Framework.Timing;
+using osu.Framework.Allocation;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play
 {
     public class BreakOverlay : Container
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
-        private const int remaining_time_container_max_size = 500;
+        private const int remaining_time_container_max_size = 450;
+        private const int element_margin = 25;
 
         public List<BreakPeriod> Breaks;
 
@@ -34,6 +37,7 @@ namespace osu.Game.Screens.Play
         private readonly LetterboxOverlay letterboxOverlay;
         private readonly Container remainingTimeBox;
         private readonly RemainingTimeCounter remainingTimeCounter;
+        private readonly InfoContainer info;
 
         public BreakOverlay(bool letterboxing)
         {
@@ -50,17 +54,19 @@ namespace osu.Game.Screens.Play
                     Size = new Vector2(0, 8),
                     CornerRadius = 4,
                     Masking = true,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
-                    }
+                    Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 remainingTimeCounter = new RemainingTimeCounter
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.BottomCentre,
-                    Margin = new MarginPadding { Bottom = 25 },
+                    Margin = new MarginPadding { Bottom = element_margin },
+                },
+                info = new InfoContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
+                    Margin = new MarginPadding { Top = element_margin },
                 }
             };
         }
@@ -103,6 +109,8 @@ namespace osu.Game.Screens.Play
 
             Scheduler.AddDelayed(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime - Clock.CurrentTime);
             remainingTimeCounter.FadeIn(fade_duration);
+
+            info.FadeIn(fade_duration);
         }
 
         private void onBreakOut()
@@ -111,6 +119,82 @@ namespace osu.Game.Screens.Play
                 letterboxOverlay.FadeOut(fade_duration);
 
             remainingTimeCounter.FadeOut(fade_duration);
+            info.FadeOut(fade_duration);
+        }
+
+        private class InfoContainer : FillFlowContainer
+        {
+            public InfoContainer()
+            {
+                AutoSizeAxes = Axes.Both;
+                Alpha = 0;
+                Direction = FillDirection.Vertical;
+                Spacing = new Vector2(5);
+                Children = new Drawable[]
+                {
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Text = @"current progress".ToUpper(),
+                        TextSize = 15,
+                        Font = "Exo2.0-Black",
+                    },
+                    new FillFlowContainer<InfoLine>
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Origin = Anchor.TopCentre,
+                        Anchor = Anchor.TopCentre,
+                        Direction = FillDirection.Vertical,
+                        Children = new InfoLine[]
+                        {
+                            new InfoLine(@"Accuracy", @"88.54%"),
+                            new InfoLine(@"Rank", @"#6584"),
+                            new InfoLine(@"Grade", @"A"),
+                        },
+                    }
+                };
+            }
+
+            private class InfoLine : Container
+            {
+                private const int margin = 2;
+
+                private readonly OsuSpriteText text;
+                private readonly OsuSpriteText valueText;
+
+                public InfoLine(string name, string value)
+                {
+                    AutoSizeAxes = Axes.Y;
+                    Children = new Drawable[]
+                    {
+                        text = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreRight,
+                            Text = name,
+                            TextSize = 17,
+                            Margin = new MarginPadding { Right = margin }
+                        },
+                        valueText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreLeft,
+                            Text = value,
+                            TextSize = 17,
+                            Font = "Exo2.0-Bold",
+                            Margin = new MarginPadding { Left = margin }
+                        }
+                    };
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    text.Colour = colours.Yellow;
+                    valueText.Colour = colours.YellowLight;
+                }
+            }
         }
 
         private class RemainingTimeCounter : Container
@@ -131,7 +215,7 @@ namespace osu.Game.Screens.Play
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = 35,
+                    TextSize = 33,
                     Font = "Venera",
                 };
             }
