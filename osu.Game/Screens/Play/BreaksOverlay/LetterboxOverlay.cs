@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Play.BreaksOverlay
 {
     public class LetterboxOverlay : Container
     {
