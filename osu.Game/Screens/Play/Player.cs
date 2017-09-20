@@ -24,6 +24,7 @@ using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Screens.Play.BreaksOverlay;
 
 namespace osu.Game.Screens.Play
 {
