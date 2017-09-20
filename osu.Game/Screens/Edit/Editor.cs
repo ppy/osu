@@ -13,6 +13,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Menus;
+using osu.Game.Screens.Edit.Components;
+using OpenTK;
 
 namespace osu.Game.Screens.Edit
 {
@@ -189,6 +191,23 @@ namespace osu.Game.Screens.Edit
                     }
                 }
             });
+
+            Add(new FillFlowContainer
+            {
+                Name = "Bottom bar",
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                RelativeSizeAxes = Axes.X,
+                Height = 60,
+                Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 10 },
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(10, 0),
+                Children = new[]
+                {
+                    new SummaryTimeline { RelativeSizeAxes = Axes.Both }
+                }
+            });
+
         }
 
         protected override void OnResuming(Screen last)
