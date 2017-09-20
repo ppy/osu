@@ -49,6 +49,9 @@ namespace osu.Game.Tests.Visual
             osuGame.Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
         }
 
+        /// <summary>
+        /// The timeline that sits at the bottom of the editor.
+        /// </summary>
         private class MiniTimeline : CompositeDrawable
         {
             private const float corner_radius = 5;
@@ -180,14 +183,12 @@ namespace osu.Game.Tests.Visual
             }
 
             protected override bool OnDragStart(InputState state) => true;
-
+            protected override bool OnDragEnd(InputState state) => true;
             protected override bool OnDrag(InputState state)
             {
                 seekToPosition(state.Mouse.NativeState.Position);
                 return true;
             }
-
-            protected override bool OnDragEnd(InputState state) => true;
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
@@ -195,6 +196,10 @@ namespace osu.Game.Tests.Visual
                 return true;
             }
 
+            /// <summary>
+            /// Seeks the <see cref="MiniTimeline"/> to the time closest to a position on the screen relative to the <see cref="MiniTimeline"/>.
+            /// </summary>
+            /// <param name="screenPosition">The position in screen coordinates.</param>
             private void seekToPosition(Vector2 screenPosition)
             {
                 float markerPos = MathHelper.Clamp(markerContainer.ToLocalSpace(screenPosition).X, 0, markerContainer.DrawWidth);
@@ -206,10 +211,12 @@ namespace osu.Game.Tests.Visual
             protected override void Update()
             {
                 base.Update();
-
                 marker.X = (float)beatmap.Value.Track.CurrentTime;
             }
 
+            /// <summary>
+            /// The part of the timeline that displays the control points.
+            /// </summary>
             private class ControlPointTimeline : Timeline
             {
                 protected override void LoadBeatmap(WorkingBeatmap beatmap)
@@ -265,6 +272,9 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
+            /// <summary>
+            /// The part of the timeline that displays bookmarks.
+            /// </summary>
             private class BookmarkTimeline : Timeline
             {
                 protected override void LoadBeatmap(WorkingBeatmap beatmap)
@@ -285,6 +295,9 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
+            /// <summary>
+            /// The part of the timeline that displays breaks in the song.
+            /// </summary>
             private class BreakTimeline : Timeline
             {
                 protected override void LoadBeatmap(WorkingBeatmap beatmap)
@@ -305,6 +318,9 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
+            /// <summary>
+            /// Represents a part of the editor timeline.
+            /// </summary>
             private abstract class Timeline : CompositeDrawable
             {
                 private readonly Container timeline;
@@ -334,6 +350,9 @@ namespace osu.Game.Tests.Visual
                 protected abstract void LoadBeatmap(WorkingBeatmap beatmap);
             }
 
+            /// <summary>
+            /// Represents a singular point on a <see cref="Timeline"/>.
+            /// </summary>
             private class PointVisualisation : Box
             {
                 public readonly double StartTime;
@@ -353,6 +372,9 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
+            /// <summary>
+            /// Represents a spanning point on a <see cref="Timeline"/>.
+            /// </summary>
             private class DurationVisualisation : Container
             {
                 public readonly double StartTime;
