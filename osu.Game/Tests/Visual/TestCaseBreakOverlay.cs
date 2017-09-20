@@ -21,15 +21,7 @@ namespace osu.Game.Tests.Visual
         {
             Clock = new FramedClock();
 
-            Children = new Drawable[]
-            {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                },
-                breakOverlay = new BreakOverlay(true)
-            };
+            Child = breakOverlay = new BreakOverlay(true);
 
             AddStep("Add 2s break", () => startBreak(2000));
             AddStep("Add 5s break", () => startBreak(5000));
