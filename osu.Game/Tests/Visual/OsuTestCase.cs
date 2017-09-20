@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 
@@ -11,6 +12,7 @@ namespace osu.Game.Tests.Visual
     {
         public override void RunTest()
         {
+            Logger.Log($"Running test for {AppDomain.CurrentDomain.FriendlyName.Replace(' ', '-')}");
             using (var host = new HeadlessGameHost(AppDomain.CurrentDomain.FriendlyName.Replace(' ', '-'), realtime: false))
                 host.Run(new OsuTestCaseTestRunner(this));
         }
