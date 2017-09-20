@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using osu.Game.Beatmaps.Timing;
 using OpenTK;
 using osu.Framework.Graphics.Shapes;
-using OpenTK.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
 using osu.Framework.Timing;
@@ -146,7 +145,7 @@ namespace osu.Game.Screens.Play
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Direction = FillDirection.Vertical,
-                        Children = new InfoLine[]
+                        Children = new []
                         {
                             new InfoLine(@"Accuracy", @"88.54%"),
                             new InfoLine(@"Rank", @"#6584"),
