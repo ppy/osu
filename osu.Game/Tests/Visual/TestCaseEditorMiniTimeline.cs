@@ -22,11 +22,11 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseEditorTimingTimeline : OsuTestCase
+    internal class TestCaseEditorMiniTimeline : OsuTestCase
     {
-        public TestCaseEditorTimingTimeline()
+        public TestCaseEditorMiniTimeline()
         {
-            Add(new TimingTimeline
+            Add(new MiniTimeline
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual
             osuGame.Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
         }
 
-        private class TimingTimeline : CompositeDrawable
+        private class MiniTimeline : CompositeDrawable
         {
             private const float corner_radius = 5;
             private const float contents_padding = 15;
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual
 
             private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
-            public TimingTimeline()
+            public MiniTimeline()
             {
                 Masking = true;
                 CornerRadius = 5;
