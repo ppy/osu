@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using osu.Framework.Development;
 using osu.Game.Database;
 using SQLite.Net;
 
@@ -17,7 +16,7 @@ namespace osu.Game.Rulesets
     /// </summary>
     public class RulesetStore : DatabaseBackedStore
     {
-        private readonly List<Ruleset> instances = new List<Ruleset>();
+        private static readonly Dictionary<Assembly, Type> loaded_assemblies = new Dictionary<Assembly, Type>();
 
         public IEnumerable<RulesetInfo> AllRulesets => Query<RulesetInfo>().Where(r => r.Available);
 
@@ -25,11 +24,20 @@ namespace osu.Game.Rulesets
         {
         }
 
+        static RulesetStore()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
+
+            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll"))
+                loadRulesetFromFile(file);
+        }
+
+        private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
+
         private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
         protected override void Prepare(bool reset = false)
         {
-            instances.Clear();
 
             Connection.CreateTable<RulesetInfo>();
 
@@ -38,73 +46,59 @@ namespace osu.Game.Rulesets
                 Connection.DeleteAll<RulesetInfo>();
             }
 
-            // todo: don't do this on deploy
-            var sln = DebugUtils.GetSolutionPath();
+            var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo()));
 
-            if (sln != null)
+            Connection.RunInTransaction(() =>
             {
-                foreach (string dir in Directory.GetDirectories(sln, $"{ruleset_library_prefix}.*"))
-                    foreach (string file in Directory.GetFiles(Path.Combine(dir, "bin", DebugUtils.IsDebug ? "Debug" : "Release"), $"{ruleset_library_prefix}.*.dll"))
-                        loadRulesetFromFile(file);
-            }
-
-            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll"))
-                loadRulesetFromFile(file);
-
-            Connection.BeginTransaction();
-
-            //add all legacy modes in correct order
-            foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
-            {
-                Connection.InsertOrReplace(createRulesetInfo(r));
-            }
-
-            //add any other modes
-            foreach (var r in instances.Where(r => r.LegacyID < 0))
-            {
-                var us = createRulesetInfo(r);
-
-                var existing = Query<RulesetInfo>().Where(ri => ri.InstantiationInfo == us.InstantiationInfo).FirstOrDefault();
-
-                if (existing == null)
-                    Connection.Insert(us);
-            }
-
-            //perform a consistency check
-            foreach (var r in Query<RulesetInfo>())
-            {
-                try
+                //add all legacy modes in correct order
+                foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
                 {
-                    r.CreateInstance();
-                    r.Available = true;
-                }
-                catch
-                {
-                    r.Available = false;
+                    Connection.InsertOrReplace(createRulesetInfo(r));
                 }
 
-                Connection.Update(r);
-            }
+                //add any other modes
+                foreach (var r in instances.Where(r => r.LegacyID < 0))
+                {
+                    var us = createRulesetInfo(r);
 
-            Connection.Commit();
+                    var existing = Query<RulesetInfo>().Where(ri => ri.InstantiationInfo == us.InstantiationInfo).FirstOrDefault();
+
+                    if (existing == null)
+                        Connection.Insert(us);
+                }
+            });
+
+            Connection.RunInTransaction(() =>
+            {
+                //perform a consistency check
+                foreach (var r in Query<RulesetInfo>())
+                {
+                    try
+                    {
+                        r.CreateInstance();
+                        r.Available = true;
+                    }
+                    catch
+                    {
+                        r.Available = false;
+                    }
+
+                    Connection.Update(r);
+                }
+            });
         }
 
-        private void loadRulesetFromFile(string file)
+        private static void loadRulesetFromFile(string file)
         {
             var filename = Path.GetFileNameWithoutExtension(file);
 
-            if (instances.Any(i => i.GetType().Namespace == filename))
+            if (loaded_assemblies.Values.Any(t => t.Namespace == filename))
                 return;
 
             try
             {
-                var assembly = Assembly.LoadFile(file);
-                var rulesets = assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(Ruleset)));
-
-                if (rulesets.Count() != 1)
-                    return;
-
-                instances.Add((Ruleset)Activator.CreateInstance(rulesets.First(), new RulesetInfo()));
+                var assembly = Assembly.LoadFrom(file);
+                loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsSubclassOf(typeof(Ruleset)));
             }
             catch (Exception) { }
         }
