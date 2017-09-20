@@ -34,6 +34,21 @@ namespace osu.Game.Tests.Visual
             });
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuGameBase osuGame, BeatmapManager beatmaps)
+        {
+            BeatmapSetInfo setInfo = null;
+
+            var sets = beatmaps.GetAllUsableBeatmapSets(false);
+            if (sets.Count > 0)
+                setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
+
+            if (setInfo == null)
+                return;
+
+            osuGame.Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+        }
+
         private class TimingTimeline : CompositeDrawable
         {
             private const float corner_radius = 5;
