@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
@@ -13,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Lists;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
@@ -158,7 +160,8 @@ namespace osu.Game.Tests.Visual
 
                 beatmap.BindTo(osuGame.Beatmap);
 
-                markerContainer.RelativeChildSize = new Vector2((float)beatmap.Value.Track.Length, 1);
+                markerContainer.RelativeChildSize = new Vector2((float)Math.Max(1, beatmap.Value.Track.Length), 1);
+                beatmap.ValueChanged += b => markerContainer.RelativeChildSize = new Vector2((float)Math.Max(1, b.Track.Length), 1);
             }
 
             protected override bool OnDragStart(InputState state) => true;
@@ -194,13 +197,8 @@ namespace osu.Game.Tests.Visual
 
             private class ControlPointTimeline : Timeline
             {
-                [BackgroundDependencyLoader]
-                private void load(OsuGameBase osuGame, OsuColour colours)
+                protected override void LoadBeatmap(WorkingBeatmap beatmap)
                 {
-                    var beatmap = osuGame.Beatmap.Value;
-                    if (beatmap == null)
-                        return;
-
                     ControlPointInfo cpi = beatmap.Beatmap.ControlPointInfo;
 
                     cpi.TimingPoints.ForEach(addTimingPoint);
@@ -254,13 +252,8 @@ namespace osu.Game.Tests.Visual
 
             private class BookmarkTimeline : Timeline
             {
-                [BackgroundDependencyLoader]
-                private void load(OsuGameBase osuGame)
+                protected override void LoadBeatmap(WorkingBeatmap beatmap)
                 {
-                    var beatmap = osuGame.Beatmap.Value;
-                    if (beatmap == null)
-                        return;
-
                     foreach (int bookmark in beatmap.BeatmapInfo.Bookmarks)
                         Add(new BookmarkVisualisation(bookmark));
                 }
@@ -279,13 +272,8 @@ namespace osu.Game.Tests.Visual
 
             private class BreakTimeline : Timeline
             {
-                [BackgroundDependencyLoader]
-                private void load(OsuGameBase osuGame)
+                protected override void LoadBeatmap(WorkingBeatmap beatmap)
                 {
-                    var beatmap = osuGame.Beatmap.Value;
-                    if (beatmap == null)
-                        return;
-
                     foreach (var breakPeriod in beatmap.Beatmap.Breaks)
                         Add(new BreakVisualisation(breakPeriod));
                 }
@@ -314,16 +302,21 @@ namespace osu.Game.Tests.Visual
                 [BackgroundDependencyLoader]
                 private void load(OsuGameBase osuGame)
                 {
-                    var beatmap = osuGame.Beatmap.Value;
-                    if (beatmap == null)
-                        return;
+                    osuGame.Beatmap.ValueChanged += b =>
+                    {
+                        timeline.Clear();
+                        timeline.RelativeChildSize = new Vector2((float)Math.Max(1, b.Track.Length), 1);
+                        LoadBeatmap(b);
+                    };
 
-                    timeline.RelativeChildSize = new Vector2((float)beatmap.Track.Length, 1);
+                    timeline.RelativeChildSize = new Vector2((float)Math.Max(1, osuGame.Beatmap.Value.Track.Length), 1);
+                    LoadBeatmap(osuGame.Beatmap);
                 }
 
                 protected void Add(PointVisualisation visualisation) => timeline.Add(visualisation);
-
                 protected void Add(DurationVisualisation visualisation) => timeline.Add(visualisation);
+
+                protected abstract void LoadBeatmap(WorkingBeatmap beatmap);
             }
 
             private class PointVisualisation : Box
