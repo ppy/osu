@@ -24,16 +24,16 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseEditorMiniTimeline : OsuTestCase
+    internal class TestCaseEditorSummaryTimeline : OsuTestCase
     {
         private const int length = 60000;
         private readonly Random random;
 
-        public TestCaseEditorMiniTimeline()
+        public TestCaseEditorSummaryTimeline()
         {
             random = new Random(1337);
 
-            Add(new MiniTimeline
+            Add(new SummaryTimeline
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual
         /// <summary>
         /// The timeline that sits at the bottom of the editor.
         /// </summary>
-        private class MiniTimeline : CompositeDrawable
+        private class SummaryTimeline : CompositeDrawable
         {
             private const float corner_radius = 5;
             private const float contents_padding = 15;
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual
 
             private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
-            public MiniTimeline()
+            public SummaryTimeline()
             {
                 Masking = true;
                 CornerRadius = 5;
@@ -238,7 +238,7 @@ namespace osu.Game.Tests.Visual
             }
 
             /// <summary>
-            /// Seeks the <see cref="MiniTimeline"/> to the time closest to a position on the screen relative to the <see cref="MiniTimeline"/>.
+            /// Seeks the <see cref="SummaryTimeline"/> to the time closest to a position on the screen relative to the <see cref="SummaryTimeline"/>.
             /// </summary>
             /// <param name="screenPosition">The position in screen coordinates.</param>
             private void seekToPosition(Vector2 screenPosition)
