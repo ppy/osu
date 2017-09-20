@@ -8,6 +8,9 @@ using osu.Game.Beatmaps.Timing;
 using OpenTK;
 using osu.Framework.Graphics.Shapes;
 using OpenTK.Graphics;
+using osu.Game.Graphics.Sprites;
+using System;
+using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Play
 {
@@ -18,9 +21,19 @@ namespace osu.Game.Screens.Play
 
         public List<BreakPeriod> Breaks;
 
+        public override IFrameBasedClock Clock
+        {
+            set
+            {
+                base.Clock = remainingTimeCounter.Clock = value;
+            }
+            get { return base.Clock; }
+        }
+
         private readonly bool letterboxing;
         private readonly LetterboxOverlay letterboxOverlay;
-        private readonly Container remainingTimeContainer;
+        private readonly Container remainingTimeBox;
+        private readonly RemainingTimeCounter remainingTimeCounter;
 
         public BreakOverlay(bool letterboxing)
         {
@@ -30,7 +43,7 @@ namespace osu.Game.Screens.Play
             Children = new Drawable[]
             {
                 letterboxOverlay = new LetterboxOverlay(),
-                remainingTimeContainer = new Container
+                remainingTimeBox = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -42,6 +55,12 @@ namespace osu.Game.Screens.Play
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White,
                     }
+                },
+                remainingTimeCounter = new RemainingTimeCounter
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.BottomCentre,
+                    Margin = new MarginPadding { Bottom = 25 },
                 }
             };
         }
@@ -77,12 +96,71 @@ namespace osu.Game.Screens.Play
             if (letterboxing)
                 letterboxOverlay.FadeIn(fade_duration);
 
-            remainingTimeContainer.ResizeWidthTo(remaining_time_container_max_size, fade_duration, Easing.OutQuint).Then().ResizeWidthTo(0, b.Duration);
+            remainingTimeBox
+                .ResizeWidthTo(remaining_time_container_max_size, fade_duration, Easing.OutQuint)
+                .Then()
+                .ResizeWidthTo(0, b.Duration);
+
+            Scheduler.AddDelayed(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime - Clock.CurrentTime);
+            remainingTimeCounter.FadeIn(fade_duration);
         }
 
         private void onBreakOut()
         {
-            if (letterboxing) letterboxOverlay.FadeOut(fade_duration);
+            if (letterboxing)
+                letterboxOverlay.FadeOut(fade_duration);
+
+            remainingTimeCounter.FadeOut(fade_duration);
+        }
+
+        private class RemainingTimeCounter : Container
+        {
+            private readonly OsuSpriteText counter;
+
+            private int? previousSecond;
+
+            private double remainingTime;
+
+            private bool isCounting;
+
+            public RemainingTimeCounter()
+            {
+                AutoSizeAxes = Axes.Both;
+                Alpha = 0;
+                Child = counter = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    TextSize = 35,
+                    Font = "Venera",
+                };
+            }
+
+            public void StartCounting(double remainingTime)
+            {
+                this.remainingTime = remainingTime;
+                isCounting = true;
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (isCounting)
+                {
+                    var currentTime = Clock.CurrentTime;
+                    if (currentTime < remainingTime)
+                    {
+                        int currentSecond = (int)Math.Floor((remainingTime - Clock.CurrentTime) / 1000.0) + 1;
+                        if (currentSecond != previousSecond)
+                        {
+                            counter.Text = currentSecond.ToString();
+                            previousSecond = currentSecond;
+                        }
+                    }
+                    else isCounting = false;
+                }
+            }
         }
     }
 }
