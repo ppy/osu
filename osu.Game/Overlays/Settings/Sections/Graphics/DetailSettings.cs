@@ -3,7 +3,6 @@
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
 
-
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class DetailSettings : SettingsSubsection
