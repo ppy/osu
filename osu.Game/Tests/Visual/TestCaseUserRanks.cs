@@ -8,28 +8,28 @@ using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Sections;
+using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
 using System;
 using System.Collections.Generic;
 
-namespace osu.Desktop.Tests.Visual
+namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseUserRanks : TestCase
+    internal class TestCaseUserRanks : OsuTestCase
     {
         public override string Description => "showing your latest achievements";
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
+        public override IReadOnlyList<Type> RequiredTypes => new Type[] { typeof(DrawableScore), typeof(RanksSection) };
 
+        public TestCaseUserRanks()
+        {
             RanksSection ranks;
 
             Add(new Container
             {
-                AutoSizeAxes = Axes.Y,
-                RelativeSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
                     new Box
@@ -37,64 +37,15 @@ namespace osu.Desktop.Tests.Visual
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(0.2f)
                     },
-                    ranks = new RanksSection(),
-                }
-            });
-
-            AddStep("Add Best Performances", () =>
-            {
-                List<Score> scores = new List<Score>();
-                Mod[] availableMods = { new OsuModHidden(), new OsuModFlashlight(), new OsuModHardRock(), new OsuModDoubleTime(), new OsuModPerfect() };
-                List<Mod> selectedMods = new List<Mod>(availableMods);
-                for (int i = 0; i <= availableMods.Length; i++)
-                {
-                    scores.Add(new Score
+                    new ScrollContainer
                     {
-                        Rank = (ScoreRank) Enum.GetValues(typeof(ScoreRank)).GetValue(Enum.GetValues(typeof(ScoreRank)).Length - 1 - i),
-                        Accuracy = Math.Pow(0.99, i),
-                        PP = Math.Pow(0.5, i) * 800,
-                        Date = DateTimeOffset.UtcNow.AddDays(-Math.Pow(i, 2)),
-                        Mods = selectedMods.ToArray(),
-                        Beatmap = new BeatmapInfo
-                        {
-                            Metadata = new BeatmapMetadata
-                            {
-                                Title = "Highscore",
-                                Artist = "Panda Eyes & Teminite"
-                            },
-                            Version = "Game Over",
-                            OnlineBeatmapID = 736215,
-                        }
-                    });
-                    if(i < availableMods.Length)
-                        selectedMods.Remove(availableMods[i]);
-                }
-                ranks.ScoresBest = scores.ToArray();
-            });
-
-            AddStep("Add First Place", () => ranks.ScoresFirst = new[]
-            {
-                new Score
-                {
-                    Rank = ScoreRank.A,
-                    Accuracy = 0.735,
-                    PP = 666,
-                    Date = DateTimeOffset.UtcNow,
-                    Mods = new Mod[] { new ModAutoplay(), new ModDoubleTime(), new OsuModEasy() },
-                    Beatmap = new BeatmapInfo
-                    {
-                        Metadata = new BeatmapMetadata
-                        {
-                            Title = "FREEDOM DiVE",
-                            Artist = "xi"
-                        },
-                        Version = "FOUR DIMENSIONS",
-                        OnlineBeatmapID = 129891,
-                    }
+                        RelativeSizeAxes = Axes.Both,
+                        Child = ranks = new RanksSection(),
+                    },
                 }
             });
 
-            AddStep("Show More", ((RanksSection.ScoreFlowContainer)ranks.Children[1]).ShowMore);
+            AddStep("Show cookiezi", () => ranks.User = new User { Id = 124493 });
         }
     }
 }
