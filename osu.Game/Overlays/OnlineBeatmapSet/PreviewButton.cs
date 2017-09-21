@@ -76,11 +76,14 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                     {
                         OnLoadComplete = d =>
                         {
-                            loading = false;
+                            if (d is AudioLoadWrapper)
+                            {
+                                loading = false;
 
-                            preview = (d as AudioLoadWrapper).Preview;
-                            Playing = Playing;
-                            updatePlayingState();
+                                preview = ((AudioLoadWrapper)d).Preview;
+                                Playing = Playing;
+                                updatePlayingState();
+                            }
                         },
                     });
 
