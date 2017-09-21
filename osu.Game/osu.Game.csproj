@@ -275,9 +275,10 @@
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\ArrowsOverlay.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\BlurredIcon.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\BreakOverlay.cs" />
-    <Compile Include="Screens\Play\BreaksOverlay\GlowingIcon.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\GlowIcon.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\InfoContainer.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\LetterboxOverlay.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\RemainingTimeCounter.cs" />

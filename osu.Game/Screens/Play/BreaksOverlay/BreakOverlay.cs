@@ -15,9 +15,6 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
         private const float remaining_time_container_max_size = 0.35f;
         private const int vertical_margin = 25;
-        private const float glowing_x_offset = 0.13f;
-        private const float glowing_x_final = 0.22f;
-        private const float blurred_x_offset = 0.2f;
 
         public List<BreakPeriod> Breaks;
 
@@ -26,12 +23,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private readonly Container remainingTimeBox;
         private readonly RemainingTimeCounter remainingTimeCounter;
         private readonly InfoContainer info;
-
-        private readonly GlowingIcon leftGlowingIcon;
-        private readonly GlowingIcon rightGlowingIcon;
-
-        private readonly BlurredIcon leftBlurredIcon;
-        private readonly BlurredIcon rightBlurredIcon;
+        private readonly ArrowsOverlay arrowsOverlay;
 
         public BreakOverlay(bool letterboxing)
         {
@@ -67,31 +59,10 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                     Origin = Anchor.TopCentre,
                     Margin = new MarginPadding { Top = vertical_margin },
                 },
-                leftGlowingIcon = new GlowingIcon
+                arrowsOverlay = new ArrowsOverlay
                 {
-                    Origin = Anchor.CentreRight,
-                    Icon = Graphics.FontAwesome.fa_chevron_left,
-                    Size = new Vector2(60),
-                    X = 1 + glowing_x_offset,
-                },
-                rightGlowingIcon = new GlowingIcon
-                {
-                    Origin = Anchor.CentreLeft,
-                    Icon = Graphics.FontAwesome.fa_chevron_right,
-                    Size = new Vector2(60),
-                    X = -glowing_x_offset,
-                },
-                leftBlurredIcon = new BlurredIcon
-                {
-                    Origin = Anchor.CentreRight,
-                    Icon = Graphics.FontAwesome.fa_chevron_left,
-                    X = 1 + blurred_x_offset,
-                },
-                rightBlurredIcon = new BlurredIcon
-                {
-                    Origin = Anchor.CentreLeft,
-                    Icon = Graphics.FontAwesome.fa_chevron_right,
-                    X = -blurred_x_offset,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                 }
             };
         }
@@ -136,12 +107,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             remainingTimeCounter.FadeIn(fade_duration);
 
             info.FadeIn(fade_duration);
-
-            leftGlowingIcon.MoveToX(1 - glowing_x_final, fade_duration, Easing.OutQuint);
-            rightGlowingIcon.MoveToX(glowing_x_final, fade_duration, Easing.OutQuint);
-
-            leftBlurredIcon.MoveToX(1, fade_duration, Easing.OutQuint);
-            rightBlurredIcon.MoveToX(0, fade_duration, Easing.OutQuint);
+            arrowsOverlay.Show(fade_duration);
         }
 
         private void onBreakOut()
@@ -151,12 +117,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
             remainingTimeCounter.FadeOut(fade_duration);
             info.FadeOut(fade_duration);
-
-            leftGlowingIcon.MoveToX(1 + glowing_x_offset, fade_duration, Easing.OutQuint);
-            rightGlowingIcon.MoveToX(-glowing_x_offset, fade_duration, Easing.OutQuint);
-
-            leftBlurredIcon.MoveToX(1 + blurred_x_offset, fade_duration, Easing.OutQuint);
-            rightBlurredIcon.MoveToX(-blurred_x_offset, fade_duration, Easing.OutQuint);
+            arrowsOverlay.Hide(fade_duration);
         }
     }
 }

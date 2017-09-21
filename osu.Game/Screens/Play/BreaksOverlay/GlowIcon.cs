@@ -1,42 +1,40 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using OpenTK;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
-    public class GlowingIcon : Container
+    public class GlowIcon : Container
     {
-        private readonly SpriteIcon icon;
-        private readonly SpriteIcon glow;
-        private readonly BufferedContainer glowContainer;
+        private const int blur_sigma = 5;
 
-        public FontAwesome Icon
-        {
-            set { icon.Icon = glow.Icon = value; }
-            get { return icon.Icon; }
-        }
+        private readonly SpriteIcon spriteIcon;
+        private readonly SpriteIcon glowIcon;
+        private readonly BufferedContainer glowContainer;
 
         public override Vector2 Size
         {
             set
             {
-                glow.Size = icon.Size = value;
-                glowContainer.Size = value * 1.5f;
+                spriteIcon.Size = glowIcon.Size = value;
+                glowContainer.Size = value + new Vector2(blur_sigma * 2);
             }
-            get
-            {
-                return glow.Size;
-            }
+            get { return spriteIcon.Size; }
         }
 
-        public GlowingIcon()
+        public FontAwesome Icon
         {
-            Anchor = Anchor.CentreLeft;
+            set { spriteIcon.Icon = glowIcon.Icon = value; }
+            get { return spriteIcon.Icon; }
+        }
+
+        public GlowIcon()
+        {
             RelativePositionAxes = Axes.X;
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
@@ -45,17 +43,17 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Masking = true,
-                    BlurSigma = new Vector2(10),
+                    BlurSigma = new Vector2(blur_sigma),
                     CacheDrawnFrameBuffer = true,
-                    Child = glow = new SpriteIcon
+                    Child = glowIcon = new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Shadow = false,
                     },
+
                 },
-                icon = new SpriteIcon
+                spriteIcon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -67,7 +65,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            glow.Colour = colours.Blue;
+            glowIcon.Colour = colours.BlueLight;
         }
     }
 }
