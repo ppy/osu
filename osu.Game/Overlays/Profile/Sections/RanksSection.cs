@@ -8,15 +8,14 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Scoring;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -28,9 +27,6 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private readonly ScoreContainer best, first;
 
-        private APIAccess api;
-        private RulesetStore rulesets;
-
         public RanksSection()
         {
             Children = new Drawable[]
@@ -38,13 +34,6 @@ namespace osu.Game.Overlays.Profile.Sections
                 best = new ScoreContainer(ScoreType.Best, "Best Performance", true),
                 first = new ScoreContainer(ScoreType.Firsts, "First Place Ranks"),
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api, RulesetStore rulesets)
-        {
-            this.api = api;
-            this.rulesets = rulesets;
         }
 
         public override User User
@@ -69,7 +58,7 @@ namespace osu.Game.Overlays.Profile.Sections
             private readonly OsuHoverContainer showMoreButton;
             private readonly LoadingAnimation showMoreLoading;
 
-            private ScoreType type;
+            private readonly ScoreType type;
             private int visiblePages;
             private User user;
             private readonly bool includeWeigth;
@@ -166,7 +155,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     if (scores.Any())
                     {
                         missing.Hide();
-                        foreach (Score score in scores)
+                        foreach (OnlineScore score in scores)
                             scoreContainer.Add(new DrawableScore(score, includeWeigth ? Math.Pow(0.95, scoreContainer.Count) : -1)
                             {
                                 RelativeSizeAxes = Axes.X,
