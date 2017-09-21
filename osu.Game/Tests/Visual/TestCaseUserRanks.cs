@@ -4,13 +4,9 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Overlays.Profile.Sections.Ranks;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using System;
 using System.Collections.Generic;
@@ -21,7 +17,7 @@ namespace osu.Game.Tests.Visual
     {
         public override string Description => "showing your latest achievements";
 
-        public override IReadOnlyList<Type> RequiredTypes => new Type[] { typeof(DrawableScore), typeof(RanksSection) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(DrawableScore), typeof(RanksSection) };
 
         public TestCaseUserRanks()
         {
