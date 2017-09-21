@@ -21,7 +21,6 @@ namespace osu.Game.Graphics.Cursor
         protected override Drawable CreateCursor() => new Cursor();
 
         private Bindable<bool> cursorRotate;
-
         private bool dragging;
 
         private bool startRotation;
@@ -43,10 +42,8 @@ namespace osu.Game.Graphics.Cursor
 
                     // Always rotate in the direction of least distance
                     float diff = (degrees - ActiveCursor.Rotation) % 360;
-                    if (diff < -180)
-                        diff += 360;
-                    if (diff > 180)
-                        diff -= 360;
+                    if (diff < -180) diff += 360;
+                    if (diff > 180) diff -= 360;
                     degrees = ActiveCursor.Rotation + diff;
 
                     ActiveCursor.RotateTo(degrees, 600, Easing.OutQuint);
@@ -116,7 +113,6 @@ namespace osu.Game.Graphics.Cursor
         {
             private Container cursorContainer;
             private Bindable<double> cursorScale;
-
             private const float base_scale = 0.15f;
 
             public Sprite AdditiveLayer;
