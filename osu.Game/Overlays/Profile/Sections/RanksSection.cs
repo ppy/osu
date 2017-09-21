@@ -6,7 +6,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Profile.Sections.Ranks;
-using osu.Game.Rulesets.Scoring;
 using System;
 using System.Linq;
 using osu.Game.Online.API;
