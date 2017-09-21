@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
 using System.Collections.Generic;
 
@@ -21,15 +20,6 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private const float blurred_x_offset = 0.2f;
 
         public List<BreakPeriod> Breaks;
-
-        public override IFrameBasedClock Clock
-        {
-            set
-            {
-                base.Clock = remainingTimeCounter.Clock = value;
-            }
-            get { return base.Clock; }
-        }
 
         private readonly bool letterboxing;
         private readonly LetterboxOverlay letterboxOverlay;
