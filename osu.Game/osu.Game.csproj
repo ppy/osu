@@ -298,7 +298,6 @@
     <Compile Include="Graphics\Containers\OsuFocusedOverlayContainer.cs" />
     <Compile Include="Graphics\Containers\OsuHoverContainer.cs" />
     <Compile Include="Graphics\Containers\OsuScrollContainer.cs" />
-    <Compile Include="Graphics\Containers\SectionsContainer.cs" />
     <Compile Include="Graphics\Containers\OsuTextFlowContainer.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
     <Compile Include="Graphics\Containers\ReverseChildIDFillFlowContainer.cs" />
@@ -318,7 +317,6 @@
     <Compile Include="Graphics\UserInterface\DialogButton.cs" />
     <Compile Include="Graphics\UserInterface\FocusedTextBox.cs" />
     <Compile Include="Graphics\UserInterface\IconButton.cs" />
-    <Compile Include="Graphics\UserInterface\ProgressBar.cs" />
     <Compile Include="Graphics\UserInterface\LineGraph.cs" />
     <Compile Include="Graphics\UserInterface\LoadingAnimation.cs" />
     <Compile Include="Graphics\UserInterface\MenuItemType.cs" />

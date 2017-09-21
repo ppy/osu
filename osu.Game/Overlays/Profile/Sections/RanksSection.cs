@@ -15,6 +15,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using osu.Game.Graphics.UserInterface;
+using OpenTK;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -24,8 +26,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         public override string Identifier => "top_ranks";
 
-        private readonly ScoreFlowContainer best, first;
-        private readonly OsuSpriteText bestMissing, firstMissing;
+        private readonly ScoreContainer best, first;
 
         private APIAccess api;
         private RulesetStore rulesets;
@@ -34,40 +35,8 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new Drawable[]
             {
-                new OsuSpriteText
-                {
-                    TextSize = 15,
-                    Text = "Best Performance",
-                    Font = "Exo2.0-RegularItalic",
-                    Margin = new MarginPadding { Top = 10, Bottom = 10 },
-                },
-                best = new ScoreFlowContainer
-                {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                },
-                bestMissing = new OsuSpriteText
-                {
-                    TextSize = 14,
-                    Text = "No awesome performance records yet. :(",
-                },
-                new OsuSpriteText
-                {
-                    TextSize = 15,
-                    Text = "First Place Ranks",
-                    Font = "Exo2.0-RegularItalic",
-                    Margin = new MarginPadding { Top = 20, Bottom = 10 },
-                },
-                first = new ScoreFlowContainer
-                {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                },
-                firstMissing = new OsuSpriteText
-                {
-                    TextSize = 14,
-                    Text = "No awesome performance records yet. :(",
-                },
+                best = new ScoreContainer(ScoreType.Best, "Best Performance", true),
+                first = new ScoreContainer(ScoreType.Firsts, "First Place Ranks"),
             };
         }
 
@@ -88,119 +57,67 @@ namespace osu.Game.Overlays.Profile.Sections
             set
             {
                 base.User = value;
-
-                // fetch online ranks
-                foreach (ScoreType m in new[] { ScoreType.Best, ScoreType.Firsts })
-                {
-                    ScoreType thisType = m;
-                    var req = new GetUserScoresRequest(User.Id, m);
-                    req.Success += scores =>
-                    {
-                        foreach (var s in scores)
-                            s.ApplyRuleset(rulesets.GetRuleset(s.OnlineRulesetID));
-
-                        switch (thisType)
-                        {
-                            case ScoreType.Best:
-                                ScoresBest = scores;
-                                break;
-                            case ScoreType.Firsts:
-                                ScoresFirst = scores;
-                                break;
-                        }
-                    };
-
-                    Schedule(() => { api.Queue(req); });
-                }
+                best.User = value;
+                first.User = value;
             }
         }
 
-
-        public IEnumerable<Score> ScoresBest
+        private class ScoreContainer : FillFlowContainer
         {
-            set
+            private readonly FillFlowContainer<DrawableScore> scoreContainer;
+            private readonly OsuSpriteText missing;
+            private readonly OsuHoverContainer showMoreButton;
+            private readonly LoadingAnimation showMoreLoading;
+
+            private ScoreType type;
+            private int visiblePages;
+            private User user;
+            private readonly bool includeWeigth;
+
+            private RulesetStore rulesets;
+            private APIAccess api;
+
+            public User User
             {
-                best.Clear();
-                if (!value.Any())
+                set
                 {
-                    bestMissing.Show();
+                    user = value;
+                    visiblePages = 0;
+                    scoreContainer.Clear();
+                    showMoreButton.Hide();
+                    missing.Show();
+                    showMore();
                 }
-                else
-                {
-                    bestMissing.Hide();
-                    int i = 0;
-                    foreach (Score score in value)
-                    {
-                        best.Add(new DrawableScore(score, Math.Pow(0.95, i))
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 60,
-                            Alpha = 0,
-                        });
-                        i++;
-                    }
-                }
-                best.ShowMore();
             }
-        }
 
-        public IEnumerable<Score> ScoresFirst
-        {
-            set
+            public ScoreContainer(ScoreType type, string header, bool includeWeigth = false)
             {
-                first.Clear();
-                if (!value.Any())
-                {
-                    firstMissing.Show();
-                }
-                else
-                {
-                    firstMissing.Hide();
-                    foreach (Score score in value)
-                        first.Add(new DrawableScore(score)
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 60,
-                            Alpha = 0,
-                        });
-                }
-                first.ShowMore();
-            }
-        }
+                this.type = type;
+                this.includeWeigth = includeWeigth;
 
-        public class ScoreFlowContainer : Container<DrawableScore>
-        {
-            private FillFlowContainer<DrawableScore> scores;
-            private OsuClickableContainer showMoreText;
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Direction = FillDirection.Vertical;
 
-            protected override Container<DrawableScore> Content => scores;
-
-            protected override void LoadComplete()
-            {
-                InternalChild = new FillFlowContainer
+                Children = new Drawable[]
                 {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    new OsuSpriteText
                     {
-                        scores = new FillFlowContainer<DrawableScore>
-                        {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                            Direction = FillDirection.Vertical,
-                        },
+                        TextSize = 15,
+                        Text = header,
+                        Font = "Exo2.0-RegularItalic",
+                        Margin = new MarginPadding { Top = 10, Bottom = 10 },
                     },
-                };
-            }
-
-            public override void Clear(bool disposeChildren)
-            {
-                base.Clear(disposeChildren);
-                if (showMoreText == null)
-                    ((FillFlowContainer)InternalChild).Add(showMoreText = new OsuHoverContainer
+                    scoreContainer = new FillFlowContainer<DrawableScore>
                     {
-                        Action = ShowMore,
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Direction = FillDirection.Vertical,
+                    },
+                    showMoreButton = new OsuHoverContainer
+                    {
+                        Alpha = 0,
+                        Action = showMore,
                         AutoSizeAxes = Axes.Both,
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
@@ -209,12 +126,57 @@ namespace osu.Game.Overlays.Profile.Sections
                             TextSize = 14,
                             Text = "show more",
                         }
-                    });
-                else
-                    showMoreText.Show();
+                    },
+                    showMoreLoading = new LoadingAnimation
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Size = new Vector2(14),
+                    },
+                    missing = new OsuSpriteText
+                    {
+                        TextSize = 14,
+                        Text = "No awesome performance records yet. :(",
+                    },
+                };
             }
 
-            public void ShowMore() => showMoreText.Alpha = Children.Where(d => !d.IsPresent).Where((d, i) => (d.Alpha = i < 5 ? 1 : 0) == 0).Any() ? 1 : 0;
+            [BackgroundDependencyLoader]
+            private void load(APIAccess api, RulesetStore rulesets)
+            {
+                this.api = api;
+                this.rulesets = rulesets;
+            }
+
+            private void showMore()
+            {
+                var req = new GetUserScoresRequest(user.Id, type, visiblePages++ * 5);
+
+                showMoreLoading.Show();
+                showMoreButton.Hide();
+
+                req.Success += scores =>
+                {
+                    foreach (var s in scores)
+                        s.ApplyRuleset(rulesets.GetRuleset(s.OnlineRulesetID));
+
+                    showMoreButton.FadeTo(scores.Count == 5 ? 1 : 0);
+                    showMoreLoading.Hide();
+
+                    if (scores.Any())
+                    {
+                        missing.Hide();
+                        foreach (Score score in scores)
+                            scoreContainer.Add(new DrawableScore(score, includeWeigth ? Math.Pow(0.95, scoreContainer.Count) : -1)
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Height = 60,
+                            });
+                    }
+                };
+
+                Schedule(() => { api.Queue(req); });
+            }
         }
     }
 }

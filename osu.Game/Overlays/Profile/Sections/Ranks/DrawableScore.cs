@@ -17,6 +17,7 @@ using osu.Framework.Localisation;
 using System.Globalization;
 using osu.Game.Rulesets.Scoring;
 using osu.Framework.Graphics.Cursor;
+using System;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -81,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         {
             stats.Add(new OsuSpriteText
             {
-                Text = $"{score.PP ?? 0}pp",
+                Text = $"{Math.Round(score.PP ?? 0)}pp",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 TextSize = 18,
@@ -91,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             {
                 stats.Add(new OsuSpriteText
                 {
-                    Text = $"weighted: {(int)(score?.PP * weight ?? 0)}pp ({weight.ToString("0%", CultureInfo.CurrentCulture)})",
+                    Text = $"weighted: {Math.Round(score.PP * weight ?? 0)}pp ({weight.ToString("0%", CultureInfo.CurrentCulture)})",
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,

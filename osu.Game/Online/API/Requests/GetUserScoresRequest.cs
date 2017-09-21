@@ -9,14 +9,16 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly long userId;
         private readonly ScoreType type;
+        private readonly int offset;
 
-        public GetUserScoresRequest(long userId, ScoreType type)
+        public GetUserScoresRequest(long userId, ScoreType type, int offset = 0)
         {
             this.userId = userId;
             this.type = type;
+            this.offset = offset;
         }
 
-        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLower()}";
+        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLower()}?offset={offset}";
     }
 
     public enum ScoreType
