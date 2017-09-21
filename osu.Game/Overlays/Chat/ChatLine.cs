@@ -62,6 +62,7 @@ namespace osu.Game.Overlays.Chat
         public const float LEFT_PADDING = message_padding + padding * 2;
 
         private const float padding = 15;
+        private const float padding_action = 5;
         private const float message_padding = 200;
         private const float text_size = 20;
 
@@ -183,7 +184,7 @@ namespace osu.Game.Overlays.Chat
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = message_padding + padding },
+                    Padding = new MarginPadding { Left = message_padding + (message.IsAction ? padding_action : padding) },
                     Children = new Drawable[]
                     {
                         contentFlow = new OsuTextFlowContainer(t => { t.TextSize = text_size; })
@@ -194,6 +195,8 @@ namespace osu.Game.Overlays.Chat
                     }
                 }
             };
+            if (message.IsAction)
+                contentFlow.Colour = senderHasBackground ? OsuColour.FromHex(message.Sender.Colour) : username_colours[message.Sender.Id % username_colours.Length];
 
             updateMessageContent();
             FinishTransforms(true);
@@ -205,7 +208,7 @@ namespace osu.Game.Overlays.Chat
             timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
 
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
-            username.Text = $@"{message.Sender.Username}" + (senderHasBackground ? "" : ":");
+            username.Text = (message.IsAction ? "*" : "") + $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
             contentFlow.Text = message.Content;
         }
 
