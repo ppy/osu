@@ -10,9 +10,9 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 {
     public class BlurredIcon : BufferedContainer
     {
-        private const int icon_size = 130;
+        private const int blur_sigma = 20;
 
-        private readonly GlowingIcon icon;
+        private readonly GlowIcon icon;
 
         public FontAwesome Icon
         {
@@ -20,20 +20,26 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             get { return icon.Icon; }
         }
 
+        public override Vector2 Size
+        {
+            set
+            {
+                icon.Size = value;
+                base.Size = value + new Vector2(blur_sigma * 2);
+            }
+            get { return icon.Size; }
+        }
+
         public BlurredIcon()
         {
-            Anchor = Anchor.CentreLeft;
             RelativePositionAxes = Axes.X;
-            Size = new Vector2(icon_size * 1.7f);
-            Masking = true;
-            BlurSigma = new Vector2(20);
+            BlurSigma = new Vector2(blur_sigma);
             Alpha = 0.6f;
             CacheDrawnFrameBuffer = true;
-            Child = icon = new GlowingIcon
+            Child = icon = new GlowIcon
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Size = new Vector2(icon_size),
             };
         }
     }
