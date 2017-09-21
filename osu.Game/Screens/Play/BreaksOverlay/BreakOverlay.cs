@@ -114,20 +114,20 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
         public void InitializeBreaks()
         {
-            if (Breaks != null)
-            {
-                foreach (var b in Breaks)
-                {
-                    if (b.HasEffect)
-                    {
-                        using (BeginAbsoluteSequence(b.StartTime, true))
-                        {
-                            onBreakIn(b);
+            if (Breaks == null)
+                return;
 
-                            using (BeginDelayedSequence(b.Duration, true))
-                                onBreakOut();
-                        }
-                    }
+            foreach (var b in Breaks)
+            {
+                if (!b.HasEffect)
+                    continue;
+
+                using (BeginAbsoluteSequence(b.StartTime, true))
+                {
+                    onBreakIn(b);
+
+                    using (BeginDelayedSequence(b.Duration, true))
+                        onBreakOut();
                 }
             }
         }
