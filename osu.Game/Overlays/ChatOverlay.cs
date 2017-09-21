@@ -465,7 +465,7 @@ namespace osu.Game.Overlays
 
             textbox.Text = string.Empty;
 
-            if (string.IsNullOrEmpty(postText))
+            if (string.IsNullOrWhiteSpace(postText))
                 return;
 
             var target = currentChannel;
@@ -478,11 +478,35 @@ namespace osu.Game.Overlays
                 return;
             }
 
+            bool isAction = false;
+
             if (postText[0] == '/')
             {
-                // TODO: handle commands
-                target.AddNewMessages(new ErrorMessage("Chat commands are not supported yet!"));
-                return;
+                postText = postText.Substring(1);
+                string commandKeyword = postText.Split(' ')[0];
+
+                switch (commandKeyword)
+                {
+                    case "me":
+
+                        if (!postText.StartsWith("me ") || string.IsNullOrWhiteSpace(postText.Substring(3)))
+                        {
+                            currentChannel.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
+                            return;
+                        }
+
+                        isAction = true;
+                        postText = postText.Substring(3);
+                        break;
+
+                    case "help":
+                        currentChannel.AddNewMessages(new ErrorMessage("Supported commands: /help, /me [action]"));
+                        return;
+
+                    default:
+                        currentChannel.AddNewMessages(new ErrorMessage($@"""/{commandKeyword}"" is not supported! For a list of supported commands see /help"));
+                        return;
+                }
             }
 
             var message = new LocalEchoMessage
@@ -491,6 +515,7 @@ namespace osu.Game.Overlays
                 Timestamp = DateTimeOffset.Now,
                 TargetType = TargetType.Channel, //TODO: read this from channel
                 TargetId = target.Id,
+                IsAction = isAction,
                 Content = postText
             };
 
