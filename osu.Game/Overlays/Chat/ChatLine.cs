@@ -62,8 +62,8 @@ namespace osu.Game.Overlays.Chat
         public const float LEFT_PADDING = message_padding + padding * 2;
 
         private const float padding = 15;
-        private const float padding_action = 5;
         private const float message_padding = 200;
+        private const float action_padding = 3;
         private const float text_size = 20;
 
         private Color4 customUsernameColour;
@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Chat
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = message_padding + (message.IsAction ? padding_action : padding) },
+                    Padding = new MarginPadding { Left = message_padding + padding },
                     Children = new Drawable[]
                     {
                         contentFlow = new OsuTextFlowContainer(t => { t.TextSize = text_size; })
@@ -208,8 +208,14 @@ namespace osu.Game.Overlays.Chat
             timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
 
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
-            username.Text = (message.IsAction ? "*" : "") + $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
-            contentFlow.Text = message.Content;
+            username.Text = $@"{message.Sender.Username}" + (senderHasBackground ? "" : ":");
+
+            contentFlow.Clear();
+            if (message.IsAction)
+                contentFlow.AddText("[", sprite => sprite.Padding = new MarginPadding { Right = action_padding });
+            contentFlow.AddText(message.Content, sprite => sprite.Font = @"Exo2.0-MediumItalic" );
+            if (message.IsAction)
+                contentFlow.AddText("]", sprite => sprite.Padding = new MarginPadding { Left = action_padding });
         }
 
         private class MessageSender : ClickableContainer, IHasContextMenu
