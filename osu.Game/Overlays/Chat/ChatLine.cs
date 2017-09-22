@@ -195,8 +195,8 @@ namespace osu.Game.Overlays.Chat
                     }
                 }
             };
-            if (message.IsAction)
-                contentFlow.Colour = senderHasBackground ? OsuColour.FromHex(message.Sender.Colour) : username_colours[message.Sender.Id % username_colours.Length];
+            if (message.IsAction && senderHasBackground)
+                contentFlow.Colour = OsuColour.FromHex(message.Sender.Colour);
 
             updateMessageContent();
             FinishTransforms(true);
