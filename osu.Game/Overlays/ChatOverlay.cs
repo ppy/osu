@@ -482,21 +482,22 @@ namespace osu.Game.Overlays
 
             if (postText[0] == '/')
             {
-                string unhandeledParameters = postText.Substring(1);
-                string commandKeyword = cutFirstParameter(ref unhandeledParameters);
+                string[] parameters = postText.Substring(1).Split(new[] { ' ' }, 2);
+                string command = parameters[0];
+                string content = parameters.Length == 2 ? parameters[1] : string.Empty;
 
-                switch (commandKeyword)
+                switch (command)
                 {
                     case "me":
 
-                        if (string.IsNullOrWhiteSpace(unhandeledParameters))
+                        if (string.IsNullOrWhiteSpace(content))
                         {
                             currentChannel.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
                             return;
                         }
 
                         isAction = true;
-                        postText = unhandeledParameters;
+                        postText = content;
                         break;
 
                     case "help":
@@ -504,7 +505,7 @@ namespace osu.Game.Overlays
                         return;
 
                     default:
-                        currentChannel.AddNewMessages(new ErrorMessage($@"""/{commandKeyword}"" is not supported! For a list of supported commands see /help"));
+                        currentChannel.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
                         return;
                 }
             }
@@ -526,13 +527,6 @@ namespace osu.Game.Overlays
             req.Success += m => target.ReplaceMessage(message, m);
 
             api.Queue(req);
-        }
-
-        private string cutFirstParameter(ref string parameters)
-        {
-            string result = parameters.Split(' ')[0];
-            parameters = result.Length == parameters.Length ? "" : parameters.Substring(result.Length + 1);
-            return result;
         }
 
         private void transformChatHeightTo(double newChatHeight, double duration = 0, Easing easing = Easing.None)
