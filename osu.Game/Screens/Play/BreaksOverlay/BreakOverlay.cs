@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 {
                     onBreakIn(b);
 
-                    using (BeginDelayedSequence(b.Duration, true))
+                    using (BeginDelayedSequence(b.Duration - fade_duration, true))
                         onBreakOut();
                 }
             }
