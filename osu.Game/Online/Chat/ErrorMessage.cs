@@ -6,20 +6,11 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
-    public class ErrorMessage : Message
+    public class ErrorMessage : InfoMessage
     {
-        private static int errorId = -1;
-
-        public ErrorMessage(string message) : base(errorId--)
+        public ErrorMessage(string message) : base(message)
         {
-            Timestamp = DateTimeOffset.Now;
-            Content = message;
-
-            Sender = new User
-            {
-                Username = @"system",
-                Colour = @"ff0000",
-            };
+            Sender.Colour = @"ff0000";
         }
     }
 }
