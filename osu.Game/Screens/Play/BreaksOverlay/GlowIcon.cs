@@ -11,25 +11,29 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 {
     public class GlowIcon : Container
     {
-        private const int blur_sigma = 5;
-
         private readonly SpriteIcon spriteIcon;
-        private readonly SpriteIcon glowIcon;
-        private readonly BufferedContainer glowContainer;
+        private readonly BlurredIcon blurredIcon;
 
         public override Vector2 Size
         {
             set
             {
-                spriteIcon.Size = glowIcon.Size = value;
-                glowContainer.Size = value + new Vector2(blur_sigma * 2);
+                blurredIcon.Size = value;
+                spriteIcon.Size = value - new Vector2(10); //Make it a bit smaller to make blur more visible
+                blurredIcon.ForceRedraw();
             }
-            get { return spriteIcon.Size; }
+            get { return base.Size; }
+        }
+
+        public Vector2 BlurSigma
+        {
+            set { blurredIcon.BlurSigma = value; }
+            get { return blurredIcon.BlurSigma; }
         }
 
         public FontAwesome Icon
         {
-            set { spriteIcon.Icon = glowIcon.Icon = value; }
+            set { spriteIcon.Icon = blurredIcon.Icon = value; }
             get { return spriteIcon.Icon; }
         }
 
@@ -39,19 +43,10 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             AutoSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
-                glowContainer = new BufferedContainer
+                blurredIcon = new BlurredIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    BlurSigma = new Vector2(blur_sigma),
-                    CacheDrawnFrameBuffer = true,
-                    Child = glowIcon = new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Shadow = false,
-                    },
-
                 },
                 spriteIcon = new SpriteIcon
                 {
@@ -65,7 +60,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            glowIcon.Colour = colours.BlueLight;
+            blurredIcon.Colour = colours.Blue;
         }
     }
 }

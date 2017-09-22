@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
     public class BreakOverlay : Container
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
-        private const float remaining_time_container_max_size = 0.35f;
+        private const float remaining_time_container_max_size = 0.3f;
         private const int vertical_margin = 25;
 
         public List<BreakPeriod> Breaks;
