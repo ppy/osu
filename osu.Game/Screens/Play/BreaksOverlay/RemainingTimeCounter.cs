@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 var currentTime = Clock.CurrentTime;
                 if (currentTime < remainingTime)
                 {
-                    int currentSecond = (int)Math.Floor((remainingTime - Clock.CurrentTime) / 1000.0) + 1;
+                    int currentSecond = (int)Math.Floor((remainingTime - Clock.CurrentTime) / 1000.0);
                     if (currentSecond != previousSecond)
                     {
                         counter.Text = currentSecond.ToString();
