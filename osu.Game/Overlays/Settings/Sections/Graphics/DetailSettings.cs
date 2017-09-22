@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
-
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
@@ -14,12 +12,17 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            Children = new Drawable[]
+            Children = new[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Storyboards",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Rotate cursor when dragging",
+                    Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
             };
         }

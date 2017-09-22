@@ -55,6 +55,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowFpsDisplay, false);
 
             Set(OsuSetting.ShowStoryboard, true);
+            Set(OsuSetting.CursorRotation, true);
 
             Set(OsuSetting.MenuParallax, true);
 
@@ -99,6 +100,7 @@ namespace osu.Game.Configuration
         AudioOffset,
         MenuMusic,
         MenuVoice,
+        CursorRotation,
         MenuParallax,
         BeatmapDetailTab,
         Username,
