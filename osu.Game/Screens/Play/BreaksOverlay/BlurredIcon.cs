@@ -33,7 +33,6 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         public BlurredIcon()
         {
             RelativePositionAxes = Axes.X;
-            Alpha = 0.7f;
             CacheDrawnFrameBuffer = true;
             Child = icon = new SpriteIcon
             {

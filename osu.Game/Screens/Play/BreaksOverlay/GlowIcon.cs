@@ -18,8 +18,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         {
             set
             {
-                blurredIcon.Size = value;
-                spriteIcon.Size = value - new Vector2(10); //Make it a bit smaller to make blur more visible
+                blurredIcon.Size = spriteIcon.Size = value;
                 blurredIcon.ForceRedraw();
             }
             get { return base.Size; }
