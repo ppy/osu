@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using System.Collections.Generic;
 using System;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.UI;
 
@@ -24,7 +23,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             yield return new Fruit
             {
                 StartTime = obj.StartTime,
-                Position = ((IHasXPosition)obj).X / OsuPlayfield.BASE_SIZE.X
+                NewCombo = (obj as IHasCombo)?.NewCombo ?? false,
+                X = ((IHasXPosition)obj).X / OsuPlayfield.BASE_SIZE.X
             };
         }
     }
