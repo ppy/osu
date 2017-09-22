@@ -5,14 +5,13 @@ using OpenTK;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
     public class BlurredIcon : BufferedContainer
     {
-        private const int blur_sigma = 20;
-
-        private readonly GlowIcon icon;
+        private readonly SpriteIcon icon;
 
         public FontAwesome Icon
         {
@@ -25,22 +24,29 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             set
             {
                 icon.Size = value;
-                base.Size = value + new Vector2(blur_sigma * 2);
+                base.Size = value + BlurSigma * 2.5f;
+                ForceRedraw();
             }
-            get { return icon.Size; }
+            get { return base.Size; }
         }
 
         public BlurredIcon()
         {
             RelativePositionAxes = Axes.X;
-            BlurSigma = new Vector2(blur_sigma);
-            Alpha = 0.6f;
+            Alpha = 0.7f;
             CacheDrawnFrameBuffer = true;
-            Child = icon = new GlowIcon
+            Child = icon = new SpriteIcon
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
+                Shadow = false,
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            Colour = colours.BlueLighter;
         }
     }
 }
