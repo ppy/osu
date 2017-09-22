@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.IO.File;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace osu.Game.Beatmaps.IO
             // no-op
         }
 
-        public override IEnumerable<string> Filenames => Directory.GetFiles(path).Select(Path.GetFileName).ToArray();
+        public override IEnumerable<string> Filenames => Directory.GetFiles(path, "*", SearchOption.AllDirectories).Select(f => FileSafety.GetRelativePath(f, path)).ToArray();
 
         public override Stream GetUnderlyingStream() => null;
     }
