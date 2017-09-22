@@ -4,6 +4,7 @@
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using OpenTK;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
@@ -48,24 +49,31 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                     BlurSigma = new Vector2(glow_icon_blur_sigma),
                     Size = new Vector2(glow_icon_size),
                 },
-                leftBlurredIcon = new BlurredIcon
+                new ParallaxContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreRight,
-                    X = - blurred_icon_offscreen_offset,
-                    Icon = Graphics.FontAwesome.fa_chevron_right,
-                    BlurSigma = new Vector2(blurred_icon_blur_sigma),
-                    Size = new Vector2(blurred_icon_size),
-                },
-                rightBlurredIcon = new BlurredIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreLeft,
-                    X = blurred_icon_offscreen_offset,
-                    Icon = Graphics.FontAwesome.fa_chevron_left,
-                    BlurSigma = new Vector2(blurred_icon_blur_sigma),
-                    Size = new Vector2(blurred_icon_size),
-                },
+                    ParallaxAmount = -0.02f,
+                    Children = new Drawable[]
+                    {
+                        leftBlurredIcon = new BlurredIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreRight,
+                            X = - blurred_icon_offscreen_offset,
+                            Icon = Graphics.FontAwesome.fa_chevron_right,
+                            BlurSigma = new Vector2(blurred_icon_blur_sigma),
+                            Size = new Vector2(blurred_icon_size),
+                        },
+                        rightBlurredIcon = new BlurredIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreLeft,
+                            X = blurred_icon_offscreen_offset,
+                            Icon = Graphics.FontAwesome.fa_chevron_left,
+                            BlurSigma = new Vector2(blurred_icon_blur_sigma),
+                            Size = new Vector2(blurred_icon_size),
+                        },
+                    }
+                }
             };
         }
 
