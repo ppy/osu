@@ -213,7 +213,11 @@ namespace osu.Game.Overlays.Chat
             contentFlow.Clear();
             if (message.IsAction)
                 contentFlow.AddText("[", sprite => sprite.Padding = new MarginPadding { Right = action_padding });
-            contentFlow.AddText(message.Content, sprite => sprite.Font = @"Exo2.0-MediumItalic" );
+            contentFlow.AddText(message.Content, sprite =>
+            {
+                if (message.IsAction)
+                    sprite.Font = @"Exo2.0-MediumItalic";
+            });
             if (message.IsAction)
                 contentFlow.AddText("]", sprite => sprite.Padding = new MarginPadding { Left = action_padding });
         }
