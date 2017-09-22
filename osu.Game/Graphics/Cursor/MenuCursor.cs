@@ -20,13 +20,14 @@ namespace osu.Game.Graphics.Cursor
     {
         protected override Drawable CreateCursor() => new Cursor();
 
+        private Bindable<bool> cursorRotate;
         private bool dragging;
 
         private bool startRotation;
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (dragging)
+            if (cursorRotate && dragging)
             {
                 Debug.Assert(state.Mouse.PositionMouseDown != null);
 
@@ -100,6 +101,12 @@ namespace osu.Game.Graphics.Cursor
         {
             ActiveCursor.FadeTo(0, 900, Easing.OutQuint);
             ActiveCursor.ScaleTo(0, 500, Easing.In);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
         }
 
         public class Cursor : Container
