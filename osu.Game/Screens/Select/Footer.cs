@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
@@ -57,6 +58,31 @@ namespace osu.Game.Screens.Select
             HoverLost = updateModeLight,
             Action = action,
         });
+
+        private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
+
+        /// <param name="text">Text on the button.</param>
+        /// <param name="colour">Colour of the button.</param>
+        /// <param name="hotkey">Hotkey of the button.</param>
+        /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
+        /// <param name="depth">
+        /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
+        /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
+        /// </param>
+        public void AddButton(string text, Color4 colour, OverlayContainer overlay, Key? hotkey = null, float depth = 0)
+        {
+            overlays.Add(overlay);
+            AddButton(text, colour, () =>
+            {
+                foreach (var o in overlays)
+                {
+                    if (o == overlay)
+                        overlay.ToggleVisibility();
+                    else
+                        overlay.Hide();
+                }
+            }, hotkey, depth);
+        }
 
         private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, Easing.OutQuint);
 
