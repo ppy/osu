@@ -10,9 +10,9 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 {
     public class ArrowsOverlay : Container
     {
-        private const int glow_icon_size = 65;
-        private const int glow_icon_blur_sigma = 8;
-        private const float glow_icon_final_offset = 0.2f;
+        private const int glow_icon_size = 60;
+        private const int glow_icon_blur_sigma = 10;
+        private const float glow_icon_final_offset = 0.22f;
         private const float glow_icon_offscreen_offset = 0.6f;
 
         private const int blurred_icon_blur_sigma = 20;
@@ -58,6 +58,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.CentreRight,
+                            Alpha = 0.7f,
                             X = - blurred_icon_offscreen_offset,
                             Icon = Graphics.FontAwesome.fa_chevron_right,
                             BlurSigma = new Vector2(blurred_icon_blur_sigma),
@@ -67,6 +68,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.CentreLeft,
+                            Alpha = 0.7f,
                             X = blurred_icon_offscreen_offset,
                             Icon = Graphics.FontAwesome.fa_chevron_left,
                             BlurSigma = new Vector2(blurred_icon_blur_sigma),
