@@ -210,16 +210,16 @@ namespace osu.Game.Overlays.Chat
             timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
             username.Text = $@"{message.Sender.Username}" + (senderHasBackground ? "" : ":");
 
-            contentFlow.Clear();
             if (message.IsAction)
-                contentFlow.AddText("[", sprite => sprite.Padding = new MarginPadding { Right = action_padding });
-            contentFlow.AddText(message.Content, sprite =>
             {
-                if (message.IsAction)
-                    sprite.Font = @"Exo2.0-MediumItalic";
-            });
-            if (message.IsAction)
+                contentFlow.Clear();
+                contentFlow.AddText("[", sprite => sprite.Padding = new MarginPadding { Right = action_padding });
+                contentFlow.AddText(message.Content, sprite => sprite.Font = @"Exo2.0-MediumItalic");
                 contentFlow.AddText("]", sprite => sprite.Padding = new MarginPadding { Left = action_padding });
+            }
+            else
+                contentFlow.Text = message.Content;
+
         }
 
         private class MessageSender : ClickableContainer, IHasContextMenu
