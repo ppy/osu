@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableFruit : DrawableScrollingHitObject<CatchBaseHit>
     {
-        private const float pulp_size = 30;
+        private const float pulp_size = 20;
 
         private class Pulp : Circle, IHasAccentColour
         {
@@ -26,15 +26,26 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             {
                 Size = new Vector2(pulp_size);
 
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Radius = 5,
-                    Colour = AccentColour.Opacity(0.5f),
-                };
+                Blending = BlendingMode.Additive;
+                Colour = Color4.White.Opacity(0.9f);
             }
 
-            public Color4 AccentColour { get; set; } = Color4.White;
+            private Color4 accentColour;
+            public Color4 AccentColour
+            {
+                get { return accentColour; }
+                set
+                {
+                    accentColour = value;
+
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Type = EdgeEffectType.Glow,
+                        Radius = 5,
+                        Colour = accentColour.Lighten(100),
+                    };
+                }
+            }
         }
 
 
@@ -42,12 +53,14 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             : base(h)
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(pulp_size * 2, pulp_size * 2.6f);
+            Size = new Vector2(pulp_size * 2.2f, pulp_size * 2.8f);
 
             RelativePositionAxes = Axes.Both;
-            X = h.Position;
+            X = h.X;
 
-            Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1);
+            AccentColour = HitObject.ComboColour;
+
+            Masking = false;
 
             Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
         }
@@ -71,6 +84,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             RelativePositionAxes = Axes.Both,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
+                            AccentColour = AccentColour,
                             Scale = new Vector2(0.6f),
                         },
                         new Pulp
@@ -78,6 +92,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             RelativePositionAxes = Axes.Both,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
+                            AccentColour = AccentColour,
                             Y = -0.08f
                         },
                         new Pulp
@@ -85,6 +100,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             RelativePositionAxes = Axes.Both,
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
+                            AccentColour = AccentColour,
                             Y = -0.08f
                         },
                         new Pulp
@@ -92,6 +108,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                             RelativePositionAxes = Axes.Both,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
+                            AccentColour = AccentColour,
                         },
                     }
                 }
