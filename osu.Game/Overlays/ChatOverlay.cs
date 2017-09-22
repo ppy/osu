@@ -482,25 +482,25 @@ namespace osu.Game.Overlays
 
             if (postText[0] == '/')
             {
-                postText = postText.Substring(1);
-                string commandKeyword = postText.Split(' ')[0];
+                string unhandeledParameters = postText.Substring(1);
+                string commandKeyword = cutFirstParameter(ref unhandeledParameters);
 
                 switch (commandKeyword)
                 {
                     case "me":
 
-                        if (!postText.StartsWith("me ") || string.IsNullOrWhiteSpace(postText.Substring(3)))
+                        if (string.IsNullOrWhiteSpace(unhandeledParameters))
                         {
                             currentChannel.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
                             return;
                         }
 
                         isAction = true;
-                        postText = postText.Substring(3);
+                        postText = unhandeledParameters;
                         break;
 
                     case "help":
-                        currentChannel.AddNewMessages(new ErrorMessage("Supported commands: /help, /me [action]"));
+                        currentChannel.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
                         return;
 
                     default:
@@ -526,6 +526,13 @@ namespace osu.Game.Overlays
             req.Success += m => target.ReplaceMessage(message, m);
 
             api.Queue(req);
+        }
+
+        private string cutFirstParameter(ref string parameters)
+        {
+            string result = parameters.Split(' ')[0];
+            parameters = result.Length == parameters.Length ? "" : parameters.Substring(result.Length + 1);
+            return result;
         }
 
         private void transformChatHeightTo(double newChatHeight, double duration = 0, Easing easing = Easing.None)
