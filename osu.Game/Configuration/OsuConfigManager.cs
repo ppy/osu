@@ -54,6 +54,8 @@ namespace osu.Game.Configuration
             // Graphics
             Set(OsuSetting.ShowFpsDisplay, false);
 
+            Set(OsuSetting.CursorRotation, true);
+
             Set(OsuSetting.MenuParallax, true);
 
             Set(OsuSetting.SnakingInSliders, true);
@@ -96,6 +98,7 @@ namespace osu.Game.Configuration
         AudioOffset,
         MenuMusic,
         MenuVoice,
+        CursorRotation,
         MenuParallax,
         BeatmapDetailTab,
         Username,
