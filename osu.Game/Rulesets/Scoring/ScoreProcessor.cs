@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Scoring
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
         }
 
-        private ScoreRank rankFrom(double acc)
+        public static ScoreRank RankFrom(double acc)
         {
             if (acc == 1)
                 return ScoreRank.X;
@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Scoring
             score.Combo = Combo;
             score.MaxCombo = HighestCombo;
             score.Accuracy = Accuracy;
-            score.Rank = rankFrom(Accuracy);
+            score.Rank = RankFrom(Accuracy);
             score.Date = DateTimeOffset.Now;
             score.Health = Health;
         }

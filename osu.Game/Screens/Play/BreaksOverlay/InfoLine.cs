@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
@@ -73,5 +74,14 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         }
 
         protected override string Format(double count) => $@"{count:P2}";
+    }
+
+    public class GradeInfoLine : InfoLine<double>
+    {
+        public GradeInfoLine(string name, string prefix = "") : base(name, prefix)
+        {
+        }
+
+        protected override string Format(double count) => $@"{ScoreProcessor.RankFrom(count)}";
     }
 }
