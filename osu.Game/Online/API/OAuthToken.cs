@@ -4,7 +4,6 @@
 using System;
 using System.Globalization;
 using Newtonsoft.Json;
-using osu.Framework.Extensions;
 
 namespace osu.Game.Online.API
 {
