@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
@@ -13,7 +12,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
     {
         public PercentageInfoLine AccuracyDisplay;
         public InfoLine<int> RankDisplay;
-        public InfoLine<ScoreRank> GradeDisplay;
+        public GradeInfoLine GradeDisplay;
 
         public InfoContainer()
         {
@@ -41,7 +40,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                     {
                         AccuracyDisplay = new PercentageInfoLine(@"Accuracy"),
                         RankDisplay = new InfoLine<int>(@"Rank", @"#"),
-                        GradeDisplay = new InfoLine<ScoreRank>(@"Grade"),
+                        GradeDisplay = new GradeInfoLine(@"Grade"),
                     },
                 }
             };
