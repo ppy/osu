@@ -70,13 +70,11 @@ namespace osu.Game.Online.API
 
         protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
 
-        private double remainingTime => Math.Max(0, Timeout - (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - (startTime ?? 0)));
+        private double remainingTime => Math.Max(0, Timeout - (DateTimeOffset.UtcNow - (startTime ?? DateTimeOffset.MinValue)).TotalMilliseconds);
 
         public bool ExceededTimeout => remainingTime == 0;
 
-        private double? startTime;
-
-        public double StartTime => startTime ?? -1;
+        private DateTimeOffset? startTime;
 
         protected APIAccess API;
         protected WebRequest WebRequest;
@@ -96,7 +94,7 @@ namespace osu.Game.Online.API
                 return;
 
             if (startTime == null)
-                startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                startTime = DateTimeOffset.UtcNow;
 
             if (remainingTime <= 0)
                 throw new TimeoutException(@"API request timeout hit");
