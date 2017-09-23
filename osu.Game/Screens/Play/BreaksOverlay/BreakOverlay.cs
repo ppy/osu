@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Scoring;
 using System.Collections.Generic;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
@@ -118,6 +119,11 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             remainingTimeCounter.FadeOut(fade_duration);
             info.FadeOut(fade_duration);
             arrowsOverlay.Hide(fade_duration);
+        }
+
+        public void BindProcessor(ScoreProcessor processor)
+        {
+            info.AccuracyDisplay.Current.BindTo(processor.Accuracy);
         }
     }
 }
