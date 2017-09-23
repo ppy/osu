@@ -77,9 +77,9 @@ namespace osu.Game.Screens.Select
                 foreach (var o in overlays)
                 {
                     if (o == overlay)
-                        overlay.ToggleVisibility();
+                        o.ToggleVisibility();
                     else
-                        overlay.Hide();
+                        o.Hide();
                 }
             }, hotkey, depth);
         }
