@@ -54,7 +54,12 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
         private void currentValueChanged(T newValue)
         {
-            valueText.Text = prefix + Format(newValue);
+            var newText = prefix + Format(newValue);
+
+            if (valueText.Text == newText)
+                return;
+
+            valueText.Text = newText;
         }
 
         protected virtual string Format(T count) => count.ToString();
