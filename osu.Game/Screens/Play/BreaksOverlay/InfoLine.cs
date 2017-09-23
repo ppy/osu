@@ -74,16 +74,4 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
         protected override string Format(double count) => $@"{count:P2}";
     }
-
-    public enum Grade
-    {
-        SSplus,
-        SS,
-        Splus,
-        S,
-        A,
-        B,
-        C,
-        F
-    }
 }
