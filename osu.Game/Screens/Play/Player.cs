@@ -67,6 +67,7 @@ namespace osu.Game.Screens.Play
 
         #endregion
 
+        private BreakOverlay breakOverlay;
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
 
@@ -173,7 +174,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks)
+                        breakOverlay = new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -210,6 +211,8 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
             hudOverlay.ModDisplay.Current.BindTo(working.Mods);
+
+            breakOverlay.BindProcessor(scoreProcessor);
 
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
