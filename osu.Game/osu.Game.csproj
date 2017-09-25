@@ -372,6 +372,7 @@
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
+    <Compile Include="Online\Chat\InfoMessage.cs" />
     <Compile Include="Online\Chat\LocalEchoMessage.cs" />
     <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="Online\Multiplayer\GameType.cs" />

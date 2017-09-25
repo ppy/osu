@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Extensions;
 using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API
@@ -70,13 +69,11 @@ namespace osu.Game.Online.API
 
         protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
 
-        private double remainingTime => Math.Max(0, Timeout - (DateTime.Now.TotalMilliseconds() - (startTime ?? 0)));
+        private double remainingTime => Math.Max(0, Timeout - (DateTimeOffset.UtcNow - (startTime ?? DateTimeOffset.MinValue)).TotalMilliseconds);
 
         public bool ExceededTimeout => remainingTime == 0;
 
-        private double? startTime;
-
-        public double StartTime => startTime ?? -1;
+        private DateTimeOffset? startTime;
 
         protected APIAccess API;
         protected WebRequest WebRequest;
@@ -96,7 +93,7 @@ namespace osu.Game.Online.API
                 return;
 
             if (startTime == null)
-                startTime = DateTime.Now.TotalMilliseconds();
+                startTime = DateTimeOffset.UtcNow;
 
             if (remainingTime <= 0)
                 throw new TimeoutException(@"API request timeout hit");
