@@ -3,8 +3,6 @@
 
 using System;
 using System.Linq;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -18,8 +16,10 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Overlays.OnlineBeatmapSet
+namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapPicker : Container
     {

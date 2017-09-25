@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,8 +11,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Overlays.OnlineBeatmapSet
+namespace osu.Game.Overlays.BeatmapSet
 {
     public class Header : Container
     {
@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Top = 20, Bottom = 30, Horizontal = OnlineBeatmapSetOverlay.X_PADDING },
+                            Padding = new MarginPadding { Top = 20, Bottom = 30, Horizontal = BeatmapSetOverlay.X_PADDING },
                             Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
-                            Margin = new MarginPadding { Right = OnlineBeatmapSetOverlay.X_PADDING },
+                            Margin = new MarginPadding { Right = BeatmapSetOverlay.X_PADDING },
                         },
                     },
                 },

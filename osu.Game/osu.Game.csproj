@@ -774,19 +774,19 @@
     <Compile Include="Users\UserPanel.cs" />
     <Compile Include="Users\UserStatistics.cs" />
     <Compile Include="Users\UserStatus.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSetOverlay.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\Info.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\Header.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\AuthorInfo.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\BeatmapPicker.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\HeaderButton.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\Details.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\FavouriteButton.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\DownloadButton.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\BasicStats.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\SuccessRate.cs" />
-    <Compile Include="Overlays\OnlineBeatmapSet\PreviewButton.cs" />
-    <Compile Include="Tests\Visual\TestCaseOnlineBeatmapSetOverlay.cs" />
+    <Compile Include="Overlays\BeatmapSetOverlay.cs" />
+    <Compile Include="Overlays\BeatmapSet\Info.cs" />
+    <Compile Include="Overlays\BeatmapSet\Header.cs" />
+    <Compile Include="Overlays\BeatmapSet\AuthorInfo.cs" />
+    <Compile Include="Overlays\BeatmapSet\BeatmapPicker.cs" />
+    <Compile Include="Overlays\BeatmapSet\HeaderButton.cs" />
+    <Compile Include="Overlays\BeatmapSet\Details.cs" />
+    <Compile Include="Overlays\BeatmapSet\FavouriteButton.cs" />
+    <Compile Include="Overlays\BeatmapSet\DownloadButton.cs" />
+    <Compile Include="Overlays\BeatmapSet\BasicStats.cs" />
+    <Compile Include="Overlays\BeatmapSet\SuccessRate.cs" />
+    <Compile Include="Overlays\BeatmapSet\PreviewButton.cs" />
+    <Compile Include="Tests\Visual\TestCaseBeatmapSetOverlay.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="lazer.ico" />
