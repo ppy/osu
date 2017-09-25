@@ -10,7 +10,7 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly BeatmapInfo beatmap;
 
-        private string lookupString => beatmap.OnlineBeatmapID > 0 ? beatmap.OnlineBeatmapID.ToString() : $@"lookup?checksum={beatmap.Hash}&filename={beatmap.Path}";
+        private string lookupString => beatmap.OnlineBeatmapID > 0 ? beatmap.OnlineBeatmapID.ToString() : $@"lookup?checksum={beatmap.Hash}&filename={System.Uri.EscapeUriString(beatmap.Path)}";
 
         public GetBeatmapDetailsRequest(BeatmapInfo beatmap)
         {
