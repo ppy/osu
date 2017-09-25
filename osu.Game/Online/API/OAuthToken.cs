@@ -4,7 +4,6 @@
 using System;
 using System.Globalization;
 using Newtonsoft.Json;
-using osu.Framework.Extensions;
 
 namespace osu.Game.Online.API
 {
@@ -22,12 +21,12 @@ namespace osu.Game.Online.API
         {
             get
             {
-                return AccessTokenExpiry - DateTime.Now.ToUnixTimestamp();
+                return AccessTokenExpiry - DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             }
 
             set
             {
-                AccessTokenExpiry = DateTime.Now.AddSeconds(value).ToUnixTimestamp();
+                AccessTokenExpiry = DateTimeOffset.Now.AddSeconds(value).ToUnixTimeSeconds();
             }
         }
 
