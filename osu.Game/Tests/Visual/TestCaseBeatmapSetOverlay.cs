@@ -12,15 +12,15 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseOnlineBeatmapSetOverlay : OsuTestCase
+    internal class TestCaseBeatmapSetOverlay : OsuTestCase
     {
         public override string Description => @"view online beatmap sets";
 
-        private readonly OnlineBeatmapSetOverlay overlay;
+        private readonly BeatmapSetOverlay overlay;
 
-        public TestCaseOnlineBeatmapSetOverlay()
+        public TestCaseBeatmapSetOverlay()
         {
-            Add(overlay = new OnlineBeatmapSetOverlay());
+            Add(overlay = new BeatmapSetOverlay());
         }
 
         [BackgroundDependencyLoader]

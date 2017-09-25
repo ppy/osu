@@ -8,7 +8,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 
-namespace osu.Game.Overlays.OnlineBeatmapSet
+namespace osu.Game.Overlays.BeatmapSet
 {
     public class HeaderButton : OsuClickableContainer
     {

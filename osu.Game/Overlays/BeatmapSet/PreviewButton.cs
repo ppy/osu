@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -15,8 +13,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Overlays.OnlineBeatmapSet
+namespace osu.Game.Overlays.BeatmapSet
 {
     public class PreviewButton : OsuClickableContainer
     {

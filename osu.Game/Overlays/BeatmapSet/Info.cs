@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -11,8 +9,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Overlays.OnlineBeatmapSet
+namespace osu.Game.Overlays.BeatmapSet
 {
     public class Info : Container
     {
@@ -67,13 +67,13 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 15, Horizontal = OnlineBeatmapSetOverlay.X_PADDING },
+                    Padding = new MarginPadding { Top = 15, Horizontal = BeatmapSetOverlay.X_PADDING },
                     Children = new Drawable[]
                     {
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = metadata_width + OnlineBeatmapSetOverlay.RIGHT_WIDTH + spacing * 2 },
+                            Padding = new MarginPadding { Right = metadata_width + BeatmapSetOverlay.RIGHT_WIDTH + spacing * 2 },
                             Child = new ScrollContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                             Width = metadata_width,
                             ScrollbarVisible = false,
                             Padding = new MarginPadding { Horizontal = 10 },
-                            Margin = new MarginPadding { Right = OnlineBeatmapSetOverlay.RIGHT_WIDTH + spacing },
+                            Margin = new MarginPadding { Right = BeatmapSetOverlay.RIGHT_WIDTH + spacing },
                             Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.Y,
-                            Width = OnlineBeatmapSetOverlay.RIGHT_WIDTH,
+                            Width = BeatmapSetOverlay.RIGHT_WIDTH,
                             Children = new Drawable[]
                             {
                                 successRateBackground = new Box

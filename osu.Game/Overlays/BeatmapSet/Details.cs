@@ -1,16 +1,16 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Select.Details;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Overlays.OnlineBeatmapSet
+namespace osu.Game.Overlays.BeatmapSet
 {
     public class Details : FillFlowContainer
     {
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.OnlineBeatmapSet
 
         public Details()
         {
-            Width = OnlineBeatmapSetOverlay.RIGHT_WIDTH;
+            Width = BeatmapSetOverlay.RIGHT_WIDTH;
             AutoSizeAxes = Axes.Y;
             Spacing = new Vector2(1f);
 

@@ -10,11 +10,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Overlays.OnlineBeatmapSet;
+using osu.Game.Overlays.BeatmapSet;
 
 namespace osu.Game.Overlays
 {
-    public class OnlineBeatmapSetOverlay : WaveOverlayContainer
+    public class BeatmapSetOverlay : WaveOverlayContainer
     {
         public const float X_PADDING = 40;
         public const float RIGHT_WIDTH = 275;
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays
         private readonly Header header;
         private readonly Info info;
 
-        public OnlineBeatmapSetOverlay()
+        public BeatmapSetOverlay()
         {
             FirstWaveColour = OsuColour.Gray(0.4f);
             SecondWaveColour = OsuColour.Gray(0.3f);
