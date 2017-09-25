@@ -82,6 +82,13 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
+        private SQLiteConnection createConnection()
+        {
+            var conn = Host.Storage.GetDatabase(@"client");
+            conn.BusyTimeout = new TimeSpan(TimeSpan.TicksPerSecond * 10);
+            return conn;
+        }
+
         private SQLiteConnection connection;
 
         [BackgroundDependencyLoader]
@@ -90,8 +97,7 @@ namespace osu.Game
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            connection = Host.Storage.GetDatabase(@"client");
-
+            connection = createConnection();
             connection.CreateTable<StoreVersion>();
 
             dependencies.Cache(API = new APIAccess
