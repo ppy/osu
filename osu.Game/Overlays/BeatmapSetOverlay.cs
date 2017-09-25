@@ -86,7 +86,6 @@ namespace osu.Game.Overlays
         public void ShowBeatmapSet(BeatmapSetInfo set)
         {
             header.BeatmapSet = info.BeatmapSet = set;
-
             Show();
         }
     }
