@@ -82,7 +82,21 @@ namespace osu.Game.Beatmaps
         public string StoredBookmarks
         {
             get { return string.Join(",", Bookmarks); }
-            set { Bookmarks = value?.Split(',').Select(v => int.Parse(v.Trim())).ToArray() ?? new int[0]; }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    Bookmarks = new int[0];
+                    return;
+                }
+
+                Bookmarks = value.Split(',').Select(v =>
+                {
+                    int val;
+                    bool result = int.TryParse(v, out val);
+                    return new { result, val };
+                }).Where(p => p.result).Select(p => p.val).ToArray();
+            }
         }
 
         [Ignore]
