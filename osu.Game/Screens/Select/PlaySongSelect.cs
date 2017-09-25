@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Footer.AddButton(@"mods", colours.Yellow, modSelect.ToggleVisibility, Key.F1, float.MaxValue);
+            Footer.AddButton(@"mods", colours.Yellow, modSelect, Key.F1, float.MaxValue);
 
             BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
             BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, null, Key.Number2);
