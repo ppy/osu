@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -81,6 +82,12 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
             FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            State = Visibility.Hidden;
+            return true;
         }
 
         public void ShowBeatmapSet(BeatmapSetInfo set)
