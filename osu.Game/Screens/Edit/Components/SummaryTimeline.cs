@@ -96,6 +96,7 @@ namespace osu.Game.Screens.Edit.Components
                             new BookmarkTimeline
                             {
                                 Anchor = Anchor.Centre,
+                                Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.35f
                             },
