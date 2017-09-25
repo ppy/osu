@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Beatmaps;
 using osu.Game.Storyboards.Drawables;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,21 @@ namespace osu.Game.Storyboards
 
             return layer;
         }
+
+        /// <summary>
+        /// Whether the beatmap's background should be hidden while this storyboard is being displayed.
+        /// </summary>
+        public bool ReplacesBackground(BeatmapInfo beatmapInfo)
+        {
+            var backgroundPath = beatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
+            if (backgroundPath == null)
+                return false;
+
+            return GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
+        }
+
+        public float AspectRatio(BeatmapInfo beatmapInfo)
+            => beatmapInfo.WidescreenStoryboard ? 16 / 9f : 4 / 3f;
 
         public DrawableStoryboard CreateDrawable()
             => new DrawableStoryboard(this);

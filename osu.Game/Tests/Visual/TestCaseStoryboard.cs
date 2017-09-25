@@ -83,7 +83,9 @@ namespace osu.Game.Tests.Visual
 
             storyboard = working.Beatmap.Storyboard.CreateDrawable();
             storyboard.Passing = false;
-            if (!working.Beatmap.StoryboardReplacesBackground)
+
+            var beatmap = working.Beatmap;
+            if (!beatmap.Storyboard.ReplacesBackground(beatmap.BeatmapInfo))
                 storyboard.BackgroundTexture = working.Background;
 
             storyboardContainer.Add(storyboard);

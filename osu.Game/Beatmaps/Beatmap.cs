@@ -47,21 +47,6 @@ namespace osu.Game.Beatmaps
         public Storyboard Storyboard = new Storyboard();
 
         /// <summary>
-        /// Whether this beatmap's background should be hidden while its storyboard is being displayed.
-        /// </summary>
-        public bool StoryboardReplacesBackground
-        {
-            get
-            {
-                var backgroundPath = BeatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
-                if (backgroundPath == null)
-                    return false;
-
-                return Storyboard.GetLayer("Background").Elements.Any(e => e.Path.ToLowerInvariant() == backgroundPath);
-            }
-        }
-
-        /// <summary>
         /// Constructs a new beatmap.
         /// </summary>
         /// <param name="original">The original beatmap to use the parameters of.</param>

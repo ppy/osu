@@ -75,7 +75,6 @@ namespace osu.Game.Beatmaps
 
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
-        public float StoryboardAspect => WidescreenStoryboard ? 16 / 9f : 4 / 3f;
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
