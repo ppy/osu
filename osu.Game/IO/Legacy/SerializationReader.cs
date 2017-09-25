@@ -49,7 +49,7 @@ namespace osu.Game.IO.Legacy
             int len = ReadInt32();
             if (len > 0) return ReadBytes(len);
             if (len < 0) return null;
-            return new byte[0];
+            return Array.Empty<byte>();
         }
 
         /// <summary> Reads a char array from the buffer, handling nulls and the array length. </summary>
@@ -58,7 +58,7 @@ namespace osu.Game.IO.Legacy
             int len = ReadInt32();
             if (len > 0) return ReadChars(len);
             if (len < 0) return null;
-            return new char[0];
+            return Array.Empty<char>();
         }
 
         /// <summary> Reads a DateTime from the buffer. </summary>
