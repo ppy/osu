@@ -232,10 +232,10 @@ namespace osu.Game.Screens.Play
             var beatmap = Beatmap.Value.Beatmap;
 
             storyboard = beatmap.Storyboard.CreateDrawable();
-            storyboard.Width = storyboard.Height * beatmap.BeatmapInfo.StoryboardAspect;
+            storyboard.Width = storyboard.Height * beatmap.Storyboard.AspectRatio(beatmap.BeatmapInfo);
             storyboard.Masking = true;
 
-            if (!beatmap.StoryboardReplacesBackground)
+            if (!beatmap.Storyboard.ReplacesBackground(beatmap.BeatmapInfo))
                 storyboard.BackgroundTexture = Beatmap.Value.Background;
             storyboardContainer.Add(asyncLoad ? new AsyncLoadWrapper(storyboard) { RelativeSizeAxes = Axes.Both } : (Drawable)storyboard);
         }
