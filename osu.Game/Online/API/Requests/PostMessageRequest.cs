@@ -23,6 +23,7 @@ namespace osu.Game.Online.API.Requests
             req.Method = HttpMethod.POST;
             req.AddParameter(@"target_type", message.TargetType.GetDescription());
             req.AddParameter(@"target_id", message.TargetId.ToString());
+            req.AddParameter(@"is_action", message.IsAction.ToString().ToLower());
             req.AddParameter(@"message", message.Content);
 
             return req;
