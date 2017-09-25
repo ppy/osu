@@ -47,7 +47,17 @@ namespace osu.Game.Storyboards
         public float AspectRatio(BeatmapInfo beatmapInfo)
             => beatmapInfo.WidescreenStoryboard ? 16 / 9f : 4 / 3f;
 
-        public DrawableStoryboard CreateDrawable()
-            => new DrawableStoryboard(this);
+        public DrawableStoryboard CreateDrawable(WorkingBeatmap working = null)
+        {
+            var drawable = new DrawableStoryboard(this);
+            if (working != null)
+            {
+                var beatmapInfo = working.Beatmap.BeatmapInfo;
+                drawable.Width = drawable.Height * AspectRatio(beatmapInfo);
+                if (!ReplacesBackground(beatmapInfo))
+                    drawable.BackgroundTexture = working.Background;
+            }
+            return drawable;
+        }
     }
 }
