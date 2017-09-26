@@ -67,7 +67,6 @@
     <Compile Include="Objects\Drawables\Pieces\NumberPiece.cs" />
     <Compile Include="Objects\Drawables\DrawableSliderTick.cs" />
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\SliderBouncer.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerDisc.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerTicks.cs" />
     <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
