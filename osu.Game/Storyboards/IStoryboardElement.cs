@@ -8,6 +8,8 @@ namespace osu.Game.Storyboards
     public interface IStoryboardElement
     {
         string Path { get; }
+        bool IsDrawable { get; }
+
         Drawable CreateDrawable();
     }
 }
