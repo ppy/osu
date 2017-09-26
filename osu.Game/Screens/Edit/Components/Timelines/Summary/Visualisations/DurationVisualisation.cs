@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Shapes;
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations
 {
     /// <summary>
-    /// Represents a spanning point on a <see cref="Timeline"/>.
+    /// Represents a spanning point on a timeline part.
     /// </summary>
     internal class DurationVisualisation : Container
     {
