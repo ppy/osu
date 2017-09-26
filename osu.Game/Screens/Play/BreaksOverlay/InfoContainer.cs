@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = @"current progress".ToUpper(),
+                    Text = "current progress".ToUpper(),
                     TextSize = 15,
                     Font = "Exo2.0-Black",
                 },
@@ -38,9 +38,9 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        AccuracyDisplay = new PercentageInfoLine(@"Accuracy"),
-                        RankDisplay = new InfoLine<int>(@"Rank", @"#"),
-                        GradeDisplay = new GradeInfoLine(@"Grade"),
+                        AccuracyDisplay = new PercentageInfoLine("Accuracy"),
+                        RankDisplay = new InfoLine<int>("Rank", @"#"),
+                        GradeDisplay = new GradeInfoLine("Grade"),
                     },
                 }
             };
