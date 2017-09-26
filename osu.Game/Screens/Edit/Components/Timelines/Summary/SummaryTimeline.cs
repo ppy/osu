@@ -1,19 +1,11 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 
@@ -26,7 +18,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
     {
         private const float corner_radius = 5;
         private const float contents_padding = 15;
-        private const float marker_bar_width = 2;
 
         private readonly Drawable background;
 
@@ -101,7 +92,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, OsuColour colours)
+        private void load(OsuColour colours)
         {
             background.Colour = colours.Gray1;
             timelineBar.Colour = colours.Gray5;
