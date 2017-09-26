@@ -5,15 +5,10 @@ using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
 
-namespace osu.Game.Rulesets.Classic.Objects.Drawables
+namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderBouncer : DrawableOsuHitObject
     {
