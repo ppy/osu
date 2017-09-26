@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
-using osu.Game.Rulesets.Classic.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -132,12 +131,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
-                var ticksCount = ticks.Children.Count + 1;
-                var ticksHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit));
+                var judgementsCount = ticks.Children.Count + bouncers.Children.Count + 1;
+                var judgementsHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit)) + bouncers.Children.Count(t => t.Judgements.Any(j => j.IsHit));
                 if (initialCircle.Judgements.Any(j => j.IsHit))
-                    ticksHit++;
+                    judgementsHit++;
 
-                var hitFraction = (double)ticksHit / ticksCount;
+                var hitFraction = (double)judgementsHit / judgementsCount;
                 if (hitFraction == 1 && initialCircle.Judgements.Any(j => j.Result == HitResult.Great))
                     AddJudgement(new OsuJudgement { Result = HitResult.Great });
                 else if (hitFraction >= 0.5 && initialCircle.Judgements.Any(j => j.Result >= HitResult.Good))
