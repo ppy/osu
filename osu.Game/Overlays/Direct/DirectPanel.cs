@@ -38,6 +38,7 @@ namespace osu.Game.Overlays.Direct
         private ProgressBar progressBar;
         private BeatmapManager beatmaps;
         private NotificationOverlay notifications;
+        private BeatmapSetOverlay beatmapSetOverlay;
 
         public readonly Bindable<bool> PreviewPlaying = new Bindable<bool>();
         protected abstract PlayButton PlayButton { get; }
@@ -67,11 +68,12 @@ namespace osu.Game.Overlays.Direct
 
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api, BeatmapManager beatmaps, OsuColour colours, NotificationOverlay notifications)
+        private void load(APIAccess api, BeatmapManager beatmaps, OsuColour colours, NotificationOverlay notifications, BeatmapSetOverlay beatmapSetOverlay)
         {
             this.api = api;
             this.beatmaps = beatmaps;
             this.notifications = notifications;
+            this.beatmapSetOverlay = beatmapSetOverlay;
 
             AddInternal(content = new Container
             {
@@ -124,6 +126,14 @@ namespace osu.Game.Overlays.Direct
 
             base.OnHoverLost(state);
         }
+
+        protected override bool OnClick(InputState state)
+        {
+            ShowInformation();
+            return true;
+        }
+
+        protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
 
         protected void StartDownload()
         {
