@@ -47,6 +47,8 @@ namespace osu.Game
 
         private UserProfileOverlay userProfile;
 
+        private BeatmapSetOverlay beatmapSetOverlay;
+
         public virtual Storage GetStorageForStableInstall() => null;
 
         private Intro intro
@@ -187,6 +189,7 @@ namespace osu.Game
                 Depth = -1
             }, overlayContent.Add);
             LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
+            LoadComponentAsync(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -2 }, mainContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
                 Depth = -3,
@@ -223,6 +226,7 @@ namespace osu.Game
             dependencies.Cache(chat);
             dependencies.Cache(userProfile);
             dependencies.Cache(musicController);
+            dependencies.Cache(beatmapSetOverlay);
             dependencies.Cache(notificationOverlay);
             dependencies.Cache(dialogOverlay);
 
