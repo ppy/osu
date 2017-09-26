@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
@@ -17,8 +16,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     internal class MarkerPart : TimelinePart
     {
-        private WorkingBeatmap beatmap;
-
         private readonly Drawable marker;
 
         public MarkerPart()
@@ -30,11 +27,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         private void load(OsuColour colours)
         {
             marker.Colour = colours.Red;
-        }
-
-        protected override void LoadBeatmap(WorkingBeatmap beatmap)
-        {
-            this.beatmap = beatmap;
         }
 
         protected override bool OnDragStart(InputState state) => true;
@@ -57,16 +49,22 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         /// <param name="screenPosition">The position in screen coordinates.</param>
         private void seekToPosition(Vector2 screenPosition)
         {
+            if (Beatmap.Value == null)
+                return;
+
             float markerPos = MathHelper.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
-            seekTo(markerPos / DrawWidth * beatmap.Track.Length);
+            seekTo(markerPos / DrawWidth * Beatmap.Value.Track.Length);
         }
 
-        private void seekTo(double time) => beatmap.Track.Seek(time);
+        private void seekTo(double time) => Beatmap.Value?.Track.Seek(time);
 
         protected override void Update()
         {
             base.Update();
-            marker.X = (float)beatmap.Track.CurrentTime;
+
+            if (Beatmap.Value == null)
+                return;
+            marker.X = (float)Beatmap.Value.Track.CurrentTime;
         }
 
         private class MarkerVisualisation : CompositeDrawable
@@ -80,27 +78,27 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 AutoSizeAxes = Axes.X;
                 InternalChildren = new Drawable[]
                 {
-                        new Triangle
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.BottomCentre,
-                            Scale = new Vector2(1, -1),
-                            Size = new Vector2(10, 5),
-                        },
-                        new Triangle
-                        {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            Size = new Vector2(10, 5)
-                        },
-                        new Box
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Y,
-                            Width = 2,
-                            EdgeSmoothness = new Vector2(1, 0)
-                        }
+                    new Triangle
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.BottomCentre,
+                        Scale = new Vector2(1, -1),
+                        Size = new Vector2(10, 5),
+                    },
+                    new Triangle
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        Size = new Vector2(10, 5)
+                    },
+                    new Box
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 2,
+                        EdgeSmoothness = new Vector2(1, 0)
+                    }
                 };
             }
 
