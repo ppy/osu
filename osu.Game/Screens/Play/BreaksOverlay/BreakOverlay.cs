@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 .Then()
                 .ResizeWidthTo(0, b.Duration - fade_duration);
 
-            Scheduler.AddDelayed(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime);
+            Scheduler.AddDelayed(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime - Clock.CurrentTime);
             remainingTimeCounter.FadeIn(fade_duration);
 
             info.FadeIn(fade_duration);

@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
         private int? previousSecond;
 
-        private double remainingTime;
+        private double endTime;
 
         private bool isCounting;
 
@@ -31,9 +31,9 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             };
         }
 
-        public void StartCounting(double remainingTime)
+        public void StartCounting(double endTime)
         {
-            this.remainingTime = remainingTime;
+            this.endTime = endTime;
             isCounting = true;
         }
 
@@ -44,9 +44,9 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             if (isCounting)
             {
                 var currentTime = Clock.CurrentTime;
-                if (currentTime < remainingTime)
+                if (currentTime < endTime)
                 {
-                    int currentSecond = (int)Math.Floor((remainingTime - Clock.CurrentTime) / 1000.0);
+                    int currentSecond = (int)Math.Floor((endTime - Clock.CurrentTime) / 1000.0);
                     if (currentSecond != previousSecond)
                     {
                         counter.Text = currentSecond.ToString();

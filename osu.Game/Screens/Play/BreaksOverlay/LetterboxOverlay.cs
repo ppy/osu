@@ -11,9 +11,9 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 {
     public class LetterboxOverlay : Container
     {
-        private const int letterbox_height = 350;
+        private const int height = 350;
 
-        private Color4 transparentBlack => new Color4(0, 0, 0, 0);
+        private static readonly Color4 transparent_black = new Color4(0, 0, 0, 0);
 
         public LetterboxOverlay()
         {
@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     RelativeSizeAxes = Axes.X,
-                    Height = letterbox_height,
+                    Height = height,
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -34,8 +34,8 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                         {
                             TopLeft = Color4.Black,
                             TopRight = Color4.Black,
-                            BottomLeft = transparentBlack,
-                            BottomRight = transparentBlack,
+                            BottomLeft = transparent_black,
+                            BottomRight = transparent_black,
                         }
                     }
                 },
@@ -44,14 +44,14 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    Height = letterbox_height,
+                    Height = height,
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = new ColourInfo
                         {
-                            TopLeft = transparentBlack,
-                            TopRight = transparentBlack,
+                            TopLeft = transparent_black,
+                            TopRight = transparent_black,
                             BottomLeft = Color4.Black,
                             BottomRight = Color4.Black,
                         }

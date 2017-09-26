@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
-                    X = - glow_icon_offscreen_offset,
+                    X = -glow_icon_offscreen_offset,
                     Icon = Graphics.FontAwesome.fa_chevron_right,
                     BlurSigma = new Vector2(glow_icon_blur_sigma),
                     Size = new Vector2(glow_icon_size),
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                             Anchor = Anchor.Centre,
                             Origin = Anchor.CentreRight,
                             Alpha = 0.7f,
-                            X = - blurred_icon_offscreen_offset,
+                            X = -blurred_icon_offscreen_offset,
                             Icon = Graphics.FontAwesome.fa_chevron_right,
                             BlurSigma = new Vector2(blurred_icon_blur_sigma),
                             Size = new Vector2(blurred_icon_size),
