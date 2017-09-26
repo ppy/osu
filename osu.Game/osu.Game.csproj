@@ -398,6 +398,7 @@
     <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
     <Compile Include="Overlays\Direct\DirectListPanel.cs" />
     <Compile Include="Overlays\Direct\DirectPanel.cs" />
+    <Compile Include="Overlays\Direct\DownloadButton.cs" />
     <Compile Include="Overlays\Direct\FilterControl.cs" />
     <Compile Include="Overlays\Direct\Header.cs" />
     <Compile Include="Overlays\KeyBindingOverlay.cs" />
@@ -774,6 +775,19 @@
     <Compile Include="Users\UserPanel.cs" />
     <Compile Include="Users\UserStatistics.cs" />
     <Compile Include="Users\UserStatus.cs" />
+    <Compile Include="Overlays\BeatmapSetOverlay.cs" />
+    <Compile Include="Overlays\BeatmapSet\Info.cs" />
+    <Compile Include="Overlays\BeatmapSet\Header.cs" />
+    <Compile Include="Overlays\BeatmapSet\AuthorInfo.cs" />
+    <Compile Include="Overlays\BeatmapSet\BeatmapPicker.cs" />
+    <Compile Include="Overlays\BeatmapSet\HeaderButton.cs" />
+    <Compile Include="Overlays\BeatmapSet\Details.cs" />
+    <Compile Include="Overlays\BeatmapSet\FavouriteButton.cs" />
+    <Compile Include="Overlays\BeatmapSet\DownloadButton.cs" />
+    <Compile Include="Overlays\BeatmapSet\BasicStats.cs" />
+    <Compile Include="Overlays\BeatmapSet\SuccessRate.cs" />
+    <Compile Include="Overlays\BeatmapSet\PreviewButton.cs" />
+    <Compile Include="Tests\Visual\TestCaseBeatmapSetOverlay.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="lazer.ico" />
