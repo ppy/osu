@@ -3,7 +3,7 @@
 
 using System;
 using OpenTK;
-using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -15,29 +15,26 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     internal abstract class TimelinePart : CompositeDrawable
     {
+        public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
         private readonly Container timeline;
 
         protected TimelinePart()
         {
             AddInternal(timeline = new Container { RelativeSizeAxes = Axes.Both });
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
-        {
-            osuGame.Beatmap.ValueChanged += b =>
+            Beatmap.ValueChanged += b =>
             {
                 timeline.Clear();
                 timeline.RelativeChildSize = new Vector2((float)Math.Max(1, b.Track.Length), 1);
                 LoadBeatmap(b);
             };
-
-            timeline.RelativeChildSize = new Vector2((float)Math.Max(1, osuGame.Beatmap.Value.Track.Length), 1);
-            LoadBeatmap(osuGame.Beatmap);
         }
 
         protected void Add(Drawable visualisation) => timeline.Add(visualisation);
 
-        protected abstract void LoadBeatmap(WorkingBeatmap beatmap);
+        protected virtual void LoadBeatmap(WorkingBeatmap beatmap)
+        {
+        }
     }
 }

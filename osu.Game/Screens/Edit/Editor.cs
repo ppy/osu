@@ -190,6 +190,7 @@ namespace osu.Game.Screens.Edit
                 }
             });
 
+            SummaryTimeline summaryTimeline;
             Add(new Container
             {
                 Anchor = Anchor.BottomLeft,
@@ -211,7 +212,7 @@ namespace osu.Game.Screens.Edit
                             Spacing = new Vector2(10, 0),
                             Children = new[]
                             {
-                                new SummaryTimeline
+                                summaryTimeline = new SummaryTimeline
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
@@ -223,6 +224,8 @@ namespace osu.Game.Screens.Edit
                     }
                 }
             });
+
+            summaryTimeline.Beatmap.BindTo(Beatmap);
         }
 
         [BackgroundDependencyLoader]

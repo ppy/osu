@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics;
@@ -11,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using OpenTK;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Tests.Visual
 {
@@ -21,40 +21,48 @@ namespace osu.Game.Tests.Visual
 
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(SummaryTimeline) };
 
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
         public TestCaseEditorSummaryTimeline()
         {
             random = new Random(1337);
 
-            Add(new SummaryTimeline
+            SummaryTimeline summaryTimeline;
+            Add(summaryTimeline = new SummaryTimeline
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Size = new Vector2(500, 50)
             });
+
+            summaryTimeline.Beatmap.BindTo(beatmap);
+
+            AddStep("New beatmap", newBeatmap);
+
+            newBeatmap();
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void newBeatmap()
         {
-            var beatmap = new Beatmap();
+            var b = new Beatmap();
 
             for (int i = 0; i < random.Next(1, 10); i++)
-                beatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { Time = random.Next(0, length) });
+                b.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { Time = random.Next(0, length) });
 
             for (int i = 0; i < random.Next(1, 5); i++)
-                beatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint { Time = random.Next(0, length) });
+                b.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint { Time = random.Next(0, length) });
 
             for (int i = 0; i < random.Next(1, 5); i++)
-                beatmap.ControlPointInfo.EffectPoints.Add(new EffectControlPoint { Time = random.Next(0, length) });
+                b.ControlPointInfo.EffectPoints.Add(new EffectControlPoint { Time = random.Next(0, length) });
 
             for (int i = 0; i < random.Next(1, 5); i++)
-                beatmap.ControlPointInfo.SoundPoints.Add(new SoundControlPoint { Time = random.Next(0, length) });
+                b.ControlPointInfo.SoundPoints.Add(new SoundControlPoint { Time = random.Next(0, length) });
 
-            beatmap.BeatmapInfo.Bookmarks = new int[random.Next(10, 30)];
-            for (int i = 0; i < beatmap.BeatmapInfo.Bookmarks.Length; i++)
-                beatmap.BeatmapInfo.Bookmarks[i] = random.Next(0, length);
+            b.BeatmapInfo.Bookmarks = new int[random.Next(10, 30)];
+            for (int i = 0; i < b.BeatmapInfo.Bookmarks.Length; i++)
+                b.BeatmapInfo.Bookmarks[i] = random.Next(0, length);
 
-            osuGame.Beatmap.Value = new TestWorkingBeatmap(beatmap);
+            beatmap.Value = new TestWorkingBeatmap(b);
         }
 
         private class TestWorkingBeatmap : WorkingBeatmap
