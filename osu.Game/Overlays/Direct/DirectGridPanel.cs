@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Framework.Input;
 using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Direct
@@ -164,6 +163,15 @@ namespace osu.Game.Overlays.Direct
                                         },
                                     },
                                 },
+                                new DownloadButton
+                                {
+                                    Size = new Vector2(30),
+                                    Margin = new MarginPadding(horizontal_padding),
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    Colour = colours.Gray5,
+                                    Action = StartDownload
+                                },
                             },
                         },
                     },
@@ -203,12 +211,6 @@ namespace osu.Game.Overlays.Direct
 
             if (PreviewPlaying && playButton.Track != null)
                 progressBar.Width = (float)(playButton.Track.CurrentTime / playButton.Track.Length);
-        }
-
-        protected override bool OnClick(InputState state)
-        {
-            StartDownload();
-            return true;
         }
     }
 }
