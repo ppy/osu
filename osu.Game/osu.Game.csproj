@@ -606,6 +606,14 @@
     <Compile Include="Screens\Charts\ChartListing.cs" />
     <Compile Include="Screens\Direct\OnlineListing.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\BreakPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\BookmarkPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\ControlPointPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\MarkerPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\TimelinePart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\DurationVisualisation.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\PointVisualisation.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\SummaryTimeline.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
@@ -735,6 +743,7 @@
     <Compile Include="Tests\Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Tests\Visual\TestCaseDrawings.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorMenuBar.cs" />
+    <Compile Include="Tests\Visual\TestCaseEditorSummaryTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseGamefield.cs" />
     <Compile Include="Tests\Visual\TestCaseGraph.cs" />
     <Compile Include="Tests\Visual\TestCaseKeyConfiguration.cs" />
