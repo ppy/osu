@@ -61,6 +61,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Velocity;
         public double TickDistance;
+        public double BouncerDistance;
 
         public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -73,6 +74,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate;
+            BouncerDistance = Distance;
         }
 
         public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
@@ -128,6 +130,35 @@ namespace osu.Game.Rulesets.Osu.Objects
                             }))
                         };
                     }
+                }
+            }
+        }
+        public IEnumerable<SliderBouncer> Bouncers
+        {
+            get
+            {
+                var length = Curve.Distance;
+                var bouncerDistance = Math.Min(BouncerDistance, length);
+                var repeatDuration = length / Velocity;
+
+                for (var repeat = 0; repeat < RepeatCount; repeat++)
+                {
+                    if (repeat > 0)
+                        for (var d = bouncerDistance; d <= length; d += bouncerDistance)
+                        {
+                            var repeatStartTime = StartTime + repeat * repeatDuration;
+                            var distanceProgress = d / length;
+
+                            yield return new SliderBouncer
+                            {
+                                RepeatIndex = repeat,
+                                StartTime = repeatStartTime,
+                                Position = Curve.PositionAt(distanceProgress),
+                                StackHeight = StackHeight,
+                                Scale = Scale,
+                                ComboColour = ComboColour,
+                            };
+                        }
                 }
             }
         }

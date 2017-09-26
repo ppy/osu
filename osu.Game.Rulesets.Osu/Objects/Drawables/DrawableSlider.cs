@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Classic.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -21,15 +22,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly List<ISliderProgress> components = new List<ISliderProgress>();
 
         private readonly Container<DrawableSliderTick> ticks;
+        private readonly Container<DrawableSliderBouncer> bouncers;
 
         private readonly SliderBody body;
         private readonly SliderBall ball;
 
-        private readonly SliderBouncer bouncer2;
-
         public DrawableSlider(Slider s) : base(s)
         {
-            SliderBouncer bouncer1;
             slider = s;
 
             Children = new Drawable[]
@@ -41,16 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     PathWidth = s.Scale * 64,
                 },
                 ticks = new Container<DrawableSliderTick>(),
-                bouncer1 = new SliderBouncer(s, false)
-                {
-                    Position = s.Curve.PositionAt(1),
-                    Scale = new Vector2(s.Scale),
-                },
-                bouncer2 = new SliderBouncer(s, true)
-                {
-                    Position = s.StackedPosition,
-                    Scale = new Vector2(s.Scale),
-                },
+                bouncers = new Container<DrawableSliderBouncer>(),
                 ball = new SliderBall(s)
                 {
                     Scale = new Vector2(s.Scale),
@@ -70,8 +60,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             components.Add(body);
             components.Add(ball);
-            components.Add(bouncer1);
-            components.Add(bouncer2);
 
             AddNested(initialCircle);
 
@@ -92,13 +80,33 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ticks.Add(drawableTick);
                 AddNested(drawableTick);
             }
+
+            foreach (var bouncer in s.Bouncers)
+            {
+                var repeatStartTime = s.StartTime + bouncer.RepeatIndex * repeatDuration;
+                var fadeInTime = repeatStartTime + (bouncer.StartTime - repeatStartTime) / 2 - (bouncer.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);
+                var fadeOutTime = repeatStartTime + repeatDuration;
+
+                var drawableBouncer = new DrawableSliderBouncer(bouncer, this)
+                {
+                    FadeInTime = fadeInTime,
+                    FadeOutTime = fadeOutTime,
+                    Position = bouncer.Position,
+                };
+
+                bouncers.Add(drawableBouncer);
+                AddNested(drawableBouncer);
+            }
         }
 
         private int currentRepeat;
+        public bool Tracking;
 
         protected override void Update()
         {
             base.Update();
+
+            Tracking = ball.Tracking;
 
             double progress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
@@ -111,8 +119,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     PlaySamples();
                 currentRepeat = repeat;
             }
-
-            bouncer2.Position = slider.Curve.PositionAt(body.SnakedEnd ?? 0);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!initialCircle.Judgements.Any(j => j.IsHit))
