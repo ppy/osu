@@ -606,6 +606,12 @@
     <Compile Include="Screens\Direct\OnlineListing.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
     <Compile Include="Screens\Edit\Components\SummaryTimeline.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\BreakPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\BookmarkPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\ControlPointPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\TimelinePart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\DurationVisualisation.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\PointVisualisation.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
