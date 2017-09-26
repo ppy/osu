@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Direct
         private BeatmapManager beatmaps;
         private NotificationOverlay notifications;
 
-        public abstract Bindable<bool> PreviewPlaying { get; }
+        public readonly Bindable<bool> PreviewPlaying = new Bindable<bool>();
         protected abstract PlayButton PlayButton { get; }
 
         protected override Container<Drawable> Content => content;

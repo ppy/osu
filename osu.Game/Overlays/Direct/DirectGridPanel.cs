@@ -27,7 +27,6 @@ namespace osu.Game.Overlays.Direct
         private Box progressBar;
 
         protected override PlayButton PlayButton => playButton;
-        public override Bindable<bool> PreviewPlaying { get; } = new Bindable<bool>();
 
         public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
