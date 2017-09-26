@@ -609,6 +609,7 @@
     <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\BreakPart.cs" />
     <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\BookmarkPart.cs" />
     <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\ControlPointPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\MarkerPart.cs" />
     <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\TimelinePart.cs" />
     <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\DurationVisualisation.cs" />
     <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\PointVisualisation.cs" />
