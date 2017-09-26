@@ -14,9 +14,6 @@ namespace osu.Game.Storyboards.Drawables
     {
         public StoryboardAnimation Animation { get; private set; }
 
-        protected override bool ShouldBeAlive => Animation.HasCommands && base.ShouldBeAlive;
-        public override bool RemoveWhenNotAlive => !Animation.HasCommands || base.RemoveWhenNotAlive;
-
         public bool FlipH { get; set; }
         public bool FlipV { get; set; }
 
@@ -59,11 +56,8 @@ namespace osu.Game.Storyboards.Drawables
             Position = animation.InitialPosition;
             Repeat = animation.LoopType == AnimationLoopType.LoopForever;
 
-            if (animation.HasCommands)
-            {
-                LifetimeStart = animation.StartTime;
-                LifetimeEnd = animation.EndTime;
-            }
+            LifetimeStart = animation.StartTime;
+            LifetimeEnd = animation.EndTime;
         }
 
         [BackgroundDependencyLoader]
