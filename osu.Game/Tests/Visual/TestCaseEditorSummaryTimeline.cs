@@ -9,8 +9,8 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Screens.Edit.Components;
 using OpenTK;
+using osu.Game.Screens.Edit.Components.Timelines.Summary;
 
 namespace osu.Game.Tests.Visual
 {
