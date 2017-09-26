@@ -11,6 +11,28 @@ namespace osu.Game.Beatmaps
     public class BeatmapOnlineInfo
     {
         /// <summary>
+        /// The length in milliseconds of this beatmap's song.
+        /// </summary>
+        public double Length { get; set; }
+
+        /// <summary>
+        /// Whether or not this beatmap has a background video.
+        /// </summary>
+        public bool HasVideo { get; set; }
+
+        /// <summary>
+        /// The amount of circles in this beatmap.
+        /// </summary>
+        [JsonProperty(@"count_circles")]
+        public int CircleCount { get; set; }
+
+        /// <summary>
+        /// The amount of sliders in this beatmap.
+        /// </summary>
+        [JsonProperty(@"count_sliders")]
+        public int SliderCount { get; set; }
+
+        /// <summary>
         /// The amount of plays this beatmap has.
         /// </summary>
         [JsonProperty(@"playcount")]
