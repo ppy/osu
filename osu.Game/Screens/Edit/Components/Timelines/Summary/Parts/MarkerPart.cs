@@ -62,9 +62,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             base.Update();
 
-            if (Beatmap.Value == null)
-                return;
-            marker.X = (float)Beatmap.Value.Track.CurrentTime;
+            marker.X = (float)(Beatmap.Value?.Track.CurrentTime ?? 0);
         }
 
         private class MarkerVisualisation : CompositeDrawable
