@@ -17,15 +17,11 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     internal class MarkerPart : TimelinePart
     {
-        private Drawable marker;
+        private readonly Drawable marker;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public MarkerPart()
         {
-            Add(marker = new MarkerVisualisation
-            {
-                Colour = colours.Red
-            });
+            Add(marker = new MarkerVisualisation());
         }
 
         protected override bool OnDragStart(InputState state) => true;
@@ -102,6 +98,9 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     }
                 };
             }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours) => Colour = colours.Red;
         }
     }
 }
