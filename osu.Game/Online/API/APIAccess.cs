@@ -225,7 +225,7 @@ namespace osu.Game.Online.API
         public APIState State
         {
             get { return state; }
-            set
+            private set
             {
                 APIState oldState = state;
                 APIState newState = value;
