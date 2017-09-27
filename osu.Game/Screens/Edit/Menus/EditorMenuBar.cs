@@ -19,8 +19,20 @@ namespace osu.Game.Screens.Edit.Menus
         public EditorMenuBar()
             : base(Direction.Horizontal, true)
         {
-            ItemsContainer.Padding = new MarginPadding(0);
+            RelativeSizeAxes = Axes.X;
+
+            ItemsContainer.Padding = new MarginPadding { Left = 100 };
             BackgroundColour = Color4.Transparent;
+
+            AddRangeInternal(new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.FromHex("111"),
+                    Depth = float.MaxValue
+                },
+            });
         }
 
         protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
@@ -32,9 +44,32 @@ namespace osu.Game.Screens.Edit.Menus
             private Color4 openedForegroundColour;
             private Color4 openedBackgroundColour;
 
+            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => parentSizedBox.ReceiveMouseInputAt(screenSpacePos);
+
+            /// <summary>
+            /// A box with width equal to this <see cref="DrawableEditorBarMenuItem"/>'s width, and height equal to the parent height.
+            /// </summary>
+            private readonly Box parentSizedBox;
+
             public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
             {
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreLeft;
+
+                AddInternal(parentSizedBox = new Box
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.X,
+                    BypassAutoSizeAxes = Axes.Both,
+                    Alpha = 0,
+                });
+            }
+
+            public override void SetFlowDirection(Direction direction)
+            {
+                AutoSizeAxes = Axes.Both;
             }
 
             [BackgroundDependencyLoader]
@@ -62,6 +97,13 @@ namespace osu.Game.Screens.Edit.Menus
                     base.UpdateForegroundColour();
             }
 
+            protected override void Update()
+            {
+                base.Update();
+
+                parentSizedBox.Height = Parent.DrawHeight;
+            }
+
             protected override Drawable CreateBackground() => new Container
             {
                 RelativeSizeAxes = Axes.Both,
@@ -75,6 +117,17 @@ namespace osu.Game.Screens.Edit.Menus
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 }
             };
+
+            protected override DrawableOsuMenuItem.TextContainer CreateTextContainer() => new TextContainer();
+
+            private new class TextContainer : DrawableOsuMenuItem.TextContainer
+            {
+                public TextContainer()
+                {
+                    NormalText.TextSize = BoldText.TextSize = 14;
+                    NormalText.Margin = BoldText.Margin = new MarginPadding { Horizontal = 10, Vertical = MARGIN_VERTICAL };
+                }
+            }
         }
 
         private class SubMenu : OsuMenu
