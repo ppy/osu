@@ -25,7 +25,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
             Beatmap.ValueChanged += b =>
             {
-                timeline.Clear();
                 timeline.RelativeChildSize = new Vector2((float)Math.Max(1, b.Track.Length), 1);
                 LoadBeatmap(b);
             };
@@ -35,6 +34,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
         protected virtual void LoadBeatmap(WorkingBeatmap beatmap)
         {
+            timeline.Clear();
         }
     }
 }
