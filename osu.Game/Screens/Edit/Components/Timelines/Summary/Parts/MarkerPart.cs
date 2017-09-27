@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
@@ -61,8 +62,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         protected override void Update()
         {
             base.Update();
-
             marker.X = (float)(Beatmap.Value?.Track.CurrentTime ?? 0);
+        }
+
+        protected override void LoadBeatmap(WorkingBeatmap beatmap)
+        {
+            // block base call so we don't clear our marker (can be reused on beatmap change).
         }
 
         private class MarkerVisualisation : CompositeDrawable
