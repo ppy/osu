@@ -68,11 +68,11 @@ namespace osu.Game.Beatmaps
             get
             {
                 // can be called from multiple threads (from thread pool)
-                if (background != null) return background;
-                lock (backgroundLock)
-                {
-                    return background ?? (background = GetBackground());
-                }
+                if (background == null)
+                    lock (backgroundLock)
+                        if (background == null)
+                            background = GetBackground();
+                return background;
             }
         }
 
