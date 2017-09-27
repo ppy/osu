@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 ensureLoaded(osu);
 
-                Assert.IsFalse(File.Exists(temp));
+                waitForOrAssert(() => !File.Exists(temp), "Temporary file still exists after standard import", 5000);
             }
         }
 
@@ -61,14 +61,13 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 ensureLoaded(osu);
 
-                Assert.IsFalse(File.Exists(temp));
+                waitForOrAssert(() => !File.Exists(temp), "Temporary still exists after IPC import", 5000);
             }
         }
 
         [Test]
         public void TestImportWhenFileOpen()
         {
-            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
             using (HeadlessGameHost host = new HeadlessGameHost("TestImportWhenFileOpen"))
             {
                 var osu = loadOsu(host);
@@ -101,8 +100,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             var osu = new OsuGameBase();
             Task.Run(() => host.Run(osu));
 
-            while (!osu.IsLoaded)
-                Thread.Sleep(1);
+            waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
 
             return osu;
         }
@@ -113,30 +111,17 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var store = osu.Dependencies.Get<BeatmapManager>();
 
-            Action waitAction = () =>
-            {
-                while (!(resultSets = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526)).Any())
-                    Thread.Sleep(50);
-            };
-
-            Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
-                @"BeatmapSet did not import to the database in allocated time.");
+            waitForOrAssert(() => (resultSets = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526)).Any(),
+                @"BeatmapSet did not import to the database in allocated time.", timeout);
 
             //ensure we were stored to beatmap database backing...
-
             Assert.IsTrue(resultSets.Count() == 1, $@"Incorrect result count found ({resultSets.Count()} but should be 1).");
 
             IEnumerable<BeatmapInfo> resultBeatmaps = null;
 
             //if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
-            waitAction = () =>
-            {
-                while ((resultBeatmaps = store.QueryBeatmaps(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() != 12)
-                    Thread.Sleep(50);
-            };
-
-            Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout),
-                @"Beatmaps did not import to the database in allocated time");
+            waitForOrAssert(() => (resultBeatmaps = store.QueryBeatmaps(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() == 12,
+                @"Beatmaps did not import to the database in allocated time", timeout);
 
             var set = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526).First();
 
@@ -159,6 +144,12 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 3))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
+        }
+
+        private void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
+        {
+            Action waitAction = () => { while (!result()) Thread.Sleep(20); };
+            Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout), failureMessage);
         }
     }
 }
