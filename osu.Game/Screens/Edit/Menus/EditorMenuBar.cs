@@ -32,6 +32,12 @@ namespace osu.Game.Screens.Edit.Menus
                     Colour = OsuColour.FromHex("111"),
                     Depth = float.MaxValue
                 },
+                new ScreenSelectionTabControl
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    X = -15
+                }
             });
         }
 
