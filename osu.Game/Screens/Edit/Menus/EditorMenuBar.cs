@@ -22,16 +22,10 @@ namespace osu.Game.Screens.Edit.Menus
             RelativeSizeAxes = Axes.X;
 
             ItemsContainer.Padding = new MarginPadding { Left = 100 };
-            BackgroundColour = Color4.Transparent;
+            BackgroundColour = OsuColour.FromHex("111");
 
             AddRangeInternal(new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex("111"),
-                    Depth = float.MaxValue
-                },
                 new ScreenSelectionTabControl
                 {
                     Anchor = Anchor.BottomRight,
