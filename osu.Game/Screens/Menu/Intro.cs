@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
@@ -64,7 +63,6 @@ namespace osu.Game.Screens.Menu
 
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
-        private Track track;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
@@ -97,8 +95,6 @@ namespace osu.Game.Screens.Menu
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
 
-            track = Beatmap.Value.Track;
-
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
         }
@@ -114,7 +110,7 @@ namespace osu.Game.Screens.Menu
             {
                 // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
                 if (menuMusic)
-                    track.Start();
+                    Beatmap.Value.Track.Start();
 
                 LoadComponentAsync(mainMenu = new MainMenu());
 
