@@ -14,9 +14,6 @@ namespace osu.Game.Storyboards.Drawables
     {
         public StoryboardSprite Sprite { get; private set; }
 
-        protected override bool ShouldBeAlive => Sprite.HasCommands && base.ShouldBeAlive;
-        public override bool RemoveWhenNotAlive => !Sprite.HasCommands || base.RemoveWhenNotAlive;
-
         public bool FlipH { get; set; }
         public bool FlipV { get; set; }
 
@@ -58,11 +55,8 @@ namespace osu.Game.Storyboards.Drawables
             Origin = sprite.Origin;
             Position = sprite.InitialPosition;
 
-            if (sprite.HasCommands)
-            {
-                LifetimeStart = sprite.StartTime;
-                LifetimeEnd = sprite.EndTime;
-            }
+            LifetimeStart = sprite.StartTime;
+            LifetimeEnd = sprite.EndTime;
         }
 
         [BackgroundDependencyLoader]

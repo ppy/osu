@@ -16,6 +16,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsCheckbox
                 {
+                    LabelText = "Storyboards",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Rotate cursor when dragging",
                     Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },

@@ -10,8 +10,8 @@ namespace osu.Game.Storyboards
         public double LoopStartTime;
         public int LoopCount;
 
-        public override double StartTime => LoopStartTime;
-        public override double EndTime => LoopStartTime + CommandsDuration * LoopCount;
+        public override double StartTime => LoopStartTime + CommandsStartTime;
+        public override double EndTime => StartTime + CommandsDuration * LoopCount;
 
         public CommandLoop(double startTime, int loopCount)
         {
