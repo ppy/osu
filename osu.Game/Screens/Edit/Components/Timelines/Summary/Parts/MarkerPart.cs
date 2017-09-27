@@ -99,9 +99,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                     }
                 };
             }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours) => Colour = colours.Red;
         }
     }
 }
