@@ -50,6 +50,7 @@ namespace osu.Game.Beatmaps
         {
             get
             {
+                if (beatmap != null) return beatmap;
                 lock (beatmapLock)
                 {
                     if (beatmap != null) return beatmap;
@@ -70,6 +71,7 @@ namespace osu.Game.Beatmaps
         {
             get
             {
+                if (background != null) return background;
                 lock (backgroundLock)
                 {
                     return background ?? (background = GetBackground());
@@ -83,6 +85,7 @@ namespace osu.Game.Beatmaps
         {
             get
             {
+                if (track != null) return track;
                 lock (trackLock)
                 {
                     if (track != null) return track;
@@ -106,14 +109,20 @@ namespace osu.Game.Beatmaps
                     other.track = track;
             }
 
-            if (background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
-                other.background = background;
+            lock (backgroundLock)
+            {
+                if (background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
+                    other.background = background;
+            }
         }
 
         public virtual void Dispose()
         {
-            background?.Dispose();
-            background = null;
+            lock (backgroundLock)
+            {
+                background?.Dispose();
+                background = null;
+            }
         }
 
         public void DisposeTrack()
