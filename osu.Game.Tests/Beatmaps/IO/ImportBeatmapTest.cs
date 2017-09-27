@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public void TestImportWhenClosed()
         {
             //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new HeadlessGameHost())
+            using (HeadlessGameHost host = new HeadlessGameHost("TestImportWhenClosed"))
             {
                 var osu = loadOsu(host);
 
@@ -69,7 +69,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         public void TestImportWhenFileOpen()
         {
             //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
-            using (HeadlessGameHost host = new HeadlessGameHost())
+            using (HeadlessGameHost host = new HeadlessGameHost("TestImportWhenFileOpen"))
             {
                 var osu = loadOsu(host);
 
