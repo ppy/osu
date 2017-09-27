@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public class SliderBouncer : OsuHitObject
+    public class RepeatPoint : OsuHitObject
     {
         public int RepeatIndex { get; set; }
     }
