@@ -18,6 +18,8 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     {
         protected override void LoadBeatmap(WorkingBeatmap beatmap)
         {
+            base.LoadBeatmap(beatmap);
+
             ControlPointInfo cpi = beatmap.Beatmap.ControlPointInfo;
 
             cpi.TimingPoints.ForEach(addTimingPoint);
