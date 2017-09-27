@@ -53,7 +53,7 @@
     <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
     <Compile Include="Judgements\OsuJudgement.cs" />
-    <Compile Include="Objects\Drawables\DrawableSliderBouncer.cs" />
+    <Compile Include="Objects\Drawables\DrawableRepeatPoint.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerBackground.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
@@ -72,7 +72,7 @@
     <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
-    <Compile Include="Objects\SliderBouncer.cs" />
+    <Compile Include="Objects\RepeatPoint.cs" />
     <Compile Include="Objects\SliderTick.cs" />
     <Compile Include="OsuDifficulty\OsuDifficultyCalculator.cs" />
     <Compile Include="OsuDifficulty\Preprocessing\OsuDifficultyBeatmap.cs" />

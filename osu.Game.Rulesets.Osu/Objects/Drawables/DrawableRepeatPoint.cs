@@ -10,9 +10,9 @@ using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
-    public class DrawableSliderBouncer : DrawableOsuHitObject
+    public class DrawableRepeatPoint : DrawableOsuHitObject
     {
-        private readonly SliderBouncer sliderBouncer;
+        private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
 
         public double FadeInTime;
@@ -20,9 +20,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public override bool RemoveWhenNotAlive => false;
 
-        public DrawableSliderBouncer(SliderBouncer sliderBouncer, DrawableSlider drawableSlider) : base(sliderBouncer)
+        public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider) : base(repeatPoint)
         {
-            this.sliderBouncer = sliderBouncer;
+            this.repeatPoint = repeatPoint;
             this.drawableSlider = drawableSlider;
 
             AutoSizeAxes = Axes.Both;
@@ -43,13 +43,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (sliderBouncer.StartTime <= Time.Current)
+            if (repeatPoint.StartTime <= Time.Current)
                 AddJudgement(new OsuJudgement { Result = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss });
         }
 
         protected override void UpdatePreemptState()
         {
-            var animIn = Math.Min(150, sliderBouncer.StartTime - FadeInTime);
+            var animIn = Math.Min(150, repeatPoint.StartTime - FadeInTime);
 
             this.Animate(
                 d => d.FadeIn(animIn),
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(FadeOutTime - sliderBouncer.StartTime).FadeOut();
+                    this.Delay(FadeOutTime - repeatPoint.StartTime).FadeOut();
                     break;
                 case ArmedState.Miss:
                     this.FadeOut(160);

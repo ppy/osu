@@ -61,7 +61,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Velocity;
         public double TickDistance;
-        public double BouncerDistance;
 
         public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -74,7 +73,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate;
-            BouncerDistance = Distance;
         }
 
         public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
@@ -133,23 +131,23 @@ namespace osu.Game.Rulesets.Osu.Objects
                 }
             }
         }
-        public IEnumerable<SliderBouncer> Bouncers
+        public IEnumerable<RepeatPoint> RepeatPoints
         {
             get
             {
                 var length = Curve.Distance;
-                var bouncerDistance = Math.Min(BouncerDistance, length);
+                var repeatPointDistance = Math.Min(Distance, length);
                 var repeatDuration = length / Velocity;
 
                 for (var repeat = 0; repeat < RepeatCount; repeat++)
                 {
                     if (repeat > 0)
-                        for (var d = bouncerDistance; d <= length; d += bouncerDistance)
+                        for (var d = repeatPointDistance; d <= length; d += repeatPointDistance)
                         {
                             var repeatStartTime = StartTime + repeat * repeatDuration;
                             var distanceProgress = d / length;
 
-                            yield return new SliderBouncer
+                            yield return new RepeatPoint
                             {
                                 RepeatIndex = repeat,
                                 StartTime = repeatStartTime,

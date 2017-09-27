@@ -42,8 +42,8 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     foreach (var unused in slider.Ticks)
                         AddJudgement(new OsuJudgement { Result = HitResult.Great });
 
-                    //Bouncers
-                    foreach (var unused in slider.Bouncers)
+                    //Repeats
+                    foreach (var unused in slider.RepeatPoints)
                         AddJudgement(new OsuJudgement { Result = HitResult.Great });
                 }
 

@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly List<ISliderProgress> components = new List<ISliderProgress>();
 
         private readonly Container<DrawableSliderTick> ticks;
-        private readonly Container<DrawableSliderBouncer> bouncers;
+        private readonly Container<DrawableRepeatPoint> repeatPoints;
 
         private readonly SliderBody body;
         private readonly SliderBall ball;
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     PathWidth = s.Scale * 64,
                 },
                 ticks = new Container<DrawableSliderTick>(),
-                bouncers = new Container<DrawableSliderBouncer>(),
+                repeatPoints = new Container<DrawableRepeatPoint>(),
                 ball = new SliderBall(s)
                 {
                     Scale = new Vector2(s.Scale),
@@ -80,21 +80,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 AddNested(drawableTick);
             }
 
-            foreach (var bouncer in s.Bouncers)
+            foreach (var repeatPoint in s.RepeatPoints)
             {
-                var repeatStartTime = s.StartTime + bouncer.RepeatIndex * repeatDuration;
-                var fadeInTime = repeatStartTime + (bouncer.StartTime - repeatStartTime) / 2 - (bouncer.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);
+                var repeatStartTime = s.StartTime + repeatPoint.RepeatIndex * repeatDuration;
+                var fadeInTime = repeatStartTime + (repeatPoint.StartTime - repeatStartTime) / 2 - (repeatPoint.RepeatIndex == 0 ? TIME_FADEIN : TIME_FADEIN / 2);
                 var fadeOutTime = repeatStartTime + repeatDuration;
 
-                var drawableBouncer = new DrawableSliderBouncer(bouncer, this)
+                var drawableRepeatPoint = new DrawableRepeatPoint(repeatPoint, this)
                 {
                     FadeInTime = fadeInTime,
                     FadeOutTime = fadeOutTime,
-                    Position = bouncer.Position,
+                    Position = repeatPoint.Position,
                 };
 
-                bouncers.Add(drawableBouncer);
-                AddNested(drawableBouncer);
+                repeatPoints.Add(drawableRepeatPoint);
+                AddNested(drawableRepeatPoint);
             }
         }
 
@@ -131,8 +131,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
-                var judgementsCount = ticks.Children.Count + bouncers.Children.Count + 1;
-                var judgementsHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit)) + bouncers.Children.Count(t => t.Judgements.Any(j => j.IsHit));
+                var judgementsCount = ticks.Children.Count + repeatPoints.Children.Count + 1;
+                var judgementsHit = ticks.Children.Count(t => t.Judgements.Any(j => j.IsHit)) + repeatPoints.Children.Count(t => t.Judgements.Any(j => j.IsHit));
                 if (initialCircle.Judgements.Any(j => j.IsHit))
                     judgementsHit++;
 
