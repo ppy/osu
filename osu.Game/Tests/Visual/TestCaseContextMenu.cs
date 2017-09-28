@@ -9,6 +9,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Tests.Visual
 {
@@ -23,32 +24,32 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseContextMenu()
         {
-            Add(container = new MyContextMenuContainer
+            Add(new OsuContextMenuContainer
             {
-                Size = new Vector2(200),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new Box
+                    container = new MyContextMenuContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Green,
-                    }
-                }
-            });
-
-            Add(new AnotherContextMenuContainer
-            {
-                Size = new Vector2(200),
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Children = new Drawable[]
-                {
-                    new Box
+                        Size = new Vector2(200),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Green,
+                        }
+                    },
+                    new AnotherContextMenuContainer
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Red,
+                        Size = new Vector2(200),
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Red,
+                        }
                     }
                 }
             });
