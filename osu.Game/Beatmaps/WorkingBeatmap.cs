@@ -45,11 +45,13 @@ namespace osu.Game.Beatmaps
         protected abstract Track GetTrack();
 
         private Beatmap beatmap;
+        /// <summary>
+        /// Get the beatmap. Should be always called from update thread.
+        /// </summary>
         public Beatmap Beatmap
         {
             get
             {
-                // should always be called from update thread
                 if (beatmap != null) return beatmap;
 
                 beatmap = GetBeatmap() ?? new Beatmap();
@@ -76,12 +78,14 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        /// <summary>
+        /// Get the track. Should be always called from update thread.
+        /// </summary>
         private Track track;
         public Track Track
         {
             get
             {
-                // should always be called from update thread
                 if (track != null) return track;
                 // we want to ensure that we always have a track, even if it's a fake one.
                 track = GetTrack() ?? new TrackVirtual();
