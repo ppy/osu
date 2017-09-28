@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Containers;
@@ -165,10 +164,8 @@ namespace osu.Game.Overlays
             wavesContainer.Height = Math.Max(0, DrawHeight - (contentContainer.DrawHeight - contentContainer.Y));
         }
 
-        private class Wave : Container, IStateful<Visibility>
+        private class Wave : VisibilityContainer
         {
-            public event Action<Visibility> StateChanged;
-
             public float FinalPosition;
 
             public Wave()
@@ -183,13 +180,7 @@ namespace osu.Game.Overlays
                     Radius = 20f,
                 };
 
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
-                };
+                Child = new Box { RelativeSizeAxes = Axes.Both };
             }
 
             protected override void Update()
@@ -201,28 +192,8 @@ namespace osu.Game.Overlays
                 Height = Parent.Parent.DrawSize.Y * 1.5f;
             }
 
-            private Visibility state;
-
-            public Visibility State
-            {
-                get { return state; }
-                set
-                {
-                    state = value;
-
-                    switch (value)
-                    {
-                        case Visibility.Hidden:
-                            this.MoveToY(Parent.Parent.DrawSize.Y, DISAPPEAR_DURATION, easing_hide);
-                            break;
-                        case Visibility.Visible:
-                            this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show);
-                            break;
-                    }
-
-                    StateChanged?.Invoke(State);
-                }
-            }
+            protected override void PopIn() => this.MoveToY(FinalPosition, APPEAR_DURATION, easing_show);
+            protected override void PopOut() => this.MoveToY(Parent.Parent.DrawSize.Y, DISAPPEAR_DURATION, easing_hide);
         }
     }
 }
