@@ -251,7 +251,7 @@ namespace osu.Game.Overlays
 
             if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty)) return;
 
-            getSetsRequest = new GetBeatmapSetsRequest(currentQuery,
+            getSetsRequest = new GetBeatmapSetsRequest(currentQuery.Value ?? string.Empty,
                                                        ((FilterControl)Filter).Ruleset.Value,
                                                        Filter.DisplayStyleControl.Dropdown.Current.Value,
                                                        Filter.Tabs.Current.Value); //todo: sort direction (?)
