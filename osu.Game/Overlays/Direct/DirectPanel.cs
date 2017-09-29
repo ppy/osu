@@ -131,12 +131,13 @@ namespace osu.Game.Overlays.Direct
                         {
                             PlayButton.Loading = false;
                             Preview = (d as AudioLoadWrapper)?.Preview;
-                            Preview.Start();
+                            PreviewPlaying.TriggerChange();
                         },
                     });
                 }
                 else
                 {
+                    Preview.Seek(0);
                     Preview.Start();
                 }
             }

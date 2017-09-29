@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Direct
 {
