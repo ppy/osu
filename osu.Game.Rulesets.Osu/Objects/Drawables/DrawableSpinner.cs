@@ -13,6 +13,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Screens.Ranking;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -29,6 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Container circleContainer;
         private readonly CirclePiece circle;
         private readonly GlowPiece glow;
+        private readonly OsuSpriteText spmText;
 
         private readonly SpriteIcon symbol;
 
@@ -96,6 +98,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             Origin = Anchor.Centre,
                         },
                         circleContainer.CreateProxy(),
+                        spmText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.BottomCentre,
+                            Text = @"0",
+                            Font = @"Venera",
+                            TextSize = 24,
+                            Y = 120
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.TopCentre,
+                            Text = @"SPINS PER MINUTE",
+                            Font = @"Venera",
+                            TextSize = 12,
+                            Y = 125
+                        },
                         ticks = new SpinnerTicks
                         {
                             Anchor = Anchor.Centre,
@@ -167,6 +187,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             circle.Rotation = disc.Rotation;
             ticks.Rotation = disc.Rotation;
+            spmText.Text = disc.SpinsPerMinute.ToString(@"#0");
 
             float relativeCircleScale = spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
