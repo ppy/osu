@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Menus
 
         protected override TabItem<EditorScreenMode> CreateTabItem(EditorScreenMode value) => new TabItem(value);
 
-        private new class TabItem : OsuTabItem
+        private class TabItem : OsuTabItem
         {
             private const float transition_length = 250;
 
