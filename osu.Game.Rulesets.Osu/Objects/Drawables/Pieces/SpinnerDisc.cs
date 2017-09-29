@@ -76,7 +76,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private float lastAngle;
         private float currentRotation;
+        private double lastTime;
         public float RotationAbsolute;
+        public double SpinsPerMinute;
 
         private int completeTick;
 
@@ -107,9 +109,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 currentRotation += thisAngle - lastAngle;
                 RotationAbsolute += Math.Abs(thisAngle - lastAngle);
+                SpinsPerMinute = (thisAngle - lastAngle) / (Time.Current - lastTime) * 1000 * 60 / 360;
             }
 
             lastAngle = thisAngle;
+            lastTime = Time.Current;
 
             if (Complete && updateCompleteTick())
             {
