@@ -101,18 +101,16 @@ namespace osu.Game.Online.API
                         }
                         break;
                     case APIState.Offline:
+                    case APIState.Connecting:
                         //work to restore a connection...
                         if (!HasLogin)
                         {
-                            //OsuGame.Scheduler.Add(() => { OsuGame.ShowLogin(); });
-
                             State = APIState.Offline;
-                            Thread.Sleep(500);
+                            Thread.Sleep(50);
                             continue;
                         }
 
-                        if (State < APIState.Connecting)
-                            State = APIState.Connecting;
+                        State = APIState.Connecting;
 
                         if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(Username, Password))
                         {
@@ -125,7 +123,8 @@ namespace osu.Game.Online.API
 
 
                         var userReq = new GetUserRequest();
-                        userReq.Success += u => {
+                        userReq.Success += u =>
+                        {
                             LocalUser.Value = u;
                             //we're connected!
                             State = APIState.Online;
@@ -133,16 +132,14 @@ namespace osu.Game.Online.API
                         };
 
                         if (!handleRequest(userReq))
-                        {
-                            State = APIState.Failing;
                             continue;
-                        }
                         break;
                 }
 
                 //hard bail if we can't get a valid access token.
                 if (authentication.RequestAccessToken() == null)
                 {
+                    Logout(false);
                     State = APIState.Offline;
                     continue;
                 }
@@ -162,20 +159,12 @@ namespace osu.Game.Online.API
             }
         }
 
-        private void clearCredentials()
-        {
-            Username = null;
-            Password = null;
-        }
-
         public void Login(string username, string password)
         {
             Debug.Assert(State == APIState.Offline);
 
             Username = username;
             Password = password;
-
-            State = APIState.Connecting;
         }
 
         /// <summary>
@@ -204,7 +193,7 @@ namespace osu.Game.Online.API
                 switch (statusCode)
                 {
                     case HttpStatusCode.Unauthorized:
-                        State = APIState.Offline;
+                        Logout(false);
                         return true;
                     case HttpStatusCode.RequestTimeout:
                         failureCount++;
@@ -215,6 +204,7 @@ namespace osu.Game.Online.API
                             return false;
 
                         State = APIState.Failing;
+                        flushQueue();
                         return true;
                 }
 
@@ -235,33 +225,21 @@ namespace osu.Game.Online.API
         public APIState State
         {
             get { return state; }
-            set
+            private set
             {
                 APIState oldState = state;
                 APIState newState = value;
 
                 state = value;
 
-                switch (state)
-                {
-                    case APIState.Failing:
-                    case APIState.Offline:
-                        flushQueue();
-                        break;
-                }
-
                 if (oldState != newState)
                 {
-                    //OsuGame.Scheduler.Add(delegate
+                    log.Add($@"We just went {newState}!");
+                    Scheduler.Add(delegate
                     {
-                        //NotificationOverlay.ShowMessage($@"We just went {newState}!", newState == APIState.Online ? Color4.YellowGreen : Color4.OrangeRed, 5000);
-                        log.Add($@"We just went {newState}!");
-                        Scheduler.Add(delegate
-                        {
-                            components.ForEach(c => c.APIStateChanged(this, newState));
-                            OnStateChange?.Invoke(oldState, newState);
-                        });
-                    }
+                        components.ForEach(c => c.APIStateChanged(this, newState));
+                        OnStateChange?.Invoke(oldState, newState);
+                    });
                 }
             }
         }
@@ -292,11 +270,12 @@ namespace osu.Game.Online.API
             }
         }
 
-        public void Logout()
+        public void Logout(bool clearUsername = true)
         {
-            clearCredentials();
+            flushQueue();
+            if (clearUsername) Username = null;
+            Password = null;
             authentication.Clear();
-            State = APIState.Offline;
             LocalUser.Value = createGuestUser();
         }
 

@@ -16,6 +16,8 @@ namespace osu.Game.Storyboards
         private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();
 
         public string Path { get; set; }
+        public bool IsDrawable => HasCommands;
+
         public Anchor Origin;
         public Vector2 InitialPosition;
 
