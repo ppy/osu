@@ -44,27 +44,12 @@ namespace osu.Game.Screens.Edit.Menus
             private Color4 openedForegroundColour;
             private Color4 openedBackgroundColour;
 
-            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => parentSizedBox.ReceiveMouseInputAt(screenSpacePos);
-
-            /// <summary>
-            /// A box with width equal to this <see cref="DrawableEditorBarMenuItem"/>'s width, and height equal to the parent height.
-            /// </summary>
-            private readonly Box parentSizedBox;
 
             public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
             {
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
-
-                AddInternal(parentSizedBox = new Box
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.X,
-                    BypassAutoSizeAxes = Axes.Both,
-                    Alpha = 0,
-                });
             }
 
             public override void SetFlowDirection(Direction direction)
@@ -100,8 +85,6 @@ namespace osu.Game.Screens.Edit.Menus
             protected override void Update()
             {
                 base.Update();
-
-                parentSizedBox.Height = Parent.DrawHeight;
             }
 
             protected override Drawable CreateBackground() => new Container
