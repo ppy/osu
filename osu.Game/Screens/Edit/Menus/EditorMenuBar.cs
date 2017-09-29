@@ -41,12 +41,15 @@ namespace osu.Game.Screens.Edit.Menus
 
         private class DrawableEditorBarMenuItem : DrawableOsuMenuItem
         {
+            private BackgroundBox background;
 
             public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
             {
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
+
+                StateChanged += stateChanged;
             }
 
             [BackgroundDependencyLoader]
@@ -79,25 +82,15 @@ namespace osu.Game.Screens.Edit.Menus
                     base.UpdateForegroundColour();
             }
 
-            protected override void Update()
+            private void stateChanged(MenuItemState newState)
             {
-                base.Update();
+                if (newState == MenuItemState.Selected)
+                    background.Expand();
+                else
+                    background.Contract();
             }
 
-            protected override Drawable CreateBackground() => new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                Child = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 2,
-                    Masking = true,
-                    CornerRadius = 4,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
-                }
-            };
-
+            protected override Drawable CreateBackground() => background = new BackgroundBox();
             protected override DrawableOsuMenuItem.TextContainer CreateTextContainer() => new TextContainer();
 
             private new class TextContainer : DrawableOsuMenuItem.TextContainer
@@ -107,6 +100,34 @@ namespace osu.Game.Screens.Edit.Menus
                     NormalText.TextSize = BoldText.TextSize = 14;
                     NormalText.Margin = BoldText.Margin = new MarginPadding { Horizontal = 10, Vertical = MARGIN_VERTICAL };
                 }
+            }
+
+            private class BackgroundBox : CompositeDrawable
+            {
+                private readonly Container innerBackground;
+
+                public BackgroundBox()
+                {
+                    RelativeSizeAxes = Axes.Both;
+                    Masking = true;
+                    InternalChild = innerBackground = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = 4,
+                        Child = new Box { RelativeSizeAxes = Axes.Both }
+                    };
+                }
+
+                /// <summary>
+                /// Expands the background such that it doesn't show the bottom corners.
+                /// </summary>
+                public void Expand() => innerBackground.Height = 2;
+
+                /// <summary>
+                /// Contracts the background such that it shows the bottom corners.
+                /// </summary>
+                public void Contract() => innerBackground.Height = 1;
             }
         }
 
