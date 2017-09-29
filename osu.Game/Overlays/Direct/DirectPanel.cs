@@ -21,6 +21,8 @@ using osu.Framework.Logging;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Configuration;
+using osu.Framework.Audio.Track;
+using osu.Game.Audio;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -39,9 +41,12 @@ namespace osu.Game.Overlays.Direct
         private BeatmapManager beatmaps;
         private NotificationOverlay notifications;
         private BeatmapSetOverlay beatmapSetOverlay;
+        private Container audioWrapper;
 
+        protected Track Preview;
         public readonly Bindable<bool> PreviewPlaying = new Bindable<bool>();
         protected abstract PlayButton PlayButton { get; }
+        protected abstract Box PreviewBar { get; }
 
         protected override Container<Drawable> Content => content;
 
@@ -82,6 +87,7 @@ namespace osu.Game.Overlays.Direct
                 EdgeEffect = edgeEffectNormal,
                 Children = new[]
                 {
+                    audioWrapper = new Container(),
                     // temporary blackness until the actual background loads.
                     BlackBackground = new Box
                     {
@@ -106,6 +112,53 @@ namespace osu.Game.Overlays.Direct
 
             if (downloadRequest != null)
                 attachDownload(downloadRequest);
+
+            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += setPlaying;
+        }
+
+        private void setPlaying(bool newValue)
+        {
+            if (newValue)
+            {
+                if(Preview == null)
+                {
+                    PlayButton.Loading = true;
+                    audioWrapper.Child = new AsyncLoadWrapper(new AudioLoadWrapper("https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3")
+                    {
+                        OnLoadComplete = d =>
+                        {
+                            PlayButton.Loading = false;
+                            Preview = (d as AudioLoadWrapper)?.Preview;
+                            Preview.Start();
+                        },
+                    });
+                }
+                else
+                {
+                    Preview.Start();
+                }
+            }
+            else
+            {
+                Preview?.Stop();
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (PreviewPlaying && Preview != null)
+            {
+                PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
+                if (Preview.HasCompleted)
+                {
+                    PreviewPlaying.Value = false;
+                    Preview = null;
+                }
+            }
         }
 
         protected override bool OnHover(InputState state)

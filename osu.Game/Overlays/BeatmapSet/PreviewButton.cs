@@ -15,6 +15,9 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Audio;
+using osu.Game.Overlays.Direct;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -24,27 +27,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private readonly Container audioWrapper;
         private readonly Box bg, progress;
-        private readonly SpriteIcon icon;
-        private readonly LoadingAnimation loadingAnimation;
+        private readonly PlayButton playButton;
 
         private Track preview;
-
-        private bool loading
-        {
-            set
-            {
-                if (value)
-                {
-                    loadingAnimation.Show();
-                    icon.FadeOut(transition_duration * 5, Easing.OutQuint);
-                }
-                else
-                {
-                    loadingAnimation.Hide();
-                    icon.FadeIn(transition_duration, Easing.OutQuint);
-                }
-            }
-        }
+        private readonly Bindable<bool> playing = new Bindable<bool>();
 
         private BeatmapSetInfo beatmapSet;
         public BeatmapSetInfo BeatmapSet
@@ -55,39 +41,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                Playing = false;
+                playing.Value = false;
                 preview = null;
-            }
-        }
-
-        private bool playing;
-        public bool Playing
-        {
-            get { return playing; }
-            set
-            {
-                if (value == playing) return;
-                playing = value;
-
-                if (preview == null)
-                {
-                    loading = true;
-                    audioWrapper.Child = new AsyncLoadWrapper(new AudioLoadWrapper(BeatmapSet)
-                    {
-                        OnLoadComplete = d =>
-                        {
-                            loading = false;
-
-                            preview = (d as AudioLoadWrapper)?.Preview;
-                            Playing = Playing;
-                            updatePlayingState();
-                        },
-                    });
-
-                    return;
-                }
-
-                updatePlayingState();
             }
         }
 
@@ -116,22 +71,16 @@ namespace osu.Game.Overlays.BeatmapSet
                         Alpha = 0f,
                     },
                 },
-                icon = new SpriteIcon
+                playButton = new PlayButton(playing)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.fa_play,
                     Size = new Vector2(18),
-                    Shadow = false,
-                },
-                loadingAnimation = new LoadingAnimation
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                 },
             };
 
-            Action = () => Playing = !Playing;
+            Action = () => playing.Value = !playing.Value;
+            playing.ValueChanged += updatePlayingState;
         }
 
         [BackgroundDependencyLoader]
@@ -144,12 +93,12 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             base.Update();
 
-            if (Playing && preview != null)
+            if (playing.Value && preview != null)
             {
                 progress.Width = (float)(preview.CurrentTime / preview.Length);
                 if (preview.HasCompleted)
                 {
-                    Playing = false;
+                    playing.Value = false;
                     preview = null;
                 }
             }
@@ -157,7 +106,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         protected override void Dispose(bool isDisposing)
         {
-            Playing = false;
+            playing.Value = false;
             base.Dispose(isDisposing);
         }
 
@@ -173,44 +122,35 @@ namespace osu.Game.Overlays.BeatmapSet
             base.OnHoverLost(state);
         }
 
-        private void updatePlayingState()
+        private void updatePlayingState(bool newValue)
         {
-            if (preview == null) return;
-
-            if (Playing)
+            if (preview == null)
             {
-                icon.Icon = FontAwesome.fa_stop;
-                progress.FadeIn(100);
+                playButton.Loading = true;
+                audioWrapper.Child = new AsyncLoadWrapper(new AudioLoadWrapper(BeatmapSet.OnlineInfo.Preview)
+                {
+                    OnLoadComplete = d =>
+                    {
+                        playButton.Loading = false;
 
-                preview.Seek(0);
-                preview.Start();
+                        preview = (d as AudioLoadWrapper)?.Preview;
+                        playing.TriggerChange();
+                    },
+                });
             }
             else
             {
-                icon.Icon = FontAwesome.fa_play;
-                progress.FadeOut(100);
-                preview.Stop();
-            }
-        }
-
-        private class AudioLoadWrapper : Drawable
-        {
-            private readonly string preview;
-
-            public Track Preview;
-
-            public AudioLoadWrapper(BeatmapSetInfo set)
-            {
-                preview = set.OnlineInfo.Preview;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
-            {
-                if (!string.IsNullOrEmpty(preview))
+                if (newValue)
                 {
-                    Preview = audio.Track.Get(preview);
-                    Preview.Volume.Value = 0.5;
+                    progress.FadeIn(100);
+
+                    preview.Seek(0);
+                    preview.Start();
+                }
+                else
+                {
+                    progress.FadeOut(100);
+                    preview.Stop();
                 }
             }
         }
