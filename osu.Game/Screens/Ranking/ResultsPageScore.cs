@@ -186,9 +186,9 @@ namespace osu.Game.Screens.Ranking
 
         private class DrawableScoreStatistic : Container
         {
-            private readonly KeyValuePair<string, dynamic> statistic;
+            private readonly KeyValuePair<string, object> statistic;
 
-            public DrawableScoreStatistic(KeyValuePair<string, dynamic> statistic)
+            public DrawableScoreStatistic(KeyValuePair<string, object> statistic)
             {
                 this.statistic = statistic;
 
