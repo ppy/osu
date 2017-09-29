@@ -41,9 +41,6 @@ namespace osu.Game.Screens.Edit.Menus
 
         private class DrawableEditorBarMenuItem : DrawableOsuMenuItem
         {
-            private Color4 openedForegroundColour;
-            private Color4 openedBackgroundColour;
-
 
             public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
@@ -52,24 +49,24 @@ namespace osu.Game.Screens.Edit.Menus
                 Origin = Anchor.CentreLeft;
             }
 
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                ForegroundColour = colours.BlueLight;
+                BackgroundColour = Color4.Transparent;
+                ForegroundColourHover = Color4.White;
+                BackgroundColourHover = colours.Gray3;
+            }
+
             public override void SetFlowDirection(Direction direction)
             {
                 AutoSizeAxes = Axes.Both;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                ForegroundColour = ForegroundColourHover = colours.BlueLight;
-                BackgroundColour = BackgroundColourHover = Color4.Transparent;
-                openedForegroundColour = Color4.White;
-                openedBackgroundColour = colours.Gray3;
-            }
-
             protected override void UpdateBackgroundColour()
             {
                 if (State == MenuItemState.Selected)
-                    Background.FadeColour(openedBackgroundColour);
+                    Background.FadeColour(BackgroundColourHover);
                 else
                     base.UpdateBackgroundColour();
             }
@@ -77,7 +74,7 @@ namespace osu.Game.Screens.Edit.Menus
             protected override void UpdateForegroundColour()
             {
                 if (State == MenuItemState.Selected)
-                    Foreground.FadeColour(openedForegroundColour);
+                    Foreground.FadeColour(ForegroundColourHover);
                 else
                     base.UpdateForegroundColour();
             }
