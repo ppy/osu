@@ -14,6 +14,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Framework.Configuration;
+using System;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -33,6 +34,7 @@ namespace osu.Game.Overlays.Direct
         private Box progressBar;
 
         protected override PlayButton PlayButton => playButton;
+        protected override Box PreviewBar => progressBar;
 
         [BackgroundDependencyLoader]
         private void load(LocalisationEngine localisation, OsuColour colours)
@@ -70,7 +72,6 @@ namespace osu.Game.Overlays.Direct
                                     Size = new Vector2(height / 2),
                                     FillMode = FillMode.Fit,
                                     Alpha = 0,
-                                    TrackUrl = "https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3",
                                 },
                                 new FillFlowContainer
                                 {
@@ -165,17 +166,6 @@ namespace osu.Game.Overlays.Direct
                     Colour = colours.Yellow,
                 },
             });
-
-            PreviewPlaying.ValueChanged += newValue => playButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
-            PreviewPlaying.ValueChanged += newValue => progressBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (PreviewPlaying && playButton.Track != null)
-                progressBar.Width = (float)(playButton.Track.CurrentTime / playButton.Track.Length);
         }
     }
 }

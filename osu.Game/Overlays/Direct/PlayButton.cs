@@ -11,81 +11,70 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using System.Threading.Tasks;
 
 namespace osu.Game.Overlays.Direct
 {
     public class PlayButton : Container
     {
-        public string TrackUrl;
-
-        public Bindable<bool> Playing;
-
-        public Track Track;
-        private Bindable<WorkingBeatmap> gameBeatmap;
-        private AudioManager audio;
+        private readonly Bindable<bool> playing;
 
         private Color4 hoverColour;
         private readonly SpriteIcon icon;
+        private readonly LoadingAnimation loadingAnimation;
+        private const float transition_duration = 500;
+
+        private bool loading;
+        public bool Loading
+        {
+            get { return loading; }
+            set
+            {
+                loading = value;
+                if (value)
+                {
+                    loadingAnimation.Show();
+                    icon.FadeOut(transition_duration * 5, Easing.OutQuint);
+                }
+                else
+                {
+                    loadingAnimation.Hide();
+                    icon.FadeIn(transition_duration, Easing.OutQuint);
+                }
+            }
+        }
 
         public PlayButton(Bindable<bool> playing)
         {
-            Playing = playing;
-            Add(icon = new SpriteIcon
+            this.playing = playing;
+            AddRange(new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                FillMode = FillMode.Fit,
-                RelativeSizeAxes = Axes.Both,
-                Icon = FontAwesome.fa_play,
+                icon = new SpriteIcon
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    FillMode = FillMode.Fit,
+                    RelativeSizeAxes = Axes.Both,
+                    Icon = FontAwesome.fa_play,
+                },
+                loadingAnimation = new LoadingAnimation(),
             });
 
-            Playing.ValueChanged += newValue => icon.Icon = newValue ? (Track == null ? FontAwesome.fa_spinner : FontAwesome.fa_pause) : FontAwesome.fa_play;
+            playing.ValueChanged += newValue => icon.Icon = newValue ? FontAwesome.fa_pause : FontAwesome.fa_play;
 
-            Playing.ValueChanged += newValue =>
-            {
-                if (newValue)
-                    Track?.Start();
-                else
-                    Track?.Stop();
-            };
-
-            Playing.ValueChanged += newValue => icon.FadeColour(newValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
+            playing.ValueChanged += newValue => icon.FadeColour(newValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, OsuGameBase game, AudioManager audio)
+        private void load(OsuColour colour)
         {
             hoverColour = colour.Yellow;
-            gameBeatmap = game.Beatmap;
-            this.audio = audio;
         }
-
-        private Task loadTask;
 
         protected override bool OnClick(InputState state)
         {
-            gameBeatmap.Value.Track.Stop();
-
-            Playing.Value = !Playing.Value;
-
-            if (loadTask == null)
-            {
-                icon.Spin(2000, RotationDirection.Clockwise);
-
-                loadTask = Task.Run(() =>
-                {
-                    Track = audio.Track.Get(TrackUrl);
-                    Track.Looping = true;
-                    if (Playing)
-                        Track.Start();
-
-                    icon.ClearTransforms();
-                    icon.Rotation = 0;
-                    Playing.TriggerChange();
-                });
-            }
-
+            playing.Value = !playing.Value;
             return true;
         }
 
@@ -97,7 +86,7 @@ namespace osu.Game.Overlays.Direct
 
         protected override void OnHoverLost(InputState state)
         {
-            if(!Playing)
+            if(!playing.Value)
                 icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
             base.OnHoverLost(state);
         }

@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.Direct
         private Box progressBar;
 
         protected override PlayButton PlayButton => playButton;
+        protected override Box PreviewBar => progressBar;
 
         public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
@@ -197,20 +198,8 @@ namespace osu.Game.Overlays.Direct
                     Margin = new MarginPadding { Top = 5, Left = 10 },
                     Size = new Vector2(30),
                     Alpha = 0,
-                    TrackUrl = "https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3",
                 },
             });
-
-            PreviewPlaying.ValueChanged += newValue => playButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
-            PreviewPlaying.ValueChanged += newValue => progressBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (PreviewPlaying && playButton.Track != null)
-                progressBar.Width = (float)(playButton.Track.CurrentTime / playButton.Track.Length);
         }
     }
 }
