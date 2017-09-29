@@ -10,6 +10,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
+using System.ComponentModel;
 
 namespace osu.Game.Screens.Edit.Menus
 {
@@ -72,13 +73,13 @@ namespace osu.Game.Screens.Edit.Menus
 
     public enum EditorScreenMode
     {
-        [System.ComponentModel.Description("compose")]
+        [Description("compose")]
         Compose,
-        [System.ComponentModel.Description("design")]
+        [Description("design")]
         Design,
-        [System.ComponentModel.Description("timing")]
+        [Description("timing")]
         Timing,
-        [System.ComponentModel.Description("song")]
+        [Description("song")]
         SongSetup
     }
 }
