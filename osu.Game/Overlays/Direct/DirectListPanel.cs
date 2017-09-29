@@ -13,8 +13,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Framework.Configuration;
-using System;
 
 namespace osu.Game.Overlays.Direct
 {
