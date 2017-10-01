@@ -19,8 +19,20 @@ namespace osu.Game.Screens.Edit.Menus
         public EditorMenuBar()
             : base(Direction.Horizontal, true)
         {
-            ItemsContainer.Padding = new MarginPadding(0);
-            BackgroundColour = Color4.Transparent;
+            RelativeSizeAxes = Axes.X;
+
+            ItemsContainer.Padding = new MarginPadding { Left = 100 };
+            BackgroundColour = OsuColour.FromHex("111");
+
+            AddRangeInternal(new Drawable[]
+            {
+                new ScreenSelectionTabControl
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    X = -15
+                }
+            });
         }
 
         protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
@@ -29,27 +41,35 @@ namespace osu.Game.Screens.Edit.Menus
 
         private class DrawableEditorBarMenuItem : DrawableOsuMenuItem
         {
-            private Color4 openedForegroundColour;
-            private Color4 openedBackgroundColour;
+            private BackgroundBox background;
 
             public DrawableEditorBarMenuItem(MenuItem item)
                 : base(item)
             {
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreLeft;
+
+                StateChanged += stateChanged;
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                ForegroundColour = ForegroundColourHover = colours.BlueLight;
-                BackgroundColour = BackgroundColourHover = Color4.Transparent;
-                openedForegroundColour = Color4.White;
-                openedBackgroundColour = colours.Gray3;
+                ForegroundColour = colours.BlueLight;
+                BackgroundColour = Color4.Transparent;
+                ForegroundColourHover = Color4.White;
+                BackgroundColourHover = colours.Gray3;
+            }
+
+            public override void SetFlowDirection(Direction direction)
+            {
+                AutoSizeAxes = Axes.Both;
             }
 
             protected override void UpdateBackgroundColour()
             {
                 if (State == MenuItemState.Selected)
-                    Background.FadeColour(openedBackgroundColour);
+                    Background.FadeColour(BackgroundColourHover);
                 else
                     base.UpdateBackgroundColour();
             }
@@ -57,24 +77,58 @@ namespace osu.Game.Screens.Edit.Menus
             protected override void UpdateForegroundColour()
             {
                 if (State == MenuItemState.Selected)
-                    Foreground.FadeColour(openedForegroundColour);
+                    Foreground.FadeColour(ForegroundColourHover);
                 else
                     base.UpdateForegroundColour();
             }
 
-            protected override Drawable CreateBackground() => new Container
+            private void stateChanged(MenuItemState newState)
             {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                Child = new Container
+                if (newState == MenuItemState.Selected)
+                    background.Expand();
+                else
+                    background.Contract();
+            }
+
+            protected override Drawable CreateBackground() => background = new BackgroundBox();
+            protected override DrawableOsuMenuItem.TextContainer CreateTextContainer() => new TextContainer();
+
+            private new class TextContainer : DrawableOsuMenuItem.TextContainer
+            {
+                public TextContainer()
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 2,
-                    Masking = true,
-                    CornerRadius = 4,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                    NormalText.TextSize = BoldText.TextSize = 14;
+                    NormalText.Margin = BoldText.Margin = new MarginPadding { Horizontal = 10, Vertical = MARGIN_VERTICAL };
                 }
-            };
+            }
+
+            private class BackgroundBox : CompositeDrawable
+            {
+                private readonly Container innerBackground;
+
+                public BackgroundBox()
+                {
+                    RelativeSizeAxes = Axes.Both;
+                    Masking = true;
+                    InternalChild = innerBackground = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = 4,
+                        Child = new Box { RelativeSizeAxes = Axes.Both }
+                    };
+                }
+
+                /// <summary>
+                /// Expands the background such that it doesn't show the bottom corners.
+                /// </summary>
+                public void Expand() => innerBackground.Height = 2;
+
+                /// <summary>
+                /// Contracts the background such that it shows the bottom corners.
+                /// </summary>
+                public void Contract() => innerBackground.Height = 1;
+            }
         }
 
         private class SubMenu : OsuMenu
