@@ -742,6 +742,7 @@
     <Compile Include="Tests\Visual\TestCaseDirect.cs" />
     <Compile Include="Tests\Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Tests\Visual\TestCaseDrawings.cs" />
+    <Compile Include="Tests\Visual\TestCaseEditor.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorMenuBar.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorSummaryTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseGamefield.cs" />
