@@ -5,9 +5,11 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
@@ -17,7 +19,21 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private const float remaining_time_container_max_size = 0.3f;
         private const int vertical_margin = 25;
 
-        public List<BreakPeriod> Breaks;
+        private List<BreakPeriod> breaks;
+        public List<BreakPeriod> Breaks
+        {
+            set
+            {
+                breaks = value;
+                initializeBreaks();
+            }
+            get
+            {
+                return breaks;
+            }
+        }
+
+        private readonly List<ScheduledDelegate> tasks = new List<ScheduledDelegate>();
 
         private readonly bool letterboxing;
         private readonly LetterboxOverlay letterboxOverlay;
@@ -71,15 +87,21 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            InitializeBreaks();
+            initializeBreaks();
         }
 
-        public void InitializeBreaks()
+        private void initializeBreaks()
         {
-            if (Breaks == null)
+            FinishTransforms(true);
+
+            foreach (var t in tasks)
+                t.Cancel();
+            tasks.Clear();
+
+            if (breaks == null)
                 return;
 
-            foreach (var b in Breaks)
+            foreach (var b in breaks)
             {
                 if (!b.HasEffect)
                     continue;
@@ -104,7 +126,9 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 .Then()
                 .ResizeWidthTo(0, b.Duration - fade_duration);
 
-            Scheduler.AddDelayed(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime - Clock.CurrentTime);
+            tasks.Add(new ScheduledDelegate(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime));
+            Scheduler.Add(tasks.Last());
+
             remainingTimeCounter.FadeIn(fade_duration);
 
             info.FadeIn(fade_duration);

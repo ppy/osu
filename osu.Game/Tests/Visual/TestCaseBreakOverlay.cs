@@ -37,8 +37,6 @@ namespace osu.Game.Tests.Visual
                     EndTime = Clock.CurrentTime + duration,
                 }
             };
-
-            breakOverlay.InitializeBreaks();
         }
 
         private void startMultipleBreaks()
@@ -58,8 +56,6 @@ namespace osu.Game.Tests.Visual
                     EndTime = currentTime + 6000,
                 }
             };
-
-            breakOverlay.InitializeBreaks();
         }
     }
 }
