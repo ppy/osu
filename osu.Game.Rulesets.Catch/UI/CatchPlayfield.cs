@@ -43,7 +43,8 @@ namespace osu.Game.Rulesets.Catch.UI
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                catcherContainer = new Container {
+                catcherContainer = new Container
+                {
                     RelativeSizeAxes = Axes.X,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
