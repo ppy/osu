@@ -30,12 +30,12 @@ namespace osu.Game.Screens.Edit.Screens
 
             this.ScaleTo(0.5f).FadeTo(0)
                 .Then()
-                .ScaleTo(1f, 500, Easing.OutQuint).FadeTo(1f, 500, Easing.OutQuint);
+                .ScaleTo(1f, 500, Easing.OutQuint).FadeTo(1f, 250, Easing.OutQuint);
         }
 
         public void Exit()
         {
-            this.ScaleTo(1.5f, 500).FadeOut(500f).Expire();
+            this.ScaleTo(1.5f, 500).FadeOut(250).Expire();
         }
     }
 }
