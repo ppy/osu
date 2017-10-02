@@ -12,25 +12,23 @@ namespace osu.Game.Screens.Play.ReplaySettings
 
         private readonly ReplaySliderBar<double> sliderbar;
 
-        private readonly BindableNumber<double> current;
-
         public PlaybackSettings()
         {
-            current = new BindableDouble(1) as BindableNumber<double>;
-            current.MinValue = 0.5;
-            current.MaxValue = 2;
-
             Child = sliderbar = new ReplaySliderBar<double>
             {
                 LabelText = "Playback speed",
-                Bindable = current,
+                Bindable = new BindableDouble(1)
+                {
+                    MinValue = 0.5,
+                    MaxValue = 2
+                },
             };
         }
 
         public void BindClock(IAdjustableClock clock)
         {
             var clockRate = clock.Rate;
-            sliderbar.Bindable.ValueChanged += (rateMultiplier) => clock.Rate = clockRate * rateMultiplier;
+            sliderbar.Bindable.ValueChanged += rateMultiplier => clock.Rate = clockRate * rateMultiplier;
         }
     }
 }
