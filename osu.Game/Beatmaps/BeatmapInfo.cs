@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps
         public int BeatmapMetadataID { get; set; }
 
         [OneToOne(CascadeOperations = CascadeOperation.All)]
-        public BeatmapMetadata Metadata { get; set; }
+        public BeatmapMetadata Metadata { get; set; } = new BeatmapMetadata();
 
         [ForeignKey(typeof(BeatmapDifficulty)), NotNull]
         public int BaseDifficultyID { get; set; }
