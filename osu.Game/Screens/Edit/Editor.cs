@@ -81,11 +81,16 @@ namespace osu.Game.Screens.Edit
                         }
                     }
                 },
-                screenContainer = new Container
+                new Container
                 {
                     Name = "Screen container",
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 40, Bottom = 60 }
+                    Padding = new MarginPadding { Top = 40, Bottom = 60 },
+                    Child = screenContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true
+                    }
                 }
             };
 
