@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         public void BindProcessor(ScoreProcessor processor)
         {
             info.AccuracyDisplay.Current.BindTo(processor.Accuracy);
-            info.GradeDisplay.Current.BindTo(processor.Accuracy);
+            info.GradeDisplay.Current.BindTo(processor.Rank);
         }
     }
 }

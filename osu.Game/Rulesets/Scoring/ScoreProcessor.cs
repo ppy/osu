@@ -52,6 +52,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableInt Combo = new BindableInt();
 
         /// <summary>
+        /// The current rank.
+        /// </summary>
+        public readonly Bindable<ScoreRank> Rank = new Bindable<ScoreRank>(ScoreRank.X);
+
+        /// <summary>
         /// THe highest combo achieved by this score.
         /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
@@ -74,9 +79,10 @@ namespace osu.Game.Rulesets.Scoring
         protected ScoreProcessor()
         {
             Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
+            Accuracy.ValueChanged += delegate { Rank.Value = rankFrom(Accuracy.Value); };
         }
 
-        public static ScoreRank RankFrom(double acc)
+        private ScoreRank rankFrom(double acc)
         {
             if (acc == 1)
                 return ScoreRank.X;
@@ -101,6 +107,7 @@ namespace osu.Game.Rulesets.Scoring
             Accuracy.Value = 1;
             Health.Value = 1;
             Combo.Value = 0;
+            Rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
 
             alreadyFailed = false;
@@ -142,7 +149,7 @@ namespace osu.Game.Rulesets.Scoring
             score.Combo = Combo;
             score.MaxCombo = HighestCombo;
             score.Accuracy = Accuracy;
-            score.Rank = RankFrom(Accuracy);
+            score.Rank = Rank;
             score.Date = DateTimeOffset.Now;
             score.Health = Health;
         }
