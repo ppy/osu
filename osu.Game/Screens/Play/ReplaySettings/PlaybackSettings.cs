@@ -3,7 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
-using osu.Framework.Graphics;
+using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {
@@ -11,17 +11,24 @@ namespace osu.Game.Screens.Play.ReplaySettings
     {
         protected override string Title => @"playback";
 
+        private ReplaySliderBar<double> sliderbar;
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            Children = new Drawable[]
+            Child = sliderbar = new ReplaySliderBar<double>
             {
-                new ReplaySliderBar<double>
-                {
-                    LabelText = "Playback speed",
-                    Bindable = config.GetBindable<double>(OsuSetting.PlaybackSpeed)
-                }
+                LabelText = "Playback speed",
+                Bindable = config.GetBindable<double>(OsuSetting.PlaybackSpeed),
             };
+        }
+
+        public void BindClock(IAdjustableClock clock)
+        {
+            var clockRate = clock.Rate;
+            sliderbar.Bindable.ValueChanged += (rateMultiplier) => clock.Rate = clockRate * rateMultiplier;
+
+            sliderbar.Bindable.Value = 1;
         }
     }
 }
