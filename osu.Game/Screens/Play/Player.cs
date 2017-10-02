@@ -222,6 +222,8 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.ModDisplay.Current.BindTo(working.Mods);
 
+            hudOverlay.ReplaySettingsOverlay.PlaybackSettings.BindClock(adjustableSourceClock);
+
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;

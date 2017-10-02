@@ -10,15 +10,17 @@ namespace osu.Game.Screens.Play
 {
     public class ReplaySettingsOverlay : FillFlowContainer
     {
+        public readonly PlaybackSettings PlaybackSettings;
+
         public ReplaySettingsOverlay()
         {
             Direction = FillDirection.Vertical;
             AutoSizeAxes = Axes.Both;
             Spacing = new Vector2(0, 20);
 
-            Add(new CollectionSettings());
-            Add(new DiscussionSettings());
-            Add(new PlaybackSettings());
+            //Add(new CollectionSettings());
+            //Add(new DiscussionSettings());
+            Add(PlaybackSettings = new PlaybackSettings());
         }
     }
 }
