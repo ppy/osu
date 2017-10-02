@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit
         internal override bool ShowOverlays => false;
 
         private readonly Box bottomBackground;
-        private readonly Container modeContainer;
+        private readonly Container screenContainer;
 
         private EditorScreen currentScreen;
 
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Edit
                         }
                     }
                 },
-                modeContainer = new Container
+                screenContainer = new Container
                 {
                     Name = "Screen container",
                     RelativeSizeAxes = Axes.Both,
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Edit
                     break;
             }
 
-            modeContainer.Add(currentScreen);
+            screenContainer.Add(currentScreen);
         }
 
         protected override void OnResuming(Screen last)
