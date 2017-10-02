@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(CatcherArea),
+            typeof(Catcher),
         };
 
         [BackgroundDependencyLoader]
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 new CatchInputManager(rulesets.GetRuleset(2))
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new CatcherArea
+                    Child = new Catcher
                     {
                         RelativePositionAxes = Axes.Both,
                         RelativeSizeAxes = Axes.Both,

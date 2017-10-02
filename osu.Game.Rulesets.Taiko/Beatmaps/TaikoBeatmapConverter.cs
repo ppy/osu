@@ -55,14 +55,17 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
             Beatmap<TaikoHitObject> converted = base.ConvertBeatmap(original);
 
-            // Post processing step to transform hit objects with the same start time into strong hits
-            converted.HitObjects = converted.HitObjects.GroupBy(t => t.StartTime).Select(x =>
+            if (original.BeatmapInfo.RulesetID == 3)
             {
-                TaikoHitObject first = x.First();
-                if (x.Skip(1).Any())
-                    first.IsStrong = true;
-                return first;
-            }).ToList();
+                // Post processing step to transform mania hit objects with the same start time into strong hits
+                converted.HitObjects = converted.HitObjects.GroupBy(t => t.StartTime).Select(x =>
+                {
+                    TaikoHitObject first = x.First();
+                    if (x.Skip(1).Any())
+                        first.IsStrong = true;
+                    return first;
+                }).ToList();
+            }
 
             return converted;
         }
