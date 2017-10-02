@@ -5,7 +5,6 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
 using System.Collections.Generic;
@@ -31,8 +30,6 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 return breaks;
             }
         }
-
-        private readonly List<ScheduledDelegate> tasks = new List<ScheduledDelegate>();
 
         private readonly bool letterboxing;
         private readonly LetterboxOverlay letterboxOverlay;
@@ -92,10 +89,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private void initializeBreaks()
         {
             FinishTransforms(true);
-
-            foreach (var t in tasks)
-                t.Cancel();
-            tasks.Clear();
+            Scheduler.CancelDelayedTasks();
 
             if (breaks == null)
                 return;
@@ -125,8 +119,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 .Then()
                 .ResizeWidthTo(0, b.Duration - fade_duration);
 
-            tasks.Add(new ScheduledDelegate(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime));
-            Scheduler.Add(tasks[tasks.Count - 1]);
+            Scheduler.AddDelayed(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime - Clock.CurrentTime);
 
             remainingTimeCounter.FadeIn(fade_duration);
 
