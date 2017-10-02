@@ -180,12 +180,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected virtual ReplaySettingsOverlay CreateReplaySettingsOverlay() => new ReplaySettingsOverlay
-        {
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight,
-            Margin = new MarginPadding { Top = 100, Right = 10 },
-        };
+        protected virtual ReplaySettingsOverlay CreateReplaySettingsOverlay() => new ReplaySettingsOverlay();
 
         public virtual void BindProcessor(ScoreProcessor processor)
         {
