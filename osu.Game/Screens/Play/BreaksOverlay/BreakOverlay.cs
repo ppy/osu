@@ -9,7 +9,6 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
@@ -127,7 +126,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 .ResizeWidthTo(0, b.Duration - fade_duration);
 
             tasks.Add(new ScheduledDelegate(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime));
-            Scheduler.Add(tasks.Last());
+            Scheduler.Add(tasks[tasks.Count - 1]);
 
             remainingTimeCounter.FadeIn(fade_duration);
 
