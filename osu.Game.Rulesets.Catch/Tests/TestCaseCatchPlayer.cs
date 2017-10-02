@@ -12,8 +12,8 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         public TestCaseCatchPlayer() : base(typeof(CatchRuleset))
         {
-            
         }
+
         protected override Beatmap CreateBeatmap()
         {
             var beatmap = new Beatmap();
