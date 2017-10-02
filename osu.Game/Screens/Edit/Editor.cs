@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using OpenTK;

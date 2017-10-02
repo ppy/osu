@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Screens;
