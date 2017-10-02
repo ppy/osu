@@ -1,9 +1,8 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
-using osu.Game.Configuration;
 using osu.Framework.Timing;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Screens.Play.ReplaySettings
 {
@@ -11,15 +10,20 @@ namespace osu.Game.Screens.Play.ReplaySettings
     {
         protected override string Title => @"playback";
 
-        private ReplaySliderBar<double> sliderbar;
+        private readonly ReplaySliderBar<double> sliderbar;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private readonly BindableNumber<double> current;
+
+        public PlaybackSettings()
         {
+            current = new BindableDouble(1) as BindableNumber<double>;
+            current.MinValue = 0.5;
+            current.MaxValue = 2;
+
             Child = sliderbar = new ReplaySliderBar<double>
             {
                 LabelText = "Playback speed",
-                Bindable = config.GetBindable<double>(OsuSetting.PlaybackSpeed),
+                Bindable = current,
             };
         }
 
@@ -27,8 +31,6 @@ namespace osu.Game.Screens.Play.ReplaySettings
         {
             var clockRate = clock.Rate;
             sliderbar.Bindable.ValueChanged += (rateMultiplier) => clock.Rate = clockRate * rateMultiplier;
-
-            sliderbar.Bindable.Value = 1;
         }
     }
 }
