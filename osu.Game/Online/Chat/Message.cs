@@ -23,6 +23,9 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"target_id")]
         public int TargetId;
 
+        [JsonProperty(@"is_action")]
+        public bool IsAction;
+
         [JsonProperty(@"timestamp")]
         public DateTimeOffset Timestamp;
 

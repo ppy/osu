@@ -1,28 +1,28 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
 using OpenTK.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Select;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Menus;
+using osu.Game.Screens.Edit.Components.Timelines.Summary;
+using OpenTK;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Edit
 {
-    internal class Editor : ScreenWhiteBox
+    internal class Editor : OsuScreen
     {
-        protected override IEnumerable<Type> PossibleChildren => new[] { typeof(EditSongSelect) };
-
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
         internal override bool ShowOverlays => false;
+
+        private readonly Box bottomBackground;
 
         public Editor()
         {
@@ -32,16 +32,11 @@ namespace osu.Game.Screens.Edit
                 Height = 40,
                 Children = new Drawable[]
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex("111")
-                    },
                     new EditorMenuBar
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        X = 100,
+                        RelativeSizeAxes = Axes.Both,
                         Items = new[]
                         {
                             new EditorMenuBarItem("File")
@@ -189,6 +184,49 @@ namespace osu.Game.Screens.Edit
                     }
                 }
             });
+
+            SummaryTimeline summaryTimeline;
+            Add(new Container
+            {
+                Anchor = Anchor.BottomLeft,
+                Origin = Anchor.BottomLeft,
+                RelativeSizeAxes = Axes.X,
+                Height = 60,
+                Children = new Drawable[]
+                {
+                    bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 10 },
+                        Child = new FillFlowContainer
+                        {
+                            Name = "Bottom bar",
+                            RelativeSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(10, 0),
+                            Children = new[]
+                            {
+                                summaryTimeline = new SummaryTimeline
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Width = 0.65f
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            summaryTimeline.Beatmap.BindTo(Beatmap);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            bottomBackground.Colour = colours.Gray2;
         }
 
         protected override void OnResuming(Screen last)
