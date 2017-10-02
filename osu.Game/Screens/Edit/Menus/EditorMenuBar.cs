@@ -11,11 +11,19 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Screens.Edit.Menus
 {
     public class EditorMenuBar : OsuMenu
     {
+        /// <summary>
+        /// Invaoked when the selected mode has changed.
+        /// </summary>
+        public event Action<EditorScreenMode> ModeChanged;
+
+        private readonly ScreenSelectionTabControl tabControl;
+
         public EditorMenuBar()
             : base(Direction.Horizontal, true)
         {
@@ -26,13 +34,21 @@ namespace osu.Game.Screens.Edit.Menus
 
             AddRangeInternal(new Drawable[]
             {
-                new ScreenSelectionTabControl
+                tabControl = new ScreenSelectionTabControl
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     X = -15
                 }
             });
+
+            tabControl.Current.ValueChanged += v => ModeChanged?.Invoke(v);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            tabControl.Current.TriggerChange();
         }
 
         protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
