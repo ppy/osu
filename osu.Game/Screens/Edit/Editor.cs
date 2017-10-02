@@ -26,57 +26,61 @@ namespace osu.Game.Screens.Edit
 
         public Editor()
         {
-            Add(new Container
+            EditorMenuBar menuBar;
+            SummaryTimeline timeline;
+
+            Children = new[]
             {
-                RelativeSizeAxes = Axes.X,
-                Height = 40,
-                Children = new Drawable[]
+                new Container
                 {
-                    new EditorMenuBar
+                    Name = "Top bar",
+                    RelativeSizeAxes = Axes.X,
+                    Height = 40,
+                    Child = menuBar = new EditorMenuBar
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         RelativeSizeAxes = Axes.Both
                     }
-                }
-            });
-
-            SummaryTimeline summaryTimeline;
-            Add(new Container
-            {
-                Anchor = Anchor.BottomLeft,
-                Origin = Anchor.BottomLeft,
-                RelativeSizeAxes = Axes.X,
-                Height = 60,
-                Children = new Drawable[]
+                },
+                new Container
                 {
-                    bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
-                    new Container
+                    Name = "Bottom bar",
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 60,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 10 },
-                        Child = new FillFlowContainer
+                        bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
+                        new Container
                         {
-                            Name = "Bottom bar",
                             RelativeSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(10, 0),
-                            Children = new[]
+                            Padding = new MarginPadding { Top = 5, Bottom = 5, Left = 10, Right = 10 },
+                            Child = new FillFlowContainer
                             {
-                                summaryTimeline = new SummaryTimeline
+                                Name = "Bottom bar",
+                                RelativeSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(10, 0),
+                                Children = new[]
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Width = 0.65f
+                                    timeline = new SummaryTimeline
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Width = 0.65f
+                                    }
                                 }
                             }
                         }
                     }
+                },
                 }
-            });
+            };
 
-            summaryTimeline.Beatmap.BindTo(Beatmap);
+            timeline.Beatmap.BindTo(Beatmap);
         }
 
         [BackgroundDependencyLoader]
