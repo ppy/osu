@@ -7,12 +7,13 @@ using osu.Framework.Allocation;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Screens;
 
 namespace osu.Game.Tests.Visual
 {
     public class TestCaseEditor : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Editor) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Editor), typeof(EditorScreen) };
 
         private readonly Random rng;
 
