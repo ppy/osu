@@ -14,6 +14,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Game.Screens.Edit.Screens;
+using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Screens.Edit
 {
@@ -110,6 +111,9 @@ namespace osu.Game.Screens.Edit
 
             switch (mode)
             {
+                case EditorScreenMode.Compose:
+                    currentScreen = new Compose();
+                    break;
                 default:
                     currentScreen = new EditorScreen();
                     break;
