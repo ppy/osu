@@ -80,12 +80,6 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            initializeBreaks();
-        }
-
         private void initializeBreaks()
         {
             FinishTransforms(true);

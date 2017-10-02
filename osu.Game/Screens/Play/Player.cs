@@ -192,8 +192,8 @@ namespace osu.Game.Screens.Play
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Breaks = beatmap.Breaks,
-                            Clock = decoupledClock
+                            Clock = decoupledClock,
+                            Breaks = beatmap.Breaks
                         },
                     }
                 },
