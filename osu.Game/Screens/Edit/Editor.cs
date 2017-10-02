@@ -13,6 +13,7 @@ using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Game.Screens.Edit.Screens;
 
 namespace osu.Game.Screens.Edit
 {
@@ -23,6 +24,9 @@ namespace osu.Game.Screens.Edit
         internal override bool ShowOverlays => false;
 
         private readonly Box bottomBackground;
+        private readonly Container modeContainer;
+
+        private EditorScreen currentScreen;
 
         public Editor()
         {
@@ -77,16 +81,36 @@ namespace osu.Game.Screens.Edit
                         }
                     }
                 },
+                modeContainer = new Container
+                {
+                    Name = "Screen container",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = 40, Bottom = 60 }
                 }
             };
 
             timeline.Beatmap.BindTo(Beatmap);
+            menuBar.ModeChanged += onModeChanged;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             bottomBackground.Colour = colours.Gray2;
+        }
+
+        private void onModeChanged(EditorScreenMode mode)
+        {
+            currentScreen?.Exit();
+
+            switch (mode)
+            {
+                default:
+                    currentScreen = new EditorScreen();
+                    break;
+            }
+
+            modeContainer.Add(currentScreen);
         }
 
         protected override void OnResuming(Screen last)

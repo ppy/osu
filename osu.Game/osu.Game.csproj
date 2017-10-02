@@ -618,6 +618,7 @@
     <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItemSpacer.cs" />
     <Compile Include="Screens\Edit\Menus\ScreenSelectionTabControl.cs" />
+    <Compile Include="Screens\Edit\Screens\EditorScreen.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
