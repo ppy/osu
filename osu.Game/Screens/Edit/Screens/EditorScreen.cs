@@ -10,8 +10,9 @@ using osu.Framework.MathUtils;
 
 namespace osu.Game.Screens.Edit.Screens
 {
-    public class EditorScreen : CompositeDrawable
+    public class EditorScreen : Container
     {
+        protected override Container<Drawable> Content => content;
         private readonly Container content;
 
         public EditorScreen()
