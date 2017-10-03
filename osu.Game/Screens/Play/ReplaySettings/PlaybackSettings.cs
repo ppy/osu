@@ -10,6 +10,13 @@ namespace osu.Game.Screens.Play.ReplaySettings
     {
         protected override string Title => @"playback";
 
+        private IAdjustableClock adjustableClock;
+        public IAdjustableClock AdjustableClock
+        {
+            set { adjustableClock = value; }
+            get { return adjustableClock; }
+        }
+
         private readonly ReplaySliderBar<double> sliderbar;
 
         public PlaybackSettings()
@@ -25,10 +32,15 @@ namespace osu.Game.Screens.Play.ReplaySettings
             };
         }
 
-        public void BindClock(IAdjustableClock clock)
+        protected override void LoadComplete()
         {
-            var clockRate = clock.Rate;
-            sliderbar.Bindable.ValueChanged += rateMultiplier => clock.Rate = clockRate * rateMultiplier;
+            base.LoadComplete();
+
+            if (adjustableClock != null)
+            {
+                var clockRate = adjustableClock.Rate;
+                sliderbar.Bindable.ValueChanged += rateMultiplier => adjustableClock.Rate = clockRate * rateMultiplier;
+            }
         }
     }
 }
