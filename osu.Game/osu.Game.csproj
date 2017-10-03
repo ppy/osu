@@ -777,6 +777,7 @@
     <Compile Include="Tests\Visual\TestCaseTwoLayerButton.cs" />
     <Compile Include="Tests\Visual\TestCaseUserPanel.cs" />
     <Compile Include="Tests\Visual\TestCaseUserProfile.cs" />
+    <Compile Include="Tests\Visual\TestCaseWaveform.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Users\Country.cs" />
     <Compile Include="Users\Medal.cs" />
