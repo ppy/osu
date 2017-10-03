@@ -97,6 +97,8 @@ namespace osu.Game.Screens.Play
 
             replayLoaded = rulesetContainer.HasReplayLoaded;
 
+            ReplaySettingsOverlay.ReplayLoaded = replayLoaded;
+
             // in the case a replay isn't loaded, we want some elements to only appear briefly.
             if (!replayLoaded)
             {

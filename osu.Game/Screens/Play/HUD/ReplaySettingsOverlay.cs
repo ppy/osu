@@ -14,6 +14,8 @@ namespace osu.Game.Screens.Play.HUD
     {
         private const int fade_duration = 200;
 
+        public bool ReplayLoaded;
+
         public override bool HandleInput => true;
 
         public readonly PlaybackSettings PlaybackSettings;
@@ -53,7 +55,7 @@ namespace osu.Game.Screens.Play.HUD
 
             if (state.Keyboard.ControlPressed)
             {
-                if (args.Key == Key.H)
+                if (args.Key == Key.H && ReplayLoaded)
                 {
                     ToggleVisibility();
                     return true;
