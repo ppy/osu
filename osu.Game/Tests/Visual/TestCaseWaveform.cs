@@ -143,7 +143,6 @@ namespace osu.Game.Tests.Visual
                 n.Size = DrawSize;
                 n.Shared = sharedData;
 
-
                 base.ApplyDrawNode(node);
             }
 
@@ -212,11 +211,6 @@ namespace osu.Game.Tests.Visual
 
                     Shader.Unbind();
                 }
-            }
-
-            private class NonInputBox : Box
-            {
-                public override bool HandleInput => false;
             }
         }
     }
