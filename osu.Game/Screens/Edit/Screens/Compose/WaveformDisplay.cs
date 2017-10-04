@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             n.Texture = texture;
             n.Size = DrawSize;
             n.Shared = sharedData;
-            n.Points = waveform.Generate((int)(MathHelper.Clamp(Math.Ceiling(DrawWidth), 0, waveform.TotalPoints) * resolution));
+            n.Points = waveform.Generate((int)(MathHelper.Clamp(Math.Ceiling(DrawWidth), 0, waveform.MaximumPoints) * resolution));
             n.Channels = waveform.Channels;
 
             base.ApplyDrawNode(node);
