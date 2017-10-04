@@ -2,9 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
-using SQLite.Net;
-using SQLiteNetExtensions.Extensions;
 
 namespace osu.Game.Beatmaps
 {
@@ -19,13 +21,7 @@ namespace osu.Game.Beatmaps
         public event Action<BeatmapInfo> BeatmapHidden;
         public event Action<BeatmapInfo> BeatmapRestored;
 
-        /// <summary>
-        /// The current version of this store. Used for migrations (see <see cref="PerformMigration(int, int)"/>).
-        /// The initial version is 1.
-        /// </summary>
-        protected override int StoreVersion => 4;
-
-        public BeatmapStore(SQLiteConnection connection)
+        public BeatmapStore(OsuDbContext connection)
             : base(connection)
         {
         }
@@ -42,18 +38,13 @@ namespace osu.Game.Beatmaps
         {
             if (reset)
             {
-                Connection.DropTable<BeatmapMetadata>();
-                Connection.DropTable<BeatmapDifficulty>();
-                Connection.DropTable<BeatmapSetInfo>();
-                Connection.DropTable<BeatmapSetFileInfo>();
-                Connection.DropTable<BeatmapInfo>();
+                // https://stackoverflow.com/a/10450893
+                Connection.Database.ExecuteSqlCommand("DELETE FROM BeatmapMetadata");
+                Connection.Database.ExecuteSqlCommand("DELETE FROM BeatmapDifficulty");
+                Connection.Database.ExecuteSqlCommand("DELETE FROM BeatmapSetInfo");
+                Connection.Database.ExecuteSqlCommand("DELETE FROM BeatmapSetFileInfo");
+                Connection.Database.ExecuteSqlCommand("DELETE FROM BeatmapInfo");
             }
-
-            Connection.CreateTable<BeatmapMetadata>();
-            Connection.CreateTable<BeatmapDifficulty>();
-            Connection.CreateTable<BeatmapSetInfo>();
-            Connection.CreateTable<BeatmapSetFileInfo>();
-            Connection.CreateTable<BeatmapInfo>();
         }
 
         protected override void StartupTasks()
@@ -63,45 +54,13 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Perform migrations between two store versions.
-        /// </summary>
-        /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
-        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
-        protected override void PerformMigration(int currentVersion, int targetVersion)
-        {
-            base.PerformMigration(currentVersion, targetVersion);
-
-            while (currentVersion++ < targetVersion)
-            {
-                switch (currentVersion)
-                {
-                    case 1:
-                    case 2:
-                        // cannot migrate; breaking underlying changes.
-                        Reset();
-                        break;
-                    case 3:
-                        // Added MD5Hash column to BeatmapInfo
-                        Connection.MigrateTable<BeatmapInfo>();
-                        break;
-                    case 4:
-                        // Added Hidden column to BeatmapInfo
-                        Connection.MigrateTable<BeatmapInfo>();
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
         /// Add a <see cref="BeatmapSetInfo"/> to the database.
         /// </summary>
         /// <param name="beatmapSet">The beatmap to add.</param>
         public void Add(BeatmapSetInfo beatmapSet)
         {
-            Connection.RunInTransaction(() =>
-            {
-                Connection.InsertOrReplaceWithChildren(beatmapSet, true);
-            });
+            Connection.BeatmapSetInfo.Update(beatmapSet);
+            Connection.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
         }
@@ -116,7 +75,8 @@ namespace osu.Game.Beatmaps
             if (beatmapSet.DeletePending) return false;
 
             beatmapSet.DeletePending = true;
-            Connection.Update(beatmapSet);
+            Connection.BeatmapSetInfo.Remove(beatmapSet);
+            Connection.SaveChanges();
 
             BeatmapSetRemoved?.Invoke(beatmapSet);
             return true;
@@ -132,7 +92,7 @@ namespace osu.Game.Beatmaps
             if (!beatmapSet.DeletePending) return false;
 
             beatmapSet.DeletePending = false;
-            Connection.Update(beatmapSet);
+            Connection.BeatmapSetInfo.Update(beatmapSet);
 
             BeatmapSetAdded?.Invoke(beatmapSet);
             return true;
@@ -148,7 +108,7 @@ namespace osu.Game.Beatmaps
             if (beatmap.Hidden) return false;
 
             beatmap.Hidden = true;
-            Connection.Update(beatmap);
+            Connection.BeatmapInfo.Update(beatmap);
 
             BeatmapHidden?.Invoke(beatmap);
             return true;
@@ -164,7 +124,7 @@ namespace osu.Game.Beatmaps
             if (!beatmap.Hidden) return false;
 
             beatmap.Hidden = false;
-            Connection.Update(beatmap);
+            Connection.BeatmapInfo.Update(beatmap);
 
             BeatmapRestored?.Invoke(beatmap);
             return true;
@@ -172,11 +132,27 @@ namespace osu.Game.Beatmaps
 
         private void cleanupPendingDeletions()
         {
-            Connection.RunInTransaction(() =>
-            {
-                foreach (var b in QueryAndPopulate<BeatmapSetInfo>(b => b.DeletePending && !b.Protected))
-                    Connection.Delete(b, true);
-            });
+            Connection.BeatmapSetInfo.RemoveRange(Connection.BeatmapSetInfo.Where(b => b.DeletePending && !b.Protected));
+        }
+
+        public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query)
+        {
+            return Connection.BeatmapSetInfo.FirstOrDefault(query);
+        }
+
+        public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
+        {
+            return Connection.BeatmapSetInfo.Where(query).ToList();
+        }
+
+        public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
+        {
+            return Connection.BeatmapInfo.FirstOrDefault(query);
+        }
+
+        public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
+        {
+            return Connection.BeatmapInfo.Where(query).ToList();
         }
     }
 }

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -37,12 +38,11 @@ namespace osu.Game.Tests.Visual
             {
                 var storage = new TestStorage(@"TestCasePlaySongSelect");
 
-                var backingDatabase = storage.GetDatabase(@"client");
-                backingDatabase.CreateTable<StoreVersion>();
+                var dbConnectionString = storage.GetDatabaseConnectionString(@"client");
 
-                dependencies.Cache(rulesets = new RulesetStore(backingDatabase));
-                dependencies.Cache(files = new FileStore(backingDatabase, storage));
-                dependencies.Cache(manager = new BeatmapManager(storage, files, backingDatabase, rulesets, null));
+                dependencies.Cache(rulesets = new RulesetStore(new OsuDbContext(dbConnectionString)));
+                dependencies.Cache(files = new FileStore(new OsuDbContext(dbConnectionString), storage));
+                dependencies.Cache(manager = new BeatmapManager(storage, files, new OsuDbContext(dbConnectionString), rulesets, null));
 
                 for (int i = 0; i < 100; i += 10)
                     manager.Import(createTestBeatmapSet(i));
@@ -60,11 +60,11 @@ namespace osu.Game.Tests.Visual
         {
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = 1234 + i,
+                BeatmapSetOnlineInfoId = 1234 + i,
                 Hash = "d8e8fca2dc0f896fd7cb4cb0031ba249",
-                Metadata = new BeatmapMetadata
+                BeatmapMetadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = 1234 + i,
+                    BeatmapSetOnlineInfoId = 1234 + i,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = "MONACA " + RNG.Next(0, 9),
                     Title = "Black Song " + RNG.Next(0, 9),
@@ -74,33 +74,33 @@ namespace osu.Game.Tests.Visual
                 {
                     new BeatmapInfo
                     {
-                        OnlineBeatmapID = 1234 + i,
-                        Ruleset = rulesets.Query<RulesetInfo>().First(),
+                        BeatmapOnlineInfoId = 1234 + i,
+                        RulesetInfo = rulesets.QueryRulesets().First(),
                         Path = "normal.osu",
                         Version = "Normal",
-                        Difficulty = new BeatmapDifficulty
+                        BeatmapDifficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 3.5f,
                         }
                     },
                     new BeatmapInfo
                     {
-                        OnlineBeatmapID = 1235 + i,
-                        Ruleset = rulesets.Query<RulesetInfo>().First(),
+                        BeatmapOnlineInfoId = 1235 + i,
+                        RulesetInfo = rulesets.QueryRulesets().First(),
                         Path = "hard.osu",
                         Version = "Hard",
-                        Difficulty = new BeatmapDifficulty
+                        BeatmapDifficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 5,
                         }
                     },
                     new BeatmapInfo
                     {
-                        OnlineBeatmapID = 1236 + i,
-                        Ruleset = rulesets.Query<RulesetInfo>().First(),
+                        BeatmapOnlineInfoId = 1236 + i,
+                        RulesetInfo = rulesets.QueryRulesets().First(),
                         Path = "insane.osu",
                         Version = "Insane",
-                        Difficulty = new BeatmapDifficulty
+                        BeatmapDifficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 7,
                         }

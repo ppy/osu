@@ -57,9 +57,9 @@ namespace osu.Game.Overlays
                 var tags = new List<string>();
                 foreach (var s in beatmapSets)
                 {
-                    artists.Add(s.Metadata.Artist);
-                    songs.Add(s.Metadata.Title);
-                    tags.AddRange(s.Metadata.Tags.Split(' '));
+                    artists.Add(s.BeatmapMetadata.Artist);
+                    songs.Add(s.BeatmapMetadata.Title);
+                    tags.AddRange(s.BeatmapMetadata.Tags.Split(' '));
                 }
 
                 ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));
@@ -175,8 +175,8 @@ namespace osu.Game.Overlays
         private void setAdded(BeatmapSetInfo set)
         {
             // if a new map was imported, we should remove it from search results (download completed etc.)
-            panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID)?.FadeOut(400).Expire();
-            BeatmapSets = BeatmapSets?.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
+            panels?.FirstOrDefault(p => p.SetInfo.BeatmapSetOnlineInfoId == set.BeatmapSetOnlineInfoId)?.FadeOut(400).Expire();
+            BeatmapSets = BeatmapSets?.Where(b => b.BeatmapSetOnlineInfoId != set.BeatmapSetOnlineInfoId);
         }
 
         private void updateResultCounts()
@@ -260,7 +260,7 @@ namespace osu.Game.Overlays
             {
                 BeatmapSets = r?.
                                 Select(response => response.ToBeatmapSet(rulesets)).
-                                Where(b => beatmaps.QueryBeatmapSet(q => q.OnlineBeatmapSetID == b.OnlineBeatmapSetID) == null);
+                                Where(b => beatmaps.QueryBeatmapSet(q => q.BeatmapSetOnlineInfoId == b.BeatmapSetOnlineInfoId) == null);
 
                 recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             };

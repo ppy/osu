@@ -2,41 +2,36 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using SQLite.Net.Attributes;
-using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Beatmaps
 {
     public class BeatmapSetInfo
     {
-        [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
-        public int? OnlineBeatmapSetID { get; set; }
+        public int? BeatmapSetOnlineInfoId { get; set; }
 
-        [OneToOne(CascadeOperations = CascadeOperation.All)]
-        public BeatmapMetadata Metadata { get; set; }
+        [ForeignKey(nameof(BeatmapMetadata))]
+        public int BeatmapMetadataId { get; set; }
+        public BeatmapMetadata BeatmapMetadata { get; set; }
 
-        [NotNull, ForeignKey(typeof(BeatmapMetadata))]
-        public int BeatmapMetadataID { get; set; }
-
-        [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<BeatmapInfo> Beatmaps { get; set; }
 
-        [Ignore]
+        [NotMapped]
         public BeatmapSetOnlineInfo OnlineInfo { get; set; }
 
         public double MaxStarDifficulty => Beatmaps.Max(b => b.StarDifficulty);
 
-        [Indexed]
         public bool DeletePending { get; set; }
 
         public string Hash { get; set; }
 
         public string StoryboardFile => Files.FirstOrDefault(f => f.Filename.EndsWith(".osb"))?.Filename;
 
-        [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<BeatmapSetFileInfo> Files { get; set; }
 
         public bool Protected { get; set; }

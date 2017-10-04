@@ -32,14 +32,14 @@ namespace osu.Game.Tests.Visual
                     Value = new BeatmapInfo
                     {
                         StarDifficulty = 3.7,
-                        Ruleset = rulesets.GetRuleset(3),
-                        Metadata = new BeatmapMetadata
+                        RulesetInfo = rulesets.GetRuleset(3),
+                        BeatmapMetadata = new BeatmapMetadata
                         {
                             Title = @"Platina",
                             Artist = @"Maaya Sakamoto",
                             Author = @"uwutm8",
                         },
-                        BeatmapSet = new BeatmapSetInfo
+                        BeatmapSetInfo = new BeatmapSetInfo
                         {
                             OnlineInfo = new BeatmapSetOnlineInfo
                             {
@@ -99,14 +99,14 @@ namespace osu.Game.Tests.Visual
                         Value = new BeatmapInfo
                         {
                             StarDifficulty = 7.07,
-                            Ruleset = rulesets.GetRuleset(0),
-                            Metadata = new BeatmapMetadata
+                            RulesetInfo = rulesets.GetRuleset(0),
+                            BeatmapMetadata = new BeatmapMetadata
                             {
                                 Title = @"FREEDOM DIVE",
                                 Artist = @"xi",
                                 Author = @"Nakagawa-Kanon",
                             },
-                            BeatmapSet = new BeatmapSetInfo
+                            BeatmapSetInfo = new BeatmapSetInfo
                             {
                                 OnlineInfo = new BeatmapSetOnlineInfo
                                 {

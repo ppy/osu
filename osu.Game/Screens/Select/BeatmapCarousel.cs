@@ -113,15 +113,15 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void RemoveBeatmap(BeatmapSetInfo beatmapSet) => removeGroup(groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID));
+        public void RemoveBeatmap(BeatmapSetInfo beatmapSet) => removeGroup(groups.Find(b => b.BeatmapSet.Id == beatmapSet.Id));
 
         internal void UpdateBeatmap(BeatmapInfo beatmap)
         {
             // todo: this method should not run more than once for the same BeatmapSetInfo.
-            var set = manager.Refresh(beatmap.BeatmapSet);
+            var set = manager.Refresh(beatmap.BeatmapSetInfo);
 
             // todo: this method should be smarter as to not recreate panels that haven't changed, etc.
-            var group = groups.Find(b => b.BeatmapSet.ID == set.ID);
+            var group = groups.Find(b => b.BeatmapSet.Id == set.Id);
 
             if (group == null)
                 return;
@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Select
             if (selectedGroup == group && newGroup.BeatmapPanels.Count > 0)
             {
                 var newSelection =
-                    newGroup.BeatmapPanels.Find(p => p.Beatmap.ID == selectedPanel?.Beatmap.ID) ??
+                    newGroup.BeatmapPanels.Find(p => p.Beatmap.Id == selectedPanel?.Beatmap.Id) ??
                     newGroup.BeatmapPanels[Math.Min(newGroup.BeatmapPanels.Count - 1, group.BeatmapPanels.IndexOf(selectedPanel))];
 
                 selectGroup(newGroup, newSelection);
@@ -337,8 +337,8 @@ namespace osu.Game.Screens.Select
         {
             foreach (var b in beatmapSet.Beatmaps)
             {
-                if (b.Metadata == null)
-                    b.Metadata = beatmapSet.Metadata;
+                if (b.BeatmapMetadata == null)
+                    b.BeatmapMetadata = beatmapSet.BeatmapMetadata;
             }
 
             return new BeatmapGroup(beatmapSet, manager)

@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = splitKeyVal(line, ':');
 
-            var metadata = beatmap.BeatmapInfo.Metadata;
+            var metadata = beatmap.BeatmapInfo.BeatmapMetadata;
             switch (pair.Key)
             {
                 case @"AudioFilename":
@@ -97,9 +97,9 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.StackLeniency = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"Mode":
-                    beatmap.BeatmapInfo.RulesetID = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.RulesetInfoId = int.Parse(pair.Value);
 
-                    switch (beatmap.BeatmapInfo.RulesetID)
+                    switch (beatmap.BeatmapInfo.RulesetInfoId)
                     {
                         case 0:
                             parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser();
@@ -155,7 +155,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = splitKeyVal(line, ':');
 
-            var metadata = beatmap.BeatmapInfo.Metadata;
+            var metadata = beatmap.BeatmapInfo.BeatmapMetadata;
             switch (pair.Key)
             {
                 case @"Title":
@@ -177,17 +177,17 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.Version = pair.Value;
                     break;
                 case @"Source":
-                    beatmap.BeatmapInfo.Metadata.Source = pair.Value;
+                    beatmap.BeatmapInfo.BeatmapMetadata.Source = pair.Value;
                     break;
                 case @"Tags":
-                    beatmap.BeatmapInfo.Metadata.Tags = pair.Value;
+                    beatmap.BeatmapInfo.BeatmapMetadata.Tags = pair.Value;
                     break;
                 case @"BeatmapID":
-                    beatmap.BeatmapInfo.OnlineBeatmapID = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.BeatmapOnlineInfoId = int.Parse(pair.Value);
                     break;
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.OnlineBeatmapSetID = int.Parse(pair.Value);
-                    metadata.OnlineBeatmapSetID = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.BeatmapSetOnlineInfoId = int.Parse(pair.Value);
+                    metadata.BeatmapSetOnlineInfoId = int.Parse(pair.Value);
                     break;
             }
         }
@@ -196,7 +196,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = splitKeyVal(line, ':');
 
-            var difficulty = beatmap.BeatmapInfo.Difficulty;
+            var difficulty = beatmap.BeatmapInfo.BeatmapDifficulty;
             switch (pair.Key)
             {
                 case @"HPDrainRate":
@@ -270,7 +270,7 @@ namespace osu.Game.Beatmaps.Formats
                         string filename = split[2].Trim('"');
 
                         if (type == EventType.Background)
-                            beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
+                            beatmap.BeatmapInfo.BeatmapMetadata.BackgroundFile = filename;
 
                         break;
                     case EventType.Break:
@@ -674,7 +674,7 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             foreach (var hitObject in beatmap.HitObjects)
-                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.Difficulty);
+                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BeatmapDifficulty);
         }
 
         private KeyValuePair<string, string> splitKeyVal(string line, char separator)

@@ -33,8 +33,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                source.Text = BeatmapSet.Metadata.Source;
-                tags.Text = BeatmapSet.Metadata.Tags;
+                source.Text = BeatmapSet.BeatmapMetadata.Source;
+                tags.Text = BeatmapSet.BeatmapMetadata.Tags;
             }
         }
 

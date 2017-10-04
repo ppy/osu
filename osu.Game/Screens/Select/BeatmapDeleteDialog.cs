@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapDeleteDialog(BeatmapSetInfo beatmap)
         {
-            BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
+            BodyText = $@"{beatmap.BeatmapMetadata?.Artist} - {beatmap.BeatmapMetadata?.Title}";
 
             Icon = FontAwesome.fa_trash_o;
             HeaderText = @"Confirm deletion of";

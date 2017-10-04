@@ -2,49 +2,43 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
-using SQLite.Net.Attributes;
-using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Beatmaps
 {
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable
     {
-        [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
         //TODO: should be in database
         public int BeatmapVersion;
 
-        public int? OnlineBeatmapID { get; set; }
+        public int? BeatmapOnlineInfoId { get; set; }
 
-        public int? OnlineBeatmapSetID { get; set; }
+        public int? BeatmapSetOnlineInfoId { get; set; }
 
-        [ForeignKey(typeof(BeatmapSetInfo))]
-        public int BeatmapSetInfoID { get; set; }
+        [ForeignKey(nameof(BeatmapSetInfo))]
+        public int BeatmapSetInfoId { get; set; }
+        public BeatmapSetInfo BeatmapSetInfo { get; set; }
 
-        [ManyToOne]
-        public BeatmapSetInfo BeatmapSet { get; set; }
+        [ForeignKey(nameof(BeatmapMetadata))]
+        public int BeatmapMetadataId { get; set; }
+        public BeatmapMetadata BeatmapMetadata { get; set; }
 
-        [ForeignKey(typeof(BeatmapMetadata))]
-        public int BeatmapMetadataID { get; set; }
+        [ForeignKey(nameof(BeatmapDifficulty))]
+        public int BeatmapDifficultyId { get; set; }
+        public BeatmapDifficulty BeatmapDifficulty { get; set; }
 
-        [OneToOne(CascadeOperations = CascadeOperation.All)]
-        public BeatmapMetadata Metadata { get; set; }
-
-        [ForeignKey(typeof(BeatmapDifficulty)), NotNull]
-        public int BaseDifficultyID { get; set; }
-
-        [OneToOne(CascadeOperations = CascadeOperation.All)]
-        public BeatmapDifficulty Difficulty { get; set; }
-
-        [Ignore]
+        [NotMapped]
         public BeatmapMetrics Metrics { get; set; }
 
-        [Ignore]
+        [NotMapped]
         public BeatmapOnlineInfo OnlineInfo { get; set; }
 
         public string Path { get; set; }
@@ -57,7 +51,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// MD5 is kept for legacy support (matching against replays, osu-web-10 etc.).
         /// </summary>
-        [Indexed]
         [JsonProperty("file_md5")]
         public string MD5Hash { get; set; }
 
@@ -67,11 +60,9 @@ namespace osu.Game.Beatmaps
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
 
-        [ForeignKey(typeof(RulesetInfo))]
-        public int RulesetID { get; set; }
-
-        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead)]
-        public RulesetInfo Ruleset { get; set; }
+        [ForeignKey(nameof(RulesetInfo))]
+        public int RulesetInfoId { get; set; }
+        public RulesetInfo RulesetInfo { get; set; }
 
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
@@ -99,7 +90,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        [Ignore]
+        [NotMapped]
         public int[] Bookmarks { get; set; } = new int[0];
 
         public double DistanceSpacing { get; set; }
@@ -114,20 +105,20 @@ namespace osu.Game.Beatmaps
 
         public bool Equals(BeatmapInfo other)
         {
-            if (ID == 0 || other?.ID == 0)
+            if (Id == 0 || other?.Id == 0)
                 // one of the two BeatmapInfos we are comparing isn't sourced from a database.
                 // fall back to reference equality.
                 return ReferenceEquals(this, other);
 
-            return ID == other?.ID;
+            return Id == other?.Id;
         }
 
-        public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
-                                                      (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
+        public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSetInfo != null && other.BeatmapSetInfo != null &&
+                                                      BeatmapSetInfo.Hash == other.BeatmapSetInfo.Hash &&
+                                                      (BeatmapMetadata ?? BeatmapSetInfo.BeatmapMetadata).AudioFile == (other.BeatmapMetadata ?? other.BeatmapSetInfo.BeatmapMetadata).AudioFile;
 
-        public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
-                                                      (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
+        public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSetInfo != null && other.BeatmapSetInfo != null &&
+                                                      BeatmapSetInfo.Hash == other.BeatmapSetInfo.Hash &&
+                                                      (BeatmapMetadata ?? BeatmapSetInfo.BeatmapMetadata).BackgroundFile == (other.BeatmapMetadata ?? other.BeatmapSetInfo.BeatmapMetadata).BackgroundFile;
     }
 }

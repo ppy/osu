@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps
             new Color4(121, 9, 13, 255)
         };
 
-        public BeatmapMetadata Metadata => BeatmapInfo?.Metadata ?? BeatmapInfo?.BeatmapSet?.Metadata;
+        public BeatmapMetadata Metadata => BeatmapInfo?.BeatmapMetadata ?? BeatmapInfo?.BeatmapSetInfo?.BeatmapMetadata;
 
         /// <summary>
         /// The HitObjects this Beatmap contains.

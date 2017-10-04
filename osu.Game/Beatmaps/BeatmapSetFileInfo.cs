@@ -1,27 +1,26 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using osu.Game.IO;
-using SQLite.Net.Attributes;
-using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Beatmaps
 {
     public class BeatmapSetFileInfo
     {
-        [PrimaryKey, AutoIncrement]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
-        [ForeignKey(typeof(BeatmapSetInfo)), NotNull]
-        public int BeatmapSetInfoID { get; set; }
+        [ForeignKey(nameof(BeatmapSetInfo))]
+        public int BeatmapSetInfoId { get; set; }
+        public BeatmapSetInfo BeatmapSetInfo { get; set; }
 
-        [ForeignKey(typeof(FileInfo)), NotNull]
-        public int FileInfoID { get; set; }
-
-        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead)]
+        [ForeignKey(nameof(FileInfo))]
+        public int FileInfoId { get; set; }
         public FileInfo FileInfo { get; set; }
 
-        [NotNull]
+        [Required]
         public string Filename { get; set; }
     }
 }

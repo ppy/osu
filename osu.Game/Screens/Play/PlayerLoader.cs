@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Play
             [BackgroundDependencyLoader]
             private void load(LocalisationEngine localisation)
             {
-                var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+                var metadata = beatmap?.BeatmapInfo?.BeatmapMetadata ?? new BeatmapMetadata();
 
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]

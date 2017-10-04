@@ -54,13 +54,13 @@ namespace osu.Game.Overlays.Direct
                             {
                                 new OsuSpriteText
                                 {
-                                    Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
+                                    Current = localisation.GetUnicodePreference(SetInfo.BeatmapMetadata.TitleUnicode, SetInfo.BeatmapMetadata.Title),
                                     TextSize = 18,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
                                 new OsuSpriteText
                                 {
-                                    Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
+                                    Current = localisation.GetUnicodePreference(SetInfo.BeatmapMetadata.ArtistUnicode, SetInfo.BeatmapMetadata.Artist),
                                     Font = @"Exo2.0-BoldItalic",
                                 },
                                 new FillFlowContainer
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Direct
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = SetInfo.Metadata.Author,
+                                            Text = SetInfo.BeatmapMetadata.Author,
                                             TextSize = 14,
                                             Font = @"Exo2.0-SemiBoldItalic",
                                         },
@@ -109,11 +109,11 @@ namespace osu.Game.Overlays.Direct
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $"from {SetInfo.Metadata.Source}",
+                                    Text = $"from {SetInfo.BeatmapMetadata.Source}",
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     TextSize = 14,
-                                    Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
+                                    Alpha = string.IsNullOrEmpty(SetInfo.BeatmapMetadata.Source) ? 0f : 1f,
                                 },
                             },
                         },
