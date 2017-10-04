@@ -21,7 +21,6 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseWaveform()
         {
-            MusicController mc;
             FillFlowContainer flow;
             Child = flow = new FillFlowContainer
             {
@@ -30,7 +29,7 @@ namespace osu.Game.Tests.Visual
                 Spacing = new Vector2(0, 10),
                 Children = new Drawable[]
                 {
-                    mc = new MusicController
+                    new MusicController
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
@@ -74,7 +73,7 @@ namespace osu.Game.Tests.Visual
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Text = $"Resolution: {(1f / i).ToString("0.00")}"
+                                    Text = $"Resolution: {(1f / i):0.00}"
                                 }
                             }
                         }

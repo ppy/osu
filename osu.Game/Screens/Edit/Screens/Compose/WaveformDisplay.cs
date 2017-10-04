@@ -23,7 +23,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         /// <summary>
         /// The beatmap which the audio waveform should be displayed for.
         /// </summary>
-        /// <returns></returns>
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private Shader shader;
@@ -46,7 +45,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         /// Controls the amount of interpolation of the waveform into the width of this <see cref="WaveformDisplay"/>.
         /// Points in the waveform are interpolated between 1 / <see cref="Resolution"/> pixels of this <see cref="WaveformDisplay"/>.
         /// </summary>
-        /// <returns></returns>
         public float Resolution
         {
             get { return resolution; }
