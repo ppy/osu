@@ -118,6 +118,7 @@ namespace osu.Game.Screens.Edit
                     break;
             }
 
+            currentScreen.Beatmap.BindTo(Beatmap);
             screenContainer.Add(currentScreen);
         }
 
