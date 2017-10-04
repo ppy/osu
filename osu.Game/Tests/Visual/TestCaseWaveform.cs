@@ -28,8 +28,6 @@ namespace osu.Game.Tests.Visual
     {
         private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-        private readonly List<WaveformDisplay> displays = new List<WaveformDisplay>();
-
         public TestCaseWaveform()
         {
             MusicController mc;
@@ -53,9 +51,13 @@ namespace osu.Game.Tests.Visual
 
             for (int i = 1; i <= 16; i *= 2)
             {
-                var newDisplay = new WaveformDisplay(i) { RelativeSizeAxes = Axes.Both };
+                var newDisplay = new WaveformDisplay
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Resolution = 1f / i
+                };
 
-                displays.Add(newDisplay);
+                newDisplay.Beatmap.BindTo(beatmapBacking);
 
                 flow.Add(new Container
                 {
@@ -91,29 +93,21 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
-        {
-            beatmapBacking.BindTo(osuGame.Beatmap);
-            beatmapBacking.ValueChanged += b => b.Track.QueryWaveform(processWaveform);
-        }
-
-        private void processWaveform(Waveform waveform) => Schedule(() => displays.ForEach(d => d.Display(waveform)));
+        private void load(OsuGameBase osuGame) => beatmapBacking.BindTo(osuGame.Beatmap);
 
         private class WaveformDisplay : Drawable
         {
-            private List<WaveformPoint> points;
-            private int channels;
+            public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+            private Waveform waveform;
 
             private Shader shader;
             private readonly Texture texture;
 
-            private readonly int resolution;
-
-            public WaveformDisplay(int resolution)
+            public WaveformDisplay()
             {
-                this.resolution = resolution;
-
                 texture = Texture.WhitePixel;
+                Beatmap.ValueChanged += generateWaveform;
             }
 
             [BackgroundDependencyLoader]
@@ -122,26 +116,51 @@ namespace osu.Game.Tests.Visual
                 shader = shaders?.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
             }
 
-            public void Display(Waveform waveform)
+            private float resolution = 1;
+            public float Resolution
             {
-                points = waveform.Generate((int)MathHelper.Clamp(Math.Ceiling(DrawWidth), 0, waveform.TotalPoints) / resolution);
-                channels = waveform.Channels;
-                Invalidate(Invalidation.DrawNode);
+                get { return resolution; }
+                set
+                {
+                    if (resolution == value)
+                        return;
+                    resolution = value;
+
+                    Invalidate(Invalidation.DrawNode);
+                }
             }
 
-            protected override DrawNode CreateDrawNode() => new WaveformDrawNode();
+            private Track lastQueriedTrack;
+
+            private void generateWaveform(WorkingBeatmap beatmap)
+            {
+                // Cancel the old query so we don't saturate the audio thread
+                lastQueriedTrack?.CancelWaveformQuery();
+
+                beatmap.Track.QueryWaveform(w =>
+                {
+                    if (Beatmap.Value == beatmap)
+                    {
+                        waveform = w;
+                        Invalidate(Invalidation.DrawNode);
+                    }
+                });
+
+                lastQueriedTrack = beatmap.Track;
+            }
 
             private readonly WaveformDrawNodeSharedData sharedData = new WaveformDrawNodeSharedData();
+            protected override DrawNode CreateDrawNode() => new WaveformDrawNode();
             protected override void ApplyDrawNode(DrawNode node)
             {
                 var n = (WaveformDrawNode)node;
 
                 n.Shader = shader;
                 n.Texture = texture;
-                n.Points = points;
-                n.Channels = channels;
                 n.Size = DrawSize;
                 n.Shared = sharedData;
+                n.Points = waveform.Generate((int)(MathHelper.Clamp(Math.Ceiling(DrawWidth), 0, waveform.TotalPoints) * resolution));
+                n.Channels = waveform.Channels;
 
                 base.ApplyDrawNode(node);
             }
