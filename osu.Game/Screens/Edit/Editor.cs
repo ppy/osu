@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Edit
             };
 
             timeline.Beatmap.BindTo(Beatmap);
-            menuBar.ModeChanged += onModeChanged;
+            menuBar.Mode.ValueChanged += onModeChanged;
         }
 
         [BackgroundDependencyLoader]
