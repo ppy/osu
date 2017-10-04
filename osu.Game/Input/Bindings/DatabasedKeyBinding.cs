@@ -1,23 +1,23 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets;
-using SQLite.Net.Attributes;
-using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Input.Bindings
 {
     [Table("KeyBinding")]
     public class DatabasedKeyBinding : KeyBinding
     {
-        [PrimaryKey, AutoIncrement]
-        public int ID { get; set; }
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
 
-        [ForeignKey(typeof(RulesetInfo))]
-        public int? RulesetID { get; set; }
+        [ForeignKey(nameof(RulesetInfo))]
+        public int? RulesetInfoId { get; set; }
+        public RulesetInfo RulesetInfo;
 
-        [Indexed]
         public int? Variant { get; set; }
 
         [Column("Keys")]
@@ -27,7 +27,6 @@ namespace osu.Game.Input.Bindings
             private set { KeyCombination = value; }
         }
 
-        [Indexed]
         [Column("Action")]
         public int IntAction
         {

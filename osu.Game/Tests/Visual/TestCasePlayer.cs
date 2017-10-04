@@ -39,10 +39,11 @@ namespace osu.Game.Tests.Visual
                 Colour = Color4.Black,
             });
 
-            foreach (var r in rulesets.Query<RulesetInfo>())
+            var queryRulesets = rulesets.QueryRulesets(r=>true);
+            foreach (var r in queryRulesets)
                 AddStep(r.Name, () => loadPlayerFor(r));
 
-            loadPlayerFor(rulesets.Query<RulesetInfo>().First());
+            loadPlayerFor(queryRulesets.First());
         }
 
         protected virtual Beatmap CreateBeatmap()
@@ -60,7 +61,7 @@ namespace osu.Game.Tests.Visual
         {
             var beatmap = CreateBeatmap();
 
-            beatmap.BeatmapInfo.Ruleset = r;
+            beatmap.BeatmapInfo.RulesetInfo = r;
 
             var instance = r.CreateInstance();
 

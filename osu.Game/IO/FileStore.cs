@@ -4,12 +4,12 @@
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
-using SQLite.Net;
 
 namespace osu.Game.IO
 {
@@ -22,9 +22,7 @@ namespace osu.Game.IO
 
         public readonly ResourceStore<byte[]> Store;
 
-        protected override int StoreVersion => 2;
-
-        public FileStore(SQLiteConnection connection, Storage storage) : base(connection, storage)
+        public FileStore(OsuDbContext connection, Storage storage) : base(connection, storage)
         {
             Store = new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), prefix);
         }
@@ -44,10 +42,8 @@ namespace osu.Game.IO
                 if (Storage.ExistsDirectory(prefix))
                     Storage.DeleteDirectory(prefix);
 
-                Connection.DropTable<FileInfo>();
+                Connection.Database.ExecuteSqlCommand("DELETE FROM FileInfo");
             }
-
-            Connection.CreateTable<FileInfo>();
         }
 
         protected override void StartupTasks()
@@ -56,33 +52,11 @@ namespace osu.Game.IO
             deletePending();
         }
 
-        /// <summary>
-        /// Perform migrations between two store versions.
-        /// </summary>
-        /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
-        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
-        protected override void PerformMigration(int currentVersion, int targetVersion)
-        {
-            base.PerformMigration(currentVersion, targetVersion);
-
-            while (currentVersion++ < targetVersion)
-            {
-                switch (currentVersion)
-                {
-                    case 1:
-                    case 2:
-                        // cannot migrate; breaking underlying changes.
-                        Reset();
-                        break;
-                }
-            }
-        }
-
         public FileInfo Add(Stream data, bool reference = true)
         {
             string hash = data.ComputeSHA2Hash();
 
-            var existing = Connection.Table<FileInfo>().Where(f => f.Hash == hash).FirstOrDefault();
+            var existing = Connection.FileInfo.Where(f => f.Hash == hash).FirstOrDefault();
 
             var info = existing ?? new FileInfo { Hash = hash };
 
@@ -100,61 +74,54 @@ namespace osu.Game.IO
             }
 
             if (existing == null)
-                Connection.Insert(info);
+                Connection.FileInfo.Add(info);
 
             if (reference || existing == null)
                 Reference(info);
 
+            Connection.SaveChanges();
             return info;
         }
 
         public void Reference(params FileInfo[] files)
         {
-            Connection.RunInTransaction(() =>
+            var incrementedFiles = files.GroupBy(f => f.Id).Select(f =>
             {
-                var incrementedFiles = files.GroupBy(f => f.ID).Select(f =>
-                {
-                    var accurateRefCount = Connection.Get<FileInfo>(f.First().ID);
-                    accurateRefCount.ReferenceCount += f.Count();
-                    return accurateRefCount;
-                });
-
-                Connection.UpdateAll(incrementedFiles);
+                var accurateRefCount = Connection.Find<FileInfo>(f.First().Id);
+                accurateRefCount.ReferenceCount += f.Count();
+                return accurateRefCount;
             });
+            //Connection.FileInfo.UpdateRange(incrementedFiles);
+            Connection.SaveChanges();
         }
 
         public void Dereference(params FileInfo[] files)
         {
-            Connection.RunInTransaction(() =>
+            var incrementedFiles = files.GroupBy(f => f.Id).Select(f =>
             {
-                var incrementedFiles = files.GroupBy(f => f.ID).Select(f =>
-                {
-                    var accurateRefCount = Connection.Get<FileInfo>(f.First().ID);
-                    accurateRefCount.ReferenceCount -= f.Count();
-                    return accurateRefCount;
-                });
-
-                Connection.UpdateAll(incrementedFiles);
+                var accurateRefCount = Connection.Find<FileInfo>(f.First().Id);
+                accurateRefCount.ReferenceCount -= f.Count();
+                return accurateRefCount;
             });
+
+            //Connection.FileInfo.UpdateRange(incrementedFiles);
+            Connection.SaveChanges();
         }
 
         private void deletePending()
         {
-            Connection.RunInTransaction(() =>
+            foreach (var f in Connection.FileInfo.Where(f => f.ReferenceCount < 1))
             {
-                foreach (var f in Query<FileInfo>(f => f.ReferenceCount < 1))
+                try
                 {
-                    try
-                    {
-                        Storage.Delete(Path.Combine(prefix, f.StoragePath));
-                        Connection.Delete(f);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $@"Could not delete beatmap {f}");
-                    }
+                    Storage.Delete(Path.Combine(prefix, f.StoragePath));
+                    Connection.FileInfo.Remove(f);
                 }
-            });
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not delete beatmap {f}");
+                }
+            }
         }
     }
 }

@@ -30,7 +30,7 @@ namespace osu.Game.Online.API.Requests
             this.direction = direction;
         }
 
-        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={(int)rankStatus}&sort={sortCriteria.ToString().ToLower()}_{directionString}";
+        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.Id ?? 0}&s={(int)rankStatus}&sort={sortCriteria.ToString().ToLower()}_{directionString}";
     }
 
     public class GetBeatmapSetsResponse : BeatmapMetadata
@@ -63,8 +63,8 @@ namespace osu.Game.Online.API.Requests
         {
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = onlineId,
-                Metadata = this,
+                BeatmapSetOnlineInfoId = onlineId,
+                BeatmapMetadata = this,
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
                     Author = new User
@@ -99,8 +99,8 @@ namespace osu.Game.Online.API.Requests
             {
                 return new BeatmapInfo
                 {
-                    Metadata = this,
-                    Ruleset = rulesets.GetRuleset(ruleset),
+                    BeatmapMetadata = this,
+                    RulesetInfo = rulesets.GetRuleset(ruleset),
                     StarDifficulty = starDifficulty,
                     OnlineInfo = new BeatmapOnlineInfo
                     {

@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             foreach (ToolbarModeButton m in modeButtons.Children.Cast<ToolbarModeButton>())
             {
-                bool isActive = m.Ruleset.ID == ruleset.ID;
+                bool isActive = m.Ruleset.Id == ruleset.Id;
                 m.Active = isActive;
                 if (isActive)
                     activeButton = m;

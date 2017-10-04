@@ -2,6 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using osu.Game.Users;
 
@@ -12,10 +15,18 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public class BeatmapSetOnlineInfo
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
         /// <summary>
         /// The author of the beatmaps in this set.
         /// </summary>
         public User Author;
+
+        public int BeatmapSetInfoId { get; set; }
+        public BeatmapSetInfo BeatmapSetInfo { get; set; }
+
+        public List<BeatmapInfo> Beatmaps { get; set; }
 
         /// <summary>
         /// The date this beatmap set was submitted to the online listing.
@@ -35,7 +46,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The different sizes of cover art for this beatmap set.
         /// </summary>
-        [JsonProperty(@"covers")]
+        [Required, JsonProperty(@"covers")]
         public BeatmapSetOnlineCovers Covers { get; set; }
 
         /// <summary>
@@ -64,6 +75,9 @@ namespace osu.Game.Beatmaps
 
     public class BeatmapSetOnlineCovers
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
         public string CoverLowRes { get; set; }
 
         [JsonProperty(@"cover@2x")]

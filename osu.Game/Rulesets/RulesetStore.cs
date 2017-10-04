@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
-using SQLite.Net;
 
 namespace osu.Game.Rulesets
 {
@@ -18,9 +18,9 @@ namespace osu.Game.Rulesets
     {
         private static readonly Dictionary<Assembly, Type> loaded_assemblies = new Dictionary<Assembly, Type>();
 
-        public IEnumerable<RulesetInfo> AllRulesets => Query<RulesetInfo>().Where(r => r.Available);
+        public IEnumerable<RulesetInfo> AllRulesets => Connection.RulesetInfo.Where(r => r.Available);
 
-        public RulesetStore(SQLiteConnection connection) : base(connection)
+        public RulesetStore(OsuDbContext connection) : base(connection)
         {
         }
 
@@ -38,54 +38,50 @@ namespace osu.Game.Rulesets
 
         protected override void Prepare(bool reset = false)
         {
-
-            Connection.CreateTable<RulesetInfo>();
-
             if (reset)
             {
-                Connection.DeleteAll<RulesetInfo>();
+                Connection.Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
             }
-
+            
             var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo()));
 
-            Connection.RunInTransaction(() =>
+            //add all legacy modes in correct order
+            foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
             {
-                //add all legacy modes in correct order
-                foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
+                var rulesetInfo = createRulesetInfo(r);
+                if (Connection.RulesetInfo.SingleOrDefault(rsi=>rsi.Id==rulesetInfo.Id)==null)
                 {
-                    Connection.InsertOrReplace(createRulesetInfo(r));
+                    Connection.RulesetInfo.Add(rulesetInfo);
                 }
+            }
 
-                //add any other modes
-                foreach (var r in instances.Where(r => r.LegacyID < 0))
-                {
-                    var us = createRulesetInfo(r);
-
-                    var existing = Query<RulesetInfo>().Where(ri => ri.InstantiationInfo == us.InstantiationInfo).FirstOrDefault();
-
-                    if (existing == null)
-                        Connection.Insert(us);
-                }
-            });
-
-            Connection.RunInTransaction(() =>
+            //add any other modes
+            foreach (var r in instances.Where(r => r.LegacyID < 0))
             {
-                //perform a consistency check
-                foreach (var r in Query<RulesetInfo>())
-                {
-                    try
-                    {
-                        r.CreateInstance();
-                        r.Available = true;
-                    }
-                    catch
-                    {
-                        r.Available = false;
-                    }
+                var us = createRulesetInfo(r);
 
-                    Connection.Update(r);
+                var existing = Connection.RulesetInfo.Where(ri => ri.InstantiationInfo == us.InstantiationInfo).FirstOrDefault();
+
+                if (existing == null)
+                    Connection.RulesetInfo.Add(us);
+            }
+
+            //perform a consistency check
+            foreach (var r in Connection.RulesetInfo)
+            {
+                try
+                {
+                    r.CreateInstance();
+                    r.Available = true;
                 }
-            });
+                catch
+                {
+                    r.Available = false;
+                }
+
+                //Connection.RulesetInfo.Update(r);
+            }
+            Connection.SaveChanges();
         }
 
         private static void loadRulesetFromFile(string file)
@@ -107,11 +103,24 @@ namespace osu.Game.Rulesets
         {
             Name = ruleset.Description,
             InstantiationInfo = ruleset.GetType().AssemblyQualifiedName,
-            ID = ruleset.LegacyID
+            Id = ruleset.LegacyID
         };
 
         protected override Type[] ValidTypes => new[] { typeof(RulesetInfo) };
 
-        public RulesetInfo GetRuleset(int id) => Query<RulesetInfo>().First(r => r.ID == id);
+        public RulesetInfo GetRuleset(int id) => Connection.RulesetInfo.First(r => r.Id == id);
+
+        public RulesetInfo QueryRulesetInfo(Func<RulesetInfo, bool> query)
+        {
+            return Connection.RulesetInfo.FirstOrDefault(query);
+        }
+
+        public List<RulesetInfo> QueryRulesets(Func<RulesetInfo, bool> query = null)
+        {
+            var rulesets = Connection.RulesetInfo;
+            if (query != null)
+                return rulesets.Where(query).ToList();
+            return rulesets.ToList();
+        }
     }
 }

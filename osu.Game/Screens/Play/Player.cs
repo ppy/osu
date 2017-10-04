@@ -99,18 +99,18 @@ namespace osu.Game.Screens.Play
                 if (beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                ruleset = Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
+                ruleset = Ruleset.Value ?? beatmap.BeatmapInfo.RulesetInfo;
                 var rulesetInstance = ruleset.CreateInstance();
 
                 try
                 {
-                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(working, ruleset.ID == beatmap.BeatmapInfo.Ruleset.ID);
+                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(working, ruleset.Id == beatmap.BeatmapInfo.RulesetInfo.Id);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
                     // we may fail to create a RulesetContainer if the beatmap cannot be loaded with the user's preferred ruleset
                     // let's try again forcing the beatmap's ruleset.
-                    ruleset = beatmap.BeatmapInfo.Ruleset;
+                    ruleset = beatmap.BeatmapInfo.RulesetInfo;
                     rulesetInstance = ruleset.CreateInstance();
                     RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap, true);
                 }

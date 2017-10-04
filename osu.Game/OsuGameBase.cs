@@ -3,7 +3,9 @@
 
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Development;
@@ -17,7 +19,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
-using SQLite.Net;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Database;
 using osu.Game.Input;
@@ -82,14 +83,21 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-        private SQLiteConnection createConnection()
-        {
-            var conn = Host.Storage.GetDatabase(@"client");
-            conn.BusyTimeout = new TimeSpan(TimeSpan.TicksPerSecond * 10);
-            return conn;
-        }
+        //private OsuDbContext dbContext;
 
-        private SQLiteConnection connection;
+        private OsuDbContext createDbContext()
+        {
+            var connectionString = Host.Storage.GetDatabaseConnectionString(@"client");
+            var context = new OsuDbContext(connectionString);
+            var connection = context.Database.GetDbConnection();
+            connection.Open();
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "PRAGMA journal_mode=WAL;";
+                command.ExecuteNonQuery();
+            }
+            return context;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -97,8 +105,10 @@ namespace osu.Game
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            connection = createConnection();
-            connection.CreateTable<StoreVersion>();
+            
+            using (var dbContext = createDbContext())
+                if (dbContext.Database.GetPendingMigrations().Any())
+                    dbContext.Database.Migrate();
 
             dependencies.Cache(API = new APIAccess
             {
@@ -106,11 +116,11 @@ namespace osu.Game
                 Token = LocalConfig.Get<string>(OsuSetting.Token)
             });
 
-            dependencies.Cache(RulesetStore = new RulesetStore(connection));
-            dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, API, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager, RulesetStore));
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(connection, RulesetStore));
+            dependencies.Cache(RulesetStore = new RulesetStore(createDbContext()));
+            dependencies.Cache(FileStore = new FileStore(createDbContext(), Host.Storage));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, createDbContext(), RulesetStore, API, Host));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, createDbContext(), Host, BeatmapManager, RulesetStore));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(createDbContext(), RulesetStore));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
@@ -237,7 +247,7 @@ namespace osu.Game
                 LocalConfig.Save();
             }
 
-            connection?.Dispose();
+            //dbContext?.Dispose();
 
             base.Dispose(isDisposing);
         }

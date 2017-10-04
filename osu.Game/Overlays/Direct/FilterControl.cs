@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Direct
 
             private void Bindable_ValueChanged(RulesetInfo obj)
             {
-                iconContainer.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
+                iconContainer.FadeTo(Ruleset.Id == obj?.Id ? 1f : 0.5f, 100);
             }
 
             public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)

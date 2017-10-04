@@ -24,12 +24,12 @@ namespace osu.Game.Tests.Visual
             AddStep("beatmap all metrics", () => details.Beatmap = new BeatmapInfo
             {
                 Version = "All Metrics",
-                Metadata = new BeatmapMetadata
+                BeatmapMetadata = new BeatmapMetadata
                 {
                     Source = "osu!lazer",
                     Tags = "this beatmap has all the metrics",
                 },
-                Difficulty = new BeatmapDifficulty
+                BeatmapDifficulty = new BeatmapDifficulty
                 {
                     CircleSize = 7,
                     DrainRate = 1,
@@ -48,12 +48,12 @@ namespace osu.Game.Tests.Visual
             AddStep("beatmap ratings", () => details.Beatmap = new BeatmapInfo
             {
                 Version = "Only Ratings",
-                Metadata = new BeatmapMetadata
+                BeatmapMetadata = new BeatmapMetadata
                 {
                     Source = "osu!lazer",
                     Tags = "this beatmap has ratings metrics but not retries or fails",
                 },
-                Difficulty = new BeatmapDifficulty
+                BeatmapDifficulty = new BeatmapDifficulty
                 {
                     CircleSize = 6,
                     DrainRate = 9,
@@ -70,12 +70,12 @@ namespace osu.Game.Tests.Visual
             AddStep("beatmap fails retries", () => details.Beatmap = new BeatmapInfo
             {
                 Version = "Only Retries and Fails",
-                Metadata = new BeatmapMetadata
+                BeatmapMetadata = new BeatmapMetadata
                 {
                     Source = "osu!lazer",
                     Tags = "this beatmap has retries and fails but no ratings",
                 },
-                Difficulty = new BeatmapDifficulty
+                BeatmapDifficulty = new BeatmapDifficulty
                 {
                     CircleSize = 3.7f,
                     DrainRate = 6,
@@ -93,12 +93,12 @@ namespace osu.Game.Tests.Visual
             AddStep("beatmap no metrics", () => details.Beatmap = new BeatmapInfo
             {
                 Version = "No Metrics",
-                Metadata = new BeatmapMetadata
+                BeatmapMetadata = new BeatmapMetadata
                 {
                     Source = "osu!lazer",
                     Tags = "this beatmap has no metrics",
                 },
-                Difficulty = new BeatmapDifficulty
+                BeatmapDifficulty = new BeatmapDifficulty
                 {
                     CircleSize = 5,
                     DrainRate = 5,

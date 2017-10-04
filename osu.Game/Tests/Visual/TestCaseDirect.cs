@@ -41,8 +41,8 @@ namespace osu.Game.Tests.Visual
             {
                 new BeatmapSetInfo
                 {
-                    OnlineBeatmapSetID = 578332,
-                    Metadata = new BeatmapMetadata
+                    BeatmapSetOnlineInfoId = 578332,
+                    BeatmapMetadata = new BeatmapMetadata
                     {
                         Title = @"OrVid",
                         Artist = @"An",
@@ -65,16 +65,16 @@ namespace osu.Game.Tests.Visual
                     {
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 5.35f,
-                            Metadata = new BeatmapMetadata(),
+                            BeatmapMetadata = new BeatmapMetadata(),
                         },
                     },
                 },
                 new BeatmapSetInfo
                 {
-                    OnlineBeatmapSetID = 599627,
-                    Metadata = new BeatmapMetadata
+                    BeatmapSetOnlineInfoId = 599627,
+                    BeatmapMetadata = new BeatmapMetadata
                     {
                         Title = @"tiny lamp",
                         Artist = @"fhana",
@@ -97,16 +97,16 @@ namespace osu.Game.Tests.Visual
                     {
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 5.81f,
-                            Metadata = new BeatmapMetadata(),
+                            BeatmapMetadata = new BeatmapMetadata(),
                         },
                     },
                 },
                 new BeatmapSetInfo
                 {
-                    OnlineBeatmapSetID = 513268,
-                    Metadata = new BeatmapMetadata
+                    BeatmapSetOnlineInfoId = 513268,
+                    BeatmapMetadata = new BeatmapMetadata
                     {
                         Title = @"At Gwanghwamun",
                         Artist = @"KYUHYUN",
@@ -129,31 +129,31 @@ namespace osu.Game.Tests.Visual
                     {
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 0.9f,
-                            Metadata = new BeatmapMetadata(),
+                            BeatmapMetadata = new BeatmapMetadata(),
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 1.1f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 2.02f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 3.49f,
                         },
                     },
                 },
                 new BeatmapSetInfo
                 {
-                    OnlineBeatmapSetID = 586841,
-                    Metadata = new BeatmapMetadata
+                    BeatmapSetOnlineInfoId = 586841,
+                    BeatmapMetadata = new BeatmapMetadata
                     {
                         Title = @"RHAPSODY OF BLUE SKY",
                         Artist = @"fhana",
@@ -176,43 +176,43 @@ namespace osu.Game.Tests.Visual
                     {
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 1.26f,
-                            Metadata = new BeatmapMetadata(),
+                            BeatmapMetadata = new BeatmapMetadata(),
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 2.01f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 2.87f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 3.76f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 3.93f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 4.37f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 5.13f,
                         },
                         new BeatmapInfo
                         {
-                            Ruleset = ruleset,
+                            RulesetInfo = ruleset,
                             StarDifficulty = 5.42f,
                         },
                     },
