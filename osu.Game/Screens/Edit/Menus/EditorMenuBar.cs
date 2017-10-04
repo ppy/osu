@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
-using System;
+using osu.Game.Screens.Edit.Screens;
 
 namespace osu.Game.Screens.Edit.Menus
 {
