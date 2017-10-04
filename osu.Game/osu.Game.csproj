@@ -622,6 +622,7 @@
     <Compile Include="Screens\Edit\Screens\Design\Design.cs" />
     <Compile Include="Screens\Edit\Screens\EditorScreen.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Compose.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\ScrollableTimeline.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\WaveformDisplay.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
@@ -748,6 +749,7 @@
     <Compile Include="Tests\Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Tests\Visual\TestCaseDrawings.cs" />
     <Compile Include="Tests\Visual\TestCaseEditor.cs" />
+    <Compile Include="Tests\Visual\TestCaseEditorComposeTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorMenuBar.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorSummaryTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseGamefield.cs" />
