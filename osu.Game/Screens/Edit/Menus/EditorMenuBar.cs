@@ -11,16 +11,14 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Configuration;
 using osu.Game.Screens.Edit.Screens;
 
 namespace osu.Game.Screens.Edit.Menus
 {
     public class EditorMenuBar : OsuMenu
     {
-        /// <summary>
-        /// Invaoked when the selected mode has changed.
-        /// </summary>
-        public event Action<EditorScreenMode> ModeChanged;
+        public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
         private readonly ScreenSelectionTabControl tabControl;
 
@@ -42,7 +40,7 @@ namespace osu.Game.Screens.Edit.Menus
                 }
             });
 
-            tabControl.Current.ValueChanged += v => ModeChanged?.Invoke(v);
+            tabControl.Current.BindTo(Mode);
         }
 
         protected override void LoadComplete()
