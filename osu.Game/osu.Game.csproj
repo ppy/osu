@@ -622,6 +622,7 @@
     <Compile Include="Screens\Edit\Screens\Design\Design.cs" />
     <Compile Include="Screens\Edit\Screens\EditorScreen.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Compose.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\WaveformDisplay.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
@@ -779,6 +780,7 @@
     <Compile Include="Tests\Visual\TestCaseTwoLayerButton.cs" />
     <Compile Include="Tests\Visual\TestCaseUserPanel.cs" />
     <Compile Include="Tests\Visual\TestCaseUserProfile.cs" />
+    <Compile Include="Tests\Visual\TestCaseWaveform.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Users\Country.cs" />
     <Compile Include="Users\Medal.cs" />
