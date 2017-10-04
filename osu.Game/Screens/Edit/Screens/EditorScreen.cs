@@ -1,13 +1,17 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit.Screens
 {
     public class EditorScreen : Container
     {
+        public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
