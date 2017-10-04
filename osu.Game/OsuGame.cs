@@ -188,11 +188,11 @@ namespace osu.Game
                 GetToolbarHeight = () => ToolbarOffset,
                 Depth = -1
             }, overlayContent.Add);
-            LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
             LoadComponentAsync(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -2 }, mainContent.Add);
+            LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -3 }, mainContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
-                Depth = -3,
+                Depth = -4,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -200,7 +200,7 @@ namespace osu.Game
 
             LoadComponentAsync(notificationOverlay = new NotificationOverlay
             {
-                Depth = -3,
+                Depth = -4,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);

@@ -124,7 +124,6 @@
       <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.dll</HintPath>
       <Private>True</Private>
@@ -618,6 +617,7 @@
     <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItemSpacer.cs" />
+    <Compile Include="Screens\Edit\Menus\ScreenSelectionTabControl.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
