@@ -28,14 +28,14 @@ namespace osu.Game.Screens.Edit.Screens
         {
             base.LoadComplete();
 
-            this.ScaleTo(0.5f).FadeTo(0)
+            this.ScaleTo(0.75f).FadeTo(0)
                 .Then()
                 .ScaleTo(1f, 500, Easing.OutQuint).FadeTo(1f, 250, Easing.OutQuint);
         }
 
         public void Exit()
         {
-            this.ScaleTo(1.5f, 500).FadeOut(250).Expire();
+            this.ScaleTo(1.25f, 500).FadeOut(250).Expire();
         }
     }
 }
