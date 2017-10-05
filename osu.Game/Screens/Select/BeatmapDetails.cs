@@ -188,8 +188,8 @@ namespace osu.Game.Screens.Select
             ratingsContainer.FadeIn(transition_duration);
             advanced.Beatmap = Beatmap;
             description.Text = Beatmap.Version;
-            source.Text = Beatmap.BeatmapMetadata.Source;
-            tags.Text = Beatmap.BeatmapMetadata.Tags;
+            source.Text = Beatmap.Metadata.Source;
+            tags.Text = Beatmap.Metadata.Tags;
 
             var requestedBeatmap = Beatmap;
             if (requestedBeatmap.Metrics == null)
@@ -264,7 +264,7 @@ namespace osu.Game.Screens.Select
             advanced.Beatmap = new BeatmapInfo
             {
                 StarDifficulty = 0,
-                BeatmapDifficulty = new BeatmapDifficulty
+                Difficulty = new BeatmapDifficulty
                 {
                     CircleSize = 0,
                     DrainRate = 0,

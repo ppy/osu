@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
@@ -10,14 +9,14 @@ namespace osu.Game.Beatmaps
 {
     public class BeatmapSetInfo
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public int? BeatmapSetOnlineInfoId { get; set; }
 
-        [ForeignKey(nameof(BeatmapMetadata))]
+        public BeatmapMetadata Metadata { get; set; }
+
         public int BeatmapMetadataId { get; set; }
-        public BeatmapMetadata BeatmapMetadata { get; set; }
 
         public List<BeatmapInfo> Beatmaps { get; set; }
 
@@ -26,6 +25,7 @@ namespace osu.Game.Beatmaps
 
         public double MaxStarDifficulty => Beatmaps.Max(b => b.StarDifficulty);
 
+        [NotMapped]
         public bool DeletePending { get; set; }
 
         public string Hash { get; set; }

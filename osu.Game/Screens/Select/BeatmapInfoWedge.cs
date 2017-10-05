@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Select
             public BufferedWedgeInfo(WorkingBeatmap beatmap)
             {
                 BeatmapInfo beatmapInfo = beatmap.BeatmapInfo;
-                BeatmapMetadata metadata = beatmapInfo.BeatmapMetadata ?? beatmap.BeatmapSetInfo?.BeatmapMetadata ?? new BeatmapMetadata();
+                BeatmapMetadata metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
                 List<InfoLabel> labels = new List<InfoLabel>();
 
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Select
                     }));
 
                     //get statistics from the current ruleset.
-                    labels.AddRange(beatmapInfo.RulesetInfo.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
+                    labels.AddRange(beatmapInfo.Ruleset.CreateInstance().GetBeatmapStatistics(beatmap).Select(s => new InfoLabel(s)));
                 }
 
                 PixelSnapping = true;

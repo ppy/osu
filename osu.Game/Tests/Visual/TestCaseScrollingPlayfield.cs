@@ -48,8 +48,8 @@ namespace osu.Game.Tests.Visual
                 HitObjects = objects,
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BeatmapDifficulty = new BeatmapDifficulty(),
-                    BeatmapMetadata = new BeatmapMetadata()
+                    Difficulty = new BeatmapDifficulty(),
+                    Metadata = new BeatmapMetadata()
                 }
             };
 

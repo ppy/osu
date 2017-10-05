@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
                 {
-                    BeatmapMetadata = new BeatmapMetadata
+                    Metadata = new BeatmapMetadata
                     {
                         Title = @"Lachryma <Re:Queen’M>",
                         Artist = @"Kaneko Chiharu",
@@ -64,8 +64,8 @@ namespace osu.Game.Tests.Visual
                         {
                             StarDifficulty = 1.36,
                             Version = @"BASIC",
-                            RulesetInfo = mania,
-                            BeatmapDifficulty = new BeatmapDifficulty
+                            Ruleset = mania,
+                            Difficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 6.5f,
@@ -92,8 +92,8 @@ namespace osu.Game.Tests.Visual
                         {
                             StarDifficulty = 2.22,
                             Version = @"NOVICE",
-                            RulesetInfo = mania,
-                            BeatmapDifficulty = new BeatmapDifficulty
+                            Ruleset = mania,
+                            Difficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 7,
@@ -120,8 +120,8 @@ namespace osu.Game.Tests.Visual
                         {
                             StarDifficulty = 3.49,
                             Version = @"ADVANCED",
-                            RulesetInfo = mania,
-                            BeatmapDifficulty = new BeatmapDifficulty
+                            Ruleset = mania,
+                            Difficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 7.5f,
@@ -148,8 +148,8 @@ namespace osu.Game.Tests.Visual
                         {
                             StarDifficulty = 4.24,
                             Version = @"EXHAUST",
-                            RulesetInfo = mania,
-                            BeatmapDifficulty = new BeatmapDifficulty
+                            Ruleset = mania,
+                            Difficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 8,
@@ -176,8 +176,8 @@ namespace osu.Game.Tests.Visual
                         {
                             StarDifficulty = 5.26,
                             Version = @"GRAVITY",
-                            RulesetInfo = mania,
-                            BeatmapDifficulty = new BeatmapDifficulty
+                            Ruleset = mania,
+                            Difficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 8.5f,
@@ -208,7 +208,7 @@ namespace osu.Game.Tests.Visual
             {
                 overlay.ShowBeatmapSet(new BeatmapSetInfo
                 {
-                    BeatmapMetadata = new BeatmapMetadata
+                    Metadata = new BeatmapMetadata
                     {
                         Title = @"Soumatou Labyrinth",
                         Artist = @"Yunomi with Momobako&miko",
@@ -238,8 +238,8 @@ namespace osu.Game.Tests.Visual
                         {
                             StarDifficulty = 1.40,
                             Version = @"yzrin's Kantan",
-                            RulesetInfo = taiko,
-                            BeatmapDifficulty = new BeatmapDifficulty
+                            Ruleset = taiko,
+                            Difficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
                                 DrainRate = 7,
@@ -266,8 +266,8 @@ namespace osu.Game.Tests.Visual
                         {
                             StarDifficulty = 2.23,
                             Version = @"Futsuu",
-                            RulesetInfo = taiko,
-                            BeatmapDifficulty = new BeatmapDifficulty
+                            Ruleset = taiko,
+                            Difficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
                                 DrainRate = 6,
@@ -294,8 +294,8 @@ namespace osu.Game.Tests.Visual
                         {
                             StarDifficulty = 3.19,
                             Version = @"Muzukashii",
-                            RulesetInfo = taiko,
-                            BeatmapDifficulty = new BeatmapDifficulty
+                            Ruleset = taiko,
+                            Difficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
                                 DrainRate = 6,
@@ -322,8 +322,8 @@ namespace osu.Game.Tests.Visual
                         {
                             StarDifficulty = 3.97,
                             Version = @"Charlotte's Oni",
-                            RulesetInfo = taiko,
-                            BeatmapDifficulty = new BeatmapDifficulty
+                            Ruleset = taiko,
+                            Difficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 5,
                                 DrainRate = 6,
@@ -350,8 +350,8 @@ namespace osu.Game.Tests.Visual
                         {
                             StarDifficulty = 5.08,
                             Version = @"Labyrinth Oni",
-                            RulesetInfo = taiko,
-                            BeatmapDifficulty = new BeatmapDifficulty
+                            Ruleset = taiko,
+                            Difficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 5,
                                 DrainRate = 5,

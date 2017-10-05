@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps
 {
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         //TODO: should be in database
@@ -23,17 +23,18 @@ namespace osu.Game.Beatmaps
 
         public int? BeatmapSetOnlineInfoId { get; set; }
 
-        [ForeignKey(nameof(BeatmapSetInfo))]
         public int BeatmapSetInfoId { get; set; }
-        public BeatmapSetInfo BeatmapSetInfo { get; set; }
 
-        [ForeignKey(nameof(BeatmapMetadata))]
+        public BeatmapSetInfo BeatmapSet { get; set; }
+
         public int BeatmapMetadataId { get; set; }
-        public BeatmapMetadata BeatmapMetadata { get; set; }
 
-        [ForeignKey(nameof(BeatmapDifficulty))]
+        public BeatmapMetadata Metadata { get; set; }
+
+        //[Required]
         public int BeatmapDifficultyId { get; set; }
-        public BeatmapDifficulty BeatmapDifficulty { get; set; }
+
+        public BeatmapDifficulty Difficulty { get; set; }
 
         [NotMapped]
         public BeatmapMetrics Metrics { get; set; }
@@ -51,6 +52,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// MD5 is kept for legacy support (matching against replays, osu-web-10 etc.).
         /// </summary>
+        [NotMapped]
         [JsonProperty("file_md5")]
         public string MD5Hash { get; set; }
 
@@ -60,9 +62,9 @@ namespace osu.Game.Beatmaps
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
 
-        [ForeignKey(nameof(RulesetInfo))]
         public int RulesetInfoId { get; set; }
-        public RulesetInfo RulesetInfo { get; set; }
+
+        public RulesetInfo Ruleset { get; set; }
 
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
@@ -113,12 +115,12 @@ namespace osu.Game.Beatmaps
             return Id == other?.Id;
         }
 
-        public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSetInfo != null && other.BeatmapSetInfo != null &&
-                                                      BeatmapSetInfo.Hash == other.BeatmapSetInfo.Hash &&
-                                                      (BeatmapMetadata ?? BeatmapSetInfo.BeatmapMetadata).AudioFile == (other.BeatmapMetadata ?? other.BeatmapSetInfo.BeatmapMetadata).AudioFile;
+        public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
+                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
+                                                      (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
 
-        public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSetInfo != null && other.BeatmapSetInfo != null &&
-                                                      BeatmapSetInfo.Hash == other.BeatmapSetInfo.Hash &&
-                                                      (BeatmapMetadata ?? BeatmapSetInfo.BeatmapMetadata).BackgroundFile == (other.BeatmapMetadata ?? other.BeatmapSetInfo.BeatmapMetadata).BackgroundFile;
+        public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
+                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
+                                                      (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
     }
 }

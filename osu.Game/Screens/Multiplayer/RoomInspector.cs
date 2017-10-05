@@ -331,7 +331,7 @@ namespace osu.Game.Screens.Multiplayer
                 coverContainer.FadeIn(transition_duration);
                 coverContainer.Children = new[]
                 {
-                    new AsyncLoadWrapper(new BeatmapSetCover(value.BeatmapSetInfo)
+                    new AsyncLoadWrapper(new BeatmapSetCover(value.BeatmapSet)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
@@ -341,10 +341,10 @@ namespace osu.Game.Screens.Multiplayer
                     }) { RelativeSizeAxes = Axes.Both },
                 };
 
-                beatmapTitle.Current = localisation.GetUnicodePreference(value.BeatmapMetadata.TitleUnicode, value.BeatmapMetadata.Title);
+                beatmapTitle.Current = localisation.GetUnicodePreference(value.Metadata.TitleUnicode, value.Metadata.Title);
                 beatmapDash.Text = @" - ";
-                beatmapArtist.Current = localisation.GetUnicodePreference(value.BeatmapMetadata.ArtistUnicode, value.BeatmapMetadata.Artist);
-                beatmapAuthor.Text = $"mapped by {value.BeatmapMetadata.Author}";
+                beatmapArtist.Current = localisation.GetUnicodePreference(value.Metadata.ArtistUnicode, value.Metadata.Artist);
+                beatmapAuthor.Text = $"mapped by {value.Metadata.Author}";
             }
             else
             {

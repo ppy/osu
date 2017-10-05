@@ -43,13 +43,13 @@ namespace osu.Game.Tests.Visual
                             Value = new BeatmapInfo
                             {
                                 StarDifficulty = 4.65,
-                                RulesetInfo = rulesets.GetRuleset(3),
-                                BeatmapMetadata = new BeatmapMetadata
+                                Ruleset = rulesets.GetRuleset(3),
+                                Metadata = new BeatmapMetadata
                                 {
                                     Title = @"Critical Crystal",
                                     Artist = @"Seiryu",
                                 },
-                                BeatmapSetInfo = new BeatmapSetInfo
+                                BeatmapSet = new BeatmapSetInfo
                                 {
                                     OnlineInfo = new BeatmapSetOnlineInfo
                                     {
@@ -81,13 +81,13 @@ namespace osu.Game.Tests.Visual
                             Value = new BeatmapInfo
                             {
                                 StarDifficulty = 1.96,
-                                RulesetInfo = rulesets.GetRuleset(0),
-                                BeatmapMetadata = new BeatmapMetadata
+                                Ruleset = rulesets.GetRuleset(0),
+                                Metadata = new BeatmapMetadata
                                 {
                                     Title = @"Serendipity",
                                     Artist = @"ZAQ",
                                 },
-                                BeatmapSetInfo = new BeatmapSetInfo
+                                BeatmapSet = new BeatmapSetInfo
                                 {
                                     OnlineInfo = new BeatmapSetOnlineInfo
                                     {

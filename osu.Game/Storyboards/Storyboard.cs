@@ -37,7 +37,7 @@ namespace osu.Game.Storyboards
         /// </summary>
         public bool ReplacesBackground(BeatmapInfo beatmapInfo)
         {
-            var backgroundPath = beatmapInfo.BeatmapSetInfo?.BeatmapMetadata?.BackgroundFile?.ToLowerInvariant();
+            var backgroundPath = beatmapInfo.BeatmapSet?.Metadata?.BackgroundFile?.ToLowerInvariant();
             if (backgroundPath == null)
                 return false;
 

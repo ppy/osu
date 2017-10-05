@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select
                 bool match = hasCurrentMode;
 
                 if (!string.IsNullOrEmpty(SearchText))
-                    match &= set.BeatmapMetadata.SearchableTerms.Any(term => term.IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) >= 0);
+                    match &= set.Metadata.SearchableTerms.Any(term => term.IndexOf(SearchText, StringComparison.InvariantCultureIgnoreCase) >= 0);
 
                 switch (g.State)
                 {
@@ -45,13 +45,13 @@ namespace osu.Game.Screens.Select
             {
                 default:
                 case SortMode.Artist:
-                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.BeatmapMetadata.Artist, y.BeatmapSet.BeatmapMetadata.Artist, StringComparison.InvariantCultureIgnoreCase));
+                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Artist, y.BeatmapSet.Metadata.Artist, StringComparison.InvariantCultureIgnoreCase));
                     break;
                 case SortMode.Title:
-                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.BeatmapMetadata.Title, y.BeatmapSet.BeatmapMetadata.Title, StringComparison.InvariantCultureIgnoreCase));
+                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase));
                     break;
                 case SortMode.Author:
-                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.BeatmapMetadata.Author, y.BeatmapSet.BeatmapMetadata.Author, StringComparison.InvariantCultureIgnoreCase));
+                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author, StringComparison.InvariantCultureIgnoreCase));
                     break;
                 case SortMode.Difficulty:
                     groups.Sort((x, y) => x.BeatmapSet.MaxStarDifficulty.CompareTo(y.BeatmapSet.MaxStarDifficulty));

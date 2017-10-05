@@ -67,8 +67,8 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 HitObjects = new List<HitObject> { new CentreHit() },
                 BeatmapInfo = new BeatmapInfo
                 {
-                    BeatmapDifficulty = new BeatmapDifficulty(),
-                    BeatmapMetadata = new BeatmapMetadata
+                    Difficulty = new BeatmapDifficulty(),
+                    Metadata = new BeatmapMetadata
                     {
                         Artist = @"Unknown",
                         Title = @"Sample Beatmap",

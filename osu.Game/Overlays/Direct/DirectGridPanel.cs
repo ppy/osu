@@ -66,13 +66,13 @@ namespace osu.Game.Overlays.Direct
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = localisation.GetUnicodePreference(SetInfo.BeatmapMetadata.TitleUnicode, SetInfo.BeatmapMetadata.Title),
+                                    Text = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
                                     TextSize = 18,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = localisation.GetUnicodePreference(SetInfo.BeatmapMetadata.ArtistUnicode, SetInfo.BeatmapMetadata.Artist),
+                                    Text = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
                                     Font = @"Exo2.0-BoldItalic",
                                 },
                             },
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Direct
                                                 },
                                                 new OsuSpriteText
                                                 {
-                                                    Text = SetInfo.BeatmapMetadata.Author,
+                                                    Text = SetInfo.Metadata.Author,
                                                     TextSize = 14,
                                                     Font = @"Exo2.0-SemiBoldItalic",
                                                     Shadow = false,
@@ -132,11 +132,11 @@ namespace osu.Game.Overlays.Direct
                                             {
                                                 new OsuSpriteText
                                                 {
-                                                    Text = $"from {SetInfo.BeatmapMetadata.Source}",
+                                                    Text = $"from {SetInfo.Metadata.Source}",
                                                     TextSize = 14,
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
-                                                    Alpha = string.IsNullOrEmpty(SetInfo.BeatmapMetadata.Source) ? 0f : 1f,
+                                                    Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
                                                 },
                                             },
                                         },

@@ -200,7 +200,7 @@ namespace osu.Game.Beatmaps
 
             ProgressNotification downloadNotification = new ProgressNotification
             {
-                Text = $"Downloading {beatmapSetInfo.BeatmapMetadata.Artist} - {beatmapSetInfo.BeatmapMetadata.Title}",
+                Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
             };
 
             var request = new DownloadBeatmapSetRequest(beatmapSetInfo);
@@ -306,11 +306,11 @@ namespace osu.Game.Beatmaps
             //lock (beatmaps)
             //    beatmaps.Populate(beatmapInfo);
 
-            if (beatmapInfo.BeatmapSetInfo == null)
+            if (beatmapInfo.BeatmapSet == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoId} is not in the local database.");
 
-            if (beatmapInfo.BeatmapMetadata == null)
-                beatmapInfo.BeatmapMetadata = beatmapInfo.BeatmapSetInfo.BeatmapMetadata;
+            if (beatmapInfo.Metadata == null)
+                beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
             WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(files.Store, beatmapInfo);
 
@@ -466,7 +466,7 @@ namespace osu.Game.Beatmaps
                 Beatmaps = new List<BeatmapInfo>(),
                 Hash = hash,
                 Files = fileInfos,
-                BeatmapMetadata = metadata
+                Metadata = metadata
             };
 
             var mapNames = reader.Filenames.Where(f => f.EndsWith(".osu"));
@@ -488,10 +488,10 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
                     // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
-                    beatmap.BeatmapInfo.BeatmapMetadata = null;
+                    beatmap.BeatmapInfo.Metadata = null;
 
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
-                    beatmap.BeatmapInfo.RulesetInfo = rulesets.QueryRulesetInfo(r => r.Id == beatmap.BeatmapInfo.RulesetInfoId);
+                    beatmap.BeatmapInfo.Ruleset = rulesets.QueryRulesetInfo(r => r.Id == beatmap.BeatmapInfo.RulesetInfoId);
                     beatmap.BeatmapInfo.StarDifficulty = rulesets.QueryRulesetInfo(r => r.Id == beatmap.BeatmapInfo.RulesetInfoId)?.CreateInstance()?.CreateDifficultyCalculator(beatmap)
                                                                  .Calculate() ?? 0;
 

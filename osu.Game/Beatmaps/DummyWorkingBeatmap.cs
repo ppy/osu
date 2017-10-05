@@ -18,14 +18,14 @@ namespace osu.Game.Beatmaps
         public DummyWorkingBeatmap(OsuGameBase game)
             : base(new BeatmapInfo
             {
-                BeatmapMetadata = new BeatmapMetadata
+                Metadata = new BeatmapMetadata
                 {
                     Artist = "please load a beatmap!",
                     Title = "no beatmaps available!",
                     Author = "no one",
                 },
-                BeatmapSetInfo = new BeatmapSetInfo(),
-                BeatmapDifficulty = new BeatmapDifficulty
+                BeatmapSet = new BeatmapSetInfo(),
+                Difficulty = new BeatmapDifficulty
                 {
                     DrainRate = 0,
                     CircleSize = 0,
@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
                     SliderMultiplier = 0,
                     SliderTickRate = 0,
                 },
-                RulesetInfo = new DummyRulesetInfo()
+                Ruleset = new DummyRulesetInfo()
             })
         {
             this.game = game;
