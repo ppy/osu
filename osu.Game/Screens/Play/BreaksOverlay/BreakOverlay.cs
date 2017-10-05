@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         private void onBreakIn(BreakPeriod b)
         {
             if (letterboxing)
-                letterboxOverlay.FadeIn(fade_duration);
+                letterboxOverlay.Show();
 
             remainingTimeBox
                 .ResizeWidthTo(remaining_time_container_max_size, fade_duration, Easing.OutQuint)
@@ -115,20 +115,19 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
             Scheduler.AddDelayed(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime - Clock.CurrentTime);
 
-            remainingTimeCounter.FadeIn(fade_duration);
-
-            info.FadeIn(fade_duration);
-            arrowsOverlay.Show(fade_duration);
+            remainingTimeCounter.Show();
+            info.Show();
+            arrowsOverlay.Show();
         }
 
         private void onBreakOut()
         {
             if (letterboxing)
-                letterboxOverlay.FadeOut(fade_duration);
+                letterboxOverlay.Hide();
 
-            remainingTimeCounter.FadeOut(fade_duration);
-            info.FadeOut(fade_duration);
-            arrowsOverlay.Hide(fade_duration);
+            remainingTimeCounter.Hide();
+            info.Hide();
+            arrowsOverlay.Hide();
         }
 
         public void BindProcessor(ScoreProcessor processor)
