@@ -99,30 +99,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                             Origin = Anchor.Centre,
                         },
                         circleContainer.CreateProxy(),
-                        spmText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.BottomCentre,
-                            Text = @"0",
-                            Font = @"Venera",
-                            TextSize = 24,
-                            Y = 120
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.TopCentre,
-                            Text = @"SPINS PER MINUTE",
-                            Font = @"Venera",
-                            TextSize = 12,
-                            Y = 125
-                        },
                         ticks = new SpinnerTicks
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
                     }
+                },
+                spmText = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.BottomCentre,
+                    Text = @"0",
+                    Font = @"Venera",
+                    TextSize = 24,
+                    Y = 120
+                },
+                new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
+                    Text = @"SPINS PER MINUTE",
+                    Font = @"Venera",
+                    TextSize = 12,
+                    Y = 125
                 },
             };
         }
