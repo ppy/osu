@@ -45,7 +45,10 @@ namespace osu.Game.Screens.Menu
                 new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
-                    Child = introSequence = new IntroSequence(),
+                    Child = introSequence = new IntroSequence
+                    {
+                        Blending = BlendingMode.Additive,
+                    },
                 }
             };
         }
@@ -110,7 +113,7 @@ namespace osu.Game.Screens.Menu
                 {
                     DidLoadMenu = true;
                     Push(mainMenu);
-                }, 3200);
+                }, 3500);
             }, 600);
 
             introSequence.Start();
