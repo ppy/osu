@@ -124,9 +124,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     rotationFrom = rotations.Dequeue();
                     timeFrom = times.Dequeue();
                 }
-                SpinsPerMinute = (currentRotation - rotationFrom) / (Time.Current - timeFrom) * 1000 * 60 / 360;
+                SpinsPerMinute = (RotationAbsolute - rotationFrom) / (Time.Current - timeFrom) * 1000 * 60 / 360;
             }
-            rotations.Enqueue(currentRotation);
+            rotations.Enqueue(RotationAbsolute);
             times.Enqueue(Time.Current);
 
             if (Complete && updateCompleteTick())
