@@ -20,11 +20,12 @@ namespace osu.Game.Tests.Visual
 
             Child = breakOverlay = new BreakOverlay(true);
 
-            AddStep("Add 2s break", () => startBreak(2000));
-            AddStep("Add 5s break", () => startBreak(5000));
-            AddStep("Add 10s break", () => startBreak(10000));
-            AddStep("Add 15s break", () => startBreak(15000));
-            AddStep("Add 2 breaks (2s each)", startMultipleBreaks);
+            AddStep("2s break", () => startBreak(2000));
+            AddStep("5s break", () => startBreak(5000));
+            AddStep("10s break", () => startBreak(10000));
+            AddStep("15s break", () => startBreak(15000));
+            AddStep("2s, 2s", startMultipleBreaks);
+            AddStep("0.5s, 0.7s, 1s, 2s", startAnotherMultipleBreaks);
         }
 
         private void startBreak(double duration)
@@ -54,6 +55,35 @@ namespace osu.Game.Tests.Visual
                 {
                     StartTime = currentTime + 4000,
                     EndTime = currentTime + 6000,
+                }
+            };
+        }
+
+        private void startAnotherMultipleBreaks()
+        {
+            double currentTime = Clock.CurrentTime;
+
+            breakOverlay.Breaks = new List<BreakPeriod>
+            {
+                new BreakPeriod // Duration is less than 650 - too short to appear
+                {
+                    StartTime = currentTime,
+                    EndTime = currentTime + 500,
+                },
+                new BreakPeriod
+                {
+                    StartTime = currentTime + 1500,
+                    EndTime = currentTime + 2200,
+                },
+                new BreakPeriod
+                {
+                    StartTime = currentTime + 3200,
+                    EndTime = currentTime + 4200,
+                },
+                new BreakPeriod
+                {
+                    StartTime = currentTime + 5200,
+                    EndTime = currentTime + 7200,
                 }
             };
         }
