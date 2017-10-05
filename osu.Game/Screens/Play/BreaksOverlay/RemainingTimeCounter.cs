@@ -5,11 +5,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics;
 using System;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
-    public class RemainingTimeCounter : Container
+    public class RemainingTimeCounter : VisibilityContainer
     {
+        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
+
         private readonly OsuSpriteText counter;
 
         private int? previousSecond;
@@ -21,7 +24,6 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         public RemainingTimeCounter()
         {
             AutoSizeAxes = Axes.Both;
-            Alpha = 0;
             Child = counter = new OsuSpriteText
             {
                 Anchor = Anchor.Centre,
@@ -56,5 +58,8 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 else isCounting = false;
             }
         }
+
+        protected override void PopIn() => this.FadeIn(fade_duration);
+        protected override void PopOut() => this.FadeOut(fade_duration);
     }
 }

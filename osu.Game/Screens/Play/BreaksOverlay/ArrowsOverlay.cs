@@ -5,11 +5,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using OpenTK;
 using osu.Game.Graphics.Containers;
+using System;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
-    public class ArrowsOverlay : Container
+    public class ArrowsOverlay : VisibilityContainer
     {
+        private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
+
         private const int glow_icon_size = 60;
         private const int glow_icon_blur_sigma = 10;
         private const float glow_icon_final_offset = 0.22f;
@@ -79,22 +83,22 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             };
         }
 
-        public void Show(double fadeDuration)
+        protected override void PopIn()
         {
-            leftGlowIcon.MoveToX(-glow_icon_final_offset, fadeDuration, Easing.OutQuint);
-            rightGlowIcon.MoveToX(glow_icon_final_offset, fadeDuration, Easing.OutQuint);
+            leftGlowIcon.MoveToX(-glow_icon_final_offset, fade_duration, Easing.OutQuint);
+            rightGlowIcon.MoveToX(glow_icon_final_offset, fade_duration, Easing.OutQuint);
 
-            leftBlurredIcon.MoveToX(-blurred_icon_final_offset, fadeDuration, Easing.OutQuint);
-            rightBlurredIcon.MoveToX(blurred_icon_final_offset, fadeDuration, Easing.OutQuint);
+            leftBlurredIcon.MoveToX(-blurred_icon_final_offset, fade_duration, Easing.OutQuint);
+            rightBlurredIcon.MoveToX(blurred_icon_final_offset, fade_duration, Easing.OutQuint);
         }
 
-        public void Hide(double fadeDuration)
+        protected override void PopOut()
         {
-            leftGlowIcon.MoveToX(-glow_icon_offscreen_offset, fadeDuration, Easing.OutQuint);
-            rightGlowIcon.MoveToX(glow_icon_offscreen_offset, fadeDuration, Easing.OutQuint);
+            leftGlowIcon.MoveToX(-glow_icon_offscreen_offset, fade_duration, Easing.OutQuint);
+            rightGlowIcon.MoveToX(glow_icon_offscreen_offset, fade_duration, Easing.OutQuint);
 
-            leftBlurredIcon.MoveToX(-blurred_icon_offscreen_offset, fadeDuration, Easing.OutQuint);
-            rightBlurredIcon.MoveToX(blurred_icon_offscreen_offset, fadeDuration, Easing.OutQuint);
+            leftBlurredIcon.MoveToX(-blurred_icon_offscreen_offset, fade_duration, Easing.OutQuint);
+            rightBlurredIcon.MoveToX(blurred_icon_offscreen_offset, fade_duration, Easing.OutQuint);
         }
     }
 }
