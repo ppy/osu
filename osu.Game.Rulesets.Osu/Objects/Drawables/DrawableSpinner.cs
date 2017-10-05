@@ -31,7 +31,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Container circleContainer;
         private readonly CirclePiece circle;
         private readonly GlowPiece glow;
-        private readonly OsuSpriteText spmText;
+        private readonly OsuSpriteText spmText, spmLabel;
+
+        private bool spmShown;
 
         private readonly SpriteIcon symbol;
 
@@ -113,16 +115,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Text = @"0",
                     Font = @"Venera",
                     TextSize = 24,
-                    Y = 120
+                    Y = 120,
+                    Alpha = 0
                 },
-                new OsuSpriteText
+                spmLabel = new OsuSpriteText
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
                     Text = @"SPINS PER MINUTE",
                     Font = @"Venera",
                     TextSize = 12,
-                    Y = 125
+                    Y = 125,
+                    Alpha = 0
                 },
             };
         }
@@ -178,6 +182,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void Update()
         {
             disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
+            if (!spmShown && disc.Tracking)
+            {
+                spmShown = true;
+                spmText.FadeIn(TIME_FADEIN);
+                spmLabel.FadeIn(TIME_FADEIN);
+            }
 
             base.Update();
         }
