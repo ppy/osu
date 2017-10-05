@@ -112,20 +112,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 currentRotation += thisAngle - lastAngle;
                 RotationAbsolute += Math.Abs(thisAngle - lastAngle);
-                if (rotations.Count > 0)
-                {
-                    float rotationFrom = rotations.Peek();
-                    double timeFrom = times.Peek();
-                    while (Time.Current - times.Peek() > spm_count_duration)
-                    {
-                        rotationFrom = rotations.Dequeue();
-                        timeFrom = times.Dequeue();
-                    }
-                    SpinsPerMinute = (currentRotation - rotationFrom) / (Time.Current - timeFrom) * 1000 * 60 / 360;
-                }
             }
 
             lastAngle = thisAngle;
+            if (rotations.Count > 0)
+            {
+                float rotationFrom = rotations.Peek();
+                double timeFrom = times.Peek();
+                while (Time.Current - times.Peek() > spm_count_duration)
+                {
+                    rotationFrom = rotations.Dequeue();
+                    timeFrom = times.Dequeue();
+                }
+                SpinsPerMinute = (currentRotation - rotationFrom) / (Time.Current - timeFrom) * 1000 * 60 / 360;
+            }
             rotations.Enqueue(currentRotation);
             times.Enqueue(Time.Current);
 
