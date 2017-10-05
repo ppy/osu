@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
         public class OsuTabItem : TabItem<T>, IHasAccentColour
         {
             protected readonly SpriteText Text;
-            private readonly Box box;
+            protected readonly Box Bar;
 
             private Color4 accentColour;
             public Color4 AccentColour
@@ -77,13 +77,13 @@ namespace osu.Game.Graphics.UserInterface
 
             private void fadeActive()
             {
-                box.FadeIn(transition_length, Easing.OutQuint);
+                Bar.FadeIn(transition_length, Easing.OutQuint);
                 Text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
             }
 
             private void fadeInactive()
             {
-                box.FadeOut(transition_length, Easing.OutQuint);
+                Bar.FadeOut(transition_length, Easing.OutQuint);
                 Text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
             }
 
@@ -123,7 +123,7 @@ namespace osu.Game.Graphics.UserInterface
                         TextSize = 14,
                         Font = @"Exo2.0-Bold", // Font should only turn bold when active?
                     },
-                    box = new Box
+                    Bar = new Box
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 1,

@@ -32,16 +32,11 @@ namespace osu.Game.Screens.Edit
                 Height = 40,
                 Children = new Drawable[]
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex("111")
-                    },
                     new EditorMenuBar
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        X = 100,
+                        RelativeSizeAxes = Axes.Both,
                         Items = new[]
                         {
                             new EditorMenuBarItem("File")
