@@ -5,7 +5,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using OpenTK;
 using osu.Game.Graphics.Containers;
-using System;
 using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
