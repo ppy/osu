@@ -93,12 +93,11 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 if (!b.HasEffect)
                     continue;
 
-                using (BeginAbsoluteSequence(b.StartTime, true))
+                using (BeginAbsoluteSequence(b.StartTime))
                 {
-                    onBreakIn(b);
-
-                    using (BeginDelayedSequence(b.Duration - fade_duration, true))
-                        onBreakOut();
+                    Schedule(() => onBreakIn(b));
+                    using (BeginDelayedSequence(b.Duration - fade_duration))
+                        Schedule(onBreakOut);
                 }
             }
         }
@@ -113,7 +112,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 .Then()
                 .ResizeWidthTo(0, b.Duration - fade_duration);
 
-            Scheduler.AddDelayed(() => remainingTimeCounter.StartCounting(b.EndTime), b.StartTime - Clock.CurrentTime);
+            remainingTimeCounter.StartCounting(b.EndTime);
 
             remainingTimeCounter.Show();
             info.Show();
