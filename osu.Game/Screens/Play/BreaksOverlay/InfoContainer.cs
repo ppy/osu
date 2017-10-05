@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                         Children = new Drawable[]
                         {
                             AccuracyDisplay = new PercentageInfoLine("Accuracy"),
-                            RankDisplay = new InfoLine<int>("Rank", @"#"),
+                            RankDisplay = new InfoLine<int>("Rank"),
                             GradeDisplay = new InfoLine<ScoreRank>("Grade"),
                         },
                     }
