@@ -24,8 +24,8 @@ namespace osu.Game.Beatmaps
         protected WorkingBeatmap(BeatmapInfo beatmapInfo)
         {
             BeatmapInfo = beatmapInfo;
-            BeatmapSetInfo = beatmapInfo.BeatmapSetInfo;
-            Metadata = beatmapInfo.BeatmapMetadata ?? BeatmapSetInfo?.BeatmapMetadata ?? new BeatmapMetadata();
+            BeatmapSetInfo = beatmapInfo.BeatmapSet;
+            Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
             Mods.ValueChanged += mods => applyRateAdjustments();
         }

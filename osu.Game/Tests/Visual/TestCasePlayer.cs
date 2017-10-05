@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual
         {
             var beatmap = CreateBeatmap();
 
-            beatmap.BeatmapInfo.RulesetInfo = r;
+            beatmap.BeatmapInfo.Ruleset = r;
 
             var instance = r.CreateInstance();
 

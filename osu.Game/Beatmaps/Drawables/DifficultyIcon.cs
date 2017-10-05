@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps.Drawables
                 new ConstrainedIconContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = beatmap.RulesetInfo.CreateInstance().CreateIcon()
+                    Icon = beatmap.Ruleset.CreateInstance().CreateIcon()
                 }
             };
         }

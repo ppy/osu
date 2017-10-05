@@ -43,8 +43,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 beatmapSet = value;
 
                 Picker.BeatmapSet = author.BeatmapSet = details.BeatmapSet = BeatmapSet;
-                title.Text = BeatmapSet.BeatmapMetadata.Title;
-                artist.Text = BeatmapSet.BeatmapMetadata.Artist;
+                title.Text = BeatmapSet.Metadata.Title;
+                artist.Text = BeatmapSet.Metadata.Artist;
 
                 cover?.FadeOut(400, Easing.Out);
                 coverContainer.Add(cover = new DelayedLoadWrapper(new BeatmapSetCover(BeatmapSet)

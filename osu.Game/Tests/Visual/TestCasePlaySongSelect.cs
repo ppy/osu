@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual
             {
                 BeatmapSetOnlineInfoId = 1234 + i,
                 Hash = "d8e8fca2dc0f896fd7cb4cb0031ba249",
-                BeatmapMetadata = new BeatmapMetadata
+                Metadata = new BeatmapMetadata
                 {
                     BeatmapSetOnlineInfoId = 1234 + i,
                     // Create random metadata, then we can check if sorting works based on these
@@ -75,10 +75,10 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         BeatmapOnlineInfoId = 1234 + i,
-                        RulesetInfo = rulesets.QueryRulesets().First(),
+                        Ruleset = rulesets.QueryRulesets().First(),
                         Path = "normal.osu",
                         Version = "Normal",
-                        BeatmapDifficulty = new BeatmapDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 3.5f,
                         }
@@ -86,10 +86,10 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         BeatmapOnlineInfoId = 1235 + i,
-                        RulesetInfo = rulesets.QueryRulesets().First(),
+                        Ruleset = rulesets.QueryRulesets().First(),
                         Path = "hard.osu",
                         Version = "Hard",
-                        BeatmapDifficulty = new BeatmapDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 5,
                         }
@@ -97,10 +97,10 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         BeatmapOnlineInfoId = 1236 + i,
-                        RulesetInfo = rulesets.QueryRulesets().First(),
+                        Ruleset = rulesets.QueryRulesets().First(),
                         Path = "insane.osu",
                         Version = "Insane",
-                        BeatmapDifficulty = new BeatmapDifficulty
+                        Difficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 7,
                         }

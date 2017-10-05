@@ -135,7 +135,7 @@ namespace osu.Game.Beatmaps.Drawables
                                         new OsuSpriteText
                                         {
                                             Font = @"Exo2.0-MediumItalic",
-                                            Text = $"{(beatmap.BeatmapMetadata ?? beatmap.BeatmapSetInfo.BeatmapMetadata).Author}",
+                                            Text = $"{(beatmap.Metadata ?? beatmap.BeatmapSet.Metadata).Author}",
                                             TextSize = 16,
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft

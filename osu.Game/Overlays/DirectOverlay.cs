@@ -57,9 +57,9 @@ namespace osu.Game.Overlays
                 var tags = new List<string>();
                 foreach (var s in beatmapSets)
                 {
-                    artists.Add(s.BeatmapMetadata.Artist);
-                    songs.Add(s.BeatmapMetadata.Title);
-                    tags.AddRange(s.BeatmapMetadata.Tags.Split(' '));
+                    artists.Add(s.Metadata.Artist);
+                    songs.Add(s.Metadata.Title);
+                    tags.AddRange(s.Metadata.Tags.Split(' '));
                 }
 
                 ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));

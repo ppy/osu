@@ -172,11 +172,11 @@ namespace osu.Game.Rulesets.UI
 
             // Apply difficulty adjustments from mods before using Difficulty.
             foreach (var mod in Mods.OfType<IApplicableToDifficulty>())
-                mod.ApplyToDifficulty(Beatmap.BeatmapInfo.BeatmapDifficulty);
+                mod.ApplyToDifficulty(Beatmap.BeatmapInfo.Difficulty);
 
             // Apply defaults
             foreach (var h in Beatmap.HitObjects)
-                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BeatmapDifficulty);
+                h.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.Difficulty);
 
             // Post-process the beatmap
             processor.PostProcess(Beatmap);

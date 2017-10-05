@@ -64,7 +64,7 @@ namespace osu.Game.Online.API.Requests
             return new BeatmapSetInfo
             {
                 BeatmapSetOnlineInfoId = onlineId,
-                BeatmapMetadata = this,
+                Metadata = this,
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
                     Author = new User
@@ -99,8 +99,8 @@ namespace osu.Game.Online.API.Requests
             {
                 return new BeatmapInfo
                 {
-                    BeatmapMetadata = this,
-                    RulesetInfo = rulesets.GetRuleset(ruleset),
+                    Metadata = this,
+                    Ruleset = rulesets.GetRuleset(ruleset),
                     StarDifficulty = starDifficulty,
                     OnlineInfo = new BeatmapOnlineInfo
                     {

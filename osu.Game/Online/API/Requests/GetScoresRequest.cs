@@ -116,7 +116,7 @@ namespace osu.Game.Online.API.Requests
         public void ApplyBeatmap(BeatmapInfo beatmap)
         {
             Beatmap = beatmap;
-            Ruleset = beatmap.RulesetInfo;
+            Ruleset = beatmap.Ruleset;
 
             // Evaluate the mod string
             Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
