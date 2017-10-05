@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Text = $"Resolution: {(1f / i):0.00}"
+                                    Text = $"Resolution: {1f / i:0.00}"
                                 }
                             }
                         }
