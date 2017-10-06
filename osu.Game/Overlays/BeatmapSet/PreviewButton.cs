@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Audio;
 using osu.Game.Overlays.Direct;
 using osu.Framework.Configuration;
 
@@ -23,7 +22,6 @@ namespace osu.Game.Overlays.BeatmapSet
     {
         private const float transition_duration = 500;
 
-        private readonly Container audioWrapper;
         private readonly Box bg, progress;
         private readonly PlayButton playButton;
 
@@ -42,7 +40,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Children = new Drawable[]
             {
-                audioWrapper = new Container(),
                 bg = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -61,7 +58,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Alpha = 0f,
                     },
                 },
-                playButton = new PlayButton()
+                playButton = new PlayButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

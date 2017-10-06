@@ -9,7 +9,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -38,7 +37,7 @@ namespace osu.Game.Overlays.Direct
         private Color4 hoverColour;
         private readonly SpriteIcon icon;
         private readonly LoadingAnimation loadingAnimation;
-        private Container audioWrapper;
+        private readonly Container audioWrapper;
 
         private const float transition_duration = 500;
 
@@ -64,7 +63,7 @@ namespace osu.Game.Overlays.Direct
 
         public PlayButton(BeatmapSetInfo setInfo = null)
         {
-            this.SetInfo = setInfo;
+            SetInfo = setInfo;
             AddRange(new Drawable[]
             {
                 audioWrapper = new Container(),
