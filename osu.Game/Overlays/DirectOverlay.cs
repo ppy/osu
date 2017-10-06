@@ -230,21 +230,21 @@ namespace osu.Game.Overlays
                 })
             };
 
-            foreach (DirectPanel panel in newPanels.Children)
-                panel.PreviewPlaying.ValueChanged += newValue =>
-                {
-                    if (newValue)
-                    {
-                        if (playing != null && playing != panel)
-                            playing.PreviewPlaying.Value = false;
-                        playing = panel;
-                    }
-                };
-
             LoadComponentAsync(newPanels, p =>
             {
                 if (panels != null) ScrollFlow.Remove(panels);
                 ScrollFlow.Add(panels = newPanels);
+
+                foreach (DirectPanel panel in p.Children)
+                    panel.PreviewPlaying.ValueChanged += newValue =>
+                    {
+                        if (newValue)
+                        {
+                            if (playing != null && playing != panel)
+                                playing.PreviewPlaying.Value = false;
+                            playing = panel;
+                        }
+                    };
             });
         }
 

@@ -27,21 +27,13 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box bg, progress;
         private readonly PlayButton playButton;
 
-        private Track preview;
-        private readonly Bindable<bool> playing = new Bindable<bool>();
+        private Track preview => playButton.Preview;
+        private Bindable<bool> playing => playButton.Playing;
 
-        private BeatmapSetInfo beatmapSet;
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
-            set
-            {
-                if (value == beatmapSet) return;
-                beatmapSet = value;
-
-                playing.Value = false;
-                preview = null;
-            }
+            get { return playButton.SetInfo; }
+            set { playButton.SetInfo = value; }
         }
 
         public PreviewButton()
@@ -69,7 +61,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Alpha = 0f,
                     },
                 },
-                playButton = new PlayButton(playing)
+                playButton = new PlayButton()
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -78,7 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet
             };
 
             Action = () => playing.Value = !playing.Value;
-            playing.ValueChanged += updatePlayingState;
+            playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
         }
 
         [BackgroundDependencyLoader]
@@ -94,11 +86,6 @@ namespace osu.Game.Overlays.BeatmapSet
             if (playing.Value && preview != null)
             {
                 progress.Width = (float)(preview.CurrentTime / preview.Length);
-                if (preview.HasCompleted)
-                {
-                    playing.Value = false;
-                    preview = null;
-                }
             }
         }
 
@@ -118,39 +105,6 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             bg.FadeColour(Color4.Black.Opacity(0.25f), 100);
             base.OnHoverLost(state);
-        }
-
-        private void updatePlayingState(bool newValue)
-        {
-            if (preview == null)
-            {
-                playButton.Loading = true;
-                audioWrapper.Child = new AsyncLoadWrapper(new AudioLoadWrapper(BeatmapSet.OnlineInfo.Preview)
-                {
-                    OnLoadComplete = d =>
-                    {
-                        playButton.Loading = false;
-
-                        preview = (d as AudioLoadWrapper)?.Preview;
-                        playing.TriggerChange();
-                    },
-                });
-            }
-            else
-            {
-                if (newValue)
-                {
-                    progress.FadeIn(100);
-
-                    preview.Seek(0);
-                    preview.Start();
-                }
-                else
-                {
-                    progress.FadeOut(100);
-                    preview.Stop();
-                }
-            }
         }
     }
 }

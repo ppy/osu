@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Direct
                             Spacing = new Vector2(10, 0),
                             Children = new Drawable[]
                             {
-                                playButton = new PlayButton(PreviewPlaying)
+                                playButton = new PlayButton(SetInfo)
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,

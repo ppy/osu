@@ -192,7 +192,7 @@ namespace osu.Game.Overlays.Direct
                         new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
                 },
-                playButton = new PlayButton(PreviewPlaying)
+                playButton = new PlayButton(SetInfo)
                 {
                     Margin = new MarginPadding { Top = 5, Left = 10 },
                     Size = new Vector2(30),
