@@ -22,7 +22,6 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Configuration;
 using osu.Framework.Audio.Track;
-using osu.Game.Audio;
 
 namespace osu.Game.Overlays.Direct
 {
