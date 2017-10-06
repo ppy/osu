@@ -41,10 +41,9 @@ namespace osu.Game.Overlays.Direct
         private BeatmapManager beatmaps;
         private NotificationOverlay notifications;
         private BeatmapSetOverlay beatmapSetOverlay;
-        private Container audioWrapper;
 
-        protected Track Preview;
-        public readonly Bindable<bool> PreviewPlaying = new Bindable<bool>();
+        public Track Preview => PlayButton.Preview;
+        public Bindable<bool> PreviewPlaying => PlayButton.Playing;
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
 
@@ -87,7 +86,6 @@ namespace osu.Game.Overlays.Direct
                 EdgeEffect = edgeEffectNormal,
                 Children = new[]
                 {
-                    audioWrapper = new Container(),
                     // temporary blackness until the actual background loads.
                     BlackBackground = new Box
                     {
@@ -112,39 +110,6 @@ namespace osu.Game.Overlays.Direct
 
             if (downloadRequest != null)
                 attachDownload(downloadRequest);
-
-            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
-            PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
-            PreviewPlaying.ValueChanged += setPlaying;
-        }
-
-        private void setPlaying(bool newValue)
-        {
-            if (newValue)
-            {
-                if(Preview == null)
-                {
-                    PlayButton.Loading = true;
-                    audioWrapper.Child = new AsyncLoadWrapper(new AudioLoadWrapper("https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3")
-                    {
-                        OnLoadComplete = d =>
-                        {
-                            PlayButton.Loading = false;
-                            Preview = (d as AudioLoadWrapper)?.Preview;
-                            PreviewPlaying.TriggerChange();
-                        },
-                    });
-                }
-                else
-                {
-                    Preview.Seek(0);
-                    Preview.Start();
-                }
-            }
-            else
-            {
-                Preview?.Stop();
-            }
         }
 
         protected override void Update()
@@ -154,11 +119,6 @@ namespace osu.Game.Overlays.Direct
             if (PreviewPlaying && Preview != null)
             {
                 PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
-                if (Preview.HasCompleted)
-                {
-                    PreviewPlaying.Value = false;
-                    Preview = null;
-                }
             }
         }
 
@@ -184,6 +144,7 @@ namespace osu.Game.Overlays.Direct
         protected override bool OnClick(InputState state)
         {
             ShowInformation();
+            PreviewPlaying.Value = false;
             return true;
         }
 
@@ -244,6 +205,9 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
+
+            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
         }
 
         protected List<DifficultyIcon> GetDifficultyIcons()

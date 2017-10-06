@@ -3,10 +3,14 @@
 
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -14,11 +18,28 @@ namespace osu.Game.Overlays.Direct
 {
     public class PlayButton : Container
     {
-        private readonly Bindable<bool> playing;
+        public readonly Bindable<bool> Playing = new Bindable<bool>();
+        public Track Preview { get; private set; }
+
+        private BeatmapSetInfo setInfo;
+        public BeatmapSetInfo SetInfo
+        {
+            get { return setInfo; }
+            set
+            {
+                if (value == setInfo) return;
+                setInfo = value;
+
+                Playing.Value = false;
+                Preview = null;
+            }
+        }
 
         private Color4 hoverColour;
         private readonly SpriteIcon icon;
         private readonly LoadingAnimation loadingAnimation;
+        private Container audioWrapper;
+
         private const float transition_duration = 500;
 
         private bool loading;
@@ -41,11 +62,12 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        public PlayButton(Bindable<bool> playing)
+        public PlayButton(BeatmapSetInfo setInfo = null)
         {
-            this.playing = playing;
+            this.SetInfo = setInfo;
             AddRange(new Drawable[]
             {
+                audioWrapper = new Container(),
                 icon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -57,9 +79,10 @@ namespace osu.Game.Overlays.Direct
                 loadingAnimation = new LoadingAnimation(),
             });
 
-            playing.ValueChanged += newValue => icon.Icon = newValue ? FontAwesome.fa_pause : FontAwesome.fa_play;
+            Playing.ValueChanged += newValue => icon.Icon = newValue ? FontAwesome.fa_pause : FontAwesome.fa_play;
+            Playing.ValueChanged += newValue => icon.FadeColour(newValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
 
-            playing.ValueChanged += newValue => icon.FadeColour(newValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
+            Playing.ValueChanged += updatePreviewTrack;
         }
 
         [BackgroundDependencyLoader]
@@ -70,7 +93,7 @@ namespace osu.Game.Overlays.Direct
 
         protected override bool OnClick(InputState state)
         {
-            playing.Value = !playing.Value;
+            Playing.Value = !Playing.Value;
             return true;
         }
 
@@ -82,9 +105,71 @@ namespace osu.Game.Overlays.Direct
 
         protected override void OnHoverLost(InputState state)
         {
-            if(!playing.Value)
+            if(!Playing.Value)
                 icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
             base.OnHoverLost(state);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if(Preview?.HasCompleted ?? false)
+            {
+                Playing.Value = false;
+                Preview = null;
+            }
+        }
+
+        private void updatePreviewTrack(bool newValue)
+        {
+            if (newValue)
+            {
+                if (Preview == null)
+                {
+                    Loading = true;
+                    audioWrapper.Child = new AsyncLoadWrapper(new AudioLoadWrapper("https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3")
+                    {
+                        OnLoadComplete = d =>
+                        {
+                            Loading = false;
+                            Preview = (d as AudioLoadWrapper)?.Preview;
+                            Playing.TriggerChange();
+                        },
+                    });
+                }
+                else
+                {
+                    Preview.Seek(0);
+                    Preview.Start();
+                }
+            }
+            else
+            {
+                Preview?.Stop();
+            }
+        }
+
+        private class AudioLoadWrapper : Drawable
+        {
+            private readonly string preview;
+
+            public Track Preview;
+
+            public AudioLoadWrapper(string preview)
+            {
+                this.preview = preview;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(AudioManager audio)
+            {
+                if (!string.IsNullOrEmpty(preview))
+                {
+                    Preview = audio.Track.Get(preview);
+                    Preview.Volume.Value = 0.5;
+                }
+            }
         }
     }
 }
