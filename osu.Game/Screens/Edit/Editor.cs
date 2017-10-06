@@ -12,6 +12,8 @@ using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Design;
@@ -45,7 +47,17 @@ namespace osu.Game.Screens.Edit
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
+                        Items = new[]
+                        {
+                            new MenuItem("File")
+                            {
+                                Items = new[]
+                                {
+                                    new EditorMenuItem("Exit", MenuItemType.Standard, Exit)
+                                }
+                            }
+                        }
                     }
                 },
                 new Container
