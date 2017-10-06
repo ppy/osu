@@ -40,6 +40,17 @@ namespace osu.Game.Screens.Edit
             {
                 new Container
                 {
+                    Name = "Screen container",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = 40, Bottom = 60 },
+                    Child = screenContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true
+                    }
+                },
+                new Container
+                {
                     Name = "Top bar",
                     RelativeSizeAxes = Axes.X,
                     Height = 40,
@@ -94,17 +105,6 @@ namespace osu.Game.Screens.Edit
                         }
                     }
                 },
-                new Container
-                {
-                    Name = "Screen container",
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 40, Bottom = 60 },
-                    Child = screenContainer = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true
-                    }
-                }
             };
 
             timeline.Beatmap.BindTo(Beatmap);
