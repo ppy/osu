@@ -20,8 +20,6 @@ namespace osu.Game.Screens.Edit.Menus
     {
         public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
 
-        private readonly ScreenSelectionTabControl tabControl;
-
         public EditorMenuBar()
             : base(Direction.Horizontal, true)
         {
@@ -31,6 +29,7 @@ namespace osu.Game.Screens.Edit.Menus
             ItemsContainer.Padding = new MarginPadding { Left = 100 };
             BackgroundColour = OsuColour.FromHex("111");
 
+            ScreenSelectionTabControl tabControl;
             AddRangeInternal(new Drawable[]
             {
                 tabControl = new ScreenSelectionTabControl
@@ -41,13 +40,13 @@ namespace osu.Game.Screens.Edit.Menus
                 }
             });
 
-            tabControl.Current.BindTo(Mode);
+            Mode.BindTo(tabControl.Current);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            tabControl.Current.TriggerChange();
+            Mode.TriggerChange();
         }
 
         protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
