@@ -621,11 +621,14 @@
     <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\DurationVisualisation.cs" />
     <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\PointVisualisation.cs" />
     <Compile Include="Screens\Edit\Components\Timelines\Summary\SummaryTimeline.cs" />
+    <Compile Include="Screens\Edit\Screens\EditorScreenMode.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
-    <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItemSpacer.cs" />
     <Compile Include="Screens\Edit\Menus\ScreenSelectionTabControl.cs" />
+    <Compile Include="Screens\Edit\Screens\Design\Design.cs" />
+    <Compile Include="Screens\Edit\Screens\EditorScreen.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Compose.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
@@ -751,6 +754,7 @@
     <Compile Include="Tests\Visual\TestCaseDirect.cs" />
     <Compile Include="Tests\Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Tests\Visual\TestCaseDrawings.cs" />
+    <Compile Include="Tests\Visual\TestCaseEditor.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorMenuBar.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorSummaryTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseGamefield.cs" />
