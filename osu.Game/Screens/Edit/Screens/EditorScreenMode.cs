@@ -7,13 +7,13 @@ namespace osu.Game.Screens.Edit.Screens
 {
     public enum EditorScreenMode
     {
+        [Description("setup")]
+        SongSetup,
         [Description("compose")]
         Compose,
         [Description("design")]
         Design,
         [Description("timing")]
         Timing,
-        [Description("song")]
-        SongSetup
     }
 }
