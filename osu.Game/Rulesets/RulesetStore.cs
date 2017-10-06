@@ -38,7 +38,6 @@ namespace osu.Game.Rulesets
 
         protected override void Prepare(bool reset = false)
         {
-
             Connection.CreateTable<RulesetInfo>();
 
             if (reset)
