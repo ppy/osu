@@ -623,7 +623,6 @@
     <Compile Include="Screens\Edit\Components\Timelines\Summary\SummaryTimeline.cs" />
     <Compile Include="Screens\Edit\Screens\EditorScreenMode.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
-    <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItemSpacer.cs" />
     <Compile Include="Screens\Edit\Menus\ScreenSelectionTabControl.cs" />
