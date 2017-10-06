@@ -24,6 +24,7 @@ using osu.Game.Screens.Ranking;
 using osu.Framework.Audio.Sample;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Screens.Play.BreaksOverlay;
 using osu.Game.Storyboards.Drawables;
 using OpenTK.Graphics;
 
@@ -69,6 +70,7 @@ namespace osu.Game.Screens.Play
 
         #endregion
 
+        private BreakOverlay breakOverlay;
         private Container storyboardContainer;
         private DrawableStoryboard storyboard;
 
@@ -179,15 +181,19 @@ namespace osu.Game.Screens.Play
                         {
                             RelativeSizeAxes = Axes.Both,
                             Clock = offsetClock,
-                            Children = new Drawable[]
-                            {
-                                RulesetContainer,
-                            }
+                            Child = RulesetContainer,
                         },
                         hudOverlay = new HUDOverlay
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
+                        },
+                        breakOverlay = new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks)
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Clock = decoupledClock,
+                            Breaks = beatmap.Breaks
                         },
                     }
                 },
@@ -221,6 +227,8 @@ namespace osu.Game.Screens.Play
             hudOverlay.Progress.OnSeek = pos => decoupledClock.Seek(pos);
 
             hudOverlay.ModDisplay.Current.BindTo(working.Mods);
+
+            breakOverlay.BindProcessor(scoreProcessor);
 
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
