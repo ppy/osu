@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Edit.Menus
         {
             RelativeSizeAxes = Axes.X;
 
+            MaskingContainer.CornerRadius = 0;
             ItemsContainer.Padding = new MarginPadding { Left = 100 };
             BackgroundColour = OsuColour.FromHex("111");
 
