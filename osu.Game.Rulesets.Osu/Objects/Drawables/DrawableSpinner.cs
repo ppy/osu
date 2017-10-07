@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly SpinnerDisc disc;
         private readonly SpinnerTicks ticks;
+        private readonly SpinnerSpmCounter spmCounter;
 
         private readonly Container mainContainer;
 
@@ -31,7 +32,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Container circleContainer;
         private readonly CirclePiece circle;
         private readonly GlowPiece glow;
-        private readonly OsuSpriteText spmText, spmLabel;
 
         private bool spmShown;
 
@@ -108,26 +108,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         },
                     }
                 },
-                spmText = new OsuSpriteText
+                spmCounter = new SpinnerSpmCounter
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.BottomCentre,
-                    Text = @"0",
-                    Font = @"Venera",
-                    TextSize = 24,
+                    Origin = Anchor.Centre,
                     Y = 120,
                     Alpha = 0
-                },
-                spmLabel = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                    Text = @"SPINS PER MINUTE",
-                    Font = @"Venera",
-                    TextSize = 12,
-                    Y = 125,
-                    Alpha = 0
-                },
+                }
             };
         }
 
@@ -185,8 +172,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!spmShown && disc.Tracking)
             {
                 spmShown = true;
-                spmText.FadeIn(TIME_FADEIN);
-                spmLabel.FadeIn(TIME_FADEIN);
+                spmCounter.FadeIn(TIME_FADEIN);
             }
 
             base.Update();
