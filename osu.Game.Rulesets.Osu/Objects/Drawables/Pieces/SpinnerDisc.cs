@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -78,17 +77,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private float lastAngle;
         private float currentRotation;
         public float RotationAbsolute;
-        public double SpinsPerMinute;
-
-        private struct RotationRecord
-        {
-            public float Rotation;
-            public double Time;
-        }
-
-        private readonly Queue<RotationRecord> records = new Queue<RotationRecord>();
-        private const double spm_count_duration = 595; // not using hundreds to avoid frame rounding issues
-
         private int completeTick;
 
         private bool updateCompleteTick() => completeTick != (completeTick = (int)(RotationAbsolute / 360));
@@ -121,14 +109,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
 
             lastAngle = thisAngle;
-            if (records.Count > 0)
-            {
-                var record = records.Peek();
-                while (Time.Current - records.Peek().Time > spm_count_duration)
-                    record = records.Dequeue();
-                SpinsPerMinute = (RotationAbsolute - record.Rotation) / (Time.Current - record.Time) * 1000 * 60 / 360;
-            }
-            records.Enqueue(new RotationRecord { Rotation = RotationAbsolute, Time = Time.Current });
 
             if (Complete && updateCompleteTick())
             {

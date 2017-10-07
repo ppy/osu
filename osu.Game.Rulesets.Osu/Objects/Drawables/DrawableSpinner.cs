@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,7 +13,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Screens.Ranking;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -184,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             circle.Rotation = disc.Rotation;
             ticks.Rotation = disc.Rotation;
-            spmText.Text = Math.Truncate(disc.SpinsPerMinute).ToString(@"#0");
+            spmCounter.SetRotation(disc.RotationAbsolute);
 
             float relativeCircleScale = spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
