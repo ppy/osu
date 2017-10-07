@@ -3,9 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -37,6 +34,40 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Y = 30
                 }
             };
+        }
+
+        private double spm;
+        public double SpinsPerMinute
+        {
+            get { return spm; }
+            private set
+            {
+                if (value == spm) return;
+                spm = value;
+                spmText.Text = Math.Truncate(value).ToString(@"#0");
+            }
+        }
+
+        private struct RotationRecord
+        {
+            public float Rotation;
+            public double Time;
+        }
+
+        private readonly Queue<RotationRecord> records = new Queue<RotationRecord>();
+        private const double spm_count_duration = 595; // not using hundreds to avoid frame rounding issues
+
+
+        public void SetRotation(float currentRotation)
+        {
+            if (records.Count > 0)
+            {
+                var record = records.Peek();
+                while (Time.Current - records.Peek().Time > spm_count_duration)
+                    record = records.Dequeue();
+                SpinsPerMinute = (currentRotation - record.Rotation) / (Time.Current - record.Time) * 1000 * 60 / 360;
+            }
+            records.Enqueue(new RotationRecord { Rotation = currentRotation, Time = Time.Current });
         }
     }
 }
