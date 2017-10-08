@@ -19,19 +19,20 @@ namespace osu.Game.Beatmaps
         //TODO: should be in database
         public int BeatmapVersion;
 
+        [NotMapped]
         public int? BeatmapOnlineInfoId { get; set; }
 
+        [NotMapped]
         public int? BeatmapSetOnlineInfoId { get; set; }
 
         public int BeatmapSetInfoId { get; set; }
 
         public BeatmapSetInfo BeatmapSet { get; set; }
 
-        public int BeatmapMetadataId { get; set; }
+        public int? BeatmapMetadataId { get; set; }
 
         public BeatmapMetadata Metadata { get; set; }
 
-        //[Required]
         public int BeatmapDifficultyId { get; set; }
 
         public BeatmapDifficulty Difficulty { get; set; }

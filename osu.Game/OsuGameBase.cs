@@ -83,8 +83,6 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-        private OsuDbContext dbContext;
-
         private OsuDbContext createDbContext()
         {
             var connectionString = Host.Storage.GetDatabaseConnectionString(@"client");
@@ -106,7 +104,7 @@ namespace osu.Game
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            dbContext = createDbContext();
+            using (var dbContext = createDbContext())
                 if (dbContext.Database.GetPendingMigrations().Any())
                     dbContext.Database.Migrate();
 
@@ -116,11 +114,11 @@ namespace osu.Game
                 Token = LocalConfig.Get<string>(OsuSetting.Token)
             });
 
-            dependencies.Cache(RulesetStore = new RulesetStore(dbContext));
-            dependencies.Cache(FileStore = new FileStore(dbContext, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, dbContext, RulesetStore, API, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, dbContext, Host, BeatmapManager, RulesetStore));
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(dbContext, RulesetStore));
+            dependencies.Cache(RulesetStore = new RulesetStore(createDbContext()));
+            dependencies.Cache(FileStore = new FileStore(createDbContext(), Host.Storage));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, createDbContext(), RulesetStore, API, Host));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, createDbContext(), Host, BeatmapManager, RulesetStore));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(createDbContext(), RulesetStore));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
@@ -246,8 +244,6 @@ namespace osu.Game
                 LocalConfig.Set(OsuSetting.Token, LocalConfig.Get<bool>(OsuSetting.SavePassword) ? API.Token : string.Empty);
                 LocalConfig.Save();
             }
-
-            dbContext?.Dispose();
 
             base.Dispose(isDisposing);
         }
