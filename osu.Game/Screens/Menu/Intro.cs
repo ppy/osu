@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Menu
     {
         private readonly OsuLogo logo;
 
-        private const string menu_music_beatmap_hash = "715a09144f885d746644c1983e285044";
+        private const string menu_music_beatmap_hash = "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
         /// <summary>
         /// Whether we have loaded the menu previously.
@@ -91,7 +91,6 @@ namespace osu.Game.Screens.Menu
                     setInfo = beatmaps.Import(new OszArchiveReader(game.Resources.GetStream(@"Tracks/circles.osz")));
 
                     setInfo.Protected = true;
-                    beatmaps.Delete(setInfo);
                 }
             }
 
@@ -101,6 +100,7 @@ namespace osu.Game.Screens.Menu
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
+            beatmaps.Delete(setInfo);
         }
 
         protected override void OnEntering(Screen last)

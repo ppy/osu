@@ -137,22 +137,22 @@ namespace osu.Game.Beatmaps
 
         public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query)
         {
-            return Connection.BeatmapSetInfo.FirstOrDefault(query);
+            return Connection.BeatmapSetInfo.Include(b=>b.Beatmaps).Include(b=>b.Metadata).FirstOrDefault(query);
         }
 
         public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
         {
-            return Connection.BeatmapSetInfo.Where(query).ToList();
+            return Connection.BeatmapSetInfo.Include(b => b.Beatmaps).Include(b => b.Metadata).Include(b=>b.Files).Where(query).ToList();
         }
 
         public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
         {
-            return Connection.BeatmapInfo.FirstOrDefault(query);
+            return Connection.BeatmapInfo.Include(b => b.BeatmapSet).Include(b => b.Metadata).Include(b=>b.Ruleset).FirstOrDefault(query);
         }
 
         public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
         {
-            return Connection.BeatmapInfo.Where(query).ToList();
+            return Connection.BeatmapInfo.Include(b => b.BeatmapSet).Include(b => b.Metadata).Where(query).ToList();
         }
     }
 }

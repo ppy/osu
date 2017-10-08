@@ -47,9 +47,6 @@ namespace osu.Game.Database
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Name).IsUnique();
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.InstantiationInfo).IsUnique();
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Available);
-            //modelBuilder.Entity<BeatmapMetadata>().HasOne(b => b.BeatmapSetOnlineInfo).WithOne(bs => bs.BeatmapMetadata).OnDelete(DeleteBehavior.SetNull);
-            //modelBuilder.Entity<BeatmapSetInfo>().HasOne(b => b.BeatmapSetOnlineInfo).WithOne(bs => bs.BeatmapSetInfo).OnDelete(DeleteBehavior.SetNull);
-            //modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BeatmapSetOnlineInfo).WithMany(bs => bs.Beatmaps).OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
