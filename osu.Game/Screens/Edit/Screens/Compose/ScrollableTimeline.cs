@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private readonly Container timelineContainer;
-        private readonly WaveformDisplay waveform;
+        private readonly BeatmapWaveformGraph waveform;
 
         public ScrollableTimeline()
         {
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                             RelativeSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                waveform = new WaveformDisplay
+                                waveform = new BeatmapWaveformGraph
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = OsuColour.FromHex("081a84")
