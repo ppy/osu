@@ -11,28 +11,42 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Configuration;
+using osu.Game.Screens.Edit.Screens;
 
 namespace osu.Game.Screens.Edit.Menus
 {
     public class EditorMenuBar : OsuMenu
     {
+        public readonly Bindable<EditorScreenMode> Mode = new Bindable<EditorScreenMode>();
+
         public EditorMenuBar()
             : base(Direction.Horizontal, true)
         {
             RelativeSizeAxes = Axes.X;
 
+            MaskingContainer.CornerRadius = 0;
             ItemsContainer.Padding = new MarginPadding { Left = 100 };
             BackgroundColour = OsuColour.FromHex("111");
 
+            ScreenSelectionTabControl tabControl;
             AddRangeInternal(new Drawable[]
             {
-                new ScreenSelectionTabControl
+                tabControl = new ScreenSelectionTabControl
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     X = -15
                 }
             });
+
+            Mode.BindTo(tabControl.Current);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Mode.TriggerChange();
         }
 
         protected override Framework.Graphics.UserInterface.Menu CreateSubMenu() => new SubMenu();
