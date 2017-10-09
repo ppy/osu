@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Menu
 {
     public class IntroSequence : Container
     {
-        private OsuSpriteText welcomeText;
+        private readonly OsuSpriteText welcomeText;
 
         private readonly OsuLogo logo;
 
@@ -282,8 +282,8 @@ namespace osu.Game.Screens.Menu
 
         private class Ring : Container<CircularContainer>
         {
-            public CircularContainer Background;
-            public CircularContainer Foreground;
+            public readonly CircularContainer Background;
+            public readonly CircularContainer Foreground;
 
             public Ring(Color4 ringColour)
             {

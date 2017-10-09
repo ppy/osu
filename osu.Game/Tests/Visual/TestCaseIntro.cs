@@ -12,13 +12,12 @@ namespace osu.Game.Tests.Visual
 {
     internal class TestCaseIntro : OsuTestCase
     {
-        private readonly IntroSequence intro;
-
         public TestCaseIntro()
         {
+            IntroSequence intro;
+
             var rateAdjustClock = new StopwatchClock(true);
             var framedClock = new FramedClock(rateAdjustClock);
-
             framedClock.ProcessFrame();
 
             Add(new Container
