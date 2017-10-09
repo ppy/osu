@@ -17,8 +17,6 @@ namespace osu.Game.Beatmaps
 
         public BeatmapMetadata Metadata { get; set; }
 
-        public int BeatmapMetadataId { get; set; }
-
         public List<BeatmapInfo> Beatmaps { get; set; }
 
         [NotMapped]

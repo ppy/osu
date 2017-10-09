@@ -56,7 +56,7 @@ namespace osu.Game.IO
         {
             string hash = data.ComputeSHA2Hash();
 
-            var existing = Connection.FileInfo.Where(f => f.Hash == hash).FirstOrDefault();
+            var existing = Connection.FileInfo.FirstOrDefault(f => f.Hash == hash);
 
             var info = existing ?? new FileInfo { Hash = hash };
 
