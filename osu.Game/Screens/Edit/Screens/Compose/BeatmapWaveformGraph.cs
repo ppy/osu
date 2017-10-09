@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         public BeatmapWaveformGraph()
         {
             InternalChild = graph = new WaveformGraph { RelativeSizeAxes = Axes.Both };
-            Beatmap.ValueChanged += b => graph.Track = b.Track;
+            Beatmap.ValueChanged += b => graph.Waveform = b.Waveform;
         }
 
         /// <summary>
