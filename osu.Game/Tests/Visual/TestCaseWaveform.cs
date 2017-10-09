@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual
 
             for (int i = 1; i <= 16; i *= 2)
             {
-                var newDisplay = new WaveformDisplay
+                var newDisplay = new BeatmapWaveformGraph
                 {
                     RelativeSizeAxes = Axes.Both,
                     Resolution = 1f / i
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Text = $"Resolution: {(1f / i):0.00}"
+                                    Text = $"Resolution: {1f / i:0.00}"
                                 }
                             }
                         }

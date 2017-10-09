@@ -12,6 +12,8 @@ using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Design;
@@ -38,6 +40,17 @@ namespace osu.Game.Screens.Edit
             {
                 new Container
                 {
+                    Name = "Screen container",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = 40, Bottom = 60 },
+                    Child = screenContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true
+                    }
+                },
+                new Container
+                {
                     Name = "Top bar",
                     RelativeSizeAxes = Axes.X,
                     Height = 40,
@@ -45,7 +58,17 @@ namespace osu.Game.Screens.Edit
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
+                        Items = new[]
+                        {
+                            new MenuItem("File")
+                            {
+                                Items = new[]
+                                {
+                                    new EditorMenuItem("Exit", MenuItemType.Standard, Exit)
+                                }
+                            }
+                        }
                     }
                 },
                 new Container
@@ -82,17 +105,6 @@ namespace osu.Game.Screens.Edit
                         }
                     }
                 },
-                new Container
-                {
-                    Name = "Screen container",
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 40, Bottom = 60 },
-                    Child = screenContainer = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true
-                    }
-                }
             };
 
             timeline.Beatmap.BindTo(Beatmap);

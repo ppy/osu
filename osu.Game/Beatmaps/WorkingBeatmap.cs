@@ -43,6 +43,7 @@ namespace osu.Game.Beatmaps
         protected abstract Beatmap GetBeatmap();
         protected abstract Texture GetBackground();
         protected abstract Track GetTrack();
+        protected virtual Waveform GetWaveform() => new Waveform();
 
         private Beatmap beatmap;
         private readonly object beatmapLock = new object();
@@ -96,6 +97,17 @@ namespace osu.Game.Beatmaps
             }
         }
 
+        private Waveform waveform;
+        private readonly object waveformLock = new object();
+        public Waveform Waveform
+        {
+            get
+            {
+                lock (waveformLock)
+                    return waveform ?? (waveform = GetWaveform());
+            }
+        }
+
         public bool TrackLoaded => track != null;
 
         public void TransferTo(WorkingBeatmap other)
@@ -114,6 +126,8 @@ namespace osu.Game.Beatmaps
         {
             background?.Dispose();
             background = null;
+
+            waveform?.Dispose();
         }
 
         public void DisposeTrack()
