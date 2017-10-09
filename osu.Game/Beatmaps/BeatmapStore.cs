@@ -137,22 +137,42 @@ namespace osu.Game.Beatmaps
 
         public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query)
         {
-            return Connection.BeatmapSetInfo.Include(b=>b.Beatmaps).Include(b=>b.Metadata).FirstOrDefault(query);
+            return Connection.BeatmapSetInfo
+                .Include(b => b.Metadata)
+                .Include(b => b.Beatmaps).ThenInclude(b => b.Ruleset)
+                .Include(b => b.Beatmaps).ThenInclude(b => b.Difficulty)
+                .Include(b => b.Files).ThenInclude(f => f.FileInfo)
+                .FirstOrDefault(query);
         }
 
         public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
         {
-            return Connection.BeatmapSetInfo.Include(b => b.Beatmaps).Include(b => b.Metadata).Include(b=>b.Files).Where(query).ToList();
+            return Connection.BeatmapSetInfo
+                .Include(b => b.Metadata)
+                .Include(b => b.Beatmaps).ThenInclude(b => b.Ruleset)
+                .Include(b => b.Beatmaps).ThenInclude(b => b.Difficulty)
+                .Include(b => b.Files).ThenInclude(f => f.FileInfo)
+                .Where(query).ToList();
         }
 
         public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
         {
-            return Connection.BeatmapInfo.Include(b => b.BeatmapSet).Include(b => b.Metadata).Include(b=>b.Ruleset).FirstOrDefault(query);
+            return Connection.BeatmapInfo
+                .Include(b => b.BeatmapSet)
+                .Include(b => b.Metadata)
+                .Include(b => b.Ruleset)
+                .Include(b => b.Difficulty)
+                .FirstOrDefault(query);
         }
 
         public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
         {
-            return Connection.BeatmapInfo.Include(b => b.BeatmapSet).Include(b => b.Metadata).Where(query).ToList();
+            return Connection.BeatmapInfo
+                .Include(b => b.BeatmapSet)
+                .Include(b => b.Metadata)
+                .Include(b => b.Ruleset)
+                .Include(b => b.Difficulty)
+                .Where(query).ToList();
         }
     }
 }
