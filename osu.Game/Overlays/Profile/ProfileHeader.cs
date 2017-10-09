@@ -19,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using System.Diagnostics;
 using System.Globalization;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -119,7 +120,7 @@ namespace osu.Game.Overlays.Profile
                                                 }
                                             }
                                         },
-                                        new LinkFlowContainer.LinkText
+                                        new LinkFlowContainer.BrowserLinkText
                                         {
                                             Text = user.Username,
                                             Url = $@"https://osu.ppy.sh/users/{user.Id}",
@@ -538,6 +539,11 @@ namespace osu.Game.Overlays.Profile
                 {
                     hoverColour = colours.Yellow;
                 }
+            }
+
+            public class BrowserLinkText : LinkText, IHasTooltip
+            {
+                public string TooltipText => "View Profile in Browser";
             }
         }
     }
