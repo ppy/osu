@@ -58,6 +58,23 @@ namespace osu.Game.Beatmaps
             ComboColors = original?.ComboColors ?? ComboColors;
             HitObjects = original?.HitObjects ?? HitObjects;
             Storyboard = original?.Storyboard ?? Storyboard;
+
+            if (original == null && Metadata == null)
+            {
+                // we may have no metadata in cases we weren't sourced from the database.
+                // let's fill it (and other related fields) so we don't need to null-check it in future usages.
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata
+                    {
+                        Artist = @"Unknown",
+                        Title = @"Unknown",
+                        Author = @"Unknown Creator",
+                    },
+                    Version = @"Normal",
+                    Difficulty = new BeatmapDifficulty()
+                };
+            }
         }
     }
 
