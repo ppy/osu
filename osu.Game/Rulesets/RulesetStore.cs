@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets
             {
                 var us = createRulesetInfo(r);
 
-                var existing = Connection.RulesetInfo.Where(ri => ri.InstantiationInfo == us.InstantiationInfo).FirstOrDefault();
+                var existing = Connection.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == us.InstantiationInfo);
 
                 if (existing == null)
                     Connection.RulesetInfo.Add(us);

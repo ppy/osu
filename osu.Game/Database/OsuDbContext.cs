@@ -20,11 +20,8 @@ namespace osu.Game.Database
             this.connectionString = connectionString;
         }
 
-        public DbSet<BeatmapMetadata> BeatmapMetadata { get; set; }
-        public DbSet<BeatmapDifficulty> BeatmapDifficulty { get; set; }
         public DbSet<BeatmapInfo> BeatmapInfo { get; set; }
         public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
-        public DbSet<BeatmapSetFileInfo> BeatmapSetFileInfo { get; set; }
         public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<RulesetInfo> RulesetInfo { get; set; }

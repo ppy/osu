@@ -27,14 +27,13 @@ namespace osu.Game.Beatmaps
 
         public int BeatmapSetInfoId { get; set; }
 
+        [Required]
         public BeatmapSetInfo BeatmapSet { get; set; }
-
-        public int? BeatmapMetadataId { get; set; }
-
         public BeatmapMetadata Metadata { get; set; }
 
         public int BeatmapDifficultyId { get; set; }
 
+        [Required]
         public BeatmapDifficulty Difficulty { get; set; }
 
         [NotMapped]
