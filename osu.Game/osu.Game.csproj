@@ -415,6 +415,11 @@
     <Compile Include="IO\Serialization\IJsonSerializable.cs" />
     <Compile Include="IPC\BeatmapIPCChannel.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
+    <Compile Include="Migrations\20171009205048_Init.cs" />
+    <Compile Include="Migrations\20171009205048_Init.designer.cs">
+      <DependentUpon>20171009205048_Init.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\IOnlineComponent.cs" />
@@ -860,9 +865,7 @@
   <ItemGroup>
     <EmbeddedResource Include="lazer.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

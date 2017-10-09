@@ -105,7 +105,6 @@ namespace osu.Game
             dependencies.Cache(LocalConfig);
 
             using (var dbContext = createDbContext())
-                if (dbContext.Database.GetPendingMigrations().Any())
                     dbContext.Database.Migrate();
 
             dependencies.Cache(API = new APIAccess
