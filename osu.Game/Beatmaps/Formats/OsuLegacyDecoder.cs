@@ -611,7 +611,7 @@ namespace osu.Game.Beatmaps.Formats
             CommandTimelineGroup timelineGroup = null;
 
             string line;
-            while ((line = stream.ReadLine()) != null)
+            while ((line = stream.ReadLine()?.Trim()) != null)
             {
                 if (string.IsNullOrEmpty(line))
                     continue;

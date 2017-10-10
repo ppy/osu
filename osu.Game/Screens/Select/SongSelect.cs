@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
@@ -108,6 +109,7 @@ namespace osu.Game.Screens.Select
                 BeatmapsChanged = carouselBeatmapsLoaded,
                 DeleteRequested = promptDelete,
                 RestoreRequested = s => { foreach (var b in s.Beatmaps) manager.Restore(b); },
+                EditRequested = editRequested,
                 HideDifficultyRequested = b => manager.Hide(b),
                 StartRequested = () => carouselRaisedStart(),
             });
@@ -193,6 +195,12 @@ namespace osu.Game.Screens.Select
 
             Beatmap.DisabledChanged += disabled => carousel.AllowSelection = !disabled;
             carousel.AllowSelection = !Beatmap.Disabled;
+        }
+
+        private void editRequested(BeatmapInfo beatmap)
+        {
+            Beatmap.Value = manager.GetWorkingBeatmap(beatmap, Beatmap);
+            Push(new Editor());
         }
 
         private void onBeatmapRestored(BeatmapInfo b) => carousel.UpdateBeatmap(b);

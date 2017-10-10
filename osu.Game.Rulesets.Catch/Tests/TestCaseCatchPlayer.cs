@@ -10,6 +10,10 @@ namespace osu.Game.Rulesets.Catch.Tests
     [TestFixture]
     public class TestCaseCatchPlayer : Game.Tests.Visual.TestCasePlayer
     {
+        public TestCaseCatchPlayer() : base(typeof(CatchRuleset))
+        {
+        }
+
         protected override Beatmap CreateBeatmap()
         {
             var beatmap = new Beatmap();
