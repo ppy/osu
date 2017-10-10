@@ -91,6 +91,9 @@ namespace osu.Game.Rulesets.Osu.UI
             var osuJudgement = (OsuJudgement)judgement;
             var osuObject = (OsuHitObject)judgedObject.HitObject;
 
+            if (!judgedObject.DisplayJudgement)
+                return;
+
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(osuJudgement)
             {
                 Origin = Anchor.Centre,
