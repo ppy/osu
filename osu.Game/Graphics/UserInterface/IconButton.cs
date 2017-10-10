@@ -38,9 +38,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             AutoSizeAxes = Axes.Both;
 
-            Origin = Anchor.Centre;
-            Anchor = Anchor.Centre;
-
             Children = new Drawable[]
             {
                 content = new Container
