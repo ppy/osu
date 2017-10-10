@@ -18,6 +18,8 @@ namespace osu.Game.Screens.Menu
 
         private readonly OsuLogo logo;
 
+        private readonly Container barsContainer;
+
         private readonly Container barTopLeft;
         private readonly Container barBottomLeft;
         private readonly Container barTopRight;
@@ -49,48 +51,57 @@ namespace osu.Game.Screens.Menu
                     Children = new Drawable[]
                     {
                         mediumRing = new Ring(Color4.White.Opacity(80)),
-                        barTopLeft = new Container
+                        barsContainer = new Container
                         {
-                            Origin = Anchor.CentreLeft,
                             Anchor = Anchor.Centre,
-                            Rotation = 45,
-                            Child = new Box
+                            Origin = Anchor.Centre,
+                            AutoSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White.Opacity(180),
-                            }
-                        },
-                        barTopRight = new Container
-                        {
-                            Origin = Anchor.CentreRight,
-                            Anchor = Anchor.Centre,
-                            Rotation = -45,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White.Opacity(80),
-                            }
-                        },
-                        barBottomLeft = new Container
-                        {
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.Centre,
-                            Rotation = -45,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White.Opacity(230),
-                            }
-                        },
-                        barBottomRight = new Container
-                        {
-                            Origin = Anchor.CentreRight,
-                            Anchor = Anchor.Centre,
-                            Rotation = 45,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White.Opacity(130),
+                                barTopLeft = new Container
+                                {
+                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = 45,
+                                    Child = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.White.Opacity(180),
+                                    }
+                                },
+                                barTopRight = new Container
+                                {
+                                    Origin = Anchor.CentreRight,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = -45,
+                                    Child = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.White.Opacity(80),
+                                    }
+                                },
+                                barBottomLeft = new Container
+                                {
+                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = -45,
+                                    Child = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.White.Opacity(230),
+                                    }
+                                },
+                                barBottomRight = new Container
+                                {
+                                    Origin = Anchor.CentreRight,
+                                    Anchor = Anchor.Centre,
+                                    Rotation = 45,
+                                    Child = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.White.Opacity(130),
+                                    }
+                                },
                             }
                         },
                         smallRing = new Ring(Color4.White),
@@ -186,56 +197,78 @@ namespace osu.Game.Screens.Menu
 
         public void Start()
         {
-            welcomeText.Delay(350).ScaleTo(1, 250, Easing.Out);
-            welcomeText.Delay(350).FadeIn(1000, Easing.Out);
-            welcomeText.Delay(350).TransformSpacingTo(new Vector2(20, 0), 1450, Easing.Out);
+            mediumRing.ResizeTo(130, 500, Easing.InExpo);
+            mediumRing.Foreground.Delay(500).ResizeTo(1, 1000, Easing.OutQuint);
 
-            mediumRing.ResizeTo(120, 500, Easing.InExpo);
-            mediumRing.Foreground.Delay(620).ResizeTo(1, 1000, Easing.OutQuint);
+            using (welcomeText.BeginDelayedSequence(350))
+            {
+                welcomeText.ScaleTo(1, 250, Easing.Out);
+                welcomeText.FadeIn(1000, Easing.Out);
+                welcomeText.TransformSpacingTo(new Vector2(20, 0), 1450, Easing.Out);
+            }
 
-            smallRing.Delay(200).ResizeTo(45, 500, Easing.InExpo);
-            smallRing.Foreground.Delay(700).ResizeTo(1, 2000, Easing.OutQuint);
+            using (smallRing.BeginDelayedSequence(200))
+            {
+                smallRing.ResizeTo(40, 400, Easing.InExpo);
+                smallRing.Foreground.Delay(400).ResizeTo(1, 1500, Easing.OutQuint);
+            }
 
-            barTopLeft.Delay(700).FadeIn();
-            barTopLeft.Delay(700).MoveTo(new Vector2(-120, -120), 900, Easing.OutQuint);
-            barTopLeft.Delay(800).ResizeWidthTo(0, 900, Easing.OutExpo);
+            using (barsContainer.BeginDelayedSequence(500, true))
+            {
+                foreach (var bar in barsContainer)
+                {
+                    bar.FadeIn();
+                    bar.Delay(100).ResizeWidthTo(0, 900, Easing.OutExpo);
+                }
 
-            barTopRight.Delay(700).FadeIn();
-            barTopRight.Delay(700).MoveTo(new Vector2(120, -120), 900, Easing.OutQuint);
-            barTopRight.Delay(800).ResizeWidthTo(0, 900, Easing.OutExpo);
-
-            barBottomLeft.Delay(700).FadeIn();
-            barBottomLeft.Delay(700).MoveTo(new Vector2(-120, 120), 900, Easing.OutQuint);
-            barBottomLeft.Delay(800).ResizeWidthTo(0, 900, Easing.OutExpo);
-
-            barBottomRight.Delay(700).FadeIn();
-            barBottomRight.Delay(700).MoveTo(new Vector2(120, 120), 900, Easing.OutQuint);
-            barBottomRight.Delay(800).ResizeWidthTo(0, 900, Easing.OutExpo);
+                barTopLeft.MoveTo(new Vector2(-120, -120), 900, Easing.OutQuint);
+                barTopRight.MoveTo(new Vector2(120, -120), 900, Easing.OutQuint);
+                barBottomLeft.MoveTo(new Vector2(-120, 120), 900, Easing.OutQuint);
+                barBottomRight.MoveTo(new Vector2(120, 120), 900, Easing.OutQuint);
+            }
 
             bigRing.Delay(1950).ResizeTo(400, 550, Easing.InOutQuint);
             bigRing.Foreground.Delay(1950).ResizeTo(0.8f, 450, Easing.InExpo).Then().ResizeTo(1, 500, Easing.OutExpo);
 
-            backgroundFill.Delay(2317).ResizeHeightTo(1, 650, Easing.InOutQuint);
-            backgroundFill.Delay(2317).RotateTo(-90, 650, Easing.InOutQuint);
+            using (backgroundFill.BeginDelayedSequence(2317))
+            {
+                backgroundFill.ResizeHeightTo(1, 650, Easing.InOutQuint);
+                backgroundFill.RotateTo(-90, 650, Easing.InOutQuint);
+            }
 
-            foregroundFill.Delay(2350).ResizeWidthTo(1, 650, Easing.InOutQuint);
-            foregroundFill.Delay(2350).RotateTo(-90, 650, Easing.InOutQuint);
+            using (foregroundFill.BeginDelayedSequence(2350))
+            {
+                foregroundFill.ResizeWidthTo(1, 650, Easing.InOutQuint);
+                foregroundFill.RotateTo(-90, 650, Easing.InOutQuint);
+            }
 
-            yellowCircle.Delay(2383).MoveToY(-207, 617, Easing.InOutQuad);
-            yellowCircle.Delay(2383).RotateTo(-180, 617, Easing.InOutQuad);
-            yellowCircle.Delay(2383).ResizeTo(414, 617, Easing.InOutExpo);
+            using (yellowCircle.BeginDelayedSequence(2383))
+            {
+                yellowCircle.MoveToY(-207, 617, Easing.InOutQuad);
+                yellowCircle.RotateTo(-180, 617, Easing.InOutQuad);
+                yellowCircle.ResizeTo(414, 617, Easing.InOutSine);
+            }
 
-            purpleCircle.Delay(2317).MoveToY(207, 683, Easing.InOutQuad);
-            purpleCircle.Delay(2317).RotateTo(-180, 683, Easing.InOutQuad);
-            purpleCircle.Delay(2317).ResizeTo(414, 683, Easing.InOutExpo);
+            using (purpleCircle.BeginDelayedSequence(2317))
+            {
+                purpleCircle.MoveToY(207, 683, Easing.InOutQuad);
+                purpleCircle.RotateTo(-180, 683, Easing.InOutQuad);
+                purpleCircle.ResizeTo(414, 683, Easing.InOutSine);
+            }
 
-            blueCircle.Delay(2449).MoveToX(-207, 551, Easing.InOutQuad);
-            blueCircle.Delay(2449).RotateTo(-180, 551, Easing.InOutQuad);
-            blueCircle.Delay(2449).ResizeTo(414, 551, Easing.InOutExpo);
+            using (blueCircle.BeginDelayedSequence(2449))
+            {
+                blueCircle.MoveToX(-207, 551, Easing.InOutQuad);
+                blueCircle.RotateTo(-180, 551, Easing.InOutQuad);
+                blueCircle.ResizeTo(414, 551, Easing.InOutSine);
+            }
 
-            pinkCircle.Delay(2515).MoveToX(208, 485, Easing.InOutQuad);
-            pinkCircle.Delay(2515).RotateTo(-180, 485, Easing.InOutQuad);
-            pinkCircle.Delay(2515).ResizeTo(416, 485, Easing.InOutExpo);
+            using (pinkCircle.BeginDelayedSequence(2515))
+            {
+                pinkCircle.MoveToX(208, 485, Easing.InOutQuad);
+                pinkCircle.RotateTo(-180, 485, Easing.InOutQuad);
+                pinkCircle.ResizeTo(416, 485, Easing.InOutSine);
+            }
 
             logo.Delay(3200).FadeIn(300);
 
@@ -252,11 +285,11 @@ namespace osu.Game.Screens.Menu
             welcomeText.Alpha = 0;
 
             smallRing.Size = mediumRing.Size = bigRing.Size = Vector2.Zero;
-            mediumRing.Foreground.Size = new Vector2(0.8f);
-            smallRing.Foreground.Size = new Vector2(0.7f);
+            mediumRing.Foreground.Size = new Vector2(0.75f);
+            smallRing.Foreground.Size = new Vector2(0.5f);
             bigRing.Foreground.Size = Vector2.Zero;
 
-            barTopLeft.Size = barTopRight.Size = barBottomLeft.Size = barBottomRight.Size = new Vector2(115, 1.5f);
+            barTopLeft.Size = barTopRight.Size = barBottomLeft.Size = barBottomRight.Size = new Vector2(110, 1.5f);
             barTopLeft.Alpha = barTopRight.Alpha = barBottomLeft.Alpha = barBottomRight.Alpha = 0;
             barTopLeft.Position = new Vector2(-90, -90);
             barTopRight.Position = new Vector2(90, -90);
@@ -269,10 +302,10 @@ namespace osu.Game.Screens.Menu
 
             yellowCircle.Size = purpleCircle.Size = blueCircle.Size = pinkCircle.Size = Vector2.Zero;
             yellowCircle.Rotation = purpleCircle.Rotation = blueCircle.Rotation = pinkCircle.Rotation = 0;
-            yellowCircle.Position = new Vector2(0, -300);
-            purpleCircle.Position = new Vector2(0, 300);
-            blueCircle.Position = new Vector2(-300, 0);
-            pinkCircle.Position = new Vector2(300, 0);
+            yellowCircle.Position = new Vector2(0, -250);
+            purpleCircle.Position = new Vector2(0, 250);
+            blueCircle.Position = new Vector2(-250, 0);
+            pinkCircle.Position = new Vector2(250, 0);
         }
 
         public void Restart()
