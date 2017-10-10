@@ -42,6 +42,62 @@ namespace osu.Game.Screens.Menu
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
+                mediumRing = new Ring(Color4.White.Opacity(80)),
+                barsContainer = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        barTopLeft = new Container
+                        {
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.Centre,
+                            Rotation = 45,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.White.Opacity(180),
+                            }
+                        },
+                        barTopRight = new Container
+                        {
+                            Origin = Anchor.CentreRight,
+                            Anchor = Anchor.Centre,
+                            Rotation = -45,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.White.Opacity(80),
+                            }
+                        },
+                        barBottomLeft = new Container
+                        {
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.Centre,
+                            Rotation = -45,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.White.Opacity(230),
+                            }
+                        },
+                        barBottomRight = new Container
+                        {
+                            Origin = Anchor.CentreRight,
+                            Anchor = Anchor.Centre,
+                            Rotation = 45,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.White.Opacity(130),
+                            }
+                        },
+                    }
+                },
+                smallRing = new Ring(Color4.White),
+                bigRing = new Ring(OsuColour.FromHex(@"B6C5E9")),
                 new CircularContainer
                 {
                     Anchor = Anchor.Centre,
@@ -50,62 +106,6 @@ namespace osu.Game.Screens.Menu
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        mediumRing = new Ring(Color4.White.Opacity(80)),
-                        barsContainer = new Container
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            AutoSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                barTopLeft = new Container
-                                {
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.Centre,
-                                    Rotation = 45,
-                                    Child = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.White.Opacity(180),
-                                    }
-                                },
-                                barTopRight = new Container
-                                {
-                                    Origin = Anchor.CentreRight,
-                                    Anchor = Anchor.Centre,
-                                    Rotation = -45,
-                                    Child = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.White.Opacity(80),
-                                    }
-                                },
-                                barBottomLeft = new Container
-                                {
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.Centre,
-                                    Rotation = -45,
-                                    Child = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.White.Opacity(230),
-                                    }
-                                },
-                                barBottomRight = new Container
-                                {
-                                    Origin = Anchor.CentreRight,
-                                    Anchor = Anchor.Centre,
-                                    Rotation = 45,
-                                    Child = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.White.Opacity(130),
-                                    }
-                                },
-                            }
-                        },
-                        smallRing = new Ring(Color4.White),
-                        bigRing = new Ring(OsuColour.FromHex(@"B6C5E9")),
                         backgroundFill = new Container
                         {
                             Anchor = Anchor.Centre,
