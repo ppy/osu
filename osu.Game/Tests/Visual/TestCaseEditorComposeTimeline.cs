@@ -9,12 +9,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Screens.Compose;
+using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Tests.Visual
 {
     public class TestCaseEditorComposeTimeline : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ScrollableTimeline), typeof(BeatmapWaveformGraph) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ScrollableTimeline), typeof(ScrollingTimelineContainer), typeof(BeatmapWaveformGraph) };
 
         private readonly ScrollableTimeline timeline;
 

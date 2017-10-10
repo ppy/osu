@@ -12,7 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Screens.Edit.Screens.Compose
+namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 {
     public class ScrollableTimeline : CompositeDrawable
     {
@@ -117,90 +117,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             base.Update();
 
             timelineContainer.Size = new Vector2(DrawSize.X - timelineContainer.DrawPosition.X, 1);
-        }
-
-        private class ScrollingTimelineContainer : ScrollContainer
-        {
-            public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
-
-            private readonly BeatmapWaveformGraph graph;
-
-            public ScrollingTimelineContainer()
-                : base(Direction.Horizontal)
-            {
-                Masking = true;
-
-                Add(graph = new BeatmapWaveformGraph
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.FromHex("222"),
-                    Depth = float.MaxValue,
-                });
-
-                Content.AutoSizeAxes = Axes.None;
-                Content.RelativeSizeAxes = Axes.Both;
-
-                graph.Beatmap.BindTo(Beatmap);
-            }
-
-            private float minZoom = 1;
-            public float MinZoom
-            {
-                get { return minZoom; }
-                set
-                {
-                    if (value <= 0)
-                        throw new ArgumentOutOfRangeException(nameof(value));
-                    if (minZoom == value)
-                        return;
-                    minZoom = value;
-                }
-            }
-
-            private float maxZoom = 30;
-            public float MaxZoom
-            {
-                get { return maxZoom; }
-                set
-                {
-                    if (value <= 0)
-                        throw new ArgumentOutOfRangeException(nameof(value));
-                    if (maxZoom == value)
-                        return;
-                    maxZoom = value;
-                }
-            }
-
-            private float zoom = 1;
-            public float Zoom
-            {
-                get { return zoom; }
-                set
-                {
-                    value = MathHelper.Clamp(value, MinZoom, MaxZoom);
-                    if (zoom == value)
-                        return;
-                    zoom = value;
-
-                    Content.ResizeWidthTo(Zoom);
-                }
-            }
-
-            protected override bool OnWheel(InputState state)
-            {
-                if (!state.Keyboard.ControlPressed)
-                    return base.OnWheel(state);
-
-                float relativeContentPosition = Content.ToLocalSpace(state.Mouse.NativeState.Position).X / Content.DrawSize.X;
-                float position = ToLocalSpace(state.Mouse.NativeState.Position).X;
-
-                Zoom += state.Mouse.WheelDelta;
-
-                float scrollPos = Content.DrawSize.X * relativeContentPosition - position;
-                ScrollTo(scrollPos, false);
-
-                return true;
-            }
         }
     }
 }
