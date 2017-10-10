@@ -266,7 +266,7 @@
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
-    <Compile Include="Screens\Edit\Screens\Compose\BeatmapWaveformGraph.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
@@ -630,7 +630,8 @@
     <Compile Include="Screens\Edit\Screens\Design\Design.cs" />
     <Compile Include="Screens\Edit\Screens\EditorScreen.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Compose.cs" />
-    <Compile Include="Screens\Edit\Screens\Compose\ScrollableTimeline.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\ScrollableTimeline.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\ScrollingTimelineContainer.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
