@@ -21,6 +21,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
+        public override bool DisplayJudgement => false;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();

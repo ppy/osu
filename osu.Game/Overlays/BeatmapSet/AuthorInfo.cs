@@ -9,6 +9,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Game.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -17,7 +20,10 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float height = 50;
 
         private readonly UpdateableAvatar avatar;
+        private readonly ClickableArea clickableArea;
         private readonly FillFlowContainer fields;
+
+        private UserProfileOverlay profile;
 
         private BeatmapSetInfo beatmapSet;
         public BeatmapSetInfo BeatmapSet
@@ -31,6 +37,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 var i = BeatmapSet.OnlineInfo;
 
                 avatar.User = i.Author;
+                clickableArea.Action = () => profile?.ShowUser(avatar.User);
+
                 fields.Children = new Drawable[]
                 {
                     new Field("made by", i.Author.Username, @"Exo2.0-RegularItalic"),
@@ -58,11 +66,15 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Children = new Drawable[]
             {
-                avatar = new UpdateableAvatar
+                clickableArea = new ClickableArea
                 {
-                    Size = new Vector2(height),
+                    AutoSizeAxes = Axes.Both,
                     CornerRadius = 3,
                     Masking = true,
+                    Child = avatar = new UpdateableAvatar
+                    {
+                        Size = new Vector2(height),
+                    },
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Colour = Color4.Black.Opacity(0.25f),
@@ -78,6 +90,13 @@ namespace osu.Game.Overlays.BeatmapSet
                     Padding = new MarginPadding { Left = height + 5 },
                 },
             };
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(UserProfileOverlay profile)
+        {
+            this.profile = profile;
+            clickableArea.Action = () => profile?.ShowUser(avatar.User);
         }
 
         private class Field : FillFlowContainer
@@ -102,6 +121,11 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                 };
             }
+        }
+
+        private class ClickableArea : OsuClickableContainer, IHasTooltip
+        {
+            public string TooltipText => @"View Profile";
         }
     }
 }
