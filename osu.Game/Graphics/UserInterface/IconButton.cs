@@ -122,10 +122,10 @@ namespace osu.Game.Graphics.UserInterface
         private void load(OsuColour colours)
         {
             if (hoverColour == null)
-                hoverColour = colours.Yellow.Opacity(0.6f);
+                HoverColour = colours.Yellow.Opacity(0.6f);
 
             if (flashColour == null)
-                flashColour = colours.Yellow;
+                FlashColour = colours.Yellow;
 
             Enabled.ValueChanged += enabled => this.FadeColour(enabled ? Color4.White : colours.Gray9, 200, Easing.OutQuint);
         }
