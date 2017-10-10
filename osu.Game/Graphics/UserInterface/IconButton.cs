@@ -17,27 +17,51 @@ namespace osu.Game.Graphics.UserInterface
     {
         private const float button_size = 30;
 
+        /// <summary>
+        /// The colour that should be flashed when the <see cref="IconButton"/> is clicked.
+        /// </summary>
         public Color4 FlashColour;
-        public Color4 NormalColour;
 
+        /// <summary>
+        /// The icon colour. This does not affect <see cref="IconButton.Colour"/>.
+        /// </summary>
+        public Color4 IconColour
+        {
+            get { return icon.Colour; }
+            set { icon.Colour = value; }
+        }
+
+        /// <summary>
+        /// The icon.
+        /// </summary>
         public FontAwesome Icon
         {
             get { return icon.Icon; }
             set { icon.Icon = value; }
         }
 
+        /// <summary>
+        /// The icon scale. This does not affect <see cref="IconButton.Scale"/>.
+        /// </summary>
         public Vector2 IconScale
         {
             get { return icon.Scale; }
             set { icon.Scale = value; }
         }
 
+        /// <summary>
+        /// The size of the <see cref="IconButton"/> while it is not being pressed.
+        /// </summary>
         public Vector2 ButtonSize
         {
             get { return content.Size; }
             set { content.Size = value; }
         }
 
+        /// <summary>
+        /// The background colour of the <see cref="IconButton"/> while it is hovered.
+        /// </summary>
+        /// <returns></returns>
         public Color4 HoverColour
         {
             get { return hover.Colour; }
