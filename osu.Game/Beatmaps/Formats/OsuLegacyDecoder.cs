@@ -679,7 +679,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private KeyValuePair<string, string> splitKeyVal(string line, char separator)
         {
-            var split = line.Trim().Split(separator);
+            var split = line.Trim().Split(new[] { separator }, 2);
 
             return new KeyValuePair<string, string>
             (
