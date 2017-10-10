@@ -91,7 +91,6 @@ namespace osu.Game.IO
                 accurateRefCount.ReferenceCount += f.Count();
                 return accurateRefCount;
             });
-            //Connection.FileInfo.UpdateRange(incrementedFiles);
             Connection.SaveChanges();
         }
 
@@ -104,7 +103,6 @@ namespace osu.Game.IO
                 return accurateRefCount;
             });
 
-            //Connection.FileInfo.UpdateRange(incrementedFiles);
             Connection.SaveChanges();
         }
 

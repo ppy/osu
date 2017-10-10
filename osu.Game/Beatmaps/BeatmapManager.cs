@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Ionic.Zip;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
@@ -15,14 +16,13 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.IO;
+using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IPC;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
-using osu.Game.Online.API.Requests;
-using System.Threading.Tasks;
-using osu.Game.Database;
-using osu.Game.Online.API;
 
 namespace osu.Game.Beatmaps
 {
@@ -302,10 +302,6 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
-            // TODO Include()
-            //lock (beatmaps)
-            //    beatmaps.Populate(beatmapInfo);
-
             if (beatmapInfo.BeatmapSet == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoId} is not in the local database.");
 
@@ -339,10 +335,6 @@ namespace osu.Game.Beatmaps
             {
                 BeatmapSetInfo set = beatmaps.QueryBeatmapSet(query);
 
-                // TODO Include()
-                //if (set != null)
-                //    beatmaps.Populate(set);
-
                 return set;
             }
         }
@@ -373,10 +365,6 @@ namespace osu.Game.Beatmaps
         {
             BeatmapInfo set = beatmaps.QueryBeatmap(query);
 
-            // TODO Include()
-            //if (set != null)
-            //    beatmaps.Populate(set);
-
             return set;
         }
 
@@ -399,8 +387,7 @@ namespace osu.Game.Beatmaps
         {
             if (ZipFile.IsZipFile(path))
                 return new OszArchiveReader(storage.GetStream(path));
-            else
-                return new LegacyFilesystemReader(path);
+            return new LegacyFilesystemReader(path);
         }
 
         /// <summary>
@@ -505,16 +492,12 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
-        /// <param name="populate">Whether returned objects should be pre-populated with all data.</param>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(bool populate = true)
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
             lock (beatmaps)
             {
-                if (populate)
-                    return beatmaps.QueryBeatmapSets(b => !b.DeletePending);
-                else
-                    return beatmaps.QueryBeatmapSets(b => !b.DeletePending);
+                return beatmaps.QueryBeatmapSets(b => !b.DeletePending);
             }
         }
 
