@@ -613,7 +613,7 @@ namespace osu.Game.Beatmaps.Formats
             string line;
             while ((line = stream.ReadLine()) != null)
             {
-                if (string.IsNullOrEmpty(line.Trim()))
+                if (string.IsNullOrWhiteSpace(line))
                     continue;
 
                 if (line.StartsWith("//"))
