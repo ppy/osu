@@ -282,7 +282,7 @@ namespace osu.Game.Screens.Menu
             Start();
         }
 
-        private class Ring : CircularContainer
+        private class Ring : Container<CircularContainer>
         {
             public readonly CircularContainer Foreground;
 
@@ -290,13 +290,19 @@ namespace osu.Game.Screens.Menu
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-                Masking = true;
-                Children = new Drawable[]
+                Children = new[]
                 {
-                    new Box
+                    new CircularContainer
                     {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Colour = ringColour,
+                        Masking = true,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = ringColour,
+                        }
                     },
                     Foreground = new CircularContainer
                     {
