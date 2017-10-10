@@ -190,29 +190,29 @@ namespace osu.Game.Screens.Menu
             welcomeText.Delay(350).FadeIn(1000, Easing.Out);
             welcomeText.Delay(350).TransformSpacingTo(new Vector2(20, 0), 1450, Easing.Out);
 
-            mediumRing.Background.ResizeTo(120, 500, Easing.InExpo);
-            mediumRing.Foreground.ResizeTo(0.8f, 500, Easing.InQuint).Then().ResizeTo(1, 1000, Easing.OutQuint);
+            mediumRing.ResizeTo(120, 500, Easing.InExpo);
+            mediumRing.Foreground.Delay(620).ResizeTo(1, 1000, Easing.OutQuint);
 
-            smallRing.Background.Delay(100).ResizeTo(45, 500, Easing.InExpo);
-            smallRing.Foreground.Delay(100).ResizeTo(0.8f, 500, Easing.InQuint).Then().ResizeTo(1, 2000, Easing.OutQuint);
+            smallRing.Delay(200).ResizeTo(45, 500, Easing.InExpo);
+            smallRing.Foreground.Delay(700).ResizeTo(1, 2000, Easing.OutQuint);
 
-            barTopLeft.Delay(500).FadeIn();
-            barTopLeft.Delay(500).MoveTo(new Vector2(-120, -120), 900, Easing.OutQuint);
-            barTopLeft.Delay(600).ResizeWidthTo(0, 900, Easing.OutExpo);
+            barTopLeft.Delay(700).FadeIn();
+            barTopLeft.Delay(700).MoveTo(new Vector2(-120, -120), 900, Easing.OutQuint);
+            barTopLeft.Delay(800).ResizeWidthTo(0, 900, Easing.OutExpo);
 
-            barTopRight.Delay(500).FadeIn();
-            barTopRight.Delay(500).MoveTo(new Vector2(120, -120), 900, Easing.OutQuint);
-            barTopRight.Delay(600).ResizeWidthTo(0, 900, Easing.OutExpo);
+            barTopRight.Delay(700).FadeIn();
+            barTopRight.Delay(700).MoveTo(new Vector2(120, -120), 900, Easing.OutQuint);
+            barTopRight.Delay(800).ResizeWidthTo(0, 900, Easing.OutExpo);
 
-            barBottomLeft.Delay(500).FadeIn();
-            barBottomLeft.Delay(500).MoveTo(new Vector2(-120, 120), 900, Easing.OutQuint);
-            barBottomLeft.Delay(600).ResizeWidthTo(0, 900, Easing.OutExpo);
+            barBottomLeft.Delay(700).FadeIn();
+            barBottomLeft.Delay(700).MoveTo(new Vector2(-120, 120), 900, Easing.OutQuint);
+            barBottomLeft.Delay(800).ResizeWidthTo(0, 900, Easing.OutExpo);
 
-            barBottomRight.Delay(500).FadeIn();
-            barBottomRight.Delay(500).MoveTo(new Vector2(120, 120), 900, Easing.OutQuint);
-            barBottomRight.Delay(600).ResizeWidthTo(0, 900, Easing.OutExpo);
+            barBottomRight.Delay(700).FadeIn();
+            barBottomRight.Delay(700).MoveTo(new Vector2(120, 120), 900, Easing.OutQuint);
+            barBottomRight.Delay(800).ResizeWidthTo(0, 900, Easing.OutExpo);
 
-            bigRing.Background.Delay(1950).ResizeTo(400, 550, Easing.InOutQuint);
+            bigRing.Delay(1950).ResizeTo(400, 550, Easing.InOutQuint);
             bigRing.Foreground.Delay(1950).ResizeTo(0.8f, 450, Easing.InExpo).Then().ResizeTo(1, 500, Easing.OutExpo);
 
             backgroundFill.Delay(2317).ResizeHeightTo(1, 650, Easing.InOutQuint);
@@ -251,9 +251,10 @@ namespace osu.Game.Screens.Menu
             welcomeText.Spacing = Vector2.Zero;
             welcomeText.Alpha = 0;
 
-            smallRing.Background.Size = smallRing.Foreground.Size = Vector2.Zero;
-            mediumRing.Background.Size = mediumRing.Foreground.Size = Vector2.Zero;
-            bigRing.Background.Size = bigRing.Foreground.Size = Vector2.Zero;
+            smallRing.Size = mediumRing.Size = bigRing.Size = Vector2.Zero;
+            mediumRing.Foreground.Size = new Vector2(0.8f);
+            smallRing.Foreground.Size = new Vector2(0.7f);
+            bigRing.Foreground.Size = Vector2.Zero;
 
             barTopLeft.Size = barTopRight.Size = barBottomLeft.Size = barBottomRight.Size = new Vector2(115, 1.5f);
             barTopLeft.Alpha = barTopRight.Alpha = barBottomLeft.Alpha = barBottomRight.Alpha = 0;
@@ -283,26 +284,19 @@ namespace osu.Game.Screens.Menu
 
         private class Ring : CircularContainer
         {
-            public readonly Container Background;
             public readonly CircularContainer Foreground;
 
             public Ring(Color4 ringColour)
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
-                AutoSizeAxes = Axes.Both;
                 Masking = true;
-                Children = new[]
+                Children = new Drawable[]
                 {
-                    Background = new Container
+                    new Box
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ringColour,
-                        }
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ringColour,
                     },
                     Foreground = new CircularContainer
                     {
