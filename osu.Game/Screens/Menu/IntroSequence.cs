@@ -14,6 +14,56 @@ namespace osu.Game.Screens.Menu
 {
     public class IntroSequence : Container
     {
+        //Size
+        private const int logo_size = 460;
+
+        private const int small_ring_size = 40;
+        private const int medium_ring_size = 130;
+        private const int big_ring_size = 400;
+
+        private static readonly Vector2 medium_ring_thickness = new Vector2(0.25f);
+        private static readonly Vector2 small_ring_thickness = new Vector2(0.5f);
+
+        private static readonly Vector2 bar_size = new Vector2(110, 1.5f);
+
+        private const int colored_circle_size = 416;
+
+        //Time
+        private const int full_animation_duration = 3000;
+
+        private const int medium_ring_resize_duration = 500;
+        private const int medium_ring_fade_duration = 1000;
+
+        private const int small_ring_animation_start_delay = 200;
+        private const int small_ring_resize_duration = 400;
+        private const int small_ring_fade_duration = 1500;
+
+        private const int text_appear_delay = 350;
+        private const int text_scale_duration = 250;
+        private const int text_fade_duration = 1000;
+        private const int text_spacing_transform_duration = 1450;
+
+        private const int bar_animation_duration = 1000;
+        private const int bar_resize_delay = 300;
+
+        private const int big_ring_animation_start_delay = 1950;
+        private const int big_ring_resize_duration = 550;
+        private const int big_ring_fade_duration = 700;
+
+        private const int background_animation_start_time = 2317;
+        private const int foreground_animation_start_time = 2350;
+
+        private const int colored_curcle_rotation_delay = 100;
+        private const int purple_circle_animation_start_time = 2317;
+        private const int yellow_circle_animation_start_time = 2383;
+        private const int blue_circle_animation_start_time = 2449;
+        private const int pink_circle_animation_start_time = 2515;
+
+        //Position
+        private const int bar_start_offset = 90;
+        private const int bar_end_offset = 120;
+        private const int colored_circle_offset = 250;
+
         private readonly OsuSpriteText welcomeText;
 
         private readonly OsuLogo logo;
@@ -102,7 +152,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(460),
+                    Size = new Vector2(logo_size),
                     Masking = true,
                     Children = new Drawable[]
                     {
@@ -197,80 +247,89 @@ namespace osu.Game.Screens.Menu
 
         public void Start()
         {
-            mediumRing.ResizeTo(130, 500, Easing.InExpo);
-            mediumRing.Foreground.Delay(500).ResizeTo(1, 1000, Easing.OutQuint);
+            int duration;
 
-            using (welcomeText.BeginDelayedSequence(350))
+            mediumRing.ResizeTo(medium_ring_size, medium_ring_resize_duration, Easing.InExpo);
+            mediumRing.Foreground.Delay(medium_ring_resize_duration).ResizeTo(1, medium_ring_fade_duration, Easing.OutQuint);
+
+            using (welcomeText.BeginDelayedSequence(text_appear_delay))
             {
-                welcomeText.ScaleTo(1, 250, Easing.Out);
-                welcomeText.FadeIn(1000, Easing.Out);
-                welcomeText.TransformSpacingTo(new Vector2(20, 0), 1450, Easing.Out);
+                welcomeText.ScaleTo(1, text_scale_duration, Easing.Out);
+                welcomeText.FadeIn(text_fade_duration, Easing.Out);
+                welcomeText.TransformSpacingTo(new Vector2(20, 0), text_spacing_transform_duration, Easing.Out);
             }
 
-            using (smallRing.BeginDelayedSequence(200, true))
+            using (smallRing.BeginDelayedSequence(small_ring_animation_start_delay, true))
             {
-                smallRing.ResizeTo(40, 400, Easing.InExpo);
-                smallRing.Foreground.Delay(400).ResizeTo(1, 1500, Easing.OutQuint);
+                smallRing.ResizeTo(small_ring_size, small_ring_resize_duration, Easing.InExpo);
+                smallRing.Foreground.Delay(small_ring_resize_duration).ResizeTo(1, small_ring_fade_duration, Easing.OutQuint);
             }
 
+            duration = bar_animation_duration - bar_resize_delay;
             using (barsContainer.BeginDelayedSequence(500, true))
             {
                 foreach (var bar in barsContainer)
                 {
                     bar.FadeIn();
-                    bar.Delay(100).ResizeWidthTo(0, 900, Easing.OutExpo);
+                    bar.Delay(bar_resize_delay).ResizeWidthTo(0, duration, Easing.OutExpo);
                 }
 
-                barTopLeft.MoveTo(new Vector2(-120, -120), 900, Easing.OutQuint);
-                barTopRight.MoveTo(new Vector2(120, -120), 900, Easing.OutQuint);
-                barBottomLeft.MoveTo(new Vector2(-120, 120), 900, Easing.OutQuint);
-                barBottomRight.MoveTo(new Vector2(120, 120), 900, Easing.OutQuint);
+                barTopLeft.MoveTo(new Vector2(-bar_end_offset, -bar_end_offset), bar_animation_duration, Easing.OutQuint);
+                barTopRight.MoveTo(new Vector2(bar_end_offset, -bar_end_offset), bar_animation_duration, Easing.OutQuint);
+                barBottomLeft.MoveTo(new Vector2(-bar_end_offset, bar_end_offset), bar_animation_duration, Easing.OutQuint);
+                barBottomRight.MoveTo(new Vector2(bar_end_offset, bar_end_offset), bar_animation_duration, Easing.OutQuint);
             }
 
-            using (bigRing.BeginDelayedSequence(1950, true))
+            using (bigRing.BeginDelayedSequence(big_ring_animation_start_delay, true))
             {
-                bigRing.ResizeTo(400, 550, Easing.OutQuint);
-                bigRing.Foreground.ResizeTo(1, 700, Easing.InOutQuad);
+                bigRing.ResizeTo(big_ring_size, big_ring_resize_duration, Easing.OutQuint);
+                bigRing.Foreground.ResizeTo(1, big_ring_fade_duration, Easing.InOutQuad);
             }
 
-            using (backgroundFill.BeginDelayedSequence(2317))
+            duration = full_animation_duration - background_animation_start_time;
+            using (backgroundFill.BeginDelayedSequence(background_animation_start_time))
             {
-                backgroundFill.ResizeHeightTo(1, 650, Easing.InOutQuint);
-                backgroundFill.RotateTo(-90, 650, Easing.InOutQuint);
+                backgroundFill.ResizeHeightTo(1, duration, Easing.InOutQuint);
+                backgroundFill.RotateTo(-90, duration, Easing.InOutQuint);
             }
 
-            using (foregroundFill.BeginDelayedSequence(2350))
+            duration = full_animation_duration - foreground_animation_start_time;
+            using (foregroundFill.BeginDelayedSequence(foreground_animation_start_time))
             {
-                foregroundFill.ResizeWidthTo(1, 650, Easing.InOutQuint);
-                foregroundFill.RotateTo(-90, 650, Easing.InOutQuint);
+                foregroundFill.ResizeWidthTo(1, duration, Easing.InOutQuint);
+                foregroundFill.RotateTo(-90, duration, Easing.InOutQuint);
             }
 
-            using (yellowCircle.BeginDelayedSequence(2383))
+            duration = full_animation_duration - purple_circle_animation_start_time;
+            using (purpleCircle.BeginDelayedSequence(purple_circle_animation_start_time))
             {
-                yellowCircle.MoveToY(-207, 617, Easing.InOutQuad);
-                yellowCircle.RotateTo(-180, 617, Easing.InOutQuad);
-                yellowCircle.ResizeTo(414, 617, Easing.InOutSine);
+                purpleCircle.MoveToY((colored_circle_size - 2) / 2, duration, Easing.InOutQuad);
+                purpleCircle.Delay(colored_curcle_rotation_delay).RotateTo(-180, duration - colored_curcle_rotation_delay, Easing.InOutQuad);
+                purpleCircle.ResizeTo(colored_circle_size - 2, duration, Easing.InOutSine);
             }
 
-            using (purpleCircle.BeginDelayedSequence(2317))
+            duration = full_animation_duration - yellow_circle_animation_start_time;
+            using (yellowCircle.BeginDelayedSequence(yellow_circle_animation_start_time))
             {
-                purpleCircle.MoveToY(207, 683, Easing.InOutQuad);
-                purpleCircle.RotateTo(-180, 683, Easing.InOutQuad);
-                purpleCircle.ResizeTo(414, 683, Easing.InOutSine);
+                yellowCircle.MoveToY(-(colored_circle_size - 2) / 2, duration, Easing.InOutQuad);
+                yellowCircle.Delay(colored_curcle_rotation_delay).RotateTo(-180, duration - colored_curcle_rotation_delay, Easing.InOutQuad);
+                yellowCircle.ResizeTo(colored_circle_size - 2, duration, Easing.InOutSine);
             }
 
-            using (blueCircle.BeginDelayedSequence(2449))
+            duration = full_animation_duration - blue_circle_animation_start_time;
+            using (blueCircle.BeginDelayedSequence(blue_circle_animation_start_time))
             {
-                blueCircle.MoveToX(-207, 551, Easing.InOutQuad);
-                blueCircle.RotateTo(-180, 551, Easing.InOutQuad);
-                blueCircle.ResizeTo(414, 551, Easing.InOutSine);
+                blueCircle.MoveToX(-(colored_circle_size - 2) / 2, duration, Easing.InOutQuad);
+                blueCircle.Delay(colored_curcle_rotation_delay).RotateTo(-180, duration - colored_curcle_rotation_delay, Easing.InOutQuad);
+                blueCircle.ResizeTo(colored_circle_size - 2, duration, Easing.InOutSine);
             }
 
-            using (pinkCircle.BeginDelayedSequence(2515))
+            duration = full_animation_duration - pink_circle_animation_start_time;
+            using (pinkCircle.BeginDelayedSequence(pink_circle_animation_start_time))
             {
-                pinkCircle.MoveToX(208, 485, Easing.InOutQuad);
-                pinkCircle.RotateTo(-180, 485, Easing.InOutQuad);
-                pinkCircle.ResizeTo(416, 485, Easing.InOutSine);
+                pinkCircle.MoveToX(colored_circle_size / 2, duration, Easing.InOutQuad);
+                pinkCircle.Delay(colored_curcle_rotation_delay).RotateTo(-180, duration - colored_curcle_rotation_delay, Easing.InOutQuad);
+                pinkCircle.ResizeTo(colored_circle_size, duration, Easing.InOutSine);
             }
 
             logo.Delay(3200).FadeIn(300);
@@ -288,16 +347,16 @@ namespace osu.Game.Screens.Menu
             welcomeText.Alpha = 0;
 
             smallRing.Size = mediumRing.Size = bigRing.Size = Vector2.Zero;
-            mediumRing.Foreground.Size = new Vector2(0.75f);
-            smallRing.Foreground.Size = new Vector2(0.5f);
+            mediumRing.Foreground.Size = Vector2.One - medium_ring_thickness;
+            smallRing.Foreground.Size = Vector2.One - small_ring_thickness;
             bigRing.Foreground.Size = Vector2.Zero;
 
-            barTopLeft.Size = barTopRight.Size = barBottomLeft.Size = barBottomRight.Size = new Vector2(110, 1.5f);
+            barTopLeft.Size = barTopRight.Size = barBottomLeft.Size = barBottomRight.Size = bar_size;
             barTopLeft.Alpha = barTopRight.Alpha = barBottomLeft.Alpha = barBottomRight.Alpha = 0;
-            barTopLeft.Position = new Vector2(-90, -90);
-            barTopRight.Position = new Vector2(90, -90);
-            barBottomLeft.Position = new Vector2(-90, 90);
-            barBottomRight.Position = new Vector2(90, 90);
+            barTopLeft.Position = new Vector2(-bar_start_offset, -bar_start_offset);
+            barTopRight.Position = new Vector2(bar_start_offset, -bar_start_offset);
+            barBottomLeft.Position = new Vector2(-bar_start_offset, bar_start_offset);
+            barBottomRight.Position = new Vector2(bar_start_offset, bar_start_offset);
 
             backgroundFill.Rotation = foregroundFill.Rotation = 0;
             backgroundFill.Alpha = foregroundFill.Alpha = 1;
@@ -305,10 +364,10 @@ namespace osu.Game.Screens.Menu
 
             yellowCircle.Size = purpleCircle.Size = blueCircle.Size = pinkCircle.Size = Vector2.Zero;
             yellowCircle.Rotation = purpleCircle.Rotation = blueCircle.Rotation = pinkCircle.Rotation = 0;
-            yellowCircle.Position = new Vector2(0, -250);
-            purpleCircle.Position = new Vector2(0, 250);
-            blueCircle.Position = new Vector2(-250, 0);
-            pinkCircle.Position = new Vector2(250, 0);
+            yellowCircle.Position = new Vector2(0, -colored_circle_offset);
+            purpleCircle.Position = new Vector2(0, colored_circle_offset);
+            blueCircle.Position = new Vector2(-colored_circle_offset, 0);
+            pinkCircle.Position = new Vector2(colored_circle_offset, 0);
         }
 
         public void Restart()
