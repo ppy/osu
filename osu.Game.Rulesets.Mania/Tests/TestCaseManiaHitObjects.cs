@@ -10,7 +10,7 @@ using osu.Game.Tests.Visual;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Rulesets.Mania.Testing
+namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
     internal class TestCaseManiaHitObjects : OsuTestCase
