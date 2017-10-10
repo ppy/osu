@@ -54,6 +54,7 @@ namespace osu.Game.Rulesets
                     Connection.RulesetInfo.Add(rulesetInfo);
                 }
             }
+            Connection.SaveChanges();
 
             //add any other modes
             foreach (var r in instances.Where(r => r.LegacyID < 0))
@@ -65,6 +66,7 @@ namespace osu.Game.Rulesets
                 if (existing == null)
                     Connection.RulesetInfo.Add(us);
             }
+            Connection.SaveChanges();
 
             //perform a consistency check
             foreach (var r in Connection.RulesetInfo)
@@ -78,8 +80,6 @@ namespace osu.Game.Rulesets
                 {
                     r.Available = false;
                 }
-
-                //Connection.RulesetInfo.Update(r);
             }
             Connection.SaveChanges();
         }
