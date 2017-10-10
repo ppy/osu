@@ -2,26 +2,26 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
+using osu.Framework.MathUtils;
+using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
-    public class DrawableFruit : DrawableCatchHitObject
+    public class DrawableFruit : DrawableCatchHitObject<Fruit>
     {
         private const float pulp_size = 20;
 
-        public DrawableFruit(CatchBaseHit h)
+        public DrawableFruit(Fruit h)
             : base(h)
         {
             Size = new Vector2(pulp_size * 2.2f, pulp_size * 2.8f);
             AccentColour = HitObject.ComboColour;
             Masking = false;
+
+            Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
         }
 
         [BackgroundDependencyLoader]
@@ -70,34 +70,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     }
                 }
             };
-        }
-
-        private class Pulp : Circle, IHasAccentColour
-        {
-            public Pulp()
-            {
-                Size = new Vector2(pulp_size);
-
-                Blending = BlendingMode.Additive;
-                Colour = Color4.White.Opacity(0.9f);
-            }
-
-            private Color4 accentColour;
-            public Color4 AccentColour
-            {
-                get { return accentColour; }
-                set
-                {
-                    accentColour = value;
-
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Glow,
-                        Radius = 5,
-                        Colour = accentColour.Lighten(100),
-                    };
-                }
-            }
         }
     }
 }

@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Objects
 
         public List<Vector2> ControlPoints;
 
+        public double Scale = 1;
+
         public CurveType CurveType = CurveType.PerfectCurve;
 
         public Vector2 Offset;

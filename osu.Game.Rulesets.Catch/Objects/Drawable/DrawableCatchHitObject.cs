@@ -3,12 +3,23 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
+    public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
+        where TObject : CatchBaseHit
+    {
+        public new TObject HitObject;
+
+        protected DrawableCatchHitObject(TObject hitObject)
+            : base(hitObject)
+        {
+            HitObject = hitObject;
+        }
+    }
+
     public abstract class DrawableCatchHitObject : DrawableScrollingHitObject<CatchBaseHit>
     {
         protected DrawableCatchHitObject(CatchBaseHit hitObject)
@@ -17,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Origin = Anchor.Centre;
             RelativePositionAxes = Axes.Both;
             X = hitObject.X;
-            Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
+            Y = (float)HitObject.StartTime;
         }
 
         public Func<CatchBaseHit, bool> CheckPosition;

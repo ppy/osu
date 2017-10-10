@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchPlayfield : ScrollingPlayfield
     {
+        public static readonly float BASE_WIDTH = 512;
+
         protected override Container<Drawable> Content => content;
         private readonly Container<Drawable> content;
 
@@ -27,8 +29,6 @@ namespace osu.Game.Rulesets.Catch.UI
             Container explodingFruitContainer;
 
             Reversed.Value = true;
-
-            Size = new Vector2(1);
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             base.Add(h);
 
-            var fruit = (DrawableFruit)h;
+            var fruit = (DrawableCatchHitObject)h;
             fruit.CheckPosition = CheckIfWeCanCatch;
         }
 
