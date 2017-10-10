@@ -207,7 +207,7 @@ namespace osu.Game.Screens.Menu
                 welcomeText.TransformSpacingTo(new Vector2(20, 0), 1450, Easing.Out);
             }
 
-            using (smallRing.BeginDelayedSequence(200))
+            using (smallRing.BeginDelayedSequence(200, true))
             {
                 smallRing.ResizeTo(40, 400, Easing.InExpo);
                 smallRing.Foreground.Delay(400).ResizeTo(1, 1500, Easing.OutQuint);
@@ -227,8 +227,11 @@ namespace osu.Game.Screens.Menu
                 barBottomRight.MoveTo(new Vector2(120, 120), 900, Easing.OutQuint);
             }
 
-            bigRing.Delay(1950).ResizeTo(400, 550, Easing.InOutQuint);
-            bigRing.Foreground.Delay(1950).ResizeTo(0.8f, 450, Easing.InExpo).Then().ResizeTo(1, 500, Easing.OutExpo);
+            using (bigRing.BeginDelayedSequence(1950, true))
+            {
+                bigRing.ResizeTo(400, 550, Easing.OutQuint);
+                bigRing.Foreground.ResizeTo(1, 700, Easing.InOutQuad);
+            }
 
             using (backgroundFill.BeginDelayedSequence(2317))
             {
