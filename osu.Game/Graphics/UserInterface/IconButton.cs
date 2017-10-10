@@ -15,9 +15,10 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class IconButton : OsuClickableContainer
     {
-        private readonly SpriteIcon icon;
-        private readonly Box hover;
-        private readonly Container content;
+        private const float button_size = 30;
+
+        public Color4 FlashColour;
+        public Color4 NormalColour;
 
         public FontAwesome Icon
         {
@@ -25,14 +26,27 @@ namespace osu.Game.Graphics.UserInterface
             set { icon.Icon = value; }
         }
 
-        private const float button_size = 30;
-        private Color4 flashColour;
-
         public Vector2 IconScale
         {
             get { return icon.Scale; }
             set { icon.Scale = value; }
         }
+
+        public Vector2 ButtonSize
+        {
+            get { return content.Size; }
+            set { content.Size = value; }
+        }
+
+        public Color4 HoverColour
+        {
+            get { return hover.Colour; }
+            set { hover.Colour = value; }
+        }
+
+        private readonly Container content;
+        private readonly SpriteIcon icon;
+        private readonly Box hover;
 
         public IconButton()
         {
@@ -45,7 +59,6 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Size = new Vector2(button_size),
-
                     CornerRadius = 5,
                     Masking = true,
                     EdgeEffect = new EdgeEffectParameters
@@ -75,8 +88,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            hover.Colour = colours.Yellow.Opacity(0.6f);
-            flashColour = colours.Yellow;
+            HoverColour = colours.Yellow.Opacity(0.6f);
+            FlashColour = colours.Yellow;
 
             Enabled.ValueChanged += enabled => this.FadeColour(enabled ? Color4.White : colours.Gray9, 200, Easing.OutQuint);
         }
@@ -95,7 +108,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(InputState state)
         {
-            hover.FlashColour(flashColour, 800, Easing.OutQuint);
+            hover.FlashColour(FlashColour, 800, Easing.OutQuint);
             return base.OnClick(state);
         }
 
