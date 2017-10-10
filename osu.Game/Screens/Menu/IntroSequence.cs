@@ -49,16 +49,18 @@ namespace osu.Game.Screens.Menu
         private const int big_ring_animation_start_delay = 2000;
         private const int big_ring_resize_duration = 500;
         private const int big_ring_foreground_resize_delay = 250;
-        private const int big_ring_fade_duration = 600;
+        private const int big_ring_fade_duration = 450;
 
         private const int background_animation_start_time = 2250;
         private const int foreground_animation_start_time = 2300;
 
-        private const int colored_curcle_rotation_delay = 150;
+        private const int colored_curcle_rotation_delay = 110;
         private const int purple_circle_animation_start_time = 2250;
         private const int yellow_circle_animation_start_time = 2315;
         private const int blue_circle_animation_start_time = 2380;
         private const int pink_circle_animation_start_time = 2445;
+
+        private const int logo_fade_duration = 300;
 
         //Position
         private const int bar_start_offset = 80;
@@ -332,10 +334,10 @@ namespace osu.Game.Screens.Menu
                 pinkCircle.ResizeTo(colored_circle_size, duration, Easing.InOutQuad);
             }
 
-            logo.Delay(3200).FadeIn(300);
+            logo.Delay(full_animation_duration).FadeIn(logo_fade_duration);
 
-            backgroundFill.Delay(3200).FadeOut();
-            foregroundFill.Delay(3500).FadeOut();
+            backgroundFill.Delay(full_animation_duration + logo_fade_duration).FadeOut();
+            foregroundFill.Delay(full_animation_duration + logo_fade_duration).FadeOut();
         }
 
         private void setDefaults()
