@@ -99,6 +99,7 @@ namespace osu.Game.Screens.Menu
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
                             Child = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -117,6 +118,7 @@ namespace osu.Game.Screens.Menu
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
                             Child = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
@@ -189,10 +191,10 @@ namespace osu.Game.Screens.Menu
             welcomeText.Delay(350).TransformSpacingTo(new Vector2(20, 0), 1450, Easing.Out);
 
             mediumRing.Background.ResizeTo(120, 500, Easing.InExpo);
-            mediumRing.Foreground.ResizeTo(80, 500, Easing.InQuint).Then().ResizeTo(124, 1000, Easing.OutQuint);
+            mediumRing.Foreground.ResizeTo(0.8f, 500, Easing.InQuint).Then().ResizeTo(1, 1000, Easing.OutQuint);
 
             smallRing.Background.Delay(100).ResizeTo(45, 500, Easing.InExpo);
-            smallRing.Foreground.Delay(100).ResizeTo(35, 500, Easing.InQuint).Then().ResizeTo(49, 2000, Easing.OutQuint);
+            smallRing.Foreground.Delay(100).ResizeTo(0.8f, 500, Easing.InQuint).Then().ResizeTo(1, 2000, Easing.OutQuint);
 
             barTopLeft.Delay(500).FadeIn();
             barTopLeft.Delay(500).MoveTo(new Vector2(-120, -120), 900, Easing.OutQuint);
@@ -211,12 +213,12 @@ namespace osu.Game.Screens.Menu
             barBottomRight.Delay(600).ResizeWidthTo(0, 900, Easing.OutExpo);
 
             bigRing.Background.Delay(1950).ResizeTo(400, 550, Easing.InOutQuint);
-            bigRing.Foreground.Delay(1950).ResizeTo(350, 450, Easing.InExpo).Then().ResizeTo(404, 500, Easing.OutExpo);
+            bigRing.Foreground.Delay(1950).ResizeTo(0.8f, 450, Easing.InExpo).Then().ResizeTo(1, 500, Easing.OutExpo);
 
-            backgroundFill.Delay(2317).ResizeHeightTo(450, 650, Easing.InOutQuint);
+            backgroundFill.Delay(2317).ResizeHeightTo(1, 650, Easing.InOutQuint);
             backgroundFill.Delay(2317).RotateTo(-90, 650, Easing.InOutQuint);
 
-            foregroundFill.Delay(2350).ResizeWidthTo(500, 650, Easing.InOutQuint);
+            foregroundFill.Delay(2350).ResizeWidthTo(1, 650, Easing.InOutQuint);
             foregroundFill.Delay(2350).RotateTo(-90, 650, Easing.InOutQuint);
 
             yellowCircle.Delay(2383).MoveToY(-207, 617, Easing.InOutQuad);
@@ -262,8 +264,7 @@ namespace osu.Game.Screens.Menu
 
             backgroundFill.Rotation = foregroundFill.Rotation = 0;
             backgroundFill.Alpha = foregroundFill.Alpha = 1;
-            backgroundFill.Size = new Vector2(500, 0);
-            foregroundFill.Size = new Vector2(0, 500);
+            backgroundFill.Height = foregroundFill.Width = 0;
 
             yellowCircle.Size = purpleCircle.Size = blueCircle.Size = pinkCircle.Size = Vector2.Zero;
             yellowCircle.Rotation = purpleCircle.Rotation = blueCircle.Rotation = pinkCircle.Rotation = 0;
@@ -280,9 +281,9 @@ namespace osu.Game.Screens.Menu
             Start();
         }
 
-        private class Ring : Container<CircularContainer>
+        private class Ring : CircularContainer
         {
-            public readonly CircularContainer Background;
+            public readonly Container Background;
             public readonly CircularContainer Foreground;
 
             public Ring(Color4 ringColour)
@@ -290,13 +291,13 @@ namespace osu.Game.Screens.Menu
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
                 AutoSizeAxes = Axes.Both;
+                Masking = true;
                 Children = new[]
                 {
-                    Background = new CircularContainer
+                    Background = new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Masking = true,
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -307,6 +308,7 @@ namespace osu.Game.Screens.Menu
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         Child = new Box
                         {
