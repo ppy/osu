@@ -17,10 +17,15 @@ namespace osu.Game.Graphics.UserInterface
     {
         private const float button_size = 30;
 
+        private Color4? flashColour;
         /// <summary>
         /// The colour that should be flashed when the <see cref="IconButton"/> is clicked.
         /// </summary>
-        public Color4 FlashColour;
+        public Color4 FlashColour
+        {
+            get { return flashColour ?? Color4.White; }
+            set { flashColour = value; }
+        }
 
         /// <summary>
         /// The icon colour. This does not affect <see cref="IconButton.Colour"/>.
@@ -29,6 +34,20 @@ namespace osu.Game.Graphics.UserInterface
         {
             get { return icon.Colour; }
             set { icon.Colour = value; }
+        }
+
+        private Color4? hoverColour;
+        /// <summary>
+        /// The background colour of the <see cref="IconButton"/> while it is hovered.
+        /// </summary>
+        public Color4 HoverColour
+        {
+            get { return hoverColour ?? Color4.White; }
+            set
+            {
+                hoverColour = value;
+                hover.Colour = value;
+            }
         }
 
         /// <summary>
@@ -56,16 +75,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             get { return content.Size; }
             set { content.Size = value; }
-        }
-
-        /// <summary>
-        /// The background colour of the <see cref="IconButton"/> while it is hovered.
-        /// </summary>
-        /// <returns></returns>
-        public Color4 HoverColour
-        {
-            get { return hover.Colour; }
-            set { hover.Colour = value; }
         }
 
         private readonly Container content;
@@ -112,8 +121,11 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            HoverColour = colours.Yellow.Opacity(0.6f);
-            FlashColour = colours.Yellow;
+            if (hoverColour == null)
+                hoverColour = colours.Yellow.Opacity(0.6f);
+
+            if (flashColour == null)
+                flashColour = colours.Yellow;
 
             Enabled.ValueChanged += enabled => this.FadeColour(enabled ? Color4.White : colours.Gray9, 200, Easing.OutQuint);
         }
