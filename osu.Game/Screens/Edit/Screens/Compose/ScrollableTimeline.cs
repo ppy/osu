@@ -17,8 +17,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
     {
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        private readonly Container timelineContainer;
-        private readonly BeatmapWaveformGraph waveform;
+        private readonly ScrollingTimelineContainer timelineContainer;
 
         public ScrollableTimeline()
         {
@@ -104,33 +103,12 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                                 }
                             }
                         },
-                        timelineContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.Y,
-                            Children = new Drawable[]
-                            {
-                                waveform = new BeatmapWaveformGraph
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.FromHex("081a84")
-                                    // Resolution = 0.33f,
-                                }
-                            }
-                        }
+                        timelineContainer = new ScrollingTimelineContainer { RelativeSizeAxes = Axes.Y }
                     }
                 }
             };
 
-            waveform.Beatmap.BindTo(Beatmap);
-        }
-
-        protected override bool OnWheel(InputState state)
-        {
-            if (!state.Keyboard.ControlPressed)
-                return false;
-
-            waveform.ScaleTo(new Vector2(MathHelper.Clamp(waveform.Scale.X + state.Mouse.WheelDelta, 1, 30), 1), 150, Easing.OutQuint);
-            return true;
+            timelineContainer.Beatmap.BindTo(Beatmap);
         }
 
         protected override void Update()
@@ -138,6 +116,50 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             base.Update();
 
             timelineContainer.Size = new Vector2(DrawSize.X - timelineContainer.DrawPosition.X, 1);
+        }
+
+        private class ScrollingTimelineContainer : ScrollContainer
+        {
+            public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
+            private readonly BeatmapWaveformGraph graph;
+
+            public ScrollingTimelineContainer()
+                : base(Direction.Horizontal)
+            {
+                Masking = true;
+
+                Add(graph = new BeatmapWaveformGraph
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.FromHex("222"),
+                    Depth = float.MaxValue,
+                });
+
+                Content.AutoSizeAxes = Axes.None;
+                Content.RelativeSizeAxes = Axes.Both;
+
+                graph.Beatmap.BindTo(Beatmap);
+            }
+
+            protected override bool OnWheel(InputState state)
+            {
+                if (!state.Keyboard.ControlPressed)
+                    return base.OnWheel(state);
+
+                float newSize = MathHelper.Clamp(Content.Size.X + state.Mouse.WheelDelta, 1, 30);
+
+                float relativeTarget = MathHelper.Clamp(Content.ToLocalSpace(state.Mouse.NativeState.Position).X / Content.DrawSize.X, 0, 1);
+                float newAbsoluteTarget = relativeTarget * newSize * Content.DrawSize.X / Content.Size.X;
+
+                float mousePos = MathHelper.Clamp(ToLocalSpace(state.Mouse.NativeState.Position).X, 0, DrawSize.X);
+                float scrollPos = newAbsoluteTarget - mousePos;
+
+                Content.ResizeWidthTo(newSize);
+                ScrollTo(scrollPos, false);
+
+                return true;
+            }
         }
     }
 }
