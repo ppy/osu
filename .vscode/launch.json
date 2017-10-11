@@ -1,7 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [{
-            "name": "osu! (VisualTests)",
+            "name": "osu! VisualTests (Debug)",
             "windows": {
                 "type": "clr"
             },
@@ -13,6 +13,23 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Debug)",
+            "runtimeExecutable": null,
+            "env": {},
+            "console": "internalConsole"
+        },
+        {
+            "name": "osu! VisualTests (Release)",
+            "windows": {
+                "type": "clr"
+            },
+            "type": "mono",
+            "request": "launch",
+            "program": "${workspaceRoot}/osu.Game/bin/Release/osu!.exe",
+            "args": [
+                "--tests"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Release)",
             "runtimeExecutable": null,
             "env": {},
             "console": "internalConsole"
