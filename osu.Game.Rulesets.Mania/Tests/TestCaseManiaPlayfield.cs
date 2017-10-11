@@ -17,7 +17,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Mania.Testing
+namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
     internal class TestCaseManiaPlayfield : OsuTestCase
