@@ -117,22 +117,27 @@ namespace osu.Game.Tests.Beatmaps.IO
             //ensure we were stored to beatmap database backing...
             Assert.IsTrue(resultSets.Count() == 1, $@"Incorrect result count found ({resultSets.Count()} but should be 1).");
 
-            IEnumerable<BeatmapInfo> resultBeatmaps = null;
-            IEnumerable<BeatmapSetInfo> resultBeatmapSet = null;
+            Func<IEnumerable<BeatmapInfo>> queryBeatmaps = () => store.QueryBeatmaps(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0);
+            Func<IEnumerable<BeatmapSetInfo>> queryBeatmapSets = () => store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526);
 
             //if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
-            waitForOrAssert(() => (resultBeatmaps = store.QueryBeatmaps(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() == 12,
+            waitForOrAssert(() => queryBeatmaps().Count() == 12,
                 @"Beatmaps did not import to the database in allocated time", timeout);
 
-            waitForOrAssert(() => (resultBeatmapSet = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526)).Count() == 1,
+            waitForOrAssert(() => queryBeatmapSets().Count() == 1,
                 @"BeatmapSet did not import to the database in allocated time", timeout);
 
-            var set = resultBeatmapSet.First();
+            int countBeatmapSetBeatmaps = 0;
+            int countBeatmaps = 0;
 
-            waitForOrAssert(() => set.Beatmaps.Count == resultBeatmaps.Count(),
-                $@"Incorrect database beatmap count post-import ({resultBeatmaps.Count()} but should be {set.Beatmaps.Count}).", timeout);
+            waitForOrAssert(() =>
+                (countBeatmapSetBeatmaps = queryBeatmapSets().First().Beatmaps.Count) ==
+                (countBeatmaps = queryBeatmaps().Count()),
+                $@"Incorrect database beatmap count post-import ({countBeatmaps} but should be {countBeatmapSetBeatmaps}).", timeout);
 
-            foreach (BeatmapInfo b in resultBeatmaps)
+            var set = queryBeatmapSets().First();
+
+            foreach (BeatmapInfo b in set.Beatmaps)
                 Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID));
 
             Assert.IsTrue(set.Beatmaps.Count > 0);
