@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             TickDistance = scoringDistance / difficulty.SliderTickRate;
         }
 
-        public IEnumerable<Droplet> Ticks
+        public IEnumerable<CatchBaseHit> Ticks
         {
             get
             {
@@ -53,8 +53,13 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                 var minDistanceFromEnd = Velocity * 0.01;
 
-                // temporary
-                while (tickDistance > 100) tickDistance /= 2;
+                yield return new Fruit
+                {
+                    Samples = Samples,
+                    ComboColour = ComboColour,
+                    StartTime = StartTime,
+                    X = X
+                };
 
                 for (var repeat = 0; repeat < RepeatCount; repeat++)
                 {
@@ -66,8 +71,10 @@ namespace osu.Game.Rulesets.Catch.Objects
                         if (d > length - minDistanceFromEnd)
                             break;
 
-                        var distanceProgress = d / length;
-                        var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
+                        var timeProgress = d / length;
+                        var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
+
+                        float tinyDroplet = 0;
 
                         yield return new Droplet
                         {
@@ -81,6 +88,14 @@ namespace osu.Game.Rulesets.Catch.Objects
                             }))
                         };
                     }
+
+                    yield return new Fruit
+                    {
+                        Samples = Samples,
+                        ComboColour = ComboColour,
+                        StartTime = repeatStartTime + repeatDuration,
+                        X = Curve.PositionAt(reversed ? 1 : 0).X
+                    };
                 }
             }
         }
