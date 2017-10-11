@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     public class SpinnerSpmCounter : Container
     {
         private readonly OsuSpriteText spmText;
+
         public SpinnerSpmCounter()
         {
             Children = new Drawable[]
@@ -37,6 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private double spm;
+
         public double SpinsPerMinute
         {
             get { return spm; }
@@ -57,7 +59,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private readonly Queue<RotationRecord> records = new Queue<RotationRecord>();
         private const double spm_count_duration = 595; // not using hundreds to avoid frame rounding issues
 
-
         public void SetRotation(float currentRotation)
         {
             if (records.Count > 0)
@@ -67,6 +68,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     record = records.Dequeue();
                 SpinsPerMinute = (currentRotation - record.Rotation) / (Time.Current - record.Time) * 1000 * 60 / 360;
             }
+
             records.Enqueue(new RotationRecord { Rotation = currentRotation, Time = Time.Current });
         }
     }
