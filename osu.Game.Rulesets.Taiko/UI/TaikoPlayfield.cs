@@ -221,7 +221,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            if (judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
+            if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
                 judgementContainer.Add(new DrawableTaikoJudgement(judgedObject, judgement)
                 {
