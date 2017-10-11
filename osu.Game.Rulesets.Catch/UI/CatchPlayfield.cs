@@ -83,7 +83,11 @@ namespace osu.Game.Rulesets.Catch.UI
             if (judgement.IsHit)
             {
                 Vector2 screenPosition = judgedObject.ScreenSpaceDrawQuad.Centre;
-                Remove(judgedObject);
+
+                // todo: don't do this
+                (judgedObject.Parent as Container<DrawableHitObject>)?.Remove(judgedObject);
+                (judgedObject.Parent as Container)?.Remove(judgedObject);
+
                 catcher.Add(judgedObject, screenPosition);
             }
         }

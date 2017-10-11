@@ -25,7 +25,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         protected DrawableCatchHitObject(CatchBaseHit hitObject)
             : base(hitObject)
         {
-            Origin = Anchor.Centre;
             RelativePositionAxes = Axes.Both;
             X = hitObject.X;
             Y = (float)HitObject.StartTime;

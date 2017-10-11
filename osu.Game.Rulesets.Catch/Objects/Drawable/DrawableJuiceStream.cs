@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             RelativeSizeAxes = Axes.Both;
             Height = (float)HitObject.Duration;
+            X = 0;
 
             Child = dropletContainer = new Container
             {
@@ -27,6 +28,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             var start = new DrawableFruit(new Fruit
             {
+                Samples = s.Samples,
                 ComboColour = Color4.Blue,
                 StartTime = s.StartTime,
                 X = s.X,
@@ -36,6 +38,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             var end = new DrawableFruit(new Fruit
             {
+                Samples = s.Samples,
                 ComboColour = Color4.Red,
                 StartTime = s.EndTime,
                 X = s.EndX,
@@ -52,6 +55,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         protected override void AddNested(DrawableHitObject<CatchBaseHit> h)
         {
+            ((DrawableCatchHitObject)h).CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
             dropletContainer.Add(h);
             base.AddNested(h);
         }
