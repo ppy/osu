@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 using osu.Framework.Lists;
-using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
@@ -66,8 +65,6 @@ namespace osu.Game.Rulesets.Catch.Objects
                     X = X
                 });
 
-                double lastTickTime = StartTime;
-
                 for (var repeat = 0; repeat < RepeatCount; repeat++)
                 {
                     var repeatStartTime = StartTime + repeat * repeatDuration;
@@ -81,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         var timeProgress = d / length;
                         var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
 
-                        lastTickTime = repeatStartTime + timeProgress * repeatDuration;
+                        var lastTickTime = repeatStartTime + timeProgress * repeatDuration;
                         ticks.Add(new Droplet
                         {
                             StartTime = lastTickTime,
@@ -96,7 +93,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         });
                     }
 
-                    double tinyTickInterval = (tickDistance / length) * repeatDuration;
+                    double tinyTickInterval = tickDistance / length * repeatDuration;
                     while (tinyTickInterval > 100)
                         tinyTickInterval /= 2;
 
