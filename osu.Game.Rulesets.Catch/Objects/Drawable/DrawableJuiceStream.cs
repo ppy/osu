@@ -28,6 +28,13 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             foreach (CatchBaseHit tick in s.Ticks)
             {
+                TinyDroplet tiny = tick as TinyDroplet;
+                if (tiny != null)
+                {
+                    AddNested(new DrawableDroplet(tiny) { Scale = new Vector2(0.5f) });
+                    continue;
+                }
+
                 Droplet droplet = tick as Droplet;
                 if (droplet != null)
                     AddNested(new DrawableDroplet(droplet));

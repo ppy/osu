@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             Size = new Vector2(Pulp.PULP_SIZE);
 
-            AccentColour = Color4.Green;
+            AccentColour = h.ComboColour;
             Masking = false;
         }
 
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Child = new Pulp
             {
                 AccentColour = AccentColour,
-                Scale = new Vector2(0.6f),
+                Scale = new Vector2(0.8f),
             };
         }
     }
