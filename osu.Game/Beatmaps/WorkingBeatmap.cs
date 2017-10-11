@@ -45,54 +45,53 @@ namespace osu.Game.Beatmaps
         protected abstract Track GetTrack();
 
         private Beatmap beatmap;
-        private readonly object beatmapLock = new object();
+        /// <summary>
+        /// Get the beatmap. Should be always called from update thread.
+        /// </summary>
         public Beatmap Beatmap
         {
             get
             {
-                lock (beatmapLock)
-                {
-                    if (beatmap != null) return beatmap;
+                if (beatmap != null) return beatmap;
 
-                    beatmap = GetBeatmap() ?? new Beatmap();
+                beatmap = GetBeatmap() ?? new Beatmap();
 
-                    // use the database-backed info.
-                    beatmap.BeatmapInfo = BeatmapInfo;
+                // use the database-backed info.
+                beatmap.BeatmapInfo = BeatmapInfo;
 
-                    return beatmap;
-                }
+                return beatmap;
             }
         }
 
         private readonly object backgroundLock = new object();
-        private Texture background;
+        private volatile Texture background;
         public Texture Background
         {
             get
             {
-                lock (backgroundLock)
-                {
-                    return background ?? (background = GetBackground());
-                }
+                // can be called from multiple threads (from thread pool)
+                if (background == null)
+                    lock (backgroundLock)
+                        if (background == null)
+                            background = GetBackground();
+                return background;
             }
         }
 
+        /// <summary>
+        /// Get the track. Should be always called from update thread.
+        /// </summary>
         private Track track;
-        private readonly object trackLock = new object();
         public Track Track
         {
             get
             {
-                lock (trackLock)
-                {
-                    if (track != null) return track;
+                if (track != null) return track;
+                // we want to ensure that we always have a track, even if it's a fake one.
+                track = GetTrack() ?? new TrackVirtual();
 
-                    // we want to ensure that we always have a track, even if it's a fake one.
-                    track = GetTrack() ?? new TrackVirtual();
-
-                    applyRateAdjustments();
-                    return track;
-                }
+                applyRateAdjustments();
+                return track;
             }
         }
 
@@ -100,29 +99,29 @@ namespace osu.Game.Beatmaps
 
         public void TransferTo(WorkingBeatmap other)
         {
-            lock (trackLock)
-            {
-                if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
-                    other.track = track;
-            }
+            if (track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
+                other.track = track;
 
-            if (background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
-                other.background = background;
+            lock (backgroundLock)
+            {
+                if (background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
+                    other.background = background;
+            }
         }
 
         public virtual void Dispose()
         {
-            background?.Dispose();
-            background = null;
+            lock (backgroundLock)
+            {
+                background?.Dispose();
+                background = null;
+            }
         }
 
         public void DisposeTrack()
         {
-            lock (trackLock)
-            {
-                track?.Dispose();
-                track = null;
-            }
+            track?.Dispose();
+            track = null;
         }
     }
 }
