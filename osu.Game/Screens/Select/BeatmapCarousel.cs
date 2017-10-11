@@ -375,6 +375,9 @@ namespace osu.Game.Screens.Select
             if (group == null)
                 return;
 
+            if (selectedGroup == group)
+                SelectNext();
+
             groups.Remove(group);
             panels.Remove(group.Header);
             foreach (var p in group.BeatmapPanels)
@@ -382,9 +385,6 @@ namespace osu.Game.Screens.Select
 
             scrollableContent.Remove(group.Header);
             scrollableContent.RemoveRange(group.BeatmapPanels);
-
-            if (selectedGroup == group)
-                SelectNext();
 
             computeYPositions();
         }
