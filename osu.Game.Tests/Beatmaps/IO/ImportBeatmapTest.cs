@@ -118,15 +118,19 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(resultSets.Count() == 1, $@"Incorrect result count found ({resultSets.Count()} but should be 1).");
 
             IEnumerable<BeatmapInfo> resultBeatmaps = null;
+            IEnumerable<BeatmapSetInfo> resultBeatmapSet = null;
 
             //if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
             waitForOrAssert(() => (resultBeatmaps = store.QueryBeatmaps(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0)).Count() == 12,
                 @"Beatmaps did not import to the database in allocated time", timeout);
 
-            var set = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526).First();
+            waitForOrAssert(() => (resultBeatmapSet = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526)).Count() == 1,
+                @"BeatmapSet did not import to the database in allocated time", timeout);
 
-            Assert.IsTrue(set.Beatmaps.Count == resultBeatmaps.Count(),
-                $@"Incorrect database beatmap count post-import ({resultBeatmaps.Count()} but should be {set.Beatmaps.Count}).");
+            var set = resultBeatmapSet.First();
+
+            waitForOrAssert(() => set.Beatmaps.Count == resultBeatmaps.Count(),
+                $@"Incorrect database beatmap count post-import ({resultBeatmaps.Count()} but should be {set.Beatmaps.Count}).", timeout);
 
             foreach (BeatmapInfo b in resultBeatmaps)
                 Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID));
