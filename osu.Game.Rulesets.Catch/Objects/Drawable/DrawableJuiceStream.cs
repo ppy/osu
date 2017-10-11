@@ -26,30 +26,15 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
             };
 
-            var start = new DrawableFruit(new Fruit
+            foreach (CatchBaseHit tick in s.Ticks)
             {
-                Samples = s.Samples,
-                ComboColour = Color4.Blue,
-                StartTime = s.StartTime,
-                X = s.X,
-            });
+                Droplet droplet = tick as Droplet;
+                if (droplet != null)
+                    AddNested(new DrawableDroplet(droplet));
 
-            AddNested(start);
-
-            var end = new DrawableFruit(new Fruit
-            {
-                Samples = s.Samples,
-                ComboColour = Color4.Red,
-                StartTime = s.EndTime,
-                X = s.EndX,
-            });
-
-            AddNested(end);
-
-            foreach (var tick in s.Ticks)
-            {
-                var droplet = new DrawableDroplet(tick);
-                AddNested(droplet);
+                Fruit fruit = tick as Fruit;
+                if (fruit != null)
+                    AddNested(new DrawableFruit(fruit));
             }
         }
 
