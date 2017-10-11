@@ -11,6 +11,7 @@ using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using OpenTK;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Overlays.Music
 {
@@ -40,6 +41,8 @@ namespace osu.Game.Overlays.Music
         public BeatmapSetInfo FirstVisibleSet => items.FirstVisibleSet;
         public BeatmapSetInfo NextSet => items.NextSet;
         public BeatmapSetInfo PreviousSet => items.PreviousSet;
+        public BeatmapSetInfo RandomSet => items.RandomSet();
+        public BeatmapSetInfo LastPlayedSet => items.LastPlayedRandomSet();
 
         public BeatmapSetInfo SelectedSet
         {
@@ -124,6 +127,31 @@ namespace osu.Game.Overlays.Music
             public BeatmapSetInfo FirstVisibleSet => items.FirstOrDefault(i => i.MatchingFilter)?.BeatmapSetInfo;
             public BeatmapSetInfo NextSet => (items.SkipWhile(i => !i.Selected).Skip(1).FirstOrDefault() ?? items.FirstOrDefault())?.BeatmapSetInfo;
             public BeatmapSetInfo PreviousSet => (items.TakeWhile(i => !i.Selected).LastOrDefault() ?? items.LastOrDefault())?.BeatmapSetInfo;
+            public BeatmapSetInfo RandomSet()
+            {
+                randomSelectedSets.Push(SelectedSet);
+                return items[RNG.Next(items.Count() - 1)]?.BeatmapSetInfo;
+            }
+            public BeatmapSetInfo LastPlayedRandomSet()
+            {
+                if (!randomSelectedSets.Any())
+                    return PreviousSet;
+
+                while (randomSelectedSets.Any())
+                {
+                    BeatmapSetInfo returned = randomSelectedSets.Pop();
+
+                    foreach (var item in items)
+                    {
+                        if (item.BeatmapSetInfo == returned)
+                            return returned;
+                    }
+                }
+
+                return PreviousSet;
+            }
+
+            private Stack<BeatmapSetInfo> randomSelectedSets = new Stack<BeatmapSetInfo>();
 
             private Vector2 nativeDragPosition;
             private PlaylistItem draggedItem;

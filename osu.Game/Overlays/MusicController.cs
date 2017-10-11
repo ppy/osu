@@ -44,6 +44,7 @@ namespace osu.Game.Overlays
         private IconButton playButton;
         private IconButton nextButton;
         private IconButton playlistButton;
+        private IconButton randomButton;
 
         private SpriteText title, artist;
 
@@ -150,6 +151,14 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Children = new Drawable[]
                                     {
+                                        randomButton = new IconButton
+                                        {
+                                            Origin = Anchor.Centre,
+                                            Anchor = Anchor.CentreLeft,
+                                            Position = new Vector2(bottom_black_area_height / 2, 0),
+                                            Icon = FontAwesome.fa_random,
+                                            Action = playlist.ToggleRandom,
+                                        },
                                         new FillFlowContainer<IconButton>
                                         {
                                             AutoSizeAxes = Axes.Both,
@@ -190,7 +199,7 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.CentreRight,
                                             Position = new Vector2(-bottom_black_area_height / 2, 0),
                                             Icon = FontAwesome.fa_bars,
-                                            Action = () => playlist.ToggleVisibility(),
+                                            Action = playlist.ToggleVisibility,
                                         },
                                     }
                                 },
@@ -210,6 +219,7 @@ namespace osu.Game.Overlays
 
             beatmapBacking.BindTo(game.Beatmap);
 
+            playlist.RandomStateChanged += s => randomButton.FadeColour(s == true ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 

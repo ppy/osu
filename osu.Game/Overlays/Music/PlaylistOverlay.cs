@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
+using System;
 
 namespace osu.Game.Overlays.Music
 {
@@ -124,9 +125,18 @@ namespace osu.Game.Overlays.Music
             playSpecified(set.Beatmaps[0]);
         }
 
+        public Action<bool> RandomStateChanged;
+
+        private bool isRandom;
+        public void ToggleRandom()
+        {
+            isRandom = !isRandom;
+            RandomStateChanged.Invoke(isRandom);
+        }
+
         public void PlayPrevious()
         {
-            var playable = list.PreviousSet;
+            var playable = isRandom ? list.LastPlayedSet : list.PreviousSet;
 
             if (playable != null)
             {
@@ -137,7 +147,7 @@ namespace osu.Game.Overlays.Music
 
         public void PlayNext()
         {
-            var playable = list.NextSet;
+            var playable = isRandom ? list.RandomSet : list.NextSet;
 
             if (playable != null)
             {
