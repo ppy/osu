@@ -31,8 +31,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly CirclePiece circle;
         private readonly GlowPiece glow;
 
-        private bool spmShown;
-
         private readonly SpriteIcon symbol;
 
         private readonly Color4 baseColour = OsuColour.FromHex(@"002c3c");
@@ -167,11 +165,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void Update()
         {
             disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
-            if (!spmShown && disc.Tracking)
-            {
-                spmShown = true;
+            if (!spmCounter.IsPresent && disc.Tracking)
                 spmCounter.FadeIn(TIME_FADEIN);
-            }
 
             base.Update();
         }
