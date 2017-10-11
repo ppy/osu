@@ -219,7 +219,7 @@ namespace osu.Game.Overlays
 
             beatmapBacking.BindTo(game.Beatmap);
 
-            playlist.RandomStateChanged += s => randomButton.FadeColour(s == true ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
+            playlist.RandomStateChanged += s => randomButton.FadeColour(s ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 

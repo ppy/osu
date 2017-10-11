@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.Music
             public BeatmapSetInfo RandomSet()
             {
                 randomSelectedSets.Push(SelectedSet);
-                return items[RNG.Next(items.Count() - 1)]?.BeatmapSetInfo;
+                return items[RNG.Next(items.Count - 1)]?.BeatmapSetInfo;
             }
             public BeatmapSetInfo LastPlayedRandomSet()
             {
@@ -151,7 +151,7 @@ namespace osu.Game.Overlays.Music
                 return PreviousSet;
             }
 
-            private Stack<BeatmapSetInfo> randomSelectedSets = new Stack<BeatmapSetInfo>();
+            private readonly Stack<BeatmapSetInfo> randomSelectedSets = new Stack<BeatmapSetInfo>();
 
             private Vector2 nativeDragPosition;
             private PlaylistItem draggedItem;
