@@ -18,7 +18,7 @@
             "console": "internalConsole"
         },
         {
-            "name": "osu! (debug)",
+            "name": "osu! (Debug)",
             "windows": {
                 "type": "clr"
             },
@@ -32,7 +32,7 @@
             "console": "internalConsole"
         },
         {
-            "name": "osu! (release)",
+            "name": "osu! (Release)",
             "windows": {
                 "type": "clr"
             },
