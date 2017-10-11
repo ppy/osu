@@ -61,6 +61,7 @@
     <Compile Include="Objects\Drawable\DrawableFruit.cs" />
     <Compile Include="Objects\Droplet.cs" />
     <Compile Include="Objects\Fruit.cs" />
+    <Compile Include="Objects\TinyDroplet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\TestCaseCatcher.cs" />
     <Compile Include="Tests\TestCaseCatchStacker.cs" />

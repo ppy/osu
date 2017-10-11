@@ -11,6 +11,8 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
+using osu.Framework.Lists;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
@@ -45,7 +47,10 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             get
             {
-                if (TickDistance == 0) yield break;
+                SortedList<CatchBaseHit> ticks = new SortedList<CatchBaseHit>((a, b) => a.StartTime.CompareTo(b.StartTime));
+
+                if (TickDistance == 0)
+                    return ticks;
 
                 var length = Curve.Distance;
                 var tickDistance = Math.Min(TickDistance, length);
@@ -53,13 +58,15 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                 var minDistanceFromEnd = Velocity * 0.01;
 
-                yield return new Fruit
+                ticks.Add(new Fruit
                 {
                     Samples = Samples,
                     ComboColour = ComboColour,
                     StartTime = StartTime,
                     X = X
-                };
+                });
+
+                double lastTickTime = StartTime;
 
                 for (var repeat = 0; repeat < RepeatCount; repeat++)
                 {
@@ -74,11 +81,11 @@ namespace osu.Game.Rulesets.Catch.Objects
                         var timeProgress = d / length;
                         var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
 
-                        float tinyDroplet = 0;
-
-                        yield return new Droplet
+                        lastTickTime = repeatStartTime + timeProgress * repeatDuration;
+                        ticks.Add(new Droplet
                         {
-                            StartTime = repeatStartTime + timeProgress * repeatDuration,
+                            StartTime = lastTickTime,
+                            ComboColour = ComboColour,
                             X = Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
                             Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
                             {
@@ -86,17 +93,41 @@ namespace osu.Game.Rulesets.Catch.Objects
                                 Name = @"slidertick",
                                 Volume = s.Volume
                             }))
-                        };
+                        });
                     }
 
-                    yield return new Fruit
+                    double tinyTickInterval = (tickDistance / length) * repeatDuration;
+                    while (tinyTickInterval > 100)
+                        tinyTickInterval /= 2;
+
+                    for (double t = 0; t < repeatDuration; t += tinyTickInterval)
+                    {
+                        double progress = reversed ? 1 - t / repeatDuration : t / repeatDuration;
+
+                        ticks.Add(new TinyDroplet
+                        {
+                            StartTime = repeatStartTime + t,
+                            ComboColour = ComboColour,
+                            X = Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
+                            Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
+                            {
+                                Bank = s.Bank,
+                                Name = @"slidertick",
+                                Volume = s.Volume
+                            }))
+                        });
+                    }
+
+                    ticks.Add(new Fruit
                     {
                         Samples = Samples,
                         ComboColour = ComboColour,
                         StartTime = repeatStartTime + repeatDuration,
-                        X = Curve.PositionAt(reversed ? 1 : 0).X
-                    };
+                        X = Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
+                    });
                 }
+
+                return ticks;
             }
         }
 
