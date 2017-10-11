@@ -120,15 +120,13 @@ namespace osu.Game.Overlays.Profile
                                                 }
                                             }
                                         },
-                                        new LinkFlowContainer.BrowserLinkText
+                                        new LinkFlowContainer.ProfileLink(user)
                                         {
-                                            Text = user.Username,
-                                            Url = $@"https://osu.ppy.sh/users/{user.Id}",
-                                            TextSize = 30,
-                                            Font = @"Exo2.0-RegularItalic",
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            Y = -48
+                                            Y = -48,
+                                            TextSize = 30,
+                                            Font = @"Exo2.0-RegularItalic",
                                         },
                                         countryFlag = new DrawableFlag(user.Country?.FlagName)
                                         {
@@ -541,9 +539,15 @@ namespace osu.Game.Overlays.Profile
                 }
             }
 
-            public class BrowserLinkText : LinkText, IHasTooltip
+            public class ProfileLink : LinkText, IHasTooltip
             {
                 public string TooltipText => "View Profile in Browser";
+
+                public ProfileLink(User user)
+                {
+                    Text = user.Username;
+                    Url = $@"https://osu.ppy.sh/users/{user.Id}";
+                }
             }
         }
     }
