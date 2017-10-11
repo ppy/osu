@@ -25,6 +25,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public virtual Color4 AccentColour { get; set; } = Color4.Gray;
 
+        /// <summary>
+        /// Whether a visible judgement should be displayed when this representation is hit.
+        /// </summary>
+        public virtual bool DisplayJudgement => true;
+
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
