@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 var minDistanceFromEnd = Velocity * 0.01;
 
                 // temporary
-                while (tickDistance > 10) tickDistance /= 2;
+                while (tickDistance > 100) tickDistance /= 2;
 
                 for (var repeat = 0; repeat < RepeatCount; repeat++)
                 {

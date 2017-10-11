@@ -45,6 +45,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             yield return new Fruit
             {
                 StartTime = obj.StartTime,
+                Samples = obj.Samples,
                 NewCombo = comboData?.NewCombo ?? false,
                 X = positionData.X / CatchPlayfield.BASE_WIDTH
             };

@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         public DrawableFruit(Fruit h)
             : base(h)
         {
+            Origin = Anchor.Centre;
+
             Size = new Vector2(pulp_size * 2.2f, pulp_size * 2.8f);
             AccentColour = HitObject.ComboColour;
             Masking = false;

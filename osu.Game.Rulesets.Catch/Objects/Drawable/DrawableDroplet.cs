@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
@@ -13,6 +14,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         public DrawableDroplet(Droplet h)
             : base(h)
         {
+            Origin = Anchor.Centre;
+
             Size = new Vector2(Pulp.PULP_SIZE);
 
             AccentColour = Color4.Green;
