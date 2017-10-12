@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,6 +31,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 IconColour = OsuColour.FromHex("555"),
+                IconHoverColour = Color4.White,
                 HoverColour = OsuColour.FromHex("3A3A3A"),
                 FlashColour = OsuColour.FromHex("555"),
                 Action = () => Action?.Invoke()
