@@ -14,6 +14,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 {
     internal class ScrollingTimelineContainer : ScrollContainer
     {
+        public readonly Bindable<bool> HitObjectsVisible = new Bindable<bool>();
+        public readonly Bindable<bool> HitSoundsVisible = new Bindable<bool>();
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
