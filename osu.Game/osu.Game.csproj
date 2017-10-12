@@ -57,7 +57,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
@@ -77,7 +76,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -103,7 +101,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <LangVersion>6</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <StartArguments>--tests</StartArguments>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -266,6 +263,7 @@
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
@@ -274,6 +272,7 @@
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\TimelineButton.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\ArrowsOverlay.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\BlurredIcon.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\BreakOverlay.cs" />
@@ -312,7 +311,6 @@
     <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
-    <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\SpriteIcon.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
@@ -629,6 +627,8 @@
     <Compile Include="Screens\Edit\Screens\Design\Design.cs" />
     <Compile Include="Screens\Edit\Screens\EditorScreen.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Compose.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\ScrollableTimeline.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\ScrollingTimelineContainer.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
@@ -755,6 +755,7 @@
     <Compile Include="Tests\Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Tests\Visual\TestCaseDrawings.cs" />
     <Compile Include="Tests\Visual\TestCaseEditor.cs" />
+    <Compile Include="Tests\Visual\TestCaseEditorComposeTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorMenuBar.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorSummaryTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseGamefield.cs" />
@@ -788,6 +789,7 @@
     <Compile Include="Tests\Visual\TestCaseTwoLayerButton.cs" />
     <Compile Include="Tests\Visual\TestCaseUserPanel.cs" />
     <Compile Include="Tests\Visual\TestCaseUserProfile.cs" />
+    <Compile Include="Tests\Visual\TestCaseWaveform.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Users\Country.cs" />
     <Compile Include="Users\Medal.cs" />
