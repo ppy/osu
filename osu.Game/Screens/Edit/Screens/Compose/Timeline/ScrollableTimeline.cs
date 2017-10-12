@@ -58,8 +58,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                                     Spacing = new Vector2(0, 4),
                                     Children = new[]
                                     {
-                                        new OsuCheckbox { LabelText = "Hit Objects" },
-                                        new OsuCheckbox { LabelText = "Hit Sounds" },
+                                        new OsuCheckbox { LabelText = "Hitobjects" },
+                                        new OsuCheckbox { LabelText = "Hitsounds" },
                                         new OsuCheckbox { LabelText = "Waveform" }
                                     }
                                 }
