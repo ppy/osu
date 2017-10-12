@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = OsuColour.FromHex("222"),
-                Depth = float.MaxValue,
+                Depth = float.MaxValue
             });
 
             Content.AutoSizeAxes = Axes.None;
