@@ -263,7 +263,7 @@
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
-    <Compile Include="Screens\Edit\Screens\Compose\BeatmapWaveformGraph.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
@@ -272,6 +272,7 @@
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\TimelineButton.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\ArrowsOverlay.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\BlurredIcon.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\BreakOverlay.cs" />
@@ -626,6 +627,8 @@
     <Compile Include="Screens\Edit\Screens\Design\Design.cs" />
     <Compile Include="Screens\Edit\Screens\EditorScreen.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Compose.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\ScrollableTimeline.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\ScrollingTimelineContainer.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
@@ -752,6 +755,7 @@
     <Compile Include="Tests\Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Tests\Visual\TestCaseDrawings.cs" />
     <Compile Include="Tests\Visual\TestCaseEditor.cs" />
+    <Compile Include="Tests\Visual\TestCaseEditorComposeTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorMenuBar.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorSummaryTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseGamefield.cs" />
