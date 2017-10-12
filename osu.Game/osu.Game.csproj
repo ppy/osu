@@ -312,7 +312,6 @@
     <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
-    <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\SpriteIcon.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
