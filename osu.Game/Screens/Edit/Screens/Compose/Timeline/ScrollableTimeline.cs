@@ -79,17 +79,19 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = OsuColour.FromHex("333")
                                 },
-                                new Container
+                                new Container<TimelineButton>
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     RelativeSizeAxes = Axes.Y,
                                     AutoSizeAxes = Axes.X,
-                                    Padding = new MarginPadding { Vertical = 5 },
+                                    Masking = true,
                                     Children = new[]
                                     {
                                         new TimelineButton
                                         {
+                                            RelativeSizeAxes = Axes.Y,
+                                            Height = 0.5f,
                                             Icon = FontAwesome.fa_search_plus,
                                             Action = () => timelineContainer.Zoom++
                                         },
@@ -97,6 +99,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
+                                            RelativeSizeAxes = Axes.Y,
+                                            Height = 0.5f,
                                             Icon = FontAwesome.fa_search_minus,
                                             Action = () => timelineContainer.Zoom--
                                         },

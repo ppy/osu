@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -38,7 +39,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             };
 
             button.Enabled.BindTo(Enabled);
-            Size = button.ButtonSize;
+            Width = button.ButtonSize.X;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            button.ButtonSize = new Vector2(button.ButtonSize.X, DrawHeight);
         }
     }
 }
