@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseEditorComposeTimeline : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ScrollableTimeline), typeof(ScrollingTimelineContainer), typeof(BeatmapWaveformGraph) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ScrollableTimeline), typeof(ScrollingTimelineContainer), typeof(BeatmapWaveformGraph), typeof(TimelineButton) };
 
         private readonly ScrollableTimeline timeline;
 

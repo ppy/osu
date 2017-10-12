@@ -76,27 +76,21 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = OsuColour.FromHex("333")
                                 },
-                                new FillFlowContainer
+                                new Container
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    AutoSizeAxes = Axes.Both,
-                                    Padding = new MarginPadding { Horizontal = 15 },
-                                    Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0, 30),
+                                    RelativeSizeAxes = Axes.Y,
+                                    AutoSizeAxes = Axes.X,
+                                    Padding = new MarginPadding { Vertical = 5 },
                                     Children = new[]
                                     {
-                                        new SpriteIcon
+                                        new TimelineButton { Icon = FontAwesome.fa_search_plus },
+                                        new TimelineButton
                                         {
-                                            Size = new Vector2(18),
-                                            Icon = FontAwesome.fa_search_plus,
-                                            Colour = OsuColour.FromHex("555")
-                                        },
-                                        new SpriteIcon
-                                        {
-                                            Size = new Vector2(18),
-                                            Icon = FontAwesome.fa_search_minus,
-                                            Colour = OsuColour.FromHex("555")
+                                            Anchor = Anchor.BottomLeft,
+                                            Origin = Anchor.BottomLeft,
+                                            Icon = FontAwesome.fa_search_minus
                                         },
                                     }
                                 }
