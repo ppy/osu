@@ -23,6 +23,7 @@
         },
         {
             "taskName": "Build (Release)",
+            "group": "build",
             "args": [
                 "/property:Configuration=Release"
             ],
