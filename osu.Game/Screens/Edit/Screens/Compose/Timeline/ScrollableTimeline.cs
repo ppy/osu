@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                                     Origin = Anchor.CentreLeft,
                                     AutoSizeAxes = Axes.Y,
                                     Width = 160,
-                                    Padding = new MarginPadding { Horizontal = 25 },
+                                    Padding = new MarginPadding { Horizontal = 15 },
                                     Direction = FillDirection.Vertical,
                                     Spacing = new Vector2(0, 4),
                                     Children = new[]
