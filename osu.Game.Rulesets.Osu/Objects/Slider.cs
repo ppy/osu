@@ -139,24 +139,23 @@ namespace osu.Game.Rulesets.Osu.Objects
                 var repeatPointDistance = Math.Min(Distance, length);
                 var repeatDuration = length / Velocity;
 
-                for (var repeat = 0; repeat < RepeatCount; repeat++)
+                for (var repeat = 1; repeat < RepeatCount; repeat++)
                 {
-                    if (repeat > 0)
-                        for (var d = repeatPointDistance; d <= length; d += repeatPointDistance)
-                        {
-                            var repeatStartTime = StartTime + repeat * repeatDuration;
-                            var distanceProgress = d / length;
+                    for (var d = repeatPointDistance; d <= length; d += repeatPointDistance)
+                    {
+                        var repeatStartTime = StartTime + repeat * repeatDuration;
+                        var distanceProgress = d / length;
 
-                            yield return new RepeatPoint
-                            {
-                                RepeatIndex = repeat,
-                                StartTime = repeatStartTime,
-                                Position = Curve.PositionAt(distanceProgress),
-                                StackHeight = StackHeight,
-                                Scale = Scale,
-                                ComboColour = ComboColour,
-                            };
-                        }
+                        yield return new RepeatPoint
+                        {
+                            RepeatIndex = repeat,
+                            StartTime = repeatStartTime,
+                            Position = Curve.PositionAt(distanceProgress),
+                            StackHeight = StackHeight,
+                            Scale = Scale,
+                            ComboColour = ComboColour,
+                        };
+                    }
                 }
             }
         }
