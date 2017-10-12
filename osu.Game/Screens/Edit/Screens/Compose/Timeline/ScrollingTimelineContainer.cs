@@ -14,6 +14,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 {
     internal class ScrollingTimelineContainer : ScrollContainer
     {
+        public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private readonly BeatmapWaveformGraph waveform;
@@ -34,6 +35,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             Content.RelativeSizeAxes = Axes.Both;
 
             waveform.Beatmap.BindTo(Beatmap);
+            WaveformVisible.ValueChanged += waveformVisibilityChanged;
         }
 
         private float minZoom = 1;
@@ -129,5 +131,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
             return true;
         }
+
+        private void waveformVisibilityChanged(bool visible) => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
     }
 }
