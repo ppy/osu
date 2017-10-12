@@ -85,12 +85,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                                     Padding = new MarginPadding { Vertical = 5 },
                                     Children = new[]
                                     {
-                                        new TimelineButton { Icon = FontAwesome.fa_search_plus },
+                                        new TimelineButton
+                                        {
+                                            Icon = FontAwesome.fa_search_plus,
+                                            Action = () => timelineContainer.Zoom++
+                                        },
                                         new TimelineButton
                                         {
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            Icon = FontAwesome.fa_search_minus
+                                            Icon = FontAwesome.fa_search_minus,
+                                            Action = () => timelineContainer.Zoom--
                                         },
                                     }
                                 }
