@@ -31,10 +31,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                IconColour = OsuColour.FromHex("555"),
+                IconColour = OsuColour.Gray(0.35f),
                 IconHoverColour = Color4.White,
-                HoverColour = OsuColour.FromHex("3A3A3A"),
-                FlashColour = OsuColour.FromHex("555"),
+                HoverColour = OsuColour.Gray(0.25f),
+                FlashColour = OsuColour.Gray(0.5f),
                 Action = () => Action?.Invoke()
             };
 
