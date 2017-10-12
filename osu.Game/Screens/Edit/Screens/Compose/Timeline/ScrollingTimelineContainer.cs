@@ -16,14 +16,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
     {
         public readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
-        private readonly BeatmapWaveformGraph graph;
+        private readonly BeatmapWaveformGraph waveform;
 
         public ScrollingTimelineContainer()
             : base(Direction.Horizontal)
         {
             Masking = true;
 
-            Add(graph = new BeatmapWaveformGraph
+            Add(waveform = new BeatmapWaveformGraph
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = OsuColour.FromHex("222"),
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             Content.AutoSizeAxes = Axes.None;
             Content.RelativeSizeAxes = Axes.Both;
 
-            graph.Beatmap.BindTo(Beatmap);
+            waveform.Beatmap.BindTo(Beatmap);
         }
 
         private float minZoom = 1;
