@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 
-namespace osu.Game.Screens.Edit.Screens.Compose
+namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 {
     public class BeatmapWaveformGraph : CompositeDrawable
     {
