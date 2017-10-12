@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Objects
     public class JuiceStream : CatchBaseHit, IHasCurve
     {
         /// <summary>
-        /// Scoring distance with a speed-adjusted beat length of 1 second.
+        /// Positional distance that results in a duration of one second, before any speed adjustments.
         /// </summary>
         private const float base_scoring_distance = 100;
 

@@ -12,14 +12,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableFruit : DrawableCatchHitObject<Fruit>
     {
-        private const float pulp_size = 20;
-
         public DrawableFruit(Fruit h)
             : base(h)
         {
             Origin = Anchor.Centre;
 
-            Size = new Vector2(pulp_size * 2.2f, pulp_size * 2.8f);
+            Size = new Vector2(Pulp.PULP_SIZE * 2.2f, Pulp.PULP_SIZE * 2.8f);
             AccentColour = HitObject.ComboColour;
             Masking = false;
 
