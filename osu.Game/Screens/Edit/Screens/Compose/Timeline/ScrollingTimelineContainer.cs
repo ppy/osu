@@ -90,22 +90,42 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
                     return;
                 zoom = value;
 
+                // Make the zoom target default to the center of the graph if it hasn't been set
+                if (relativeContentZoomTarget == null)
+                    relativeContentZoomTarget = ToSpaceOfOtherDrawable(DrawSize / 2, Content).X / Content.DrawSize.X;
+                if (localZoomTarget == null)
+                    localZoomTarget = DrawSize.X / 2;
+
                 Content.ResizeWidthTo(Zoom);
+
+                // Update the scroll position to focus on the zoom target
+                float scrollPos = Content.DrawSize.X * relativeContentZoomTarget.Value - localZoomTarget.Value;
+                ScrollTo(scrollPos, false);
+
+                relativeContentZoomTarget = null;
+                localZoomTarget = null;
             }
         }
+
+        /// <summary>
+        /// Zoom target as a relative position in the <see cref="Content"/> space.
+        /// </summary>
+        private float? relativeContentZoomTarget;
+
+        /// <summary>
+        /// Zoom target as a position in our local space.
+        /// </summary>
+        private float? localZoomTarget;
 
         protected override bool OnWheel(InputState state)
         {
             if (!state.Keyboard.ControlPressed)
                 return base.OnWheel(state);
 
-            float relativeContentPosition = Content.ToLocalSpace(state.Mouse.NativeState.Position).X / Content.DrawSize.X;
-            float position = ToLocalSpace(state.Mouse.NativeState.Position).X;
+            relativeContentZoomTarget = Content.ToLocalSpace(state.Mouse.NativeState.Position).X / Content.DrawSize.X;
+            localZoomTarget = ToLocalSpace(state.Mouse.NativeState.Position).X;
 
             Zoom += state.Mouse.WheelDelta;
-
-            float scrollPos = Content.DrawSize.X * relativeContentPosition - position;
-            ScrollTo(scrollPos, false);
 
             return true;
         }
