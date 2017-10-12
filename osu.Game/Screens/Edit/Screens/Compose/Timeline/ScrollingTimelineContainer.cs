@@ -38,6 +38,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
             waveform.Beatmap.BindTo(Beatmap);
             WaveformVisible.ValueChanged += waveformVisibilityChanged;
+
+            Zoom = 10;
         }
 
         private float minZoom = 1;
