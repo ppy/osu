@@ -50,14 +50,21 @@
     <Compile Include="Beatmaps\CatchBeatmapProcessor.cs" />
     <Compile Include="CatchDifficultyCalculator.cs" />
     <Compile Include="CatchInputManager.cs" />
+    <Compile Include="Objects\Drawable\DrawableCatchHitObject.cs" />
+    <Compile Include="Objects\Drawable\DrawableDroplet.cs" />
+    <Compile Include="Objects\Drawable\DrawableJuiceStream.cs" />
+    <Compile Include="Objects\Drawable\Pieces\Pulp.cs" />
+    <Compile Include="Objects\JuiceStream.cs" />
     <Compile Include="Scoring\CatchScoreProcessor.cs" />
     <Compile Include="Judgements\CatchJudgement.cs" />
     <Compile Include="Objects\CatchBaseHit.cs" />
     <Compile Include="Objects\Drawable\DrawableFruit.cs" />
     <Compile Include="Objects\Droplet.cs" />
     <Compile Include="Objects\Fruit.cs" />
+    <Compile Include="Objects\TinyDroplet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\TestCaseCatcher.cs" />
+    <Compile Include="Tests\TestCaseCatchStacker.cs" />
     <Compile Include="Tests\TestCaseCatchPlayer.cs" />
     <Compile Include="UI\Catcher.cs" />
     <Compile Include="UI\CatchRulesetContainer.cs" />
@@ -77,11 +84,6 @@
     <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
       <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
       <Name>osu.Framework</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
-      <Project>{C92A607B-1FDD-4954-9F92-03FF547D9080}</Project>
-      <Name>osu.Game.Rulesets.Osu</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
