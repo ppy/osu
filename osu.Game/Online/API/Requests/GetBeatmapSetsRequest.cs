@@ -51,7 +51,7 @@ namespace osu.Game.Online.API.Requests
         private int onlineId { get; set; }
 
         [JsonProperty(@"creator")]
-        private string creatorUsername;
+        private string creatorUsername { get; set; }
 
         [JsonProperty(@"user_id")]
         private long creatorId = 1;
