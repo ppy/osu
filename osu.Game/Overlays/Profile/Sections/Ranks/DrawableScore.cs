@@ -27,9 +27,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private readonly FillFlowContainer metadata;
         private readonly ModContainer modContainer;
         private readonly Score score;
-        private readonly double weight;
+        private readonly double? weight;
 
-        public DrawableScore(Score score, double weight = -1)
+        public DrawableScore(Score score, double? weight = null)
         {
             this.score = score;
             this.weight = weight;
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Width = 60,
-                    Margin = new MarginPadding{ Right = 150 }
+                    Margin = new MarginPadding { Right = 150 }
                 }
             };
         }
@@ -88,11 +88,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 TextSize = 18,
                 Font = "Exo2.0-BoldItalic",
             });
-            if (weight != -1)
+
+            if (weight.HasValue)
             {
                 stats.Add(new OsuSpriteText
                 {
-                    Text = $"weighted: {Math.Round(score.PP * weight ?? 0)}pp ({weight.ToString("0%", CultureInfo.CurrentCulture)})",
+                    Text = $"weighted: {Math.Round(score.PP * weight ?? 0)}pp ({weight.Value.ToString("0%", CultureInfo.CurrentCulture)})",
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,
@@ -100,6 +101,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Font = "Exo2.0-RegularItalic",
                 });
             }
+
             stats.Add(new OsuSpriteText
             {
                 Text = "accuracy: " + score.Accuracy.ToString("0.00%"),
@@ -121,7 +123,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     {
                         new OsuSpriteText
                         {
-                            Current = locale.GetUnicodePreference($"{score.Beatmap.Metadata.TitleUnicode ?? score.Beatmap.Metadata.Title} [{score.Beatmap.Version}] ", $"{score.Beatmap.Metadata.Title ?? score.Beatmap.Metadata.TitleUnicode} [{score.Beatmap.Version}] "),
+                            Current = locale.GetUnicodePreference(
+                                $"{score.Beatmap.Metadata.TitleUnicode ?? score.Beatmap.Metadata.Title} [{score.Beatmap.Version}] ",
+                                $"{score.Beatmap.Metadata.Title ?? score.Beatmap.Metadata.TitleUnicode} [{score.Beatmap.Version}] "
+                            ),
                             TextSize = 15,
                             Font = "Exo2.0-SemiBoldItalic",
                         },
@@ -156,7 +161,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private class ModIcon : Rulesets.UI.ModIcon, IHasTooltip
         {
-            public ModIcon(Mod mod) : base(mod)
+            public ModIcon(Mod mod)
+                : base(mod)
             {
                 TooltipText = mod.Name;
             }
