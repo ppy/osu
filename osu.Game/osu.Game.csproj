@@ -393,6 +393,7 @@
     <Compile Include="Overlays\Chat\ChannelSelectionOverlay.cs" />
     <Compile Include="Overlays\Chat\ChatLine.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
+    <Compile Include="Overlays\Direct\PlayButton.cs" />
     <Compile Include="Overlays\Chat\DrawableChannel.cs" />
     <Compile Include="Overlays\DialogOverlay.cs" />
     <Compile Include="Overlays\Dialog\PopupDialog.cs" />

@@ -32,6 +32,7 @@ namespace osu.Game.Overlays
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
         private FillFlowContainer<DirectPanel> panels;
+        private DirectPanel playing;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
@@ -201,6 +202,12 @@ namespace osu.Game.Overlays
                 panels.FadeOut(200);
                 panels.Expire();
                 panels = null;
+
+                if (playing != null)
+                {
+                    playing.PreviewPlaying.Value = false;
+                    playing = null;
+                }
             }
 
             if (BeatmapSets == null) return;
@@ -227,6 +234,17 @@ namespace osu.Game.Overlays
             {
                 if (panels != null) ScrollFlow.Remove(panels);
                 ScrollFlow.Add(panels = newPanels);
+
+                foreach (DirectPanel panel in p.Children)
+                    panel.PreviewPlaying.ValueChanged += newValue =>
+                    {
+                        if (newValue)
+                        {
+                            if (playing != null && playing != panel)
+                                playing.PreviewPlaying.Value = false;
+                            playing = panel;
+                        }
+                    };
             });
         }
 
