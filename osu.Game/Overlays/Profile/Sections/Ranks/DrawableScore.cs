@@ -16,8 +16,8 @@ using System.Diagnostics;
 using osu.Framework.Localisation;
 using System.Globalization;
 using osu.Game.Rulesets.Scoring;
-using osu.Framework.Graphics.Cursor;
 using System;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -157,17 +157,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 for (int i = 0; i < count; i++)
                     yield return new Vector2(DrawWidth * i * (count == 1 ? 0 : 1f / (count - 1)), 0);
             }
-        }
-
-        private class ModIcon : Rulesets.UI.ModIcon, IHasTooltip
-        {
-            public ModIcon(Mod mod)
-                : base(mod)
-            {
-                TooltipText = mod.Name;
-            }
-
-            public string TooltipText { get; }
         }
     }
 }
