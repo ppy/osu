@@ -3,7 +3,6 @@
 
 using System;
 using Newtonsoft.Json;
-using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
@@ -12,11 +11,6 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public class BeatmapSetOnlineInfo
     {
-        /// <summary>
-        /// The author of the beatmaps in this set.
-        /// </summary>
-        public User Author;
-
         /// <summary>
         /// The date this beatmap set was submitted to the online listing.
         /// </summary>
