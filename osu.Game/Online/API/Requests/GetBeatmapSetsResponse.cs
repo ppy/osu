@@ -5,34 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetBeatmapSetsRequest : APIRequest<IEnumerable<GetBeatmapSetsResponse>>
-    {
-        private readonly string query;
-        private readonly RulesetInfo ruleset;
-        private readonly RankStatus rankStatus;
-        private readonly DirectSortCriteria sortCriteria;
-        private readonly SortDirection direction;
-        private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
-
-        public GetBeatmapSetsRequest(string query, RulesetInfo ruleset, RankStatus rankStatus = RankStatus.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
-        {
-            this.query = System.Uri.EscapeDataString(query);
-            this.ruleset = ruleset;
-            this.rankStatus = rankStatus;
-            this.sortCriteria = sortCriteria;
-            this.direction = direction;
-        }
-
-        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={(int)rankStatus}&sort={sortCriteria.ToString().ToLower()}_{directionString}";
-    }
-
     public class GetBeatmapSetsResponse : BeatmapMetadata
     {
         [JsonProperty(@"covers")]
