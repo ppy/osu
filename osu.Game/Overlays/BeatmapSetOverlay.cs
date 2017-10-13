@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -11,7 +12,10 @@ using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays
 {
@@ -22,6 +26,9 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
         private readonly Info info;
+
+        private APIAccess api;
+        private RulesetStore rulesets;
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
@@ -75,6 +82,13 @@ namespace osu.Game.Overlays
             header.Picker.Beatmap.ValueChanged += b => info.Beatmap = b;
         }
 
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api, RulesetStore rulesets)
+        {
+            this.api = api;
+            this.rulesets = rulesets;
+        }
+
         protected override void PopIn()
         {
             base.PopIn();
@@ -91,6 +105,14 @@ namespace osu.Game.Overlays
         {
             State = Visibility.Hidden;
             return true;
+        }
+
+        public void ShowBeatmapSet(int beatmapSetId)
+        {
+            // todo: display the overlay while we are loading here. we need to support setting BeatmapSet to null for this to work.
+            var req = new GetBeatmapSetRequest(beatmapSetId);
+            req.Success += res => ShowBeatmapSet(res.ToBeatmapSet(rulesets));
+            api.Queue(req);
         }
 
         public void ShowBeatmapSet(BeatmapSetInfo set)

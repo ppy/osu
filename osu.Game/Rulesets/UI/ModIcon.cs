@@ -6,13 +6,14 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using OpenTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    public class ModIcon : Container
+    public class ModIcon : Container, IHasTooltip
     {
         private readonly SpriteIcon modIcon;
         private readonly SpriteIcon background;
@@ -27,11 +28,15 @@ namespace osu.Game.Rulesets.UI
 
         private readonly ModType type;
 
+        public string TooltipText { get; }
+
         public ModIcon(Mod mod)
         {
             if (mod == null) throw new ArgumentNullException(nameof(mod));
 
             type = mod.Type;
+
+            TooltipText = mod.Name;
 
             Children = new Drawable[]
             {
