@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,31 +19,39 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCasePlayer : OsuTestCase
     {
+        private readonly Type ruleset;
+
         protected Player Player;
-        private RulesetStore rulesets;
 
         public override string Description => @"Showing everything to play the game.";
+
+        /// <summary>
+        /// Create a TestCase which runs through the Player screen.
+        /// </summary>
+        /// <param name="ruleset">An optional ruleset type which we want to target. If not provided we'll allow all rulesets to be tested.</param>
+        protected TestCasePlayer(Type ruleset)
+        {
+            this.ruleset = ruleset;
+        }
+
+        public TestCasePlayer()
+        {
+
+        }
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            this.rulesets = rulesets;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
             Add(new Box
             {
                 RelativeSizeAxes = Framework.Graphics.Axes.Both,
                 Colour = Color4.Black,
             });
 
-            foreach (var r in rulesets.Query<RulesetInfo>())
-                AddStep(r.Name, () => loadPlayerFor(r));
+            string instantiation = ruleset?.AssemblyQualifiedName;
 
-            loadPlayerFor(rulesets.Query<RulesetInfo>().First());
+            foreach (var r in rulesets.Query<RulesetInfo>(rs => rs.Available && (instantiation == null || rs.InstantiationInfo == instantiation)))
+                AddStep(r.Name, () => loadPlayerFor(r));
         }
 
         protected virtual Beatmap CreateBeatmap()

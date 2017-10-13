@@ -79,11 +79,13 @@ namespace osu.Game.Tests.Visual
                 storyboardContainer.Remove(storyboard);
 
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
-            decoupledClock.ChangeSource(working.Track);
             storyboardContainer.Clock = decoupledClock;
 
-            storyboardContainer.Add(storyboard = working.Beatmap.Storyboard.CreateDrawable());
+            storyboard = working.Beatmap.Storyboard.CreateDrawable(beatmapBacking);
             storyboard.Passing = false;
+
+            storyboardContainer.Add(storyboard);
+            decoupledClock.ChangeSource(working.Track);
         }
     }
 }

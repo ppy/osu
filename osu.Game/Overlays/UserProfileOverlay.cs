@@ -34,6 +34,7 @@ namespace osu.Game.Overlays
 
         public const float CONTENT_X_MARGIN = 50;
 
+        // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         protected override bool OnClick(InputState state)

@@ -31,6 +31,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public Action<BeatmapInfo> HideDifficultyRequested;
 
+        public Action<BeatmapInfo> EditRequested;
+
         public BeatmapSetHeader Header;
 
         public List<BeatmapPanel> BeatmapPanels;
@@ -87,7 +89,8 @@ namespace osu.Game.Beatmaps.Drawables
                 Alpha = 0,
                 GainedSelection = panelGainedSelection,
                 HideRequested = p => HideDifficultyRequested?.Invoke(p),
-                StartRequested = p => { StartRequested?.Invoke(p.Beatmap); },
+                StartRequested = p => StartRequested?.Invoke(p.Beatmap),
+                EditRequested = p => EditRequested?.Invoke(p.Beatmap),
                 RelativeSizeAxes = Axes.X,
             }).ToList();
 
