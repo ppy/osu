@@ -11,10 +11,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
-using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -30,8 +28,14 @@ namespace osu.Game.Overlays.Direct
             Height = height;
         }
 
+        private PlayButton playButton;
+        private Box progressBar;
+
+        protected override PlayButton PlayButton => playButton;
+        protected override Box PreviewBar => progressBar;
+
         [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation)
+        private void load(LocalisationEngine localisation, OsuColour colours)
         {
             Content.CornerRadius = 5;
 
@@ -50,29 +54,50 @@ namespace osu.Game.Overlays.Direct
                     {
                         new FillFlowContainer
                         {
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
+                            Direction = FillDirection.Horizontal,
+                            LayoutEasing = Easing.OutQuint,
+                            LayoutDuration = 120,
+                            Spacing = new Vector2(10, 0),
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                playButton = new PlayButton(SetInfo)
                                 {
-                                    Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
-                                    TextSize = 18,
-                                    Font = @"Exo2.0-BoldItalic",
-                                },
-                                new OsuSpriteText
-                                {
-                                    Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreLeft,
+                                    Size = new Vector2(height / 2),
+                                    FillMode = FillMode.Fit,
+                                    Alpha = 0,
                                 },
                                 new FillFlowContainer
                                 {
-                                    AutoSizeAxes = Axes.X,
-                                    Height = 20,
-                                    Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
-                                    Children = GetDifficultyIcons(),
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
+                                            TextSize = 18,
+                                            Font = @"Exo2.0-BoldItalic",
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
+                                            Font = @"Exo2.0-BoldItalic",
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.X,
+                                            Height = 20,
+                                            Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
+                                            Children = GetDifficultyIcons(),
+                                        },
+                                    },
                                 },
-                            },
+                            }
                         },
                         new FillFlowContainer
                         {
@@ -128,49 +153,17 @@ namespace osu.Game.Overlays.Direct
                         },
                     },
                 },
-            });
-        }
-
-        private class DownloadButton : OsuClickableContainer
-        {
-            private readonly SpriteIcon icon;
-
-            public DownloadButton()
-            {
-                Children = new Drawable[]
+                progressBar = new Box
                 {
-                    icon = new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(30),
-                        Icon = FontAwesome.fa_osu_chevron_down_o,
-                    },
-                };
-            }
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                icon.ScaleTo(0.9f, 1000, Easing.Out);
-                return base.OnMouseDown(state, args);
-            }
-
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-            {
-                icon.ScaleTo(1f, 500, Easing.OutElastic);
-                return base.OnMouseUp(state, args);
-            }
-
-            protected override bool OnHover(InputState state)
-            {
-                icon.ScaleTo(1.1f, 500, Easing.OutElastic);
-                return base.OnHover(state);
-            }
-
-            protected override void OnHoverLost(InputState state)
-            {
-                icon.ScaleTo(1f, 500, Easing.OutElastic);
-            }
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    BypassAutoSizeAxes = Axes.Y,
+                    Size = new Vector2(0, 3),
+                    Alpha = 0,
+                    Colour = colours.Yellow,
+                },
+            });
         }
     }
 }

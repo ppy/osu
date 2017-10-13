@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Mods
 
                 if (mod == null)
                 {
-                    Mods = new Mod[0];
+                    Mods = Array.Empty<Mod>();
                     Alpha = 0;
                 }
                 else

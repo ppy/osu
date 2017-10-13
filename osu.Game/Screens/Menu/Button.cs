@@ -121,13 +121,14 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        private bool rightward;
+
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
             if (!IsHovered) return;
 
-            bool rightward = beatIndex % 2 == 1;
             double duration = timingPoint.BeatLength / 2;
 
             icon.RotateTo(rightward ? 10 : -10, duration * 2, Easing.InOutSine);
@@ -139,6 +140,8 @@ namespace osu.Game.Screens.Menu
                 i => i.MoveToY(0, duration, Easing.In),
                 i => i.ScaleTo(new Vector2(1, 0.9f), duration, Easing.In)
             );
+
+            rightward = !rightward;
         }
 
         protected override bool OnHover(InputState state)
@@ -152,7 +155,7 @@ namespace osu.Game.Screens.Menu
             double duration = TimeUntilNextBeat;
 
             icon.ClearTransforms();
-            icon.RotateTo(10, duration, Easing.InOutSine);
+            icon.RotateTo(rightward ? -10 : 10, duration, Easing.InOutSine);
             icon.ScaleTo(new Vector2(1, 0.9f), duration, Easing.Out);
             return true;
         }

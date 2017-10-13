@@ -80,15 +80,29 @@ namespace osu.Game.Beatmaps
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
-        public string StoredBookmarks { get; set; }
+        [JsonIgnore]
+        public string StoredBookmarks
+        {
+            get { return string.Join(",", Bookmarks); }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    Bookmarks = new int[0];
+                    return;
+                }
+
+                Bookmarks = value.Split(',').Select(v =>
+                {
+                    int val;
+                    bool result = int.TryParse(v, out val);
+                    return new { result, val };
+                }).Where(p => p.result).Select(p => p.val).ToArray();
+            }
+        }
 
         [Ignore]
-        [JsonIgnore]
-        public int[] Bookmarks
-        {
-            get { return StoredBookmarks.Split(',').Select(int.Parse).ToArray(); }
-            set { StoredBookmarks = string.Join(",", value); }
-        }
+        public int[] Bookmarks { get; set; } = new int[0];
 
         public double DistanceSpacing { get; set; }
         public int BeatDivisor { get; set; }

@@ -57,7 +57,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
@@ -77,7 +76,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -103,7 +101,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <LangVersion>6</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <StartArguments>--tests</StartArguments>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -124,7 +121,6 @@
       <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.dll</HintPath>
       <Private>True</Private>
@@ -267,6 +263,7 @@
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
     <Compile Include="Beatmaps\Drawables\Panel.cs" />
@@ -276,6 +273,15 @@
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
     <Compile Include="Online\API\Requests\GetUserScoresRequest.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\TimelineButton.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\ArrowsOverlay.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\BlurredIcon.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\BreakOverlay.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\GlowIcon.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\InfoContainer.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\InfoLine.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\LetterboxOverlay.cs" />
+    <Compile Include="Screens\Play\BreaksOverlay\RemainingTimeCounter.cs" />
     <Compile Include="Beatmaps\IO\OszArchiveReader.cs" />
     <Compile Include="Beatmaps\Legacy\LegacyBeatmap.cs" />
     <Compile Include="Beatmaps\RankStatus.cs" />
@@ -307,7 +313,6 @@
     <Compile Include="Graphics\Cursor\OsuTooltipContainer.cs" />
     <Compile Include="Graphics\IHasAccentColour.cs" />
     <Compile Include="Graphics\OsuColour.cs" />
-    <Compile Include="Graphics\Processing\RatioAdjust.cs" />
     <Compile Include="Graphics\SpriteIcon.cs" />
     <Compile Include="Graphics\Sprites\OsuSpriteText.cs" />
     <Compile Include="Graphics\UserInterface\BackButton.cs" />
@@ -374,6 +379,7 @@
     <Compile Include="Online\API\Requests\PostMessageRequest.cs" />
     <Compile Include="Online\Chat\Channel.cs" />
     <Compile Include="Online\Chat\ErrorMessage.cs" />
+    <Compile Include="Online\Chat\InfoMessage.cs" />
     <Compile Include="Online\Chat\LocalEchoMessage.cs" />
     <Compile Include="Online\Chat\Message.cs" />
     <Compile Include="Online\Multiplayer\GameType.cs" />
@@ -389,6 +395,7 @@
     <Compile Include="Overlays\Chat\ChannelSelectionOverlay.cs" />
     <Compile Include="Overlays\Chat\ChatLine.cs" />
     <Compile Include="Overlays\Chat\ChatTabControl.cs" />
+    <Compile Include="Overlays\Direct\PlayButton.cs" />
     <Compile Include="Overlays\Chat\DrawableChannel.cs" />
     <Compile Include="Overlays\DialogOverlay.cs" />
     <Compile Include="Overlays\Dialog\PopupDialog.cs" />
@@ -399,6 +406,7 @@
     <Compile Include="Overlays\Direct\DirectGridPanel.cs" />
     <Compile Include="Overlays\Direct\DirectListPanel.cs" />
     <Compile Include="Overlays\Direct\DirectPanel.cs" />
+    <Compile Include="Overlays\Direct\DownloadButton.cs" />
     <Compile Include="Overlays\Direct\FilterControl.cs" />
     <Compile Include="Overlays\Direct\Header.cs" />
     <Compile Include="Overlays\KeyBindingOverlay.cs" />
@@ -607,10 +615,24 @@
     <Compile Include="Screens\Charts\ChartListing.cs" />
     <Compile Include="Screens\Direct\OnlineListing.cs" />
     <Compile Include="Screens\Edit\Editor.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\BreakPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\BookmarkPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\ControlPointPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\MarkerPart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Parts\TimelinePart.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\DurationVisualisation.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\Visualisations\PointVisualisation.cs" />
+    <Compile Include="Screens\Edit\Components\Timelines\Summary\SummaryTimeline.cs" />
+    <Compile Include="Screens\Edit\Screens\EditorScreenMode.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuBar.cs" />
-    <Compile Include="Screens\Edit\Menus\EditorMenuBarItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItem.cs" />
     <Compile Include="Screens\Edit\Menus\EditorMenuItemSpacer.cs" />
+    <Compile Include="Screens\Edit\Menus\ScreenSelectionTabControl.cs" />
+    <Compile Include="Screens\Edit\Screens\Design\Design.cs" />
+    <Compile Include="Screens\Edit\Screens\EditorScreen.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Compose.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\ScrollableTimeline.cs" />
+    <Compile Include="Screens\Edit\Screens\Compose\Timeline\ScrollingTimelineContainer.cs" />
     <Compile Include="Screens\Loader.cs" />
     <Compile Include="Screens\Menu\Button.cs" />
     <Compile Include="Screens\Menu\ButtonSystem.cs" />
@@ -729,15 +751,20 @@
     <Compile Include="Tests\Visual\TestCaseBeatmapOptionsOverlay.cs" />
     <Compile Include="Tests\Visual\TestCaseBeatSyncedContainer.cs" />
     <Compile Include="Tests\Visual\TestCaseBreadcrumbs.cs" />
+    <Compile Include="Tests\Visual\TestCaseBreakOverlay.cs" />
     <Compile Include="Tests\Visual\TestCaseChatDisplay.cs" />
     <Compile Include="Tests\Visual\TestCaseContextMenu.cs" />
     <Compile Include="Tests\Visual\TestCaseDialogOverlay.cs" />
     <Compile Include="Tests\Visual\TestCaseDirect.cs" />
     <Compile Include="Tests\Visual\TestCaseDrawableRoom.cs" />
     <Compile Include="Tests\Visual\TestCaseDrawings.cs" />
+    <Compile Include="Tests\Visual\TestCaseEditor.cs" />
+    <Compile Include="Tests\Visual\TestCaseEditorComposeTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseEditorMenuBar.cs" />
+    <Compile Include="Tests\Visual\TestCaseEditorSummaryTimeline.cs" />
     <Compile Include="Tests\Visual\TestCaseGamefield.cs" />
     <Compile Include="Tests\Visual\TestCaseGraph.cs" />
+    <Compile Include="Tests\Visual\TestCaseIconButton.cs" />
     <Compile Include="Tests\Visual\TestCaseKeyConfiguration.cs" />
     <Compile Include="Tests\Visual\TestCaseKeyCounter.cs" />
     <Compile Include="Tests\Visual\TestCaseLeaderboard.cs" />
@@ -767,6 +794,7 @@
     <Compile Include="Tests\Visual\TestCaseUserPanel.cs" />
     <Compile Include="Tests\Visual\TestCaseUserProfile.cs" />
     <Compile Include="Tests\Visual\TestCaseUserRanks.cs" />
+    <Compile Include="Tests\Visual\TestCaseWaveform.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Users\Country.cs" />
     <Compile Include="Users\Medal.cs" />
@@ -777,6 +805,19 @@
     <Compile Include="Users\UserPanel.cs" />
     <Compile Include="Users\UserStatistics.cs" />
     <Compile Include="Users\UserStatus.cs" />
+    <Compile Include="Overlays\BeatmapSetOverlay.cs" />
+    <Compile Include="Overlays\BeatmapSet\Info.cs" />
+    <Compile Include="Overlays\BeatmapSet\Header.cs" />
+    <Compile Include="Overlays\BeatmapSet\AuthorInfo.cs" />
+    <Compile Include="Overlays\BeatmapSet\BeatmapPicker.cs" />
+    <Compile Include="Overlays\BeatmapSet\HeaderButton.cs" />
+    <Compile Include="Overlays\BeatmapSet\Details.cs" />
+    <Compile Include="Overlays\BeatmapSet\FavouriteButton.cs" />
+    <Compile Include="Overlays\BeatmapSet\DownloadButton.cs" />
+    <Compile Include="Overlays\BeatmapSet\BasicStats.cs" />
+    <Compile Include="Overlays\BeatmapSet\SuccessRate.cs" />
+    <Compile Include="Overlays\BeatmapSet\PreviewButton.cs" />
+    <Compile Include="Tests\Visual\TestCaseBeatmapSetOverlay.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="lazer.ico" />

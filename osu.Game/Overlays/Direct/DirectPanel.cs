@@ -20,6 +20,8 @@ using osu.Game.Online.API;
 using osu.Framework.Logging;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Configuration;
+using osu.Framework.Audio.Track;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -37,6 +39,12 @@ namespace osu.Game.Overlays.Direct
         private ProgressBar progressBar;
         private BeatmapManager beatmaps;
         private NotificationOverlay notifications;
+        private BeatmapSetOverlay beatmapSetOverlay;
+
+        public Track Preview => PlayButton.Preview;
+        public Bindable<bool> PreviewPlaying => PlayButton.Playing;
+        protected abstract PlayButton PlayButton { get; }
+        protected abstract Box PreviewBar { get; }
 
         protected override Container<Drawable> Content => content;
 
@@ -63,11 +71,12 @@ namespace osu.Game.Overlays.Direct
 
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api, BeatmapManager beatmaps, OsuColour colours, NotificationOverlay notifications)
+        private void load(APIAccess api, BeatmapManager beatmaps, OsuColour colours, NotificationOverlay notifications, BeatmapSetOverlay beatmapSetOverlay)
         {
             this.api = api;
             this.beatmaps = beatmaps;
             this.notifications = notifications;
+            this.beatmapSetOverlay = beatmapSetOverlay;
 
             AddInternal(content = new Container
             {
@@ -102,10 +111,21 @@ namespace osu.Game.Overlays.Direct
                 attachDownload(downloadRequest);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (PreviewPlaying && Preview != null)
+            {
+                PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
+            }
+        }
+
         protected override bool OnHover(InputState state)
         {
             content.TweenEdgeEffectTo(edgeEffectHovered, hover_transition_time, Easing.OutQuint);
             content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
+            PlayButton.FadeIn(120, Easing.InOutQuint);
 
             return base.OnHover(state);
         }
@@ -114,9 +134,20 @@ namespace osu.Game.Overlays.Direct
         {
             content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
+            if (!PreviewPlaying)
+                PlayButton.FadeOut(120, Easing.InOutQuint);
 
             base.OnHoverLost(state);
         }
+
+        protected override bool OnClick(InputState state)
+        {
+            ShowInformation();
+            PreviewPlaying.Value = false;
+            return true;
+        }
+
+        protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
 
         protected void StartDownload()
         {
@@ -173,6 +204,9 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
+
+            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
         }
 
         protected List<DifficultyIcon> GetDifficultyIcons()

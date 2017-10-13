@@ -15,7 +15,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 using SQLite.Net;
 using osu.Framework.Graphics.Performance;
@@ -82,6 +81,13 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
+        private SQLiteConnection createConnection()
+        {
+            var conn = Host.Storage.GetDatabase(@"client");
+            conn.BusyTimeout = new TimeSpan(TimeSpan.TicksPerSecond * 10);
+            return conn;
+        }
+
         private SQLiteConnection connection;
 
         [BackgroundDependencyLoader]
@@ -90,8 +96,7 @@ namespace osu.Game
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            connection = Host.Storage.GetDatabase(@"client");
-
+            connection = createConnection();
             connection.CreateTable<StoreVersion>();
 
             dependencies.Cache(API = new APIAccess
@@ -180,7 +185,7 @@ namespace osu.Game
 
             GlobalKeyBindingInputManager globalBinding;
 
-            base.Content.Add(new RatioAdjust
+            base.Content.Add(new DrawSizePreservingFillContainer
             {
                 Children = new Drawable[]
                 {

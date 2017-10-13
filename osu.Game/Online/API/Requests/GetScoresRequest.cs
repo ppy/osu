@@ -96,7 +96,7 @@ namespace osu.Game.Online.API.Requests
         }
 
         [JsonProperty(@"statistics")]
-        private Dictionary<string, dynamic> jsonStats
+        private Dictionary<string, object> jsonStats
         {
             set
             {
