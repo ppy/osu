@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
 {
@@ -13,6 +14,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
     {
         public Compose()
         {
+            ScrollableTimeline timeline;
             Children = new[]
             {
                 new Container
@@ -31,11 +33,22 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                         {
                             Name = "Content",
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Horizontal = 17, Vertical = 10 }
+                            Padding = new MarginPadding { Horizontal = 17, Vertical = 10 },
+                            Children = new Drawable[]
+                            {
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Right = 115 },
+                                    Child = timeline = new ScrollableTimeline { RelativeSizeAxes = Axes.Both }
+                                }
+                            }
                         }
                     }
                 }
             };
+
+            timeline.Beatmap.BindTo(Beatmap);
         }
     }
 }
