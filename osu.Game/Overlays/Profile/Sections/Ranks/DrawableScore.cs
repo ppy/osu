@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Leaderboards;
 using System.Linq;
-using System.Diagnostics;
 using osu.Framework.Localisation;
 using System.Globalization;
 using osu.Game.Rulesets.Scoring;
@@ -78,7 +77,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, LocalisationEngine locale)
+        private void load(OsuColour colour, LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
         {
             stats.Add(new OsuSpriteText
             {
@@ -115,7 +114,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             metadata.Add(new OsuHoverContainer
             {
                 AutoSizeAxes = Axes.Both,
-                Action = () => Process.Start($"https://osu.ppy.sh/beatmaps/{score.Beatmap.OnlineBeatmapID}"),
+                Action = () =>
+                {
+                    if (score.Beatmap.OnlineBeatmapSetID.HasValue) beatmapSetOverlay.ShowBeatmapSet(score.Beatmap.OnlineBeatmapSetID.Value);
+                },
                 Child = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
