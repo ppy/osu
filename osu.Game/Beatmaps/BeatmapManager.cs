@@ -550,7 +550,7 @@ namespace osu.Game.Beatmaps
                 catch { return null; }
             }
 
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => f.Filename == filename).FileInfo.StoragePath;
+            private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
 
             protected override Texture GetBackground()
             {
@@ -573,6 +573,8 @@ namespace osu.Game.Beatmaps
                 }
                 catch { return new TrackVirtual(); }
             }
+
+            protected override Waveform GetWaveform() => new Waveform(store.GetStream(getPathForFile(Metadata.AudioFile)));
         }
 
         /// <summary>
