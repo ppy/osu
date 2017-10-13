@@ -38,7 +38,6 @@ namespace osu.Game.Overlays.Direct
         private Color4 hoverColour;
         private readonly SpriteIcon icon;
         private readonly LoadingAnimation loadingAnimation;
-        private readonly Container audioWrapper;
 
         private const float transition_duration = 500;
 
@@ -64,7 +63,6 @@ namespace osu.Game.Overlays.Direct
             BeatmapSet = setInfo;
             AddRange(new Drawable[]
             {
-                audioWrapper = new Container(),
                 icon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
