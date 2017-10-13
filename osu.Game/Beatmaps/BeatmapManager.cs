@@ -573,6 +573,8 @@ namespace osu.Game.Beatmaps
                 }
                 catch { return new TrackVirtual(); }
             }
+
+            protected override Waveform GetWaveform() => new Waveform(store.GetStream(getPathForFile(Metadata.AudioFile)));
         }
 
         /// <summary>
