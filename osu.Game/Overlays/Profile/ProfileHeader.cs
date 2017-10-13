@@ -19,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using System.Diagnostics;
 using System.Globalization;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -119,15 +120,11 @@ namespace osu.Game.Overlays.Profile
                                                 }
                                             }
                                         },
-                                        new LinkFlowContainer.LinkText
+                                        new LinkFlowContainer.ProfileLink(user)
                                         {
-                                            Text = user.Username,
-                                            Url = $@"https://osu.ppy.sh/users/{user.Id}",
-                                            TextSize = 30,
-                                            Font = @"Exo2.0-RegularItalic",
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            Y = -48
+                                            Y = -48,
                                         },
                                         countryFlag = new DrawableFlag(user.Country?.FlagName)
                                         {
@@ -537,6 +534,19 @@ namespace osu.Game.Overlays.Profile
                 private void load(OsuColour colours)
                 {
                     hoverColour = colours.Yellow;
+                }
+            }
+
+            public class ProfileLink : LinkText, IHasTooltip
+            {
+                public string TooltipText => "View Profile in Browser";
+
+                public ProfileLink(User user)
+                {
+                    Text = user.Username;
+                    Url = $@"https://osu.ppy.sh/users/{user.Id}";
+                    Font = @"Exo2.0-RegularItalic";
+                    TextSize = 30;
                 }
             }
         }
