@@ -125,8 +125,6 @@ namespace osu.Game.Overlays.Profile
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
                                             Y = -48,
-                                            TextSize = 30,
-                                            Font = @"Exo2.0-RegularItalic",
                                         },
                                         countryFlag = new DrawableFlag(user.Country?.FlagName)
                                         {
@@ -547,6 +545,8 @@ namespace osu.Game.Overlays.Profile
                 {
                     Text = user.Username;
                     Url = $@"https://osu.ppy.sh/users/{user.Id}";
+                    Font = @"Exo2.0-RegularItalic";
+                    TextSize = 30;
                 }
             }
         }
