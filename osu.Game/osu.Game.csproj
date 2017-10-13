@@ -263,6 +263,8 @@
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
+    <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
+    <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyColouredContainer.cs" />
     <Compile Include="Beatmaps\Drawables\DifficultyIcon.cs" />
@@ -272,6 +274,7 @@
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoder.cs" />
     <Compile Include="Beatmaps\IO\ArchiveReader.cs" />
     <Compile Include="Beatmaps\IO\LegacyFilesystemReader.cs" />
+    <Compile Include="Online\API\Requests\GetUserScoresRequest.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Timeline\TimelineButton.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\ArrowsOverlay.cs" />
     <Compile Include="Screens\Play\BreaksOverlay\BlurredIcon.cs" />
@@ -301,6 +304,7 @@
     <Compile Include="Graphics\Containers\ConstrainedIconContainer.cs" />
     <Compile Include="Graphics\Containers\OsuClickableContainer.cs" />
     <Compile Include="Graphics\Containers\OsuFocusedOverlayContainer.cs" />
+    <Compile Include="Graphics\Containers\OsuHoverContainer.cs" />
     <Compile Include="Graphics\Containers\OsuScrollContainer.cs" />
     <Compile Include="Graphics\Containers\OsuTextFlowContainer.cs" />
     <Compile Include="Graphics\Containers\ParallaxContainer.cs" />
@@ -368,7 +372,7 @@
     <Compile Include="Online\API\OAuthToken.cs" />
     <Compile Include="Online\API\Requests\DownloadBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapDetailsRequest.cs" />
-    <Compile Include="Online\API\Requests\GetBeatmapSetsRequest.cs" />
+    <Compile Include="Online\API\Requests\SearchBeatmapSetsRequest.cs" />
     <Compile Include="Online\API\Requests\GetMessagesRequest.cs" />
     <Compile Include="Online\API\Requests\GetScoresRequest.cs" />
     <Compile Include="Online\API\Requests\GetUserRequest.cs" />
@@ -438,6 +442,7 @@
     <Compile Include="Overlays\Notifications\ProgressNotification.cs" />
     <Compile Include="Overlays\Notifications\SimpleNotification.cs" />
     <Compile Include="Overlays\OnScreenDisplay.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\DrawableScore.cs" />
     <Compile Include="Overlays\Profile\ProfileHeader.cs" />
     <Compile Include="Overlays\Profile\ProfileSection.cs" />
     <Compile Include="Overlays\Profile\RankChart.cs" />
@@ -790,6 +795,7 @@
     <Compile Include="Tests\Visual\TestCaseTwoLayerButton.cs" />
     <Compile Include="Tests\Visual\TestCaseUserPanel.cs" />
     <Compile Include="Tests\Visual\TestCaseUserProfile.cs" />
+    <Compile Include="Tests\Visual\TestCaseUserRanks.cs" />
     <Compile Include="Tests\Visual\TestCaseWaveform.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Users\Country.cs" />
