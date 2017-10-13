@@ -30,8 +30,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return playButton.SetInfo; }
-            set { playButton.SetInfo = value; }
+            get { return playButton.BeatmapSet; }
+            set { playButton.BeatmapSet = value; }
         }
 
         public PreviewButton()

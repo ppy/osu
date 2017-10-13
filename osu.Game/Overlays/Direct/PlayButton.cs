@@ -20,16 +20,17 @@ namespace osu.Game.Overlays.Direct
         public readonly Bindable<bool> Playing = new Bindable<bool>();
         public Track Preview { get; private set; }
 
-        private BeatmapSetInfo setInfo;
-        public BeatmapSetInfo SetInfo
+        private BeatmapSetInfo beatmapSet;
+        public BeatmapSetInfo BeatmapSet
         {
-            get { return setInfo; }
+            get { return beatmapSet; }
             set
             {
-                if (value == setInfo) return;
-                setInfo = value;
+                if (value == beatmapSet) return;
+                beatmapSet = value;
 
                 Playing.Value = false;
+                trackLoader = null;
                 Preview = null;
             }
         }
@@ -41,13 +42,10 @@ namespace osu.Game.Overlays.Direct
 
         private const float transition_duration = 500;
 
-        private bool loading;
-        public bool Loading
+        private bool loading
         {
-            get { return loading; }
             set
             {
-                loading = value;
                 if (value)
                 {
                     loadingAnimation.Show();
@@ -63,7 +61,7 @@ namespace osu.Game.Overlays.Direct
 
         public PlayButton(BeatmapSetInfo setInfo = null)
         {
-            SetInfo = setInfo;
+            BeatmapSet = setInfo;
             AddRange(new Drawable[]
             {
                 audioWrapper = new Container(),
@@ -78,10 +76,12 @@ namespace osu.Game.Overlays.Direct
                 loadingAnimation = new LoadingAnimation(),
             });
 
-            Playing.ValueChanged += newValue => icon.Icon = newValue ? FontAwesome.fa_pause : FontAwesome.fa_play;
-            Playing.ValueChanged += newValue => icon.FadeColour(newValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
-
-            Playing.ValueChanged += updatePreviewTrack;
+            Playing.ValueChanged += playing =>
+            {
+                icon.Icon = playing ? FontAwesome.fa_pause : FontAwesome.fa_play;
+                icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
+                updatePreviewTrack(playing);
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Direct
 
         protected override void OnHoverLost(InputState state)
         {
-            if(!Playing.Value)
+            if (!Playing.Value)
                 icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
             base.OnHoverLost(state);
         }
@@ -113,35 +113,25 @@ namespace osu.Game.Overlays.Direct
         {
             base.Update();
 
-            if(Preview?.HasCompleted ?? false)
+            if (Preview?.HasCompleted ?? false)
             {
                 Playing.Value = false;
                 Preview = null;
             }
         }
 
-        private void updatePreviewTrack(bool newValue)
+        private void updatePreviewTrack(bool playing)
         {
-            if (newValue)
+            if (playing)
             {
                 if (Preview == null)
                 {
-                    Loading = true;
-                    audioWrapper.Child = new AsyncLoadWrapper(new AudioLoadWrapper("https://b.ppy.sh/preview/" + SetInfo.OnlineBeatmapSetID + ".mp3")
-                    {
-                        OnLoadComplete = d =>
-                        {
-                            Loading = false;
-                            Preview = (d as AudioLoadWrapper)?.Preview;
-                            Playing.TriggerChange();
-                        },
-                    });
+                    beginAudioLoad();
+                    return;
                 }
-                else
-                {
-                    Preview.Seek(0);
-                    Preview.Start();
-                }
+
+                Preview.Seek(0);
+                Preview.Start();
             }
             else
             {
@@ -149,13 +139,32 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        private class AudioLoadWrapper : Drawable
+        private TrackLoader trackLoader;
+
+        private void beginAudioLoad()
+        {
+            if (trackLoader != null) return;
+
+            Add(new AsyncLoadWrapper(trackLoader = new TrackLoader($"https://b.ppy.sh/preview/{BeatmapSet.OnlineBeatmapSetID}.mp3")
+            {
+                OnLoadComplete = d =>
+                {
+                    // we may have been replaced by another loader
+                    if (trackLoader != d) return;
+
+                    Preview = (d as TrackLoader)?.Preview;
+                    Playing.TriggerChange();
+                },
+            }));
+        }
+
+        private class TrackLoader : Drawable
         {
             private readonly string preview;
 
             public Track Preview;
 
-            public AudioLoadWrapper(string preview)
+            public TrackLoader(string preview)
             {
                 this.preview = preview;
             }
