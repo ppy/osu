@@ -27,13 +27,13 @@ namespace osu.Game.Overlays.MedalSplash
         private readonly Sprite medalSprite, medalGlow;
         private readonly OsuSpriteText unlocked, name;
         private readonly TextFlowContainer description;
-        private readonly FillFlowContainer infoFlow;
         private DisplayState state;
         public DrawableMedal(Medal medal)
         {
             this.medal = medal;
             Position = new Vector2(0f, MedalOverlay.DISC_SIZE / 2);
 
+            FillFlowContainer infoFlow;
             Children = new Drawable[]
             {
                 medalContainer = new Container
@@ -108,6 +108,12 @@ namespace osu.Game.Overlays.MedalSplash
                 s.Origin = Anchor.TopCentre;
                 s.TextSize = 16;
             });
+
+            medalContainer.OnLoadComplete = d =>
+            {
+                unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 10);
+                infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -123,9 +129,6 @@ namespace osu.Game.Overlays.MedalSplash
             base.LoadComplete();
 
             updateState();
-
-            unlocked.Position = new Vector2(0f, medalContainer.DrawSize.Y / 2 + 10);
-            infoFlow.Position = new Vector2(0f, unlocked.Position.Y + 90);
         }
 
         public DisplayState State
