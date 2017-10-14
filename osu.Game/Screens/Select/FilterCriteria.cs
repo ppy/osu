@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select
                     groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Title, y.BeatmapSet.Metadata.Title, StringComparison.InvariantCultureIgnoreCase));
                     break;
                 case SortMode.Author:
-                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author, y.BeatmapSet.Metadata.Author, StringComparison.InvariantCultureIgnoreCase));
+                    groups.Sort((x, y) => string.Compare(x.BeatmapSet.Metadata.Author.Username, y.BeatmapSet.Metadata.Author.Username, StringComparison.InvariantCultureIgnoreCase));
                     break;
                 case SortMode.Difficulty:
                     groups.Sort((x, y) => x.BeatmapSet.MaxStarDifficulty.CompareTo(y.BeatmapSet.MaxStarDifficulty));
