@@ -46,7 +46,7 @@ namespace osu.Game.Tests.Visual
                     {
                         Title = @"OrVid",
                         Artist = @"An",
-                        Author = @"RLC",
+                        AuthorString = @"RLC",
                         Source = @"",
                         Tags = @"acuticnotes an-fillnote revid tear tearvid encrpted encryption axi axivid quad her hervid recoll",
                     },
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual
                     {
                         Title = @"tiny lamp",
                         Artist = @"fhana",
-                        Author = @"Sotarks",
+                        AuthorString = @"Sotarks",
                         Source = @"ぎんぎつね",
                         Tags = @"lantis junichi sato yuxuki waga kevin mitsunaga towana gingitsune opening op full ver version kalibe collab collaboration",
                     },
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Visual
                     {
                         Title = @"At Gwanghwamun",
                         Artist = @"KYUHYUN",
-                        Author = @"Cerulean Veyron",
+                        AuthorString = @"Cerulean Veyron",
                         Source = @"",
                         Tags = @"soul ballad kh super junior sj suju 슈퍼주니어 kt뮤직 sm엔터테인먼트 s.m.entertainment kt music 1st mini album ep",
                     },
@@ -157,7 +157,7 @@ namespace osu.Game.Tests.Visual
                     {
                         Title = @"RHAPSODY OF BLUE SKY",
                         Artist = @"fhana",
-                        Author = @"[Kamiya]",
+                        AuthorString = @"[Kamiya]",
                         Source = @"小林さんちのメイドラゴン",
                         Tags = @"kobayashi san chi no maidragon aozora no opening anime maid dragon oblivion karen dynamix imoutosan pata-mon gxytcgxytc",
                     },
