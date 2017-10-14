@@ -12,13 +12,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using System.Diagnostics;
 using System.Globalization;
+using System.Collections.Generic;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -119,15 +120,11 @@ namespace osu.Game.Overlays.Profile
                                                 }
                                             }
                                         },
-                                        new LinkFlowContainer.LinkText
+                                        new LinkFlowContainer.ProfileLink(user)
                                         {
-                                            Text = user.Username,
-                                            Url = $@"https://osu.ppy.sh/users/{user.Id}",
-                                            TextSize = 30,
-                                            Font = @"Exo2.0-RegularItalic",
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
-                                            Y = -48
+                                            Y = -48,
                                         },
                                         countryFlag = new DrawableFlag(user.Country?.FlagName)
                                         {
@@ -509,34 +506,42 @@ namespace osu.Game.Overlays.Profile
 
             public class LinkText : OsuSpriteText
             {
-                public override bool HandleInput => Url != null;
+                private readonly OsuHoverContainer content;
 
-                public string Url;
+                public override bool HandleInput => content.Action != null;
 
-                private Color4 hoverColour;
+                protected override Container<Drawable> Content => content ?? (Container<Drawable>)this;
 
-                protected override bool OnHover(InputState state)
+                protected override IEnumerable<Drawable> FlowingChildren => Children;
+
+                public string Url
                 {
-                    this.FadeColour(hoverColour, 500, Easing.OutQuint);
-                    return base.OnHover(state);
+                    set
+                    {
+                        if(value != null)
+                            content.Action = () => Process.Start(value);
+                    }
                 }
 
-                protected override void OnHoverLost(InputState state)
+                public LinkText()
                 {
-                    this.FadeColour(Color4.White, 500, Easing.OutQuint);
-                    base.OnHoverLost(state);
+                    AddInternal(content = new OsuHoverContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                    });
                 }
+            }
 
-                protected override bool OnClick(InputState state)
-                {
-                    Process.Start(Url);
-                    return true;
-                }
+            public class ProfileLink : LinkText, IHasTooltip
+            {
+                public string TooltipText => "View Profile in Browser";
 
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
+                public ProfileLink(User user)
                 {
-                    hoverColour = colours.Yellow;
+                    Text = user.Username;
+                    Url = $@"https://osu.ppy.sh/users/{user.Id}";
+                    Font = @"Exo2.0-RegularItalic";
+                    TextSize = 30;
                 }
             }
         }

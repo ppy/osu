@@ -3,6 +3,7 @@
 
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Game.Users;
 using SQLite.Net.Attributes;
 
 namespace osu.Game.Beatmaps
@@ -19,8 +20,21 @@ namespace osu.Game.Beatmaps
         public string Artist { get; set; }
         public string ArtistUnicode { get; set; }
 
+        /// <summary>
+        /// Helper property to deserialize a username to <see cref="User"/>.
+        /// </summary>
         [JsonProperty(@"creator")]
-        public string Author { get; set; }
+        [Column("Author")]
+        public string AuthorString
+        {
+            get { return Author?.Username; }
+            set { Author = new User { Username = value }; }
+        }
+
+        /// <summary>
+        /// The author of the beatmaps in this set.
+        /// </summary>
+        public User Author;
 
         public string Source { get; set; }
 
@@ -32,7 +46,7 @@ namespace osu.Game.Beatmaps
 
         public string[] SearchableTerms => new[]
         {
-            Author,
+            Author?.Username,
             Artist,
             ArtistUnicode,
             Title,

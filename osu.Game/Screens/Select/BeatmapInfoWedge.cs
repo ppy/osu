@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Select
                                     new OsuSpriteText
                                     {
                                         Font = @"Exo2.0-Bold",
-                                        Text = metadata.Author,
+                                        Text = metadata.Author.Username,
                                         TextSize = 15,
                                         },
                                 }
