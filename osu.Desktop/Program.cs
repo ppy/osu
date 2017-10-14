@@ -8,7 +8,7 @@ using osu.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
 
-namespace osu.Game
+namespace osu.Desktop
 {
     public static class Program
     {

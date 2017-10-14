@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.Direct
                                                 },
                                                 new OsuSpriteText
                                                 {
-                                                    Text = SetInfo.Metadata.Author,
+                                                    Text = SetInfo.Metadata.Author.Username,
                                                     TextSize = 14,
                                                     Font = @"Exo2.0-SemiBoldItalic",
                                                     Shadow = false,
