@@ -1,8 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Rulesets;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace osu.Game.Database
 {
@@ -30,6 +34,7 @@ namespace osu.Game.Database
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.UseSqlite(connectionString);
+            optionsBuilder.UseLoggerFactory(new OsuDbLoggerFactory());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,6 +49,36 @@ namespace osu.Game.Database
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Name).IsUnique();
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.InstantiationInfo).IsUnique();
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Available);
+        }
+
+        private class OsuDbLoggerFactory : ILoggerFactory
+        {
+            public void Dispose()
+            {
+            }
+
+            public ILogger CreateLogger(string categoryName) => new OsuDbLogger();
+
+            public void AddProvider(ILoggerProvider provider) => new OsuDbLoggerProvider();
+
+            private class OsuDbLoggerProvider : ILoggerProvider
+            {
+                public void Dispose()
+                {
+                }
+
+                public ILogger CreateLogger(string categoryName) => new OsuDbLogger();
+            }
+
+            private class OsuDbLogger : ILogger
+            {
+                public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+                    => Logger.Log(formatter(state, exception), LoggingTarget.Database, Framework.Logging.LogLevel.Debug);
+
+                public bool IsEnabled(LogLevel logLevel) => true;
+
+                public IDisposable BeginScope<TState>(TState state) => null;
+            }
         }
     }
 }
