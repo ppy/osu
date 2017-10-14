@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Scoring
 
         public double Health { get; set; } = 1;
 
+        public double? PP { get; set; }
+
         public int MaxCombo { get; set; }
 
         public int Combo { get; set; }

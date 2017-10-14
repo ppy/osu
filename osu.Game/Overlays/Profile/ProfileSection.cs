@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Users;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Profile
@@ -18,7 +19,16 @@ namespace osu.Game.Overlays.Profile
         public abstract string Identifier { get; }
 
         private readonly FillFlowContainer content;
+
         protected override Container<Drawable> Content => content;
+
+        public virtual User User
+        {
+            get { return user; }
+            set { user = value; }
+        }
+
+        private User user;
 
         protected ProfileSection()
         {
