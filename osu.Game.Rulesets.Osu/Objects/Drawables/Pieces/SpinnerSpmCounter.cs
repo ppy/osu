@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             if (records.Count > 0)
             {
                 var record = records.Peek();
-                while (Time.Current - records.Peek().Time > spm_count_duration)
+                while (records.Count > 0 && Time.Current - records.Peek().Time > spm_count_duration)
                     record = records.Dequeue();
                 SpinsPerMinute = (currentRotation - record.Rotation) / (Time.Current - record.Time) * 1000 * 60 / 360;
             }
