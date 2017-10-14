@@ -611,9 +611,9 @@ namespace osu.Game.Beatmaps.Formats
             CommandTimelineGroup timelineGroup = null;
 
             string line;
-            while ((line = stream.ReadLine()?.Trim()) != null)
+            while ((line = stream.ReadLine()) != null)
             {
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrWhiteSpace(line))
                     continue;
 
                 if (line.StartsWith("//"))
@@ -679,10 +679,12 @@ namespace osu.Game.Beatmaps.Formats
 
         private KeyValuePair<string, string> splitKeyVal(string line, char separator)
         {
+            var split = line.Trim().Split(new[] { separator }, 2);
+
             return new KeyValuePair<string, string>
             (
-                line.Remove(line.IndexOf(separator)).Trim(),
-                line.Substring(line.IndexOf(separator) + 1).Trim()
+                split[0].Trim(),
+                split.Length > 1 ? split[1].Trim() : string.Empty
             );
         }
 

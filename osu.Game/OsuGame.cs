@@ -188,8 +188,8 @@ namespace osu.Game
                 GetToolbarHeight = () => ToolbarOffset,
                 Depth = -1
             }, overlayContent.Add);
-            LoadComponentAsync(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -2 }, mainContent.Add);
-            LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -3 }, mainContent.Add);
+            LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
+            LoadComponentAsync(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, mainContent.Add);
             LoadComponentAsync(musicController = new MusicController
             {
                 Depth = -4,

@@ -28,8 +28,14 @@ namespace osu.Game.Overlays.Direct
             Height = height;
         }
 
+        private PlayButton playButton;
+        private Box progressBar;
+
+        protected override PlayButton PlayButton => playButton;
+        protected override Box PreviewBar => progressBar;
+
         [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation)
+        private void load(LocalisationEngine localisation, OsuColour colours)
         {
             Content.CornerRadius = 5;
 
@@ -48,29 +54,50 @@ namespace osu.Game.Overlays.Direct
                     {
                         new FillFlowContainer
                         {
+                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
+                            Direction = FillDirection.Horizontal,
+                            LayoutEasing = Easing.OutQuint,
+                            LayoutDuration = 120,
+                            Spacing = new Vector2(10, 0),
                             Children = new Drawable[]
                             {
-                                new OsuSpriteText
+                                playButton = new PlayButton(SetInfo)
                                 {
-                                    Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
-                                    TextSize = 18,
-                                    Font = @"Exo2.0-BoldItalic",
-                                },
-                                new OsuSpriteText
-                                {
-                                    Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreLeft,
+                                    Size = new Vector2(height / 2),
+                                    FillMode = FillMode.Fit,
+                                    Alpha = 0,
                                 },
                                 new FillFlowContainer
                                 {
-                                    AutoSizeAxes = Axes.X,
-                                    Height = 20,
-                                    Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
-                                    Children = GetDifficultyIcons(),
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
+                                    {
+                                        new OsuSpriteText
+                                        {
+                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
+                                            TextSize = 18,
+                                            Font = @"Exo2.0-BoldItalic",
+                                        },
+                                        new OsuSpriteText
+                                        {
+                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
+                                            Font = @"Exo2.0-BoldItalic",
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.X,
+                                            Height = 20,
+                                            Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
+                                            Children = GetDifficultyIcons(),
+                                        },
+                                    },
                                 },
-                            },
+                            }
                         },
                         new FillFlowContainer
                         {
@@ -125,6 +152,16 @@ namespace osu.Game.Overlays.Direct
                             Action = StartDownload
                         },
                     },
+                },
+                progressBar = new Box
+                {
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    BypassAutoSizeAxes = Axes.Y,
+                    Size = new Vector2(0, 3),
+                    Alpha = 0,
+                    Colour = colours.Yellow,
                 },
             });
         }

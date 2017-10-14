@@ -161,11 +161,15 @@ namespace osu.Game.Overlays
                                             {
                                                 prevButton = new IconButton
                                                 {
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
                                                 },
                                                 playButton = new IconButton
                                                 {
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
                                                     Action = play,
@@ -173,6 +177,8 @@ namespace osu.Game.Overlays
                                                 },
                                                 nextButton = new IconButton
                                                 {
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
                                                     Action = next,
                                                     Icon = FontAwesome.fa_step_forward,
                                                 },

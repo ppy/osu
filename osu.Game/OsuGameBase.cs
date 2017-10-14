@@ -17,7 +17,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
-using osu.Game.Graphics.Processing;
 using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Database;
@@ -193,7 +192,7 @@ namespace osu.Game
 
             GlobalKeyBindingInputManager globalBinding;
 
-            base.Content.Add(new RatioAdjust
+            base.Content.Add(new DrawSizePreservingFillContainer
             {
                 Children = new Drawable[]
                 {
