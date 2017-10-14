@@ -134,6 +134,7 @@ namespace osu.Game.Overlays.Direct
             else
             {
                 Preview?.Stop();
+                loading = false;
             }
         }
 
