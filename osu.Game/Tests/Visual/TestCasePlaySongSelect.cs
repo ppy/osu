@@ -60,11 +60,11 @@ namespace osu.Game.Tests.Visual
         {
             return new BeatmapSetInfo
             {
-                BeatmapSetOnlineInfoId = 1234 + i,
+                OnlineBeatmapSetID = 1234 + i,
                 Hash = "d8e8fca2dc0f896fd7cb4cb0031ba249",
                 Metadata = new BeatmapMetadata
                 {
-                    BeatmapSetOnlineInfoId = 1234 + i,
+                    OnlineBeatmapSetID = 1234 + i,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = "MONACA " + RNG.Next(0, 9),
                     Title = "Black Song " + RNG.Next(0, 9),
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual
                 {
                     new BeatmapInfo
                     {
-                        BeatmapOnlineInfoId = 1234 + i,
+                        OnlineBeatmapID = 1234 + i,
                         Ruleset = rulesets.QueryRulesets().First(),
                         Path = "normal.osu",
                         Version = "Normal",
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual
                     },
                     new BeatmapInfo
                     {
-                        BeatmapOnlineInfoId = 1235 + i,
+                        OnlineBeatmapID = 1235 + i,
                         Ruleset = rulesets.QueryRulesets().First(),
                         Path = "hard.osu",
                         Version = "Hard",
@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual
                     },
                     new BeatmapInfo
                     {
-                        BeatmapOnlineInfoId = 1236 + i,
+                        OnlineBeatmapID = 1236 + i,
                         Ruleset = rulesets.QueryRulesets().First(),
                         Path = "insane.osu",
                         Version = "Insane",

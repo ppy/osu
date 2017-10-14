@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.Music
 
             public bool RemoveBeatmapSet(BeatmapSetInfo beatmapSet)
             {
-                var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.Id == beatmapSet.Id);
+                var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == beatmapSet.ID);
                 if (itemToRemove == null)
                     return false;
                 return items.Remove(itemToRemove);
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Music
                 set
                 {
                     foreach (PlaylistItem s in items.Children)
-                        s.Selected = s.BeatmapSetInfo.Id == value?.Id;
+                        s.Selected = s.BeatmapSetInfo.ID == value?.ID;
                 }
             }
 

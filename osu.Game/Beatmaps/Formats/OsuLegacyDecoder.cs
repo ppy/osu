@@ -97,9 +97,9 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.StackLeniency = float.Parse(pair.Value, NumberFormatInfo.InvariantInfo);
                     break;
                 case @"Mode":
-                    beatmap.BeatmapInfo.RulesetInfoId = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.RulesetID = int.Parse(pair.Value);
 
-                    switch (beatmap.BeatmapInfo.RulesetInfoId)
+                    switch (beatmap.BeatmapInfo.RulesetID)
                     {
                         case 0:
                             parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser();
@@ -183,11 +183,11 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.Metadata.Tags = pair.Value;
                     break;
                 case @"BeatmapID":
-                    beatmap.BeatmapInfo.BeatmapOnlineInfoId = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.OnlineBeatmapID = int.Parse(pair.Value);
                     break;
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.BeatmapSetOnlineInfoId = int.Parse(pair.Value);
-                    metadata.BeatmapSetOnlineInfoId = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.OnlineBeatmapSetID = int.Parse(pair.Value);
+                    metadata.OnlineBeatmapSetID = int.Parse(pair.Value);
                     break;
             }
         }

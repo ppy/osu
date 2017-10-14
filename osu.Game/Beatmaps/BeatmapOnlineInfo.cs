@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace osu.Game.Beatmaps
@@ -11,9 +10,6 @@ namespace osu.Game.Beatmaps
     /// </summary>
     public class BeatmapOnlineInfo
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
         /// <summary>
         /// The length in milliseconds of this beatmap's song.
         /// </summary>

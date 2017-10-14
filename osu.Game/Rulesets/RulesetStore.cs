@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets
             foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
             {
                 var rulesetInfo = createRulesetInfo(r);
-                if (Connection.RulesetInfo.SingleOrDefault(rsi=>rsi.Id==rulesetInfo.Id)==null)
+                if (Connection.RulesetInfo.SingleOrDefault(rsi=>rsi.ID==rulesetInfo.ID)==null)
                 {
                     Connection.RulesetInfo.Add(rulesetInfo);
                 }
@@ -103,12 +103,12 @@ namespace osu.Game.Rulesets
         {
             Name = ruleset.Description,
             InstantiationInfo = ruleset.GetType().AssemblyQualifiedName,
-            Id = ruleset.LegacyID
+            ID = ruleset.LegacyID
         };
 
         protected override Type[] ValidTypes => new[] { typeof(RulesetInfo) };
 
-        public RulesetInfo GetRuleset(int id) => Connection.RulesetInfo.First(r => r.Id == id);
+        public RulesetInfo GetRuleset(int id) => Connection.RulesetInfo.First(r => r.ID == id);
 
         public RulesetInfo QueryRulesetInfo(Func<RulesetInfo, bool> query)
         {

@@ -19,6 +19,6 @@ namespace osu.Game.Online.API.Requests
             Progress += (current, total) => DownloadProgressed?.Invoke((float) current / total);
         }
 
-        protected override string Target => $@"beatmapsets/{BeatmapSet.BeatmapSetOnlineInfoId}/download";
+        protected override string Target => $@"beatmapsets/{BeatmapSet.OnlineBeatmapSetID}/download";
     }
 }

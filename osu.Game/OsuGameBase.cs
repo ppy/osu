@@ -3,7 +3,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Allocation;
@@ -104,7 +103,7 @@ namespace osu.Game
             dependencies.Cache(LocalConfig);
 
             using (var dbContext = createDbContext())
-                    dbContext.Database.Migrate();
+                dbContext.Database.Migrate();
 
             dependencies.Cache(API = new APIAccess
             {

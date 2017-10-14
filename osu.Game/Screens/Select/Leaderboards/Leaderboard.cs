@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             Scores = null;
             getScoresRequest?.Cancel();
 
-            if (api == null || Beatmap?.BeatmapOnlineInfoId == null) return;
+            if (api == null || Beatmap?.OnlineBeatmapID == null) return;
 
             loading.Show();
 

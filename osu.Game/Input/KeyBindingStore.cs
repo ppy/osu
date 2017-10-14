@@ -22,7 +22,7 @@ namespace osu.Game.Input
             {
                 var ruleset = info.CreateInstance();
                 foreach (var variant in ruleset.AvailableVariants)
-                    insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.Id, variant);
+                    insertDefaults(ruleset.GetDefaultKeyBindings(variant), info.ID, variant);
             }
         }
 
@@ -48,7 +48,7 @@ namespace osu.Game.Input
                     {
                         KeyCombination = insertable.KeyCombination,
                         Action = insertable.Action,
-                        RulesetInfoId = rulesetId,
+                        RulesetID = rulesetId,
                         Variant = variant
                     });
                     Connection.SaveChanges();
@@ -62,7 +62,7 @@ namespace osu.Game.Input
         };
 
         public List<KeyBinding> Query(int? rulesetId = null, int? variant = null) =>
-            new List<KeyBinding>(Connection.DatabasedKeyBinding.Where(b => b.RulesetInfoId == rulesetId && b.Variant == variant));
+            new List<KeyBinding>(Connection.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant));
 
         public void Update(KeyBinding keyBinding)
         {

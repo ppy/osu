@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets
     public class RulesetInfo : IEquatable<RulesetInfo>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int? Id { get; set; }
+        public int? ID { get; set; }
 
         public string Name { get; set; }
 
@@ -19,6 +19,6 @@ namespace osu.Game.Rulesets
 
         public virtual Ruleset CreateInstance() => (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo), this);
 
-        public bool Equals(RulesetInfo other) => other != null && Id == other.Id && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
+        public bool Equals(RulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;
     }
 }

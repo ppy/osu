@@ -14,26 +14,26 @@ namespace osu.Game.Beatmaps
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int ID { get; set; }
 
         //TODO: should be in database
         public int BeatmapVersion;
 
         [JsonProperty("id")]
         [NotMapped]
-        public int? BeatmapOnlineInfoId { get; set; }
+        public int? OnlineBeatmapID { get; set; }
 
         [JsonProperty("beatmapset_id")]
         [NotMapped]
-        public int? BeatmapSetOnlineInfoId { get; set; }
+        public int? OnlineBeatmapSetID { get; set; }
 
-        public int BeatmapSetInfoId { get; set; }
+        public int BeatmapSetInfoID { get; set; }
 
         [Required]
         public BeatmapSetInfo BeatmapSet { get; set; }
         public BeatmapMetadata Metadata { get; set; }
 
-        public int BeatmapDifficultyId { get; set; }
+        public int BaseDifficultyID { get; set; }
 
         [Required]
         public BeatmapDifficulty Difficulty { get; set; }
@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
 
-        public int RulesetInfoId { get; set; }
+        public int RulesetID { get; set; }
 
         public RulesetInfo Ruleset { get; set; }
 
@@ -109,12 +109,12 @@ namespace osu.Game.Beatmaps
 
         public bool Equals(BeatmapInfo other)
         {
-            if (Id == 0 || other?.Id == 0)
+            if (ID == 0 || other?.ID == 0)
                 // one of the two BeatmapInfos we are comparing isn't sourced from a database.
                 // fall back to reference equality.
                 return ReferenceEquals(this, other);
 
-            return Id == other?.Id;
+            return ID == other?.ID;
         }
 
         public bool AudioEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&

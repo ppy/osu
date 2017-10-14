@@ -246,7 +246,7 @@ namespace osu.Game.Screens.Select
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
                 if (beatmap?.Equals(Beatmap.Value.BeatmapInfo) != true)
                 {
-                    bool preview = beatmap?.BeatmapSetInfoId != Beatmap.Value.BeatmapInfo.BeatmapSetInfoId;
+                    bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value.BeatmapInfo.BeatmapSetInfoID;
 
                     Beatmap.Value = manager.GetWorkingBeatmap(beatmap, Beatmap);
                     ensurePlayingSelected(preview);
@@ -269,7 +269,7 @@ namespace osu.Game.Screens.Select
             }
             else
             {
-                if (beatmap.BeatmapSetInfoId == beatmapNoDebounce?.BeatmapSetInfoId)
+                if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
                     sampleChangeDifficulty.Play();
                 else
                     sampleChangeBeatmap.Play();
