@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Soleily", meta.Artist);
                 Assert.AreEqual("Soleily", meta.ArtistUnicode);
                 Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", meta.AudioFile);
-                Assert.AreEqual("Gamu", meta.Author);
+                Assert.AreEqual("Gamu", meta.AuthorString);
                 Assert.AreEqual("machinetop_background.jpg", meta.BackgroundFile);
                 Assert.AreEqual(164471, meta.PreviewTime);
                 Assert.AreEqual(string.Empty, meta.Source);

@@ -27,6 +27,7 @@ namespace osu.Game.Beatmaps
         [Column("Author")]
         public string AuthorString
         {
+            get { return Author?.Username; }
             set { Author = new User { Username = value }; }
         }
 
