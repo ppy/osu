@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual
                         {
                             Title = @"Platina",
                             Artist = @"Maaya Sakamoto",
-                            Author = @"uwutm8",
+                            AuthorString = @"uwutm8",
                         },
                         BeatmapSet = new BeatmapSetInfo
                         {
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual
                             {
                                 Title = @"FREEDOM DIVE",
                                 Artist = @"xi",
-                                Author = @"Nakagawa-Kanon",
+                                AuthorString = @"Nakagawa-Kanon",
                             },
                             BeatmapSet = new BeatmapSetInfo
                             {
