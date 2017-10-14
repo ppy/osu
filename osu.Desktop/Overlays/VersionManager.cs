@@ -13,15 +13,17 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
+using osu.Game;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using OpenTK;
 using OpenTK.Graphics;
 using Squirrel;
 
-namespace osu.Game.Overlays
+namespace osu.Desktop.Overlays
 {
     public class VersionManager : OverlayContainer
     {

@@ -9,12 +9,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
-using osu.Game.Overlays;
+using osu.Game;
 using osu.Game.Screens.Menu;
 
-namespace osu.Game
+namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
