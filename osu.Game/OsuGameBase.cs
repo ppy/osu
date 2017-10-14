@@ -83,6 +83,7 @@ namespace osu.Game
 
         private OsuDbContext createDbContext()
         {
+            SQLitePCL.Batteries.Init();
             var connectionString = Host.Storage.GetDatabaseConnectionString(@"client");
             var context = new OsuDbContext(connectionString);
             var connection = context.Database.GetDbConnection();
