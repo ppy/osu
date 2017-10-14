@@ -2,9 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
 
@@ -133,46 +131,6 @@ namespace osu.Game.Beatmaps
         private void cleanupPendingDeletions()
         {
             Connection.BeatmapSetInfo.RemoveRange(Connection.BeatmapSetInfo.Where(b => b.DeletePending && !b.Protected));
-        }
-
-        public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query)
-        {
-            return Connection.BeatmapSetInfo
-                .Include(b => b.Metadata)
-                .Include(b => b.Beatmaps).ThenInclude(b => b.Ruleset)
-                .Include(b => b.Beatmaps).ThenInclude(b => b.Difficulty)
-                .Include(b => b.Files).ThenInclude(f => f.FileInfo)
-                .FirstOrDefault(query);
-        }
-
-        public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
-        {
-            return Connection.BeatmapSetInfo
-                .Include(b => b.Metadata)
-                .Include(b => b.Beatmaps).ThenInclude(b => b.Ruleset)
-                .Include(b => b.Beatmaps).ThenInclude(b => b.Difficulty)
-                .Include(b => b.Files).ThenInclude(f => f.FileInfo)
-                .Where(query).ToList();
-        }
-
-        public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
-        {
-            return Connection.BeatmapInfo
-                .Include(b => b.BeatmapSet)
-                .Include(b => b.Metadata)
-                .Include(b => b.Ruleset)
-                .Include(b => b.Difficulty)
-                .FirstOrDefault(query);
-        }
-
-        public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
-        {
-            return Connection.BeatmapInfo
-                .Include(b => b.BeatmapSet)
-                .Include(b => b.Metadata)
-                .Include(b => b.Ruleset)
-                .Include(b => b.Difficulty)
-                .Where(query).ToList();
         }
     }
 }
