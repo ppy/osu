@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Play
         private IAdjustableClock adjustableSourceClock;
         private FramedOffsetClock offsetClock;
         private DecoupleableInterpolatingFramedClock decoupledClock;
+        private double clockRate;
 
         private PauseContainer pauseContainer;
 
@@ -148,6 +149,8 @@ namespace osu.Game.Screens.Play
 
                 foreach (var mod in working.Mods.Value.OfType<IApplicableToClock>())
                     mod.ApplyToClock(adjustableSourceClock);
+
+                clockRate = adjustableSourceClock.Rate;
 
                 decoupledClock.ChangeSource(adjustableSourceClock);
             });
@@ -334,6 +337,8 @@ namespace osu.Game.Screens.Play
         {
             if (HasFailed || !ValidForResume || pauseContainer?.AllowExit != false || RulesetContainer?.HasReplayLoaded != false)
             {
+                // We want to make sure we restore the clock rate
+                adjustableSourceClock.Rate = clockRate;
                 fadeOut();
                 return base.OnExiting(next);
             }
