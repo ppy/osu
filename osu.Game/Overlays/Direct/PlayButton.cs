@@ -134,6 +134,7 @@ namespace osu.Game.Overlays.Direct
             else
             {
                 Preview?.Stop();
+                loading = false;
             }
         }
 
@@ -142,6 +143,8 @@ namespace osu.Game.Overlays.Direct
         private void beginAudioLoad()
         {
             if (trackLoader != null) return;
+
+            loading = true;
 
             Add(new AsyncLoadWrapper(trackLoader = new TrackLoader($"https://b.ppy.sh/preview/{BeatmapSet.OnlineBeatmapSetID}.mp3")
             {
@@ -152,6 +155,7 @@ namespace osu.Game.Overlays.Direct
 
                     Preview = (d as TrackLoader)?.Preview;
                     Playing.TriggerChange();
+                    loading = false;
                 },
             }));
         }
