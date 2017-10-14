@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = "MONACA " + RNG.Next(0, 9),
                     Title = "Black Song " + RNG.Next(0, 9),
-                    Author = "Some Guy " + RNG.Next(0, 9),
+                    AuthorString = "Some Guy " + RNG.Next(0, 9),
                 },
                 Beatmaps = new List<BeatmapInfo>(new[]
                 {
