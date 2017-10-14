@@ -323,6 +323,11 @@
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
+    <Compile Include="Migrations\20171014052545_Init.cs" />
+    <Compile Include="Migrations\20171014052545_Init.designer.cs">
+      <DependentUpon>20171014052545_Init.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />
@@ -425,11 +430,6 @@
     <Compile Include="IO\Serialization\IJsonSerializable.cs" />
     <Compile Include="IPC\BeatmapIPCChannel.cs" />
     <Compile Include="IPC\ScoreIPCChannel.cs" />
-    <Compile Include="Migrations\20171009205048_Init.cs" />
-    <Compile Include="Migrations\20171009205048_Init.designer.cs">
-      <DependentUpon>20171009205048_Init.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\APIAccess.cs" />
     <Compile Include="Online\API\APIRequest.cs" />
     <Compile Include="Online\API\IOnlineComponent.cs" />

@@ -10,11 +10,10 @@ namespace osu.Game.Beatmaps
     public class BeatmapMetadata
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int ID { get; set; }
 
         [NotMapped]
-        public int? BeatmapSetOnlineInfoId { get; set; }
-        public int BeatmapSetInfoId { get; set; }
+        public int? OnlineBeatmapSetID { get; set; }
 
         public string Title { get; set; }
         public string TitleUnicode { get; set; }

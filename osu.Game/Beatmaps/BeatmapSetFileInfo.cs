@@ -10,11 +10,11 @@ namespace osu.Game.Beatmaps
     public class BeatmapSetFileInfo
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int ID { get; set; }
 
-        public int BeatmapSetInfoId { get; set; }
+        public int BeatmapSetInfoID { get; set; }
 
-        public int FileInfoId { get; set; }
+        public int FileInfoID { get; set; }
 
         public FileInfo FileInfo { get; set; }
 

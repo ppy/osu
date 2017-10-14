@@ -180,7 +180,7 @@ namespace osu.Game.Beatmaps
         public void Import(BeatmapSetInfo beatmapSetInfo)
         {
             // If we have an ID then we already exist in the database.
-            if (beatmapSetInfo.Id != 0) return;
+            if (beatmapSetInfo.ID != 0) return;
 
             beatmaps.Add(beatmapSetInfo);
         }
@@ -251,7 +251,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmap">The <see cref="BeatmapSetInfo"/> whose download request is wanted.</param>
         /// <returns>The <see cref="DownloadBeatmapSetRequest"/> object if it exists, or null.</returns>
-        public DownloadBeatmapSetRequest GetExistingDownload(BeatmapSetInfo beatmap) => currentDownloads.Find(d => d.BeatmapSet.BeatmapSetOnlineInfoId == beatmap.BeatmapSetOnlineInfoId);
+        public DownloadBeatmapSetRequest GetExistingDownload(BeatmapSetInfo beatmap) => currentDownloads.Find(d => d.BeatmapSet.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
 
         /// <summary>
         /// Delete a beatmap from the manager.
@@ -303,7 +303,7 @@ namespace osu.Game.Beatmaps
                 return DefaultBeatmap;
 
             if (beatmapInfo.BeatmapSet == null)
-                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoId} is not in the local database.");
+                throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
 
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
@@ -344,7 +344,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapSet">A stale instance.</param>
         /// <returns>A fresh instance.</returns>
-        public BeatmapSetInfo Refresh(BeatmapSetInfo beatmapSet) => QueryBeatmapSet(s => s.Id == beatmapSet.Id);
+        public BeatmapSetInfo Refresh(BeatmapSetInfo beatmapSet) => QueryBeatmapSet(s => s.ID == beatmapSet.ID);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
@@ -449,7 +449,7 @@ namespace osu.Game.Beatmaps
 
             beatmapSet = new BeatmapSetInfo
             {
-                BeatmapSetOnlineInfoId = metadata.BeatmapSetOnlineInfoId,
+                OnlineBeatmapSetID = metadata.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
                 Hash = hash,
                 Files = fileInfos,
@@ -478,8 +478,8 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Metadata = null;
 
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
-                    beatmap.BeatmapInfo.Ruleset = rulesets.QueryRulesetInfo(r => r.Id == beatmap.BeatmapInfo.RulesetInfoId);
-                    beatmap.BeatmapInfo.StarDifficulty = rulesets.QueryRulesetInfo(r => r.Id == beatmap.BeatmapInfo.RulesetInfoId)?.CreateInstance()?.CreateDifficultyCalculator(beatmap)
+                    beatmap.BeatmapInfo.Ruleset = rulesets.QueryRulesetInfo(r => r.ID == beatmap.BeatmapInfo.RulesetID);
+                    beatmap.BeatmapInfo.StarDifficulty = rulesets.QueryRulesetInfo(r => r.ID == beatmap.BeatmapInfo.RulesetID)?.CreateInstance()?.CreateDifficultyCalculator(beatmap)
                                                                  .Calculate() ?? 0;
 
                     beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);

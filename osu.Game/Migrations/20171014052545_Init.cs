@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
 
@@ -12,7 +15,7 @@ namespace osu.Game.Migrations
                 name: "BeatmapDifficulty",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     ApproachRate = table.Column<float>(type: "REAL", nullable: false),
                     CircleSize = table.Column<float>(type: "REAL", nullable: false),
@@ -23,81 +26,20 @@ namespace osu.Game.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BeatmapDifficulty", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "BeatmapSetInfo",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    DeletePending = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Hash = table.Column<string>(type: "TEXT", nullable: true),
-                    Protected = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BeatmapSetInfo", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FileInfo",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Hash = table.Column<string>(type: "TEXT", nullable: true),
-                    ReferenceCount = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FileInfo", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "KeyBinding",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Action = table.Column<int>(type: "INTEGER", nullable: false),
-                    Keys = table.Column<string>(type: "TEXT", nullable: true),
-                    RulesetInfoId = table.Column<int>(type: "INTEGER", nullable: true),
-                    Variant = table.Column<int>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_KeyBinding", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RulesetInfo",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Available = table.Column<bool>(type: "INTEGER", nullable: false),
-                    InstantiationInfo = table.Column<string>(type: "TEXT", nullable: true),
-                    Name = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RulesetInfo", x => x.Id);
+                    table.PrimaryKey("PK_BeatmapDifficulty", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
                 name: "BeatmapMetadata",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Artist = table.Column<string>(type: "TEXT", nullable: true),
                     ArtistUnicode = table.Column<string>(type: "TEXT", nullable: true),
                     AudioFile = table.Column<string>(type: "TEXT", nullable: true),
                     Author = table.Column<string>(type: "TEXT", nullable: true),
                     BackgroundFile = table.Column<string>(type: "TEXT", nullable: true),
-                    BeatmapSetInfoId = table.Column<int>(type: "INTEGER", nullable: false),
                     PreviewTime = table.Column<int>(type: "INTEGER", nullable: false),
                     Source = table.Column<string>(type: "TEXT", nullable: true),
                     Tags = table.Column<string>(type: "TEXT", nullable: true),
@@ -106,62 +48,97 @@ namespace osu.Game.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BeatmapMetadata", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BeatmapMetadata_BeatmapSetInfo_BeatmapSetInfoId",
-                        column: x => x.BeatmapSetInfoId,
-                        principalTable: "BeatmapSetInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_BeatmapMetadata", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
-                name: "BeatmapSetFileInfo",
+                name: "FileInfo",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    BeatmapSetInfoId = table.Column<int>(type: "INTEGER", nullable: false),
-                    FileInfoId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Filename = table.Column<string>(type: "TEXT", nullable: false)
+                    Hash = table.Column<string>(type: "TEXT", nullable: true),
+                    ReferenceCount = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BeatmapSetFileInfo", x => x.Id);
+                    table.PrimaryKey("PK_FileInfo", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "KeyBinding",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Action = table.Column<int>(type: "INTEGER", nullable: false),
+                    Keys = table.Column<string>(type: "TEXT", nullable: true),
+                    RulesetID = table.Column<int>(type: "INTEGER", nullable: true),
+                    Variant = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KeyBinding", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RulesetInfo",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Available = table.Column<bool>(type: "INTEGER", nullable: false),
+                    InstantiationInfo = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RulesetInfo", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BeatmapSetInfo",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    DeletePending = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Hash = table.Column<string>(type: "TEXT", nullable: true),
+                    MetadataID = table.Column<int>(type: "INTEGER", nullable: true),
+                    Protected = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BeatmapSetInfo", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_BeatmapSetFileInfo_BeatmapSetInfo_BeatmapSetInfoId",
-                        column: x => x.BeatmapSetInfoId,
-                        principalTable: "BeatmapSetInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BeatmapSetFileInfo_FileInfo_FileInfoId",
-                        column: x => x.FileInfoId,
-                        principalTable: "FileInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_BeatmapSetInfo_BeatmapMetadata_MetadataID",
+                        column: x => x.MetadataID,
+                        principalTable: "BeatmapMetadata",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "BeatmapInfo",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     AudioLeadIn = table.Column<int>(type: "INTEGER", nullable: false),
+                    BaseDifficultyID = table.Column<int>(type: "INTEGER", nullable: false),
                     BeatDivisor = table.Column<int>(type: "INTEGER", nullable: false),
-                    BeatmapDifficultyId = table.Column<int>(type: "INTEGER", nullable: false),
-                    BeatmapSetInfoId = table.Column<int>(type: "INTEGER", nullable: false),
+                    BeatmapSetInfoID = table.Column<int>(type: "INTEGER", nullable: false),
                     Countdown = table.Column<bool>(type: "INTEGER", nullable: false),
+                    DifficultyID = table.Column<int>(type: "INTEGER", nullable: false),
                     DistanceSpacing = table.Column<double>(type: "REAL", nullable: false),
                     GridSize = table.Column<int>(type: "INTEGER", nullable: false),
                     Hash = table.Column<string>(type: "TEXT", nullable: true),
                     Hidden = table.Column<bool>(type: "INTEGER", nullable: false),
                     LetterboxInBreaks = table.Column<bool>(type: "INTEGER", nullable: false),
                     MD5Hash = table.Column<string>(type: "TEXT", nullable: true),
-                    MetadataId = table.Column<int>(type: "INTEGER", nullable: true),
+                    MetadataID = table.Column<int>(type: "INTEGER", nullable: true),
                     Path = table.Column<string>(type: "TEXT", nullable: true),
-                    RulesetInfoId = table.Column<int>(type: "INTEGER", nullable: false),
+                    RulesetID = table.Column<int>(type: "INTEGER", nullable: false),
                     SpecialStyle = table.Column<bool>(type: "INTEGER", nullable: false),
                     StackLeniency = table.Column<float>(type: "REAL", nullable: false),
                     StarDifficulty = table.Column<double>(type: "REAL", nullable: false),
@@ -172,42 +149,69 @@ namespace osu.Game.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BeatmapInfo", x => x.Id);
+                    table.PrimaryKey("PK_BeatmapInfo", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_BeatmapInfo_BeatmapDifficulty_BeatmapDifficultyId",
-                        column: x => x.BeatmapDifficultyId,
-                        principalTable: "BeatmapDifficulty",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BeatmapInfo_BeatmapSetInfo_BeatmapSetInfoId",
-                        column: x => x.BeatmapSetInfoId,
+                        name: "FK_BeatmapInfo_BeatmapSetInfo_BeatmapSetInfoID",
+                        column: x => x.BeatmapSetInfoID,
                         principalTable: "BeatmapSetInfo",
-                        principalColumn: "Id",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BeatmapInfo_BeatmapMetadata_MetadataId",
-                        column: x => x.MetadataId,
+                        name: "FK_BeatmapInfo_BeatmapDifficulty_DifficultyID",
+                        column: x => x.DifficultyID,
+                        principalTable: "BeatmapDifficulty",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BeatmapInfo_BeatmapMetadata_MetadataID",
+                        column: x => x.MetadataID,
                         principalTable: "BeatmapMetadata",
-                        principalColumn: "Id",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_BeatmapInfo_RulesetInfo_RulesetInfoId",
-                        column: x => x.RulesetInfoId,
+                        name: "FK_BeatmapInfo_RulesetInfo_RulesetID",
+                        column: x => x.RulesetID,
                         principalTable: "RulesetInfo",
-                        principalColumn: "Id",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BeatmapSetFileInfo",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    BeatmapSetInfoID = table.Column<int>(type: "INTEGER", nullable: false),
+                    FileInfoID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Filename = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BeatmapSetFileInfo", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_BeatmapSetFileInfo_BeatmapSetInfo_BeatmapSetInfoID",
+                        column: x => x.BeatmapSetInfoID,
+                        principalTable: "BeatmapSetInfo",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BeatmapSetFileInfo_FileInfo_FileInfoID",
+                        column: x => x.FileInfoID,
+                        principalTable: "FileInfo",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_BeatmapInfo_BeatmapDifficultyId",
+                name: "IX_BeatmapInfo_BeatmapSetInfoID",
                 table: "BeatmapInfo",
-                column: "BeatmapDifficultyId");
+                column: "BeatmapSetInfoID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BeatmapInfo_BeatmapSetInfoId",
+                name: "IX_BeatmapInfo_DifficultyID",
                 table: "BeatmapInfo",
-                column: "BeatmapSetInfoId");
+                column: "DifficultyID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BeatmapInfo_MD5Hash",
@@ -215,35 +219,34 @@ namespace osu.Game.Migrations
                 column: "MD5Hash");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BeatmapInfo_MetadataId",
+                name: "IX_BeatmapInfo_MetadataID",
                 table: "BeatmapInfo",
-                column: "MetadataId");
+                column: "MetadataID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BeatmapInfo_RulesetInfoId",
+                name: "IX_BeatmapInfo_RulesetID",
                 table: "BeatmapInfo",
-                column: "RulesetInfoId");
+                column: "RulesetID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BeatmapMetadata_BeatmapSetInfoId",
-                table: "BeatmapMetadata",
-                column: "BeatmapSetInfoId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BeatmapSetFileInfo_BeatmapSetInfoId",
+                name: "IX_BeatmapSetFileInfo_BeatmapSetInfoID",
                 table: "BeatmapSetFileInfo",
-                column: "BeatmapSetInfoId");
+                column: "BeatmapSetInfoID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BeatmapSetFileInfo_FileInfoId",
+                name: "IX_BeatmapSetFileInfo_FileInfoID",
                 table: "BeatmapSetFileInfo",
-                column: "FileInfoId");
+                column: "FileInfoID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BeatmapSetInfo_DeletePending",
                 table: "BeatmapSetInfo",
                 column: "DeletePending");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BeatmapSetInfo_MetadataID",
+                table: "BeatmapSetInfo",
+                column: "MetadataID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FileInfo_Hash",
@@ -299,16 +302,16 @@ namespace osu.Game.Migrations
                 name: "BeatmapDifficulty");
 
             migrationBuilder.DropTable(
-                name: "BeatmapMetadata");
+                name: "RulesetInfo");
 
             migrationBuilder.DropTable(
-                name: "RulesetInfo");
+                name: "BeatmapSetInfo");
 
             migrationBuilder.DropTable(
                 name: "FileInfo");
 
             migrationBuilder.DropTable(
-                name: "BeatmapSetInfo");
+                name: "BeatmapMetadata");
         }
     }
 }

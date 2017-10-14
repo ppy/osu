@@ -40,7 +40,7 @@ namespace osu.Game.Online.API.Requests
         {
             return new BeatmapSetInfo
             {
-                BeatmapSetOnlineInfoId = onlineId,
+                OnlineBeatmapSetID = onlineId,
                 Metadata = this,
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {

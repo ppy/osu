@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Menu
             {
                 var sets = beatmaps.GetAllUsableBeatmapSets();
                 if (sets.Count > 0)
-                    setInfo = beatmaps.QueryBeatmapSet(s => s.Id == sets[RNG.Next(0, sets.Count - 1)].Id);
+                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
             }
 
             if (setInfo == null)

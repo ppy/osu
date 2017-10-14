@@ -27,6 +27,6 @@ namespace osu.Game.Online.API.Requests
             this.direction = direction;
         }
 
-        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.Id ?? 0}&s={(int)rankStatus}&sort={sortCriteria.ToString().ToLower()}_{directionString}";
+        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={(int)rankStatus}&sort={sortCriteria.ToString().ToLower()}_{directionString}";
     }
 }

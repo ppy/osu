@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual
             {
                 new BeatmapSetInfo
                 {
-                    BeatmapSetOnlineInfoId = 578332,
+                    OnlineBeatmapSetID = 578332,
                     Metadata = new BeatmapMetadata
                     {
                         Title = @"OrVid",
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual
                 },
                 new BeatmapSetInfo
                 {
-                    BeatmapSetOnlineInfoId = 599627,
+                    OnlineBeatmapSetID = 599627,
                     Metadata = new BeatmapMetadata
                     {
                         Title = @"tiny lamp",
@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual
                 },
                 new BeatmapSetInfo
                 {
-                    BeatmapSetOnlineInfoId = 513268,
+                    OnlineBeatmapSetID = 513268,
                     Metadata = new BeatmapMetadata
                     {
                         Title = @"At Gwanghwamun",
@@ -152,7 +152,7 @@ namespace osu.Game.Tests.Visual
                 },
                 new BeatmapSetInfo
                 {
-                    BeatmapSetOnlineInfoId = 586841,
+                    OnlineBeatmapSetID = 586841,
                     Metadata = new BeatmapMetadata
                     {
                         Title = @"RHAPSODY OF BLUE SKY",

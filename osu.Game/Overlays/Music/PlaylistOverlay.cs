@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Music
 
         private void itemSelected(BeatmapSetInfo set)
         {
-            if (set.Id == (beatmapBacking.Value?.BeatmapSetInfo?.Id ?? -1))
+            if (set.ID == (beatmapBacking.Value?.BeatmapSetInfo?.ID ?? -1))
             {
                 beatmapBacking.Value?.Track?.Seek(0);
                 return;

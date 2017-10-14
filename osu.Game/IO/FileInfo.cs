@@ -9,7 +9,7 @@ namespace osu.Game.IO
     public class FileInfo
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int ID { get; set; }
 
         public string Hash { get; set; }
 

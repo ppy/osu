@@ -19,8 +19,8 @@ namespace osu.Game.Online.API.Requests
 
         public GetScoresRequest(BeatmapInfo beatmap)
         {
-            if (!beatmap.BeatmapOnlineInfoId.HasValue)
-                throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.BeatmapOnlineInfoId)}.");
+            if (!beatmap.OnlineBeatmapID.HasValue)
+                throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
 
             this.beatmap = beatmap;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Online.API.Requests
                 score.ApplyBeatmap(beatmap);
         }
 
-        protected override string Target => $@"beatmaps/{beatmap.BeatmapOnlineInfoId}/scores";
+        protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores";
     }
 
     public class GetScoresResponse

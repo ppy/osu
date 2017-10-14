@@ -111,14 +111,14 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var store = osu.Dependencies.Get<BeatmapManager>();
 
-            waitForOrAssert(() => (resultSets = store.QueryBeatmapSets(s => s.BeatmapSetOnlineInfoId == 241526)).Any(),
+            waitForOrAssert(() => (resultSets = store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526)).Any(),
                 @"BeatmapSet did not import to the database in allocated time.", timeout);
 
             //ensure we were stored to beatmap database backing...
             Assert.IsTrue(resultSets.Count() == 1, $@"Incorrect result count found ({resultSets.Count()} but should be 1).");
 
-            Func<IEnumerable<BeatmapInfo>> queryBeatmaps = () => store.QueryBeatmaps(s => s.BeatmapSetOnlineInfoId == 241526 && s.BeatmapDifficultyId > 0);
-            Func<IEnumerable<BeatmapSetInfo>> queryBeatmapSets = () => store.QueryBeatmapSets(s => s.BeatmapSetOnlineInfoId == 241526);
+            Func<IEnumerable<BeatmapInfo>> queryBeatmaps = () => store.QueryBeatmaps(s => s.OnlineBeatmapSetID == 241526 && s.BaseDifficultyID > 0);
+            Func<IEnumerable<BeatmapSetInfo>> queryBeatmapSets = () => store.QueryBeatmapSets(s => s.OnlineBeatmapSetID == 241526);
 
             //if we don't re-check here, the set will be inserted but the beatmaps won't be present yet.
             waitForOrAssert(() => queryBeatmaps().Count() == 12,
@@ -141,16 +141,16 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                 Assert.IsTrue(set.Beatmaps.Count > 0);
 
-            var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetInfoId == 0))?.Beatmap;
+            var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
 
-            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetInfoId == 1))?.Beatmap;
+            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 1))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
 
-            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetInfoId == 2))?.Beatmap;
+            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 2))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
 
-            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetInfoId == 3))?.Beatmap;
+            beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 3))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
         }
 

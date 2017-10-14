@@ -146,7 +146,7 @@ namespace osu.Game.Overlays.Direct
 
             loading = true;
 
-            Add(new AsyncLoadWrapper(trackLoader = new TrackLoader($"https://b.ppy.sh/preview/{BeatmapSet.BeatmapSetOnlineInfoId}.mp3")
+            Add(new AsyncLoadWrapper(trackLoader = new TrackLoader($"https://b.ppy.sh/preview/{BeatmapSet.OnlineBeatmapSetID}.mp3")
             {
                 OnLoadComplete = d =>
                 {

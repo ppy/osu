@@ -10,9 +10,9 @@ namespace osu.Game.Input.Bindings
     public class DatabasedKeyBinding : KeyBinding
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int ID { get; set; }
 
-        public int? RulesetInfoId { get; set; }
+        public int? RulesetID { get; set; }
 
         public int? Variant { get; set; }
 
