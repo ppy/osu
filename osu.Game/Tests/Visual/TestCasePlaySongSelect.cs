@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1234 + i,
-                        Ruleset = rulesets.QueryRulesets().First(),
+                        Ruleset = rulesets.Query<RulesetInfo>().First(),
                         Path = "normal.osu",
                         Version = "Normal",
                         Difficulty = new BeatmapDifficulty
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1235 + i,
-                        Ruleset = rulesets.QueryRulesets().First(),
+                        Ruleset = rulesets.Query<RulesetInfo>().First(),
                         Path = "hard.osu",
                         Version = "Hard",
                         Difficulty = new BeatmapDifficulty
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual
                     new BeatmapInfo
                     {
                         OnlineBeatmapID = 1236 + i,
-                        Ruleset = rulesets.QueryRulesets().First(),
+                        Ruleset = rulesets.Query<RulesetInfo>().First(),
                         Path = "insane.osu",
                         Version = "Insane",
                         Difficulty = new BeatmapDifficulty

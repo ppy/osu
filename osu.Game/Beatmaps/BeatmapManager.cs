@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ionic.Zip;
 using osu.Framework.Audio.Track;
@@ -260,10 +259,13 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            if (!beatmaps.Delete(beatmapSet)) return;
+            lock (beatmaps)
+            {
+                if (!beatmaps.Delete(beatmapSet)) return;
 
-            if (!beatmapSet.Protected)
-                files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+                if (!beatmapSet.Protected)
+                    files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+            }
         }
 
         /// <summary>
@@ -302,6 +304,9 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
+            lock (beatmaps)
+                beatmaps.Populate(beatmapInfo);
+
             if (beatmapInfo.BeatmapSet == null)
                 throw new InvalidOperationException($@"Beatmap set {beatmapInfo.BeatmapSetInfoID} is not in the local database.");
 
@@ -333,7 +338,10 @@ namespace osu.Game.Beatmaps
         {
             lock (beatmaps)
             {
-                BeatmapSetInfo set = beatmaps.QueryBeatmapSet(query);
+                BeatmapSetInfo set = beatmaps.Query(query).FirstOrDefault();
+
+                if (set != null)
+                    beatmaps.Populate(set);
 
                 return set;
             }
@@ -351,9 +359,9 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
+        public List<BeatmapSetInfo> QueryBeatmapSets(Func<BeatmapSetInfo, bool> query)
         {
-            return beatmaps.QueryBeatmapSets(query);
+            return beatmaps.QueryAndPopulate(query);
         }
 
         /// <summary>
@@ -363,9 +371,15 @@ namespace osu.Game.Beatmaps
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
         public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
         {
-            BeatmapInfo set = beatmaps.QueryBeatmap(query);
+            lock (beatmaps)
+            {
+                BeatmapInfo set = beatmaps.Query(query).FirstOrDefault();
 
-            return set;
+                if (set != null)
+                    beatmaps.Populate(set);
+
+                return set;
+            }
         }
 
         /// <summary>
@@ -373,9 +387,9 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
+        public List<BeatmapInfo> QueryBeatmaps(Func<BeatmapInfo, bool> query)
         {
-            lock (beatmaps) return beatmaps.QueryBeatmaps(query);
+            lock (beatmaps) return beatmaps.Query(query);
         }
 
         /// <summary>
@@ -414,7 +428,7 @@ namespace osu.Game.Beatmaps
             // check if this beatmap has already been imported and exit early if so.
             BeatmapSetInfo beatmapSet;
             lock (beatmaps)
-                beatmapSet = beatmaps.QueryBeatmapSet(b => b.Hash == hash);
+                beatmapSet = beatmaps.QueryAndPopulate<BeatmapSetInfo>(b => b.Hash == hash).FirstOrDefault();
 
             if (beatmapSet != null)
             {
@@ -478,8 +492,8 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Metadata = null;
 
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
-                    beatmap.BeatmapInfo.Ruleset = rulesets.QueryRulesetInfo(r => r.ID == beatmap.BeatmapInfo.RulesetID);
-                    beatmap.BeatmapInfo.StarDifficulty = rulesets.QueryRulesetInfo(r => r.ID == beatmap.BeatmapInfo.RulesetID)?.CreateInstance()?.CreateDifficultyCalculator(beatmap)
+                    beatmap.BeatmapInfo.Ruleset = rulesets.Query<RulesetInfo>(r => r.ID == beatmap.BeatmapInfo.RulesetID).FirstOrDefault();
+                    beatmap.BeatmapInfo.StarDifficulty = rulesets.Query<RulesetInfo>(r => r.ID == beatmap.BeatmapInfo.RulesetID).FirstOrDefault()?.CreateInstance()?.CreateDifficultyCalculator(beatmap)
                                                                  .Calculate() ?? 0;
 
                     beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
@@ -493,11 +507,11 @@ namespace osu.Game.Beatmaps
         /// Returns a list of all usable <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
-        public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
+        public List<BeatmapSetInfo> GetAllUsableBeatmapSets(bool populate = true)
         {
             lock (beatmaps)
             {
-                return beatmaps.QueryBeatmapSets(b => !b.DeletePending);
+                return populate ? beatmaps.QueryAndPopulate<BeatmapSetInfo>(b => !b.DeletePending) : beatmaps.Query<BeatmapSetInfo>(b => !b.DeletePending);
             }
         }
 
