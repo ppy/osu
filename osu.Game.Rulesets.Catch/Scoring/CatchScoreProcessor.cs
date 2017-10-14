@@ -21,6 +21,19 @@ namespace osu.Game.Rulesets.Catch.Scoring
         {
             foreach (var obj in beatmap.HitObjects)
             {
+                var stream = obj as JuiceStream;
+
+                if (stream != null)
+                {
+                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+
+                    foreach (var unused in stream.Ticks)
+                        AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+
+                    continue;
+                }
+
                 var fruit = obj as Fruit;
 
                 if (fruit != null)

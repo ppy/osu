@@ -27,13 +27,28 @@ namespace osu.Game.Graphics.UserInterface
             set { flashColour = value; }
         }
 
+        private Color4? iconColour;
         /// <summary>
         /// The icon colour. This does not affect <see cref="IconButton.Colour"/>.
         /// </summary>
         public Color4 IconColour
         {
-            get { return icon.Colour; }
-            set { icon.Colour = value; }
+            get { return iconColour ?? Color4.White; }
+            set
+            {
+                iconColour = value;
+                icon.Colour = value;
+            }
+        }
+
+        private Color4? iconHoverColour;
+        /// <summary>
+        /// The icon colour while the <see cref="IconButton"/> is hovered.
+        /// </summary>
+        public Color4 IconHoverColour
+        {
+            get { return iconHoverColour ?? IconColour; }
+            set { iconHoverColour = value; }
         }
 
         private Color4? hoverColour;
@@ -133,12 +148,14 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(InputState state)
         {
             hover.FadeIn(500, Easing.OutQuint);
+            icon.FadeColour(IconHoverColour, 500, Easing.OutQuint);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
             hover.FadeOut(500, Easing.OutQuint);
+            icon.FadeColour(IconColour, 500, Easing.OutQuint);
             base.OnHoverLost(state);
         }
 
