@@ -6,7 +6,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -27,11 +26,10 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty(@"id")]
         private int onlineId { get; set; }
 
-        [JsonProperty(@"creator")]
-        private string creatorUsername { get; set; }
-
         [JsonProperty(@"user_id")]
-        private long creatorId = 1;
+        private long creatorId {
+            set { Author.Id = value; }
+        }
 
         [JsonProperty(@"beatmaps")]
         private IEnumerable<GetBeatmapSetsBeatmapResponse> beatmaps { get; set; }
@@ -44,11 +42,6 @@ namespace osu.Game.Online.API.Requests
                 Metadata = this,
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
-                    Author = new User
-                    {
-                        Id = creatorId,
-                        Username = creatorUsername,
-                    },
                     Covers = covers,
                     Preview = preview,
                     PlayCount = playCount,
