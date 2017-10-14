@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 AutoSizeAxes = Axes.Both,
                 Action = () =>
                 {
-                    if (score.Beatmap.OnlineBeatmapSetID.HasValue) beatmapSetOverlay.ShowBeatmapSet(score.Beatmap.OnlineBeatmapSetID.Value);
+                    if (score.Beatmap.BeatmapSetOnlineInfoId.HasValue) beatmapSetOverlay.ShowBeatmapSet(score.Beatmap.BeatmapSetOnlineInfoId.Value);
                 },
                 Child = new FillFlowContainer
                 {
