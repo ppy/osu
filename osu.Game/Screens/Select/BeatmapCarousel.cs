@@ -181,13 +181,18 @@ namespace osu.Game.Screens.Select
 
         public Action<BeatmapInfo> HideDifficultyRequested;
 
+        private void selectNullBeatmap()
+        {
+            selectedGroup = null;
+            selectedPanel = null;
+            SelectionChanged?.Invoke(null);
+        }
+
         public void SelectNext(int direction = 1, bool skipDifficulties = true)
         {
             if (groups.All(g => g.State == BeatmapGroupState.Hidden))
             {
-                selectedGroup = null;
-                selectedPanel = null;
-                SelectionChanged?.Invoke(null);
+                selectNullBeatmap();
                 return;
             }
 
@@ -376,7 +381,12 @@ namespace osu.Game.Screens.Select
                 return;
 
             if (selectedGroup == group)
-                SelectNext();
+            {
+                if (getVisibleGroups().Count() == 1)
+                    selectNullBeatmap();
+                else
+                    SelectNext();
+            }
 
             groups.Remove(group);
             panels.Remove(group.Header);
