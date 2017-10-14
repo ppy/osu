@@ -7,7 +7,7 @@
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/osu.Game/bin/Debug/osu!.exe",
+            "program": "${workspaceRoot}/osu.Desktop/bin/Debug/osu!.exe",
             "args": [
                 "--tests"
             ],
@@ -24,7 +24,7 @@
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/osu.Game/bin/Release/osu!.exe",
+            "program": "${workspaceRoot}/osu.Desktop/bin/Release/osu!.exe",
             "args": [
                 "--tests"
             ],
@@ -41,7 +41,7 @@
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/osu.Game/bin/Debug/osu!.exe",
+            "program": "${workspaceRoot}/osu.Desktop/bin/Debug/osu!.exe",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Debug)",
             "runtimeExecutable": null,
@@ -55,7 +55,7 @@
             },
             "type": "mono",
             "request": "launch",
-            "program": "${workspaceRoot}/osu.Game/bin/Release/osu!.exe",
+            "program": "${workspaceRoot}/osu.Desktop/bin/Release/osu!.exe",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build (Release)",
             "runtimeExecutable": null,
