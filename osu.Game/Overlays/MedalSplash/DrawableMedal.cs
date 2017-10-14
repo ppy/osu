@@ -27,13 +27,13 @@ namespace osu.Game.Overlays.MedalSplash
         private readonly Sprite medalSprite, medalGlow;
         private readonly OsuSpriteText unlocked, name;
         private readonly TextFlowContainer description;
-        private readonly FillFlowContainer infoFlow;
         private DisplayState state;
         public DrawableMedal(Medal medal)
         {
             this.medal = medal;
             Position = new Vector2(0f, MedalOverlay.DISC_SIZE / 2);
 
+            FillFlowContainer infoFlow;
             Children = new Drawable[]
             {
                 medalContainer = new Container
