@@ -402,7 +402,7 @@ namespace osu.Game.Overlays.Profile
                 scoreText.Add(createScoreText("Ranked Score"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.RankedScore.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Accuracy"));
-                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy.ToString("0.##", CultureInfo.CurrentCulture)}%"));
+                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy.ToString("0.##")}%"));
                 scoreText.Add(createScoreText("Play Count"));
                 scoreNumberText.Add(createScoreNumberText(user.Statistics.PlayCount.ToString(@"#,0")));
                 scoreText.Add(createScoreText("Total Score"));
