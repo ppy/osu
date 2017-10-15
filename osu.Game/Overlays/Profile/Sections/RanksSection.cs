@@ -155,7 +155,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     {
                         missing.Hide();
                         foreach (OnlineScore score in scores)
-                            scoreContainer.Add(new DrawableScore(score, includeWeigth ? Math.Pow(0.95, scoreContainer.Count) : -1)
+                            scoreContainer.Add(new DrawableScore(score, includeWeigth ? Math.Pow(0.95, scoreContainer.Count) : (double?)null)
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Height = 60,
