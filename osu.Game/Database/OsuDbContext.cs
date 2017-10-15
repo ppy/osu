@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
@@ -12,6 +15,11 @@ namespace osu.Game.Database
 {
     public class OsuDbContext : DbContext
     {
+        public DbSet<BeatmapInfo> BeatmapInfo { get; set; }
+        public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
+        public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
+        public DbSet<FileInfo> FileInfo { get; set; }
+        public DbSet<RulesetInfo> RulesetInfo { get; set; }
         private readonly string connectionString;
 
         public OsuDbContext()
@@ -23,12 +31,6 @@ namespace osu.Game.Database
         {
             this.connectionString = connectionString;
         }
-
-        public DbSet<BeatmapInfo> BeatmapInfo { get; set; }
-        public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
-        public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
-        public DbSet<FileInfo> FileInfo { get; set; }
-        public DbSet<RulesetInfo> RulesetInfo { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -53,9 +55,13 @@ namespace osu.Game.Database
 
         private class OsuDbLoggerFactory : ILoggerFactory
         {
+            #region Disposal
+
             public void Dispose()
             {
             }
+
+            #endregion
 
             public ILogger CreateLogger(string categoryName) => new OsuDbLogger();
 
@@ -63,9 +69,13 @@ namespace osu.Game.Database
 
             private class OsuDbLoggerProvider : ILoggerProvider
             {
+                #region Disposal
+
                 public void Dispose()
                 {
                 }
+
+                #endregion
 
                 public ILogger CreateLogger(string categoryName) => new OsuDbLogger();
             }
