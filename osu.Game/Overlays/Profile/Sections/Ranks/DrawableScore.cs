@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             {
                 stats.Add(new OsuSpriteText
                 {
-                    Text = $"weighted: {Math.Round(score.PP * weight ?? 0)}pp ({weight.Value.ToString("0%", CultureInfo.CurrentCulture)})",
+                    Current = locale.Format($"weighted: {score.PP * weight ?? 0:0}pp ({weight:0%})"),
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,
