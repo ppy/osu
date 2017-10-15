@@ -59,6 +59,8 @@ namespace osu.Game.Beatmaps
 
         private readonly FileStore files;
 
+        private readonly OsuDbContext connection;
+
         private readonly RulesetStore rulesets;
 
         private readonly BeatmapStore beatmaps;
@@ -90,6 +92,7 @@ namespace osu.Game.Beatmaps
 
             this.storage = storage;
             this.files = files;
+            this.connection = connection;
             this.rulesets = rulesets;
             this.api = api;
 
@@ -160,7 +163,7 @@ namespace osu.Game.Beatmaps
         /// <param name="archiveReader">The beatmap to be imported.</param>
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
-            BeatmapSetInfo set;
+            BeatmapSetInfo set = null;
 
             // let's only allow one concurrent import at a time for now.
             lock (importLock)
@@ -178,8 +181,7 @@ namespace osu.Game.Beatmaps
             // If we have an ID then we already exist in the database.
             if (beatmapSetInfo.ID != 0) return;
 
-            lock (beatmaps)
-                beatmaps.Add(beatmapSetInfo);
+            beatmaps.Add(beatmapSetInfo);
         }
 
         /// <summary>
@@ -270,21 +272,13 @@ namespace osu.Game.Beatmaps
         /// Delete a beatmap difficulty.
         /// </summary>
         /// <param name="beatmap">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmap)
-        {
-            lock (beatmaps)
-                beatmaps.Hide(beatmap);
-        }
+        public void Hide(BeatmapInfo beatmap) => beatmaps.Hide(beatmap);
 
         /// <summary>
         /// Restore a beatmap difficulty.
         /// </summary>
         /// <param name="beatmap">The beatmap difficulty to restore.</param>
-        public void Restore(BeatmapInfo beatmap)
-        {
-            lock (beatmaps)
-                beatmaps.Restore(beatmap);
-        }
+        public void Restore(BeatmapInfo beatmap) => beatmaps.Restore(beatmap);
 
         /// <summary>
         /// Returns a <see cref="BeatmapSetInfo"/> to a usable state if it has previously been deleted but not yet purged.
@@ -293,8 +287,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to restore.</param>
         public void Undelete(BeatmapSetInfo beatmapSet)
         {
-            lock (beatmaps)
-                if (!beatmaps.Undelete(beatmapSet)) return;
+            if (!beatmaps.Undelete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
                 files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
@@ -368,8 +361,7 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public List<BeatmapSetInfo> QueryBeatmapSets(Func<BeatmapSetInfo, bool> query)
         {
-            lock (beatmaps)
-                return beatmaps.QueryAndPopulate(query);
+            return beatmaps.QueryAndPopulate(query);
         }
 
         /// <summary>
