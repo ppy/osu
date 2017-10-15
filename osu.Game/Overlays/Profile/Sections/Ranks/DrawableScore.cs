@@ -13,9 +13,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Leaderboards;
 using System.Linq;
 using osu.Framework.Localisation;
-using System.Globalization;
 using osu.Game.Rulesets.Scoring;
-using System;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
