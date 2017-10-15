@@ -138,9 +138,8 @@ namespace osu.Game.Tests.Beatmaps.IO
             var set = queryBeatmapSets().First();
 
             foreach (BeatmapInfo b in set.Beatmaps)
-                Assert.IsTrue(set.Beatmaps.Any(c => c.OnlineBeatmapID == b.OnlineBeatmapID));
 
-            Assert.IsTrue(set.Beatmaps.Count > 0);
+                Assert.IsTrue(set.Beatmaps.Count > 0);
 
             var beatmap = store.GetWorkingBeatmap(set.Beatmaps.First(b => b.RulesetID == 0))?.Beatmap;
             Assert.IsTrue(beatmap?.HitObjects.Count > 0);
