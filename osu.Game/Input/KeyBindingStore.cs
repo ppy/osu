@@ -67,7 +67,7 @@ namespace osu.Game.Input
         public void Update(KeyBinding keyBinding)
         {
             var dbKeyBinding = Connection.DatabasedKeyBinding.FirstOrDefault(kb => kb.ToString() == keyBinding.ToString());
-            if (dbKeyBinding!=null)
+            if (dbKeyBinding != null)
             {
                 dbKeyBinding.KeyCombination = keyBinding.KeyCombination;
                 dbKeyBinding.Action = keyBinding.Action;
