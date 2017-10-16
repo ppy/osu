@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
 
@@ -51,7 +50,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to add.</param>
         public void Add(BeatmapSetInfo beatmapSet)
         {
-            Connection.BeatmapSetInfo.Update(beatmapSet);
+            Connection.BeatmapSetInfo.Add(beatmapSet);
             Connection.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
@@ -67,7 +66,7 @@ namespace osu.Game.Beatmaps
             if (beatmapSet.DeletePending) return false;
 
             beatmapSet.DeletePending = true;
-            Connection.BeatmapSetInfo.Remove(beatmapSet);
+            Connection.BeatmapSetInfo.Update(beatmapSet);
             Connection.SaveChanges();
 
             BeatmapSetRemoved?.Invoke(beatmapSet);
@@ -85,6 +84,7 @@ namespace osu.Game.Beatmaps
 
             beatmapSet.DeletePending = false;
             Connection.BeatmapSetInfo.Update(beatmapSet);
+            Connection.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
             return true;
@@ -101,6 +101,7 @@ namespace osu.Game.Beatmaps
 
             beatmap.Hidden = true;
             Connection.BeatmapInfo.Update(beatmap);
+            Connection.SaveChanges();
 
             BeatmapHidden?.Invoke(beatmap);
             return true;
@@ -117,6 +118,7 @@ namespace osu.Game.Beatmaps
 
             beatmap.Hidden = false;
             Connection.BeatmapInfo.Update(beatmap);
+            Connection.SaveChanges();
 
             BeatmapRestored?.Invoke(beatmap);
             return true;
@@ -125,46 +127,21 @@ namespace osu.Game.Beatmaps
         private void cleanupPendingDeletions()
         {
             Connection.BeatmapSetInfo.RemoveRange(Connection.BeatmapSetInfo.Where(b => b.DeletePending && !b.Protected));
+            Connection.SaveChanges();
         }
 
-        public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query)
-        {
-            return Connection.BeatmapSetInfo
-                .Include(b => b.Metadata)
-                .Include(b => b.Beatmaps).ThenInclude(b => b.Ruleset)
-                .Include(b => b.Beatmaps).ThenInclude(b => b.Difficulty)
-                .Include(b => b.Files).ThenInclude(f => f.FileInfo)
-                .FirstOrDefault(query);
-        }
+        public IEnumerable<BeatmapSetInfo> BeatmapSets => Connection.BeatmapSetInfo
+                                                                    .Include(s => s.Metadata)
+                                                                    .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
+                                                                    .Include(s => s.Beatmaps).ThenInclude(b => b.Difficulty)
+                                                                    .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                                                                    .Include(s => s.Files).ThenInclude(f => f.FileInfo)
+                                                                    .Where(s => !s.DeletePending);
 
-        public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query)
-        {
-            return Connection.BeatmapSetInfo
-                .Include(b => b.Metadata)
-                .Include(b => b.Beatmaps).ThenInclude(b => b.Ruleset)
-                .Include(b => b.Beatmaps).ThenInclude(b => b.Difficulty)
-                .Include(b => b.Files).ThenInclude(f => f.FileInfo)
-                .Where(query).ToList();
-        }
-
-        public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
-        {
-            return Connection.BeatmapInfo
-                .Include(b => b.BeatmapSet)
-                .Include(b => b.Metadata)
-                .Include(b => b.Ruleset)
-                .Include(b => b.Difficulty)
-                .FirstOrDefault(query);
-        }
-
-        public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query)
-        {
-            return Connection.BeatmapInfo
-                .Include(b => b.BeatmapSet)
-                .Include(b => b.Metadata)
-                .Include(b => b.Ruleset)
-                .Include(b => b.Difficulty)
-                .Where(query).ToList();
-        }
+        public IEnumerable<BeatmapInfo> Beatmaps => Connection.BeatmapInfo
+                                                              .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
+                                                              .Include(b => b.Metadata)
+                                                              .Include(b => b.Ruleset)
+                                                              .Include(b => b.Difficulty);
     }
 }
