@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Logging;
@@ -49,46 +48,6 @@ namespace osu.Game.Database
         /// Reset this database to a default state. Undo all changes to database and storage backings.
         /// </summary>
         public void Reset() => Prepare(true);
-
-        public List<T> Query<T>(Func<T, bool> filter = null) where T : class
-        {
-            checkType(typeof(T));
-
-            var dbSet = Connection.GetType().GetProperties().Single(property => property.PropertyType == typeof(DbSet<T>)).GetValue(Connection) as DbSet<T>;
-            var query = dbSet.ToList();
-
-            if (filter != null)
-                query = query.Where(filter).ToList();
-
-            return query;
-        }
-
-        /// <summary>
-        /// Query and populate results.
-        /// </summary>
-        /// <param name="filter">An filter to refine results.</param>
-        /// <returns></returns>
-        public List<T> QueryAndPopulate<T>(Func<T, bool> filter)
-            where T : class, IPopulate
-        {
-            checkType(typeof(T));
-
-            var query = Query(filter);
-            foreach (var item in query)
-                Populate(item);
-            return query;
-        }
-
-        /// <summary>
-        /// Populate a database-backed item.
-        /// </summary>
-        /// <param name="item"></param>
-        public void Populate(IPopulate item)
-        {
-            checkType(item.GetType());
-
-            item.Populate(Connection);
-        }
 
         private void checkType(Type type)
         {
