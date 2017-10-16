@@ -4,12 +4,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using osu.Game.Database;
-using osu.Game.IO;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapSetInfo : IPopulate
+    public class BeatmapSetInfo
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
@@ -36,25 +34,5 @@ namespace osu.Game.Beatmaps
         public List<BeatmapSetFileInfo> Files { get; set; }
 
         public bool Protected { get; set; }
-
-        public void Populate(OsuDbContext connection)
-        {
-            var entry = connection.Entry(this);
-            entry.Collection<BeatmapInfo>(nameof(Beatmaps)).Load();
-            entry.Reference<BeatmapMetadata>(nameof(Metadata)).Load();
-            entry.Collection<BeatmapSetFileInfo>(nameof(Files)).Load();
-
-            foreach (var beatmap in Beatmaps)
-            {
-                var beatmapEntry = connection.Entry(beatmap);
-                beatmapEntry.Reference<BeatmapDifficulty>(nameof(beatmap.Difficulty)).Load();
-            }
-
-            foreach (var file in Files)
-            {
-                var fileEntry = connection.Entry(file);
-                fileEntry.Reference<FileInfo>(nameof(file.FileInfo)).Load();
-            }
-        }
     }
 }

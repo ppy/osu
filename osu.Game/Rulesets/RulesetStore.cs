@@ -42,14 +42,14 @@ namespace osu.Game.Rulesets
             {
                 Connection.Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
             }
-
+            
             var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo()));
 
             //add all legacy modes in correct order
             foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
             {
                 var rulesetInfo = createRulesetInfo(r);
-                if (Connection.RulesetInfo.SingleOrDefault(rsi => rsi.ID == rulesetInfo.ID) == null)
+                if (Connection.RulesetInfo.SingleOrDefault(rsi=>rsi.ID==rulesetInfo.ID)==null)
                 {
                     Connection.RulesetInfo.Add(rulesetInfo);
                 }
@@ -108,6 +108,19 @@ namespace osu.Game.Rulesets
 
         protected override Type[] ValidTypes => new[] { typeof(RulesetInfo) };
 
-        public RulesetInfo GetRuleset(int id) => Query<RulesetInfo>().First(r => r.ID == id);
+        public RulesetInfo GetRuleset(int id) => Connection.RulesetInfo.First(r => r.ID == id);
+
+        public RulesetInfo QueryRulesetInfo(Func<RulesetInfo, bool> query)
+        {
+            return Connection.RulesetInfo.FirstOrDefault(query);
+        }
+
+        public List<RulesetInfo> QueryRulesets(Func<RulesetInfo, bool> query = null)
+        {
+            var rulesets = Connection.RulesetInfo;
+            if (query != null)
+                return rulesets.Where(query).ToList();
+            return rulesets.ToList();
+        }
     }
 }

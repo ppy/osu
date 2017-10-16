@@ -277,7 +277,6 @@
     <Compile Include="Beatmaps\Drawables\BeatmapPanel.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
-    <Compile Include="Database\IPopulate.cs" />
     <Compile Include="Migrations\20171014052545_Init.cs" />
     <Compile Include="Migrations\20171014052545_Init.designer.cs">
       <DependentUpon>20171014052545_Init.cs</DependentUpon>

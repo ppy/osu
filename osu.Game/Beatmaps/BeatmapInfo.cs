@@ -6,13 +6,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
-using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IPopulate
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
@@ -125,11 +124,5 @@ namespace osu.Game.Beatmaps
         public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
                                                       BeatmapSet.Hash == other.BeatmapSet.Hash &&
                                                       (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
-
-        public void Populate(OsuDbContext connection)
-        {
-            var entry = connection.Entry(this);
-            entry.Reference<BeatmapDifficulty>(nameof(Difficulty));
-        }
     }
 }
