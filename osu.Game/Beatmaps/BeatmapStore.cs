@@ -73,11 +73,6 @@ namespace osu.Game.Beatmaps
             if (beatmapSet.DeletePending) return false;
 
             beatmapSet.DeletePending = true;
-
-            // We can't use one to one relationship with its cascade delete because FileInfo can be used not only inside of BeatmapSetFileInfo
-            var files = beatmapSet.Files.Select(beatmapSetFileInfo => beatmapSetFileInfo.FileInfo);
-            Connection.FileInfo.RemoveRange(files);
-
             Connection.BeatmapSetInfo.Remove(beatmapSet);
             Connection.SaveChanges();
 

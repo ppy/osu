@@ -23,7 +23,6 @@
     <TargetZone>LocalIntranet</TargetZone>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -279,9 +278,9 @@
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Database\IPopulate.cs" />
-    <Compile Include="Migrations\20171015101238_Init.cs" />
-    <Compile Include="Migrations\20171015101238_Init.designer.cs">
-      <DependentUpon>20171015101238_Init.cs</DependentUpon>
+    <Compile Include="Migrations\20171014052545_Init.cs" />
+    <Compile Include="Migrations\20171014052545_Init.designer.cs">
+      <DependentUpon>20171014052545_Init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
