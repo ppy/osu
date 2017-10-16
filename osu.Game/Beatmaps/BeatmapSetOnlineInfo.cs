@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
 namespace osu.Game.Beatmaps
@@ -30,7 +29,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The different sizes of cover art for this beatmap set.
         /// </summary>
-        [Required, JsonProperty(@"covers")]
+        [JsonProperty(@"covers")]
         public BeatmapSetOnlineCovers Covers { get; set; }
 
         /// <summary>
