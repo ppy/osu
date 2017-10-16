@@ -36,7 +36,6 @@ namespace osu.Game.Database
         /// </summary>
         protected virtual void StartupTasks()
         {
-
         }
 
         /// <summary>
