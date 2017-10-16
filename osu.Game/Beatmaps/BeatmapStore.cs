@@ -26,14 +26,6 @@ namespace osu.Game.Beatmaps
         {
         }
 
-        protected override Type[] ValidTypes => new[]
-        {
-            typeof(BeatmapSetInfo),
-            typeof(BeatmapInfo),
-            typeof(BeatmapMetadata),
-            typeof(BeatmapDifficulty),
-        };
-
         protected override void Prepare(bool reset = false)
         {
             if (reset)

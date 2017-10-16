@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -47,13 +46,5 @@ namespace osu.Game.Database
         /// Reset this database to a default state. Undo all changes to database and storage backings.
         /// </summary>
         public void Reset() => Prepare(true);
-
-        private void checkType(Type type)
-        {
-            if (!ValidTypes.Contains(type))
-                throw new InvalidOperationException($"The requested operation specified a type of {type}, which is invalid for this {nameof(DatabaseBackedStore)}.");
-        }
-
-        protected abstract Type[] ValidTypes { get; }
     }
 }

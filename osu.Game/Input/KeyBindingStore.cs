@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -56,11 +55,6 @@ namespace osu.Game.Input
                 }
             }
         }
-
-        protected override Type[] ValidTypes => new[]
-        {
-            typeof(DatabasedKeyBinding)
-        };
 
         public List<KeyBinding> Query(int? rulesetId = null, int? variant = null) =>
             new List<KeyBinding>(Connection.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant));
