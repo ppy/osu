@@ -22,14 +22,29 @@ namespace osu.Game.Database
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
         private readonly string connectionString;
 
-        public OsuDbContext()
+        static OsuDbContext()
         {
-            connectionString = "DataSource=:memory:";
+            // required to initialise native SQLite libraries on some platforms.
+            SQLitePCL.Batteries_V2.Init();
         }
 
-        public OsuDbContext(string connectionString)
+        /// <summary>
+        /// Create a new OsuDbContext instance.
+        /// </summary>
+        /// <param name="connectionString">A valid SQLite connection string. If not provided, an in-memory instance will be created.</param>
+        public OsuDbContext(string connectionString = "DataSource=:memory:")
         {
             this.connectionString = connectionString;
+
+            Database.SetCommandTimeout(new TimeSpan(TimeSpan.TicksPerSecond * 10));
+
+            var connection = Database.GetDbConnection();
+            connection.Open();
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = "PRAGMA journal_mode=WAL;";
+                cmd.ExecuteNonQuery();
+            }
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
