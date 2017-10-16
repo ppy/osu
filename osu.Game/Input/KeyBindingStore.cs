@@ -30,7 +30,8 @@ namespace osu.Game.Input
 
         protected override void Prepare(bool reset = false)
         {
-            Connection.Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
+            if (reset)
+                Connection.Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
         }
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
