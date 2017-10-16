@@ -38,11 +38,13 @@ namespace osu.Game.Input
             // compare counts in database vs defaults
             foreach (var group in defaults.GroupBy(k => k.Action))
             {
-                int count;
-                while (group.Count() > (count = Query(rulesetId, variant).Count(k => (int)k.Action == (int)group.Key)))
-                {
-                    var insertable = group.Skip(count).First();
+                int count = Query(rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
+                int aimCount = group.Count();
 
+                if (aimCount <= count)
+                    continue;
+
+                foreach (var insertable in group.Skip(count).Take(aimCount - count))
                     // insert any defaults which are missing.
                     Connection.DatabasedKeyBinding.Add(new DatabasedKeyBinding
                     {
@@ -51,22 +53,22 @@ namespace osu.Game.Input
                         RulesetID = rulesetId,
                         Variant = variant
                     });
-                    Connection.SaveChanges();
-                }
             }
+
+            Connection.SaveChanges();
         }
 
-        public List<KeyBinding> Query(int? rulesetId = null, int? variant = null) =>
-            new List<KeyBinding>(Connection.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant));
+        /// <summary>
+        /// Retrieve <see cref="KeyBinding"/>s for a specified ruleset/variant content.
+        /// </summary>
+        /// <param name="rulesetId">The ruleset's internal ID.</param>
+        /// <param name="variant">An optional variant.</param>
+        /// <returns></returns>
+        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) => Connection.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant);
 
         public void Update(KeyBinding keyBinding)
         {
-            var dbKeyBinding = Connection.DatabasedKeyBinding.FirstOrDefault(kb => kb.ToString() == keyBinding.ToString());
-            if (dbKeyBinding != null)
-            {
-                dbKeyBinding.KeyCombination = keyBinding.KeyCombination;
-                dbKeyBinding.Action = keyBinding.Action;
-            }
+            Connection.Update(keyBinding);
             Connection.SaveChanges();
         }
     }
