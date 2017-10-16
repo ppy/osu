@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using Microsoft.EntityFrameworkCore;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 
@@ -17,7 +16,6 @@ namespace osu.Game.Database
         {
             Storage = storage;
             Connection = connection;
-            Connection.Database.SetCommandTimeout(new TimeSpan(TimeSpan.TicksPerSecond * 10));
 
             try
             {
