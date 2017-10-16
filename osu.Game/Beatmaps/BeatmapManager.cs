@@ -60,8 +60,6 @@ namespace osu.Game.Beatmaps
 
         private readonly FileStore files;
 
-        private readonly OsuDbContext connection;
-
         private readonly RulesetStore rulesets;
 
         private readonly BeatmapStore beatmaps;
@@ -93,7 +91,6 @@ namespace osu.Game.Beatmaps
 
             this.storage = storage;
             this.files = files;
-            this.connection = connection;
             this.rulesets = rulesets;
             this.api = api;
 
@@ -164,7 +161,7 @@ namespace osu.Game.Beatmaps
         /// <param name="archiveReader">The beatmap to be imported.</param>
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
-            BeatmapSetInfo set = null;
+            BeatmapSetInfo set;
 
             // let's only allow one concurrent import at a time for now.
             lock (importLock)
