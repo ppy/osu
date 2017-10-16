@@ -81,21 +81,7 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-        private OsuDbContext createDbContext()
-        {
-            SQLitePCL.Batteries.Init();
-            var connectionString = Host.Storage.GetDatabaseConnectionString(@"client");
-            var context = new OsuDbContext(connectionString);
-            var connection = context.Database.GetDbConnection();
-            connection.Open();
-            using (var command = connection.CreateCommand())
-            {
-                command.CommandText = "PRAGMA journal_mode=WAL;";
-                command.ExecuteNonQuery();
-            }
-            context.Database.SetCommandTimeout(new TimeSpan(TimeSpan.TicksPerSecond * 10));
-            return context;
-        }
+        private OsuDbContext createDbContext() => new OsuDbContext(Host.Storage.GetDatabaseConnectionString(@"client"));
 
         [BackgroundDependencyLoader]
         private void load()
