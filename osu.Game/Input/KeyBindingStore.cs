@@ -17,7 +17,7 @@ namespace osu.Game.Input
         public KeyBindingStore(OsuDbContext connection, RulesetStore rulesets, Storage storage = null)
             : base(connection, storage)
         {
-            foreach (var info in rulesets.AllRulesets)
+            foreach (var info in rulesets.AvailableRulesets)
             {
                 var ruleset = info.CreateInstance();
                 foreach (var variant in ruleset.AvailableVariants)

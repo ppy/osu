@@ -474,10 +474,11 @@ namespace osu.Game.Beatmaps
                     // TODO: Diff beatmap metadata with set metadata and leave it here if necessary
                     beatmap.BeatmapInfo.Metadata = null;
 
+                    RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
+
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
-                    beatmap.BeatmapInfo.Ruleset = rulesets.QueryRulesetInfo(r => r.ID == beatmap.BeatmapInfo.RulesetID);
-                    beatmap.BeatmapInfo.StarDifficulty = rulesets.QueryRulesetInfo(r => r.ID == beatmap.BeatmapInfo.RulesetID)?.CreateInstance()?.CreateDifficultyCalculator(beatmap)
-                                                                 .Calculate() ?? 0;
+                    beatmap.BeatmapInfo.Ruleset = ruleset;
+                    beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance()?.CreateDifficultyCalculator(beatmap).Calculate() ?? 0;
 
                     beatmapSet.Beatmaps.Add(beatmap.BeatmapInfo);
                 }
