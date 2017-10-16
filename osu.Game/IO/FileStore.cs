@@ -85,23 +85,22 @@ namespace osu.Game.IO
 
         public void Reference(params FileInfo[] files)
         {
-            var incrementedFiles = files.GroupBy(f => f.ID).Select(f =>
+            foreach (var f in files.GroupBy(f => f.ID))
             {
-                var accurateRefCount = Connection.Find<FileInfo>(f.First().ID);
-                accurateRefCount.ReferenceCount += f.Count();
-                return accurateRefCount;
-            });
+                var refetch = Connection.Find<FileInfo>(f.First().ID);
+                refetch.ReferenceCount += f.Count();
+            }
+
             Connection.SaveChanges();
         }
 
         public void Dereference(params FileInfo[] files)
         {
-            var incrementedFiles = files.GroupBy(f => f.ID).Select(f =>
+            foreach (var f in files.GroupBy(f => f.ID))
             {
                 var accurateRefCount = Connection.Find<FileInfo>(f.First().ID);
                 accurateRefCount.ReferenceCount -= f.Count();
-                return accurateRefCount;
-            });
+            }
 
             Connection.SaveChanges();
         }
