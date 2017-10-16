@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets, OsuGame game)
         {
-            foreach (var r in rulesets.AllRulesets)
+            foreach (var r in rulesets.AvailableRulesets)
             {
                 modeButtons.Add(new ToolbarModeButton
                 {

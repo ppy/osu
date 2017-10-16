@@ -18,13 +18,6 @@ namespace osu.Game.Rulesets
     {
         private static readonly Dictionary<Assembly, Type> loaded_assemblies = new Dictionary<Assembly, Type>();
 
-        public IEnumerable<RulesetInfo> AllRulesets => Connection.RulesetInfo.Where(r => r.Available);
-
-        public RulesetStore(OsuDbContext connection)
-            : base(connection)
-        {
-        }
-
         static RulesetStore()
         {
             AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
@@ -32,6 +25,23 @@ namespace osu.Game.Rulesets
             foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll"))
                 loadRulesetFromFile(file);
         }
+
+        public RulesetStore(OsuDbContext connection)
+            : base(connection)
+        {
+        }
+
+        /// <summary>
+        /// Retrieve a ruleset using a known ID.
+        /// </summary>
+        /// <param name="id">The ruleset's internal ID.</param>
+        /// <returns>A ruleset, if available, else null.</returns>
+        public RulesetInfo GetRuleset(int id) => AvailableRulesets.FirstOrDefault(r => r.ID == id);
+
+        /// <summary>
+        /// All available rulesets.
+        /// </summary>
+        public IEnumerable<RulesetInfo> AvailableRulesets => Connection.RulesetInfo.Where(r => r.Available);
 
         private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
 
@@ -44,7 +54,7 @@ namespace osu.Game.Rulesets
                 Connection.Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
             }
 
-            var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo()));
+            var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo())).ToList();
 
             //add all legacy modes in correct order
             foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
@@ -55,6 +65,7 @@ namespace osu.Game.Rulesets
                     Connection.RulesetInfo.Add(rulesetInfo);
                 }
             }
+
             Connection.SaveChanges();
 
             //add any other modes
@@ -67,6 +78,7 @@ namespace osu.Game.Rulesets
                 if (existing == null)
                     Connection.RulesetInfo.Add(us);
             }
+
             Connection.SaveChanges();
 
             //perform a consistency check
@@ -82,6 +94,7 @@ namespace osu.Game.Rulesets
                     r.Available = false;
                 }
             }
+
             Connection.SaveChanges();
         }
 
@@ -108,20 +121,5 @@ namespace osu.Game.Rulesets
             InstantiationInfo = ruleset.GetType().AssemblyQualifiedName,
             ID = ruleset.LegacyID
         };
-
-        public RulesetInfo GetRuleset(int id) => Connection.RulesetInfo.First(r => r.ID == id);
-
-        public RulesetInfo QueryRulesetInfo(Func<RulesetInfo, bool> query)
-        {
-            return Connection.RulesetInfo.FirstOrDefault(query);
-        }
-
-        public List<RulesetInfo> QueryRulesets(Func<RulesetInfo, bool> query = null)
-        {
-            var rulesets = Connection.RulesetInfo;
-            if (query != null)
-                return rulesets.Where(query).ToList();
-            return rulesets.ToList();
-        }
     }
 }
