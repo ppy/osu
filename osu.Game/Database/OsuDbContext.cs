@@ -80,7 +80,10 @@ namespace osu.Game.Database
 
             public ILogger CreateLogger(string categoryName) => new OsuDbLogger();
 
-            public void AddProvider(ILoggerProvider provider) => new OsuDbLoggerProvider();
+            public void AddProvider(ILoggerProvider provider)
+            {
+                throw new NotImplementedException();
+            }
 
             private class OsuDbLoggerProvider : ILoggerProvider
             {
