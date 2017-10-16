@@ -14,7 +14,6 @@ namespace osu.Game.Beatmaps
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
-        public int BeatmapInfoId { get; set; }
         public float DrainRate { get; set; } = DEFAULT_DIFFICULTY;
         public float CircleSize { get; set; } = DEFAULT_DIFFICULTY;
         public float OverallDifficulty { get; set; } = DEFAULT_DIFFICULTY;
