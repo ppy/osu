@@ -109,8 +109,6 @@ namespace osu.Game.Rulesets
             ID = ruleset.LegacyID
         };
 
-        protected override Type[] ValidTypes => new[] { typeof(RulesetInfo) };
-
         public RulesetInfo GetRuleset(int id) => Connection.RulesetInfo.First(r => r.ID == id);
 
         public RulesetInfo QueryRulesetInfo(Func<RulesetInfo, bool> query)

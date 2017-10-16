@@ -27,10 +27,6 @@ namespace osu.Game.IO
             Store = new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), prefix);
         }
 
-        protected override Type[] ValidTypes => new[] {
-            typeof(FileInfo),
-        };
-
         protected override void Prepare(bool reset = false)
         {
             if (reset)
