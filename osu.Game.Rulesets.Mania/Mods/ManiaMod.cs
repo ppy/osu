@@ -174,7 +174,10 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
     }
-
+   public class ManiaModHardRock : ModSecret
+    {
+        public override double ScoreMultiplier => 42.00;
+    }
     public class ManiaModAutoplay : ModAutoplay<ManiaHitObject>
     {
         private int availableColumns;
