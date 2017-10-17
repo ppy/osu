@@ -165,6 +165,8 @@ namespace osu.Game.Beatmaps
 
         private readonly object importLock = new object();
 
+        private OsuDbContext importContext;
+
         /// <summary>
         /// Import a beatmap from an <see cref="ArchiveReader"/>.
         /// </summary>
@@ -174,7 +176,7 @@ namespace osu.Game.Beatmaps
             // let's only allow one concurrent import at a time for now.
             lock (importLock)
             {
-                var context = createContext();
+                var context = importContext ?? (importContext = createContext());
 
                 context.Database.AutoTransactionsEnabled = false;
 
@@ -190,9 +192,9 @@ namespace osu.Game.Beatmaps
                     {
                         iBeatmaps.Add(set);
                         context.SaveChanges();
-                        transaction.Commit();
                     }
 
+                    transaction.Commit();
                     return set;
                 }
             }
