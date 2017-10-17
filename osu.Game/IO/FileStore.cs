@@ -22,7 +22,7 @@ namespace osu.Game.IO
 
         public readonly ResourceStore<byte[]> Store;
 
-        public FileStore(OsuDbContext connection, Storage storage) : base(connection, storage)
+        public FileStore(OsuDbContext context, Storage storage) : base(context, storage)
         {
             Store = new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), prefix);
         }
@@ -34,7 +34,7 @@ namespace osu.Game.IO
                 if (Storage.ExistsDirectory(prefix))
                     Storage.DeleteDirectory(prefix);
 
-                Connection.Database.ExecuteSqlCommand("DELETE FROM FileInfo");
+                Context.Database.ExecuteSqlCommand("DELETE FROM FileInfo");
             }
         }
 
@@ -48,7 +48,7 @@ namespace osu.Game.IO
         {
             string hash = data.ComputeSHA2Hash();
 
-            var existing = Connection.FileInfo.FirstOrDefault(f => f.Hash == hash);
+            var existing = Context.FileInfo.FirstOrDefault(f => f.Hash == hash);
 
             var info = existing ?? new FileInfo { Hash = hash };
 
@@ -75,34 +75,34 @@ namespace osu.Game.IO
         {
             foreach (var f in files.GroupBy(f => f.ID))
             {
-                var refetch = Connection.Find<FileInfo>(f.First().ID) ?? f.First();
+                var refetch = Context.Find<FileInfo>(f.First().ID) ?? f.First();
                 refetch.ReferenceCount += f.Count();
-                Connection.FileInfo.Update(refetch);
+                Context.FileInfo.Update(refetch);
             }
 
-            Connection.SaveChanges();
+            Context.SaveChanges();
         }
 
         public void Dereference(params FileInfo[] files)
         {
             foreach (var f in files.GroupBy(f => f.ID))
             {
-                var refetch = Connection.Find<FileInfo>(f.First().ID);
+                var refetch = Context.Find<FileInfo>(f.First().ID);
                 refetch.ReferenceCount -= f.Count();
-                Connection.Update(refetch);
+                Context.Update(refetch);
             }
 
-            Connection.SaveChanges();
+            Context.SaveChanges();
         }
 
         private void deletePending()
         {
-            foreach (var f in Connection.FileInfo.Where(f => f.ReferenceCount < 1))
+            foreach (var f in Context.FileInfo.Where(f => f.ReferenceCount < 1))
             {
                 try
                 {
                     Storage.Delete(Path.Combine(prefix, f.StoragePath));
-                    Connection.FileInfo.Remove(f);
+                    Context.FileInfo.Remove(f);
                 }
                 catch (Exception e)
                 {
@@ -110,7 +110,7 @@ namespace osu.Game.IO
                 }
             }
 
-            Connection.SaveChanges();
+            Context.SaveChanges();
         }
     }
 }

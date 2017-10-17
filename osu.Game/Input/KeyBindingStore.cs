@@ -14,8 +14,8 @@ namespace osu.Game.Input
 {
     public class KeyBindingStore : DatabaseBackedStore
     {
-        public KeyBindingStore(OsuDbContext connection, RulesetStore rulesets, Storage storage = null)
-            : base(connection, storage)
+        public KeyBindingStore(OsuDbContext context, RulesetStore rulesets, Storage storage = null)
+            : base(context, storage)
         {
             foreach (var info in rulesets.AvailableRulesets)
             {
@@ -30,7 +30,7 @@ namespace osu.Game.Input
         protected override void Prepare(bool reset = false)
         {
             if (reset)
-                Connection.Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
+                Context.Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
         }
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
@@ -46,7 +46,7 @@ namespace osu.Game.Input
 
                 foreach (var insertable in group.Skip(count).Take(aimCount - count))
                     // insert any defaults which are missing.
-                    Connection.DatabasedKeyBinding.Add(new DatabasedKeyBinding
+                    Context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
                     {
                         KeyCombination = insertable.KeyCombination,
                         Action = insertable.Action,
@@ -55,7 +55,7 @@ namespace osu.Game.Input
                     });
             }
 
-            Connection.SaveChanges();
+            Context.SaveChanges();
         }
 
         /// <summary>
@@ -64,12 +64,12 @@ namespace osu.Game.Input
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
-        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) => Connection.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant);
+        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) => Context.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant);
 
         public void Update(KeyBinding keyBinding)
         {
-            Connection.Update(keyBinding);
-            Connection.SaveChanges();
+            Context.Update(keyBinding);
+            Context.SaveChanges();
         }
     }
 }
