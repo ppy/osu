@@ -29,10 +29,18 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Create a new in-memory OsuDbContext instance.
+        /// </summary>
+        public OsuDbContext() : this("DataSource=:memory:")
+        {
+            // required for tooling (see https://wildermuth.com/2017/07/06/Program-cs-in-ASP-NET-Core-2-0).
+        }
+
+        /// <summary>
         /// Create a new OsuDbContext instance.
         /// </summary>
-        /// <param name="connectionString">A valid SQLite connection string. If not provided, an in-memory instance will be created.</param>
-        public OsuDbContext(string connectionString = "DataSource=:memory:")
+        /// <param name="connectionString">A valid SQLite connection string.</param>
+        public OsuDbContext(string connectionString)
         {
             this.connectionString = connectionString;
 
@@ -82,7 +90,7 @@ namespace osu.Game.Database
 
             public void AddProvider(ILoggerProvider provider)
             {
-                throw new NotImplementedException();
+                // no-op. called by tooling.
             }
 
             private class OsuDbLoggerProvider : ILoggerProvider
