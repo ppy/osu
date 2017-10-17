@@ -32,7 +32,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Perform any common startup tasks. Runs after <see cref="Prepare(bool)"/> and <see cref="PerformMigration(int, int)"/>.
+        /// Perform any common startup tasks. Runs after <see cref="Prepare(bool)"/>.
         /// </summary>
         protected virtual void StartupTasks()
         {
