@@ -10,12 +10,12 @@ namespace osu.Game.Database
     public abstract class DatabaseBackedStore
     {
         protected readonly Storage Storage;
-        protected readonly OsuDbContext Connection;
+        protected readonly OsuDbContext Context;
 
-        protected DatabaseBackedStore(OsuDbContext connection, Storage storage = null)
+        protected DatabaseBackedStore(OsuDbContext context, Storage storage = null)
         {
             Storage = storage;
-            Connection = connection;
+            Context = context;
 
             try
             {

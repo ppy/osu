@@ -80,9 +80,9 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
-        public BeatmapManager(Storage storage, FileStore files, OsuDbContext connection, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
+        public BeatmapManager(Storage storage, FileStore files, OsuDbContext context, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
         {
-            beatmaps = new BeatmapStore(connection);
+            beatmaps = new BeatmapStore(context);
             beatmaps.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
             beatmaps.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
             beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);

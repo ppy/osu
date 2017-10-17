@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets
                 loadRulesetFromFile(file);
         }
 
-        public RulesetStore(OsuDbContext connection)
-            : base(connection)
+        public RulesetStore(OsuDbContext context)
+            : base(context)
         {
         }
 
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// All available rulesets.
         /// </summary>
-        public IEnumerable<RulesetInfo> AvailableRulesets => Connection.RulesetInfo.Where(r => r.Available);
+        public IEnumerable<RulesetInfo> AvailableRulesets => Context.RulesetInfo.Where(r => r.Available);
 
         private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
 
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets
         {
             if (reset)
             {
-                Connection.Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
+                Context.Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
             }
 
             var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo())).ToList();
@@ -60,29 +60,29 @@ namespace osu.Game.Rulesets
             foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
             {
                 var rulesetInfo = createRulesetInfo(r);
-                if (Connection.RulesetInfo.SingleOrDefault(rsi => rsi.ID == rulesetInfo.ID) == null)
+                if (Context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == rulesetInfo.ID) == null)
                 {
-                    Connection.RulesetInfo.Add(rulesetInfo);
+                    Context.RulesetInfo.Add(rulesetInfo);
                 }
             }
 
-            Connection.SaveChanges();
+            Context.SaveChanges();
 
             //add any other modes
             foreach (var r in instances.Where(r => r.LegacyID < 0))
             {
                 var us = createRulesetInfo(r);
 
-                var existing = Connection.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == us.InstantiationInfo);
+                var existing = Context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == us.InstantiationInfo);
 
                 if (existing == null)
-                    Connection.RulesetInfo.Add(us);
+                    Context.RulesetInfo.Add(us);
             }
 
-            Connection.SaveChanges();
+            Context.SaveChanges();
 
             //perform a consistency check
-            foreach (var r in Connection.RulesetInfo)
+            foreach (var r in Context.RulesetInfo)
             {
                 try
                 {
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets
                 }
             }
 
-            Connection.SaveChanges();
+            Context.SaveChanges();
         }
 
         private static void loadRulesetFromFile(string file)

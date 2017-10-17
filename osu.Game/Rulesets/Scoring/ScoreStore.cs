@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Scoring
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
-        public ScoreStore(Storage storage, OsuDbContext connection, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(connection)
+        public ScoreStore(Storage storage, OsuDbContext context, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(context)
         {
             this.storage = storage;
             this.beatmaps = beatmaps;
