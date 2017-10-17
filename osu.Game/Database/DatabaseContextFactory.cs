@@ -14,6 +14,6 @@ namespace osu.Game.Database
             this.host = host;
         }
 
-        public OsuDbContext GetContext() => new OsuDbContext(host.Storage.GetDatabaseConnectionString(@"client"));
+        public OsuDbContext GetContext() => new OsuDbContext(host.Storage.GetDatabaseConnectionString(@"client-ef"));
     }
 }
