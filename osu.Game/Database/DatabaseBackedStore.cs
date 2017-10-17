@@ -26,6 +26,8 @@ namespace osu.Game.Database
                 Logger.Error(e, $@"Failed to initialise the {GetType()}! Trying again with a clean database...");
                 Prepare(true);
             }
+
+            StartupTasks();
         }
 
         /// <summary>
