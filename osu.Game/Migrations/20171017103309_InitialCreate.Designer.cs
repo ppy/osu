@@ -10,7 +10,7 @@ using System;
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    [Migration("20171017092037_InitialCreate")]
+    [Migration("20171017103309_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -95,6 +95,8 @@ namespace osu.Game.Migrations
 
                     b.HasIndex("BeatmapSetInfoID");
 
+                    b.HasIndex("Hash");
+
                     b.HasIndex("MD5Hash");
 
                     b.HasIndex("RulesetID");
@@ -178,6 +180,8 @@ namespace osu.Game.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("DeletePending");
+
+                    b.HasIndex("Hash");
 
                     b.ToTable("BeatmapSetInfo");
                 });

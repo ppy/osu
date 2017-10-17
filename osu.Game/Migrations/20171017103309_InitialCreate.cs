@@ -212,6 +212,11 @@ namespace osu.Game.Migrations
                 column: "BeatmapSetInfoID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BeatmapInfo_Hash",
+                table: "BeatmapInfo",
+                column: "Hash");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BeatmapInfo_MD5Hash",
                 table: "BeatmapInfo",
                 column: "MD5Hash");
@@ -247,6 +252,11 @@ namespace osu.Game.Migrations
                 name: "IX_BeatmapSetInfo_DeletePending",
                 table: "BeatmapSetInfo",
                 column: "DeletePending");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BeatmapSetInfo_Hash",
+                table: "BeatmapSetInfo",
+                column: "Hash");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FileInfo_Hash",

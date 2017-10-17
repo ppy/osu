@@ -66,7 +66,9 @@ namespace osu.Game.Database
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
+            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash);
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.Variant);
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.IntAction);
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.Hash).IsUnique();

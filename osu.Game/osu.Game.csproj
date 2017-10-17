@@ -286,9 +286,9 @@
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
-    <Compile Include="Migrations\20171017092037_InitialCreate.cs" />
-    <Compile Include="Migrations\20171017092037_InitialCreate.designer.cs">
-      <DependentUpon>20171017092037_InitialCreate.cs</DependentUpon>
+    <Compile Include="Migrations\20171017103309_InitialCreate.cs" />
+    <Compile Include="Migrations\20171017103309_InitialCreate.designer.cs">
+      <DependentUpon>20171017103309_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
