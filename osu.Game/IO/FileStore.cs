@@ -65,10 +65,6 @@ namespace osu.Game.IO
                 data.Seek(0, SeekOrigin.Begin);
             }
 
-            if (existing == null)
-                // SaveChanges is performed in Reference.
-                Connection.FileInfo.Add(info);
-
             if (reference || existing == null)
                 Reference(info);
 
@@ -79,9 +75,9 @@ namespace osu.Game.IO
         {
             foreach (var f in files.GroupBy(f => f.ID))
             {
-                var refetch = Connection.Find<FileInfo>(f.First().ID);
+                var refetch = Connection.Find<FileInfo>(f.First().ID) ?? f.First();
                 refetch.ReferenceCount += f.Count();
-                Connection.Update(refetch);
+                Connection.FileInfo.Update(refetch);
             }
 
             Connection.SaveChanges();
