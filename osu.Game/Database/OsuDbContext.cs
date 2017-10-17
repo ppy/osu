@@ -74,6 +74,9 @@ namespace osu.Game.Database
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Name).IsUnique();
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.InstantiationInfo).IsUnique();
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Available);
+
+            modelBuilder.Entity<BeatmapMetadata>().HasOne(m => m.BeatmapSetInfo).WithOne(s => s.Metadata).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<BeatmapMetadata>().HasOne(m => m.BeatmapInfo).WithOne(b => b.Metadata).OnDelete(DeleteBehavior.Cascade);
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory

@@ -16,6 +16,14 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public int? OnlineBeatmapSetID { get; set; }
 
+        public int? BeatmapSetInfoID { get; set; }
+
+        public BeatmapSetInfo BeatmapSetInfo { get; set; }
+
+        public int? BeatmapInfoID { get; set; }
+
+        public BeatmapInfo BeatmapInfo { get; set; }
+
         public string Title { get; set; }
         public string TitleUnicode { get; set; }
         public string Artist { get; set; }
