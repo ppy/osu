@@ -50,7 +50,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to add.</param>
         public void Add(BeatmapSetInfo beatmapSet)
         {
-            Connection.BeatmapSetInfo.Add(beatmapSet);
+            Connection.BeatmapSetInfo.Attach(beatmapSet);
             Connection.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
@@ -135,8 +135,7 @@ namespace osu.Game.Beatmaps
                                                                     .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
                                                                     .Include(s => s.Beatmaps).ThenInclude(b => b.Difficulty)
                                                                     .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                                                                    .Include(s => s.Files).ThenInclude(f => f.FileInfo)
-                                                                    .Where(s => !s.DeletePending);
+                                                                    .Include(s => s.Files).ThenInclude(f => f.FileInfo);
 
         public IEnumerable<BeatmapInfo> Beatmaps => Connection.BeatmapInfo
                                                               .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)

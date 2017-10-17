@@ -66,10 +66,8 @@ namespace osu.Game.IO
             }
 
             if (existing == null)
-            {
+                // SaveChanges is performed in Reference.
                 Connection.FileInfo.Add(info);
-                Connection.SaveChanges();
-            }
 
             if (reference || existing == null)
                 Reference(info);

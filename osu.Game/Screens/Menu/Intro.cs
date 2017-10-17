@@ -89,7 +89,6 @@ namespace osu.Game.Screens.Menu
                 {
                     // we need to import the default menu background beatmap
                     setInfo = beatmaps.Import(new OszArchiveReader(game.Resources.GetStream(@"Tracks/circles.osz")));
-
                     setInfo.Protected = true;
                 }
             }
