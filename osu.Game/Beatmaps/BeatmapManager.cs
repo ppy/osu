@@ -501,7 +501,7 @@ namespace osu.Game.Beatmaps
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
             lock (beatmaps)
-                return beatmaps.BeatmapSets.ToList();
+                return beatmaps.BeatmapSets.Where(s => !s.DeletePending).ToList();
         }
 
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
