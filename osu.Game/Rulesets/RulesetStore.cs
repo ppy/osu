@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets
         /// <summary>
         /// All available rulesets.
         /// </summary>
-        public IEnumerable<RulesetInfo> AvailableRulesets => Context.RulesetInfo.Where(r => r.Available);
+        public IEnumerable<RulesetInfo> AvailableRulesets => GetContext().RulesetInfo.Where(r => r.Available);
 
         private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
 
@@ -49,9 +49,11 @@ namespace osu.Game.Rulesets
 
         protected override void Prepare(bool reset = false)
         {
+            var context = GetContext();
+
             if (reset)
             {
-                Context.Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
+                context.Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
             }
 
             var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo())).ToList();
@@ -60,29 +62,29 @@ namespace osu.Game.Rulesets
             foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
             {
                 var rulesetInfo = createRulesetInfo(r);
-                if (Context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == rulesetInfo.ID) == null)
+                if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == rulesetInfo.ID) == null)
                 {
-                    Context.RulesetInfo.Add(rulesetInfo);
+                    context.RulesetInfo.Add(rulesetInfo);
                 }
             }
 
-            Context.SaveChanges();
+            context.SaveChanges();
 
             //add any other modes
             foreach (var r in instances.Where(r => r.LegacyID < 0))
             {
                 var us = createRulesetInfo(r);
 
-                var existing = Context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == us.InstantiationInfo);
+                var existing = context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == us.InstantiationInfo);
 
                 if (existing == null)
-                    Context.RulesetInfo.Add(us);
+                    context.RulesetInfo.Add(us);
             }
 
-            Context.SaveChanges();
+            context.SaveChanges();
 
             //perform a consistency check
-            foreach (var r in Context.RulesetInfo)
+            foreach (var r in context.RulesetInfo)
             {
                 try
                 {
@@ -95,7 +97,7 @@ namespace osu.Game.Rulesets
                 }
             }
 
-            Context.SaveChanges();
+            context.SaveChanges();
         }
 
         private static void loadRulesetFromFile(string file)
