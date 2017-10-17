@@ -29,12 +29,14 @@ namespace osu.Game.Beatmaps
         {
             if (reset)
             {
+                var context = GetContext();
+
                 // https://stackoverflow.com/a/10450893
-                Context.Database.ExecuteSqlCommand("DELETE FROM BeatmapMetadata");
-                Context.Database.ExecuteSqlCommand("DELETE FROM BeatmapDifficulty");
-                Context.Database.ExecuteSqlCommand("DELETE FROM BeatmapSetInfo");
-                Context.Database.ExecuteSqlCommand("DELETE FROM BeatmapSetFileInfo");
-                Context.Database.ExecuteSqlCommand("DELETE FROM BeatmapInfo");
+                context.Database.ExecuteSqlCommand("DELETE FROM BeatmapMetadata");
+                context.Database.ExecuteSqlCommand("DELETE FROM BeatmapDifficulty");
+                context.Database.ExecuteSqlCommand("DELETE FROM BeatmapSetInfo");
+                context.Database.ExecuteSqlCommand("DELETE FROM BeatmapSetFileInfo");
+                context.Database.ExecuteSqlCommand("DELETE FROM BeatmapInfo");
             }
         }
 
@@ -50,8 +52,10 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to add.</param>
         public void Add(BeatmapSetInfo beatmapSet)
         {
-            Context.BeatmapSetInfo.Attach(beatmapSet);
-            Context.SaveChanges();
+            var context = GetContext();
+
+            context.BeatmapSetInfo.Attach(beatmapSet);
+            context.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
         }
@@ -63,11 +67,13 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the beatmap's <see cref="BeatmapSetInfo.DeletePending"/> was changed.</returns>
         public bool Delete(BeatmapSetInfo beatmapSet)
         {
+            var context = GetContext();
+
             if (beatmapSet.DeletePending) return false;
 
             beatmapSet.DeletePending = true;
-            Context.BeatmapSetInfo.Update(beatmapSet);
-            Context.SaveChanges();
+            context.BeatmapSetInfo.Update(beatmapSet);
+            context.SaveChanges();
 
             BeatmapSetRemoved?.Invoke(beatmapSet);
             return true;
@@ -80,11 +86,13 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the beatmap's <see cref="BeatmapSetInfo.DeletePending"/> was changed.</returns>
         public bool Undelete(BeatmapSetInfo beatmapSet)
         {
+            var context = GetContext();
+
             if (!beatmapSet.DeletePending) return false;
 
             beatmapSet.DeletePending = false;
-            Context.BeatmapSetInfo.Update(beatmapSet);
-            Context.SaveChanges();
+            context.BeatmapSetInfo.Update(beatmapSet);
+            context.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
             return true;
@@ -97,11 +105,13 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the beatmap's <see cref="BeatmapInfo.Hidden"/> was changed.</returns>
         public bool Hide(BeatmapInfo beatmap)
         {
+            var context = GetContext();
+
             if (beatmap.Hidden) return false;
 
             beatmap.Hidden = true;
-            Context.BeatmapInfo.Update(beatmap);
-            Context.SaveChanges();
+            context.BeatmapInfo.Update(beatmap);
+            context.SaveChanges();
 
             BeatmapHidden?.Invoke(beatmap);
             return true;
@@ -114,11 +124,13 @@ namespace osu.Game.Beatmaps
         /// <returns>Whether the beatmap's <see cref="BeatmapInfo.Hidden"/> was changed.</returns>
         public bool Restore(BeatmapInfo beatmap)
         {
+            var context = GetContext();
+
             if (!beatmap.Hidden) return false;
 
             beatmap.Hidden = false;
-            Context.BeatmapInfo.Update(beatmap);
-            Context.SaveChanges();
+            context.BeatmapInfo.Update(beatmap);
+            context.SaveChanges();
 
             BeatmapRestored?.Invoke(beatmap);
             return true;
@@ -126,21 +138,23 @@ namespace osu.Game.Beatmaps
 
         private void cleanupPendingDeletions()
         {
-            Context.BeatmapSetInfo.RemoveRange(Context.BeatmapSetInfo.Where(b => b.DeletePending && !b.Protected));
-            Context.SaveChanges();
+            var context = GetContext();
+
+            context.BeatmapSetInfo.RemoveRange(context.BeatmapSetInfo.Where(b => b.DeletePending && !b.Protected));
+            context.SaveChanges();
         }
 
-        public IEnumerable<BeatmapSetInfo> BeatmapSets => Context.BeatmapSetInfo
-                                                                    .Include(s => s.Metadata)
-                                                                    .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
-                                                                    .Include(s => s.Beatmaps).ThenInclude(b => b.Difficulty)
-                                                                    .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                                                                    .Include(s => s.Files).ThenInclude(f => f.FileInfo);
+        public IEnumerable<BeatmapSetInfo> BeatmapSets => GetContext().BeatmapSetInfo
+                                                                      .Include(s => s.Metadata)
+                                                                      .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
+                                                                      .Include(s => s.Beatmaps).ThenInclude(b => b.Difficulty)
+                                                                      .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                                                                      .Include(s => s.Files).ThenInclude(f => f.FileInfo);
 
-        public IEnumerable<BeatmapInfo> Beatmaps => Context.BeatmapInfo
-                                                              .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
-                                                              .Include(b => b.Metadata)
-                                                              .Include(b => b.Ruleset)
-                                                              .Include(b => b.Difficulty);
+        public IEnumerable<BeatmapInfo> Beatmaps => GetContext().BeatmapInfo
+                                                                .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
+                                                                .Include(b => b.Metadata)
+                                                                .Include(b => b.Ruleset)
+                                                                .Include(b => b.Difficulty);
     }
 }

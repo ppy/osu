@@ -11,14 +11,12 @@ namespace osu.Game.Database
     {
         protected readonly Storage Storage;
 
-        private readonly Func<OsuDbContext> contextSource;
+        protected readonly Func<OsuDbContext> GetContext;
 
-        protected OsuDbContext Context => contextSource();
-
-        protected DatabaseBackedStore(Func<OsuDbContext> contextSource, Storage storage = null)
+        protected DatabaseBackedStore(Func<OsuDbContext> getContext, Storage storage = null)
         {
             Storage = storage;
-            this.contextSource = contextSource;
+            GetContext = getContext;
 
             try
             {

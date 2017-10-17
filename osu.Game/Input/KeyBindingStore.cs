@@ -15,9 +15,16 @@ namespace osu.Game.Input
 {
     public class KeyBindingStore : DatabaseBackedStore
     {
-        public KeyBindingStore(Func<OsuDbContext> contextSource, RulesetStore rulesets, Storage storage = null)
-            : base(contextSource, storage)
+        /// <summary>
+        /// As we do a lot of lookups, let's share a context between them to hopefully improve performance.
+        /// </summary>
+        private readonly OsuDbContext queryContext;
+
+        public KeyBindingStore(Func<OsuDbContext> getContext, RulesetStore rulesets, Storage storage = null)
+            : base(getContext, storage)
         {
+            queryContext = GetContext();
+
             foreach (var info in rulesets.AvailableRulesets)
             {
                 var ruleset = info.CreateInstance();
@@ -31,15 +38,17 @@ namespace osu.Game.Input
         protected override void Prepare(bool reset = false)
         {
             if (reset)
-                Context.Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
+                GetContext().Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
         }
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
+            var context = GetContext();
+
             // compare counts in database vs defaults
             foreach (var group in defaults.GroupBy(k => k.Action))
             {
-                int count = Query(rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
+                int count = query(context, rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
                 int aimCount = group.Count();
 
                 if (aimCount <= count)
@@ -47,7 +56,7 @@ namespace osu.Game.Input
 
                 foreach (var insertable in group.Skip(count).Take(aimCount - count))
                     // insert any defaults which are missing.
-                    Context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
+                    context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
                     {
                         KeyCombination = insertable.KeyCombination,
                         Action = insertable.Action,
@@ -56,7 +65,7 @@ namespace osu.Game.Input
                     });
             }
 
-            Context.SaveChanges();
+            context.SaveChanges();
         }
 
         /// <summary>
@@ -65,12 +74,16 @@ namespace osu.Game.Input
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
-        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) => Context.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant);
+        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) => query(queryContext, rulesetId, variant);
+
+        private IEnumerable<KeyBinding> query(OsuDbContext context, int? rulesetId = null, int? variant = null) =>
+            context.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant);
 
         public void Update(KeyBinding keyBinding)
         {
-            Context.Update(keyBinding);
-            Context.SaveChanges();
+            var context = GetContext();
+            context.Update(keyBinding);
+            context.SaveChanges();
         }
     }
 }
