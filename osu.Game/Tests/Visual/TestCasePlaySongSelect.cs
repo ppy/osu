@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Allocation;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -36,9 +37,11 @@ namespace osu.Game.Tests.Visual
             {
                 var storage = new TestStorage(@"TestCasePlaySongSelect");
 
-                var dbConnectionString = storage.GetDatabaseConnectionString(@"client");
+                // this is by no means clean. should be replacing inside of OsuGameBase somehow.
+                var context = new OsuDbContext(storage.GetDatabaseConnectionString(@"client"));
+                context.Database.Migrate();
 
-                Func<OsuDbContext> contextFactory = () => new OsuDbContext(dbConnectionString);
+                Func<OsuDbContext> contextFactory = () => context;
 
                 dependencies.Cache(rulesets = new RulesetStore(contextFactory));
                 dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null));
