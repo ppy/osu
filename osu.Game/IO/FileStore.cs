@@ -22,7 +22,7 @@ namespace osu.Game.IO
 
         public readonly ResourceStore<byte[]> Store;
 
-        public FileStore(OsuDbContext context, Storage storage) : base(context, storage)
+        public FileStore(Func<OsuDbContext> contextSource, Storage storage) : base(contextSource, storage)
         {
             Store = new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), prefix);
         }

@@ -57,6 +57,18 @@ namespace osu.Game.Beatmaps
 
         private readonly Storage storage;
 
+        private BeatmapStore createBeatmapStore(Func<OsuDbContext> context)
+        {
+            var store = new BeatmapStore(context);
+            store.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
+            store.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
+            store.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
+            store.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
+            return store;
+        }
+
+        private readonly Func<OsuDbContext> createContext;
+
         private readonly FileStore files;
 
         private readonly RulesetStore rulesets;
@@ -80,16 +92,13 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
-        public BeatmapManager(Storage storage, FileStore files, OsuDbContext context, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
+        public BeatmapManager(Storage storage, Func<OsuDbContext> context, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
         {
-            beatmaps = new BeatmapStore(context);
-            beatmaps.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
-            beatmaps.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
-            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
-            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
+            createContext = context;
+            beatmaps = createBeatmapStore(context);
+            files = new FileStore(context, storage);
 
             this.storage = storage;
-            this.files = files;
             this.rulesets = rulesets;
             this.api = api;
 
@@ -160,13 +169,24 @@ namespace osu.Game.Beatmaps
         /// <param name="archiveReader">The beatmap to be imported.</param>
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
-            BeatmapSetInfo set;
-
             // let's only allow one concurrent import at a time for now.
             lock (importLock)
-                Import(set = importToStorage(archiveReader));
+            {
+                var context = createContext();
 
-            return set;
+                using (var transaction = context.Database.BeginTransaction())
+                {
+                    // create local stores so we can isolate and thread safely, and share a context/transaction.
+                    var filesForImport = new FileStore(() => context, storage);
+                    var beatmapsForImport = createBeatmapStore(() => context);
+
+                    BeatmapSetInfo set = importToStorage(filesForImport, archiveReader);
+                    beatmapsForImport.Add(set);
+                    context.SaveChanges();
+                    transaction.Commit();
+                    return set;
+                }
+            }
         }
 
         /// <summary>
@@ -178,8 +198,7 @@ namespace osu.Game.Beatmaps
             // If we have an ID then we already exist in the database.
             if (beatmapSetInfo.ID != 0) return;
 
-            lock (beatmaps)
-                beatmaps.Add(beatmapSetInfo);
+            createBeatmapStore(createContext).Add(beatmapSetInfo);
         }
 
         /// <summary>
@@ -323,15 +342,6 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Reset the manager to an empty state.
-        /// </summary>
-        public void Reset()
-        {
-            lock (beatmaps)
-                beatmaps.Reset();
-        }
-
-        /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapSetInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
@@ -400,7 +410,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="reader">The beatmap archive to be read.</param>
         /// <returns>The imported beatmap, or an existing instance if it is already present.</returns>
-        private BeatmapSetInfo importToStorage(ArchiveReader reader)
+        private BeatmapSetInfo importToStorage(FileStore files, ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));

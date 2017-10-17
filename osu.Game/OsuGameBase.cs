@@ -81,16 +81,18 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-        private OsuDbContext createDbContext() => new OsuDbContext(Host.Storage.GetDatabaseConnectionString(@"client"));
+        private DatabaseContextFactory contextFactory;
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
+
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            using (var dbContext = createDbContext())
-                dbContext.Database.Migrate();
+            using (var context = contextFactory.GetContext())
+                context.Database.Migrate();
 
             dependencies.Cache(API = new APIAccess
             {
@@ -98,11 +100,11 @@ namespace osu.Game
                 Token = LocalConfig.Get<string>(OsuSetting.Token)
             });
 
-            dependencies.Cache(RulesetStore = new RulesetStore(createDbContext()));
-            dependencies.Cache(FileStore = new FileStore(createDbContext(), Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, createDbContext(), RulesetStore, API, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, createDbContext(), Host, BeatmapManager, RulesetStore));
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(createDbContext(), RulesetStore));
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory.GetContext));
+            dependencies.Cache(FileStore = new FileStore(contextFactory.GetContext, Host.Storage));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory.GetContext, RulesetStore, API, Host));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory.GetContext, Host, BeatmapManager, RulesetStore));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory.GetContext, RulesetStore));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.

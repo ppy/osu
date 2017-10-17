@@ -10,12 +10,15 @@ namespace osu.Game.Database
     public abstract class DatabaseBackedStore
     {
         protected readonly Storage Storage;
-        protected readonly OsuDbContext Context;
 
-        protected DatabaseBackedStore(OsuDbContext context, Storage storage = null)
+        private readonly Func<OsuDbContext> contextSource;
+
+        protected OsuDbContext Context => contextSource();
+
+        protected DatabaseBackedStore(Func<OsuDbContext> contextSource, Storage storage = null)
         {
             Storage = storage;
-            Context = context;
+            this.contextSource = contextSource;
 
             try
             {

@@ -1,13 +1,13 @@
 // Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Filter;
@@ -25,8 +25,6 @@ namespace osu.Game.Tests.Visual
 
         private DependencyContainer dependencies;
 
-        private FileStore files;
-
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
 
         [BackgroundDependencyLoader]
@@ -40,9 +38,10 @@ namespace osu.Game.Tests.Visual
 
                 var dbConnectionString = storage.GetDatabaseConnectionString(@"client");
 
-                dependencies.Cache(rulesets = new RulesetStore(new OsuDbContext(dbConnectionString)));
-                dependencies.Cache(files = new FileStore(new OsuDbContext(dbConnectionString), storage));
-                dependencies.Cache(manager = new BeatmapManager(storage, files, new OsuDbContext(dbConnectionString), rulesets, null));
+                Func<OsuDbContext> contextFactory = () => new OsuDbContext(dbConnectionString);
+
+                dependencies.Cache(rulesets = new RulesetStore(contextFactory));
+                dependencies.Cache(manager = new BeatmapManager(storage, contextFactory, rulesets, null));
 
                 for (int i = 0; i < 100; i += 10)
                     manager.Import(createTestBeatmapSet(i));
