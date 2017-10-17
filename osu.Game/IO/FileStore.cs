@@ -38,12 +38,6 @@ namespace osu.Game.IO
             }
         }
 
-        protected override void StartupTasks()
-        {
-            base.StartupTasks();
-            deletePending();
-        }
-
         public FileInfo Add(Stream data, bool reference = true)
         {
             var context = GetContext();
@@ -101,7 +95,7 @@ namespace osu.Game.IO
             context.SaveChanges();
         }
 
-        private void deletePending()
+        public override void Cleanup()
         {
             var context = GetContext();
 

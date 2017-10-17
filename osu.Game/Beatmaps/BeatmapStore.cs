@@ -40,12 +40,6 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        protected override void StartupTasks()
-        {
-            base.StartupTasks();
-            cleanupPendingDeletions();
-        }
-
         /// <summary>
         /// Add a <see cref="BeatmapSetInfo"/> to the database.
         /// </summary>
@@ -136,7 +130,7 @@ namespace osu.Game.Beatmaps
             return true;
         }
 
-        private void cleanupPendingDeletions()
+        public override void Cleanup()
         {
             var context = GetContext();
 

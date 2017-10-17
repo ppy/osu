@@ -160,6 +160,8 @@ namespace osu.Game
             };
 
             API.Register(this);
+
+            FileStore.Cleanup();
         }
 
         private WorkingBeatmap lastBeatmap;
