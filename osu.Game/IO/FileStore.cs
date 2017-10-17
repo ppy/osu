@@ -31,10 +31,6 @@ namespace osu.Game.IO
         {
             if (reset)
             {
-                // in earlier versions we stored beatmaps as solid archives, but not any more.
-                if (Storage.ExistsDirectory("beatmaps"))
-                    Storage.DeleteDirectory("beatmaps");
-
                 if (Storage.ExistsDirectory(prefix))
                     Storage.DeleteDirectory(prefix);
 
@@ -70,12 +66,14 @@ namespace osu.Game.IO
             }
 
             if (existing == null)
+            {
                 Connection.FileInfo.Add(info);
+                Connection.SaveChanges();
+            }
 
             if (reference || existing == null)
                 Reference(info);
 
-            Connection.SaveChanges();
             return info;
         }
 
@@ -85,6 +83,7 @@ namespace osu.Game.IO
             {
                 var refetch = Connection.Find<FileInfo>(f.First().ID);
                 refetch.ReferenceCount += f.Count();
+                Connection.Update(refetch);
             }
 
             Connection.SaveChanges();
@@ -94,8 +93,9 @@ namespace osu.Game.IO
         {
             foreach (var f in files.GroupBy(f => f.ID))
             {
-                var accurateRefCount = Connection.Find<FileInfo>(f.First().ID);
-                accurateRefCount.ReferenceCount -= f.Count();
+                var refetch = Connection.Find<FileInfo>(f.First().ID);
+                refetch.ReferenceCount -= f.Count();
+                Connection.Update(refetch);
             }
 
             Connection.SaveChanges();
@@ -115,6 +115,8 @@ namespace osu.Game.IO
                     Logger.Error(e, $@"Could not delete beatmap {f}");
                 }
             }
+
+            Connection.SaveChanges();
         }
     }
 }
