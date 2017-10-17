@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -14,8 +15,8 @@ namespace osu.Game.Input
 {
     public class KeyBindingStore : DatabaseBackedStore
     {
-        public KeyBindingStore(OsuDbContext context, RulesetStore rulesets, Storage storage = null)
-            : base(context, storage)
+        public KeyBindingStore(Func<OsuDbContext> contextSource, RulesetStore rulesets, Storage storage = null)
+            : base(contextSource, storage)
         {
             foreach (var info in rulesets.AvailableRulesets)
             {

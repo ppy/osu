@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Platform;
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Scoring
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
-        public ScoreStore(Storage storage, OsuDbContext context, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(context)
+        public ScoreStore(Storage storage, Func<OsuDbContext> factory, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(factory)
         {
             this.storage = storage;
             this.beatmaps = beatmaps;

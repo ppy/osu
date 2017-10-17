@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets
                 loadRulesetFromFile(file);
         }
 
-        public RulesetStore(OsuDbContext context)
-            : base(context)
+        public RulesetStore(Func<OsuDbContext> factory)
+            : base(factory)
         {
         }
 
