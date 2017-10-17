@@ -27,14 +27,12 @@ namespace osu.Game.Database
                 Logger.Error(e, $@"Failed to initialise the {GetType()}! Trying again with a clean database...");
                 Prepare(true);
             }
-
-            StartupTasks();
         }
 
         /// <summary>
-        /// Perform any common startup tasks. Runs after <see cref="Prepare(bool)"/>.
+        /// Perform any common clean-up tasks. Should be run when idle, or whenever necessary.
         /// </summary>
-        protected virtual void StartupTasks()
+        public virtual void Cleanup()
         {
         }
 

@@ -104,6 +104,8 @@ namespace osu.Game.Beatmaps
 
             if (importHost != null)
                 ipc = new BeatmapIPCChannel(importHost, this);
+
+            beatmaps.Cleanup();
         }
 
         /// <summary>
