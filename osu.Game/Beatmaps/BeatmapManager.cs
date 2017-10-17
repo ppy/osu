@@ -98,7 +98,7 @@ namespace osu.Game.Beatmaps
             beatmaps = createBeatmapStore(context);
             files = new FileStore(context, storage);
 
-            this.storage = storage;
+            this.storage = files.Storage;
             this.rulesets = rulesets;
             this.api = api;
 
@@ -174,16 +174,23 @@ namespace osu.Game.Beatmaps
             {
                 var context = createContext();
 
+                context.Database.AutoTransactionsEnabled = false;
+
                 using (var transaction = context.Database.BeginTransaction())
                 {
                     // create local stores so we can isolate and thread safely, and share a context/transaction.
-                    var filesForImport = new FileStore(() => context, storage);
-                    var beatmapsForImport = createBeatmapStore(() => context);
+                    var iFiles = new FileStore(() => context, storage);
+                    var iBeatmaps = createBeatmapStore(() => context);
 
-                    BeatmapSetInfo set = importToStorage(filesForImport, archiveReader);
-                    beatmapsForImport.Add(set);
-                    context.SaveChanges();
-                    transaction.Commit();
+                    BeatmapSetInfo set = importToStorage(iFiles, iBeatmaps, archiveReader);
+
+                    if (set.ID == 0)
+                    {
+                        iBeatmaps.Add(set);
+                        context.SaveChanges();
+                        transaction.Commit();
+                    }
+
                     return set;
                 }
             }
@@ -308,7 +315,7 @@ namespace osu.Game.Beatmaps
         /// Is a no-op for already usable beatmaps.
         /// </summary>
         /// <param name="beatmapSet">The beatmap to restore.</param>
-        public void Undelete(BeatmapSetInfo beatmapSet)
+        private void undelete(BeatmapStore beatmaps, FileStore files, BeatmapSetInfo beatmapSet)
         {
             lock (beatmaps)
                 if (!beatmaps.Undelete(beatmapSet)) return;
@@ -410,7 +417,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="reader">The beatmap archive to be read.</param>
         /// <returns>The imported beatmap, or an existing instance if it is already present.</returns>
-        private BeatmapSetInfo importToStorage(FileStore files, ArchiveReader reader)
+        private BeatmapSetInfo importToStorage(FileStore files, BeatmapStore beatmaps, ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
@@ -432,7 +439,7 @@ namespace osu.Game.Beatmaps
 
             if (beatmapSet != null)
             {
-                Undelete(beatmapSet);
+                undelete(beatmaps, files, beatmapSet);
 
                 // ensure all files are present and accessible
                 foreach (var f in beatmapSet.Files)
@@ -441,6 +448,8 @@ namespace osu.Game.Beatmaps
                         using (Stream s = reader.GetStream(f.Filename))
                             files.Add(s, false);
                 }
+
+                // todo: delete any files which shouldn't exist any more.
 
                 return beatmapSet;
             }
