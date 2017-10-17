@@ -15,16 +15,9 @@ namespace osu.Game.Input
 {
     public class KeyBindingStore : DatabaseBackedStore
     {
-        /// <summary>
-        /// As we do a lot of lookups, let's share a context between them to hopefully improve performance.
-        /// </summary>
-        private readonly OsuDbContext queryContext;
-
         public KeyBindingStore(Func<OsuDbContext> getContext, RulesetStore rulesets, Storage storage = null)
             : base(getContext, storage)
         {
-            queryContext = GetContext();
-
             foreach (var info in rulesets.AvailableRulesets)
             {
                 var ruleset = info.CreateInstance();
@@ -74,7 +67,7 @@ namespace osu.Game.Input
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
-        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) => query(queryContext, rulesetId, variant);
+        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) => query(GetContext(), rulesetId, variant);
 
         private IEnumerable<KeyBinding> query(OsuDbContext context, int? rulesetId = null, int? variant = null) =>
             context.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant);
