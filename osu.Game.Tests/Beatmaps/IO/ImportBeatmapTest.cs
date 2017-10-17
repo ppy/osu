@@ -95,8 +95,6 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private OsuGameBase loadOsu(GameHost host)
         {
-            host.Storage.DeleteDatabase(@"client");
-
             var osu = new OsuGameBase();
             Task.Run(() => host.Run(osu));
 
