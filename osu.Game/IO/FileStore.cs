@@ -18,21 +18,21 @@ namespace osu.Game.IO
     /// </summary>
     public class FileStore : DatabaseBackedStore
     {
-        private const string prefix = "files";
+        public readonly IResourceStore<byte[]> Store;
 
-        public readonly ResourceStore<byte[]> Store;
+        public Storage Storage => base.Storage;
 
-        public FileStore(Func<OsuDbContext> getContext, Storage storage) : base(getContext, storage)
+        public FileStore(Func<OsuDbContext> getContext, Storage storage) : base(getContext, storage.GetStorageForDirectory(@"files"))
         {
-            Store = new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), prefix);
+            Store = new StorageBackedResourceStore(Storage);
         }
 
         protected override void Prepare(bool reset = false)
         {
             if (reset)
             {
-                if (Storage.ExistsDirectory(prefix))
-                    Storage.DeleteDirectory(prefix);
+                if (Storage.ExistsDirectory(string.Empty))
+                    Storage.DeleteDirectory(string.Empty);
 
                 GetContext().Database.ExecuteSqlCommand("DELETE FROM FileInfo");
             }
@@ -54,7 +54,7 @@ namespace osu.Game.IO
 
             var info = existing ?? new FileInfo { Hash = hash };
 
-            string path = Path.Combine(prefix, info.StoragePath);
+            string path = info.StoragePath;
 
             // we may be re-adding a file to fix missing store entries.
             if (!Storage.Exists(path))
@@ -109,7 +109,7 @@ namespace osu.Game.IO
             {
                 try
                 {
-                    Storage.Delete(Path.Combine(prefix, f.StoragePath));
+                    Storage.Delete(f.StoragePath);
                     context.FileInfo.Remove(f);
                 }
                 catch (Exception e)
