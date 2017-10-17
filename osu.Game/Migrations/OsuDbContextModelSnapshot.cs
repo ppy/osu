@@ -94,6 +94,8 @@ namespace osu.Game.Migrations
 
                     b.HasIndex("BeatmapSetInfoID");
 
+                    b.HasIndex("Hash");
+
                     b.HasIndex("MD5Hash");
 
                     b.HasIndex("RulesetID");
@@ -177,6 +179,8 @@ namespace osu.Game.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("DeletePending");
+
+                    b.HasIndex("Hash");
 
                     b.ToTable("BeatmapSetInfo");
                 });
