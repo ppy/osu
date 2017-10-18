@@ -16,6 +16,7 @@ namespace osu.Game.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     DeletePending = table.Column<bool>(type: "INTEGER", nullable: false),
                     Hash = table.Column<string>(type: "TEXT", nullable: true),
+                    OnlineBeatmapSetID = table.Column<int>(type: "INTEGER", nullable: true),
                     Protected = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>

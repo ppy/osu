@@ -174,6 +174,8 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("Hash");
 
+                    b.Property<int?>("OnlineBeatmapSetID");
+
                     b.Property<bool>("Protected");
 
                     b.HasKey("ID");

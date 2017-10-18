@@ -10,7 +10,7 @@ using System;
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    [Migration("20171017103309_InitialCreate")]
+    [Migration("20171018125509_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -174,6 +174,8 @@ namespace osu.Game.Migrations
                     b.Property<bool>("DeletePending");
 
                     b.Property<string>("Hash");
+
+                    b.Property<int?>("OnlineBeatmapSetID");
 
                     b.Property<bool>("Protected");
 
