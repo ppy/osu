@@ -66,7 +66,6 @@ namespace osu.Game.Beatmaps
             if (beatmapSet.DeletePending) return false;
 
             beatmapSet.DeletePending = true;
-            context.BeatmapSetInfo.Update(beatmapSet);
             context.SaveChanges();
 
             BeatmapSetRemoved?.Invoke(beatmapSet);
@@ -85,7 +84,6 @@ namespace osu.Game.Beatmaps
             if (!beatmapSet.DeletePending) return false;
 
             beatmapSet.DeletePending = false;
-            context.BeatmapSetInfo.Update(beatmapSet);
             context.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
@@ -104,7 +102,6 @@ namespace osu.Game.Beatmaps
             if (beatmap.Hidden) return false;
 
             beatmap.Hidden = true;
-            context.BeatmapInfo.Update(beatmap);
             context.SaveChanges();
 
             BeatmapHidden?.Invoke(beatmap);
@@ -123,7 +120,6 @@ namespace osu.Game.Beatmaps
             if (!beatmap.Hidden) return false;
 
             beatmap.Hidden = false;
-            context.BeatmapInfo.Update(beatmap);
             context.SaveChanges();
 
             BeatmapRestored?.Invoke(beatmap);
