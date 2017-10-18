@@ -11,15 +11,13 @@ namespace osu.Game.Tests.Visual
     {
         public override void RunTest()
         {
-            Storage storage;
             using (var host = new HeadlessGameHost($"test-{Guid.NewGuid()}", realtime: false))
             {
-                storage = host.Storage;
                 host.Run(new OsuTestCaseTestRunner(this));
             }
 
             // clean up after each run
-            storage.DeleteDirectory(string.Empty);
+            //storage.DeleteDirectory(string.Empty);
         }
 
         public class OsuTestCaseTestRunner : OsuGameBase
