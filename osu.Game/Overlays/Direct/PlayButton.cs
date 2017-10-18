@@ -115,6 +115,7 @@ namespace osu.Game.Overlays.Direct
             {
                 Playing.Value = false;
                 Preview = null;
+                trackLoader = null;
             }
         }
 
