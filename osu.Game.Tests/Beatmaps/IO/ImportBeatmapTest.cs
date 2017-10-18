@@ -155,7 +155,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
         private void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
         {
-            Action waitAction = () => { while (!result()) Thread.Sleep(20); };
+            Action waitAction = () => { while (!result()) Thread.Sleep(200); };
             Assert.IsTrue(waitAction.BeginInvoke(null, null).AsyncWaitHandle.WaitOne(timeout), failureMessage);
         }
     }
