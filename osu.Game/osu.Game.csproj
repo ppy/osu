@@ -103,7 +103,6 @@
       <HintPath>$(SolutionDir)\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Data.Sqlite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Microsoft.Data.Sqlite.Core.2.0.0\lib\netstandard2.0\Microsoft.Data.Sqlite.dll</HintPath>
     </Reference>
@@ -200,10 +199,6 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\System.Runtime.CompilerServices.Unsafe.4.4.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple">
-      <HintPath>$(SolutionDir)\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
       <HintPath>$(SolutionDir)\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
