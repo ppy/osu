@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Ionic.Zip;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
@@ -95,6 +96,13 @@ namespace osu.Game.Beatmaps
         public BeatmapManager(Storage storage, Func<OsuDbContext> context, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
         {
             createContext = context;
+            importContext = new Lazy<OsuDbContext>(() =>
+            {
+                var c = createContext();
+                c.Database.AutoTransactionsEnabled = false;
+                return c;
+            });
+
             beatmaps = createBeatmapStore(context);
             files = new FileStore(context, storage);
 
@@ -163,9 +171,7 @@ namespace osu.Game.Beatmaps
             notification.State = ProgressNotificationState.Completed;
         }
 
-        private readonly object importLock = new object();
-
-        private OsuDbContext importContext;
+        private readonly Lazy<OsuDbContext> importContext;
 
         /// <summary>
         /// Import a beatmap from an <see cref="ArchiveReader"/>.
@@ -174,9 +180,9 @@ namespace osu.Game.Beatmaps
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
             // let's only allow one concurrent import at a time for now.
-            lock (importLock)
+            lock (importContext)
             {
-                var context = importContext ?? (importContext = createContext());
+                var context = importContext.Value;
 
                 context.Database.AutoTransactionsEnabled = false;
 
@@ -287,10 +293,33 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            if (!beatmaps.Delete(beatmapSet)) return;
+            lock (importContext)
+            {
+                var context = importContext.Value;
 
-            if (!beatmapSet.Protected)
-                files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+                using (var transaction = context.Database.BeginTransaction())
+                {
+                    context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                    // re-fetch the beatmap set on the import context.
+                    beatmapSet = context.BeatmapSetInfo.Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == beatmapSet.ID);
+
+                    // create local stores so we can isolate and thread safely, and share a context/transaction.
+                    var iFiles = new FileStore(() => context, storage);
+                    var iBeatmaps = createBeatmapStore(() => context);
+
+                    if (iBeatmaps.Delete(beatmapSet))
+                    {
+                        if (!beatmapSet.Protected)
+                            iFiles.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+                    }
+
+                    context.ChangeTracker.AutoDetectChangesEnabled = true;
+                    context.SaveChanges();
+
+                    transaction.Commit();
+                }
+            }
         }
 
         /// <summary>
@@ -587,9 +616,9 @@ namespace osu.Game.Beatmaps
 
         public void DeleteAll()
         {
-            var maps = GetAllUsableBeatmapSets().ToArray();
+            var maps = GetAllUsableBeatmapSets();
 
-            if (maps.Length == 0) return;
+            if (maps.Count == 0) return;
 
             var notification = new ProgressNotification
             {
@@ -607,8 +636,8 @@ namespace osu.Game.Beatmaps
                     // user requested abort
                     return;
 
-                notification.Text = $"Deleting ({i} of {maps.Length})";
-                notification.Progress = (float)++i / maps.Length;
+                notification.Text = $"Deleting ({i} of {maps.Count})";
+                notification.Progress = (float)++i / maps.Count;
                 Delete(b);
             }
 

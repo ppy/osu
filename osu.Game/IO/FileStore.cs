@@ -87,9 +87,9 @@ namespace osu.Game.IO
         {
             foreach (var f in files.GroupBy(f => f.ID))
             {
-                var refetch = context.Find<FileInfo>(f.First().ID);
+                var refetch = context.FileInfo.Find(f.Key);
                 refetch.ReferenceCount -= f.Count();
-                context.Update(refetch);
+                context.FileInfo.Update(refetch);
             }
 
             context.SaveChanges();
