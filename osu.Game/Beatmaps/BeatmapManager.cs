@@ -414,6 +414,7 @@ namespace osu.Game.Beatmaps
         private ArchiveReader getReaderFrom(string path)
         {
             if (ZipFile.IsZipFile(path))
+                // ReSharper disable once InconsistentlySynchronizedField
                 return new OszArchiveReader(storage.GetStream(path));
             return new LegacyFilesystemReader(path);
         }
