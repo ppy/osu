@@ -287,8 +287,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            lock (beatmaps)
-                if (!beatmaps.Delete(beatmapSet)) return;
+            if (!beatmaps.Delete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
                 files.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
@@ -298,21 +297,13 @@ namespace osu.Game.Beatmaps
         /// Delete a beatmap difficulty.
         /// </summary>
         /// <param name="beatmap">The beatmap difficulty to hide.</param>
-        public void Hide(BeatmapInfo beatmap)
-        {
-            lock (beatmaps)
-                beatmaps.Hide(beatmap);
-        }
+        public void Hide(BeatmapInfo beatmap) => beatmaps.Hide(beatmap);
 
         /// <summary>
         /// Restore a beatmap difficulty.
         /// </summary>
         /// <param name="beatmap">The beatmap difficulty to restore.</param>
-        public void Restore(BeatmapInfo beatmap)
-        {
-            lock (beatmaps)
-                beatmaps.Restore(beatmap);
-        }
+        public void Restore(BeatmapInfo beatmap) => beatmaps.Restore(beatmap);
 
         /// <summary>
         /// Returns a <see cref="BeatmapSetInfo"/> to a usable state if it has previously been deleted but not yet purged.
@@ -321,8 +312,7 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap to restore.</param>
         private void undelete(BeatmapStore beatmaps, FileStore files, BeatmapSetInfo beatmapSet)
         {
-            lock (beatmaps)
-                if (!beatmaps.Undelete(beatmapSet)) return;
+            if (!beatmaps.Undelete(beatmapSet)) return;
 
             if (!beatmapSet.Protected)
                 files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
@@ -357,11 +347,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query)
-        {
-            lock (beatmaps)
-                return beatmaps.BeatmapSets.FirstOrDefault(query);
-        }
+        public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query) => beatmaps.BeatmapSets.FirstOrDefault(query);
 
         /// <summary>
         /// Refresh an existing instance of a <see cref="BeatmapSetInfo"/> from the store.
@@ -375,33 +361,21 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapSetInfo> QueryBeatmapSets(Func<BeatmapSetInfo, bool> query)
-        {
-            lock (beatmaps)
-                return beatmaps.BeatmapSets.Where(query).ToList();
-        }
+        public List<BeatmapSetInfo> QueryBeatmapSets(Func<BeatmapSetInfo, bool> query) => beatmaps.BeatmapSets.Where(query).ToList();
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query)
-        {
-            lock (beatmaps)
-                return beatmaps.Beatmaps.FirstOrDefault(query);
-        }
+        public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query) => beatmaps.Beatmaps.FirstOrDefault(query);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapInfo> QueryBeatmaps(Func<BeatmapInfo, bool> query)
-        {
-            lock (beatmaps)
-                return beatmaps.Beatmaps.Where(query).ToList();
-        }
+        public List<BeatmapInfo> QueryBeatmaps(Func<BeatmapInfo, bool> query) => beatmaps.Beatmaps.Where(query).ToList();
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
@@ -437,9 +411,7 @@ namespace osu.Game.Beatmaps
             var hash = hashable.ComputeSHA2Hash();
 
             // check if this beatmap has already been imported and exit early if so.
-            BeatmapSetInfo beatmapSet;
-            lock (beatmaps)
-                beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.Hash == hash);
+            var beatmapSet = beatmaps.BeatmapSets.FirstOrDefault(b => b.Hash == hash);
 
             if (beatmapSet != null)
             {
@@ -523,8 +495,7 @@ namespace osu.Game.Beatmaps
         /// <returns>A list of available <see cref="BeatmapSetInfo"/>.</returns>
         public List<BeatmapSetInfo> GetAllUsableBeatmapSets()
         {
-            lock (beatmaps)
-                return beatmaps.BeatmapSets.Where(s => !s.DeletePending).ToList();
+            return beatmaps.BeatmapSets.Where(s => !s.DeletePending).ToList();
         }
 
         protected class BeatmapManagerWorkingBeatmap : WorkingBeatmap
