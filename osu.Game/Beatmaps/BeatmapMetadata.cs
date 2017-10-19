@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
@@ -16,18 +17,13 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public int? OnlineBeatmapSetID { get; set; }
 
-        public int? BeatmapSetInfoID { get; set; }
-
-        public BeatmapSetInfo BeatmapSetInfo { get; set; }
-
-        public int? BeatmapInfoID { get; set; }
-
-        public BeatmapInfo BeatmapInfo { get; set; }
-
         public string Title { get; set; }
         public string TitleUnicode { get; set; }
         public string Artist { get; set; }
         public string ArtistUnicode { get; set; }
+
+        public List<BeatmapInfo> Beatmaps { get; set; }
+        public List<BeatmapSetInfo> BeatmapSets { get; set; }
 
         /// <summary>
         /// Helper property to deserialize a username to <see cref="User"/>.

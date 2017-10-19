@@ -20,7 +20,6 @@ namespace osu.Game.Beatmaps
         public int BeatmapVersion;
 
         [JsonProperty("id")]
-        [NotMapped]
         public int? OnlineBeatmapID { get; set; }
 
         [JsonProperty("beatmapset_id")]
@@ -36,8 +35,7 @@ namespace osu.Game.Beatmaps
 
         public int BaseDifficultyID { get; set; }
 
-        [Required]
-        public BeatmapDifficulty Difficulty { get; set; }
+        public BeatmapDifficulty BaseDifficulty { get; set; }
 
         [NotMapped]
         public BeatmapMetrics Metrics { get; set; }
@@ -55,7 +53,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// MD5 is kept for legacy support (matching against replays, osu-web-10 etc.).
         /// </summary>
-        [NotMapped]
         [JsonProperty("file_md5")]
         public string MD5Hash { get; set; }
 

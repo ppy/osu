@@ -10,7 +10,7 @@ using System;
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    [Migration("20171018125509_InitialCreate")]
+    [Migration("20171019041408_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,8 +26,6 @@ namespace osu.Game.Migrations
 
                     b.Property<float>("ApproachRate");
 
-                    b.Property<int>("BeatmapInfoID");
-
                     b.Property<float>("CircleSize");
 
                     b.Property<float>("DrainRate");
@@ -39,9 +37,6 @@ namespace osu.Game.Migrations
                     b.Property<float>("SliderTickRate");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("BeatmapInfoID")
-                        .IsUnique();
 
                     b.ToTable("BeatmapDifficulty");
                 });
@@ -73,6 +68,10 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("MD5Hash");
 
+                    b.Property<int?>("MetadataID");
+
+                    b.Property<int?>("OnlineBeatmapID");
+
                     b.Property<string>("Path");
 
                     b.Property<int>("RulesetID");
@@ -93,11 +92,15 @@ namespace osu.Game.Migrations
 
                     b.HasKey("ID");
 
+                    b.HasIndex("BaseDifficultyID");
+
                     b.HasIndex("BeatmapSetInfoID");
 
                     b.HasIndex("Hash");
 
                     b.HasIndex("MD5Hash");
+
+                    b.HasIndex("MetadataID");
 
                     b.HasIndex("RulesetID");
 
@@ -120,10 +123,6 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("BackgroundFile");
 
-                    b.Property<int?>("BeatmapInfoID");
-
-                    b.Property<int?>("BeatmapSetInfoID");
-
                     b.Property<int>("PreviewTime");
 
                     b.Property<string>("Source");
@@ -135,12 +134,6 @@ namespace osu.Game.Migrations
                     b.Property<string>("TitleUnicode");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("BeatmapInfoID")
-                        .IsUnique();
-
-                    b.HasIndex("BeatmapSetInfoID")
-                        .IsUnique();
 
                     b.ToTable("BeatmapMetadata");
                 });
@@ -175,6 +168,8 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("Hash");
 
+                    b.Property<int?>("MetadataID");
+
                     b.Property<int?>("OnlineBeatmapSetID");
 
                     b.Property<bool>("Protected");
@@ -184,6 +179,8 @@ namespace osu.Game.Migrations
                     b.HasIndex("DeletePending");
 
                     b.HasIndex("Hash");
+
+                    b.HasIndex("MetadataID");
 
                     b.ToTable("BeatmapSetInfo");
                 });
@@ -246,46 +243,28 @@ namespace osu.Game.Migrations
 
                     b.HasIndex("Available");
 
-                    b.HasIndex("InstantiationInfo")
-                        .IsUnique();
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("RulesetInfo");
-                });
-
-            modelBuilder.Entity("osu.Game.Beatmaps.BeatmapDifficulty", b =>
-                {
-                    b.HasOne("osu.Game.Beatmaps.BeatmapInfo")
-                        .WithOne("Difficulty")
-                        .HasForeignKey("osu.Game.Beatmaps.BeatmapDifficulty", "BeatmapInfoID")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("osu.Game.Beatmaps.BeatmapInfo", b =>
                 {
+                    b.HasOne("osu.Game.Beatmaps.BeatmapDifficulty", "BaseDifficulty")
+                        .WithMany()
+                        .HasForeignKey("BaseDifficultyID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("osu.Game.Beatmaps.BeatmapSetInfo", "BeatmapSet")
                         .WithMany("Beatmaps")
                         .HasForeignKey("BeatmapSetInfoID")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("osu.Game.Beatmaps.BeatmapMetadata", "Metadata")
+                        .WithMany("Beatmaps")
+                        .HasForeignKey("MetadataID");
+
                     b.HasOne("osu.Game.Rulesets.RulesetInfo", "Ruleset")
                         .WithMany()
                         .HasForeignKey("RulesetID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("osu.Game.Beatmaps.BeatmapMetadata", b =>
-                {
-                    b.HasOne("osu.Game.Beatmaps.BeatmapInfo", "BeatmapInfo")
-                        .WithOne("Metadata")
-                        .HasForeignKey("osu.Game.Beatmaps.BeatmapMetadata", "BeatmapInfoID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("osu.Game.Beatmaps.BeatmapSetInfo", "BeatmapSetInfo")
-                        .WithOne("Metadata")
-                        .HasForeignKey("osu.Game.Beatmaps.BeatmapMetadata", "BeatmapSetInfoID")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -300,6 +279,13 @@ namespace osu.Game.Migrations
                         .WithMany()
                         .HasForeignKey("FileInfoID")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("osu.Game.Beatmaps.BeatmapSetInfo", b =>
+                {
+                    b.HasOne("osu.Game.Beatmaps.BeatmapMetadata", "Metadata")
+                        .WithMany("BeatmapSets")
+                        .HasForeignKey("MetadataID");
                 });
 #pragma warning restore 612, 618
         }

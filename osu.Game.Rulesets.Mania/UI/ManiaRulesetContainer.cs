@@ -88,18 +88,18 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter()
         {
             if (IsForCurrentRuleset)
-                AvailableColumns = (int)Math.Max(1, Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize));
+                AvailableColumns = (int)Math.Max(1, Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.CircleSize));
             else
             {
                 float percentSliderOrSpinner = (float)WorkingBeatmap.Beatmap.HitObjects.Count(h => h is IHasEndTime) / WorkingBeatmap.Beatmap.HitObjects.Count;
                 if (percentSliderOrSpinner < 0.2)
                     AvailableColumns = 7;
-                else if (percentSliderOrSpinner < 0.3 || Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.CircleSize) >= 5)
-                    AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) > 5 ? 7 : 6;
+                else if (percentSliderOrSpinner < 0.3 || Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.CircleSize) >= 5)
+                    AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) > 5 ? 7 : 6;
                 else if (percentSliderOrSpinner > 0.6)
-                    AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) > 4 ? 5 : 4;
+                    AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) > 4 ? 5 : 4;
                 else
-                    AvailableColumns = Math.Max(4, Math.Min((int)Math.Round(WorkingBeatmap.BeatmapInfo.Difficulty.OverallDifficulty) + 1, 7));
+                    AvailableColumns = Math.Max(4, Math.Min((int)Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) + 1, 7));
             }
 
             return new ManiaBeatmapConverter(IsForCurrentRuleset, AvailableColumns);

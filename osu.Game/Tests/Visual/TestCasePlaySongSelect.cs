@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual
                         Ruleset = rulesets.AvailableRulesets.First(),
                         Path = "normal.osu",
                         Version = "Normal",
-                        Difficulty = new BeatmapDifficulty
+                        BaseDifficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 3.5f,
                         }
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual
                         Ruleset = rulesets.AvailableRulesets.First(),
                         Path = "hard.osu",
                         Version = "Hard",
-                        Difficulty = new BeatmapDifficulty
+                        BaseDifficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 5,
                         }
@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual
                         Ruleset = rulesets.AvailableRulesets.First(),
                         Path = "insane.osu",
                         Version = "Insane",
-                        Difficulty = new BeatmapDifficulty
+                        BaseDifficulty = new BeatmapDifficulty
                         {
                             OverallDifficulty = 7,
                         }
