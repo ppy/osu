@@ -160,7 +160,14 @@ namespace osu.Game.Database
         public void Migrate()
         {
             migrateFromSqliteNet();
-            Database.Migrate();
+            try
+            {
+                Database.Migrate();
+            }
+            catch
+            {
+                throw new MigrationFailedException();
+            }
         }
 
         private void migrateFromSqliteNet()
