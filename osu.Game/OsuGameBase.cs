@@ -16,7 +16,6 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
-using SQLite.Net;
 using osu.Framework.Graphics.Performance;
 using osu.Game.Database;
 using osu.Game.Input;
@@ -81,23 +80,28 @@ namespace osu.Game
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
-        private SQLiteConnection createConnection()
-        {
-            var conn = Host.Storage.GetDatabase(@"client");
-            conn.BusyTimeout = new TimeSpan(TimeSpan.TicksPerSecond * 10);
-            return conn;
-        }
-
-        private SQLiteConnection connection;
+        private DatabaseContextFactory contextFactory;
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
+
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            connection = createConnection();
-            connection.CreateTable<StoreVersion>();
+            try
+            {
+                using (var context = contextFactory.GetContext())
+                    context.Migrate();
+            }
+            catch (MigrationFailedException)
+            {
+                using (var context = contextFactory.GetContext())
+                    context.Database.EnsureDeleted();
+                using (var context = contextFactory.GetContext())
+                    context.Migrate();
+            }
 
             dependencies.Cache(API = new APIAccess
             {
@@ -105,11 +109,11 @@ namespace osu.Game
                 Token = LocalConfig.Get<string>(OsuSetting.Token)
             });
 
-            dependencies.Cache(RulesetStore = new RulesetStore(connection));
-            dependencies.Cache(FileStore = new FileStore(connection, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, FileStore, connection, RulesetStore, API, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, connection, Host, BeatmapManager, RulesetStore));
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(connection, RulesetStore));
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory.GetContext));
+            dependencies.Cache(FileStore = new FileStore(contextFactory.GetContext, Host.Storage));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory.GetContext, RulesetStore, API, Host));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory.GetContext, Host, BeatmapManager, RulesetStore));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory.GetContext, RulesetStore));
             dependencies.Cache(new OsuColour());
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
@@ -165,6 +169,8 @@ namespace osu.Game
             };
 
             API.Register(this);
+
+            FileStore.Cleanup();
         }
 
         private WorkingBeatmap lastBeatmap;
@@ -207,10 +213,7 @@ namespace osu.Game
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
             fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
-            fpsDisplayVisible.ValueChanged += val =>
-            {
-                FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None;
-            };
+            fpsDisplayVisible.ValueChanged += val => { FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
             fpsDisplayVisible.TriggerChange();
         }
 
@@ -235,8 +238,6 @@ namespace osu.Game
                 LocalConfig.Set(OsuSetting.Token, LocalConfig.Get<bool>(OsuSetting.SavePassword) ? API.Token : string.Empty);
                 LocalConfig.Save();
             }
-
-            connection?.Dispose();
 
             base.Dispose(isDisposing);
         }
