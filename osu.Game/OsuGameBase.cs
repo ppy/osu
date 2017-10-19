@@ -90,8 +90,18 @@ namespace osu.Game
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            using (var context = contextFactory.GetContext())
-                context.Migrate();
+            try
+            {
+                using (var context = contextFactory.GetContext())
+                    context.Migrate();
+            }
+            catch (MigrationFailedException)
+            {
+                using (var context = contextFactory.GetContext())
+                    context.Database.EnsureDeleted();
+                using (var context = contextFactory.GetContext())
+                    context.Migrate();
+            }
 
             dependencies.Cache(API = new APIAccess
             {
@@ -203,10 +213,7 @@ namespace osu.Game
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
             fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
-            fpsDisplayVisible.ValueChanged += val =>
-            {
-                FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None;
-            };
+            fpsDisplayVisible.ValueChanged += val => { FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
             fpsDisplayVisible.TriggerChange();
         }
 
