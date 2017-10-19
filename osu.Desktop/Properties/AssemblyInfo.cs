@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Reflection;
@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("osu.Game.Rulesets.Mania")]
-[assembly: AssemblyDescription("smash the keys. to the beat.")]
+[assembly: AssemblyTitle("osu!lazer")]
+[assembly: AssemblyDescription("click the circles. to the beat.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ppy Pty Ltd")]
-[assembly: AssemblyProduct("osu.Game.Rulesets.Mania")]
+[assembly: AssemblyProduct("osu!lazer")]
 [assembly: AssemblyCopyright("ppy Pty Ltd 2007-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("48f4582b-7687-4621-9cbe-5c24197cb536")]
+[assembly: Guid("b0cb1d48-e4c2-4612-a347-beea7b1a71e7")]
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.0.0")]
+[assembly: AssemblyFileVersion("0.0.0")]
