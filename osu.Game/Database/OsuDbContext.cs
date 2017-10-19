@@ -160,13 +160,14 @@ namespace osu.Game.Database
         public void Migrate()
         {
             migrateFromSqliteNet();
+
             try
             {
                 Database.Migrate();
             }
-            catch
+            catch (Exception e)
             {
-                throw new MigrationFailedException();
+                throw new MigrationFailedException(e);
             }
         }
 
@@ -186,6 +187,8 @@ namespace osu.Game.Database
 
                     try
                     {
+                        Logger.Log("Performing migration from sqlite-net to EF...", LoggingTarget.Database, Framework.Logging.LogLevel.Important);
+
                         // we are good to perform messy migration of data!.
                         Database.ExecuteSqlCommand("ALTER TABLE BeatmapDifficulty RENAME TO BeatmapDifficulty_Old");
                         Database.ExecuteSqlCommand("ALTER TABLE BeatmapMetadata RENAME TO BeatmapMetadata_Old");
@@ -228,11 +231,12 @@ namespace osu.Game.Database
                         Database.ExecuteSqlCommand(
                             "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, IFNULL(Hidden, 0), LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), OnlineBeatmapID, Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
                         Database.ExecuteSqlCommand("DROP TABLE BeatmapInfo_Old");
+
+                        Logger.Log("Migration complete!", LoggingTarget.Database, Framework.Logging.LogLevel.Important);
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        // if anything went wrong during migration just nuke the database.
-                        throw new MigrationFailedException();
+                        throw new MigrationFailedException(e);
                     }
                 }
                 catch (MigrationFailedException e)
@@ -248,5 +252,9 @@ namespace osu.Game.Database
 
     public class MigrationFailedException : Exception
     {
+        public MigrationFailedException(Exception exception)
+            : base("sqlite-net migration failed", exception)
+        {
+        }
     }
 }

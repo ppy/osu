@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
+using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -169,8 +170,11 @@ namespace osu.Game
                 using (var context = contextFactory.GetContext())
                     context.Migrate();
             }
-            catch (MigrationFailedException)
+            catch (MigrationFailedException e)
             {
+                Logger.Log(e.ToString(), LoggingTarget.Database, LogLevel.Error);
+                Logger.Log("Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database, LogLevel.Error);
+
                 // if we failed, let's delete the database and start fresh.
                 // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
                 int retries = 20;
@@ -181,6 +185,7 @@ namespace osu.Game
                         using (var context = contextFactory.GetContext())
                         {
                             context.Database.EnsureDeleted();
+                            Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
                             break;
                         }
                     }
