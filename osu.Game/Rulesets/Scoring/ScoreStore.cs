@@ -11,7 +11,6 @@ using osu.Game.IO.Legacy;
 using osu.Game.IPC;
 using osu.Game.Rulesets.Replays;
 using SharpCompress.Compressors.LZMA;
-using SQLite.Net;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Scoring
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
-        public ScoreStore(Storage storage, SQLiteConnection connection, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(connection)
+        public ScoreStore(Storage storage, Func<OsuDbContext> factory, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(factory)
         {
             this.storage = storage;
             this.beatmaps = beatmaps;
@@ -148,7 +147,5 @@ namespace osu.Game.Rulesets.Scoring
         protected override void Prepare(bool reset = false)
         {
         }
-
-        protected override Type[] ValidTypes => new[] { typeof(Score) };
     }
 }

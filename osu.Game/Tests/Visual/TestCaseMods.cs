@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Toggle", modSelect.ToggleVisibility);
 
-            foreach (var ruleset in rulesets.AllRulesets)
+            foreach (var ruleset in rulesets.AvailableRulesets)
                 AddStep(ruleset.CreateInstance().Description, () => modSelect.Ruleset.Value = ruleset);
         }
     }
