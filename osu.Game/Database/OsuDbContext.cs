@@ -31,7 +31,8 @@ namespace osu.Game.Database
         /// <summary>
         /// Create a new in-memory OsuDbContext instance.
         /// </summary>
-        public OsuDbContext() : this("DataSource=:memory:")
+        public OsuDbContext()
+            : this("DataSource=:memory:")
         {
             // required for tooling (see https://wildermuth.com/2017/07/06/Program-cs-in-ASP-NET-Core-2-0).
         }
@@ -116,9 +117,37 @@ namespace osu.Game.Database
             private class OsuDbLogger : ILogger
             {
                 public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-                    => Logger.Log(formatter(state, exception), LoggingTarget.Database, Framework.Logging.LogLevel.Debug);
+                {
+                    if (logLevel < LogLevel.Information)
+                        return;
 
-                public bool IsEnabled(LogLevel logLevel) => true;
+                    Framework.Logging.LogLevel frameworkLogLevel;
+
+                    switch (logLevel)
+                    {
+                        default:
+                            frameworkLogLevel = Framework.Logging.LogLevel.Debug;
+                            break;
+                        case LogLevel.Warning:
+                            frameworkLogLevel = Framework.Logging.LogLevel.Important;
+                            break;
+                        case LogLevel.Error:
+                        case LogLevel.Critical:
+                            frameworkLogLevel = Framework.Logging.LogLevel.Error;
+                            break;
+                    }
+
+                    Logger.Log(formatter(state, exception), LoggingTarget.Database, frameworkLogLevel);
+                }
+
+                public bool IsEnabled(LogLevel logLevel)
+                {
+#if DEBUG
+                    return logLevel > LogLevel.Debug;
+#else
+                    return logLevel > LogLevel.Information;
+#endif
+                }
 
                 public IDisposable BeginScope<TState>(TState state) => null;
             }
