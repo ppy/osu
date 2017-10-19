@@ -16,6 +16,8 @@ namespace osu.Game.Database
     public class OsuDbContext : DbContext
     {
         public DbSet<BeatmapInfo> BeatmapInfo { get; set; }
+        public DbSet<BeatmapDifficulty> BeatmapDifficulty { get; set; }
+        public DbSet<BeatmapMetadata> BeatmapMetadata { get; set; }
         public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
         public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }

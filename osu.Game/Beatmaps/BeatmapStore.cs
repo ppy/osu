@@ -130,7 +130,20 @@ namespace osu.Game.Beatmaps
         {
             var context = GetContext();
 
-            context.BeatmapSetInfo.RemoveRange(context.BeatmapSetInfo.Where(b => b.DeletePending && !b.Protected));
+            var purgeable = context.BeatmapSetInfo.Where(s => s.DeletePending && !s.Protected)
+                   .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                   .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                   .Include(s => s.Metadata);
+
+            // metadata is M-N so we can't rely on cascades
+            context.BeatmapMetadata.RemoveRange(purgeable.Select(s => s.Metadata));
+            context.BeatmapMetadata.RemoveRange(purgeable.SelectMany(s => s.Beatmaps.Select(b => b.Metadata)));
+
+            // todo: we can probably make cascades work here with a FK in BeatmapDifficulty. just make to make it work correctly.
+            context.BeatmapDifficulty.RemoveRange(purgeable.SelectMany(s => s.Beatmaps.Select(b => b.BaseDifficulty)));
+
+            // cascades down to beatmaps.
+            context.BeatmapSetInfo.RemoveRange(purgeable);
             context.SaveChanges();
         }
 
