@@ -22,6 +22,8 @@ namespace osu.Game.Database
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
         private readonly string connectionString;
 
+        private static readonly Lazy<OsuDbLoggerFactory> logger = new Lazy<OsuDbLoggerFactory>(() => new OsuDbLoggerFactory());
+
         static OsuDbContext()
         {
             // required to initialise native SQLite libraries on some platforms.
@@ -60,7 +62,7 @@ namespace osu.Game.Database
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.UseSqlite(connectionString);
-            optionsBuilder.UseLoggerFactory(new OsuDbLoggerFactory());
+            optionsBuilder.UseLoggerFactory(logger.Value);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
