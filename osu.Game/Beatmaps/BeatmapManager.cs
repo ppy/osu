@@ -184,8 +184,6 @@ namespace osu.Game.Beatmaps
             {
                 var context = importContext.Value;
 
-                context.Database.AutoTransactionsEnabled = false;
-
                 using (var transaction = context.Database.BeginTransaction())
                 {
                     // create local stores so we can isolate and thread safely, and share a context/transaction.
