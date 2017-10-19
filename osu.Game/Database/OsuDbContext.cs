@@ -65,20 +65,22 @@ namespace osu.Game.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
+
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash);
+
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.Variant);
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.IntAction);
+
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.Hash).IsUnique();
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.ReferenceCount);
-            modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Name).IsUnique();
-            modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.InstantiationInfo).IsUnique();
+
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Available);
 
-            modelBuilder.Entity<BeatmapMetadata>().HasOne(m => m.BeatmapSetInfo).WithOne(s => s.Metadata).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<BeatmapMetadata>().HasOne(m => m.BeatmapInfo).WithOne(b => b.Metadata).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory
