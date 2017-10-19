@@ -13,9 +13,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select.Leaderboards;
 using System.Linq;
 using osu.Framework.Localisation;
-using System.Globalization;
 using osu.Game.Rulesets.Scoring;
-using System;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
@@ -79,9 +77,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
         {
+            double pp = score.PP ?? 0;
             stats.Add(new OsuSpriteText
             {
-                Text = $"{Math.Round(score.PP ?? 0)}pp",
+                Text = $"{pp:0}pp",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 TextSize = 18,
@@ -92,7 +91,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             {
                 stats.Add(new OsuSpriteText
                 {
-                    Text = $"weighted: {Math.Round(score.PP * weight ?? 0)}pp ({weight.Value.ToString("0%", CultureInfo.CurrentCulture)})",
+                    Text = $"weighted: {pp * weight:0}pp ({weight:P0})",
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,
@@ -103,7 +102,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
             stats.Add(new OsuSpriteText
             {
-                Text = "accuracy: " + score.Accuracy.ToString("0.00%"),
+                Text = $"accuracy: {score.Accuracy:P2}",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Colour = colour.GrayA,

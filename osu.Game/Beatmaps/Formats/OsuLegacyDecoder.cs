@@ -171,7 +171,7 @@ namespace osu.Game.Beatmaps.Formats
                     metadata.ArtistUnicode = pair.Value;
                     break;
                 case @"Creator":
-                    metadata.Author = pair.Value;
+                    metadata.AuthorString = pair.Value;
                     break;
                 case @"Version":
                     beatmap.BeatmapInfo.Version = pair.Value;
