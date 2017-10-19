@@ -221,19 +221,25 @@ namespace osu.Game.Database
                         Database.ExecuteSqlCommand(
                             "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, Hidden, LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), OnlineBeatmapID, Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
                         Database.ExecuteSqlCommand("DROP TABLE BeatmapInfo_Old");
-
-                        throw new Exception();
                     }
                     catch
                     {
                         // if anything went wrong during migration just nuke the database.
-                        Database.EnsureDeleted();
+                        throw new MigrationFailedException();
                     }
+                }
+                catch (MigrationFailedException e)
+                {
+                    throw;
                 }
                 catch
                 {
                 }
             }
         }
+    }
+
+    public class MigrationFailedException : Exception
+    {
     }
 }
