@@ -177,48 +177,58 @@ namespace osu.Game.Database
                     // will fail (intentionally) if we don't have sqlite-net data present.
                     Database.ExecuteSqlCommand("SELECT OnlineBeatmapSetId FROM BeatmapMetadata LIMIT 1");
 
-                    // we are good to perform messy migration of data!.
-                    Database.ExecuteSqlCommand("ALTER TABLE BeatmapDifficulty RENAME TO BeatmapDifficulty_Old");
-                    Database.ExecuteSqlCommand("ALTER TABLE BeatmapMetadata RENAME TO BeatmapMetadata_Old");
-                    Database.ExecuteSqlCommand("ALTER TABLE FileInfo RENAME TO FileInfo_Old");
-                    Database.ExecuteSqlCommand("ALTER TABLE KeyBinding RENAME TO KeyBinding_Old");
-                    Database.ExecuteSqlCommand("ALTER TABLE BeatmapSetInfo RENAME TO BeatmapSetInfo_Old");
-                    Database.ExecuteSqlCommand("ALTER TABLE BeatmapInfo RENAME TO BeatmapInfo_Old");
-                    Database.ExecuteSqlCommand("ALTER TABLE BeatmapSetFileInfo RENAME TO BeatmapSetFileInfo_Old");
-                    Database.ExecuteSqlCommand("ALTER TABLE RulesetInfo RENAME TO RulesetInfo_Old");
+                    try
+                    {
+                        // we are good to perform messy migration of data!.
+                        Database.ExecuteSqlCommand("ALTER TABLE BeatmapDifficulty RENAME TO BeatmapDifficulty_Old");
+                        Database.ExecuteSqlCommand("ALTER TABLE BeatmapMetadata RENAME TO BeatmapMetadata_Old");
+                        Database.ExecuteSqlCommand("ALTER TABLE FileInfo RENAME TO FileInfo_Old");
+                        Database.ExecuteSqlCommand("ALTER TABLE KeyBinding RENAME TO KeyBinding_Old");
+                        Database.ExecuteSqlCommand("ALTER TABLE BeatmapSetInfo RENAME TO BeatmapSetInfo_Old");
+                        Database.ExecuteSqlCommand("ALTER TABLE BeatmapInfo RENAME TO BeatmapInfo_Old");
+                        Database.ExecuteSqlCommand("ALTER TABLE BeatmapSetFileInfo RENAME TO BeatmapSetFileInfo_Old");
+                        Database.ExecuteSqlCommand("ALTER TABLE RulesetInfo RENAME TO RulesetInfo_Old");
 
-                    Database.ExecuteSqlCommand("DROP TABLE StoreVersion");
+                        Database.ExecuteSqlCommand("DROP TABLE StoreVersion");
 
-                    // perform EF migrations to create sane table structure.
-                    Database.Migrate();
+                        // perform EF migrations to create sane table structure.
+                        Database.Migrate();
 
-                    // copy data table by table to new structure, dropping old tables as we go.
-                    Database.ExecuteSqlCommand("INSERT INTO FileInfo SELECT * FROM FileInfo_Old");
-                    Database.ExecuteSqlCommand("DROP TABLE FileInfo_Old");
+                        // copy data table by table to new structure, dropping old tables as we go.
+                        Database.ExecuteSqlCommand("INSERT INTO FileInfo SELECT * FROM FileInfo_Old");
+                        Database.ExecuteSqlCommand("DROP TABLE FileInfo_Old");
 
-                    Database.ExecuteSqlCommand("INSERT INTO KeyBinding SELECT ID, [Action], Keys, RulesetID, Variant FROM KeyBinding_Old");
-                    Database.ExecuteSqlCommand("DROP TABLE KeyBinding_Old");
+                        Database.ExecuteSqlCommand("INSERT INTO KeyBinding SELECT ID, [Action], Keys, RulesetID, Variant FROM KeyBinding_Old");
+                        Database.ExecuteSqlCommand("DROP TABLE KeyBinding_Old");
 
-                    Database.ExecuteSqlCommand(
-                        "INSERT INTO BeatmapMetadata SELECT ID, Artist, ArtistUnicode, AudioFile, Author, BackgroundFile, PreviewTime, Source, Tags, Title, TitleUnicode FROM BeatmapMetadata_Old");
-                    Database.ExecuteSqlCommand("DROP TABLE BeatmapMetadata_Old");
+                        Database.ExecuteSqlCommand(
+                            "INSERT INTO BeatmapMetadata SELECT ID, Artist, ArtistUnicode, AudioFile, Author, BackgroundFile, PreviewTime, Source, Tags, Title, TitleUnicode FROM BeatmapMetadata_Old");
+                        Database.ExecuteSqlCommand("DROP TABLE BeatmapMetadata_Old");
 
-                    Database.ExecuteSqlCommand(
-                        "INSERT INTO BeatmapDifficulty SELECT  `ID`, `ApproachRate`, `CircleSize`, `DrainRate`, `OverallDifficulty`, `SliderMultiplier`, `SliderTickRate` FROM BeatmapDifficulty_Old");
-                    Database.ExecuteSqlCommand("DROP TABLE BeatmapDifficulty_Old");
+                        Database.ExecuteSqlCommand(
+                            "INSERT INTO BeatmapDifficulty SELECT  `ID`, `ApproachRate`, `CircleSize`, `DrainRate`, `OverallDifficulty`, `SliderMultiplier`, `SliderTickRate` FROM BeatmapDifficulty_Old");
+                        Database.ExecuteSqlCommand("DROP TABLE BeatmapDifficulty_Old");
 
-                    Database.ExecuteSqlCommand("INSERT INTO BeatmapSetInfo SELECT ID, DeletePending, Hash, BeatmapMetadataID, OnlineBeatmapSetID, Protected FROM BeatmapSetInfo_Old");
-                    Database.ExecuteSqlCommand("DROP TABLE BeatmapSetInfo_Old");
+                        Database.ExecuteSqlCommand("INSERT INTO BeatmapSetInfo SELECT ID, DeletePending, Hash, BeatmapMetadataID, OnlineBeatmapSetID, Protected FROM BeatmapSetInfo_Old");
+                        Database.ExecuteSqlCommand("DROP TABLE BeatmapSetInfo_Old");
 
-                    Database.ExecuteSqlCommand("INSERT INTO BeatmapSetFileInfo SELECT ID, BeatmapSetInfoID, FileInfoID, Filename FROM BeatmapSetFileInfo_Old");
-                    Database.ExecuteSqlCommand("DROP TABLE BeatmapSetFileInfo_Old");
+                        Database.ExecuteSqlCommand("INSERT INTO BeatmapSetFileInfo SELECT ID, BeatmapSetInfoID, FileInfoID, Filename FROM BeatmapSetFileInfo_Old");
+                        Database.ExecuteSqlCommand("DROP TABLE BeatmapSetFileInfo_Old");
 
-                    Database.ExecuteSqlCommand("INSERT INTO RulesetInfo SELECT ID, Available, InstantiationInfo, Name FROM RulesetInfo_Old");
-                    Database.ExecuteSqlCommand("DROP TABLE RulesetInfo_Old");
+                        Database.ExecuteSqlCommand("INSERT INTO RulesetInfo SELECT ID, Available, InstantiationInfo, Name FROM RulesetInfo_Old");
+                        Database.ExecuteSqlCommand("DROP TABLE RulesetInfo_Old");
 
-                    Database.ExecuteSqlCommand(
-                        "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, Hidden, LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), OnlineBeatmapID, Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
-                    Database.ExecuteSqlCommand("DROP TABLE BeatmapInfo_Old");
+                        Database.ExecuteSqlCommand(
+                            "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, Hidden, LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), OnlineBeatmapID, Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
+                        Database.ExecuteSqlCommand("DROP TABLE BeatmapInfo_Old");
+
+                        throw new Exception();
+                    }
+                    catch
+                    {
+                        // if anything went wrong during migration just nuke the database.
+                        Database.EnsureDeleted();
+                    }
                 }
                 catch
                 {
