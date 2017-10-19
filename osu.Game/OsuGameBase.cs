@@ -97,8 +97,18 @@ namespace osu.Game
             }
             catch (MigrationFailedException)
             {
-                using (var context = contextFactory.GetContext())
-                    context.Database.EnsureDeleted();
+                while (true)
+                {
+                    try
+                    {
+                        using (var context = contextFactory.GetContext())
+                        {
+                            context.Database.EnsureDeleted();
+                            break;
+                        }
+                    }
+                    catch { }
+                }
                 using (var context = contextFactory.GetContext())
                     context.Migrate();
             }
