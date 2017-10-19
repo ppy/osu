@@ -90,28 +90,7 @@ namespace osu.Game
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            try
-            {
-                using (var context = contextFactory.GetContext())
-                    context.Migrate();
-            }
-            catch (MigrationFailedException)
-            {
-                while (true)
-                {
-                    try
-                    {
-                        using (var context = contextFactory.GetContext())
-                        {
-                            context.Database.EnsureDeleted();
-                            break;
-                        }
-                    }
-                    catch { }
-                }
-                using (var context = contextFactory.GetContext())
-                    context.Migrate();
-            }
+            runMigrations();
 
             dependencies.Cache(API = new APIAccess
             {
@@ -181,6 +160,38 @@ namespace osu.Game
             API.Register(this);
 
             FileStore.Cleanup();
+        }
+
+        private void runMigrations()
+        {
+            try
+            {
+                using (var context = contextFactory.GetContext())
+                    context.Migrate();
+            }
+            catch (MigrationFailedException)
+            {
+                // if we failed, let's delete the database and start fresh.
+                // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
+                int retries = 20;
+                while (retries-- > 0)
+                {
+                    try
+                    {
+                        using (var context = contextFactory.GetContext())
+                        {
+                            context.Database.EnsureDeleted();
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                using (var context = contextFactory.GetContext())
+                    context.Migrate();
+            }
         }
 
         private WorkingBeatmap lastBeatmap;
