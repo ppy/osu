@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Select
                     Schedule(() =>
                     {
                         foreach (var g in newGroups)
-                            addGroup(g);
+                            if (g != null) addGroup(g);
 
                         computeYPositions();
                         BeatmapsChanged?.Invoke();
@@ -101,6 +101,9 @@ namespace osu.Game.Screens.Select
             {
                 var group = createGroup(beatmapSet);
 
+                if (group == null)
+                    return;
+
                 addGroup(group);
                 computeYPositions();
                 if (selectedGroup == null)
@@ -124,19 +127,23 @@ namespace osu.Game.Screens.Select
             if (group == null)
                 return;
 
-            var newGroup = createGroup(set);
-
             int i = groups.IndexOf(group);
             groups.RemoveAt(i);
-            groups.Insert(i, newGroup);
 
-            if (selectedGroup == group && newGroup.BeatmapPanels.Count == 0)
+            var newGroup = createGroup(set);
+
+            if (newGroup != null)
+                groups.Insert(i, newGroup);
+
+            bool hadSelection = selectedGroup == group;
+
+            if (hadSelection && newGroup == null)
                 selectedGroup = null;
 
             Filter(null, false);
 
             //check if we can/need to maintain our current selection.
-            if (selectedGroup == group && newGroup.BeatmapPanels.Count > 0)
+            if (hadSelection && newGroup != null)
             {
                 var newSelection =
                     newGroup.BeatmapPanels.Find(p => p.Beatmap.ID == selectedPanel?.Beatmap.ID) ??
@@ -335,6 +342,9 @@ namespace osu.Game.Screens.Select
 
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
         {
+            if (beatmapSet.Beatmaps.All(b => b.Hidden))
+                return null;
+
             foreach (var b in beatmapSet.Beatmaps)
             {
                 if (b.Metadata == null)
