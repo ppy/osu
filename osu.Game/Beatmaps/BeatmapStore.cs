@@ -66,6 +66,7 @@ namespace osu.Game.Beatmaps
             if (beatmapSet.DeletePending) return false;
 
             beatmapSet.DeletePending = true;
+            context.Update(beatmapSet);
             context.SaveChanges();
 
             BeatmapSetRemoved?.Invoke(beatmapSet);
@@ -84,6 +85,7 @@ namespace osu.Game.Beatmaps
             if (!beatmapSet.DeletePending) return false;
 
             beatmapSet.DeletePending = false;
+            context.Update(beatmapSet);
             context.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
@@ -137,7 +139,7 @@ namespace osu.Game.Beatmaps
 
             // metadata is M-N so we can't rely on cascades
             context.BeatmapMetadata.RemoveRange(purgeable.Select(s => s.Metadata));
-            context.BeatmapMetadata.RemoveRange(purgeable.SelectMany(s => s.Beatmaps.Select(b => b.Metadata)));
+            context.BeatmapMetadata.RemoveRange(purgeable.SelectMany(s => s.Beatmaps.Select(b => b.Metadata).Where(m => m != null)));
 
             // todo: we can probably make cascades work here with a FK in BeatmapDifficulty. just make to make it work correctly.
             context.BeatmapDifficulty.RemoveRange(purgeable.SelectMany(s => s.Beatmaps.Select(b => b.BaseDifficulty)));
