@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -63,8 +64,12 @@ namespace osu.Game.Database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlite(connectionString);
-            optionsBuilder.UseLoggerFactory(logger.Value);
+            optionsBuilder
+                // this is required for the time being due to the way we are querying in places like BeatmapStore.
+                // if we ever move to having consumers file their own .Includes, or get eager loading support, this could be re-enabled.
+                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
+                .UseSqlite(connectionString)
+                .UseLoggerFactory(logger.Value);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
