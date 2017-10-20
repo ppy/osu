@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual
 
             string instantiation = ruleset?.AssemblyQualifiedName;
 
-            foreach (var r in rulesets.Query<RulesetInfo>(rs => rs.Available && (instantiation == null || rs.InstantiationInfo == instantiation)))
+            foreach (var r in rulesets.AvailableRulesets.Where(rs => instantiation == null || rs.InstantiationInfo == instantiation))
                 AddStep(r.Name, () => loadPlayerFor(r));
         }
 

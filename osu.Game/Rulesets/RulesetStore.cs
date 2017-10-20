@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
-using SQLite.Net;
 
 namespace osu.Game.Rulesets
 {
@@ -18,12 +18,6 @@ namespace osu.Game.Rulesets
     {
         private static readonly Dictionary<Assembly, Type> loaded_assemblies = new Dictionary<Assembly, Type>();
 
-        public IEnumerable<RulesetInfo> AllRulesets => Query<RulesetInfo>().Where(r => r.Available);
-
-        public RulesetStore(SQLiteConnection connection) : base(connection)
-        {
-        }
-
         static RulesetStore()
         {
             AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
@@ -32,59 +26,78 @@ namespace osu.Game.Rulesets
                 loadRulesetFromFile(file);
         }
 
+        public RulesetStore(Func<OsuDbContext> factory)
+            : base(factory)
+        {
+        }
+
+        /// <summary>
+        /// Retrieve a ruleset using a known ID.
+        /// </summary>
+        /// <param name="id">The ruleset's internal ID.</param>
+        /// <returns>A ruleset, if available, else null.</returns>
+        public RulesetInfo GetRuleset(int id) => AvailableRulesets.FirstOrDefault(r => r.ID == id);
+
+        /// <summary>
+        /// All available rulesets.
+        /// </summary>
+        public IEnumerable<RulesetInfo> AvailableRulesets => GetContext().RulesetInfo.Where(r => r.Available);
+
         private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
 
         private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
         protected override void Prepare(bool reset = false)
         {
-            Connection.CreateTable<RulesetInfo>();
+            var context = GetContext();
 
             if (reset)
             {
-                Connection.DeleteAll<RulesetInfo>();
+                context.Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
             }
 
-            var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo()));
+            var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo())).ToList();
 
-            Connection.RunInTransaction(() =>
+            //add all legacy modes in correct order
+            foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
             {
-                //add all legacy modes in correct order
-                foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
+                var rulesetInfo = createRulesetInfo(r);
+                if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == rulesetInfo.ID) == null)
                 {
-                    Connection.InsertOrReplace(createRulesetInfo(r));
+                    context.RulesetInfo.Add(rulesetInfo);
                 }
+            }
 
-                //add any other modes
-                foreach (var r in instances.Where(r => r.LegacyID < 0))
-                {
-                    var us = createRulesetInfo(r);
+            context.SaveChanges();
 
-                    var existing = Query<RulesetInfo>().Where(ri => ri.InstantiationInfo == us.InstantiationInfo).FirstOrDefault();
-
-                    if (existing == null)
-                        Connection.Insert(us);
-                }
-            });
-
-            Connection.RunInTransaction(() =>
+            //add any other modes
+            foreach (var r in instances.Where(r => r.LegacyID < 0))
             {
-                //perform a consistency check
-                foreach (var r in Query<RulesetInfo>())
-                {
-                    try
-                    {
-                        r.CreateInstance();
-                        r.Available = true;
-                    }
-                    catch
-                    {
-                        r.Available = false;
-                    }
+                var us = createRulesetInfo(r);
 
-                    Connection.Update(r);
+                var existing = context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == us.InstantiationInfo);
+
+                if (existing == null)
+                    context.RulesetInfo.Add(us);
+            }
+
+            context.SaveChanges();
+
+            //perform a consistency check
+            foreach (var r in context.RulesetInfo)
+            {
+                try
+                {
+                    r.CreateInstance();
+                    r.Available = true;
                 }
-            });
+                catch
+                {
+                    r.Available = false;
+                }
+            }
+
+            context.SaveChanges();
         }
 
         private static void loadRulesetFromFile(string file)
@@ -99,7 +112,9 @@ namespace osu.Game.Rulesets
                 var assembly = Assembly.LoadFrom(file);
                 loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsSubclassOf(typeof(Ruleset)));
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+            }
         }
 
         private RulesetInfo createRulesetInfo(Ruleset ruleset) => new RulesetInfo
@@ -108,9 +123,5 @@ namespace osu.Game.Rulesets
             InstantiationInfo = ruleset.GetType().AssemblyQualifiedName,
             ID = ruleset.LegacyID
         };
-
-        protected override Type[] ValidTypes => new[] { typeof(RulesetInfo) };
-
-        public RulesetInfo GetRuleset(int id) => Query<RulesetInfo>().First(r => r.ID == id);
     }
 }
