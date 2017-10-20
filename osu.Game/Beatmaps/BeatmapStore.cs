@@ -104,6 +104,7 @@ namespace osu.Game.Beatmaps
             if (beatmap.Hidden) return false;
 
             beatmap.Hidden = true;
+            context.Update(beatmap);
             context.SaveChanges();
 
             BeatmapHidden?.Invoke(beatmap);
@@ -122,6 +123,7 @@ namespace osu.Game.Beatmaps
             if (!beatmap.Hidden) return false;
 
             beatmap.Hidden = false;
+            context.Update(beatmap);
             context.SaveChanges();
 
             BeatmapRestored?.Invoke(beatmap);
