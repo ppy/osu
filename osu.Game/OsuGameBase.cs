@@ -177,22 +177,8 @@ namespace osu.Game
 
                 // if we failed, let's delete the database and start fresh.
                 // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
-                int retries = 20;
-                while (retries-- > 0)
-                {
-                    try
-                    {
-                        using (var context = contextFactory.GetContext())
-                        {
-                            context.Database.EnsureDeleted();
-                            Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
-                            break;
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
+                contextFactory.ResetDatabase();
+                Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
 
                 using (var context = contextFactory.GetContext())
                     context.Migrate();
