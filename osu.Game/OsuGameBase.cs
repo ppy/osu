@@ -172,7 +172,7 @@ namespace osu.Game
             }
             catch (MigrationFailedException e)
             {
-                Logger.Log(e.ToString(), LoggingTarget.Database, LogLevel.Error);
+                Logger.Log((e.InnerException ?? e).ToString(), LoggingTarget.Database, LogLevel.Error);
                 Logger.Log("Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database, LogLevel.Error);
 
                 // if we failed, let's delete the database and start fresh.
