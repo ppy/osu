@@ -15,6 +15,8 @@ namespace osu.Game.Input
 {
     public class KeyBindingStore : DatabaseBackedStore
     {
+        public event Action KeyBindingChanged;
+
         public KeyBindingStore(Func<OsuDbContext> getContext, RulesetStore rulesets, Storage storage = null)
             : base(getContext, storage)
         {
@@ -59,7 +61,8 @@ namespace osu.Game.Input
                         });
                 }
 
-                context.SaveChanges(transaction);
+                context.SaveChanges();
+                transaction.Commit();
             }
         }
 
@@ -79,6 +82,8 @@ namespace osu.Game.Input
             var context = GetContext();
             context.Update(keyBinding);
             context.SaveChanges();
+
+            KeyBindingChanged?.Invoke();
         }
     }
 }
