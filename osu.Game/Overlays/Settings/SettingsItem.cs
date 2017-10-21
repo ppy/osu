@@ -36,6 +36,18 @@ namespace osu.Game.Overlays.Settings
 
         public bool ShowsDefaultIndicator = true;
 
+        private Color4? defaultIndicatorColour;
+
+        public Color4 DefaultIndicatorColour
+        {
+            get { return defaultIndicatorColour ?? Color4.White; }
+            set
+            {
+                defaultIndicatorColour = value;
+                defaultIndicator?.SetIndicatorColour(DefaultIndicatorColour);
+            }
+        }
+
         public virtual string LabelText
         {
             get { return text?.Text ?? string.Empty; }
@@ -112,8 +124,9 @@ namespace osu.Game.Overlays.Settings
 
             if (defaultIndicator != null)
             {
-                defaultIndicator.Colour = ColourInfo.GradientHorizontal(colours.Yellow.Opacity(0.8f), colours.Yellow.Opacity(0));
-                defaultIndicator.Alpha = 0f;
+                if (!defaultIndicatorColour.HasValue)
+                    defaultIndicatorColour = colours.Yellow;
+                defaultIndicator.SetIndicatorColour(DefaultIndicatorColour);
                 AddInternal(defaultIndicator);
             }
         }
@@ -122,11 +135,14 @@ namespace osu.Game.Overlays.Settings
         {
             internal readonly Bindable<T> Bindable = new Bindable<T>();
 
+            private Color4 indicatorColour;
+
             private bool hovering;
 
             public SettingsItemDefaultIndicator()
             {
-                Bindable.ValueChanged += value => updateAlpha();
+                Bindable.ValueChanged += value => UpdateState();
+                Bindable.DisabledChanged += disabled => UpdateState();
 
                 RelativeSizeAxes = Axes.Y;
                 Width = SettingsOverlay.CONTENT_MARGINS;
@@ -141,25 +157,36 @@ namespace osu.Game.Overlays.Settings
 
             protected override bool OnClick(InputState state)
             {
-                Bindable.SetDefault();
+                if (!Bindable.Disabled)
+                    Bindable.SetDefault();
                 return true;
             }
 
             protected override bool OnHover(InputState state)
             {
                 hovering = true;
-                updateAlpha();
+                UpdateState();
                 return true;
             }
 
             protected override void OnHoverLost(InputState state)
             {
                 hovering = false;
-                updateAlpha();
+                UpdateState();
             }
 
-            private void updateAlpha() =>
-                Alpha = Bindable.IsDefault ? 0f : hovering ? 1f : 0.5f;
+            internal void SetIndicatorColour(Color4 indicatorColour)
+            {
+                this.indicatorColour = indicatorColour;
+                UpdateState();
+            }
+
+            internal void UpdateState()
+            {
+                var colour = Bindable.Disabled ? Color4.Gray : indicatorColour;
+                Alpha = Bindable.IsDefault ? 0f : (hovering && !Bindable.Disabled) ? 1f : 0.5f;
+                Colour = ColourInfo.GradientHorizontal(colour.Opacity(0.8f), colour.Opacity(0));
+            }
         }
     }
 }
