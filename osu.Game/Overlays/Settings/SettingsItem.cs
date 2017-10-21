@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Settings
             internal void UpdateState()
             {
                 var colour = Bindable.Disabled ? Color4.Gray : indicatorColour;
-                Alpha = Bindable.IsDefault ? 0f : (hovering && !Bindable.Disabled) ? 1f : 0.5f;
+                Alpha = Bindable.IsDefault ? 0f : hovering && !Bindable.Disabled ? 1f : 0.5f;
                 Colour = ColourInfo.GradientHorizontal(colour.Opacity(0.8f), colour.Opacity(0));
             }
         }
