@@ -14,9 +14,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         {
             Children = new Drawable[]
             {
-                new OsuButton
+                new SettingsButton
                 {
-                    RelativeSizeAxes = Axes.X,
                     Text = "Key Configuration",
                     Action = keyConfig.ToggleVisibility
                 },
