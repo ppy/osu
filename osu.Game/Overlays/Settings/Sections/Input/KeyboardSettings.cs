@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Input
 {

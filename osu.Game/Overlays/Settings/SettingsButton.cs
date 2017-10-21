@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Overlays.Settings.Sections
+namespace osu.Game.Overlays.Settings
 {
     public class SettingsButton : OsuButton
     {
