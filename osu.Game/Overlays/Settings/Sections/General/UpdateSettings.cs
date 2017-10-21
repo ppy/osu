@@ -23,9 +23,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     LabelText = "Release stream",
                     Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
                 },
-                new OsuButton
+                new SettingsButton
                 {
-                    RelativeSizeAxes = Axes.X,
                     Text = "Open osu! folder",
                     Action = storage.OpenInNativeExplorer,
                 }

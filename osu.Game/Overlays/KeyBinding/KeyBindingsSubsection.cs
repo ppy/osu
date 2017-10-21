@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.KeyBinding
             this.variant = variant;
 
             FlowContent.Spacing = new Vector2(0, 1);
+            FlowContent.Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS, Right = SettingsOverlay.CONTENT_MARGINS };
         }
 
         [BackgroundDependencyLoader]

@@ -24,9 +24,8 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                     LabelText = "Active mode",
                     Bindable = config.GetBindable<GCLatencyMode>(DebugSetting.ActiveGCMode)
                 },
-                new OsuButton
+                new SettingsButton
                 {
-                    RelativeSizeAxes = Axes.X,
                     Text = "Force garbage collection",
                     Action = GC.Collect
                 },
