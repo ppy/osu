@@ -9,11 +9,19 @@ namespace osu.Game.Database
     {
         private readonly GameHost host;
 
+        private const string database_name = @"client";
+
         public DatabaseContextFactory(GameHost host)
         {
             this.host = host;
         }
 
-        public OsuDbContext GetContext() => new OsuDbContext(host.Storage.GetDatabaseConnectionString(@"client"));
+        public OsuDbContext GetContext() => new OsuDbContext(host.Storage.GetDatabaseConnectionString(database_name));
+
+        public void ResetDatabase()
+        {
+            // todo: we probably want to make sure there are no active contexts before performing this operation.
+            host.Storage.DeleteDatabase(database_name);
+        }
     }
 }
