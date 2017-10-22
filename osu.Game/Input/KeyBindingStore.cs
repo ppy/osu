@@ -15,6 +15,8 @@ namespace osu.Game.Input
 {
     public class KeyBindingStore : DatabaseBackedStore
     {
+        public event Action KeyBindingChanged;
+
         public KeyBindingStore(Func<OsuDbContext> getContext, RulesetStore rulesets, Storage storage = null)
             : base(getContext, storage)
         {
@@ -36,29 +38,32 @@ namespace osu.Game.Input
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
-            var context = GetContext();
-
-            // compare counts in database vs defaults
-            foreach (var group in defaults.GroupBy(k => k.Action))
+            using (var context = GetContext())
+            using (var transaction = context.Database.BeginTransaction())
             {
-                int count = query(context, rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
-                int aimCount = group.Count();
+                // compare counts in database vs defaults
+                foreach (var group in defaults.GroupBy(k => k.Action))
+                {
+                    int count = query(context, rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
+                    int aimCount = group.Count();
 
-                if (aimCount <= count)
-                    continue;
+                    if (aimCount <= count)
+                        continue;
 
-                foreach (var insertable in group.Skip(count).Take(aimCount - count))
-                    // insert any defaults which are missing.
-                    context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
-                    {
-                        KeyCombination = insertable.KeyCombination,
-                        Action = insertable.Action,
-                        RulesetID = rulesetId,
-                        Variant = variant
-                    });
+                    foreach (var insertable in group.Skip(count).Take(aimCount - count))
+                        // insert any defaults which are missing.
+                        context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
+                        {
+                            KeyCombination = insertable.KeyCombination,
+                            Action = insertable.Action,
+                            RulesetID = rulesetId,
+                            Variant = variant
+                        });
+                }
+
+                context.SaveChanges();
+                transaction.Commit();
             }
-
-            context.SaveChanges();
         }
 
         /// <summary>
@@ -77,6 +82,8 @@ namespace osu.Game.Input
             var context = GetContext();
             context.Update(keyBinding);
             context.SaveChanges();
+
+            KeyBindingChanged?.Invoke();
         }
     }
 }
