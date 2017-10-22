@@ -7,10 +7,11 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
-    public class FollowPoint : CircularContainer
+    public class FollowPoint : CircleSizeAdjustContainer
     {
         private const float width = 8;
 
@@ -18,20 +19,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             Origin = Anchor.Centre;
             Size = new Vector2(width);
-            Masking = true;
-
-            EdgeEffect = new EdgeEffectParameters
+            Child = new CircularContainer
             {
-                Type = EdgeEffectType.Glow,
-                Colour = Color4.White.Opacity(0.2f),
-                Radius = 4,
-            };
-
-            Child = new Box
-            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Blending = BlendingMode.Additive,
-                Alpha = 0.5f,
+                Masking = true,
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = Color4.White.Opacity(0.2f),
+                    Radius = 4,
+                },
+                Child = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Blending = BlendingMode.Additive,
+                    Alpha = 0.5f,
+                }
             };
         }
     }

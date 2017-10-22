@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Framework.Allocation;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
@@ -54,14 +52,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }
         }
 
-        private float followPointScalingFactor;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
-        {
-            followPointScalingFactor = (float)(1 - 0.7 * (1 + game.Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY);
-        }
-
         private void update()
         {
             Clear();
@@ -98,13 +88,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                             Position = pointStartPosition,
                             Rotation = rotation,
                             Alpha = 0,
-                            Scale = new Vector2(1.5f * followPointScalingFactor),
+                            Scale = new Vector2(1.5f),
                         });
 
                         using (fp.BeginAbsoluteSequence(fadeInTime))
                         {
                             fp.FadeIn(DrawableOsuHitObject.TIME_FADEIN);
-                            fp.ScaleTo(followPointScalingFactor, DrawableOsuHitObject.TIME_FADEIN, Easing.Out);
+                            fp.ApplyScale(1, true, DrawableOsuHitObject.TIME_FADEIN, Easing.Out);
 
                             fp.MoveTo(pointEndPosition, DrawableOsuHitObject.TIME_FADEIN, Easing.Out);
 
