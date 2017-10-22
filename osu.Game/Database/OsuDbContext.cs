@@ -157,7 +157,7 @@ namespace osu.Game.Database
 
                 public bool IsEnabled(LogLevel logLevel)
                 {
-#if DEBUG
+#if DEBUG_DATABASE
                     return logLevel > LogLevel.Debug;
 #else
                     return logLevel > LogLevel.Information;
