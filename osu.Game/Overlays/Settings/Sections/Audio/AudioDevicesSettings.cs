@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             Children = new Drawable[]
             {
-                dropdown = new SettingsDropdown<string> { ShowsDefaultIndicator = false }
+                dropdown = new SettingsDropdown<string>()
             };
 
             updateItems();
