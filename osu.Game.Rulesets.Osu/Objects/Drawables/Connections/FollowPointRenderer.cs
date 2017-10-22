@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
-            followPointScalingFactor = (float)(1 - 0.7 * (1 + game.Beatmap.Value.BeatmapInfo.Difficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY);
+            followPointScalingFactor = (float)(1 - 0.7 * (1 + game.Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY);
         }
 
         private void update()
