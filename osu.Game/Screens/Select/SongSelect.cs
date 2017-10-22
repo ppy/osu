@@ -19,13 +19,14 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen
     {
-        private BeatmapManager manager;
+        private BeatmapManager beatmaps;
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
         private readonly BeatmapCarousel carousel;
@@ -107,8 +108,9 @@ namespace osu.Game.Screens.Select
                 SelectionChanged = carouselSelectionChanged,
                 BeatmapsChanged = carouselBeatmapsLoaded,
                 DeleteRequested = promptDelete,
-                RestoreRequested = s => { foreach (var b in s.Beatmaps) manager.Restore(b); },
-                HideDifficultyRequested = b => manager.Hide(b),
+                RestoreRequested = s => { foreach (var b in s.Beatmaps) beatmaps.Restore(b); },
+                EditRequested = editRequested,
+                HideDifficultyRequested = b => beatmaps.Hide(b),
                 StartRequested = () => carouselRaisedStart(),
             });
             Add(FilterControl = new FilterControl
@@ -169,16 +171,16 @@ namespace osu.Game.Screens.Select
                 BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, () => promptDelete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
             }
 
-            if (manager == null)
-                manager = beatmaps;
+            if (this.beatmaps == null)
+                this.beatmaps = beatmaps;
 
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
 
-            manager.BeatmapSetAdded += onBeatmapSetAdded;
-            manager.BeatmapSetRemoved += onBeatmapSetRemoved;
-            manager.BeatmapHidden += onBeatmapHidden;
-            manager.BeatmapRestored += onBeatmapRestored;
+            this.beatmaps.BeatmapSetAdded += onBeatmapSetAdded;
+            this.beatmaps.BeatmapSetRemoved += onBeatmapSetRemoved;
+            this.beatmaps.BeatmapHidden += onBeatmapHidden;
+            this.beatmaps.BeatmapRestored += onBeatmapRestored;
 
             dialogOverlay = dialog;
 
@@ -187,12 +189,18 @@ namespace osu.Game.Screens.Select
 
             initialAddSetsTask = new CancellationTokenSource();
 
-            carousel.Beatmaps = manager.GetAllUsableBeatmapSets();
+            carousel.Beatmaps = this.beatmaps.GetAllUsableBeatmapSets();
 
             Beatmap.ValueChanged += beatmap_ValueChanged;
 
             Beatmap.DisabledChanged += disabled => carousel.AllowSelection = !disabled;
             carousel.AllowSelection = !Beatmap.Disabled;
+        }
+
+        private void editRequested(BeatmapInfo beatmap)
+        {
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap);
+            Push(new Editor());
         }
 
         private void onBeatmapRestored(BeatmapInfo b) => carousel.UpdateBeatmap(b);
@@ -240,7 +248,7 @@ namespace osu.Game.Screens.Select
                 {
                     bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value.BeatmapInfo.BeatmapSetInfoID;
 
-                    Beatmap.Value = manager.GetWorkingBeatmap(beatmap, Beatmap);
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap);
                     ensurePlayingSelected(preview);
                 }
 
@@ -349,12 +357,12 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
-            if (manager != null)
+            if (beatmaps != null)
             {
-                manager.BeatmapSetAdded -= onBeatmapSetAdded;
-                manager.BeatmapSetRemoved -= onBeatmapSetRemoved;
-                manager.BeatmapHidden -= onBeatmapHidden;
-                manager.BeatmapRestored -= onBeatmapRestored;
+                beatmaps.BeatmapSetAdded -= onBeatmapSetAdded;
+                beatmaps.BeatmapSetRemoved -= onBeatmapSetRemoved;
+                beatmaps.BeatmapHidden -= onBeatmapHidden;
+                beatmaps.BeatmapRestored -= onBeatmapRestored;
             }
 
             initialAddSetsTask?.Cancel();

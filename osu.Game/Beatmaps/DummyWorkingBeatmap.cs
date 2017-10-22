@@ -22,10 +22,10 @@ namespace osu.Game.Beatmaps
                 {
                     Artist = "please load a beatmap!",
                     Title = "no beatmaps available!",
-                    Author = "no one",
+                    AuthorString = "no one",
                 },
                 BeatmapSet = new BeatmapSetInfo(),
-                Difficulty = new BeatmapDifficulty
+                BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = 0,
                     CircleSize = 0,

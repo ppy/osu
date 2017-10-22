@@ -171,7 +171,7 @@ namespace osu.Game.Beatmaps.Formats
                     metadata.ArtistUnicode = pair.Value;
                     break;
                 case @"Creator":
-                    metadata.Author = pair.Value;
+                    metadata.AuthorString = pair.Value;
                     break;
                 case @"Version":
                     beatmap.BeatmapInfo.Version = pair.Value;
@@ -196,7 +196,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = splitKeyVal(line, ':');
 
-            var difficulty = beatmap.BeatmapInfo.Difficulty;
+            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
             switch (pair.Key)
             {
                 case @"HPDrainRate":
@@ -613,7 +613,7 @@ namespace osu.Game.Beatmaps.Formats
             string line;
             while ((line = stream.ReadLine()) != null)
             {
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrWhiteSpace(line))
                     continue;
 
                 if (line.StartsWith("//"))
@@ -674,15 +674,17 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             foreach (var hitObject in beatmap.HitObjects)
-                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.Difficulty);
+                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
         }
 
         private KeyValuePair<string, string> splitKeyVal(string line, char separator)
         {
+            var split = line.Trim().Split(new[] { separator }, 2);
+
             return new KeyValuePair<string, string>
             (
-                line.Remove(line.IndexOf(separator)).Trim(),
-                line.Substring(line.IndexOf(separator) + 1).Trim()
+                split[0].Trim(),
+                split.Length > 1 ? split[1].Trim() : string.Empty
             );
         }
 

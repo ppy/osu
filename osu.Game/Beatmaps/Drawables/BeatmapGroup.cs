@@ -31,6 +31,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         public Action<BeatmapInfo> HideDifficultyRequested;
 
+        public Action<BeatmapInfo> EditRequested;
+
         public BeatmapSetHeader Header;
 
         public List<BeatmapPanel> BeatmapPanels;
@@ -81,13 +83,13 @@ namespace osu.Game.Beatmaps.Drawables
                 RelativeSizeAxes = Axes.X,
             };
 
-            BeatmapSet.Beatmaps = BeatmapSet.Beatmaps.Where(b => !b.Hidden).OrderBy(b => b.StarDifficulty).ToList();
-            BeatmapPanels = BeatmapSet.Beatmaps.Select(b => new BeatmapPanel(b)
+            BeatmapPanels = BeatmapSet.Beatmaps.Where(b => !b.Hidden).OrderBy(b => b.StarDifficulty).Select(b => new BeatmapPanel(b)
             {
                 Alpha = 0,
                 GainedSelection = panelGainedSelection,
                 HideRequested = p => HideDifficultyRequested?.Invoke(p),
-                StartRequested = p => { StartRequested?.Invoke(p.Beatmap); },
+                StartRequested = p => StartRequested?.Invoke(p.Beatmap),
+                EditRequested = p => EditRequested?.Invoke(p.Beatmap),
                 RelativeSizeAxes = Axes.X,
             }).ToList();
 
