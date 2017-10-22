@@ -180,7 +180,7 @@ namespace osu.Game.Database
         {
             try
             {
-                // will fail if the database isn't in a sane EF-migradted state.
+                // will fail if the database isn't in a sane EF-migrated state.
                 Database.ExecuteSqlCommand("SELECT MetadataID FROM BeatmapSetInfo LIMIT 1");
             }
             catch
