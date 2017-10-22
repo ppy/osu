@@ -7,13 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Microsoft.Win32;
 using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
 using osu.Game.Screens.Menu;
+using OpenTK.Input;
 
 namespace osu.Desktop
 {
@@ -105,16 +105,13 @@ namespace osu.Desktop
                 desktopWindow.Icon = new Icon(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
                 desktopWindow.Title = Name;
 
-                desktopWindow.DragEnter += dragEnter;
-                desktopWindow.DragDrop += dragDrop;
+                desktopWindow.FileDrop += fileDrop;
             }
         }
 
-        private void dragDrop(DragEventArgs e)
+        private void fileDrop(object sender, FileDropEventArgs e)
         {
-            // this method will only be executed if e.Effect in dragEnter gets set to something other that None.
-            var dropData = (object[])e.Data.GetData(DataFormats.FileDrop);
-            var filePaths = dropData.Select(f => f.ToString()).ToArray();
+            var filePaths = new [] { e.FileName };
 
             if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
                 Task.Run(() => BeatmapManager.Import(filePaths));
@@ -127,16 +124,5 @@ namespace osu.Desktop
         }
 
         private static readonly string[] allowed_extensions = { @".osz", @".osr" };
-
-        private void dragEnter(DragEventArgs e)
-        {
-            // dragDrop will only be executed if e.Effect gets set to something other that None in this method.
-            bool isFile = e.Data.GetDataPresent(DataFormats.FileDrop);
-            if (isFile)
-            {
-                var paths = ((object[])e.Data.GetData(DataFormats.FileDrop)).Select(f => f.ToString()).ToArray();
-                e.Effect = allowed_extensions.Any(ext => paths.All(p => p.EndsWith(ext))) ? DragDropEffects.Copy : DragDropEffects.None;
-            }
-        }
     }
 }
