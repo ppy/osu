@@ -9,6 +9,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -32,19 +33,19 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText text;
 
-        private readonly SettingsItemDefaultIndicator<T> defaultIndicator = new SettingsItemDefaultIndicator<T>();
+        private readonly RestoreDefaultValueButton<T> restoreDefaultValueButton = new RestoreDefaultValueButton<T>();
 
         public bool ShowsDefaultIndicator = true;
 
-        private Color4? defaultIndicatorColour;
+        private Color4? restoreDefaultValueColour;
 
-        public Color4 DefaultIndicatorColour
+        public Color4 RestoreDefaultValueColour
         {
-            get { return defaultIndicatorColour ?? Color4.White; }
+            get { return restoreDefaultValueColour ?? Color4.White; }
             set
             {
-                defaultIndicatorColour = value;
-                defaultIndicator?.SetIndicatorColour(DefaultIndicatorColour);
+                restoreDefaultValueColour = value;
+                restoreDefaultValueButton?.SetButtonColour(RestoreDefaultValueColour);
             }
         }
 
@@ -79,8 +80,8 @@ namespace osu.Game.Overlays.Settings
                 controlWithCurrent?.Current.BindTo(bindable);
                 if (ShowsDefaultIndicator)
                 {
-                    defaultIndicator.Bindable.BindTo(bindable);
-                    defaultIndicator.Bindable.TriggerChange();
+                    restoreDefaultValueButton.Bindable.BindTo(bindable);
+                    restoreDefaultValueButton.Bindable.TriggerChange();
                 }
             }
         }
@@ -122,24 +123,24 @@ namespace osu.Game.Overlays.Settings
         {
             AddInternal(FlowContent);
 
-            if (defaultIndicator != null)
+            if (restoreDefaultValueButton != null)
             {
-                if (!defaultIndicatorColour.HasValue)
-                    defaultIndicatorColour = colours.Yellow;
-                defaultIndicator.SetIndicatorColour(DefaultIndicatorColour);
-                AddInternal(defaultIndicator);
+                if (!restoreDefaultValueColour.HasValue)
+                    restoreDefaultValueColour = colours.Yellow;
+                restoreDefaultValueButton.SetButtonColour(RestoreDefaultValueColour);
+                AddInternal(restoreDefaultValueButton);
             }
         }
 
-        private class SettingsItemDefaultIndicator<T> : Box
+        private class RestoreDefaultValueButton<T> : Box, IHasTooltip
         {
             internal readonly Bindable<T> Bindable = new Bindable<T>();
 
-            private Color4 indicatorColour;
+            private Color4 buttonColour;
 
             private bool hovering;
 
-            public SettingsItemDefaultIndicator()
+            public RestoreDefaultValueButton()
             {
                 Bindable.ValueChanged += value => UpdateState();
                 Bindable.DisabledChanged += disabled => UpdateState();
@@ -148,6 +149,8 @@ namespace osu.Game.Overlays.Settings
                 Width = SettingsOverlay.CONTENT_MARGINS;
                 Alpha = 0f;
             }
+
+            public string TooltipText => "Revert to default";
 
             public override bool HandleInput => true;
 
@@ -175,17 +178,17 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            internal void SetIndicatorColour(Color4 indicatorColour)
+            internal void SetButtonColour(Color4 buttonColour)
             {
-                this.indicatorColour = indicatorColour;
+                this.buttonColour = buttonColour;
                 UpdateState();
             }
 
             internal void UpdateState()
             {
-                var colour = Bindable.Disabled ? Color4.Gray : indicatorColour;
-                Alpha = Bindable.IsDefault ? 0f : hovering && !Bindable.Disabled ? 1f : 0.5f;
-                Colour = ColourInfo.GradientHorizontal(colour.Opacity(0.8f), colour.Opacity(0));
+                var colour = Bindable.Disabled ? Color4.Gray : buttonColour;
+                this.FadeTo(Bindable.IsDefault ? 0f : hovering && !Bindable.Disabled ? 1f : 0.5f, 200, Easing.OutQuint);
+                this.FadeColour(ColourInfo.GradientHorizontal(colour.Opacity(0.8f), colour.Opacity(0)), 200, Easing.OutQuint);
             }
         }
     }
