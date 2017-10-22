@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
+using osu.Framework.Logging;
 using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
@@ -90,18 +91,7 @@ namespace osu.Game
             dependencies.Cache(this);
             dependencies.Cache(LocalConfig);
 
-            try
-            {
-                using (var context = contextFactory.GetContext())
-                    context.Migrate();
-            }
-            catch (MigrationFailedException)
-            {
-                using (var context = contextFactory.GetContext())
-                    context.Database.EnsureDeleted();
-                using (var context = contextFactory.GetContext())
-                    context.Migrate();
-            }
+            runMigrations();
 
             dependencies.Cache(API = new APIAccess
             {
@@ -171,6 +161,28 @@ namespace osu.Game
             API.Register(this);
 
             FileStore.Cleanup();
+        }
+
+        private void runMigrations()
+        {
+            try
+            {
+                using (var context = contextFactory.GetContext())
+                    context.Migrate();
+            }
+            catch (MigrationFailedException e)
+            {
+                Logger.Log((e.InnerException ?? e).ToString(), LoggingTarget.Database, LogLevel.Error);
+                Logger.Log("Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database, LogLevel.Error);
+
+                // if we failed, let's delete the database and start fresh.
+                // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
+                contextFactory.ResetDatabase();
+                Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
+
+                using (var context = contextFactory.GetContext())
+                    context.Migrate();
+            }
         }
 
         private WorkingBeatmap lastBeatmap;
