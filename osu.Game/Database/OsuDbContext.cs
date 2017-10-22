@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
@@ -50,8 +51,6 @@ namespace osu.Game.Database
         {
             this.connectionString = connectionString;
 
-            Database.SetCommandTimeout(new TimeSpan(TimeSpan.TicksPerSecond * 10));
-
             var connection = Database.GetDbConnection();
             connection.Open();
             using (var cmd = connection.CreateCommand())
@@ -68,7 +67,7 @@ namespace osu.Game.Database
                 // this is required for the time being due to the way we are querying in places like BeatmapStore.
                 // if we ever move to having consumers file their own .Includes, or get eager loading support, this could be re-enabled.
                 .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
-                .UseSqlite(connectionString)
+                .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10))
                 .UseLoggerFactory(logger.Value);
         }
 
