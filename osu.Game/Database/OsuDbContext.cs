@@ -93,6 +93,13 @@ namespace osu.Game.Database
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
         }
 
+        public new int SaveChanges(IDbContextTransaction transaction = null)
+        {
+            var ret = base.SaveChanges();
+            transaction?.Commit();
+            return ret;
+        }
+
         private class OsuDbLoggerFactory : ILoggerFactory
         {
             #region Disposal
