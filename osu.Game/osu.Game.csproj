@@ -282,7 +282,7 @@
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Migrations\20171019041408_InitialCreate.cs" />
-    <Compile Include="Migrations\20171019041408_InitialCreate.designer.cs">
+    <Compile Include="Migrations\20171019041408_InitialCreate.Designer.cs">
       <DependentUpon>20171019041408_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
