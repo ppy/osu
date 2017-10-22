@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             private void calculateScale()
             {
-                adjustContainer.ApplyScale((float)cursorScale.Value, autoCursorScale);
+                adjustContainer.ApplyScale((float)cursorScale.Value, autoCursorScale, 200, Easing.OutQuad);
             }
         }
 

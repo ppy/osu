@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.Containers
         {
             beatmap = game.Beatmap.GetBoundCopy();
             beatmap.ValueChanged += v => ApplyScale();
-            ApplyScale(Scale.X);
+            ApplyScale();
         }
 
         public virtual void ApplyScale(float scale = 1, bool useScalingFactor = true, double duration = 0, Easing easing = Easing.None)
