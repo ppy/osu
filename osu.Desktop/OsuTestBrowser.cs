@@ -3,9 +3,10 @@
 
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using osu.Game;
 using osu.Game.Screens.Backgrounds;
 
-namespace osu.Game
+namespace osu.Desktop
 {
     internal class OsuTestBrowser : OsuGameBase
     {

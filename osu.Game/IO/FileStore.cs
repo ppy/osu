@@ -4,12 +4,12 @@
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Database;
-using SQLite.Net;
 
 namespace osu.Game.IO
 {
@@ -18,75 +18,37 @@ namespace osu.Game.IO
     /// </summary>
     public class FileStore : DatabaseBackedStore
     {
-        private const string prefix = "files";
+        public readonly IResourceStore<byte[]> Store;
 
-        public readonly ResourceStore<byte[]> Store;
+        public Storage Storage => base.Storage;
 
-        protected override int StoreVersion => 2;
-
-        public FileStore(SQLiteConnection connection, Storage storage) : base(connection, storage)
+        public FileStore(Func<OsuDbContext> getContext, Storage storage) : base(getContext, storage.GetStorageForDirectory(@"files"))
         {
-            Store = new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), prefix);
+            Store = new StorageBackedResourceStore(Storage);
         }
-
-        protected override Type[] ValidTypes => new[] {
-            typeof(FileInfo),
-        };
 
         protected override void Prepare(bool reset = false)
         {
             if (reset)
             {
-                // in earlier versions we stored beatmaps as solid archives, but not any more.
-                if (Storage.ExistsDirectory("beatmaps"))
-                    Storage.DeleteDirectory("beatmaps");
+                if (Storage.ExistsDirectory(string.Empty))
+                    Storage.DeleteDirectory(string.Empty);
 
-                if (Storage.ExistsDirectory(prefix))
-                    Storage.DeleteDirectory(prefix);
-
-                Connection.DropTable<FileInfo>();
-            }
-
-            Connection.CreateTable<FileInfo>();
-        }
-
-        protected override void StartupTasks()
-        {
-            base.StartupTasks();
-            deletePending();
-        }
-
-        /// <summary>
-        /// Perform migrations between two store versions.
-        /// </summary>
-        /// <param name="currentVersion">The current store version. This will be zero on a fresh database initialisation.</param>
-        /// <param name="targetVersion">The target version which we are migrating to (equal to the current <see cref="StoreVersion"/>).</param>
-        protected override void PerformMigration(int currentVersion, int targetVersion)
-        {
-            base.PerformMigration(currentVersion, targetVersion);
-
-            while (currentVersion++ < targetVersion)
-            {
-                switch (currentVersion)
-                {
-                    case 1:
-                    case 2:
-                        // cannot migrate; breaking underlying changes.
-                        Reset();
-                        break;
-                }
+                GetContext().Database.ExecuteSqlCommand("DELETE FROM FileInfo");
             }
         }
 
         public FileInfo Add(Stream data, bool reference = true)
         {
+            var context = GetContext();
+
             string hash = data.ComputeSHA2Hash();
 
-            var existing = Connection.Table<FileInfo>().Where(f => f.Hash == hash).FirstOrDefault();
+            var existing = context.FileInfo.FirstOrDefault(f => f.Hash == hash);
 
             var info = existing ?? new FileInfo { Hash = hash };
 
-            string path = Path.Combine(prefix, info.StoragePath);
+            string path = info.StoragePath;
 
             // we may be re-adding a file to fix missing store entries.
             if (!Storage.Exists(path))
@@ -99,62 +61,58 @@ namespace osu.Game.IO
                 data.Seek(0, SeekOrigin.Begin);
             }
 
-            if (existing == null)
-                Connection.Insert(info);
-
             if (reference || existing == null)
                 Reference(info);
 
             return info;
         }
 
-        public void Reference(params FileInfo[] files)
-        {
-            Connection.RunInTransaction(() =>
-            {
-                var incrementedFiles = files.GroupBy(f => f.ID).Select(f =>
-                {
-                    var accurateRefCount = Connection.Get<FileInfo>(f.First().ID);
-                    accurateRefCount.ReferenceCount += f.Count();
-                    return accurateRefCount;
-                });
+        public void Reference(params FileInfo[] files) => reference(GetContext(), files);
 
-                Connection.UpdateAll(incrementedFiles);
-            });
+        private void reference(OsuDbContext context, FileInfo[] files)
+        {
+            foreach (var f in files.GroupBy(f => f.ID))
+            {
+                var refetch = context.Find<FileInfo>(f.First().ID) ?? f.First();
+                refetch.ReferenceCount += f.Count();
+                context.FileInfo.Update(refetch);
+            }
+
+            context.SaveChanges();
         }
 
-        public void Dereference(params FileInfo[] files)
-        {
-            Connection.RunInTransaction(() =>
-            {
-                var incrementedFiles = files.GroupBy(f => f.ID).Select(f =>
-                {
-                    var accurateRefCount = Connection.Get<FileInfo>(f.First().ID);
-                    accurateRefCount.ReferenceCount -= f.Count();
-                    return accurateRefCount;
-                });
+        public void Dereference(params FileInfo[] files) => dereference(GetContext(), files);
 
-                Connection.UpdateAll(incrementedFiles);
-            });
+        private void dereference(OsuDbContext context, FileInfo[] files)
+        {
+            foreach (var f in files.GroupBy(f => f.ID))
+            {
+                var refetch = context.FileInfo.Find(f.Key);
+                refetch.ReferenceCount -= f.Count();
+                context.FileInfo.Update(refetch);
+            }
+
+            context.SaveChanges();
         }
 
-        private void deletePending()
+        public override void Cleanup()
         {
-            Connection.RunInTransaction(() =>
+            var context = GetContext();
+
+            foreach (var f in context.FileInfo.Where(f => f.ReferenceCount < 1))
             {
-                foreach (var f in Query<FileInfo>(f => f.ReferenceCount < 1))
+                try
                 {
-                    try
-                    {
-                        Storage.Delete(Path.Combine(prefix, f.StoragePath));
-                        Connection.Delete(f);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $@"Could not delete beatmap {f}");
-                    }
+                    Storage.Delete(f.StoragePath);
+                    context.FileInfo.Remove(f);
                 }
-            });
+                catch (Exception e)
+                {
+                    Logger.Error(e, $@"Could not delete beatmap {f}");
+                }
+            }
+
+            context.SaveChanges();
         }
     }
 }

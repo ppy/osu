@@ -71,12 +71,12 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
         protected override void SimulateAutoplay(Beatmap<TaikoHitObject> beatmap)
         {
-            double hpMultiplierNormal = 1 / (hp_hit_great * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, 0.5, 0.75, 0.98));
+            double hpMultiplierNormal = 1 / (hp_hit_great * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98));
 
             hpIncreaseTick = hp_hit_tick;
             hpIncreaseGreat = hpMultiplierNormal * hp_hit_great;
             hpIncreaseGood = hpMultiplierNormal * hp_hit_good;
-            hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.Difficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
+            hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
 
             foreach (var obj in beatmap.HitObjects)
             {

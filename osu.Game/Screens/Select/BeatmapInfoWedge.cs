@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Select
                                     new OsuSpriteText
                                     {
                                         Font = @"Exo2.0-Bold",
-                                        Text = metadata.Author,
+                                        Text = metadata.Author.Username,
                                         TextSize = 15,
                                         },
                                 }
@@ -232,9 +232,9 @@ namespace osu.Game.Screens.Select
                 double bpmMax = beatmap.ControlPointInfo.BPMMaximum;
                 double bpmMin = beatmap.ControlPointInfo.BPMMinimum;
 
-                if (Precision.AlmostEquals(bpmMin, bpmMax)) return Math.Round(bpmMin) + "bpm";
+                if (Precision.AlmostEquals(bpmMin, bpmMax)) return $"{bpmMin:0}bpm";
 
-                return Math.Round(bpmMin) + "-" + Math.Round(bpmMax) + "bpm (mostly " + Math.Round(beatmap.ControlPointInfo.BPMMode) + "bpm)";
+                return $"{bpmMin:0}-{bpmMax:0}bpm (mostly {beatmap.ControlPointInfo.BPMMode:0}bpm)";
             }
 
             public class InfoLabel : Container

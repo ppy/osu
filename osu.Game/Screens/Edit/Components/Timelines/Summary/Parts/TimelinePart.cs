@@ -25,16 +25,29 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
             Beatmap.ValueChanged += b =>
             {
-                timeline.Clear();
-                timeline.RelativeChildSize = new Vector2((float)Math.Max(1, b.Track.Length), 1);
+                updateRelativeChildSize();
                 LoadBeatmap(b);
             };
+        }
+
+        private void updateRelativeChildSize()
+        {
+            // the track may not be loaded completely (only has a length once it is).
+            if (!Beatmap.Value.Track.IsLoaded)
+            {
+                timeline.RelativeChildSize = Vector2.One;
+                Schedule(updateRelativeChildSize);
+                return;
+            }
+
+            timeline.RelativeChildSize = new Vector2((float)Math.Max(1, Beatmap.Value.Track.Length), 1);
         }
 
         protected void Add(Drawable visualisation) => timeline.Add(visualisation);
 
         protected virtual void LoadBeatmap(WorkingBeatmap beatmap)
         {
+            timeline.Clear();
         }
     }
 }

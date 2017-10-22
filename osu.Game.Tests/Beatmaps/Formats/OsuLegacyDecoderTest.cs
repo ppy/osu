@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("Soleily", meta.Artist);
                 Assert.AreEqual("Soleily", meta.ArtistUnicode);
                 Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", meta.AudioFile);
-                Assert.AreEqual("Gamu", meta.Author);
+                Assert.AreEqual("Gamu", meta.AuthorString);
                 Assert.AreEqual("machinetop_background.jpg", meta.BackgroundFile);
                 Assert.AreEqual(164471, meta.PreviewTime);
                 Assert.AreEqual(string.Empty, meta.Source);
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             {
                 var beatmap = decoder.Decode(new StreamReader(stream));
-                var difficulty = beatmap.BeatmapInfo.Difficulty;
+                var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
                 Assert.AreEqual(6.5f, difficulty.DrainRate);
                 Assert.AreEqual(4, difficulty.CircleSize);
                 Assert.AreEqual(8, difficulty.OverallDifficulty);

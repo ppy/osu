@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Mods
             if (osu != null)
                 Ruleset.BindTo(osu.Ruleset);
             else
-                Ruleset.Value = rulesets.AllRulesets.First();
+                Ruleset.Value = rulesets.AvailableRulesets.First();
 
             Ruleset.ValueChanged += rulesetChanged;
             Ruleset.TriggerChange();

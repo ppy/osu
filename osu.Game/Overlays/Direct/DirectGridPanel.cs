@@ -21,6 +21,11 @@ namespace osu.Game.Overlays.Direct
         private const float vertical_padding = 5;
 
         private FillFlowContainer bottomPanel;
+        private PlayButton playButton;
+        private Box progressBar;
+
+        protected override PlayButton PlayButton => playButton;
+        protected override Box PreviewBar => progressBar;
 
         public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
@@ -87,6 +92,15 @@ namespace osu.Game.Overlays.Direct
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
+                                progressBar = new Box
+                                {
+                                    Origin = Anchor.BottomLeft,
+                                    RelativeSizeAxes = Axes.X,
+                                    BypassAutoSizeAxes = Axes.Both,
+                                    Size = new Vector2(0, 3),
+                                    Alpha = 0,
+                                    Colour = colours.Yellow,
+                                },
                                 new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
@@ -116,7 +130,7 @@ namespace osu.Game.Overlays.Direct
                                                 },
                                                 new OsuSpriteText
                                                 {
-                                                    Text = SetInfo.Metadata.Author,
+                                                    Text = SetInfo.Metadata.Author.Username,
                                                     TextSize = 14,
                                                     Font = @"Exo2.0-SemiBoldItalic",
                                                     Shadow = false,
@@ -177,6 +191,12 @@ namespace osu.Game.Overlays.Direct
                         },
                         new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                     },
+                },
+                playButton = new PlayButton(SetInfo)
+                {
+                    Margin = new MarginPadding { Top = 5, Left = 10 },
+                    Size = new Vector2(30),
+                    Alpha = 0,
                 },
             });
         }

@@ -34,6 +34,7 @@ namespace osu.Game.Overlays
 
         public const float CONTENT_X_MARGIN = 50;
 
+        // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         protected override bool OnClick(InputState state)
@@ -91,12 +92,12 @@ namespace osu.Game.Overlays
             sections = new ProfileSection[]
             {
                 new AboutSection(),
-                new RecentSection(),
+                //new RecentSection(),
                 new RanksSection(),
-                new MedalsSection(),
-                new HistoricalSection(),
-                new BeatmapsSection(),
-                new KudosuSection()
+                //new MedalsSection(),
+                //new HistoricalSection(),
+                //new BeatmapsSection(),
+                //new KudosuSection()
             };
             tabs = new ProfileTabControl
             {
@@ -174,6 +175,8 @@ namespace osu.Game.Overlays
                 var sec = sections.FirstOrDefault(s => s.Identifier == id);
                 if (sec != null)
                 {
+                    sec.User = user;
+
                     sectionsContainer.Add(sec);
                     tabs.AddItem(sec);
                 }
