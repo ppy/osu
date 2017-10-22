@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
@@ -63,8 +64,12 @@ namespace osu.Game.Database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlite(connectionString);
-            optionsBuilder.UseLoggerFactory(logger.Value);
+            optionsBuilder
+                // this is required for the time being due to the way we are querying in places like BeatmapStore.
+                // if we ever move to having consumers file their own .Includes, or get eager loading support, this could be re-enabled.
+                .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
+                .UseSqlite(connectionString)
+                .UseLoggerFactory(logger.Value);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -160,7 +165,15 @@ namespace osu.Game.Database
         public void Migrate()
         {
             migrateFromSqliteNet();
-            Database.Migrate();
+
+            try
+            {
+                Database.Migrate();
+            }
+            catch (Exception e)
+            {
+                throw new MigrationFailedException(e);
+            }
         }
 
         private void migrateFromSqliteNet()
@@ -179,6 +192,8 @@ namespace osu.Game.Database
 
                     try
                     {
+                        Logger.Log("Performing migration from sqlite-net to EF...", LoggingTarget.Database, Framework.Logging.LogLevel.Important);
+
                         // we are good to perform messy migration of data!.
                         Database.ExecuteSqlCommand("ALTER TABLE BeatmapDifficulty RENAME TO BeatmapDifficulty_Old");
                         Database.ExecuteSqlCommand("ALTER TABLE BeatmapMetadata RENAME TO BeatmapMetadata_Old");
@@ -219,13 +234,14 @@ namespace osu.Game.Database
                         Database.ExecuteSqlCommand("DROP TABLE RulesetInfo_Old");
 
                         Database.ExecuteSqlCommand(
-                            "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, Hidden, LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), OnlineBeatmapID, Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
+                            "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, IFNULL(Hidden, 0), LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), OnlineBeatmapID, Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
                         Database.ExecuteSqlCommand("DROP TABLE BeatmapInfo_Old");
+
+                        Logger.Log("Migration complete!", LoggingTarget.Database, Framework.Logging.LogLevel.Important);
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        // if anything went wrong during migration just nuke the database.
-                        throw new MigrationFailedException();
+                        throw new MigrationFailedException(e);
                     }
                 }
                 catch (MigrationFailedException e)
@@ -241,5 +257,9 @@ namespace osu.Game.Database
 
     public class MigrationFailedException : Exception
     {
+        public MigrationFailedException(Exception exception)
+            : base("sqlite-net migration failed", exception)
+        {
+        }
     }
 }
