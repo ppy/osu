@@ -19,12 +19,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             Origin = Anchor.Centre;
             Size = new Vector2(width);
             Masking = true;
+
             EdgeEffect = new EdgeEffectParameters
             {
                 Type = EdgeEffectType.Glow,
                 Colour = Color4.White.Opacity(0.2f),
                 Radius = 4,
             };
+
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,
