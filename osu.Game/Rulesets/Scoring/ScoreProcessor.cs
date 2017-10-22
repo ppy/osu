@@ -69,7 +69,12 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether the score is in a failed state.
         /// </summary>
-        public virtual bool HasFailed => Health.Value == Health.MinValue;
+        public virtual bool HasFailed => alreadyFailed;
+
+        /// <summary>
+        /// The conditions for failing
+        /// </summary>
+        protected virtual bool FailCondition => Health.Value == Health.MinValue;
 
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
@@ -121,7 +126,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected void UpdateFailed()
         {
-            if (alreadyFailed || !HasFailed)
+            if (alreadyFailed || !FailCondition)
                 return;
 
             if (Failed?.Invoke() != false)
