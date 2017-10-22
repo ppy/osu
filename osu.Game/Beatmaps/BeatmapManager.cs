@@ -198,7 +198,7 @@ namespace osu.Game.Beatmaps
                         context.SaveChanges();
                     }
 
-                    transaction.Commit();
+                    context.SaveChanges(transaction);
                     return set;
                 }
             }
@@ -313,9 +313,7 @@ namespace osu.Game.Beatmaps
                     }
 
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
-                    context.SaveChanges();
-
-                    transaction.Commit();
+                    context.SaveChanges(transaction);
                 }
             }
         }
