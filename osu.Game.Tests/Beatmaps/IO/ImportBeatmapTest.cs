@@ -100,6 +100,10 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
 
+            // this is a temporary workaround for database transaction clashes.
+            // see https://github.com/aspnet/EntityFrameworkCore/issues/9994 for more information.
+            Thread.Sleep(1000);
+
             return osu;
         }
 
