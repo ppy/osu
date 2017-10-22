@@ -180,13 +180,15 @@ namespace osu.Game.Database
         {
             try
             {
-                // will fail if EF hasn't touched the database yet.
-                Database.ExecuteSqlCommand("SELECT * FROM __EFMigrationsHistory LIMIT 1");
+                // will fail if the database isn't in a sane EF-migradted state.
+                Database.ExecuteSqlCommand("SELECT MetadataID FROM BeatmapSetInfo LIMIT 1");
             }
             catch
             {
                 try
                 {
+                    Database.ExecuteSqlCommand("DROP TABLE IF EXISTS __EFMigrationsHistory");
+
                     // will fail (intentionally) if we don't have sqlite-net data present.
                     Database.ExecuteSqlCommand("SELECT OnlineBeatmapSetId FROM BeatmapMetadata LIMIT 1");
 
