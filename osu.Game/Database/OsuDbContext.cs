@@ -92,6 +92,12 @@ namespace osu.Game.Database
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
         }
 
+        public IDbContextTransaction BeginTransaction()
+        {
+            // return Database.BeginTransaction();
+            return null;
+        }
+
         public new int SaveChanges(IDbContextTransaction transaction = null)
         {
             var ret = base.SaveChanges();

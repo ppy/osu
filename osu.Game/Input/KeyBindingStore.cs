@@ -39,7 +39,7 @@ namespace osu.Game.Input
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
             using (var context = GetContext())
-            using (var transaction = context.Database.BeginTransaction())
+            using (var transaction = context.BeginTransaction())
             {
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
