@@ -22,7 +22,7 @@ namespace osu.Game.IO
 
         public Storage Storage => base.Storage;
 
-        public FileStore(Func<OsuDbContext> getContext, Storage storage) : base(getContext, storage.GetStorageForDirectory(@"files"))
+        public FileStore(Func<OsuDbContext> createContext, Storage storage) : base(createContext, storage.GetStorageForDirectory(@"files"))
         {
             Store = new StorageBackedResourceStore(Storage);
         }

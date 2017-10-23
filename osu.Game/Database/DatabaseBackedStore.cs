@@ -11,12 +11,24 @@ namespace osu.Game.Database
     {
         protected readonly Storage Storage;
 
-        protected readonly Func<OsuDbContext> GetContext;
+        /// <summary>
+        /// Create a new <see cref="OsuDbContext"/> instance (separate from the shared context via <see cref="GetContext"/> for performing isolated operations.
+        /// </summary>
+        protected readonly Func<OsuDbContext> CreateContext;
 
-        protected DatabaseBackedStore(Func<OsuDbContext> getContext, Storage storage = null)
+        private readonly Lazy<OsuDbContext> queryContext;
+
+        /// <summary>
+        /// Retrieve a shared context for performing lookups (or write operations on the update thread, for now).
+        /// </summary>
+        protected OsuDbContext GetContext() => queryContext.Value;
+
+        protected DatabaseBackedStore(Func<OsuDbContext> createContext, Storage storage = null)
         {
+            CreateContext = createContext;
+            queryContext = new Lazy<OsuDbContext>(CreateContext);
+
             Storage = storage;
-            GetContext = getContext;
 
             try
             {
