@@ -41,6 +41,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        [NonParallelizable]
         public void TestImportOverIPC()
         {
             using (HeadlessGameHost host = new HeadlessGameHost("host", true))
