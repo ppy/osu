@@ -158,19 +158,15 @@ namespace osu.Game
             BeatmapManager.PostNotification = n => notificationOverlay?.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
 
-            AddRange(new Drawable[] {
+            AddRange(new Drawable[]
+            {
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
                     ActionRequested = action => volume.Adjust(action)
                 },
-                mainContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                volume = new VolumeControl(),
-                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                new OnScreenDisplay(),
+                mainContent = new Container { RelativeSizeAxes = Axes.Both },
+                overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
             });
 
             loadComponentSingleFile(screenStack = new Loader(), d =>
@@ -189,6 +185,9 @@ namespace osu.Game
                     intro?.ChildScreen?.MakeCurrent();
                 },
             }, overlayContent.Add);
+
+            loadComponentSingleFile(volume = new VolumeControl(), AddInternal);
+            loadComponentSingleFile(new OnScreenDisplay(), AddInternal);
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
