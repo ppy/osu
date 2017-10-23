@@ -57,7 +57,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
@@ -76,7 +75,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -102,7 +100,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <LangVersion>6</LangVersion>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <StartArguments>--tests</StartArguments>
   </PropertyGroup>
   <ItemGroup>
@@ -158,6 +155,10 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>../packages/System.ValueTuple.4.4.0/lib/net461/System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -231,6 +232,10 @@
     <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
       <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
       <Name>osu.Game.Rulesets.Taiko</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\osu.Game.Tests\osu.Game.Tests.csproj">
+      <Project>{54377672-20b1-40af-8087-5cf73bf3953a}</Project>
+      <Name>osu.Game.Tests</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>

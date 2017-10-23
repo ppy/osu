@@ -196,7 +196,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var pair = splitKeyVal(line, ':');
 
-            var difficulty = beatmap.BeatmapInfo.Difficulty;
+            var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
             switch (pair.Key)
             {
                 case @"HPDrainRate":
@@ -674,7 +674,7 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             foreach (var hitObject in beatmap.HitObjects)
-                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.Difficulty);
+                hitObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
         }
 
         private KeyValuePair<string, string> splitKeyVal(string line, char separator)
