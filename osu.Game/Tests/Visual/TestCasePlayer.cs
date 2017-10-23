@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCasePlayer : OsuTestCase
+    public abstract class TestCasePlayer : OsuTestCase
     {
         private readonly Type ruleset;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual
             this.ruleset = ruleset;
         }
 
-        public TestCasePlayer()
+        protected TestCasePlayer()
         {
 
         }
