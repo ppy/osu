@@ -74,7 +74,7 @@
       <Name>osu.Game.Rulesets.Taiko</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{0D3FBF8A-7464-4CF7-8C90-3E7886DF2D4D}</Project>
+      <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
       <Name>osu.Game</Name>
     </ProjectReference>
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
@@ -90,6 +90,56 @@
     <Compile Include="Beatmaps\IO\ImportBeatmapTest.cs" />
     <Compile Include="Resources\Resource.cs" />
     <Compile Include="Beatmaps\Formats\OsuLegacyDecoderTest.cs" />
+    <Compile Include="Visual\TestCaseBeatmapDetailArea.cs" />
+    <Compile Include="Visual\TestCaseBeatmapDetails.cs" />
+    <Compile Include="Visual\TestCaseBeatmapOptionsOverlay.cs" />
+    <Compile Include="Visual\TestCaseBeatmapSetOverlay.cs" />
+    <Compile Include="Visual\TestCaseBeatSyncedContainer.cs" />
+    <Compile Include="Visual\TestCaseBreadcrumbs.cs" />
+    <Compile Include="Visual\TestCaseBreakOverlay.cs" />
+    <Compile Include="Visual\TestCaseChatDisplay.cs" />
+    <Compile Include="Visual\TestCaseContextMenu.cs" />
+    <Compile Include="Visual\TestCaseDialogOverlay.cs" />
+    <Compile Include="Visual\TestCaseDirect.cs" />
+    <Compile Include="Visual\TestCaseDrawableRoom.cs" />
+    <Compile Include="Visual\TestCaseDrawings.cs" />
+    <Compile Include="Visual\TestCaseEditor.cs" />
+    <Compile Include="Visual\TestCaseEditorComposeTimeline.cs" />
+    <Compile Include="Visual\TestCaseEditorMenuBar.cs" />
+    <Compile Include="Visual\TestCaseEditorSummaryTimeline.cs" />
+    <Compile Include="Visual\TestCaseGamefield.cs" />
+    <Compile Include="Visual\TestCaseGraph.cs" />
+    <Compile Include="Visual\TestCaseIconButton.cs" />
+    <Compile Include="Visual\TestCaseKeyConfiguration.cs" />
+    <Compile Include="Visual\TestCaseKeyCounter.cs" />
+    <Compile Include="Visual\TestCaseLeaderboard.cs" />
+    <Compile Include="Visual\TestCaseMedalOverlay.cs" />
+    <Compile Include="Visual\TestCaseMenuButtonSystem.cs" />
+    <Compile Include="Visual\TestCaseMenuOverlays.cs" />
+    <Compile Include="Visual\TestCaseMods.cs" />
+    <Compile Include="Visual\TestCaseMusicController.cs" />
+    <Compile Include="Visual\TestCaseNotificationOverlay.cs" />
+    <Compile Include="Visual\TestCaseOnScreenDisplay.cs" />
+    <Compile Include="Visual\TestCaseAllPlayers.cs" />
+    <Compile Include="Visual\TestCasePlaySongSelect.cs" />
+    <Compile Include="Visual\TestCaseReplay.cs" />
+    <Compile Include="Visual\TestCaseReplaySettingsOverlay.cs" />
+    <Compile Include="Visual\TestCaseResults.cs" />
+    <Compile Include="Visual\TestCaseRoomInspector.cs" />
+    <Compile Include="Visual\TestCaseScoreCounter.cs" />
+    <Compile Include="Visual\TestCaseScrollingPlayfield.cs" />
+    <Compile Include="Visual\TestCaseSettings.cs" />
+    <Compile Include="Visual\TestCaseSkipButton.cs" />
+    <Compile Include="Visual\TestCaseSocial.cs" />
+    <Compile Include="Visual\TestCaseSongProgress.cs" />
+    <Compile Include="Visual\TestCaseStoryboard.cs" />
+    <Compile Include="Visual\TestCaseTabControl.cs" />
+    <Compile Include="Visual\TestCaseTextAwesome.cs" />
+    <Compile Include="Visual\TestCaseTwoLayerButton.cs" />
+    <Compile Include="Visual\TestCaseUserPanel.cs" />
+    <Compile Include="Visual\TestCaseUserProfile.cs" />
+    <Compile Include="Visual\TestCaseUserRanks.cs" />
+    <Compile Include="Visual\TestCaseWaveform.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
