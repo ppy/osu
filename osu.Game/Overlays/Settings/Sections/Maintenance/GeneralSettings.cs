@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         restoreButton.Enabled.Value = false;
                         Task.Run(() =>
                         {
-                            foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden))
+                            foreach (var b in beatmaps.QueryBeatmaps(b => b.Hidden).ToList())
                                 beatmaps.Restore(b);
                         }).ContinueWith(t => Schedule(() => restoreButton.Enabled.Value = true));
                     }
