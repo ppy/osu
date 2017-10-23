@@ -146,6 +146,7 @@
       <HintPath>$(SolutionDir)\packages\Microsoft.Extensions.Primitives.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>$(SolutionDir)\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -282,7 +283,7 @@
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
     <Compile Include="Migrations\20171019041408_InitialCreate.cs" />
-    <Compile Include="Migrations\20171019041408_InitialCreate.designer.cs">
+    <Compile Include="Migrations\20171019041408_InitialCreate.Designer.cs">
       <DependentUpon>20171019041408_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
@@ -767,55 +768,7 @@
     <Compile Include="Tests\Beatmaps\TestWorkingBeatmap.cs" />
     <Compile Include="Tests\Platform\TestStorage.cs" />
     <Compile Include="Tests\Visual\OsuTestCase.cs" />
-    <Compile Include="Tests\Visual\TestCaseBeatmapDetailArea.cs" />
-    <Compile Include="Tests\Visual\TestCaseBeatmapDetails.cs" />
-    <Compile Include="Tests\Visual\TestCaseBeatmapOptionsOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseBeatSyncedContainer.cs" />
-    <Compile Include="Tests\Visual\TestCaseBreadcrumbs.cs" />
-    <Compile Include="Tests\Visual\TestCaseBreakOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseChatDisplay.cs" />
-    <Compile Include="Tests\Visual\TestCaseContextMenu.cs" />
-    <Compile Include="Tests\Visual\TestCaseDialogOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseDirect.cs" />
-    <Compile Include="Tests\Visual\TestCaseDrawableRoom.cs" />
-    <Compile Include="Tests\Visual\TestCaseDrawings.cs" />
-    <Compile Include="Tests\Visual\TestCaseEditor.cs" />
-    <Compile Include="Tests\Visual\TestCaseEditorComposeTimeline.cs" />
-    <Compile Include="Tests\Visual\TestCaseEditorMenuBar.cs" />
-    <Compile Include="Tests\Visual\TestCaseEditorSummaryTimeline.cs" />
-    <Compile Include="Tests\Visual\TestCaseGamefield.cs" />
-    <Compile Include="Tests\Visual\TestCaseGraph.cs" />
-    <Compile Include="Tests\Visual\TestCaseIconButton.cs" />
-    <Compile Include="Tests\Visual\TestCaseKeyConfiguration.cs" />
-    <Compile Include="Tests\Visual\TestCaseKeyCounter.cs" />
-    <Compile Include="Tests\Visual\TestCaseLeaderboard.cs" />
-    <Compile Include="Tests\Visual\TestCaseMedalOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseMenuButtonSystem.cs" />
-    <Compile Include="Tests\Visual\TestCaseMenuOverlays.cs" />
-    <Compile Include="Tests\Visual\TestCaseMods.cs" />
-    <Compile Include="Tests\Visual\TestCaseMusicController.cs" />
-    <Compile Include="Tests\Visual\TestCaseNotificationOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseOnScreenDisplay.cs" />
     <Compile Include="Tests\Visual\TestCasePlayer.cs" />
-    <Compile Include="Tests\Visual\TestCasePlaySongSelect.cs" />
-    <Compile Include="Tests\Visual\TestCaseReplay.cs" />
-    <Compile Include="Tests\Visual\TestCaseReplaySettingsOverlay.cs" />
-    <Compile Include="Tests\Visual\TestCaseResults.cs" />
-    <Compile Include="Tests\Visual\TestCaseRoomInspector.cs" />
-    <Compile Include="Tests\Visual\TestCaseScoreCounter.cs" />
-    <Compile Include="Tests\Visual\TestCaseScrollingPlayfield.cs" />
-    <Compile Include="Tests\Visual\TestCaseSettings.cs" />
-    <Compile Include="Tests\Visual\TestCaseSkipButton.cs" />
-    <Compile Include="Tests\Visual\TestCaseSocial.cs" />
-    <Compile Include="Tests\Visual\TestCaseSongProgress.cs" />
-    <Compile Include="Tests\Visual\TestCaseStoryboard.cs" />
-    <Compile Include="Tests\Visual\TestCaseTabControl.cs" />
-    <Compile Include="Tests\Visual\TestCaseTextAwesome.cs" />
-    <Compile Include="Tests\Visual\TestCaseTwoLayerButton.cs" />
-    <Compile Include="Tests\Visual\TestCaseUserPanel.cs" />
-    <Compile Include="Tests\Visual\TestCaseUserProfile.cs" />
-    <Compile Include="Tests\Visual\TestCaseUserRanks.cs" />
-    <Compile Include="Tests\Visual\TestCaseWaveform.cs" />
     <Compile Include="Users\Avatar.cs" />
     <Compile Include="Users\Country.cs" />
     <Compile Include="Users\Medal.cs" />
@@ -838,9 +791,7 @@
     <Compile Include="Overlays\BeatmapSet\BasicStats.cs" />
     <Compile Include="Overlays\BeatmapSet\SuccessRate.cs" />
     <Compile Include="Overlays\BeatmapSet\PreviewButton.cs" />
-    <Compile Include="Tests\Visual\TestCaseBeatmapSetOverlay.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
