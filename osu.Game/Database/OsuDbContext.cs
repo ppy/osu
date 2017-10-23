@@ -42,6 +42,8 @@ namespace osu.Game.Database
             : this("DataSource=:memory:")
         {
             // required for tooling (see https://wildermuth.com/2017/07/06/Program-cs-in-ASP-NET-Core-2-0).
+
+            Migrate();
         }
 
         /// <summary>
