@@ -18,8 +18,6 @@ namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
-        private VersionManager versionManager;
-
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
@@ -81,7 +79,7 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, v =>
+            LoadComponentAsync(new VersionManager { Depth = int.MinValue }, v =>
             {
                 Add(v);
                 v.State = Visibility.Visible;
