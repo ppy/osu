@@ -39,6 +39,11 @@ namespace osu.Game.Tests.Visual
                         Artist = @"Kaneko Chiharu",
                         Source = @"SOUND VOLTEX III GRAVITY WARS",
                         Tags = @"sdvx grace the 5th kac original song contest konami bemani",
+                        Author = new User
+                        {
+                            Username = @"Fresh Chicken",
+                            Id = 3984370,
+                        },
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
@@ -48,11 +53,6 @@ namespace osu.Game.Tests.Visual
                         Submitted = new DateTime(2016, 2, 10),
                         Ranked = new DateTime(2016, 6, 19),
                         BPM = 236,
-                        Author = new User
-                        {
-                            Username = @"Fresh Chicken",
-                            Id = 3984370,
-                        },
                         Covers = new BeatmapSetOnlineCovers
                         {
                             Cover = @"https://assets.ppy.sh/beatmaps/415886/covers/cover.jpg?1465651778",
@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 1.36,
                             Version = @"BASIC",
                             Ruleset = mania,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 6.5f,
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 2.22,
                             Version = @"NOVICE",
                             Ruleset = mania,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 7,
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 3.49,
                             Version = @"ADVANCED",
                             Ruleset = mania,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 7.5f,
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 4.24,
                             Version = @"EXHAUST",
                             Ruleset = mania,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 8,
@@ -177,7 +177,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 5.26,
                             Version = @"GRAVITY",
                             Ruleset = mania,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 8.5f,
@@ -213,6 +213,11 @@ namespace osu.Game.Tests.Visual
                         Title = @"Soumatou Labyrinth",
                         Artist = @"Yunomi with Momobako&miko",
                         Tags = @"mmbk.com yuzu__rinrin charlotte",
+                        Author = new User
+                        {
+                            Username = @"komasy",
+                            Id = 1980256,
+                        },
                     },
                     OnlineInfo = new BeatmapSetOnlineInfo
                     {
@@ -222,11 +227,6 @@ namespace osu.Game.Tests.Visual
                         Submitted = new DateTime(2016, 6, 11),
                         Ranked = new DateTime(2016, 7, 12),
                         BPM = 160,
-                        Author = new User
-                        {
-                            Username = @"komasy",
-                            Id = 1980256,
-                        },
                         Covers = new BeatmapSetOnlineCovers
                         {
                             Cover = @"https://assets.ppy.sh/beatmaps/625493/covers/cover.jpg?1499167472",
@@ -239,7 +239,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 1.40,
                             Version = @"yzrin's Kantan",
                             Ruleset = taiko,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
                                 DrainRate = 7,
@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 2.23,
                             Version = @"Futsuu",
                             Ruleset = taiko,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
                                 DrainRate = 6,
@@ -295,7 +295,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 3.19,
                             Version = @"Muzukashii",
                             Ruleset = taiko,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
                                 DrainRate = 6,
@@ -323,7 +323,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 3.97,
                             Version = @"Charlotte's Oni",
                             Ruleset = taiko,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 5,
                                 DrainRate = 6,
@@ -351,7 +351,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 5.08,
                             Version = @"Labyrinth Oni",
                             Ruleset = taiko,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 5,
                                 DrainRate = 5,

@@ -66,13 +66,11 @@ namespace osu.Game.Tests.Visual
 
             progressingNotifications.RemoveAll(n => n.State == ProgressNotificationState.Completed);
 
-            while (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
+            if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
             {
                 var p = progressingNotifications.FirstOrDefault(n => n.IsAlive && n.State == ProgressNotificationState.Queued);
-                if (p == null)
-                    break;
-
-                p.State = ProgressNotificationState.Active;
+                if (p != null)
+                    p.State = ProgressNotificationState.Active;
             }
 
             foreach (var n in progressingNotifications.FindAll(n => n.State == ProgressNotificationState.Active))

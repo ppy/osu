@@ -32,17 +32,17 @@ namespace osu.Game.Screens.Select.Details
                 if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
                 {
                     firstValue.Title = "Key Amount";
-                    firstValue.Value = (int)Math.Round(Beatmap?.Difficulty?.CircleSize ?? 0);
+                    firstValue.Value = (int)Math.Round(Beatmap?.BaseDifficulty?.CircleSize ?? 0);
                 }
                 else
                 {
                     firstValue.Title = "Circle Size";
-                    firstValue.Value = Beatmap?.Difficulty?.CircleSize ?? 0;
+                    firstValue.Value = Beatmap?.BaseDifficulty?.CircleSize ?? 0;
                 }
 
-                hpDrain.Value = beatmap.Difficulty?.DrainRate ?? 0;
-                accuracy.Value = beatmap.Difficulty?.OverallDifficulty ?? 0;
-                approachRate.Value = beatmap.Difficulty?.ApproachRate ?? 0;
+                hpDrain.Value = beatmap.BaseDifficulty?.DrainRate ?? 0;
+                accuracy.Value = beatmap.BaseDifficulty?.OverallDifficulty ?? 0;
+                approachRate.Value = beatmap.BaseDifficulty?.ApproachRate ?? 0;
                 starDifficulty.Value = (float)beatmap.StarDifficulty;
             }
         }

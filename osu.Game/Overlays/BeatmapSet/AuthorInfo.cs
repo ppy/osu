@@ -36,12 +36,12 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 var i = BeatmapSet.OnlineInfo;
 
-                avatar.User = i.Author;
+                avatar.User = BeatmapSet.Metadata.Author;
                 clickableArea.Action = () => profile?.ShowUser(avatar.User);
 
                 fields.Children = new Drawable[]
                 {
-                    new Field("made by", i.Author.Username, @"Exo2.0-RegularItalic"),
+                    new Field("made by", BeatmapSet.Metadata.Author.Username, @"Exo2.0-RegularItalic"),
                     new Field("submitted on", i.Submitted.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold")
                     {
                         Margin = new MarginPadding { Top = 5 },

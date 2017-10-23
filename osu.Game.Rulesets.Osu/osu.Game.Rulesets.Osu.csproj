@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\osu.Game\bin\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,7 +27,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\osu.Game\bin\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -53,6 +53,7 @@
     <Compile Include="Objects\Drawables\Connections\ConnectionRenderer.cs" />
     <Compile Include="Objects\Drawables\Connections\FollowPointRenderer.cs" />
     <Compile Include="Judgements\OsuJudgement.cs" />
+    <Compile Include="Objects\Drawables\DrawableRepeatPoint.cs" />
     <Compile Include="Objects\Drawables\Pieces\ApproachCircle.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerBackground.cs" />
     <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
@@ -66,13 +67,13 @@
     <Compile Include="Objects\Drawables\Pieces\NumberPiece.cs" />
     <Compile Include="Objects\Drawables\DrawableSliderTick.cs" />
     <Compile Include="Objects\Drawables\Pieces\RingPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\SliderBouncer.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerDisc.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerSpmCounter.cs" />
     <Compile Include="Objects\Drawables\Pieces\SpinnerTicks.cs" />
     <Compile Include="Objects\Drawables\Pieces\TrianglesPiece.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBall.cs" />
     <Compile Include="Objects\Drawables\Pieces\SliderBody.cs" />
+    <Compile Include="Objects\RepeatPoint.cs" />
     <Compile Include="Objects\SliderTick.cs" />
     <Compile Include="OsuDifficulty\OsuDifficultyCalculator.cs" />
     <Compile Include="OsuDifficulty\Preprocessing\OsuDifficultyBeatmap.cs" />
