@@ -168,6 +168,8 @@ namespace osu.Game.Overlays
         {
             public float FinalPosition;
 
+            protected override bool StartHidden => true;
+
             public Wave()
             {
                 RelativeSizeAxes = Axes.X;
