@@ -23,9 +23,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         {
             Children = new Drawable[]
             {
-                importButton = new OsuButton
+                importButton = new SettingsButton
                 {
-                    RelativeSizeAxes = Axes.X,
                     Text = "Import beatmaps from stable",
                     Action = () =>
                     {
@@ -33,9 +32,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         Task.Run(() => beatmaps.ImportFromStable()).ContinueWith(t => Schedule(() => importButton.Enabled.Value = true));
                     }
                 },
-                deleteButton = new OsuButton
+                deleteButton = new SettingsButton
                 {
-                    RelativeSizeAxes = Axes.X,
                     Text = "Delete ALL beatmaps",
                     Action = () =>
                     {
@@ -43,9 +41,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         Task.Run(() => beatmaps.DeleteAll()).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
                     }
                 },
-                restoreButton = new OsuButton
+                restoreButton = new SettingsButton
                 {
-                    RelativeSizeAxes = Axes.X,
                     Text = "Restore all hidden difficulties",
                     Action = () =>
                     {
