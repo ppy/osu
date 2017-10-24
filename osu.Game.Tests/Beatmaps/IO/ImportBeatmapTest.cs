@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Beatmaps.IO
     {
         private const string osz_path = @"../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
 
-        //[Test]
+        [Test]
         public void TestImportWhenClosed()
         {
             //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
@@ -40,14 +40,16 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
-        //[Test]
+        [Test]
+        [NonParallelizable]
+        [Ignore("Binding IPC on Appveyor isn't working (port in use). Need to figure out why")]
         public void TestImportOverIPC()
         {
             using (HeadlessGameHost host = new HeadlessGameHost("host", true))
             using (HeadlessGameHost client = new HeadlessGameHost("client", true))
             {
                 Assert.IsTrue(host.IsPrimaryInstance);
-                Assert.IsTrue(!client.IsPrimaryInstance);
+                Assert.IsFalse(client.IsPrimaryInstance);
 
                 var osu = loadOsu(host);
 
@@ -65,7 +67,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
-        //[Test]
+        [Test]
         public void TestImportWhenFileOpen()
         {
             using (HeadlessGameHost host = new HeadlessGameHost("TestImportWhenFileOpen"))
