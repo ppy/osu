@@ -49,12 +49,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<double>
                         {
                             LabelText = "Horizontal position",
-                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionX)
+                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionX),
+                            KeyboardStep = 0.1f
                         },
                         new SettingsSlider<double>
                         {
                             LabelText = "Vertical position",
-                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionY)
+                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionY),
+                            KeyboardStep = 0.1f
                         },
                     }
                 },
