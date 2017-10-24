@@ -7,7 +7,6 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
 using FileWebRequest = osu.Framework.IO.Network.FileWebRequest;
@@ -391,8 +390,8 @@ namespace osu.Desktop.Deploy
 
         public static void AuthenticatedBlockingPerform(this WebRequest r)
         {
-            r.AddHeader("Authorization", $"token {GitHubAccessToken}");
-            r.BlockingPerform();
+            r.Headers.Add("Authorization", $"token {GitHubAccessToken}");
+            r.Perform();
         }
     }
 
@@ -402,12 +401,7 @@ namespace osu.Desktop.Deploy
         {
         }
 
-        protected override HttpWebRequest CreateWebRequest(string requestString = null)
-        {
-            var req = base.CreateWebRequest(requestString);
-            req.Accept = "application/octet-stream";
-            return req;
-        }
+        protected override string Accept => "application/octet-stream";
     }
 
     internal class ReleaseLine
