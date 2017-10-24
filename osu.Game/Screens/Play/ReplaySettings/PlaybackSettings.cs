@@ -19,7 +19,8 @@ namespace osu.Game.Screens.Play.ReplaySettings
                 new ReplaySliderBar<double>
                 {
                     LabelText = "Playback speed",
-                    Bindable = config.GetBindable<double>(OsuSetting.PlaybackSpeed)
+                    Bindable = config.GetBindable<double>(OsuSetting.PlaybackSpeed),
+                    KeyboardStep = 0.5f
                 }
             };
         }
