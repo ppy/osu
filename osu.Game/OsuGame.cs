@@ -185,8 +185,8 @@ namespace osu.Game
                 },
             }, overlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeControl(), AddInternal);
-            loadComponentSingleFile(new OnScreenDisplay(), AddInternal);
+            loadComponentSingleFile(volume = new VolumeControl(), Add);
+            loadComponentSingleFile(new OnScreenDisplay(), Add);
 
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
