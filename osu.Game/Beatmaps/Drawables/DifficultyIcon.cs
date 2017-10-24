@@ -35,7 +35,8 @@ namespace osu.Game.Beatmaps.Drawables
                 new ConstrainedIconContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Icon = beatmap.Ruleset.CreateInstance().CreateIcon()
+                    // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
+                    Icon = beatmap.Ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.fa_question_circle_o }
                 }
             };
         }
