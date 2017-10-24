@@ -6,7 +6,6 @@ using System.Runtime;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Debug
 {
@@ -24,9 +23,8 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                     LabelText = "Active mode",
                     Bindable = config.GetBindable<GCLatencyMode>(DebugSetting.ActiveGCMode)
                 },
-                new OsuButton
+                new SettingsButton
                 {
-                    RelativeSizeAxes = Axes.X,
                     Text = "Force garbage collection",
                     Action = GC.Collect
                 },

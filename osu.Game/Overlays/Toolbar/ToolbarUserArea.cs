@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -11,11 +12,12 @@ namespace osu.Game.Overlays.Toolbar
     internal class ToolbarUserArea : Container
     {
         public LoginOverlay LoginOverlay;
-        private readonly ToolbarUserButton button;
+        private ToolbarUserButton button;
 
         public override RectangleF BoundingBox => button.BoundingBox;
 
-        public ToolbarUserArea()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             RelativeSizeAxes = Axes.Y;
             AutoSizeAxes = Axes.X;
