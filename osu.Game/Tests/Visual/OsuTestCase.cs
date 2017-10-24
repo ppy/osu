@@ -13,11 +13,9 @@ namespace osu.Game.Tests.Visual
         {
             using (var host = new HeadlessGameHost($"test-{Guid.NewGuid()}", realtime: false))
             {
+                host.Storage.DeleteDirectory(string.Empty);
                 host.Run(new OsuTestCaseTestRunner(this));
             }
-
-            // clean up after each run
-            //storage.DeleteDirectory(string.Empty);
         }
 
         public class OsuTestCaseTestRunner : OsuGameBase
