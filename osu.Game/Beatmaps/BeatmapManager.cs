@@ -184,7 +184,7 @@ namespace osu.Game.Beatmaps
             {
                 var context = importContext.Value;
 
-                using (var transaction = context.Database.BeginTransaction())
+                using (var transaction = context.BeginTransaction())
                 {
                     // create local stores so we can isolate and thread safely, and share a context/transaction.
                     var iFiles = new FileStore(() => context, storage);
@@ -198,7 +198,7 @@ namespace osu.Game.Beatmaps
                         context.SaveChanges();
                     }
 
-                    transaction.Commit();
+                    context.SaveChanges(transaction);
                     return set;
                 }
             }
@@ -295,7 +295,7 @@ namespace osu.Game.Beatmaps
             {
                 var context = importContext.Value;
 
-                using (var transaction = context.Database.BeginTransaction())
+                using (var transaction = context.BeginTransaction())
                 {
                     context.ChangeTracker.AutoDetectChangesEnabled = false;
 
@@ -313,9 +313,7 @@ namespace osu.Game.Beatmaps
                     }
 
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
-                    context.SaveChanges();
-
-                    transaction.Commit();
+                    context.SaveChanges(transaction);
                 }
             }
         }

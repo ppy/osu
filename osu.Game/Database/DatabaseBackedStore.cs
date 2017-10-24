@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Threading;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 
@@ -11,12 +12,26 @@ namespace osu.Game.Database
     {
         protected readonly Storage Storage;
 
-        protected readonly Func<OsuDbContext> GetContext;
+        /// <summary>
+        /// Create a new <see cref="OsuDbContext"/> instance (separate from the shared context via <see cref="GetContext"/> for performing isolated operations.
+        /// </summary>
+        protected readonly Func<OsuDbContext> CreateContext;
 
-        protected DatabaseBackedStore(Func<OsuDbContext> getContext, Storage storage = null)
+        private readonly ThreadLocal<OsuDbContext> queryContext;
+
+        /// <summary>
+        /// Retrieve a shared context for performing lookups (or write operations on the update thread, for now).
+        /// </summary>
+        protected OsuDbContext GetContext() => queryContext.Value;
+
+        protected DatabaseBackedStore(Func<OsuDbContext> createContext, Storage storage = null)
         {
+            CreateContext = createContext;
+
+            // todo: while this seems to work quite well, we need to consider that contexts could enter a state where they are never cleaned up.
+            queryContext = new ThreadLocal<OsuDbContext>(CreateContext);
+
             Storage = storage;
-            GetContext = getContext;
 
             try
             {
