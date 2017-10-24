@@ -95,7 +95,7 @@ namespace osu.Game.Overlays
                 //new RecentSection(),
                 new RanksSection(),
                 //new MedalsSection(),
-                //new HistoricalSection(),
+                new HistoricalSection(),
                 //new BeatmapsSection(),
                 //new KudosuSection()
             };
