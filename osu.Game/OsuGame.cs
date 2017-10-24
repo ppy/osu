@@ -277,17 +277,7 @@ namespace osu.Game
         private void loadComponentSingleFile<T>(T d, Action<T> add)
             where T : Drawable
         {
-            Schedule(() =>
-            {
-                if (asyncLoadStream != null)
-                    asyncLoadStream = asyncLoadStream.ContinueWith(t =>
-                    {
-                        Thread.Sleep(100);
-                        LoadComponentAsync(d, add).Wait();
-                    });
-                else
-                    asyncLoadStream = LoadComponentAsync(d, add);
-            });
+            Schedule(() => { asyncLoadStream = asyncLoadStream?.ContinueWith(t => LoadComponentAsync(d, add).Wait()) ?? LoadComponentAsync(d, add); });
         }
 
         public bool OnPressed(GlobalAction action)
