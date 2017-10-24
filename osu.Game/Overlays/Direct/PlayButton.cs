@@ -111,11 +111,8 @@ namespace osu.Game.Overlays.Direct
         {
             base.Update();
 
-            if (Preview?.HasCompleted ?? false)
-            {
+            if ((Preview?.HasCompleted ?? false) && Playing.Value)
                 Playing.Value = false;
-                Preview = null;
-            }
         }
 
         private void updatePreviewTrack(bool playing)
