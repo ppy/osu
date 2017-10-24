@@ -24,12 +24,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private readonly FillFlowContainer metadata;
         private readonly ModContainer modContainer;
         private readonly Score score;
-        private readonly double? weight;
 
-        public DrawableScore(Score score, double? weight = null)
+        private DrawableScore(Score score)
         {
             this.score = score;
-            this.weight = weight;
 
             Children = new Drawable[]
             {
@@ -77,29 +75,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
         {
-            double pp = score.PP ?? 0;
-            stats.Add(new OsuSpriteText
-            {
-                Text = $"{pp:0}pp",
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                TextSize = 18,
-                Font = "Exo2.0-BoldItalic",
-            });
-
-            if (weight.HasValue)
-            {
-                stats.Add(new OsuSpriteText
-                {
-                    Text = $"weighted: {pp * weight:0}pp ({weight:P0})",
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Colour = colour.GrayA,
-                    TextSize = 11,
-                    Font = "Exo2.0-RegularItalic",
-                });
-            }
-
             stats.Add(new OsuSpriteText
             {
                 Text = $"accuracy: {score.Accuracy:P2}",
@@ -108,6 +83,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Colour = colour.GrayA,
                 TextSize = 11,
                 Font = "Exo2.0-RegularItalic",
+                Depth = -1,
             });
 
             metadata.Add(new OsuHoverContainer
@@ -157,6 +133,62 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 int count = FlowingChildren.Count();
                 for (int i = 0; i < count; i++)
                     yield return new Vector2(DrawWidth * i * (count == 1 ? 0 : 1f / (count - 1)), 0);
+            }
+        }
+
+        public class PPScore : DrawableScore
+        {
+            private readonly double? weight;
+
+            public PPScore(Score score, double? weight = null) : base(score)
+            {
+                this.weight = weight;
+            }
+
+            [BackgroundDependencyLoader]
+            private new void load(OsuColour colour, LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
+            {
+                double pp = score.PP ?? 0;
+                stats.Add(new OsuSpriteText
+                {
+                    Text = $"{pp:0}pp",
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    TextSize = 18,
+                    Font = "Exo2.0-BoldItalic",
+                });
+
+                if (weight.HasValue)
+                {
+                    stats.Add(new OsuSpriteText
+                    {
+                        Text = $"weighted: {pp * weight:0}pp ({weight:P0})",
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Colour = colour.GrayA,
+                        TextSize = 11,
+                        Font = "Exo2.0-RegularItalic",
+                    });
+                }
+            }
+        }
+
+        public class TotalScore : DrawableScore
+        {
+            public TotalScore(Score score) : base(score)
+            { }
+
+            [BackgroundDependencyLoader]
+            private new void load(OsuColour colour, LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
+            {
+                stats.Add(new OsuSpriteText
+                {
+                    Text = score.TotalScore.ToString("#,###"),
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    TextSize = 18,
+                    Font = "Exo2.0-BoldItalic",
+                });
             }
         }
     }
