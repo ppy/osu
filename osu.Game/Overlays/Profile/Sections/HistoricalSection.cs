@@ -22,8 +22,8 @@ namespace osu.Game.Overlays.Profile.Sections
 
         public override User User
         {
-            get => base.User;
-            set => base.User = recent.User = value;
+            get { return base.User; }
+            set { base.User = recent.User = value; }
         }
     }
 }
