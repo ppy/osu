@@ -106,7 +106,7 @@ namespace osu.Game.Online.API
                 return;
 
             if (!WebRequest.Aborted) //could have been aborted by a Cancel() call
-                WebRequest.BlockingPerform();
+                WebRequest.Perform();
 
             if (checkAndProcessFailure())
                 return;
