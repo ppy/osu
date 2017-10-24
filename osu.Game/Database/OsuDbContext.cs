@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
@@ -23,6 +24,7 @@ namespace osu.Game.Database
         public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
+
         private readonly string connectionString;
 
         private static readonly Lazy<OsuDbLoggerFactory> logger = new Lazy<OsuDbLoggerFactory>(() => new OsuDbLoggerFactory());
@@ -52,8 +54,6 @@ namespace osu.Game.Database
         {
             this.connectionString = connectionString;
 
-            Database.SetCommandTimeout(new TimeSpan(TimeSpan.TicksPerSecond * 10));
-
             var connection = Database.GetDbConnection();
             connection.Open();
             using (var cmd = connection.CreateCommand())
@@ -70,7 +70,7 @@ namespace osu.Game.Database
                 // this is required for the time being due to the way we are querying in places like BeatmapStore.
                 // if we ever move to having consumers file their own .Includes, or get eager loading support, this could be re-enabled.
                 .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
-                .UseSqlite(connectionString)
+                .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10))
                 .UseLoggerFactory(logger.Value);
         }
 
@@ -93,6 +93,19 @@ namespace osu.Game.Database
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Available);
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
+        }
+
+        public IDbContextTransaction BeginTransaction()
+        {
+            // return Database.BeginTransaction();
+            return null;
+        }
+
+        public new int SaveChanges(IDbContextTransaction transaction = null)
+        {
+            var ret = base.SaveChanges();
+            transaction?.Commit();
+            return ret;
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory
@@ -153,7 +166,7 @@ namespace osu.Game.Database
 
                 public bool IsEnabled(LogLevel logLevel)
                 {
-#if DEBUG
+#if DEBUG_DATABASE
                     return logLevel > LogLevel.Debug;
 #else
                     return logLevel > LogLevel.Information;

@@ -37,7 +37,7 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    req.BlockingPerform();
+                    req.Perform();
                 }
                 catch
                 {
@@ -61,7 +61,7 @@ namespace osu.Game.Online.API
                     ClientSecret = clientSecret
                 })
                 {
-                    req.BlockingPerform();
+                    req.Perform();
 
                     Token = req.ResponseObject;
                     return true;
