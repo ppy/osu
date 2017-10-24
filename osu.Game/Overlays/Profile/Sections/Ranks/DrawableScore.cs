@@ -146,7 +146,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             }
 
             [BackgroundDependencyLoader]
-            private new void load(OsuColour colour, LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
+            private new void load(OsuColour colour)
             {
                 double pp = score.PP ?? 0;
                 stats.Add(new OsuSpriteText
@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             { }
 
             [BackgroundDependencyLoader]
-            private new void load(OsuColour colour, LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
+            private new void load()
             {
                 stats.Add(new OsuSpriteText
                 {
