@@ -29,7 +29,8 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importButton.Enabled.Value = false;
-                        Task.Run(() => beatmaps.ImportFromStable()).ContinueWith(t => Schedule(() => importButton.Enabled.Value = true));
+                        Task.Factory.StartNew(beatmaps.ImportFromStable)
+                            .ContinueWith(t => Schedule(() => importButton.Enabled.Value = true), TaskContinuationOptions.LongRunning);
                     }
                 },
                 deleteButton = new SettingsButton

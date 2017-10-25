@@ -106,7 +106,7 @@ namespace osu.Desktop
             var filePaths = new [] { e.FileName };
 
             if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
-                Task.Run(() => BeatmapManager.Import(filePaths));
+                Task.Factory.StartNew(() => BeatmapManager.Import(filePaths), TaskCreationOptions.LongRunning);
             else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
                 Task.Run(() =>
                 {
