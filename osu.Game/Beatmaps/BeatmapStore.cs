@@ -136,16 +136,16 @@ namespace osu.Game.Beatmaps
         }
 
         public IQueryable<BeatmapSetInfo> BeatmapSets => GetContext().BeatmapSetInfo
-                                                                      .Include(s => s.Metadata)
-                                                                      .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
-                                                                      .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
-                                                                      .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
-                                                                      .Include(s => s.Files).ThenInclude(f => f.FileInfo);
+                                                                     .Include(s => s.Metadata)
+                                                                     .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
+                                                                     .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
+                                                                     .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
+                                                                     .Include(s => s.Files).ThenInclude(f => f.FileInfo);
 
         public IQueryable<BeatmapInfo> Beatmaps => GetContext().BeatmapInfo
-                                                                .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
-                                                                .Include(b => b.Metadata)
-                                                                .Include(b => b.Ruleset)
-                                                                .Include(b => b.BaseDifficulty);
+                                                               .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
+                                                               .Include(b => b.Metadata)
+                                                               .Include(b => b.Ruleset)
+                                                               .Include(b => b.BaseDifficulty);
     }
 }
