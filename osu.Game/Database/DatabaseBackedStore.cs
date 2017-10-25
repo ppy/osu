@@ -19,6 +19,11 @@ namespace osu.Game.Database
         private readonly ThreadLocal<OsuDbContext> queryContext;
 
         /// <summary>
+        /// Refresh an instance potentially from a diffrent thread with a local context-tracked instance.
+        /// </summary>
+        protected void Refresh<T>(ref T obj) where T : class, IHasPrimaryKey => obj = GetContext().Find<T>(obj.ID);
+
+        /// <summary>
         /// Retrieve a shared context for performing lookups (or write operations on the update thread, for now).
         /// </summary>
         protected OsuDbContext GetContext() => queryContext.Value;
