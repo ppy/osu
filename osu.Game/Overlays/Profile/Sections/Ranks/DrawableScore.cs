@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         public DrawableScore(Score score)
         {
-            this.Score = score;
+            Score = score;
 
             Children = new Drawable[]
             {
