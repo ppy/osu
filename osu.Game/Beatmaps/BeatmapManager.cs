@@ -379,7 +379,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.BeatmapSets.FirstOrDefault(query);
+        public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.BeatmapSets.AsNoTracking().FirstOrDefault(query);
 
         /// <summary>
         /// Refresh an existing instance of a <see cref="BeatmapSetInfo"/> from the store.
@@ -400,7 +400,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.FirstOrDefault(query);
+        public BeatmapInfo QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().FirstOrDefault(query);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
