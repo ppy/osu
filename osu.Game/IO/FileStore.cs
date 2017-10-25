@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -102,14 +101,6 @@ namespace osu.Game.IO
             }
 
             context.SaveChanges();
-        }
-
-        public override void Reset()
-        {
-            if (Storage.ExistsDirectory(string.Empty))
-                Storage.DeleteDirectory(string.Empty);
-
-            GetContext().Database.ExecuteSqlCommand("DELETE FROM FileInfo");
         }
     }
 }

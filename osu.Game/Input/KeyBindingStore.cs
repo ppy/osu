@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -76,11 +75,6 @@ namespace osu.Game.Input
             context.SaveChanges();
 
             KeyBindingChanged?.Invoke();
-        }
-
-        public override void Reset()
-        {
-            GetContext().Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
         }
     }
 }

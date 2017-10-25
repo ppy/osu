@@ -39,10 +39,5 @@ namespace osu.Game.Database
         public virtual void Cleanup()
         {
         }
-
-        /// <summary>
-        /// Reset this database to a default state. Undo all changes to database and storage backings.
-        /// </summary>
-        public abstract void Reset();
     }
 }

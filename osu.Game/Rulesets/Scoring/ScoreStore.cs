@@ -143,10 +143,5 @@ namespace osu.Game.Rulesets.Scoring
 
             return new Replay { Frames = frames };
         }
-
-        public override void Reset()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
