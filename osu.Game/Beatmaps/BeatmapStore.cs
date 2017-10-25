@@ -25,21 +25,6 @@ namespace osu.Game.Beatmaps
         {
         }
 
-        protected override void Prepare(bool reset = false)
-        {
-            if (reset)
-            {
-                var context = GetContext();
-
-                // https://stackoverflow.com/a/10450893
-                context.Database.ExecuteSqlCommand("DELETE FROM BeatmapMetadata");
-                context.Database.ExecuteSqlCommand("DELETE FROM BeatmapDifficulty");
-                context.Database.ExecuteSqlCommand("DELETE FROM BeatmapSetInfo");
-                context.Database.ExecuteSqlCommand("DELETE FROM BeatmapSetFileInfo");
-                context.Database.ExecuteSqlCommand("DELETE FROM BeatmapInfo");
-            }
-        }
-
         /// <summary>
         /// Add a <see cref="BeatmapSetInfo"/> to the database.
         /// </summary>
