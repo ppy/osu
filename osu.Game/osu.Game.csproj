@@ -282,6 +282,7 @@
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
+    <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Migrations\20171019041408_InitialCreate.cs" />
     <Compile Include="Migrations\20171019041408_InitialCreate.Designer.cs">
       <DependentUpon>20171019041408_InitialCreate.cs</DependentUpon>
