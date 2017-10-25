@@ -34,7 +34,7 @@ namespace osu.Game.Database
             if (context.Entry(obj).State != EntityState.Detached) return;
 
             var id = obj.ID;
-            obj = lookupSource?.FirstOrDefault(t => t.ID == id) ?? context.Find<T>(id);
+            obj = lookupSource?.SingleOrDefault(t => t.ID == id) ?? context.Find<T>(id);
         }
 
         /// <summary>
