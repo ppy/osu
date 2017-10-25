@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets
         public RulesetStore(Func<OsuDbContext> factory)
             : base(factory)
         {
+            AddMissingRulesets();
         }
 
         /// <summary>
@@ -47,14 +48,9 @@ namespace osu.Game.Rulesets
 
         private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
-        protected override void Prepare(bool reset = false)
+        protected void AddMissingRulesets()
         {
             var context = GetContext();
-
-            if (reset)
-            {
-                context.Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
-            }
 
             var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo())).ToList();
 
@@ -123,5 +119,10 @@ namespace osu.Game.Rulesets
             InstantiationInfo = ruleset.GetType().AssemblyQualifiedName,
             ID = ruleset.LegacyID
         };
+
+        public override void Reset()
+        {
+            GetContext().Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
+        }
     }
 }
