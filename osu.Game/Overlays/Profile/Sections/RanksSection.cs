@@ -20,24 +20,9 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new Drawable[]
             {
-                best = new ScoreContainer.PPScoreContainer(ScoreType.Best, "Best Performance", "No awesome performance records yet. :(", true),
-                first = new ScoreContainer.PPScoreContainer(ScoreType.Firsts, "First Place Ranks", "No awesome performance records yet. :("),
+                best = new ScoreContainer(ScoreType.Best, User, "Best Performance", true),
+                first = new ScoreContainer(ScoreType.Firsts, User, "First Place Ranks"),
             };
-        }
-
-        public override User User
-        {
-            get
-            {
-                return base.User;
-            }
-
-            set
-            {
-                base.User = value;
-                best.User = value;
-                first.User = value;
-            }
         }
     }
 }

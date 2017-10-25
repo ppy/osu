@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using OpenTK.Graphics;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -22,13 +23,7 @@ namespace osu.Game.Overlays.Profile
 
         protected override Container<Drawable> Content => content;
 
-        public virtual User User
-        {
-            get { return user; }
-            set { user = value; }
-        }
-
-        private User user;
+        public readonly Bindable<User> User = new Bindable<User>();
 
         protected ProfileSection()
         {
