@@ -246,9 +246,13 @@ namespace osu.Game.Beatmaps
             {
                 downloadNotification.State = ProgressNotificationState.Completed;
 
-                using (var stream = new MemoryStream(data))
-                using (var archive = new OszArchiveReader(stream))
-                    Import(archive);
+                Task.Factory.StartNew(() =>
+                {
+                    // This gets scheduled back to the update thread, but we want the import to run in the background.
+                    using (var stream = new MemoryStream(data))
+                    using (var archive = new OszArchiveReader(stream))
+                        Import(archive);
+                }, TaskCreationOptions.LongRunning);
 
                 currentDownloads.Remove(request);
             };
