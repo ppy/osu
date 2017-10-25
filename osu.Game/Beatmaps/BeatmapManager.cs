@@ -244,7 +244,7 @@ namespace osu.Game.Beatmaps
 
             request.Success += data =>
             {
-                downloadNotification.State = ProgressNotificationState.Completed;
+                downloadNotification.Text = $"Importing {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}";
 
                 Task.Factory.StartNew(() =>
                 {
@@ -252,6 +252,8 @@ namespace osu.Game.Beatmaps
                     using (var stream = new MemoryStream(data))
                     using (var archive = new OszArchiveReader(stream))
                         Import(archive);
+
+                    downloadNotification.State = ProgressNotificationState.Completed;
                 }, TaskCreationOptions.LongRunning);
 
                 currentDownloads.Remove(request);
