@@ -30,12 +30,6 @@ namespace osu.Game.Input
 
         public void Register(KeyBindingInputManager manager) => insertDefaults(manager.DefaultKeyBindings);
 
-        protected override void Prepare(bool reset = false)
-        {
-            if (reset)
-                GetContext().Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
-        }
-
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
             var context = GetContext();
@@ -82,6 +76,11 @@ namespace osu.Game.Input
             context.SaveChanges();
 
             KeyBindingChanged?.Invoke();
+        }
+
+        public override void Reset()
+        {
+            GetContext().Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
         }
     }
 }

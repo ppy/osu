@@ -27,17 +27,6 @@ namespace osu.Game.IO
             Store = new StorageBackedResourceStore(Storage);
         }
 
-        protected override void Prepare(bool reset = false)
-        {
-            if (reset)
-            {
-                if (Storage.ExistsDirectory(string.Empty))
-                    Storage.DeleteDirectory(string.Empty);
-
-                GetContext().Database.ExecuteSqlCommand("DELETE FROM FileInfo");
-            }
-        }
-
         public FileInfo Add(Stream data, bool reference = true)
         {
             var context = GetContext();
@@ -113,6 +102,14 @@ namespace osu.Game.IO
             }
 
             context.SaveChanges();
+        }
+
+        public override void Reset()
+        {
+            if (Storage.ExistsDirectory(string.Empty))
+                Storage.DeleteDirectory(string.Empty);
+
+            GetContext().Database.ExecuteSqlCommand("DELETE FROM FileInfo");
         }
     }
 }
