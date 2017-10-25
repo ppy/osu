@@ -48,10 +48,10 @@ namespace osu.Game.Beatmaps
         {
             var context = GetContext();
 
-            if (beatmapSet.DeletePending) return false;
+            Refresh(ref beatmapSet, BeatmapSets);
 
+            if (beatmapSet.DeletePending) return false;
             beatmapSet.DeletePending = true;
-            context.Update(beatmapSet);
             context.SaveChanges();
 
             BeatmapSetRemoved?.Invoke(beatmapSet);
@@ -67,10 +67,10 @@ namespace osu.Game.Beatmaps
         {
             var context = GetContext();
 
-            if (!beatmapSet.DeletePending) return false;
+            Refresh(ref beatmapSet, BeatmapSets);
 
+            if (!beatmapSet.DeletePending) return false;
             beatmapSet.DeletePending = false;
-            context.Update(beatmapSet);
             context.SaveChanges();
 
             BeatmapSetAdded?.Invoke(beatmapSet);
@@ -86,10 +86,10 @@ namespace osu.Game.Beatmaps
         {
             var context = GetContext();
 
-            if (beatmap.Hidden) return false;
+            Refresh(ref beatmap, Beatmaps);
 
+            if (beatmap.Hidden) return false;
             beatmap.Hidden = true;
-            context.Update(beatmap);
             context.SaveChanges();
 
             BeatmapHidden?.Invoke(beatmap);
@@ -105,10 +105,10 @@ namespace osu.Game.Beatmaps
         {
             var context = GetContext();
 
-            if (!beatmap.Hidden) return false;
+            Refresh(ref beatmap, Beatmaps);
 
+            if (!beatmap.Hidden) return false;
             beatmap.Hidden = false;
-            context.Update(beatmap);
             context.SaveChanges();
 
             BeatmapRestored?.Invoke(beatmap);
