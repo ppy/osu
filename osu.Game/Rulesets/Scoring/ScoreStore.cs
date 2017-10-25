@@ -143,9 +143,5 @@ namespace osu.Game.Rulesets.Scoring
 
             return new Replay { Frames = frames };
         }
-
-        protected override void Prepare(bool reset = false)
-        {
-        }
     }
 }
