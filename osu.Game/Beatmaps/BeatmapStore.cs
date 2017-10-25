@@ -136,18 +136,6 @@ namespace osu.Game.Beatmaps
             context.SaveChanges();
         }
 
-        public override void Reset()
-        {
-            var context = GetContext();
-
-            // https://stackoverflow.com/a/10450893
-            context.Database.ExecuteSqlCommand("DELETE FROM BeatmapMetadata");
-            context.Database.ExecuteSqlCommand("DELETE FROM BeatmapDifficulty");
-            context.Database.ExecuteSqlCommand("DELETE FROM BeatmapSetInfo");
-            context.Database.ExecuteSqlCommand("DELETE FROM BeatmapSetFileInfo");
-            context.Database.ExecuteSqlCommand("DELETE FROM BeatmapInfo");
-        }
-
         public IEnumerable<BeatmapSetInfo> BeatmapSets => GetContext().BeatmapSetInfo
                                                                       .Include(s => s.Metadata)
                                                                       .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)

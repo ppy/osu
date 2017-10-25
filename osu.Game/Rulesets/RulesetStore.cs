@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
 
 namespace osu.Game.Rulesets
@@ -119,10 +118,5 @@ namespace osu.Game.Rulesets
             InstantiationInfo = ruleset.GetType().AssemblyQualifiedName,
             ID = ruleset.LegacyID
         };
-
-        public override void Reset()
-        {
-            GetContext().Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
-        }
     }
 }
