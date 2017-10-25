@@ -2,7 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Platform;
 
 namespace osu.Game.Database
@@ -19,9 +22,20 @@ namespace osu.Game.Database
         private readonly ThreadLocal<OsuDbContext> queryContext;
 
         /// <summary>
-        /// Refresh an instance potentially from a diffrent thread with a local context-tracked instance.
+        /// Refresh an instance potentially from a different thread with a local context-tracked instance.
         /// </summary>
-        protected void Refresh<T>(ref T obj) where T : class, IHasPrimaryKey => obj = GetContext().Find<T>(obj.ID);
+        /// <param name="obj"></param>
+        /// <param name="lookupSource"></param>
+        /// <typeparam name="T"></typeparam>
+        protected virtual void Refresh<T>(ref T obj, IEnumerable<T> lookupSource = null) where T : class, IHasPrimaryKey
+        {
+            var context = GetContext();
+
+            if (context.Entry(obj).State != EntityState.Detached) return;
+
+            var id = obj.ID;
+            obj = lookupSource?.FirstOrDefault(t => t.ID == id) ?? context.Find<T>(id);
+        }
 
         /// <summary>
         /// Retrieve a shared context for performing lookups (or write operations on the update thread, for now).
