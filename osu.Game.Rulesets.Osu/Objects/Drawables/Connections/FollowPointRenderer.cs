@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                         using (fp.BeginAbsoluteSequence(fadeInTime))
                         {
                             fp.FadeIn(DrawableOsuHitObject.TIME_FADEIN);
-                            fp.ScaleTo(1, DrawableOsuHitObject.TIME_FADEIN, Easing.Out);
+                            fp.ApplyScale(1, true, DrawableOsuHitObject.TIME_FADEIN, Easing.Out);
 
                             fp.MoveTo(pointEndPosition, DrawableOsuHitObject.TIME_FADEIN, Easing.Out);
 

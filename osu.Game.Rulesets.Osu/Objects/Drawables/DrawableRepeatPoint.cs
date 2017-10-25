@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -29,9 +30,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
 
-            Children = new Drawable[]
+            Child = new CircleSizeAdjustContainer
             {
-                new SpriteIcon
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                AutoSizeAxes = Axes.Both,
+                Child = new SpriteIcon
                 {
                     Icon = FontAwesome.fa_eercast,
                     Anchor = Anchor.Centre,
