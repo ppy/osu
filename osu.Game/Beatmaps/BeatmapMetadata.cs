@@ -17,6 +17,7 @@ namespace osu.Game.Beatmaps
         private int? onlineBeatmapSetID;
 
         [NotMapped]
+        [JsonProperty(@"id")]
         public int? OnlineBeatmapSetID
         {
             get { return onlineBeatmapSetID; }
