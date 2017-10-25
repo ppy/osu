@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
 
 namespace osu.Game.Rulesets
@@ -29,6 +28,7 @@ namespace osu.Game.Rulesets
         public RulesetStore(Func<OsuDbContext> factory)
             : base(factory)
         {
+            AddMissingRulesets();
         }
 
         /// <summary>
@@ -47,14 +47,9 @@ namespace osu.Game.Rulesets
 
         private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
-        protected override void Prepare(bool reset = false)
+        protected void AddMissingRulesets()
         {
             var context = GetContext();
-
-            if (reset)
-            {
-                context.Database.ExecuteSqlCommand("DELETE FROM RulesetInfo");
-            }
 
             var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo())).ToList();
 

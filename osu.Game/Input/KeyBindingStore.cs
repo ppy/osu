@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -29,12 +28,6 @@ namespace osu.Game.Input
         }
 
         public void Register(KeyBindingInputManager manager) => insertDefaults(manager.DefaultKeyBindings);
-
-        protected override void Prepare(bool reset = false)
-        {
-            if (reset)
-                GetContext().Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
-        }
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
