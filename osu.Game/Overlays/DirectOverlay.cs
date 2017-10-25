@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -65,9 +66,7 @@ namespace osu.Game.Overlays
 
                 ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));
 
-                if (beatmapSets.Any() && panels == null)
-                    // real use case? currently only seems to be for test case
-                    recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             }
         }
 
@@ -276,12 +275,15 @@ namespace osu.Game.Overlays
 
             getSetsRequest.Success += response =>
             {
-                var onlineIds = response.Select(r => r.OnlineBeatmapSetID);
-                var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID)).Select(r => r.OnlineBeatmapSetID).ToList();
+                Task.Run(() =>
+                {
+                    var onlineIds = response.Select(r => r.OnlineBeatmapSetID).ToList();
+                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID)).Select(r => r.OnlineBeatmapSetID).ToList();
+                    var sets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID)).ToList();
 
-                BeatmapSets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID));
-
-                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                    // may not need scheduling; loads async internally.
+                    Schedule(() => BeatmapSets = sets);
+                });
             };
 
             api.Queue(getSetsRequest);
