@@ -60,7 +60,7 @@ namespace osu.Game.Input
         }
 
         /// <summary>
-        /// Retrieve <see cref="KeyBinding"/>s for a specified ruleset/variant content.
+        /// Retrieve <see cref="DatabasedKeyBinding"/>s for a specified ruleset/variant content.
         /// </summary>
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
