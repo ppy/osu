@@ -3,6 +3,7 @@
 
 using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
@@ -17,36 +18,36 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public abstract class ScoreContainer : FillFlowContainer
+    public class ScoreContainer : FillFlowContainer
     {
         private readonly FillFlowContainer<DrawableScore> scoreContainer;
         private readonly OsuSpriteText missing;
         private readonly OsuHoverContainer showMoreButton;
         private readonly LoadingAnimation showMoreLoading;
 
+        private readonly bool includeWeight;
         private readonly ScoreType type;
         private int visiblePages;
-        private User user;
+        private readonly Bindable<User> user;
 
         private RulesetStore rulesets;
         private APIAccess api;
 
-        public User User
+        private void setUser(User newUser)
         {
-            set
-            {
-                user = value;
-                visiblePages = 0;
-                scoreContainer.Clear();
-                showMoreButton.Hide();
-                missing.Show();
-                showMore();
-            }
+            visiblePages = 0;
+            scoreContainer.Clear();
+            showMoreButton.Hide();
+            missing.Show();
+            showMore();
         }
 
-        private ScoreContainer(ScoreType type, string header, string missingText)
+        public ScoreContainer(ScoreType type, Bindable<User> user, string header, bool includeWeight = false)
         {
             this.type = type;
+            this.includeWeight = includeWeight;
+            this.user = user;
+            user.ValueChanged += setUser;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -89,7 +90,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     missing = new OsuSpriteText
                     {
                         TextSize = 14,
-                        Text = missingText,
+                        Text = type == ScoreType.Recent ? "No performance records. :(" : "No awesome performance records yet. :(",
                     },
             };
         }
@@ -103,7 +104,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         private void showMore()
         {
-            var req = new GetUserScoresRequest(user.Id, type, visiblePages++ * 5);
+            var req = new GetUserScoresRequest(user.Value.Id, type, visiblePages++ * 5);
 
             showMoreLoading.Show();
             showMoreButton.Hide();
@@ -121,7 +122,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     missing.Hide();
                     foreach (OnlineScore score in scores)
                     {
-                        var drawableScore = CreateScore(score, scoreContainer.Count);
+                        var drawableScore = type == ScoreType.Recent ? (DrawableScore)new TotalScore(score) : new PPScore(score, includeWeight ? Math.Pow(0.95, scoreContainer.Count) : (double?)null);
                         drawableScore.RelativeSizeAxes = Axes.X;
                         drawableScore.Height = 60;
                         scoreContainer.Add(drawableScore);
@@ -130,28 +131,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             };
 
             Schedule(() => { api.Queue(req); });
-        }
-
-        protected abstract DrawableScore CreateScore(OnlineScore score, int index);
-
-        public class PPScoreContainer : ScoreContainer
-        {
-            private readonly bool includeWeight;
-
-            public PPScoreContainer(ScoreType type, string header, string missing, bool includeWeight = false) : base(type, header, missing)
-            {
-                this.includeWeight = includeWeight;
-            }
-
-            protected override DrawableScore CreateScore(OnlineScore score, int index) => new DrawableScore.PPScore(score, includeWeight ? Math.Pow(0.95, scoreContainer.Count) : (double?)null);
-        }
-
-        public class TotalScoreContainer : ScoreContainer
-        {
-            public TotalScoreContainer(ScoreType type, string header, string missing) : base(type, header, missing)
-            { }
-
-            protected override DrawableScore CreateScore(OnlineScore score, int index) => new DrawableScore.TotalScore(score);
         }
     }
 }

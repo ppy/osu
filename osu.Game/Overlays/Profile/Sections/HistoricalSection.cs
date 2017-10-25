@@ -17,13 +17,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         public HistoricalSection()
         {
-            Child = recent = new ScoreContainer.TotalScoreContainer(ScoreType.Recent, "Recent Plays (24h)", "No performance records. :(");
-        }
-
-        public override User User
-        {
-            get { return base.User; }
-            set { base.User = recent.User = value; }
+            Child = recent = new ScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)");
         }
     }
 }
