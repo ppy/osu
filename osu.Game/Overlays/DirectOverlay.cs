@@ -274,11 +274,12 @@ namespace osu.Game.Overlays
                                                        Filter.DisplayStyleControl.Dropdown.Current.Value,
                                                        Filter.Tabs.Current.Value); //todo: sort direction (?)
 
-            getSetsRequest.Success += r =>
+            getSetsRequest.Success += response =>
             {
-                BeatmapSets = r?.
-                                Select(response => response.ToBeatmapSet(rulesets)).
-                                Where(b => beatmaps.QueryBeatmapSet(q => q.OnlineBeatmapSetID == b.OnlineBeatmapSetID) == null);
+                var onlineIds = response.Select(r => r.OnlineBeatmapSetID);
+                var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID)).Select(r => r.OnlineBeatmapSetID).ToList();
+
+                BeatmapSets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID));
 
                 recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             };
