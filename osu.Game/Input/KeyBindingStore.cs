@@ -76,7 +76,8 @@ namespace osu.Game.Input
 
             Refresh(ref dbKeyBinding);
 
-            context.Update(dbKeyBinding);
+            dbKeyBinding.KeyCombination = keyBinding.KeyCombination;
+
             context.SaveChanges();
 
             KeyBindingChanged?.Invoke();
