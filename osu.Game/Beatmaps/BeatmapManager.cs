@@ -365,6 +365,8 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
+            // TODO Other "files" field usages are locked using importLock. This usage should be locked too or importLock should be removed.
+            // ReSharper disable once InconsistentlySynchronizedField
             WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(files.Store, beatmapInfo);
 
             previous?.TransferTo(working);
