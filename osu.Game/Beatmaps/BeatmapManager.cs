@@ -244,11 +244,17 @@ namespace osu.Game.Beatmaps
 
             request.Success += data =>
             {
-                downloadNotification.State = ProgressNotificationState.Completed;
+                downloadNotification.Text = $"Importing {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}";
 
-                using (var stream = new MemoryStream(data))
-                using (var archive = new OszArchiveReader(stream))
-                    Import(archive);
+                Task.Factory.StartNew(() =>
+                {
+                    // This gets scheduled back to the update thread, but we want the import to run in the background.
+                    using (var stream = new MemoryStream(data))
+                    using (var archive = new OszArchiveReader(stream))
+                        Import(archive);
+
+                    downloadNotification.State = ProgressNotificationState.Completed;
+                }, TaskCreationOptions.LongRunning);
 
                 currentDownloads.Remove(request);
             };
@@ -272,7 +278,7 @@ namespace osu.Game.Beatmaps
             PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            Task.Run(() => request.Perform(api));
+            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
 
             return request;
         }
