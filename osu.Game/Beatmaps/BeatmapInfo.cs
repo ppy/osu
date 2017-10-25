@@ -19,12 +19,23 @@ namespace osu.Game.Beatmaps
         //TODO: should be in database
         public int BeatmapVersion;
 
+        private int? onlineBeatmapID;
+        private int? onlineBeatmapSetID;
+
         [JsonProperty("id")]
-        public int? OnlineBeatmapID { get; set; }
+        public int? OnlineBeatmapID
+        {
+            get { return onlineBeatmapID; }
+            set { onlineBeatmapID = value > 0 ? value : null; }
+        }
 
         [JsonProperty("beatmapset_id")]
         [NotMapped]
-        public int? OnlineBeatmapSetID { get; set; }
+        public int? OnlineBeatmapSetID
+        {
+            get { return onlineBeatmapSetID; }
+            set { onlineBeatmapSetID = value > 0 ? value : null; }
+        }
 
         public int BeatmapSetInfoID { get; set; }
 
