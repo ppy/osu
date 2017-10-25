@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using osu.Game.Database;
@@ -136,14 +135,14 @@ namespace osu.Game.Beatmaps
             context.SaveChanges();
         }
 
-        public IEnumerable<BeatmapSetInfo> BeatmapSets => GetContext().BeatmapSetInfo
+        public IQueryable<BeatmapSetInfo> BeatmapSets => GetContext().BeatmapSetInfo
                                                                       .Include(s => s.Metadata)
                                                                       .Include(s => s.Beatmaps).ThenInclude(s => s.Ruleset)
                                                                       .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
                                                                       .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata)
                                                                       .Include(s => s.Files).ThenInclude(f => f.FileInfo);
 
-        public IEnumerable<BeatmapInfo> Beatmaps => GetContext().BeatmapInfo
+        public IQueryable<BeatmapInfo> Beatmaps => GetContext().BeatmapInfo
                                                                 .Include(b => b.BeatmapSet).ThenInclude(s => s.Metadata)
                                                                 .Include(b => b.Metadata)
                                                                 .Include(b => b.Ruleset)

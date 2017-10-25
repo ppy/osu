@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ionic.Zip;
 using Microsoft.EntityFrameworkCore;
@@ -378,7 +379,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query) => beatmaps.BeatmapSets.FirstOrDefault(query);
+        public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.BeatmapSets.FirstOrDefault(query);
 
         /// <summary>
         /// Refresh an existing instance of a <see cref="BeatmapSetInfo"/> from the store.
@@ -392,21 +393,21 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapSetInfo> QueryBeatmapSets(Func<BeatmapSetInfo, bool> query) => beatmaps.BeatmapSets.Where(query).ToList();
+        public List<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.BeatmapSets.Where(query).ToList();
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query) => beatmaps.Beatmaps.FirstOrDefault(query);
+        public BeatmapInfo QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.FirstOrDefault(query);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapInfo> QueryBeatmaps(Func<BeatmapInfo, bool> query) => beatmaps.Beatmaps.Where(query).ToList();
+        public List<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.Where(query).ToList();
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
