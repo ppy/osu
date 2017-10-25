@@ -272,7 +272,7 @@ namespace osu.Game.Beatmaps
             PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            Task.Run(() => request.Perform(api));
+            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
 
             return request;
         }
