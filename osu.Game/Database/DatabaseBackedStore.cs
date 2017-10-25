@@ -3,7 +3,6 @@
 
 using System;
 using System.Threading;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 
 namespace osu.Game.Database
@@ -32,16 +31,6 @@ namespace osu.Game.Database
             queryContext = new ThreadLocal<OsuDbContext>(CreateContext);
 
             Storage = storage;
-
-            try
-            {
-                Prepare();
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, $@"Failed to initialise the {GetType()}! Trying again with a clean database...");
-                Prepare(true);
-            }
         }
 
         /// <summary>
@@ -50,15 +39,5 @@ namespace osu.Game.Database
         public virtual void Cleanup()
         {
         }
-
-        /// <summary>
-        /// Prepare this database for use. Tables should be created here.
-        /// </summary>
-        protected abstract void Prepare(bool reset = false);
-
-        /// <summary>
-        /// Reset this database to a default state. Undo all changes to database and storage backings.
-        /// </summary>
-        public void Reset() => Prepare(true);
     }
 }
