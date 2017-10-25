@@ -16,7 +16,11 @@ namespace osu.Game.Database
             this.host = host;
         }
 
-        public OsuDbContext GetContext() => new OsuDbContext(host.Storage.GetDatabaseConnectionString(database_name));
+        public OsuDbContext GetContext()
+        {
+            var inMemory = host == null;
+            return inMemory ? new OsuDbContext() : new OsuDbContext(host.Storage.GetDatabaseConnectionString(database_name));
+        }
 
         public void ResetDatabase()
         {
