@@ -251,7 +251,7 @@ namespace osu.Game.Database
                         Database.ExecuteSqlCommand("DROP TABLE RulesetInfo_Old");
 
                         Database.ExecuteSqlCommand(
-                            "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, IFNULL(Hidden, 0), LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), OnlineBeatmapID, Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
+                            "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, IFNULL(Hidden, 0), LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), NULLIF(OnlineBeatmapID, 0), Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
                         Database.ExecuteSqlCommand("DROP TABLE BeatmapInfo_Old");
 
                         Logger.Log("Migration complete!", LoggingTarget.Database, Framework.Logging.LogLevel.Important);
