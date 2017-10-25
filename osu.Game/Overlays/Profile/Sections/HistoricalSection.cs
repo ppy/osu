@@ -3,7 +3,6 @@
 
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile.Sections.Ranks;
-using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
@@ -13,11 +12,9 @@ namespace osu.Game.Overlays.Profile.Sections
 
         public override string Identifier => "historical";
 
-        private readonly ScoreContainer recent;
-
         public HistoricalSection()
         {
-            Child = recent = new ScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)");
+            Child = new ScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)");
         }
     }
 }
