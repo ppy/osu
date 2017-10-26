@@ -24,12 +24,14 @@ namespace osu.Game.Overlays.Settings.Sections
                 new SettingsSlider<double, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
-                    Bindable = config.GetBindable<double>(OsuSetting.MenuCursorSize)
+                    Bindable = config.GetBindable<double>(OsuSetting.MenuCursorSize),
+                    KeyboardStep = 0.1f
                 },
                 new SettingsSlider<double, SizeSlider>
                 {
                     LabelText = "Gameplay cursor size",
-                    Bindable = config.GetBindable<double>(OsuSetting.GameplayCursorSize)
+                    Bindable = config.GetBindable<double>(OsuSetting.GameplayCursorSize),
+                    KeyboardStep = 0.1f
                 },
                 new SettingsCheckbox
                 {

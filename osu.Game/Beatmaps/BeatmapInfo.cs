@@ -2,51 +2,57 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
-using SQLite.Net.Attributes;
-using SQLiteNetExtensions.Attributes;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
     {
-        [PrimaryKey, AutoIncrement]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
         //TODO: should be in database
         public int BeatmapVersion;
 
+        private int? onlineBeatmapID;
+        private int? onlineBeatmapSetID;
+
         [JsonProperty("id")]
-        public int? OnlineBeatmapID { get; set; }
+        public int? OnlineBeatmapID
+        {
+            get { return onlineBeatmapID; }
+            set { onlineBeatmapID = value > 0 ? value : null; }
+        }
 
         [JsonProperty("beatmapset_id")]
-        public int? OnlineBeatmapSetID { get; set; }
+        [NotMapped]
+        public int? OnlineBeatmapSetID
+        {
+            get { return onlineBeatmapSetID; }
+            set { onlineBeatmapSetID = value > 0 ? value : null; }
+        }
 
-        [ForeignKey(typeof(BeatmapSetInfo))]
         public int BeatmapSetInfoID { get; set; }
 
-        [ManyToOne]
+        [Required]
         public BeatmapSetInfo BeatmapSet { get; set; }
 
-        [ForeignKey(typeof(BeatmapMetadata))]
-        public int BeatmapMetadataID { get; set; }
-
-        [OneToOne(CascadeOperations = CascadeOperation.All)]
         public BeatmapMetadata Metadata { get; set; }
 
-        [ForeignKey(typeof(BeatmapDifficulty)), NotNull]
         public int BaseDifficultyID { get; set; }
 
-        [OneToOne(CascadeOperations = CascadeOperation.All)]
-        public BeatmapDifficulty Difficulty { get; set; }
+        public BeatmapDifficulty BaseDifficulty { get; set; }
 
-        [Ignore]
+        [NotMapped]
         public BeatmapMetrics Metrics { get; set; }
 
-        [Ignore]
+        [NotMapped]
         public BeatmapOnlineInfo OnlineInfo { get; set; }
 
         public string Path { get; set; }
@@ -59,7 +65,6 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// MD5 is kept for legacy support (matching against replays, osu-web-10 etc.).
         /// </summary>
-        [Indexed]
         [JsonProperty("file_md5")]
         public string MD5Hash { get; set; }
 
@@ -69,10 +74,8 @@ namespace osu.Game.Beatmaps
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
 
-        [ForeignKey(typeof(RulesetInfo))]
         public int RulesetID { get; set; }
 
-        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead)]
         public RulesetInfo Ruleset { get; set; }
 
         public bool LetterboxInBreaks { get; set; }
@@ -101,7 +104,7 @@ namespace osu.Game.Beatmaps
             }
         }
 
-        [Ignore]
+        [NotMapped]
         public int[] Bookmarks { get; set; } = new int[0];
 
         public double DistanceSpacing { get; set; }
