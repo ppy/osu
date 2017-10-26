@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCasePlayer : OsuTestCase
+    public abstract class TestCasePlayer : OsuTestCase
     {
         private readonly Type ruleset;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual
             this.ruleset = ruleset;
         }
 
-        public TestCasePlayer()
+        protected TestCasePlayer()
         {
 
         }
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual
 
             string instantiation = ruleset?.AssemblyQualifiedName;
 
-            foreach (var r in rulesets.Query<RulesetInfo>(rs => rs.Available && (instantiation == null || rs.InstantiationInfo == instantiation)))
+            foreach (var r in rulesets.AvailableRulesets.Where(rs => instantiation == null || rs.InstantiationInfo == instantiation))
                 AddStep(r.Name, () => loadPlayerFor(r));
         }
 

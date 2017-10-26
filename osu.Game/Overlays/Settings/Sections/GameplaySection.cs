@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            foreach(Ruleset ruleset in rulesets.AllRulesets.Select(info => info.CreateInstance()))
+            foreach(Ruleset ruleset in rulesets.AvailableRulesets.Select(info => info.CreateInstance()))
             {
                 SettingsSubsection section = ruleset.CreateSettings();
                 if (section != null)
