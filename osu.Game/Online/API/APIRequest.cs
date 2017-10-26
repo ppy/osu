@@ -36,7 +36,7 @@ namespace osu.Game.Online.API
             return request;
         }
 
-        private void request_Progress(WebRequest request, long current, long total) => API.Scheduler.Add(delegate { Progress?.Invoke(current, total); });
+        private void request_Progress(long current, long total) => API.Scheduler.Add(delegate { Progress?.Invoke(current, total); });
 
         protected APIDownloadRequest()
         {
