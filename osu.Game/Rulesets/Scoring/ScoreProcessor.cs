@@ -67,14 +67,14 @@ namespace osu.Game.Rulesets.Scoring
         protected virtual bool HasCompleted => false;
 
         /// <summary>
-        /// Whether the score is in a failed state.
-        /// </summary>
-        public virtual bool HasFailed => Health.Value == Health.MinValue;
-
-        /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
-        private bool alreadyFailed;
+        public virtual bool HasFailed { get; private set; }
+
+        /// <summary>
+        /// The conditions for failing.
+        /// </summary>
+        protected virtual bool FailCondition => Health.Value == Health.MinValue;
 
         protected ScoreProcessor()
         {
@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Scoring
             Rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
 
-            alreadyFailed = false;
+            HasFailed = false;
         }
 
         /// <summary>
@@ -121,11 +121,11 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected void UpdateFailed()
         {
-            if (alreadyFailed || !HasFailed)
+            if (HasFailed || !FailCondition)
                 return;
 
             if (Failed?.Invoke() != false)
-                alreadyFailed = true;
+                HasFailed = true;
         }
 
         /// <summary>

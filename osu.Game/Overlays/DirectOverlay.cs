@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -65,9 +66,7 @@ namespace osu.Game.Overlays
 
                 ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));
 
-                if (beatmapSets.Any() && panels == null)
-                    // real use case? currently only seems to be for test case
-                    recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             }
         }
 
@@ -274,13 +273,17 @@ namespace osu.Game.Overlays
                                                        Filter.DisplayStyleControl.Dropdown.Current.Value,
                                                        Filter.Tabs.Current.Value); //todo: sort direction (?)
 
-            getSetsRequest.Success += r =>
+            getSetsRequest.Success += response =>
             {
-                BeatmapSets = r?.
-                                Select(response => response.ToBeatmapSet(rulesets)).
-                                Where(b => beatmaps.QueryBeatmapSet(q => q.OnlineBeatmapSetID == b.OnlineBeatmapSetID) == null);
+                Task.Run(() =>
+                {
+                    var onlineIds = response.Select(r => r.OnlineBeatmapSetID).ToList();
+                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID)).Select(r => r.OnlineBeatmapSetID).ToList();
+                    var sets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID)).ToList();
 
-                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                    // may not need scheduling; loads async internally.
+                    Schedule(() => BeatmapSets = sets);
+                });
             };
 
             api.Queue(getSetsRequest);

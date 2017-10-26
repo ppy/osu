@@ -21,6 +21,6 @@ namespace osu.Game.Rulesets.Mania
             return 0;
         }
 
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter(true, (int)Math.Max(1, Math.Round(Beatmap.BeatmapInfo.Difficulty.CircleSize)));
+        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter(true, (int)Math.Max(1, Math.Round(Beatmap.BeatmapInfo.BaseDifficulty.CircleSize)));
     }
 }
