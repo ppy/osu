@@ -14,13 +14,12 @@ using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
     public class Intro : OsuScreen
     {
-        private readonly OsuLogo logo;
+        private readonly IntroSequence introSequence;
 
         private const string menu_music_beatmap_hash = "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
@@ -46,18 +45,10 @@ namespace osu.Game.Screens.Menu
                 new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
-                    Children = new Drawable[]
+                    Child = introSequence = new IntroSequence
                     {
-                        logo = new OsuLogo
-                        {
-                            Alpha = 0,
-                            Triangles = false,
-                            Blending = BlendingMode.Additive,
-                            Interactive = false,
-                            Colour = Color4.DarkGray,
-                            Ripple = false
-                        }
-                    }
+                        Blending = BlendingMode.Additive,
+                    },
                 }
             };
         }
@@ -121,14 +112,10 @@ namespace osu.Game.Screens.Menu
                 {
                     DidLoadMenu = true;
                     Push(mainMenu);
-                }, 2300);
+                }, 3500);
             }, 600);
 
-            logo.ScaleTo(0.4f);
-            logo.FadeOut();
-
-            logo.ScaleTo(1, 4400, Easing.OutQuint);
-            logo.FadeIn(20000, Easing.OutQuint);
+            introSequence.Start();
         }
 
         protected override void OnSuspending(Screen next)
