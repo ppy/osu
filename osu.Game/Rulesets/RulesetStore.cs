@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets
                 loadRulesetFromFile(file);
         }
 
-        public RulesetStore(Func<OsuDbContext> factory)
+        public RulesetStore(DatabaseContextFactory factory)
             : base(factory)
         {
             AddMissingRulesets();
@@ -49,52 +49,51 @@ namespace osu.Game.Rulesets
 
         protected void AddMissingRulesets()
         {
-            var context = GetContext();
-
-            var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo())).ToList();
-
-            //add all legacy modes in correct order
-            foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
+            using (var context = GetContext())
             {
-                var rulesetInfo = createRulesetInfo(r);
-                if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == rulesetInfo.ID) == null)
+                var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, new RulesetInfo())).ToList();
+
+                //add all legacy modes in correct order
+                foreach (var r in instances.Where(r => r.LegacyID >= 0).OrderBy(r => r.LegacyID))
                 {
-                    context.RulesetInfo.Add(rulesetInfo);
+                    var rulesetInfo = createRulesetInfo(r);
+                    if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == rulesetInfo.ID) == null)
+                    {
+                        context.RulesetInfo.Add(rulesetInfo);
+                    }
                 }
-            }
 
-            context.SaveChanges();
-
-            //add any other modes
-            foreach (var r in instances.Where(r => r.LegacyID < 0))
-            {
-                var us = createRulesetInfo(r);
-
-                var existing = context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == us.InstantiationInfo);
-
-                if (existing == null)
-                    context.RulesetInfo.Add(us);
-            }
-
-            context.SaveChanges();
-
-            //perform a consistency check
-            foreach (var r in context.RulesetInfo)
-            {
-                try
+                //add any other modes
+                foreach (var r in instances.Where(r => r.LegacyID < 0))
                 {
-                    r.CreateInstance();
-                    r.Available = true;
+                    var us = createRulesetInfo(r);
+
+                    var existing = context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == us.InstantiationInfo);
+
+                    if (existing == null)
+                        context.RulesetInfo.Add(us);
                 }
-                catch
+
+                context.SaveChanges();
+
+                //perform a consistency check
+                foreach (var r in context.RulesetInfo)
                 {
-                    r.Available = false;
+                    try
+                    {
+                        r.CreateInstance();
+                        r.Available = true;
+                    }
+                    catch
+                    {
+                        r.Available = false;
+                    }
                 }
+
+                context.SaveChanges();
+
+                AvailableRulesets = context.RulesetInfo.Where(r => r.Available).ToList();
             }
-
-            context.SaveChanges();
-
-            AvailableRulesets = context.RulesetInfo.Where(r => r.Available).ToList();
         }
 
         private static void loadRulesetFromFile(string file)

@@ -59,9 +59,9 @@ namespace osu.Game.Beatmaps
 
         private readonly Storage storage;
 
-        private BeatmapStore createBeatmapStore(Func<OsuDbContext> context)
+        private BeatmapStore createBeatmapStore(DatabaseContextFactory contextFactory)
         {
-            var store = new BeatmapStore(context);
+            var store = new BeatmapStore(contextFactory);
             store.BeatmapSetAdded += s => BeatmapSetAdded?.Invoke(s);
             store.BeatmapSetRemoved += s => BeatmapSetRemoved?.Invoke(s);
             store.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps
             return store;
         }
 
-        private readonly Func<OsuDbContext> createContext;
+        private readonly DatabaseContextFactory dataContextFactory;
 
         private readonly FileStore files;
 
@@ -94,18 +94,19 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
-        public BeatmapManager(Storage storage, Func<OsuDbContext> context, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
+        public BeatmapManager(Storage storage, DatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, IIpcHost importHost = null)
         {
-            createContext = context;
-            importContext = new Lazy<OsuDbContext>(() =>
+            dataContextFactory = contextFactory;
+            importLock = new object();
+            getImportContext = () =>
             {
-                var c = createContext();
+                var c = dataContextFactory.GetContext();
                 c.Database.AutoTransactionsEnabled = false;
                 return c;
-            });
+            };
 
-            beatmaps = createBeatmapStore(context);
-            files = new FileStore(context, storage);
+            beatmaps = createBeatmapStore(contextFactory);
+            files = new FileStore(contextFactory, storage);
 
             this.storage = files.Storage;
             this.rulesets = rulesets;
@@ -172,7 +173,8 @@ namespace osu.Game.Beatmaps
             notification.State = ProgressNotificationState.Completed;
         }
 
-        private readonly Lazy<OsuDbContext> importContext;
+        private readonly Func<OsuDbContext> getImportContext;
+        private readonly object importLock;
 
         /// <summary>
         /// Import a beatmap from an <see cref="ArchiveReader"/>.
@@ -181,26 +183,23 @@ namespace osu.Game.Beatmaps
         public BeatmapSetInfo Import(ArchiveReader archiveReader)
         {
             // let's only allow one concurrent import at a time for now.
-            lock (importContext)
+            lock (importLock)
             {
-                var context = importContext.Value;
-
-                using (var transaction = context.BeginTransaction())
+                using (var context = getImportContext())
                 {
-                    // create local stores so we can isolate and thread safely, and share a context/transaction.
-                    var iFiles = new FileStore(() => context, storage);
-                    var iBeatmaps = createBeatmapStore(() => context);
-
-                    BeatmapSetInfo set = importToStorage(iFiles, iBeatmaps, archiveReader);
-
-                    if (set.ID == 0)
+                    using (var transaction = context.BeginTransaction())
                     {
-                        iBeatmaps.Add(set);
-                        context.SaveChanges();
-                    }
+                        BeatmapSetInfo set = importToStorage(files, beatmaps, archiveReader);
 
-                    context.SaveChanges(transaction);
-                    return set;
+                        if (set.ID == 0)
+                        {
+                            beatmaps.Add(set);
+                            context.SaveChanges();
+                        }
+
+                        context.SaveChanges(transaction);
+                        return set;
+                    }
                 }
             }
         }
@@ -214,7 +213,7 @@ namespace osu.Game.Beatmaps
             // If we have an ID then we already exist in the database.
             if (beatmapSetInfo.ID != 0) return;
 
-            createBeatmapStore(createContext).Add(beatmapSetInfo);
+            createBeatmapStore(dataContextFactory).Add(beatmapSetInfo);
         }
 
         /// <summary>
@@ -298,29 +297,26 @@ namespace osu.Game.Beatmaps
         /// <param name="beatmapSet">The beatmap set to delete.</param>
         public void Delete(BeatmapSetInfo beatmapSet)
         {
-            lock (importContext)
+            lock (importLock)
             {
-                var context = importContext.Value;
-
-                using (var transaction = context.BeginTransaction())
+                using (var context = getImportContext())
                 {
-                    context.ChangeTracker.AutoDetectChangesEnabled = false;
-
-                    // re-fetch the beatmap set on the import context.
-                    beatmapSet = context.BeatmapSetInfo.Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == beatmapSet.ID);
-
-                    // create local stores so we can isolate and thread safely, and share a context/transaction.
-                    var iFiles = new FileStore(() => context, storage);
-                    var iBeatmaps = createBeatmapStore(() => context);
-
-                    if (iBeatmaps.Delete(beatmapSet))
+                    using (var transaction = context.BeginTransaction())
                     {
-                        if (!beatmapSet.Protected)
-                            iFiles.Dereference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
-                    }
+                        context.ChangeTracker.AutoDetectChangesEnabled = false;
 
-                    context.ChangeTracker.AutoDetectChangesEnabled = true;
-                    context.SaveChanges(transaction);
+                        // re-fetch the beatmap set on the import context.
+                        beatmapSet = context.BeatmapSetInfo.Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == beatmapSet.ID);
+
+                        if (beatmaps.Delete(beatmapSet))
+                        {
+                            if (!beatmapSet.Protected)
+                                files.Dereference(context, beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+                        }
+
+                        context.ChangeTracker.AutoDetectChangesEnabled = true;
+                        context.SaveChanges(transaction);
+                    }
                 }
             }
         }
@@ -346,8 +342,10 @@ namespace osu.Game.Beatmaps
         {
             if (!beatmaps.Undelete(beatmapSet)) return;
 
-            if (!beatmapSet.Protected)
-                files.Reference(beatmapSet.Files.Select(f => f.FileInfo).ToArray());
+            // TODO this does not look like "database context per transaction" and should be changed
+            using (var context = dataContextFactory.GetContext())
+                if (!beatmapSet.Protected)
+                    files.Reference(context, beatmapSet.Files.Select(f => f.FileInfo).ToArray());
         }
 
         /// <summary>
@@ -367,6 +365,8 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
+            // TODO Other "files" field usages are locked using importLock. This usage should be locked too or importLock should be removed.
+            // ReSharper disable once InconsistentlySynchronizedField
             WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(files.Store, beatmapInfo);
 
             previous?.TransferTo(working);
