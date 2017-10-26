@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
             Child = sliderbar = new ReplaySliderBar<double>
             {
                 LabelText = "Playback speed",
-                Bindable = new BindableDouble
+                Bindable = new BindableDouble(1)
                 {
                     Default = 1,
                     MinValue = 0.5,
