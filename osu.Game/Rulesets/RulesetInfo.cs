@@ -2,22 +2,19 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using SQLite.Net.Attributes;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace osu.Game.Rulesets
 {
     public class RulesetInfo : IEquatable<RulesetInfo>
     {
-        [PrimaryKey, AutoIncrement]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int? ID { get; set; }
 
-        [Indexed(Unique = true)]
         public string Name { get; set; }
 
-        [Indexed(Unique = true)]
         public string InstantiationInfo { get; set; }
 
-        [Indexed]
         public bool Available { get; set; }
 
         public virtual Ruleset CreateInstance() => (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo), this);

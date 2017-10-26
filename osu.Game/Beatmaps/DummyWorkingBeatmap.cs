@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps
                     AuthorString = "no one",
                 },
                 BeatmapSet = new BeatmapSetInfo(),
-                Difficulty = new BeatmapDifficulty
+                BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = 0,
                     CircleSize = 0,

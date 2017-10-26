@@ -10,12 +10,7 @@ namespace osu.Game.Screens.Play.ReplaySettings
     {
         protected override string Title => @"playback";
 
-        private IAdjustableClock adjustableClock;
-        public IAdjustableClock AdjustableClock
-        {
-            set { adjustableClock = value; }
-            get { return adjustableClock; }
-        }
+        public IAdjustableClock AdjustableClock { set; get; }
 
         private readonly ReplaySliderBar<double> sliderbar;
 
@@ -24,8 +19,9 @@ namespace osu.Game.Screens.Play.ReplaySettings
             Child = sliderbar = new ReplaySliderBar<double>
             {
                 LabelText = "Playback speed",
-                Bindable = new BindableDouble(1)
+                Bindable = new BindableDouble
                 {
+                    Default = 1,
                     MinValue = 0.5,
                     MaxValue = 2
                 },
@@ -36,11 +32,11 @@ namespace osu.Game.Screens.Play.ReplaySettings
         {
             base.LoadComplete();
 
-            if (adjustableClock != null)
-            {
-                var clockRate = adjustableClock.Rate;
-                sliderbar.Bindable.ValueChanged += rateMultiplier => adjustableClock.Rate = clockRate * rateMultiplier;
-            }
+            if (AdjustableClock == null)
+                return;
+
+            var clockRate = AdjustableClock.Rate;
+            sliderbar.Bindable.ValueChanged += rateMultiplier => AdjustableClock.Rate = clockRate * rateMultiplier;
         }
     }
 }

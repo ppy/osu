@@ -2,17 +2,24 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : FillFlowContainer, IFilterable
+    public abstract class SettingsItem<T> : Container, IFilterable
     {
         protected abstract Drawable CreateControl();
 
@@ -20,7 +27,27 @@ namespace osu.Game.Overlays.Settings
 
         private IHasCurrentValue<T> controlWithCurrent => Control as IHasCurrentValue<T>;
 
+        protected override Container<Drawable> Content => FlowContent;
+
+        protected readonly FillFlowContainer FlowContent;
+
         private SpriteText text;
+
+        private readonly RestoreDefaultValueButton<T> restoreDefaultValueButton = new RestoreDefaultValueButton<T>();
+
+        public bool ShowsDefaultIndicator = true;
+
+        private Color4? restoreDefaultValueColour;
+
+        public Color4 RestoreDefaultValueColour
+        {
+            get { return restoreDefaultValueColour ?? Color4.White; }
+            set
+            {
+                restoreDefaultValueColour = value;
+                restoreDefaultValueButton?.SetButtonColour(RestoreDefaultValueColour);
+            }
+        }
 
         public virtual string LabelText
         {
@@ -51,6 +78,11 @@ namespace osu.Game.Overlays.Settings
             {
                 bindable = value;
                 controlWithCurrent?.Current.BindTo(bindable);
+                if (ShowsDefaultIndicator)
+                {
+                    restoreDefaultValueButton.Bindable.BindTo(bindable);
+                    restoreDefaultValueButton.Bindable.TriggerChange();
+                }
             }
         }
 
@@ -69,13 +101,94 @@ namespace osu.Game.Overlays.Settings
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Right = 5 };
+            Padding = new MarginPadding { Right = SettingsOverlay.CONTENT_MARGINS };
+
+            FlowContent = new FillFlowContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS, Right = 5 },
+            };
 
             if ((Control = CreateControl()) != null)
             {
                 if (controlWithCurrent != null)
                     controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
-                Add(Control);
+                FlowContent.Add(Control);
+            }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AddInternal(FlowContent);
+
+            if (restoreDefaultValueButton != null)
+            {
+                if (!restoreDefaultValueColour.HasValue)
+                    restoreDefaultValueColour = colours.Yellow;
+                restoreDefaultValueButton.SetButtonColour(RestoreDefaultValueColour);
+                AddInternal(restoreDefaultValueButton);
+            }
+        }
+
+        private class RestoreDefaultValueButton<T> : Box, IHasTooltip
+        {
+            internal readonly Bindable<T> Bindable = new Bindable<T>();
+
+            private Color4 buttonColour;
+
+            private bool hovering;
+
+            public RestoreDefaultValueButton()
+            {
+                Bindable.ValueChanged += value => UpdateState();
+                Bindable.DisabledChanged += disabled => UpdateState();
+
+                RelativeSizeAxes = Axes.Y;
+                Width = SettingsOverlay.CONTENT_MARGINS;
+                Alpha = 0f;
+            }
+
+            public string TooltipText => "Revert to default";
+
+            public override bool HandleInput => true;
+
+            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
+
+            protected override bool OnClick(InputState state)
+            {
+                if (!Bindable.Disabled)
+                    Bindable.SetDefault();
+                return true;
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                hovering = true;
+                UpdateState();
+                return true;
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                hovering = false;
+                UpdateState();
+            }
+
+            internal void SetButtonColour(Color4 buttonColour)
+            {
+                this.buttonColour = buttonColour;
+                UpdateState();
+            }
+
+            internal void UpdateState()
+            {
+                var colour = Bindable.Disabled ? Color4.Gray : buttonColour;
+                this.FadeTo(Bindable.IsDefault ? 0f : hovering && !Bindable.Disabled ? 1f : 0.5f, 200, Easing.OutQuint);
+                this.FadeColour(ColourInfo.GradientHorizontal(colour.Opacity(0.8f), colour.Opacity(0)), 200, Easing.OutQuint);
             }
         }
     }

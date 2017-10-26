@@ -33,10 +33,7 @@ namespace osu.Game.Screens.Select
 
         public IEnumerable<BeatmapSetInfo> Beatmaps
         {
-            get
-            {
-                return groups.Select(g => g.BeatmapSet);
-            }
+            get { return groups.Select(g => g.BeatmapSet); }
 
             set
             {
@@ -55,7 +52,7 @@ namespace osu.Game.Screens.Select
                     Schedule(() =>
                     {
                         foreach (var g in newGroups)
-                            addGroup(g);
+                            if (g != null) addGroup(g);
 
                         computeYPositions();
                         BeatmapsChanged?.Invoke();
@@ -100,12 +97,13 @@ namespace osu.Game.Screens.Select
 
         public void AddBeatmap(BeatmapSetInfo beatmapSet)
         {
-            var group = createGroup(beatmapSet);
-
-            //for the time being, let's completely load the difficulty panels in the background.
-            //this likely won't scale so well, but allows us to completely async the loading flow.
-            Schedule(delegate
+            Schedule(() =>
             {
+                var group = createGroup(beatmapSet);
+
+                if (group == null)
+                    return;
+
                 addGroup(group);
                 computeYPositions();
                 if (selectedGroup == null)
@@ -113,12 +111,15 @@ namespace osu.Game.Screens.Select
             });
         }
 
-        public void RemoveBeatmap(BeatmapSetInfo beatmapSet) => removeGroup(groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID));
+        public void RemoveBeatmap(BeatmapSetInfo beatmapSet)
+        {
+            Schedule(() => removeGroup(groups.Find(b => b.BeatmapSet.ID == beatmapSet.ID)));
+        }
 
         internal void UpdateBeatmap(BeatmapInfo beatmap)
         {
             // todo: this method should not run more than once for the same BeatmapSetInfo.
-            var set = manager.Refresh(beatmap.BeatmapSet);
+            var set = manager.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
 
             // todo: this method should be smarter as to not recreate panels that haven't changed, etc.
             var group = groups.Find(b => b.BeatmapSet.ID == set.ID);
@@ -126,19 +127,23 @@ namespace osu.Game.Screens.Select
             if (group == null)
                 return;
 
-            var newGroup = createGroup(set);
-
             int i = groups.IndexOf(group);
             groups.RemoveAt(i);
-            groups.Insert(i, newGroup);
 
-            if (selectedGroup == group && newGroup.BeatmapPanels.Count == 0)
+            var newGroup = createGroup(set);
+
+            if (newGroup != null)
+                groups.Insert(i, newGroup);
+
+            bool hadSelection = selectedGroup == group;
+
+            if (hadSelection && newGroup == null)
                 selectedGroup = null;
 
             Filter(null, false);
 
             //check if we can/need to maintain our current selection.
-            if (selectedGroup == group && newGroup.BeatmapPanels.Count > 0)
+            if (hadSelection && newGroup != null)
             {
                 var newSelection =
                     newGroup.BeatmapPanels.Find(p => p.Beatmap.ID == selectedPanel?.Beatmap.ID) ??
@@ -337,6 +342,9 @@ namespace osu.Game.Screens.Select
 
         private BeatmapGroup createGroup(BeatmapSetInfo beatmapSet)
         {
+            if (beatmapSet.Beatmaps.All(b => b.Hidden))
+                return null;
+
             foreach (var b in beatmapSet.Beatmaps)
             {
                 if (b.Metadata == null)
@@ -519,7 +527,7 @@ namespace osu.Game.Screens.Select
             float drawHeight = DrawHeight;
 
             // Remove all panels that should no longer be on-screen
-            scrollableContent.RemoveAll(delegate (Panel p)
+            scrollableContent.RemoveAll(delegate(Panel p)
             {
                 float panelPosY = p.Position.Y;
                 bool remove = panelPosY < Current - p.DrawHeight || panelPosY > Current + drawHeight || !p.IsPresent;
