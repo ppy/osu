@@ -6,12 +6,13 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable
+    public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
@@ -19,12 +20,23 @@ namespace osu.Game.Beatmaps
         //TODO: should be in database
         public int BeatmapVersion;
 
+        private int? onlineBeatmapID;
+        private int? onlineBeatmapSetID;
+
         [JsonProperty("id")]
-        public int? OnlineBeatmapID { get; set; }
+        public int? OnlineBeatmapID
+        {
+            get { return onlineBeatmapID; }
+            set { onlineBeatmapID = value > 0 ? value : null; }
+        }
 
         [JsonProperty("beatmapset_id")]
         [NotMapped]
-        public int? OnlineBeatmapSetID { get; set; }
+        public int? OnlineBeatmapSetID
+        {
+            get { return onlineBeatmapSetID; }
+            set { onlineBeatmapSetID = value > 0 ? value : null; }
+        }
 
         public int BeatmapSetInfoID { get; set; }
 

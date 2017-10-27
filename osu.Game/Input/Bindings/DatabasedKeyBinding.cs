@@ -3,11 +3,12 @@
 
 using System.ComponentModel.DataAnnotations.Schema;
 using osu.Framework.Input.Bindings;
+using osu.Game.Database;
 
 namespace osu.Game.Input.Bindings
 {
     [Table("KeyBinding")]
-    public class DatabasedKeyBinding : KeyBinding
+    public class DatabasedKeyBinding : KeyBinding, IHasPrimaryKey
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
