@@ -121,18 +121,28 @@ namespace osu.Game.Online.API
                             continue;
                         }
 
-
                         var userReq = new GetUserRequest();
                         userReq.Success += u =>
                         {
                             LocalUser.Value = u;
+                            failureCount = 0;
+
                             //we're connected!
                             State = APIState.Online;
-                            failureCount = 0;
                         };
 
                         if (!handleRequest(userReq))
+                        {
+                            Thread.Sleep(500);
                             continue;
+                        }
+
+                        // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
+                        // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
+                        // before actually going online.
+                        while (State != APIState.Online)
+                            Thread.Sleep(500);
+
                         break;
                 }
 

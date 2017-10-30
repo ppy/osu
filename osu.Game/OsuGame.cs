@@ -157,40 +157,49 @@ namespace osu.Game
             BeatmapManager.PostNotification = n => notificationOverlay?.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
 
-            AddRange(new Drawable[] {
+            AddRange(new Drawable[]
+            {
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
                     ActionRequested = action => volume.Adjust(action)
                 },
-                mainContent = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                volume = new VolumeControl(),
-                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                new OnScreenDisplay(),
+                mainContent = new Container { RelativeSizeAxes = Axes.Both },
+                overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
             });
 
-            LoadComponentAsync(screenStack = new Loader(), d =>
+            loadComponentSingleFile(screenStack = new Loader(), d =>
             {
                 screenStack.ModePushed += screenAdded;
                 screenStack.Exited += screenRemoved;
                 mainContent.Add(screenStack);
             });
 
+            loadComponentSingleFile(Toolbar = new Toolbar
+            {
+                Depth = -5,
+                OnHome = delegate
+                {
+                    hideAllOverlays();
+                    intro?.ChildScreen?.MakeCurrent();
+                },
+            }, overlayContent.Add);
+
+            loadComponentSingleFile(volume = new VolumeControl(), Add);
+            loadComponentSingleFile(new OnScreenDisplay(), Add);
+
             //overlay elements
-            LoadComponentAsync(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
-            LoadComponentAsync(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
-            LoadComponentAsync(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
-            LoadComponentAsync(settings = new MainSettings
+            loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(settings = new MainSettings
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Depth = -1
             }, overlayContent.Add);
-            LoadComponentAsync(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
-            LoadComponentAsync(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, mainContent.Add);
-            LoadComponentAsync(musicController = new MusicController
+            loadComponentSingleFile(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
+            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, mainContent.Add);
+            loadComponentSingleFile(musicController = new MusicController
             {
                 Depth = -4,
                 Position = new Vector2(0, Toolbar.HEIGHT),
@@ -198,16 +207,16 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
-            LoadComponentAsync(notificationOverlay = new NotificationOverlay
+            loadComponentSingleFile(notificationOverlay = new NotificationOverlay
             {
                 Depth = -4,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
-            LoadComponentAsync(dialogOverlay = new DialogOverlay
+            loadComponentSingleFile(dialogOverlay = new DialogOverlay
             {
-                Depth = -5,
+                Depth = -6,
             }, overlayContent.Add);
 
             Logger.NewEntry += entry =>
@@ -246,16 +255,6 @@ namespace osu.Game
                 };
             }
 
-            LoadComponentAsync(Toolbar = new Toolbar
-            {
-                Depth = -4,
-                OnHome = delegate
-                {
-                    hideAllOverlays();
-                    intro?.ChildScreen?.MakeCurrent();
-                },
-            }, overlayContent.Add);
-
             settings.StateChanged += delegate
             {
                 switch (settings.State)
@@ -270,6 +269,17 @@ namespace osu.Game
             };
 
             Cursor.State = Visibility.Hidden;
+        }
+
+        private Task asyncLoadStream;
+
+        private void loadComponentSingleFile<T>(T d, Action<T> add)
+            where T : Drawable
+        {
+            // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
+            // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
+            // we could avoid the need for scheduling altogether.
+            Schedule(() => { asyncLoadStream = asyncLoadStream?.ContinueWith(t => LoadComponentAsync(d, add).Wait()) ?? LoadComponentAsync(d, add); });
         }
 
         public bool OnPressed(GlobalAction action)

@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 1.36,
                             Version = @"BASIC",
                             Ruleset = mania,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 6.5f,
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 2.22,
                             Version = @"NOVICE",
                             Ruleset = mania,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 7,
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 3.49,
                             Version = @"ADVANCED",
                             Ruleset = mania,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 7.5f,
@@ -149,7 +149,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 4.24,
                             Version = @"EXHAUST",
                             Ruleset = mania,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 8,
@@ -177,7 +177,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 5.26,
                             Version = @"GRAVITY",
                             Ruleset = mania,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 4,
                                 DrainRate = 8.5f,
@@ -239,7 +239,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 1.40,
                             Version = @"yzrin's Kantan",
                             Ruleset = taiko,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
                                 DrainRate = 7,
@@ -267,7 +267,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 2.23,
                             Version = @"Futsuu",
                             Ruleset = taiko,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
                                 DrainRate = 6,
@@ -295,7 +295,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 3.19,
                             Version = @"Muzukashii",
                             Ruleset = taiko,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 2,
                                 DrainRate = 6,
@@ -323,7 +323,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 3.97,
                             Version = @"Charlotte's Oni",
                             Ruleset = taiko,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 5,
                                 DrainRate = 6,
@@ -351,7 +351,7 @@ namespace osu.Game.Tests.Visual
                             StarDifficulty = 5.08,
                             Version = @"Labyrinth Oni",
                             Ruleset = taiko,
-                            Difficulty = new BeatmapDifficulty
+                            BaseDifficulty = new BeatmapDifficulty
                             {
                                 CircleSize = 5,
                                 DrainRate = 5,
