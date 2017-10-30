@@ -18,14 +18,14 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableScore : Container
+    public abstract class DrawableScore : Container
     {
         protected readonly FillFlowContainer<OsuSpriteText> Stats;
         private readonly FillFlowContainer metadata;
         private readonly ModContainer modContainer;
         protected readonly Score Score;
 
-        public DrawableScore(Score score)
+        protected DrawableScore(Score score)
         {
             Score = score;
 
@@ -134,27 +134,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 for (int i = 0; i < count; i++)
                     yield return new Vector2(DrawWidth * i * (count == 1 ? 0 : 1f / (count - 1)), 0);
             }
-        }
-    }
-
-    public class TotalScore : DrawableScore
-    {
-        public TotalScore(Score score)
-            : base(score)
-        {
-        }
-
-        [BackgroundDependencyLoader]
-        private new void load()
-        {
-            Stats.Add(new OsuSpriteText
-            {
-                Text = Score.TotalScore.ToString("#,###"),
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                TextSize = 18,
-                Font = "Exo2.0-BoldItalic",
-            });
         }
     }
 }
