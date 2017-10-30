@@ -288,7 +288,7 @@
       <DependentUpon>20171019041408_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\20171025071459_AddMissingIndexRules.cs" />
-    <Compile Include="Migrations\20171025071459_AddMissingIndexRules.designer.cs">
+    <Compile Include="Migrations\20171025071459_AddMissingIndexRules.Designer.cs">
       <DependentUpon>20171025071459_AddMissingIndexRules.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
