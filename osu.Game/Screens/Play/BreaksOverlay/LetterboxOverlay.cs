@@ -31,13 +31,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = new ColourInfo
-                        {
-                            TopLeft = Color4.Black,
-                            TopRight = Color4.Black,
-                            BottomLeft = transparent_black,
-                            BottomRight = transparent_black,
-                        }
+                        Colour = ColourInfo.GradientVertical(Color4.Black, transparent_black),
                     }
                 },
                 new Container
@@ -49,13 +43,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = new ColourInfo
-                        {
-                            TopLeft = transparent_black,
-                            TopRight = transparent_black,
-                            BottomLeft = Color4.Black,
-                            BottomRight = Color4.Black,
-                        }
+                        Colour = ColourInfo.GradientVertical(transparent_black, Color4.Black),
                     }
                 }
             };

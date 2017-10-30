@@ -20,7 +20,7 @@ using osu.Game.Screens.Edit.Screens.Design;
 
 namespace osu.Game.Screens.Edit
 {
-    internal class Editor : OsuScreen
+    public class Editor : OsuScreen
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
