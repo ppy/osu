@@ -95,7 +95,7 @@ namespace osu.Game.Overlays
                 //new RecentSection(),
                 new RanksSection(),
                 //new MedalsSection(),
-                //new HistoricalSection(),
+                new HistoricalSection(),
                 //new BeatmapsSection(),
                 //new KudosuSection()
             };
@@ -175,7 +175,7 @@ namespace osu.Game.Overlays
                 var sec = sections.FirstOrDefault(s => s.Identifier == id);
                 if (sec != null)
                 {
-                    sec.User = user;
+                    sec.User.Value = user;
 
                     sectionsContainer.Add(sec);
                     tabs.AddItem(sec);

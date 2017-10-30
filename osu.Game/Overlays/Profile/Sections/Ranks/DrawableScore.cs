@@ -18,18 +18,16 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableScore : Container
+    public abstract class DrawableScore : Container
     {
-        private readonly FillFlowContainer<OsuSpriteText> stats;
+        protected readonly FillFlowContainer<OsuSpriteText> Stats;
         private readonly FillFlowContainer metadata;
         private readonly ModContainer modContainer;
-        private readonly Score score;
-        private readonly double? weight;
+        protected readonly Score Score;
 
-        public DrawableScore(Score score, double? weight = null)
+        protected DrawableScore(Score score)
         {
-            this.score = score;
-            this.weight = weight;
+            Score = score;
 
             Children = new Drawable[]
             {
@@ -39,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Width = 60,
                     FillMode = FillMode.Fit,
                 },
-                stats = new FillFlowContainer<OsuSpriteText>
+                Stats = new FillFlowContainer<OsuSpriteText>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
@@ -74,40 +72,18 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             };
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuColour colour, LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
         {
-            double pp = score.PP ?? 0;
-            stats.Add(new OsuSpriteText
+            Stats.Add(new OsuSpriteText
             {
-                Text = $"{pp:0}pp",
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                TextSize = 18,
-                Font = "Exo2.0-BoldItalic",
-            });
-
-            if (weight.HasValue)
-            {
-                stats.Add(new OsuSpriteText
-                {
-                    Text = $"weighted: {pp * weight:0}pp ({weight:P0})",
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Colour = colour.GrayA,
-                    TextSize = 11,
-                    Font = "Exo2.0-RegularItalic",
-                });
-            }
-
-            stats.Add(new OsuSpriteText
-            {
-                Text = $"accuracy: {score.Accuracy:P2}",
+                Text = $"accuracy: {Score.Accuracy:P2}",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Colour = colour.GrayA,
                 TextSize = 11,
                 Font = "Exo2.0-RegularItalic",
+                Depth = -1,
             });
 
             metadata.Add(new OsuHoverContainer
@@ -115,7 +91,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 AutoSizeAxes = Axes.Both,
                 Action = () =>
                 {
-                    if (score.Beatmap.OnlineBeatmapSetID.HasValue) beatmapSetOverlay.ShowBeatmapSet(score.Beatmap.OnlineBeatmapSetID.Value);
+                    if (Score.Beatmap.OnlineBeatmapSetID.HasValue) beatmapSetOverlay?.ShowBeatmapSet(Score.Beatmap.OnlineBeatmapSetID.Value);
                 },
                 Child = new FillFlowContainer
                 {
@@ -125,15 +101,15 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         new OsuSpriteText
                         {
                             Current = locale.GetUnicodePreference(
-                                $"{score.Beatmap.Metadata.TitleUnicode ?? score.Beatmap.Metadata.Title} [{score.Beatmap.Version}] ",
-                                $"{score.Beatmap.Metadata.Title ?? score.Beatmap.Metadata.TitleUnicode} [{score.Beatmap.Version}] "
+                                $"{Score.Beatmap.Metadata.TitleUnicode ?? Score.Beatmap.Metadata.Title} [{Score.Beatmap.Version}] ",
+                                $"{Score.Beatmap.Metadata.Title ?? Score.Beatmap.Metadata.TitleUnicode} [{Score.Beatmap.Version}] "
                             ),
                             TextSize = 15,
                             Font = "Exo2.0-SemiBoldItalic",
                         },
                         new OsuSpriteText
                         {
-                            Current = locale.GetUnicodePreference(score.Beatmap.Metadata.ArtistUnicode, score.Beatmap.Metadata.Artist),
+                            Current = locale.GetUnicodePreference(Score.Beatmap.Metadata.ArtistUnicode, Score.Beatmap.Metadata.Artist),
                             TextSize = 12,
                             Padding = new MarginPadding { Top = 3 },
                             Font = "Exo2.0-RegularItalic",
@@ -142,7 +118,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 },
             });
 
-            foreach (Mod mod in score.Mods)
+            foreach (Mod mod in Score.Mods)
                 modContainer.Add(new ModIcon(mod)
                 {
                     AutoSizeAxes = Axes.Both,
