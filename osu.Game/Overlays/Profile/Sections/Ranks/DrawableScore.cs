@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             };
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuColour colour, LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
         {
             Stats.Add(new OsuSpriteText
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 AutoSizeAxes = Axes.Both,
                 Action = () =>
                 {
-                    if (Score.Beatmap.OnlineBeatmapSetID.HasValue) beatmapSetOverlay.ShowBeatmapSet(Score.Beatmap.OnlineBeatmapSetID.Value);
+                    if (Score.Beatmap.OnlineBeatmapSetID.HasValue) beatmapSetOverlay?.ShowBeatmapSet(Score.Beatmap.OnlineBeatmapSetID.Value);
                 },
                 Child = new FillFlowContainer
                 {
