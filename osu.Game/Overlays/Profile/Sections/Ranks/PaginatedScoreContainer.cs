@@ -28,26 +28,18 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private readonly bool includeWeight;
         private readonly ScoreType type;
         private int visiblePages;
-        private readonly Bindable<User> user;
+
+        private readonly Bindable<User> user = new Bindable<User>();
 
         private RulesetStore rulesets;
         private APIAccess api;
-
-        private void setUser(User newUser)
-        {
-            visiblePages = 0;
-            scoreContainer.Clear();
-            showMoreButton.Hide();
-            missing.Show();
-            showMore();
-        }
 
         public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, bool includeWeight = false)
         {
             this.type = type;
             this.includeWeight = includeWeight;
-            this.user = user;
-            user.ValueChanged += setUser;
+            this.user.BindTo(user);
+            this.user.ValueChanged += user_ValueChanged;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -93,6 +85,15 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         Text = type == ScoreType.Recent ? "No performance records. :(" : "No awesome performance records yet. :(",
                     },
             };
+        }
+
+        private void user_ValueChanged(User newUser)
+        {
+            visiblePages = 0;
+            scoreContainer.Clear();
+            showMoreButton.Hide();
+            missing.Show();
+            showMore();
         }
 
         [BackgroundDependencyLoader]
