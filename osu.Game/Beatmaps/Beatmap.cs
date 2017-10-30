@@ -72,7 +72,7 @@ namespace osu.Game.Beatmaps
                         AuthorString = @"Unknown Creator",
                     },
                     Version = @"Normal",
-                    Difficulty = new BeatmapDifficulty()
+                    BaseDifficulty = new BeatmapDifficulty()
                 };
             }
         }

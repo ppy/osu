@@ -264,7 +264,7 @@ namespace osu.Game.Screens.Select
             advanced.Beatmap = new BeatmapInfo
             {
                 StarDifficulty = 0,
-                Difficulty = new BeatmapDifficulty
+                BaseDifficulty = new BeatmapDifficulty
                 {
                     CircleSize = 0,
                     DrainRate = 0,
