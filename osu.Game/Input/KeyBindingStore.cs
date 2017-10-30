@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -29,12 +28,6 @@ namespace osu.Game.Input
         }
 
         public void Register(KeyBindingInputManager manager) => insertDefaults(manager.DefaultKeyBindings);
-
-        protected override void Prepare(bool reset = false)
-        {
-            if (reset)
-                GetContext().Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
-        }
 
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
@@ -67,18 +60,24 @@ namespace osu.Game.Input
         }
 
         /// <summary>
-        /// Retrieve <see cref="KeyBinding"/>s for a specified ruleset/variant content.
+        /// Retrieve <see cref="DatabasedKeyBinding"/>s for a specified ruleset/variant content.
         /// </summary>
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
-        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) =>
-            GetContext().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant);
+        public List<DatabasedKeyBinding> Query(int? rulesetId = null, int? variant = null) =>
+            GetContext().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 
         public void Update(KeyBinding keyBinding)
         {
+            var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
+
             var context = GetContext();
-            context.Update(keyBinding);
+
+            Refresh(ref dbKeyBinding);
+
+            dbKeyBinding.KeyCombination = keyBinding.KeyCombination;
+
             context.SaveChanges();
 
             KeyBindingChanged?.Invoke();
