@@ -39,7 +39,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             this.type = type;
             this.includeWeight = includeWeight;
             this.user.BindTo(user);
-            this.user.ValueChanged += user_ValueChanged;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -47,44 +46,54 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
             Children = new Drawable[]
             {
-                    new OsuSpriteText
-                    {
-                        TextSize = 15,
-                        Text = header,
-                        Font = "Exo2.0-RegularItalic",
-                        Margin = new MarginPadding { Top = 10, Bottom = 10 },
-                    },
-                    scoreContainer = new FillFlowContainer<DrawableScore>
-                    {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
-                    },
-                    showMoreButton = new OsuHoverContainer
-                    {
-                        Alpha = 0,
-                        Action = showMore,
-                        AutoSizeAxes = Axes.Both,
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Child = new OsuSpriteText
-                        {
-                            TextSize = 14,
-                            Text = "show more",
-                        }
-                    },
-                    showMoreLoading = new LoadingAnimation
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Size = new Vector2(14),
-                    },
-                    missing = new OsuSpriteText
+                new OsuSpriteText
+                {
+                    TextSize = 15,
+                    Text = header,
+                    Font = "Exo2.0-RegularItalic",
+                    Margin = new MarginPadding { Top = 10, Bottom = 10 },
+                },
+                scoreContainer = new FillFlowContainer<DrawableScore>
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Direction = FillDirection.Vertical,
+                },
+                showMoreButton = new OsuHoverContainer
+                {
+                    Alpha = 0,
+                    Action = showMore,
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Child = new OsuSpriteText
                     {
                         TextSize = 14,
-                        Text = type == ScoreType.Recent ? "No performance records. :(" : "No awesome performance records yet. :(",
-                    },
+                        Text = "show more",
+                    }
+                },
+                showMoreLoading = new LoadingAnimation
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Size = new Vector2(14),
+                },
+                missing = new OsuSpriteText
+                {
+                    TextSize = 14,
+                    Text = type == ScoreType.Recent ? "No performance records. :(" : "No awesome performance records yet. :(",
+                },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api, RulesetStore rulesets)
+        {
+            this.api = api;
+            this.rulesets = rulesets;
+
+            user.ValueChanged += user_ValueChanged;
+            user.TriggerChange();
         }
 
         private void user_ValueChanged(User newUser)
@@ -94,13 +103,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             showMoreButton.Hide();
             missing.Show();
             showMore();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api, RulesetStore rulesets)
-        {
-            this.api = api;
-            this.rulesets = rulesets;
         }
 
         private void showMore()
@@ -118,16 +120,28 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 showMoreButton.FadeTo(scores.Count == 5 ? 1 : 0);
                 showMoreLoading.Hide();
 
-                if (scores.Any())
+                if (!scores.Any()) return;
+
+                missing.Hide();
+
+                foreach (OnlineScore score in scores)
                 {
-                    missing.Hide();
-                    foreach (OnlineScore score in scores)
+                    DrawableScore drawableScore;
+
+                    switch (type)
                     {
-                        var drawableScore = type == ScoreType.Recent ? (DrawableScore)new DrawableTotalScore(score) : new DrawablePerformanceScore(score, includeWeight ? Math.Pow(0.95, scoreContainer.Count) : (double?)null);
-                        drawableScore.RelativeSizeAxes = Axes.X;
-                        drawableScore.Height = 60;
-                        scoreContainer.Add(drawableScore);
+                        default:
+                            drawableScore = new DrawablePerformanceScore(score, includeWeight ? Math.Pow(0.95, scoreContainer.Count) : (double?)null);
+                            break;
+                        case ScoreType.Recent:
+                            drawableScore = new DrawableTotalScore(score);
+                            break;
                     }
+
+                    drawableScore.RelativeSizeAxes = Axes.X;
+                    drawableScore.Height = 60;
+
+                    scoreContainer.Add(drawableScore);
                 }
             };
 
