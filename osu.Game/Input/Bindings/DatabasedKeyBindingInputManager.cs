@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets;
+using System.Linq;
 
 namespace osu.Game.Input.Bindings
 {
@@ -44,11 +45,15 @@ namespace osu.Game.Input.Bindings
         private void load(KeyBindingStore keyBindings)
         {
             store = keyBindings;
+            store.KeyBindingChanged += ReloadMappings;
         }
 
-        protected override void ReloadMappings()
+        protected override void Dispose(bool isDisposing)
         {
-            KeyBindings = store.Query(ruleset?.ID, variant);
+            base.Dispose(isDisposing);
+            store.KeyBindingChanged -= ReloadMappings;
         }
+
+        protected override void ReloadMappings() => KeyBindings = store.Query(ruleset?.ID, variant).ToList();
     }
 }

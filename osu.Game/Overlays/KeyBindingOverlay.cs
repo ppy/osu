@@ -19,7 +19,7 @@ namespace osu.Game.Overlays
         {
             AddSection(new GlobalKeyBindingsSection(global));
 
-            foreach (var ruleset in rulesets.AllRulesets)
+            foreach (var ruleset in rulesets.AvailableRulesets)
                 AddSection(new RulesetBindingsSection(ruleset));
         }
 

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -31,7 +30,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 beatmap = value;
 
                 var rate = (float)beatmap.OnlineInfo.PassCount / beatmap.OnlineInfo.PlayCount;
-                successPercent.Text = $"{Math.Round(rate * 100)}%";
+                successPercent.Text = rate.ToString("P0");
                 successRate.Length = rate;
                 percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
