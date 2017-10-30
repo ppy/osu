@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 }
             };
 
-            Schedule(() => { api.Queue(req); });
+            api.Queue(req);
         }
     }
 }
