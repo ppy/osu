@@ -102,7 +102,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             scoreContainer.Clear();
             showMoreButton.Hide();
             missing.Show();
-            showMore();
+
+            if (newUser != null)
+                showMore();
         }
 
         private void showMore()
