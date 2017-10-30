@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class ScoreContainer : FillFlowContainer
+    public class PaginatedScoreContainer : FillFlowContainer
     {
         private readonly FillFlowContainer<DrawableScore> scoreContainer;
         private readonly OsuSpriteText missing;
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             showMore();
         }
 
-        public ScoreContainer(ScoreType type, Bindable<User> user, string header, bool includeWeight = false)
+        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, bool includeWeight = false)
         {
             this.type = type;
             this.includeWeight = includeWeight;
