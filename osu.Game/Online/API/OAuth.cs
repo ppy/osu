@@ -127,7 +127,8 @@ namespace osu.Game.Online.API
 
             protected override void PrePerform()
             {
-                Parameters[@"refresh_token"] = RefreshToken;
+                AddParameter("refresh_token", RefreshToken);
+
                 base.PrePerform();
             }
         }
@@ -146,8 +147,9 @@ namespace osu.Game.Online.API
 
             protected override void PrePerform()
             {
-                Parameters[@"username"] = Username;
-                Parameters[@"password"] = Password;
+                AddParameter("username", Username);
+                AddParameter("password", Password);
+
                 base.PrePerform();
             }
         }
@@ -161,9 +163,10 @@ namespace osu.Game.Online.API
 
             protected override void PrePerform()
             {
-                Parameters[@"grant_type"] = GrantType;
-                Parameters[@"client_id"] = ClientId;
-                Parameters[@"client_secret"] = ClientSecret;
+                AddParameter("grant_type", GrantType);
+                AddParameter("client_id", ClientId);
+                AddParameter("client_secret", ClientSecret);
+
                 base.PrePerform();
             }
         }
