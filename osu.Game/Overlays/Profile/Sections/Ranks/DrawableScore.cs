@@ -136,47 +136,13 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             }
         }
     }
-    public class PPScore : DrawableScore
-    {
-        private readonly double? weight;
-
-        public PPScore(Score score, double? weight = null) : base(score)
-        {
-            this.weight = weight;
-        }
-
-        [BackgroundDependencyLoader]
-        private new void load(OsuColour colour)
-        {
-            double pp = Score.PP ?? 0;
-            Stats.Add(new OsuSpriteText
-            {
-                Text = $"{pp:0}pp",
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                TextSize = 18,
-                Font = "Exo2.0-BoldItalic",
-            });
-
-            if (weight.HasValue)
-            {
-                Stats.Add(new OsuSpriteText
-                {
-                    Text = $"weighted: {pp * weight:0}pp ({weight:P0})",
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Colour = colour.GrayA,
-                    TextSize = 11,
-                    Font = "Exo2.0-RegularItalic",
-                });
-            }
-        }
-    }
 
     public class TotalScore : DrawableScore
     {
-        public TotalScore(Score score) : base(score)
-        { }
+        public TotalScore(Score score)
+            : base(score)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private new void load()

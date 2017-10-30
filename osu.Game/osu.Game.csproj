@@ -294,6 +294,7 @@
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetsResponse.cs" />
+    <Compile Include="Overlays\Profile\Sections\Ranks\DrawablePerformanceScore.cs" />
     <Compile Include="Overlays\Profile\Sections\Ranks\ScoreContainer.cs" />
     <Compile Include="Overlays\Settings\SettingsButton.cs" />
     <Compile Include="Screens\Edit\Screens\Compose\Timeline\BeatmapWaveformGraph.cs" />

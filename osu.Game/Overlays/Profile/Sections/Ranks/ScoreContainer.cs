@@ -122,7 +122,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     missing.Hide();
                     foreach (OnlineScore score in scores)
                     {
-                        var drawableScore = type == ScoreType.Recent ? (DrawableScore)new TotalScore(score) : new PPScore(score, includeWeight ? Math.Pow(0.95, scoreContainer.Count) : (double?)null);
+                        var drawableScore = type == ScoreType.Recent ? (DrawableScore)new TotalScore(score) : new DrawablePerformanceScore(score, includeWeight ? Math.Pow(0.95, scoreContainer.Count) : (double?)null);
                         drawableScore.RelativeSizeAxes = Axes.X;
                         drawableScore.Height = 60;
                         scoreContainer.Add(drawableScore);
