@@ -390,7 +390,7 @@ namespace osu.Desktop.Deploy
 
         public static void AuthenticatedBlockingPerform(this WebRequest r)
         {
-            r.Headers.Add("Authorization", $"token {GitHubAccessToken}");
+            r.AddHeader("Authorization", $"token {GitHubAccessToken}");
             r.Perform();
         }
     }
