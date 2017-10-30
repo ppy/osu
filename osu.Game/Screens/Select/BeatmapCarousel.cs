@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Select
         internal void UpdateBeatmap(BeatmapInfo beatmap)
         {
             // todo: this method should not run more than once for the same BeatmapSetInfo.
-            var set = manager.Refresh(beatmap.BeatmapSet);
+            var set = manager.QueryBeatmapSet(s => s.ID == beatmap.BeatmapSetInfoID);
 
             // todo: this method should be smarter as to not recreate panels that haven't changed, etc.
             var group = groups.Find(b => b.BeatmapSet.ID == set.ID);

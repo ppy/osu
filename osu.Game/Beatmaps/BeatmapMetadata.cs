@@ -14,8 +14,15 @@ namespace osu.Game.Beatmaps
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
+        private int? onlineBeatmapSetID;
+
         [NotMapped]
-        public int? OnlineBeatmapSetID { get; set; }
+        [JsonProperty(@"id")]
+        public int? OnlineBeatmapSetID
+        {
+            get { return onlineBeatmapSetID; }
+            set { onlineBeatmapSetID = value > 0 ? value : null; }
+        }
 
         public string Title { get; set; }
         public string TitleUnicode { get; set; }

@@ -282,9 +282,14 @@
     <Compile Include="Beatmaps\Drawables\BeatmapSetCover.cs" />
     <Compile Include="Beatmaps\Drawables\BeatmapSetHeader.cs" />
     <Compile Include="Database\DatabaseContextFactory.cs" />
+    <Compile Include="Database\IHasPrimaryKey.cs" />
     <Compile Include="Migrations\20171019041408_InitialCreate.cs" />
     <Compile Include="Migrations\20171019041408_InitialCreate.Designer.cs">
       <DependentUpon>20171019041408_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20171025071459_AddMissingIndexRules.cs" />
+    <Compile Include="Migrations\20171025071459_AddMissingIndexRules.Designer.cs">
+      <DependentUpon>20171025071459_AddMissingIndexRules.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\OsuDbContextModelSnapshot.cs" />
     <Compile Include="Online\API\Requests\GetBeatmapSetRequest.cs" />
