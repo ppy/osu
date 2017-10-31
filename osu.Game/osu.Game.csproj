@@ -17,10 +17,6 @@
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\osu.licenseheader">
       <Link>osu.licenseheader</Link>
     </None>
