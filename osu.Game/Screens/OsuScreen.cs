@@ -16,7 +16,7 @@ namespace osu.Game.Screens
 {
     public abstract class OsuScreen : Screen
     {
-        internal BackgroundScreen Background { get; private set; }
+        public BackgroundScreen Background { get; private set; }
 
         /// <summary>
         /// Override to create a BackgroundMode for the current screen.
@@ -24,17 +24,17 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
 
-        internal virtual bool ShowOverlays => true;
+        public virtual bool ShowOverlays => true;
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        internal virtual bool HasLocalCursorDisplayed => false;
+        public virtual bool HasLocalCursorDisplayed => false;
 
         /// <summary>
         /// Whether the beatmap or ruleset should be allowed to be changed by the user or game.
         /// Used to mark exclusive areas where this is strongly prohibited, like gameplay.
         /// </summary>
-        internal virtual bool AllowBeatmapRulesetChange => true;
+        public virtual bool AllowBeatmapRulesetChange => true;
 
         protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
