@@ -8,7 +8,7 @@ namespace osu.Game.Screens
 {
     internal class Loader : OsuScreen
     {
-        internal override bool ShowOverlays => false;
+        public override bool ShowOverlays => false;
 
         public Loader()
         {
