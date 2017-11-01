@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Menu
     {
         private readonly ButtonSystem buttons;
 
-        internal override bool ShowOverlays => buttons.State != MenuState.Initial;
+        public override bool ShowOverlays => buttons.State != MenuState.Initial;
 
         private readonly BackgroundScreenDefault background;
         private Screen songSelect;

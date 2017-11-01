@@ -34,13 +34,13 @@ namespace osu.Game.Screens.Play
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
-        internal override bool ShowOverlays => false;
+        public override bool ShowOverlays => false;
 
-        internal override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && RulesetContainer.ProvidingUserCursor;
+        public override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && RulesetContainer.ProvidingUserCursor;
 
         public Action RestartRequested;
 
-        internal override bool AllowBeatmapRulesetChange => false;
+        public override bool AllowBeatmapRulesetChange => false;
 
         public bool HasFailed { get; private set; }
 
