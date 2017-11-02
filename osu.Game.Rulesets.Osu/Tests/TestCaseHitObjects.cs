@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             h.Depth = depth++;
 
             if (auto)
-                h.State = ArmedState.Hit;
+                h.State.Value = ArmedState.Hit;
 
             playfieldContainer.Add(h);
             var proxyable = h as IDrawableHitObjectWithProxiedApproach;

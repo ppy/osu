@@ -104,6 +104,7 @@ namespace osu.Game.Rulesets.UI
         where TObject : HitObject
     {
         public event Action<Judgement> OnJudgement;
+        public event Action<Judgement> OnJudgementRemoved;
 
         /// <summary>
         /// The Beatmap
@@ -240,6 +241,8 @@ namespace osu.Game.Rulesets.UI
                     Playfield.OnJudgement(d, j);
                     OnJudgement?.Invoke(j);
                 };
+
+                drawableObject.OnJudgementRemoved += (d, j) => { OnJudgementRemoved?.Invoke(j); };
 
                 Playfield.Add(drawableObject);
             }

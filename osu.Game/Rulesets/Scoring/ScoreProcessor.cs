@@ -185,6 +185,7 @@ namespace osu.Game.Rulesets.Scoring
             Debug.Assert(base_portion + combo_portion == 1.0);
 
             rulesetContainer.OnJudgement += AddJudgement;
+            rulesetContainer.OnJudgementRemoved += RemoveJudgement;
 
             SimulateAutoplay(rulesetContainer.Beatmap);
             Reset(true);
@@ -213,13 +214,26 @@ namespace osu.Game.Rulesets.Scoring
         protected void AddJudgement(Judgement judgement)
         {
             OnNewJudgement(judgement);
-            NotifyNewJudgement(judgement);
+            updateScore();
 
+            NotifyNewJudgement(judgement);
             UpdateFailed();
         }
 
+        protected void RemoveJudgement(Judgement judgement)
+        {
+            OnJudgementRemoved(judgement);
+            updateScore();
+        }
+
+        /// <summary>
+        /// Applies a judgement.
+        /// </summary>
+        /// <param name="judgement">The judgement to apply/</param>
         protected virtual void OnNewJudgement(Judgement judgement)
         {
+            judgement.ComboAtJudgement = Combo;
+            judgement.HighestComboAtJudgement = HighestCombo;
 
             if (judgement.AffectsCombo)
             {
@@ -242,7 +256,30 @@ namespace osu.Game.Rulesets.Scoring
             }
             else if (judgement.IsHit)
                 bonusScore += judgement.NumericResult;
+        }
 
+        /// <summary>
+        /// Removes a judgement. This should reverse everything in <see cref="OnNewJudgement(Judgement)"/>.
+        /// </summary>
+        /// <param name="judgement">The judgement to remove.</param>
+        protected virtual void OnJudgementRemoved(Judgement judgement)
+        {
+            Combo.Value = judgement.ComboAtJudgement;
+            HighestCombo.Value = judgement.HighestComboAtJudgement;
+
+            if (judgement.AffectsCombo)
+            {
+                baseScore -= judgement.NumericResult;
+                rollingMaxBaseScore -= judgement.MaxNumericResult;
+
+                Hits--;
+            }
+            else if (judgement.IsHit)
+                bonusScore -= judgement.NumericResult;
+        }
+
+        private void updateScore()
+        {
             if (rollingMaxBaseScore != 0)
                 Accuracy.Value = baseScore / rollingMaxBaseScore;
 
