@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Menu
             logo.Colour = Color4.DarkGray;
             logo.Ripple = false;
 
-            const int quick_appear = 150;
+            const int quick_appear = 350;
 
             int initialMovementTime = logo.Alpha > 0.2f ? quick_appear : 0;
 
