@@ -11,9 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 
         public TaikoStrongHitJudgement()
         {
-            base.Result = HitResult.Perfect;
+            Final = true;
         }
-
-        public new HitResult Result => base.Result;
     }
 }
