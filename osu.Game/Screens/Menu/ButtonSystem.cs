@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Menu
             switch (args.Key)
             {
                 case Key.Space:
-                    logo.TriggerOnClick(state);
+                    logo?.TriggerOnClick(state);
                     return true;
                 case Key.Escape:
                     switch (State)
