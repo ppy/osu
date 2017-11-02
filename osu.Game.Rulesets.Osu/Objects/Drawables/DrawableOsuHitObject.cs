@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected sealed override void UpdateState(ArmedState state)
         {
-            FinishTransforms();
+            ClearTransforms(true);
 
             using (BeginAbsoluteSequence(HitObject.StartTime - TIME_PREEMPT, true))
             {
@@ -38,7 +38,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void UpdateInitialState()
         {
-            Hide();
+            // Hide() cannot be used here, because when rewinding, we need these to be the final values
+            Alpha = 0;
         }
 
         protected virtual void UpdatePreemptState()

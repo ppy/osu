@@ -86,15 +86,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialState();
 
-            // sane defaults
-            ring.Show();
-            circle.Show();
-            number.Show();
-            glow.Show();
+            // Hide() cannot be used here, because when rewinding, we need these to be the final values
 
-            ApproachCircle.Hide();
-            ApproachCircle.ScaleTo(new Vector2(4));
-            explode.Hide();
+            ring.Alpha = 1;
+            circle.Alpha = 1;
+            number.Alpha = 1;
+            glow.Alpha = 1;
+
+            ApproachCircle.Alpha = 0;
+            ApproachCircle.Scale = new Vector2(4);
+            explode.Alpha = 0;
+            flash.Alpha = 0;
+
+            Scale = new Vector2(HitObject.Scale);
         }
 
         protected override void UpdatePreemptState()
