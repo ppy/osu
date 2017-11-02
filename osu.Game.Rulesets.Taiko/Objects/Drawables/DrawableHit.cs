@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             var offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
             using (BeginDelayedSequence(HitObject.StartTime - Time.Current + offset, true))
             {
-                switch (State)
+                switch (State.Value)
                 {
                     case ArmedState.Idle:
                         this.Delay(HitObject.HitWindowMiss).Expire();
