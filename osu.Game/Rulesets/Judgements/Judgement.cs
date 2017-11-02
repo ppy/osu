@@ -20,12 +20,12 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// The combo prior to this judgement occurring.
         /// </summary>
-        internal int ComboAtJudgement { get; set; }
+        internal int ComboAtJudgement;
 
         /// <summary>
         /// The highest combo achieved prior to this judgement occurring.
         /// </summary>
-        internal int HighestComboAtJudgement { get; set; }
+        internal int HighestComboAtJudgement;
 
         /// <summary>
         /// Whether a successful hit occurred.
