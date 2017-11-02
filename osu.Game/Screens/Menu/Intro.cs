@@ -33,9 +33,9 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
         private SampleChannel seeya;
 
-        internal override bool HasLocalCursorDisplayed => true;
+        public override bool HasLocalCursorDisplayed => true;
 
-        internal override bool ShowOverlays => false;
+        public override bool ShowOverlays => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
 
