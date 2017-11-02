@@ -104,9 +104,9 @@ namespace osu.Game.Screens.Play
 
             logo.ScaleTo(new Vector2(0.15f), 300, Easing.In);
             logo.MoveTo(new Vector2(0.5f), 300, Easing.In);
-            logo.FadeIn();
+            logo.FadeIn(350);
 
-            logo.Delay(500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
+            logo.Delay(resuming ? 0 : 500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
         }
 
         private void pushWhenLoaded()
