@@ -174,6 +174,7 @@ namespace osu.Game.Rulesets.Scoring
         private double maxBaseScore;
         private double rollingMaxBaseScore;
         private double baseScore;
+        private double bonusScore;
 
         protected ScoreProcessor()
         {
@@ -219,7 +220,6 @@ namespace osu.Game.Rulesets.Scoring
 
         protected virtual void OnNewJudgement(Judgement judgement)
         {
-            double bonusScore = 0;
 
             if (judgement.AffectsCombo)
             {
@@ -271,6 +271,7 @@ namespace osu.Game.Rulesets.Scoring
             Hits = 0;
             baseScore = 0;
             rollingMaxBaseScore = 0;
+            bonusScore = 0;
         }
     }
 
