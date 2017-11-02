@@ -33,6 +33,11 @@ namespace osu.Game.Rulesets.Judgements
         public bool IsHit => Result > HitResult.Miss;
 
         /// <summary>
+        /// Whether this judgement is the final judgement for the hit object.
+        /// </summary>
+        public bool Final = true;
+
+        /// <summary>
         /// The offset from a perfect hit at which this judgement occurred.
         /// Populated when added via <see cref="DrawableHitObject{TObject}.AddJudgement"/>.
         /// </summary>

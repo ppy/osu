@@ -105,12 +105,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         private bool judgementOccurred;
-        private bool hasJudgementResult => Judgements.LastOrDefault()?.Result >= HitResult.Miss;
+        private bool judgementFinalized => judgements.LastOrDefault()?.Final == true;
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public virtual bool AllJudged => (!ProvidesJudgement || hasJudgementResult) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
+        public virtual bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
 
         /// <summary>
         /// Notifies that a new judgement has occurred for this <see cref="DrawableHitObject"/>.
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     judgementOccurred |= d.UpdateJudgement(userTriggered);
             }
 
-            if (!ProvidesJudgement || hasJudgementResult || judgementOccurred)
+            if (!ProvidesJudgement || judgementFinalized || judgementOccurred)
                 return judgementOccurred;
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
