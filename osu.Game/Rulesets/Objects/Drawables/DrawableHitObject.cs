@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public virtual bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
+        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (NestedHitObjects?.All(h => h.AllJudged) ?? true);
 
         /// <summary>
         /// Notifies that a new judgement has occurred for this <see cref="DrawableHitObject"/>.
