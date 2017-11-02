@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected abstract TaikoAction[] HitActions { get; }
 
         /// <summary>
-        /// Whether a second hit is allowed to be processed.
+        /// Whether a second hit is allowed to be processed. This occurs once this hit object has been hit successfully.
         /// </summary>
         protected bool SecondHitAllowed { get; private set; }
 
