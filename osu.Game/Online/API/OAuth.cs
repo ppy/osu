@@ -27,6 +27,9 @@ namespace osu.Game.Online.API
 
         internal bool AuthenticateWithLogin(string username, string password)
         {
+            if (string.IsNullOrEmpty(username)) return false;
+            if (string.IsNullOrEmpty(password)) return false;
+
             using (var req = new AccessTokenRequestPassword(username, password)
             {
                 Url = $@"{endpoint}/oauth/token",

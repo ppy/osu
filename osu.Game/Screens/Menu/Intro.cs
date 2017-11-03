@@ -14,6 +14,8 @@ using osu.Game.Beatmaps.IO;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
@@ -38,24 +40,10 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
 
-        public Intro()
-        {
-            Children = new Drawable[]
-            {
-                new ParallaxContainer
-                {
-                    ParallaxAmount = 0.01f,
-                    Child = introSequence = new IntroSequence
-                    {
-                        Blending = BlendingMode.Additive,
-                    },
-                }
-            };
-        }
-
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
         private Track track;
+        private readonly ParallaxContainer parallax;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
@@ -112,10 +100,48 @@ namespace osu.Game.Screens.Menu
                 {
                     DidLoadMenu = true;
                     Push(mainMenu);
-                }, 3500);
-            }, 600);
+                }, delay_step_one);
+            }, delay_step_two);
+        }
 
-            introSequence.Start();
+        private const double delay_step_one = 2300;
+        private const double delay_step_two = 600;
+
+        public const int EXIT_DELAY = 3000;
+
+        protected override void LogoSetup(OsuLogo logo, bool resuming)
+        {
+            base.LogoSetup(logo, resuming);
+
+            logo.RelativePositionAxes = Axes.Both;
+
+            logo.Triangles = false;
+            logo.Colour = Color4.DarkGray;
+            logo.Ripple = false;
+
+            const int quick_appear = 350;
+
+            int initialMovementTime = logo.Alpha > 0.2f ? quick_appear : 0;
+
+            logo.MoveTo(new Vector2(0.5f), initialMovementTime, Easing.OutQuint);
+
+            if (!resuming)
+            {
+                logo.ScaleTo(0.4f);
+                logo.FadeOut();
+
+                logo.ScaleTo(1, delay_step_one + delay_step_two, Easing.OutQuint);
+                logo.FadeIn(delay_step_one + delay_step_two, Easing.OutQuint);
+            }
+            else
+            {
+                logo
+                    .ScaleTo(1, initialMovementTime, Easing.OutQuint)
+                    .FadeIn(quick_appear, Easing.OutQuint)
+                    .Then()
+                    .RotateTo(20, EXIT_DELAY * 1.5f)
+                    .FadeOut(EXIT_DELAY);
+            }
         }
 
         protected override void OnSuspending(Screen next)
@@ -135,7 +161,7 @@ namespace osu.Game.Screens.Menu
             if (!(last is MainMenu))
                 Content.FadeIn(300);
 
-            double fadeOutTime = 2000;
+            double fadeOutTime = EXIT_DELAY;
             //we also handle the exit transition.
             if (menuVoice)
                 seeya.Play();

@@ -10,7 +10,9 @@ using osu.Game.Graphics.Containers;
 using OpenTK;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Menu;
 
 namespace osu.Game.Screens
 {
@@ -29,6 +31,8 @@ namespace osu.Game.Screens
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         public virtual bool HasLocalCursorDisplayed => false;
+
+        private OsuLogo logo;
 
         /// <summary>
         /// Whether the beatmap or ruleset should be allowed to be changed by the user or game.
@@ -72,7 +76,14 @@ namespace osu.Game.Screens
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
+            logo.DelayUntilTransformsFinished().Schedule(() => logoSetup(true));
             sampleExit?.Play();
+        }
+
+        protected override void OnSuspending(Screen next)
+        {
+            base.OnSuspending(next);
+            logoOnSuspending();
         }
 
         protected override void OnEntering(Screen last)
@@ -106,11 +117,19 @@ namespace osu.Game.Screens
                 });
             }
 
+            if ((logo = lastOsu?.logo) == null)
+                AddInternal(logo = new OsuLogo());
+
             base.OnEntering(last);
+
+            logo.DelayUntilTransformsFinished().Schedule(() => logoSetup(false));
         }
 
         protected override bool OnExiting(Screen next)
         {
+            if (ValidForResume && logo != null)
+                logoOnExiting();
+
             OsuScreen nextOsu = next as OsuScreen;
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
@@ -127,6 +146,34 @@ namespace osu.Game.Screens
 
             Beatmap.UnbindAll();
             return false;
+        }
+
+        private void logoSetup(bool resuming) => LogoSetup(logo, resuming);
+
+        protected virtual void LogoSetup(OsuLogo logo, bool resuming)
+        {
+            logo.Action = null;
+            logo.FadeOut(300, Easing.OutQuint);
+        }
+
+        private void logoOnExiting()
+        {
+            logo.ClearTransforms();
+            LogoOnExiting(logo);
+        }
+
+        protected virtual void LogoOnExiting(OsuLogo logo)
+        {
+        }
+
+        private void logoOnSuspending()
+        {
+            logo.ClearTransforms();
+            LogoOnSuspending(logo);
+        }
+
+        protected virtual void LogoOnSuspending(OsuLogo logo)
+        {
         }
     }
 }

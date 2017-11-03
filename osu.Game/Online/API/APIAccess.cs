@@ -118,6 +118,7 @@ namespace osu.Game.Online.API
                             //NotificationOverlay.ShowMessage("Login failed!");
                             log.Add(@"Login failed!");
                             Password = null;
+                            authentication.Clear();
                             continue;
                         }
 
