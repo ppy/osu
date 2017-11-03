@@ -18,12 +18,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public double FadeInTime;
         public double FadeOutTime;
 
-        public override bool RemoveWhenNotAlive => false;
-
-        public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider) : base(repeatPoint)
+        public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
+            : base(repeatPoint)
         {
             this.repeatPoint = repeatPoint;
             this.drawableSlider = drawableSlider;
+
+            // The containing DrawableSlider is updated before us and clears our transforms, so we need to be
+            // present to get updated and have UpdateState correctly called when rewinding.
+            AlwaysPresent = true;
 
             AutoSizeAxes = Axes.Both;
             Blending = BlendingMode.Additive;
