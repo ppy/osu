@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
         public HistoricalSection()
         {
-            Child = new PaginatedScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)");
+            Child = new PaginatedScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)", "No performance records. :(");
         }
     }
 }
