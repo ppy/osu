@@ -76,7 +76,7 @@ namespace osu.Game.Screens
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
-            logo.WaitForTransforms().Schedule(() => logoSetup(true));
+            logo.DelayUntilTransformsFinished().Schedule(() => logoSetup(true));
             sampleExit?.Play();
         }
 
@@ -122,7 +122,7 @@ namespace osu.Game.Screens
 
             base.OnEntering(last);
 
-            logo.WaitForTransforms().Schedule(() => logoSetup(false));
+            logo.DelayUntilTransformsFinished().Schedule(() => logoSetup(false));
         }
 
         protected override bool OnExiting(Screen next)
