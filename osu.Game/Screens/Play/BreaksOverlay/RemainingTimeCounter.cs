@@ -9,17 +9,11 @@ using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
-    public class RemainingTimeCounter : VisibilityContainer
+    public class RemainingTimeCounter : Container
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
 
         private readonly OsuSpriteText counter;
-
-        private int? previousSecond;
-
-        private double endTime;
-
-        private bool isCounting;
 
         public RemainingTimeCounter()
         {
@@ -31,35 +25,27 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 TextSize = 33,
                 Font = "Venera",
             };
+
+            Alpha = 0;
         }
 
-        public void StartCounting(double endTime)
+        public void CountTo(double duration)
         {
-            this.endTime = endTime;
-            isCounting = true;
-        }
+            double offset = 0;
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (isCounting)
+            while (duration > 0)
             {
-                var currentTime = Clock.CurrentTime;
-                if (currentTime < endTime)
-                {
-                    int currentSecond = (int)Math.Ceiling((endTime - Clock.CurrentTime) / 1000.0);
-                    if (currentSecond != previousSecond)
-                    {
-                        counter.Text = currentSecond.ToString();
-                        previousSecond = currentSecond;
-                    }
-                }
-                else isCounting = false;
+                int seconds = (int)Math.Ceiling(duration / 1000);
+                counter.Delay(offset).TransformTextTo(seconds.ToString());
+
+                double localOffset = duration - (seconds - 1) * 1000 + 1; // +1 because we want the duration to be the next second when ceiled
+
+                offset += localOffset;
+                duration -= localOffset;
             }
         }
 
-        protected override void PopIn() => this.FadeIn(fade_duration);
-        protected override void PopOut() => this.FadeOut(fade_duration);
+        public override void Show() => this.FadeIn(fade_duration);
+        public override void Hide() => this.FadeOut(fade_duration);
     }
 }
