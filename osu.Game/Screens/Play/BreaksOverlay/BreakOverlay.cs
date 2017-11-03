@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             }
         }
 
+        public override bool RemoveCompletedTransforms => false;
+
         private readonly bool letterboxing;
         private readonly LetterboxOverlay letterboxOverlay;
         private readonly Container remainingTimeAdjustmentBox;
@@ -101,38 +103,41 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                 if (!b.HasEffect)
                     continue;
 
+                using (BeginAbsoluteSequence(b.StartTime, true))
+                {
+                    remainingTimeAdjustmentBox
+                        .ResizeWidthTo(remaining_time_container_max_size, fade_duration, Easing.OutQuint)
+                        .Delay(b.Duration - fade_duration)
+                        .ResizeWidthTo(0);
+
+                    remainingTimeBox
+                        .ResizeWidthTo(0, b.Duration - fade_duration)
+                        .Then()
+                        .ResizeWidthTo(1);
+
+                    remainingTimeCounter.CountTo(b.Duration);
+                }
+
                 using (BeginAbsoluteSequence(b.StartTime))
                 {
-                    Schedule(() => onBreakIn(b));
+                    Schedule(() => showBreak(b));
                     using (BeginDelayedSequence(b.Duration - fade_duration))
-                        Schedule(onBreakOut);
+                        Schedule(hideBreak);
                 }
             }
         }
 
-        private void onBreakIn(BreakPeriod b)
+        private void showBreak(BreakPeriod b)
         {
             if (letterboxing)
                 letterboxOverlay.Show();
-
-            remainingTimeAdjustmentBox
-                .ResizeWidthTo(remaining_time_container_max_size, fade_duration, Easing.OutQuint)
-                .Delay(b.Duration - fade_duration)
-                .ResizeWidthTo(0);
-
-            remainingTimeBox
-                .ResizeWidthTo(0, b.Duration - fade_duration)
-                .Then()
-                .ResizeWidthTo(1);
-
-            remainingTimeCounter.StartCounting(b.EndTime);
 
             remainingTimeCounter.Show();
             info.Show();
             arrowsOverlay.Show();
         }
 
-        private void onBreakOut()
+        private void hideBreak()
         {
             if (letterboxing)
                 letterboxOverlay.Hide();
