@@ -47,16 +47,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 AddJudgement(new OsuJudgement { Result = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss });
         }
 
+        protected override void UpdateInitialState()
+        {
+            base.UpdateInitialState();
+
+            Scale = new Vector2(0.5f);
+        }
+
         protected override void UpdatePreemptState()
         {
             var animIn = Math.Min(150, repeatPoint.StartTime - FadeInTime);
 
-            this.Animate(
-                d => d.FadeIn(animIn),
-                d => d.ScaleTo(0.5f).ScaleTo(1.2f, animIn)
-            ).Then(
-                d => d.ScaleTo(1, 150, Easing.Out)
-            );
+            this.FadeIn(animIn).ScaleTo(1.2f, animIn)
+                .Then()
+                .ScaleTo(1, 150, Easing.Out);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
