@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -15,11 +16,9 @@ namespace osu.Game.Screens.Menu
     public class IntroSequence : Container
     {
         //Size
-        private const int logo_size = 460; //todo: this should probably be 480
+        private const float logo_size = 460; //todo: this should probably be 480
 
         private readonly OsuSpriteText welcomeText;
-
-        private readonly OsuLogo logo;
 
         private readonly Container barsContainer;
 
@@ -185,144 +184,95 @@ namespace osu.Game.Screens.Menu
                         Colour = OsuColour.FromHex(@"e967a1"),
                     }
                 },
-                logo = new OsuLogo
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Ripple = false,
-                    Interactive = false,
-                    Blending = BlendingMode.Additive,
-                },
             };
-
-            setDefaults();
         }
 
-        public void Start()
+        public void Start(double length)
         {
-            const int circle_size = 416;
+            FinishTransforms(true);
+            setDefaults();
 
-            //Time
-            const int full_animation_duration = 2950;
+            mediumRing.ResizeTo(130, 360, Easing.InExpo).OnComplete(r => r.Foreground.ResizeTo(1, 420, Easing.OutQuad));
 
-            const int medium_ring_resize_duration = 360;
-            const int medium_ring_fade_duration = 420;
-
-            const int small_ring_resize_duration = 250;
-            const int small_ring_fade_duration = 650;
-
-            const int text_fade_duration = 700;
-            const int text_spacing_transform_duration = 1500;
-
-            const int bar_animation_duration = 700;
-            const int bar_resize_delay = 150;
-
-            const int big_ring_animation_start_delay = 2000;
-            const int big_ring_resize_duration = 500;
-            const int big_ring_foreground_resize_delay = 250;
-            const int big_ring_fade_duration = 450;
-
-            const int background_animation_start_time = 2250;
-            const int foreground_animation_start_time = 2300;
-
-            const int colored_circle_rotation_delay = 110;
-            const int colored_circles_appear_delay = 80;
-            const int purple_circle_animation_start_time = 2250;
-
-            const int logo_fade_duration = 300;
-
-            //Position
-            const int bar_end_offset = 120;
-
-            mediumRing.ResizeTo(130, medium_ring_resize_duration, Easing.InExpo);
+            Func<double> remainingTime = () => length - TransformDelay;
 
             using (BeginDelayedSequence(200, true))
             {
-                welcomeText.FadeIn(text_fade_duration);
-                welcomeText.TransformSpacingTo(new Vector2(20, 0), text_spacing_transform_duration, Easing.Out);
+                welcomeText.FadeIn(700);
+                welcomeText.TransformSpacingTo(new Vector2(20, 0), 1500, Easing.Out);
 
-                smallRing.ResizeTo(40, small_ring_resize_duration, Easing.InExpo);
-                smallRing.Foreground.Delay(small_ring_resize_duration).ResizeTo(1, small_ring_fade_duration, Easing.OutQuad);
-            }
+                smallRing.ResizeTo(logo_size * 0.086f, 250, Easing.InExpo).OnComplete(r => r.Foreground.ResizeTo(1, 650, Easing.OutQuad));
 
-            using (BeginDelayedSequence(medium_ring_resize_duration, true))
-            {
-                mediumRing.Foreground.ResizeTo(1, medium_ring_fade_duration, Easing.OutQuad);
-
-                foreach (var bar in barsContainer)
+                using (BeginDelayedSequence(160, true))
                 {
-                    bar.FadeIn();
-                    bar.Delay(bar_resize_delay).ResizeWidthTo(0, bar_animation_duration - bar_resize_delay, Easing.OutQuint);
-                }
+                    const int bar_duration = 700;
+                    const int bar_resize = 150;
 
-                barTopLeft.MoveTo(new Vector2(-bar_end_offset, -bar_end_offset), bar_animation_duration, Easing.OutQuint);
-                barTopRight.MoveTo(new Vector2(bar_end_offset, -bar_end_offset), bar_animation_duration, Easing.OutQuint);
-                barBottomLeft.MoveTo(new Vector2(-bar_end_offset, bar_end_offset), bar_animation_duration, Easing.OutQuint);
-                barBottomRight.MoveTo(new Vector2(bar_end_offset, bar_end_offset), bar_animation_duration, Easing.OutQuint);
-            }
-
-            using (bigRing.BeginDelayedSequence(big_ring_animation_start_delay, true))
-            {
-                bigRing.ResizeTo(400, big_ring_resize_duration, Easing.InOutQuint);
-                bigRing.Foreground.Delay(big_ring_foreground_resize_delay).ResizeTo(1, big_ring_fade_duration, Easing.OutExpo);
-            }
-
-            int duration = full_animation_duration - background_animation_start_time;
-            using (backgroundFill.BeginDelayedSequence(background_animation_start_time))
-            {
-                backgroundFill.ResizeHeightTo(1, duration, Easing.InOutQuart);
-                backgroundFill.RotateTo(-90, duration, Easing.InOutQuart);
-            }
-
-            duration = full_animation_duration - foreground_animation_start_time;
-            using (foregroundFill.BeginDelayedSequence(foreground_animation_start_time))
-            {
-                foregroundFill.ResizeWidthTo(1, duration, Easing.InOutQuart);
-                foregroundFill.RotateTo(-90, duration, Easing.InOutQuart);
-            }
-
-            duration = full_animation_duration - purple_circle_animation_start_time;
-            using (BeginDelayedSequence(purple_circle_animation_start_time, true))
-            {
-                purpleCircle.MoveToY((circle_size - 2) / 2.0f, duration, Easing.InOutQuad);
-                purpleCircle.Delay(colored_circle_rotation_delay).RotateTo(-180, duration - colored_circle_rotation_delay, Easing.OutQuad);
-                purpleCircle.ResizeTo(circle_size - 2, duration, Easing.InOutQuad);
-
-                duration -= colored_circles_appear_delay;
-                using (BeginDelayedSequence(colored_circles_appear_delay, true))
-                {
-                    yellowCircle.MoveToY(-(circle_size - 2) / 2.0f, duration, Easing.InOutQuad);
-                    yellowCircle.Delay(colored_circle_rotation_delay).RotateTo(-180, duration - colored_circle_rotation_delay, Easing.OutQuad);
-                    yellowCircle.ResizeTo(circle_size - 2, duration, Easing.InOutQuad);
-
-                    duration -= colored_circles_appear_delay;
-                    using (BeginDelayedSequence(colored_circles_appear_delay, true))
+                    foreach (var bar in barsContainer)
                     {
-                        blueCircle.MoveToX(-(circle_size - 2) / 2.0f, duration, Easing.InOutQuad);
-                        blueCircle.Delay(colored_circle_rotation_delay).RotateTo(-180, duration - colored_circle_rotation_delay, Easing.OutQuad);
-                        blueCircle.ResizeTo(circle_size - 2, duration, Easing.InOutQuad);
+                        bar.FadeIn();
+                        bar.Delay(bar_resize).ResizeWidthTo(0, bar_duration - bar_resize, Easing.OutQuint);
+                    }
 
-                        duration -= colored_circles_appear_delay;
-                        using (BeginDelayedSequence(colored_circles_appear_delay, true))
+                    const int bar_end_offset = 120;
+                    barTopLeft.MoveTo(new Vector2(-bar_end_offset, -bar_end_offset), bar_duration, Easing.OutQuint);
+                    barTopRight.MoveTo(new Vector2(bar_end_offset, -bar_end_offset), bar_duration, Easing.OutQuint);
+                    barBottomLeft.MoveTo(new Vector2(-bar_end_offset, bar_end_offset), bar_duration, Easing.OutQuint);
+                    barBottomRight.MoveTo(new Vector2(bar_end_offset, bar_end_offset), bar_duration, Easing.OutQuint);
+
+                    using (BeginDelayedSequence(1640, true)) // 2000
+                    {
+                        bigRing.ResizeTo(logo_size * 0.86f, 500, Easing.InOutQuint);
+                        bigRing.Foreground.Delay(250).ResizeTo(1, 450, Easing.OutExpo);
+
+                        using (BeginDelayedSequence(250, true)) // 2250
                         {
-                            pinkCircle.MoveToX(circle_size / 2.0f, duration, Easing.InOutQuad);
-                            pinkCircle.Delay(colored_circle_rotation_delay).RotateTo(-180, duration - colored_circle_rotation_delay, Easing.OutQuad);
-                            pinkCircle.ResizeTo(circle_size, duration, Easing.InOutQuad);
+                            backgroundFill.ResizeHeightTo(1, remainingTime(), Easing.InOutQuart);
+                            backgroundFill.RotateTo(-90, remainingTime(), Easing.InOutQuart);
+
+                            using (BeginDelayedSequence(50, true))
+                            {
+                                foregroundFill.ResizeWidthTo(1, remainingTime(), Easing.InOutQuart);
+                                foregroundFill.RotateTo(-90, remainingTime(), Easing.InOutQuart);
+                            }
+
+                            const float circle_size = logo_size * 0.9f;
+
+                            const int rotation_delay = 110;
+                            const int appear_delay = 80;
+
+                            purpleCircle.MoveToY(circle_size / 2, remainingTime(), Easing.InOutQuad);
+                            purpleCircle.Delay(rotation_delay).RotateTo(-180, remainingTime() - rotation_delay, Easing.OutQuad);
+                            purpleCircle.ResizeTo(circle_size, remainingTime(), Easing.InOutQuad);
+
+                            using (BeginDelayedSequence(appear_delay, true))
+                            {
+                                yellowCircle.MoveToY(-circle_size / 2, remainingTime(), Easing.InOutQuad);
+                                yellowCircle.Delay(rotation_delay).RotateTo(-180, remainingTime() - rotation_delay, Easing.OutQuad);
+                                yellowCircle.ResizeTo(circle_size, remainingTime(), Easing.InOutQuad);
+
+                                using (BeginDelayedSequence(appear_delay, true))
+                                {
+                                    blueCircle.MoveToX(-circle_size / 2, remainingTime(), Easing.InOutQuad);
+                                    blueCircle.Delay(rotation_delay).RotateTo(-180, remainingTime() - rotation_delay, Easing.OutQuad);
+                                    blueCircle.ResizeTo(circle_size, remainingTime(), Easing.InOutQuad);
+
+                                    using (BeginDelayedSequence(appear_delay, true))
+                                    {
+                                        pinkCircle.MoveToX(circle_size / 2, remainingTime(), Easing.InOutQuad);
+                                        pinkCircle.Delay(rotation_delay).RotateTo(-180, remainingTime() - rotation_delay, Easing.OutQuad);
+                                        pinkCircle.ResizeTo(circle_size, remainingTime(), Easing.InOutQuad);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
-
-            logo.Delay(full_animation_duration).FadeIn(logo_fade_duration);
-
-            backgroundFill.Delay(full_animation_duration + logo_fade_duration).FadeOut();
-            foregroundFill.Delay(full_animation_duration + logo_fade_duration).FadeOut();
         }
 
         private void setDefaults()
         {
-            logo.Alpha = 0;
-
             welcomeText.Spacing = new Vector2(5);
             welcomeText.Alpha = 0;
 
@@ -353,13 +303,6 @@ namespace osu.Game.Screens.Menu
             purpleCircle.Position = new Vector2(0, circle_offset);
             blueCircle.Position = new Vector2(-circle_offset, 0);
             pinkCircle.Position = new Vector2(circle_offset, 0);
-        }
-
-        public void Restart()
-        {
-            FinishTransforms(true);
-            setDefaults();
-            Start();
         }
 
         private class Ring : Container<CircularContainer>

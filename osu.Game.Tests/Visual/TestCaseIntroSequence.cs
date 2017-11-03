@@ -12,16 +12,16 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseIntro : OsuTestCase
+    public class TestCaseIntroSequence : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(IntroSequence)
+            typeof(OsuLogo),
         };
 
-        public TestCaseIntro()
+        public TestCaseIntroSequence()
         {
-            IntroSequence intro;
+            OsuLogo logo;
 
             var rateAdjustClock = new StopwatchClock(true);
             var framedClock = new FramedClock(rateAdjustClock);
@@ -38,11 +38,14 @@ namespace osu.Game.Tests.Visual
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                     },
-                    intro = new IntroSequence(),
+                    logo = new OsuLogo
+                    {
+                        Anchor = Anchor.Centre,
+                    }
                 }
             });
 
-            AddStep(@"Restart", intro.Restart);
+            AddStep(@"Restart", logo.PlayIntro);
             AddSliderStep("Playback speed", 0.0, 2.0, 1, v => rateAdjustClock.Rate = v);
         }
     }
