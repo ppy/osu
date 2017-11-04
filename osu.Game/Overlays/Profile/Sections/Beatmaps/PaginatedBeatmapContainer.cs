@@ -16,7 +16,6 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private const float panel_padding = 10f;
 
         private readonly BeatmapSetType type;
-        private string header;
 
         private DirectPanel playing;
 
@@ -24,7 +23,6 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             : base(user, header, missing)
         {
             this.type = type;
-            this.header = header;
 
             ItemsPerPage = 6;
 
