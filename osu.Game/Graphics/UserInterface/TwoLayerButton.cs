@@ -17,7 +17,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class TwoLayerButton : OsuClickableContainer
+    public class TwoLayerButton : OsuClickableContainer, IHandleOnHoverLost, IHandleOnMouseDown
     {
         private readonly BouncingIcon bouncingIcon;
 
@@ -171,7 +171,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => IconLayer.ReceiveMouseInputAt(screenSpacePos) || TextLayer.ReceiveMouseInputAt(screenSpacePos);
 
-        protected override bool OnHover(InputState state)
+        public override bool OnHover(InputState state)
         {
             this.ResizeTo(SIZE_EXTENDED, transform_time, Easing.OutElastic);
             IconLayer.FadeColour(HoverColour, transform_time, Easing.OutElastic);
@@ -181,7 +181,7 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             this.ResizeTo(SIZE_RETRACTED, transform_time, Easing.OutElastic);
             IconLayer.FadeColour(TextLayer.Colour, transform_time, Easing.OutElastic);
@@ -189,12 +189,12 @@ namespace osu.Game.Graphics.UserInterface
             bouncingIcon.ScaleTo(1, transform_time, Easing.OutElastic);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             return true;
         }
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             var flash = new Box
             {

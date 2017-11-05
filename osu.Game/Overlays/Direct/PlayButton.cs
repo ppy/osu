@@ -15,7 +15,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class PlayButton : Container
+    public class PlayButton : Container, IHandleOnClick, IHandleOnHover, IHandleOnHoverLost
     {
         public readonly Bindable<bool> Playing = new Bindable<bool>();
         public Track Preview { get; private set; }
@@ -88,19 +88,19 @@ namespace osu.Game.Overlays.Direct
             hoverColour = colour.Yellow;
         }
 
-        protected override bool OnClick(InputState state)
+        public virtual bool OnClick(InputState state)
         {
             Playing.Value = !Playing.Value;
             return true;
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             icon.FadeColour(hoverColour, 120, Easing.InOutQuint);
             return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             if (!Playing.Value)
                 icon.FadeColour(Color4.White, 120, Easing.InOutQuint);

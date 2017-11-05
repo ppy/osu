@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A Checkbox styled to be placed in line with an <see cref="OsuTabControl{T}"/>
     /// </summary>
-    public class OsuTabControlCheckbox : Checkbox
+    public class OsuTabControlCheckbox : Checkbox, IHandleOnHover, IHandleOnHoverLost
     {
         private readonly Box box;
         private readonly SpriteText text;
@@ -59,13 +59,13 @@ namespace osu.Game.Graphics.UserInterface
             text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             fadeIn();
             return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             if (!Current)
                 fadeOut();

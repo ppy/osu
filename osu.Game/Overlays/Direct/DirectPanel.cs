@@ -25,7 +25,7 @@ using osu.Framework.Audio.Track;
 
 namespace osu.Game.Overlays.Direct
 {
-    public abstract class DirectPanel : Container
+    public abstract class DirectPanel : Container, IHandleOnHover, IHandleOnHoverLost, IHandleOnClick
     {
         public readonly BeatmapSetInfo SetInfo;
 
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             content.TweenEdgeEffectTo(edgeEffectHovered, hover_transition_time, Easing.OutQuint);
             content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.Direct
             return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.Direct
                 PlayButton.FadeOut(120, Easing.InOutQuint);
         }
 
-        protected override bool OnClick(InputState state)
+        public virtual bool OnClick(InputState state)
         {
             ShowInformation();
             PreviewPlaying.Value = false;

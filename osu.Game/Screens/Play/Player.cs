@@ -30,7 +30,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuScreen
+    public class Player : OsuScreen, IHandleOnWheel
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
@@ -381,6 +381,6 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo(1f, fade_out_duration);
         }
 
-        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
+        public virtual bool OnWheel(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
     }
 }

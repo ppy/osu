@@ -27,7 +27,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class MusicController : OsuFocusedOverlayContainer
+    public class MusicController : OsuFocusedOverlayContainer, IHandleOnDrag, IHandleOnDragEnd
     {
         private const float player_height = 130;
 
@@ -65,9 +65,9 @@ namespace osu.Game.Overlays
             AlwaysPresent = true;
         }
 
-        protected override bool OnDragStart(InputState state) => true;
+        public override bool OnDragStart(InputState state) => true;
 
-        protected override bool OnDrag(InputState state)
+        public virtual bool OnDrag(InputState state)
         {
             Trace.Assert(state.Mouse.PositionMouseDown != null, "state.Mouse.PositionMouseDown != null");
 
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        protected override bool OnDragEnd(InputState state)
+        public virtual bool OnDragEnd(InputState state)
         {
             dragContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
             return false;

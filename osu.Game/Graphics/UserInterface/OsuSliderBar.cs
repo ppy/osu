@@ -16,7 +16,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
+    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour, IHandleOnHover, IHandleOnHoverLost, IHandleOnMouseUp, IHandleOnMouseDown
         where T : struct, IEquatable<T>
     {
         private SampleChannel sample;
@@ -104,13 +104,13 @@ namespace osu.Game.Graphics.UserInterface
             AccentColour = colours.Pink;
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             Nub.Glowing = true;
             return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             Nub.Glowing = false;
         }
@@ -142,13 +142,13 @@ namespace osu.Game.Graphics.UserInterface
             sample.Play();
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             Nub.Current.Value = true;
             return false;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             Nub.Current.Value = false;
             return false;

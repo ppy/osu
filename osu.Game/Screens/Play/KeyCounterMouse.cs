@@ -1,13 +1,14 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using OpenTK.Input;
 using OpenTK;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterMouse : KeyCounter
+    public class KeyCounterMouse : KeyCounter, IHandleOnMouseDown, IHandleOnMouseUp
     {
         public MouseButton Button { get; }
 
@@ -31,13 +32,13 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             if (args.Button == Button) IsLit = true;
             return false;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             if (args.Button == Button) IsLit = false;
             return false;

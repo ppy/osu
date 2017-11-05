@@ -16,7 +16,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public abstract class Notification : Container
+    public abstract class Notification : Container, IHandleOnHover, IHandleOnHoverLost, IHandleOnClick
     {
         /// <summary>
         /// User requested close.
@@ -114,18 +114,18 @@ namespace osu.Game.Overlays.Notifications
             });
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             closeButton.FadeIn(75);
             return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             closeButton.FadeOut(75);
         }
 
-        protected override bool OnClick(InputState state)
+        public virtual bool OnClick(InputState state)
         {
             if (Activated?.Invoke() ?? true)
                 Close();
@@ -153,7 +153,7 @@ namespace osu.Game.Overlays.Notifications
             Expire();
         }
 
-        private class CloseButton : OsuClickableContainer
+        private class CloseButton : OsuClickableContainer, IHandleOnHoverLost
         {
             private Color4 hoverColour;
 
@@ -180,13 +180,13 @@ namespace osu.Game.Overlays.Notifications
                 hoverColour = colours.Yellow;
             }
 
-            protected override bool OnHover(InputState state)
+            public override bool OnHover(InputState state)
             {
                 this.FadeColour(hoverColour, 200);
                 return base.OnHover(state);
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 this.FadeColour(OsuColour.Gray(0.2f), 200);
             }

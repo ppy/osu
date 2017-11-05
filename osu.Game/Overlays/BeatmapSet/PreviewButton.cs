@@ -18,7 +18,7 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class PreviewButton : OsuClickableContainer
+    public class PreviewButton : OsuClickableContainer, IHandleOnHoverLost
     {
         private const float transition_duration = 500;
 
@@ -92,13 +92,13 @@ namespace osu.Game.Overlays.BeatmapSet
             base.Dispose(isDisposing);
         }
 
-        protected override bool OnHover(InputState state)
+        public override bool OnHover(InputState state)
         {
             bg.FadeColour(Color4.Black.Opacity(0.5f), 100);
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             bg.FadeColour(Color4.Black.Opacity(0.25f), 100);
         }

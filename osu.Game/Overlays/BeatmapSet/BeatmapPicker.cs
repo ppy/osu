@@ -157,17 +157,17 @@ namespace osu.Game.Overlays.BeatmapSet
             difficulties.Children.ToList().ForEach(diff => diff.State = diff.Beatmap == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
         }
 
-        private class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
+        private class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>, IHandleOnHoverLost
         {
             public Action OnLostHover;
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 OnLostHover?.Invoke();
             }
         }
 
-        private class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>
+        private class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>, IHandleOnHoverLost
         {
             private const float transition_duration = 100;
             private const float size = 52;
@@ -227,20 +227,20 @@ namespace osu.Game.Overlays.BeatmapSet
                 };
             }
 
-            protected override bool OnHover(InputState state)
+            public override bool OnHover(InputState state)
             {
                 fadeIn();
                 OnHovered?.Invoke(Beatmap);
                 return base.OnHover(state);
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 if (State == DifficultySelectorState.NotSelected)
                     fadeOut();
             }
 
-            protected override bool OnClick(InputState state)
+            public override bool OnClick(InputState state)
             {
                 OnClicked?.Invoke(Beatmap);
                 return base.OnClick(state);

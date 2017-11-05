@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// A type of <see cref="Playfield"/> specialized towards scrolling <see cref="DrawableHitObject"/>s.
     /// </summary>
-    public class ScrollingPlayfield : Playfield
+    public class ScrollingPlayfield : Playfield,IHandleOnKeyDown
     {
         /// <summary>
         /// The default span of time visible by the length of the scrolling axes.
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.UI
             nestedPlayfields.Add(otherPlayfield);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (state.Keyboard.ControlPressed)
             {

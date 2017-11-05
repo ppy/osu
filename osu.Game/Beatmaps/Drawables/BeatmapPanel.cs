@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps.Drawables
             triangles.Colour = OsuColour.Gray(0.5f);
         }
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             if (State == PanelSelectedState.Selected)
                 StartRequested?.Invoke(this);

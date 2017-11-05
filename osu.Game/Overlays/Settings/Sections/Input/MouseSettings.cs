@@ -116,13 +116,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             private bool isDragging;
 
-            protected override bool OnDragStart(InputState state)
+            public override bool OnDragStart(InputState state)
             {
                 isDragging = true;
                 return base.OnDragStart(state);
             }
 
-            protected override bool OnDragEnd(InputState state)
+            public override bool OnDragEnd(InputState state)
             {
                 isDragging = false;
                 Current.TriggerChange();

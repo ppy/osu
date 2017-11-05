@@ -30,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface
             PlaceholderText = "type to search";
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (HandlePendingText(state)) return true;
 

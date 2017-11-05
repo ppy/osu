@@ -12,7 +12,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class HotkeyRetryOverlay : Container
+    public class HotkeyRetryOverlay : Container, IHandleOnKeyDown, IHandleOnKeyUp
     {
         public Action Action;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        public virtual bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
             if (args.Key == Key.Tilde && !fired)
             {

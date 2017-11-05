@@ -25,7 +25,7 @@ using osu.Framework.MathUtils;
 
 namespace osu.Game.Overlays
 {
-    public class MedalOverlay : FocusedOverlayContainer
+    public class MedalOverlay : FocusedOverlayContainer, IHandleOnFocusLost
     {
         public const float DISC_SIZE = 400;
 
@@ -176,13 +176,13 @@ namespace osu.Game.Overlays
             particleContainer.Add(new MedalParticle(RNG.Next(0, 359)));
         }
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             dismiss();
             return true;
         }
 
-        protected override void OnFocusLost(InputState state)
+        public virtual void OnFocusLost(InputState state)
         {
             if (state.Keyboard.Keys.Contains(Key.Escape)) dismiss();
         }

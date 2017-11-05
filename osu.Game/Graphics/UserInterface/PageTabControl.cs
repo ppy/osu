@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
             Height = 30;
         }
 
-        public class PageTabItem : TabItem<T>
+        public class PageTabItem : TabItem<T>, IHandleOnHover, IHandleOnHoverLost
         {
             private const float transition_duration = 100;
 
@@ -66,14 +66,14 @@ namespace osu.Game.Graphics.UserInterface
                 box.Colour = colours.Yellow;
             }
 
-            protected override bool OnHover(InputState state)
+            public virtual bool OnHover(InputState state)
             {
                 if (!Active)
                     slideActive();
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 if (!Active)
                     slideInactive();

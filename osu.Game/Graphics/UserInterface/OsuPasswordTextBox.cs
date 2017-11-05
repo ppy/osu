@@ -42,20 +42,20 @@ namespace osu.Game.Graphics.UserInterface
             this.host = host;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Key == Key.CapsLock)
                 updateCapsWarning(host.CapsLockEnabled);
             return base.OnKeyDown(state, args);
         }
 
-        protected override void OnFocus(InputState state)
+        public override void OnFocus(InputState state)
         {
             updateCapsWarning(host.CapsLockEnabled);
             base.OnFocus(state);
         }
 
-        protected override void OnFocusLost(InputState state)
+        public override void OnFocusLost(InputState state)
         {
             updateCapsWarning(false);
             base.OnFocusLost(state);

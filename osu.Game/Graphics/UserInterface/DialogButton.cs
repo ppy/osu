@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DialogButton : OsuClickableContainer
+    public class DialogButton : OsuClickableContainer, IHandleOnHoverLost
     {
         private const float hover_width = 0.9f;
         private const float hover_duration = 500;
@@ -93,7 +93,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceiveMouseInputAt(screenSpacePos);
 
-        protected override bool OnClick(Framework.Input.InputState state)
+        public override bool OnClick(Framework.Input.InputState state)
         {
             didClick = true;
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
@@ -109,7 +109,7 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnClick(state);
         }
 
-        protected override bool OnHover(Framework.Input.InputState state)
+        public override bool OnHover(Framework.Input.InputState state)
         {
             spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
 
@@ -119,7 +119,7 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        protected override void OnHoverLost(Framework.Input.InputState state)
+        public virtual void OnHoverLost(Framework.Input.InputState state)
         {
             if (!didClick)
             {

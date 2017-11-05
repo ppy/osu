@@ -23,7 +23,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class LoginSettings : FillFlowContainer, IOnlineComponent
+    public class LoginSettings : FillFlowContainer, IOnlineComponent, IHandleOnClick, IHandleOnFocus
     {
         private bool bounding = true;
         private LoginForm form;
@@ -176,14 +176,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         public override bool AcceptsFocus => true;
 
-        protected override bool OnClick(InputState state) => true;
+        public virtual bool OnClick(InputState state) => true;
 
-        protected override void OnFocus(InputState state)
+        public virtual void OnFocus(InputState state)
         {
             if (form != null) GetContainingInputManager().ChangeFocus(form);
         }
 
-        private class LoginForm : FillFlowContainer
+        private class LoginForm : FillFlowContainer, IHandleOnClick, IHandleOnFocus
         {
             private TextBox username;
             private TextBox password;
@@ -244,9 +244,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             public override bool AcceptsFocus => true;
 
-            protected override bool OnClick(InputState state) => true;
+            public virtual bool OnClick(InputState state) => true;
 
-            protected override void OnFocus(InputState state)
+            public virtual void OnFocus(InputState state)
             {
                 Schedule(() => { GetContainingInputManager().ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
             }

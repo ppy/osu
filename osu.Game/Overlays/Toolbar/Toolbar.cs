@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(1, HEIGHT);
         }
 
-        public class ToolbarBackground : Container
+        public class ToolbarBackground : Container, IHandleOnHover, IHandleOnHoverLost
         {
             private readonly Box solidBackground;
             private readonly Box gradientBackground;
@@ -104,14 +104,14 @@ namespace osu.Game.Overlays.Toolbar
                 };
             }
 
-            protected override bool OnHover(InputState state)
+            public virtual bool OnHover(InputState state)
             {
                 solidBackground.FadeTo(alpha_hovering, transition_time, Easing.OutQuint);
                 gradientBackground.FadeIn(transition_time, Easing.OutQuint);
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 solidBackground.FadeTo(alpha_normal, transition_time, Easing.OutQuint);
                 gradientBackground.FadeOut(transition_time, Easing.OutQuint);

@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Dialog
                 Buttons.Skip(index).First().TriggerOnClick();
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 

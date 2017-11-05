@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Chat
             OnRequestLeave?.Invoke(tab.Value);
         }
 
-        private class ChannelTabItem : TabItem<Channel>
+        private class ChannelTabItem : TabItem<Channel>, IHandleOnHover, IHandleOnHoverLost
         {
             private Color4 backgroundInactive;
             private Color4 backgroundHover;
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.Chat
                 textBold.FadeOut(transition_length, Easing.OutQuint);
             }
 
-            protected override bool OnHover(InputState state)
+            public virtual bool OnHover(InputState state)
             {
                 if (IsRemovable)
                     closeButton.FadeIn(200, Easing.OutQuint);
@@ -151,7 +151,7 @@ namespace osu.Game.Overlays.Chat
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 closeButton.FadeOut(200, Easing.OutQuint);
                 updateState();
@@ -259,7 +259,7 @@ namespace osu.Game.Overlays.Chat
                 };
             }
 
-            public class CloseButton : ClickableContainer
+            public class CloseButton : ClickableContainer, IHandleOnMouseDown, IHandleOnMouseUp, IHandleOnHover, IHandleOnHoverLost
             {
                 private readonly SpriteIcon icon;
 
@@ -277,25 +277,25 @@ namespace osu.Game.Overlays.Chat
                     };
                 }
 
-                protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+                public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
                 {
                     icon.ScaleTo(0.5f, 1000, Easing.OutQuint);
                     return false;
                 }
 
-                protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+                public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
                 {
                     icon.ScaleTo(0.75f, 1000, Easing.OutElastic);
                     return false;
                 }
 
-                protected override bool OnHover(InputState state)
+                public virtual bool OnHover(InputState state)
                 {
                     icon.FadeColour(Color4.Red, 200, Easing.OutQuint);
                     return false;
                 }
 
-                protected override void OnHoverLost(InputState state)
+                public virtual void OnHoverLost(InputState state)
                 {
                     icon.FadeColour(Color4.White, 200, Easing.OutQuint);
                 }

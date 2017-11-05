@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Profile
             return base.Invalidate(invalidation, source, shallPropagate);
         }
 
-        private class RankChartLineGraph : LineGraph
+        private class RankChartLineGraph : LineGraph, IHandleOnMouseMove, IHandleOnHoverLost
         {
             private readonly CircularContainer ball;
             private bool ballShown;
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Profile
                 ballShown = true;
             }
 
-            protected override bool OnMouseMove(InputState state)
+            public virtual bool OnMouseMove(InputState state)
             {
                 if (ballShown)
                 {
@@ -166,7 +166,7 @@ namespace osu.Game.Overlays.Profile
                 return false;
             }
 
-            protected override void OnHoverLost(InputState state)
+            public virtual void OnHoverLost(InputState state)
             {
                 if (ballShown)
                     ResetBall();

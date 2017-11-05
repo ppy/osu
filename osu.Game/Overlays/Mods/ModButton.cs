@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Mods
     /// <summary>
     /// Represents a clickable button which can cycle through one of more mods.
     /// </summary>
-    public class ModButton : ModButtonEmpty, IHasTooltip
+    public class ModButton : ModButtonEmpty, IHasTooltip, IHandleOnMouseDown
     {
         private ModIcon foregroundIcon;
         private ModIcon backgroundIcon;
@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Mods
             sampleOff = audio.Sample.Get(@"UI/check-off");
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             switch (args.Button)
             {

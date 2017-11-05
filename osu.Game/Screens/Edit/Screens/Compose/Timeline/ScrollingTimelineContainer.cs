@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         /// </summary>
         private float? localZoomTarget;
 
-        protected override bool OnWheel(InputState state)
+        public override bool OnWheel(InputState state)
         {
             if (!state.Keyboard.ControlPressed)
                 return base.OnWheel(state);

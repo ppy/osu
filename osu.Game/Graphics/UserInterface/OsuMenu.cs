@@ -97,7 +97,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            protected override bool OnHover(InputState state)
+            public override bool OnHover(InputState state)
             {
                 sampleHover.Play();
                 text.BoldText.FadeIn(transition_length, Easing.OutQuint);
@@ -105,14 +105,14 @@ namespace osu.Game.Graphics.UserInterface
                 return base.OnHover(state);
             }
 
-            protected override void OnHoverLost(InputState state)
+            public override void OnHoverLost(InputState state)
             {
                 text.BoldText.FadeOut(transition_length, Easing.OutQuint);
                 text.NormalText.FadeIn(transition_length, Easing.OutQuint);
                 base.OnHoverLost(state);
             }
 
-            protected override bool OnClick(InputState state)
+            public override bool OnClick(InputState state)
             {
                 sampleClick.Play();
                 return base.OnClick(state);

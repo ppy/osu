@@ -418,7 +418,7 @@ namespace osu.Game.Screens.Select
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 
@@ -441,7 +441,7 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(state, args);
         }
 
-        private class ResetScrollContainer : Container
+        private class ResetScrollContainer : Container, IHandleOnHover
         {
             private readonly Action onHoverAction;
 
@@ -450,7 +450,7 @@ namespace osu.Game.Screens.Select
                 this.onHoverAction = onHoverAction;
             }
 
-            protected override bool OnHover(InputState state)
+            public virtual bool OnHover(InputState state)
             {
                 onHoverAction?.Invoke();
                 return false;

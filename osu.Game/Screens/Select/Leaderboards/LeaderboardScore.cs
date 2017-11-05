@@ -20,7 +20,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer, IStateful<Visibility>
+    public class LeaderboardScore : OsuClickableContainer, IStateful<Visibility>, IHandleOnHoverLost
     {
         public static readonly float HEIGHT = 60;
 
@@ -277,13 +277,13 @@ namespace osu.Game.Screens.Select.Leaderboards
         public override void Hide() => State = Visibility.Hidden;
         public override void Show() => State = Visibility.Visible;
 
-        protected override bool OnHover(InputState state)
+        public override bool OnHover(InputState state)
         {
             background.FadeTo(0.5f, 300, Easing.OutQuint);
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             background.FadeTo(background_alpha, 200, Easing.OutQuint);
         }

@@ -18,7 +18,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuButton : Button, IFilterable
+    public class OsuButton : Button, IFilterable, IHandleOnHover, IHandleOnHoverLost, IHandleOnMouseDown, IHandleOnMouseUp
     {
         private Box hover;
 
@@ -82,31 +82,31 @@ namespace osu.Game.Graphics.UserInterface
             this.FadeColour(enabled ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
         }
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             sampleClick?.Play();
             return base.OnClick(state);
         }
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             sampleHover?.Play();
             hover.FadeIn(200);
             return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             hover.FadeOut(200);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             Content.ScaleTo(0.9f, 4000, Easing.OutQuint);
             return false;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
             return false;

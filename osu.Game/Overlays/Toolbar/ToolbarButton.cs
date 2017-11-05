@@ -16,7 +16,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarButton : OsuClickableContainer
+    public class ToolbarButton : OsuClickableContainer, IHandleOnMouseDown, IHandleOnHoverLost
     {
         public const float WIDTH = Toolbar.HEIGHT * 1.4f;
 
@@ -143,22 +143,22 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             HoverBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
             return base.OnClick(state);
         }
 
-        protected override bool OnHover(InputState state)
+        public override bool OnHover(InputState state)
         {
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             HoverBackground.FadeOut(200);
             tooltipContainer.FadeOut(100);

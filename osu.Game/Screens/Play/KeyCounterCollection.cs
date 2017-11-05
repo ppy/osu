@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
             this.receptor = receptor;
         }
 
-        public class Receptor : Drawable
+        public class Receptor : Drawable, IHandleOnKeyDown, IHandleOnKeyUp, IHandleOnMouseDown, IHandleOnMouseUp
         {
             protected readonly KeyCounterCollection Target;
 
@@ -143,13 +143,13 @@ namespace osu.Game.Screens.Play
 
             public override bool HandleInput => true;
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyDown(state, args));
+            public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyDown(state, args));
 
-            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyUp(state, args));
+            public virtual bool OnKeyUp(InputState state, KeyUpEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyUp(state, args));
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseDown(state, args));
+            public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseDown(state, args));
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseUp(state, args));
+            public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseUp(state, args));
         }
     }
 }

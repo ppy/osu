@@ -19,7 +19,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public class HUDOverlay : Container
+    public class HUDOverlay : Container, IHandleOnKeyDown
     {
         private const int duration = 100;
 
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Play
                 ModDisplay.Delay(2000).FadeOut(200);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 

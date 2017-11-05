@@ -11,7 +11,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SpinnerDisc : CircularContainer, IHasAccentColour
+    public class SpinnerDisc : CircularContainer, IHasAccentColour, IHandleOnMouseMove
     {
         private readonly Spinner spinner;
 
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        protected override bool OnMouseMove(InputState state)
+        public virtual bool OnMouseMove(InputState state)
         {
             mousePosition = Parent.ToLocalSpace(state.Mouse.NativeState.Position);
             return false;

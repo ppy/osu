@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
             public override string Header => "paused";
             public override string Description => "you're not going to do what i think you're going to do, are ya?";
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            public override bool OnKeyDown(InputState state, KeyDownEventArgs args)
             {
                 if (!args.Repeat && args.Key == Key.Escape)
                 {

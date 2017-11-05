@@ -16,7 +16,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class ModDisplay : Container, IHasCurrentValue<IEnumerable<Mod>>
+    public class ModDisplay : Container, IHasCurrentValue<IEnumerable<Mod>>, IHandleOnHover, IHandleOnHoverLost
     {
         private const int fade_duration = 1000;
 
@@ -91,13 +91,13 @@ namespace osu.Game.Screens.Play.HUD
 
         private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
 
-        protected override bool OnHover(InputState state)
+        public virtual bool OnHover(InputState state)
         {
             expand();
             return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             contract();
         }

@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSection : Container
+    public abstract class ModSection : Container,IHandleOnKeyDown
     {
         private readonly OsuSpriteText headerLabel;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             var index = Array.IndexOf(ToggleKeys, args.Key);
             if (index > -1 && index < buttons.Length)

@@ -13,7 +13,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class IconButton : OsuClickableContainer
+    public class IconButton : OsuClickableContainer, IHandleOnHoverLost, IHandleOnMouseDown, IHandleOnMouseUp
     {
         private const float button_size = 30;
 
@@ -145,32 +145,32 @@ namespace osu.Game.Graphics.UserInterface
             Enabled.ValueChanged += enabled => this.FadeColour(enabled ? Color4.White : colours.Gray9, 200, Easing.OutQuint);
         }
 
-        protected override bool OnHover(InputState state)
+        public override bool OnHover(InputState state)
         {
             hover.FadeIn(500, Easing.OutQuint);
             icon.FadeColour(IconHoverColour, 500, Easing.OutQuint);
             return base.OnHover(state);
         }
 
-        protected override void OnHoverLost(InputState state)
+        public virtual void OnHoverLost(InputState state)
         {
             hover.FadeOut(500, Easing.OutQuint);
             icon.FadeColour(IconColour, 500, Easing.OutQuint);
         }
 
-        protected override bool OnClick(InputState state)
+        public override bool OnClick(InputState state)
         {
             hover.FlashColour(FlashColour, 800, Easing.OutQuint);
             return base.OnClick(state);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             content.ScaleTo(0.75f, 2000, Easing.OutQuint);
             return false;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             content.ScaleTo(1, 1000, Easing.OutElastic);
             return false;

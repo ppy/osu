@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// The part of the timeline that displays the current position of the song.
     /// </summary>
-    internal class MarkerPart : TimelinePart
+    internal class MarkerPart : TimelinePart, IHandleOnDragStart, IHandleOnDrag, IHandleOnDragEnd, IHandleOnMouseDown
     {
         private readonly Drawable marker;
 
@@ -24,15 +24,15 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             Add(marker = new MarkerVisualisation());
         }
 
-        protected override bool OnDragStart(InputState state) => true;
-        protected override bool OnDragEnd(InputState state) => true;
-        protected override bool OnDrag(InputState state)
+        public virtual bool OnDragStart(InputState state) => true;
+        public virtual bool OnDragEnd(InputState state) => true;
+        public virtual bool OnDrag(InputState state)
         {
             seekToPosition(state.Mouse.NativeState.Position);
             return true;
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             seekToPosition(state.Mouse.NativeState.Position);
             return true;

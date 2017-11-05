@@ -30,13 +30,13 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected override void OnFocus(InputState state)
+        public override void OnFocus(InputState state)
         {
             base.OnFocus(state);
             BorderThickness = 0;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Key == Key.Escape)
             {
