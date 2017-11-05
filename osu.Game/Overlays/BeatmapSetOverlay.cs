@@ -24,11 +24,14 @@ namespace osu.Game.Overlays
         public const float X_PADDING = 40;
         public const float RIGHT_WIDTH = 275;
 
+        private BeatmapSetInfo currentBeatmap;
+
         private readonly Header header;
         private readonly Info info;
 
         private APIAccess api;
         private RulesetStore rulesets;
+        private BeatmapManager manager;
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
@@ -83,10 +86,17 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, RulesetStore rulesets)
+        private void load(APIAccess api, RulesetStore rulesets, BeatmapManager manager)
         {
             this.api = api;
             this.rulesets = rulesets;
+            this.manager = manager;
+
+            manager.BeatmapSetAdded += beatmap =>
+            {
+                if (beatmap.OnlineBeatmapSetID == currentBeatmap.OnlineBeatmapSetID)
+                    Hide();
+            };
         }
 
         protected override void PopIn()
@@ -118,7 +128,7 @@ namespace osu.Game.Overlays
 
         public void ShowBeatmapSet(BeatmapSetInfo set)
         {
-            header.BeatmapSet = info.BeatmapSet = set;
+            currentBeatmap = header.BeatmapSet = info.BeatmapSet = set;
             Show();
         }
     }

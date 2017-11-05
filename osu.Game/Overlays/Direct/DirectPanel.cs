@@ -18,7 +18,6 @@ using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Framework.Logging;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Configuration;
 using osu.Framework.Audio.Track;
@@ -109,6 +108,8 @@ namespace osu.Game.Overlays.Direct
 
             if (downloadRequest != null)
                 attachDownload(downloadRequest);
+
+            beatmaps.BeatmapDownloadBegan += attachDownload;
         }
 
         protected override void Update()
@@ -151,16 +152,6 @@ namespace osu.Game.Overlays.Direct
 
         protected void StartDownload()
         {
-            if (!api.LocalUser.Value.IsSupporter)
-            {
-                notifications.Post(new SimpleNotification
-                {
-                    Icon = FontAwesome.fa_superpowers,
-                    Text = "You gotta be a supporter to download for now 'yo"
-                });
-                return;
-            }
-
             if (beatmaps.GetExistingDownload(SetInfo) != null)
             {
                 // we already have an active download running.
@@ -172,13 +163,14 @@ namespace osu.Game.Overlays.Direct
                 return;
             }
 
-            var request = beatmaps.Download(SetInfo);
-
-            attachDownload(request);
+            beatmaps.Download(SetInfo);
         }
 
         private void attachDownload(DownloadBeatmapSetRequest request)
         {
+            if (request.BeatmapSet.OnlineBeatmapSetID != SetInfo.OnlineBeatmapSetID)
+                return;
+
             progressBar.FadeIn(400, Easing.OutQuint);
             progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
 
