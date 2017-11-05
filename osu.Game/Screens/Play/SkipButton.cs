@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Play
         protected override bool OnMouseMove(InputState state)
         {
             fadeContainer.State = Visibility.Visible;
-            return base.OnMouseMove(state);
+            return false;
         }
 
         [BackgroundDependencyLoader]
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
                     return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
 
         private class FadeContainer : Container, IStateful<Visibility>
@@ -266,19 +266,18 @@ namespace osu.Game.Screens.Play
                 flow.TransformSpacingTo(new Vector2(0), 500, Easing.OutQuint);
                 box.FadeColour(colourNormal, 500, Easing.OutQuint);
                 background.FadeTo(0.2f, 500, Easing.OutQuint);
-                base.OnHoverLost(state);
             }
 
             protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
             {
                 aspect.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                return base.OnMouseDown(state, args);
+                return false;
             }
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
                 aspect.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(state, args);
+                return false;
             }
 
             protected override bool OnClick(InputState state)

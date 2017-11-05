@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.Cursor
                 ActiveCursor.ScaleTo(1, 500, Easing.OutElastic);
             }
 
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
         protected override bool OnClick(InputState state)

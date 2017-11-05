@@ -182,7 +182,6 @@ namespace osu.Game.Overlays
         protected override void OnFocus(InputState state)
         {
             GetContainingInputManager().ChangeFocus(searchTextBox);
-            base.OnFocus(state);
         }
 
         protected override void UpdateAfterChildren()

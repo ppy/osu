@@ -17,13 +17,13 @@ namespace osu.Game.Screens.Play
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Key == Key) IsLit = true;
-            return base.OnKeyDown(state, args);
+            return false;
         }
 
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
             if (args.Key == Key) IsLit = false;
-            return base.OnKeyUp(state, args);
+            return false;
         }
     }
 }

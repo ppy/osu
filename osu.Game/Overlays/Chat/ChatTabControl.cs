@@ -280,25 +280,24 @@ namespace osu.Game.Overlays.Chat
                 protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
                 {
                     icon.ScaleTo(0.5f, 1000, Easing.OutQuint);
-                    return base.OnMouseDown(state, args);
+                    return false;
                 }
 
                 protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
                 {
                     icon.ScaleTo(0.75f, 1000, Easing.OutElastic);
-                    return base.OnMouseUp(state, args);
+                    return false;
                 }
 
                 protected override bool OnHover(InputState state)
                 {
                     icon.FadeColour(Color4.Red, 200, Easing.OutQuint);
-                    return base.OnHover(state);
+                    return false;
                 }
 
                 protected override void OnHoverLost(InputState state)
                 {
                     icon.FadeColour(Color4.White, 200, Easing.OutQuint);
-                    base.OnHoverLost(state);
                 }
             }
 

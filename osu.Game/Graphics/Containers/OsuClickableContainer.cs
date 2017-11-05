@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.Containers
         protected override bool OnHover(InputState state)
         {
             SampleHover?.Play();
-            return base.OnHover(state);
+            return false;
         }
 
         protected override bool OnClick(InputState state)

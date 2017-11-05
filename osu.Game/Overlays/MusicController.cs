@@ -77,13 +77,13 @@ namespace osu.Game.Overlays
             change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
 
             dragContainer.MoveTo(change);
-            return base.OnDrag(state);
+            return false;
         }
 
         protected override bool OnDragEnd(InputState state)
         {
             dragContainer.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-            return base.OnDragEnd(state);
+            return false;
         }
 
         [BackgroundDependencyLoader]

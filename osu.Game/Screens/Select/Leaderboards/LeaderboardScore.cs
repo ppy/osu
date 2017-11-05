@@ -286,7 +286,6 @@ namespace osu.Game.Screens.Select.Leaderboards
         protected override void OnHoverLost(InputState state)
         {
             background.FadeTo(background_alpha, 200, Easing.OutQuint);
-            base.OnHoverLost(state);
         }
 
         private class GlowingSpriteText : Container

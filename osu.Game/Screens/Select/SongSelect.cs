@@ -453,7 +453,7 @@ namespace osu.Game.Screens.Select
             protected override bool OnHover(InputState state)
             {
                 onHoverAction?.Invoke();
-                return base.OnHover(state);
+                return false;
             }
         }
     }

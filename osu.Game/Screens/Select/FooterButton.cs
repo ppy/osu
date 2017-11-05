@@ -104,13 +104,13 @@ namespace osu.Game.Screens.Select
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             box.FadeTo(0.3f, Footer.TRANSITION_LENGTH * 2, Easing.OutQuint);
-            return base.OnMouseDown(state, args);
+            return false;
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             box.FadeOut(Footer.TRANSITION_LENGTH, Easing.OutQuint);
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
         protected override bool OnClick(InputState state)
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Select
                 return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
     }
 }

@@ -97,14 +97,13 @@ namespace osu.Game.Overlays.Direct
         protected override bool OnHover(InputState state)
         {
             icon.FadeColour(hoverColour, 120, Easing.InOutQuint);
-            return base.OnHover(state);
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             if (!Playing.Value)
                 icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
-            base.OnHoverLost(state);
         }
 
         protected override void Update()

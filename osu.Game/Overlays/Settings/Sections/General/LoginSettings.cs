@@ -181,7 +181,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
         protected override void OnFocus(InputState state)
         {
             if (form != null) GetContainingInputManager().ChangeFocus(form);
-            base.OnFocus(state);
         }
 
         private class LoginForm : FillFlowContainer

@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Direct
             content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
             PlayButton.FadeIn(120, Easing.InOutQuint);
 
-            return base.OnHover(state);
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)
@@ -136,8 +136,6 @@ namespace osu.Game.Overlays.Direct
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
             if (!PreviewPlaying)
                 PlayButton.FadeOut(120, Easing.InOutQuint);
-
-            base.OnHoverLost(state);
         }
 
         protected override bool OnClick(InputState state)

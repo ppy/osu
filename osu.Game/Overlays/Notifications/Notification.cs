@@ -117,13 +117,12 @@ namespace osu.Game.Overlays.Notifications
         protected override bool OnHover(InputState state)
         {
             closeButton.FadeIn(75);
-            return base.OnHover(state);
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             closeButton.FadeOut(75);
-            base.OnHoverLost(state);
         }
 
         protected override bool OnClick(InputState state)
@@ -190,7 +189,6 @@ namespace osu.Game.Overlays.Notifications
             protected override void OnHoverLost(InputState state)
             {
                 this.FadeColour(OsuColour.Gray(0.2f), 200);
-                base.OnHoverLost(state);
             }
         }
 

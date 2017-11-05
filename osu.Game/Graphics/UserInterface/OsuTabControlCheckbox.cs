@@ -62,15 +62,13 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(InputState state)
         {
             fadeIn();
-            return base.OnHover(state);
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             if (!Current)
                 fadeOut();
-
-            base.OnHoverLost(state);
         }
 
         [BackgroundDependencyLoader]

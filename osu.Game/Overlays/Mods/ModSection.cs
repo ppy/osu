@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Mods
             if (index > -1 && index < buttons.Length)
                 buttons[index].SelectNext();
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
 
         public void DeselectAll()

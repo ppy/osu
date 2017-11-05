@@ -514,7 +514,7 @@ namespace osu.Game.Screens.Select
             }
 
             if (direction == 0)
-                return base.OnKeyDown(state, args);
+                return false;
 
             SelectNext(direction, skipDifficulties);
             return true;

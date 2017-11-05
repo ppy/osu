@@ -163,14 +163,13 @@ namespace osu.Game.Overlays.Profile
                         }
                     }
                 }
-                return base.OnMouseMove(state);
+                return false;
             }
 
             protected override void OnHoverLost(InputState state)
             {
                 if (ballShown)
                     ResetBall();
-                base.OnHoverLost(state);
             }
         }
     }

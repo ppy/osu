@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Music
         {
             handle.FadeIn(fade_duration);
 
-            return base.OnHover(state);
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)

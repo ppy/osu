@@ -21,7 +21,6 @@ namespace osu.Game.Graphics.Containers
         protected override void OnHoverLost(InputState state)
         {
             this.FadeColour(Color4.White, 500, Easing.OutQuint);
-            base.OnHoverLost(state);
         }
 
         [BackgroundDependencyLoader]

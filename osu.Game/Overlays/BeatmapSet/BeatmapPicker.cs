@@ -163,7 +163,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
             protected override void OnHoverLost(InputState state)
             {
-                base.OnHoverLost(state);
                 OnLostHover?.Invoke();
             }
         }
@@ -239,7 +238,6 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 if (State == DifficultySelectorState.NotSelected)
                     fadeOut();
-                base.OnHoverLost(state);
             }
 
             protected override bool OnClick(InputState state)

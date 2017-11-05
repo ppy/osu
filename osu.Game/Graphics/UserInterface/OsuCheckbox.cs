@@ -93,14 +93,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             Nub.Glowing = true;
             Nub.Expanded = true;
-            return base.OnHover(state);
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             Nub.Glowing = false;
             Nub.Expanded = false;
-            base.OnHoverLost(state);
         }
 
         [BackgroundDependencyLoader]

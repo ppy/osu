@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
 
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            return base.OnKeyUp(state, args);
+            return false;
         }
 
         protected override void Update()

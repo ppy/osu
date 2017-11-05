@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            return base.OnKeyDown(state, args);
+            return false;
         }
 
         protected virtual RollingCounter<double> CreateAccuracyCounter() => new PercentageCounter

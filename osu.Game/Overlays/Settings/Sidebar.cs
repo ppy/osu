@@ -66,14 +66,12 @@ namespace osu.Game.Overlays.Settings
             expandEvent?.Cancel();
             lastHoveredButton = null;
             State = ExpandedState.Contracted;
-
-            base.OnHoverLost(state);
         }
 
         protected override bool OnMouseMove(InputState state)
         {
             queueExpandIfHovering();
-            return base.OnMouseMove(state);
+            return false;
         }
 
         private class SidebarScrollContainer : ScrollContainer

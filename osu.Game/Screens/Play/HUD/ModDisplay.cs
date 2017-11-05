@@ -94,13 +94,12 @@ namespace osu.Game.Screens.Play.HUD
         protected override bool OnHover(InputState state)
         {
             expand();
-            return base.OnHover(state);
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             contract();
-            base.OnHoverLost(state);
         }
     }
 }

@@ -101,7 +101,6 @@ namespace osu.Game.Overlays.BeatmapSet
         protected override void OnHoverLost(InputState state)
         {
             bg.FadeColour(Color4.Black.Opacity(0.25f), 100);
-            base.OnHoverLost(state);
         }
     }
 }

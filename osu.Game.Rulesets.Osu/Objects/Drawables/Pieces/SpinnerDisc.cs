@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         protected override bool OnMouseMove(InputState state)
         {
             mousePosition = Parent.ToLocalSpace(state.Mouse.NativeState.Position);
-            return base.OnMouseMove(state);
+            return false;
         }
 
         private Vector2 mousePosition;

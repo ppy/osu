@@ -156,7 +156,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             hover.FadeOut(500, Easing.OutQuint);
             icon.FadeColour(IconColour, 500, Easing.OutQuint);
-            base.OnHoverLost(state);
         }
 
         protected override bool OnClick(InputState state)
@@ -168,13 +167,13 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             content.ScaleTo(0.75f, 2000, Easing.OutQuint);
-            return base.OnMouseDown(state, args);
+            return false;
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             content.ScaleTo(1, 1000, Easing.OutElastic);
-            return base.OnMouseUp(state, args);
+            return false;
         }
     }
 }

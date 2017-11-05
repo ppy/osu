@@ -153,7 +153,6 @@ namespace osu.Game.Overlays.Chat
         protected override void OnFocus(InputState state)
         {
             GetContainingInputManager().ChangeFocus(search);
-            base.OnFocus(state);
         }
 
         protected override void PopIn()

@@ -120,13 +120,12 @@ namespace osu.Game.Overlays.Settings
         protected override bool OnHover(InputState state)
         {
             backgroundBox.FadeTo(0.4f, 200);
-            return base.OnHover(state);
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             backgroundBox.FadeTo(0, 200);
-            base.OnHoverLost(state);
         }
     }
 }

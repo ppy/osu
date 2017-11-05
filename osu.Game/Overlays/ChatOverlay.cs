@@ -222,7 +222,7 @@ namespace osu.Game.Overlays
         protected override bool OnDragEnd(InputState state)
         {
             isDragging = false;
-            return base.OnDragEnd(state);
+            return false;
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -246,7 +246,6 @@ namespace osu.Game.Overlays
         {
             //this is necessary as textbox is masked away and therefore can't get focus :(
             GetContainingInputManager().ChangeFocus(textbox);
-            base.OnFocus(state);
         }
 
         protected override void PopIn()

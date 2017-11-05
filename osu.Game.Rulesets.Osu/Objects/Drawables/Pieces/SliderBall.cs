@@ -83,19 +83,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             lastState = state;
-            return base.OnMouseDown(state, args);
+            return false;
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             lastState = state;
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
         protected override bool OnMouseMove(InputState state)
         {
             lastState = state;
-            return base.OnMouseMove(state);
+            return false;
         }
 
         // If the current time is between the start and end of the slider, we should track mouse input regardless of the cursor position.

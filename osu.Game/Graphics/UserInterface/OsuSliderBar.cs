@@ -107,13 +107,12 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(InputState state)
         {
             Nub.Glowing = true;
-            return base.OnHover(state);
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)
         {
             Nub.Glowing = false;
-            base.OnHoverLost(state);
         }
 
         protected override void OnUserChange()
@@ -146,13 +145,13 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             Nub.Current.Value = true;
-            return base.OnMouseDown(state, args);
+            return false;
         }
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             Nub.Current.Value = false;
-            return base.OnMouseUp(state, args);
+            return false;
         }
 
         protected override void UpdateAfterChildren()

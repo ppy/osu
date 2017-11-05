@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 lastPosition = state.Mouse.NativeState.Position;
                 resampler.AddPosition(lastPosition.Value);
-                return base.OnMouseMove(state);
+                return false;
             }
 
             foreach (Vector2 pos2 in resampler.AddPosition(state.Mouse.NativeState.Position))
@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 }
             }
 
-            return base.OnMouseMove(state);
+            return false;
         }
 
         private void addPosition(Vector2 pos)
