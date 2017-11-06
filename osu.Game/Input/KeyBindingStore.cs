@@ -20,6 +20,9 @@ namespace osu.Game.Input
         public KeyBindingStore(Func<OsuDbContext> getContext, RulesetStore rulesets, Storage storage = null)
             : base(getContext, storage)
         {
+            if (rulesets == null)
+                throw new ArgumentNullException(nameof(rulesets));
+
             foreach (var info in rulesets.AvailableRulesets)
             {
                 var ruleset = info.CreateInstance();
