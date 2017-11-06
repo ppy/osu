@@ -47,18 +47,24 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
                 foreach (var s in sets)
                 {
-                    var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets)) { Width = 400 };
-                    ItemsContainer.Add(panel);
-
-                    panel.PreviewPlaying.ValueChanged += newValue =>
+                    var subReq = new GetBeatmapSetRequest(s.OnlineBeatmapSetID.Value);
+                    subReq.Success += b =>
                     {
-                        if (newValue)
+                        var panel = new DirectGridPanel(b.ToBeatmapSet(Rulesets)) { Width = 400 };
+                        ItemsContainer.Add(panel);
+
+                        panel.PreviewPlaying.ValueChanged += newValue =>
                         {
-                            if (playing != null && playing != panel)
-                                playing.PreviewPlaying.Value = false;
-                            playing = panel;
-                        }
+                            if (newValue)
+                            {
+                                if (playing != null && playing != panel)
+                                    playing.PreviewPlaying.Value = false;
+                                playing = panel;
+                            }
+                        };
                     };
+
+                    Api.Queue(subReq);
                 }
             };
 
