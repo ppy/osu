@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
@@ -23,6 +24,7 @@ namespace osu.Game.Database
         public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
+
         private readonly string connectionString;
 
         private static readonly Lazy<OsuDbLoggerFactory> logger = new Lazy<OsuDbLoggerFactory>(() => new OsuDbLoggerFactory());
@@ -40,6 +42,8 @@ namespace osu.Game.Database
             : this("DataSource=:memory:")
         {
             // required for tooling (see https://wildermuth.com/2017/07/06/Program-cs-in-ASP-NET-Core-2-0).
+
+            Migrate();
         }
 
         /// <summary>
@@ -70,7 +74,7 @@ namespace osu.Game.Database
                 // this is required for the time being due to the way we are querying in places like BeatmapStore.
                 // if we ever move to having consumers file their own .Includes, or get eager loading support, this could be re-enabled.
                 .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning))
-                .UseSqlite(connectionString)
+                .UseSqlite(connectionString, sqliteOptions => sqliteOptions.CommandTimeout(10))
                 .UseLoggerFactory(logger.Value);
         }
 
@@ -78,11 +82,12 @@ namespace osu.Game.Database
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash).IsUnique();
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash).IsUnique();
 
+            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineBeatmapSetID).IsUnique();
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
-            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash);
+            modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
 
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.Variant);
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.IntAction);
@@ -93,6 +98,19 @@ namespace osu.Game.Database
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Available);
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
+        }
+
+        public IDbContextTransaction BeginTransaction()
+        {
+            // return Database.BeginTransaction();
+            return null;
+        }
+
+        public new int SaveChanges(IDbContextTransaction transaction = null)
+        {
+            var ret = base.SaveChanges();
+            transaction?.Commit();
+            return ret;
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory
@@ -153,7 +171,7 @@ namespace osu.Game.Database
 
                 public bool IsEnabled(LogLevel logLevel)
                 {
-#if DEBUG
+#if DEBUG_DATABASE
                     return logLevel > LogLevel.Debug;
 #else
                     return logLevel > LogLevel.Information;
@@ -238,7 +256,7 @@ namespace osu.Game.Database
                         Database.ExecuteSqlCommand("DROP TABLE RulesetInfo_Old");
 
                         Database.ExecuteSqlCommand(
-                            "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, IFNULL(Hidden, 0), LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), OnlineBeatmapID, Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
+                            "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, IFNULL(Hidden, 0), LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), NULLIF(OnlineBeatmapID, 0), Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
                         Database.ExecuteSqlCommand("DROP TABLE BeatmapInfo_Old");
 
                         Logger.Log("Migration complete!", LoggingTarget.Database, Framework.Logging.LogLevel.Important);

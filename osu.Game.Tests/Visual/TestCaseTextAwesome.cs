@@ -4,10 +4,9 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -19,29 +18,37 @@ namespace osu.Game.Tests.Visual
         {
             FillFlowContainer flow;
 
-            Add(flow = new FillFlowContainer
+            Add(new ScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Size = new Vector2(0.5f),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre
+                Child = flow = new FillFlowContainer
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Full,
+                },
             });
 
-            int i = 50;
             foreach (FontAwesome fa in Enum.GetValues(typeof(FontAwesome)))
+                flow.Add(new Icon(fa));
+        }
+
+        private class Icon : Container, IHasTooltip
+        {
+            public string TooltipText { get; }
+
+            public Icon(FontAwesome fa)
             {
-                flow.Add(new SpriteIcon
+                TooltipText = fa.ToString();
+
+                AutoSizeAxes = Axes.Both;
+                Child = new SpriteIcon
                 {
                     Icon = fa,
                     Size = new Vector2(60),
-                    Colour = new Color4(
-                        Math.Max(0.5f, RNG.NextSingle()),
-                        Math.Max(0.5f, RNG.NextSingle()),
-                        Math.Max(0.5f, RNG.NextSingle()),
-                        1)
-                });
-
-                if (i-- == 0) break;
+                };
             }
         }
     }

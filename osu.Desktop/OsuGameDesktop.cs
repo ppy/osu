@@ -12,15 +12,12 @@ using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
-using osu.Game.Screens.Menu;
 using OpenTK.Input;
 
 namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
-        private VersionManager versionManager;
-
         public OsuGameDesktop(string[] args = null)
             : base(args)
         {
@@ -82,16 +79,11 @@ namespace osu.Desktop
         {
             base.LoadComplete();
 
-            LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue });
-
-            ScreenChanged += s =>
+            LoadComponentAsync(new VersionManager { Depth = int.MinValue }, v =>
             {
-                if (s is Intro && s.ChildScreen == null)
-                {
-                    Add(versionManager);
-                    versionManager.State = Visibility.Visible;
-                }
-            };
+                Add(v);
+                v.State = Visibility.Visible;
+            });
         }
 
         public override void SetHost(GameHost host)
@@ -114,7 +106,7 @@ namespace osu.Desktop
             var filePaths = new [] { e.FileName };
 
             if (filePaths.All(f => Path.GetExtension(f) == @".osz"))
-                Task.Run(() => BeatmapManager.Import(filePaths));
+                Task.Factory.StartNew(() => BeatmapManager.Import(filePaths), TaskCreationOptions.LongRunning);
             else if (filePaths.All(f => Path.GetExtension(f) == @".osr"))
                 Task.Run(() =>
                 {

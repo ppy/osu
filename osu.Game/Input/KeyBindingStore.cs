@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Game.Database;
@@ -17,8 +16,8 @@ namespace osu.Game.Input
     {
         public event Action KeyBindingChanged;
 
-        public KeyBindingStore(Func<OsuDbContext> getContext, RulesetStore rulesets, Storage storage = null)
-            : base(getContext, storage)
+        public KeyBindingStore(Func<OsuDbContext> createContext, RulesetStore rulesets, Storage storage = null)
+            : base(createContext, storage)
         {
             if (rulesets == null)
                 throw new ArgumentNullException(nameof(rulesets));
@@ -33,21 +32,16 @@ namespace osu.Game.Input
 
         public void Register(KeyBindingInputManager manager) => insertDefaults(manager.DefaultKeyBindings);
 
-        protected override void Prepare(bool reset = false)
-        {
-            if (reset)
-                GetContext().Database.ExecuteSqlCommand("DELETE FROM KeyBinding");
-        }
-
         private void insertDefaults(IEnumerable<KeyBinding> defaults, int? rulesetId = null, int? variant = null)
         {
-            using (var context = GetContext())
-            using (var transaction = context.Database.BeginTransaction())
+            var context = GetContext();
+
+            using (var transaction = context.BeginTransaction())
             {
                 // compare counts in database vs defaults
                 foreach (var group in defaults.GroupBy(k => k.Action))
                 {
-                    int count = query(context, rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
+                    int count = Query(rulesetId, variant).Count(k => (int)k.Action == (int)group.Key);
                     int aimCount = group.Count();
 
                     if (aimCount <= count)
@@ -64,26 +58,29 @@ namespace osu.Game.Input
                         });
                 }
 
-                context.SaveChanges();
-                transaction.Commit();
+                context.SaveChanges(transaction);
             }
         }
 
         /// <summary>
-        /// Retrieve <see cref="KeyBinding"/>s for a specified ruleset/variant content.
+        /// Retrieve <see cref="DatabasedKeyBinding"/>s for a specified ruleset/variant content.
         /// </summary>
         /// <param name="rulesetId">The ruleset's internal ID.</param>
         /// <param name="variant">An optional variant.</param>
         /// <returns></returns>
-        public IEnumerable<KeyBinding> Query(int? rulesetId = null, int? variant = null) => query(GetContext(), rulesetId, variant);
-
-        private IEnumerable<KeyBinding> query(OsuDbContext context, int? rulesetId = null, int? variant = null) =>
-            context.DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant);
+        public List<DatabasedKeyBinding> Query(int? rulesetId = null, int? variant = null) =>
+            GetContext().DatabasedKeyBinding.Where(b => b.RulesetID == rulesetId && b.Variant == variant).ToList();
 
         public void Update(KeyBinding keyBinding)
         {
+            var dbKeyBinding = (DatabasedKeyBinding)keyBinding;
+
             var context = GetContext();
-            context.Update(keyBinding);
+
+            Refresh(ref dbKeyBinding);
+
+            dbKeyBinding.KeyCombination = keyBinding.KeyCombination;
+
             context.SaveChanges();
 
             KeyBindingChanged?.Invoke();

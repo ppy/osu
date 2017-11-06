@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using osu.Framework.Extensions;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
@@ -22,20 +21,9 @@ namespace osu.Game.IO
 
         public Storage Storage => base.Storage;
 
-        public FileStore(Func<OsuDbContext> getContext, Storage storage) : base(getContext, storage.GetStorageForDirectory(@"files"))
+        public FileStore(Func<OsuDbContext> createContext, Storage storage) : base(createContext, storage.GetStorageForDirectory(@"files"))
         {
             Store = new StorageBackedResourceStore(Storage);
-        }
-
-        protected override void Prepare(bool reset = false)
-        {
-            if (reset)
-            {
-                if (Storage.ExistsDirectory(string.Empty))
-                    Storage.DeleteDirectory(string.Empty);
-
-                GetContext().Database.ExecuteSqlCommand("DELETE FROM FileInfo");
-            }
         }
 
         public FileInfo Add(Stream data, bool reference = true)

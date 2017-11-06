@@ -36,7 +36,7 @@ namespace osu.Game.Online.API
             return request;
         }
 
-        private void request_Progress(WebRequest request, long current, long total) => API.Scheduler.Add(delegate { Progress?.Invoke(current, total); });
+        private void request_Progress(long current, long total) => API.Scheduler.Add(delegate { Progress?.Invoke(current, total); });
 
         protected APIDownloadRequest()
         {
@@ -99,14 +99,14 @@ namespace osu.Game.Online.API
                 throw new TimeoutException(@"API request timeout hit");
 
             WebRequest = CreateWebRequest();
-            WebRequest.RetryCount = 0;
-            WebRequest.Headers[@"Authorization"] = $@"Bearer {api.AccessToken}";
+            WebRequest.AllowRetryOnTimeout = false;
+            WebRequest.AddHeader("Authorization", $"Bearer {api.AccessToken}");
 
             if (checkAndProcessFailure())
                 return;
 
             if (!WebRequest.Aborted) //could have been aborted by a Cancel() call
-                WebRequest.BlockingPerform();
+                WebRequest.Perform();
 
             if (checkAndProcessFailure())
                 return;

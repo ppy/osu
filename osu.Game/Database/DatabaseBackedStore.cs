@@ -2,7 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Logging;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Microsoft.EntityFrameworkCore;
 using osu.Framework.Platform;
 
 namespace osu.Game.Database
@@ -11,22 +14,42 @@ namespace osu.Game.Database
     {
         protected readonly Storage Storage;
 
-        protected readonly Func<OsuDbContext> GetContext;
+        /// <summary>
+        /// Create a new <see cref="OsuDbContext"/> instance (separate from the shared context via <see cref="GetContext"/> for performing isolated operations.
+        /// </summary>
+        protected readonly Func<OsuDbContext> CreateContext;
 
-        protected DatabaseBackedStore(Func<OsuDbContext> getContext, Storage storage = null)
+        private readonly ThreadLocal<OsuDbContext> queryContext;
+
+        /// <summary>
+        /// Refresh an instance potentially from a different thread with a local context-tracked instance.
+        /// </summary>
+        /// <param name="obj">The object to use as a reference when negotiating a local instance.</param>
+        /// <param name="lookupSource">An optional lookup source which will be used to query and populate a freshly retrieved replacement. If not provided, the refreshed object will still be returned but will not have any includes.</param>
+        /// <typeparam name="T">A valid EF-stored type.</typeparam>
+        protected virtual void Refresh<T>(ref T obj, IEnumerable<T> lookupSource = null) where T : class, IHasPrimaryKey
         {
-            Storage = storage;
-            GetContext = getContext;
+            var context = GetContext();
 
-            try
-            {
-                Prepare();
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, $@"Failed to initialise the {GetType()}! Trying again with a clean database...");
-                Prepare(true);
-            }
+            if (context.Entry(obj).State != EntityState.Detached) return;
+
+            var id = obj.ID;
+            obj = lookupSource?.SingleOrDefault(t => t.ID == id) ?? context.Find<T>(id);
+        }
+
+        /// <summary>
+        /// Retrieve a shared context for performing lookups (or write operations on the update thread, for now).
+        /// </summary>
+        protected OsuDbContext GetContext() => queryContext.Value;
+
+        protected DatabaseBackedStore(Func<OsuDbContext> createContext, Storage storage = null)
+        {
+            CreateContext = createContext;
+
+            // todo: while this seems to work quite well, we need to consider that contexts could enter a state where they are never cleaned up.
+            queryContext = new ThreadLocal<OsuDbContext>(CreateContext);
+
+            Storage = storage;
         }
 
         /// <summary>
@@ -35,15 +58,5 @@ namespace osu.Game.Database
         public virtual void Cleanup()
         {
         }
-
-        /// <summary>
-        /// Prepare this database for use. Tables should be created here.
-        /// </summary>
-        protected abstract void Prepare(bool reset = false);
-
-        /// <summary>
-        /// Reset this database to a default state. Undo all changes to database and storage backings.
-        /// </summary>
-        public void Reset() => Prepare(true);
     }
 }

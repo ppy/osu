@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly PlayButton playButton;
 
         private Track preview => playButton.Preview;
-        private Bindable<bool> playing => playButton.Playing;
+        public Bindable<bool> Playing => playButton.Playing;
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -66,8 +66,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
             };
 
-            Action = () => playing.Value = !playing.Value;
-            playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
+            Action = () => Playing.Value = !Playing.Value;
+            Playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
         }
 
         [BackgroundDependencyLoader]
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             base.Update();
 
-            if (playing.Value && preview != null)
+            if (Playing.Value && preview != null)
             {
                 progress.Width = (float)(preview.CurrentTime / preview.Length);
             }
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         protected override void Dispose(bool isDisposing)
         {
-            playing.Value = false;
+            Playing.Value = false;
             base.Dispose(isDisposing);
         }
 

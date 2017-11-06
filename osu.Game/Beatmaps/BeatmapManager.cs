@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ionic.Zip;
 using Microsoft.EntityFrameworkCore;
@@ -184,7 +185,7 @@ namespace osu.Game.Beatmaps
             {
                 var context = importContext.Value;
 
-                using (var transaction = context.Database.BeginTransaction())
+                using (var transaction = context.BeginTransaction())
                 {
                     // create local stores so we can isolate and thread safely, and share a context/transaction.
                     var iFiles = new FileStore(() => context, storage);
@@ -198,7 +199,7 @@ namespace osu.Game.Beatmaps
                         context.SaveChanges();
                     }
 
-                    transaction.Commit();
+                    context.SaveChanges(transaction);
                     return set;
                 }
             }
@@ -244,11 +245,17 @@ namespace osu.Game.Beatmaps
 
             request.Success += data =>
             {
-                downloadNotification.State = ProgressNotificationState.Completed;
+                downloadNotification.Text = $"Importing {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}";
 
-                using (var stream = new MemoryStream(data))
-                using (var archive = new OszArchiveReader(stream))
-                    Import(archive);
+                Task.Factory.StartNew(() =>
+                {
+                    // This gets scheduled back to the update thread, but we want the import to run in the background.
+                    using (var stream = new MemoryStream(data))
+                    using (var archive = new OszArchiveReader(stream))
+                        Import(archive);
+
+                    downloadNotification.State = ProgressNotificationState.Completed;
+                }, TaskCreationOptions.LongRunning);
 
                 currentDownloads.Remove(request);
             };
@@ -272,7 +279,7 @@ namespace osu.Game.Beatmaps
             PostNotification?.Invoke(downloadNotification);
 
             // don't run in the main api queue as this is a long-running task.
-            Task.Run(() => request.Perform(api));
+            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
 
             return request;
         }
@@ -295,7 +302,7 @@ namespace osu.Game.Beatmaps
             {
                 var context = importContext.Value;
 
-                using (var transaction = context.Database.BeginTransaction())
+                using (var transaction = context.BeginTransaction())
                 {
                     context.ChangeTracker.AutoDetectChangesEnabled = false;
 
@@ -313,9 +320,7 @@ namespace osu.Game.Beatmaps
                     }
 
                     context.ChangeTracker.AutoDetectChangesEnabled = true;
-                    context.SaveChanges();
-
-                    transaction.Commit();
+                    context.SaveChanges(transaction);
                 }
             }
         }
@@ -374,7 +379,7 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapSetInfo QueryBeatmapSet(Func<BeatmapSetInfo, bool> query) => beatmaps.BeatmapSets.FirstOrDefault(query);
+        public BeatmapSetInfo QueryBeatmapSet(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.BeatmapSets.AsNoTracking().FirstOrDefault(query);
 
         /// <summary>
         /// Refresh an existing instance of a <see cref="BeatmapSetInfo"/> from the store.
@@ -388,21 +393,21 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapSetInfo> QueryBeatmapSets(Func<BeatmapSetInfo, bool> query) => beatmaps.BeatmapSets.Where(query).ToList();
+        public IEnumerable<BeatmapSetInfo> QueryBeatmapSets(Expression<Func<BeatmapSetInfo, bool>> query) => beatmaps.BeatmapSets.AsNoTracking().Where(query);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>The first result for the provided query, or null if no results were found.</returns>
-        public BeatmapInfo QueryBeatmap(Func<BeatmapInfo, bool> query) => beatmaps.Beatmaps.FirstOrDefault(query);
+        public BeatmapInfo QueryBeatmap(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().FirstOrDefault(query);
 
         /// <summary>
         /// Perform a lookup query on available <see cref="BeatmapInfo"/>s.
         /// </summary>
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
-        public List<BeatmapInfo> QueryBeatmaps(Func<BeatmapInfo, bool> query) => beatmaps.Beatmaps.Where(query).ToList();
+        public IEnumerable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
         /// <summary>
         /// Creates an <see cref="ArchiveReader"/> from a valid storage path.
