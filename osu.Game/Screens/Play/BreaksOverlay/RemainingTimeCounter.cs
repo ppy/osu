@@ -6,10 +6,11 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics;
 using System;
 using osu.Game.Beatmaps.Timing;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
-    public class RemainingTimeCounter : Container
+    public class RemainingTimeCounter : Counter
     {
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
 
@@ -18,7 +19,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
         public RemainingTimeCounter()
         {
             AutoSizeAxes = Axes.Both;
-            Child = counter = new OsuSpriteText
+            InternalChild = counter = new OsuSpriteText
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -29,21 +30,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
             Alpha = 0;
         }
 
-        public void CountTo(double duration)
-        {
-            double offset = 0;
-
-            while (duration > 0)
-            {
-                int seconds = (int)Math.Ceiling(duration / 1000);
-                counter.Delay(offset).TransformTextTo(seconds.ToString());
-
-                double localOffset = duration - (seconds - 1) * 1000 + 1; // +1 because we want the duration to be the next second when ceiled
-
-                offset += localOffset;
-                duration -= localOffset;
-            }
-        }
+        protected override void OnCountChanged(double count) => counter.Text = ((int)Math.Ceiling(count / 1000)).ToString();
 
         public override void Show() => this.FadeIn(fade_duration);
         public override void Hide() => this.FadeOut(fade_duration);

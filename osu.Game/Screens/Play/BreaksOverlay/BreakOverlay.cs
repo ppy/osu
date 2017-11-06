@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Scoring;
 using System.Collections.Generic;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Play.BreaksOverlay
 {
@@ -115,7 +116,7 @@ namespace osu.Game.Screens.Play.BreaksOverlay
                         .Then()
                         .ResizeWidthTo(1);
 
-                    remainingTimeCounter.CountTo(b.Duration);
+                    remainingTimeCounter.CountTo(b.Duration).CountTo(0, b.Duration);
                 }
 
                 using (BeginAbsoluteSequence(b.StartTime))
