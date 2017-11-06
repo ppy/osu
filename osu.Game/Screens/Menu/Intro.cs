@@ -99,7 +99,9 @@ namespace osu.Game.Screens.Menu
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
-            beatmaps.Delete(setInfo);
+
+            if (setInfo.Protected)
+                beatmaps.Delete(setInfo);
         }
 
         protected override void OnEntering(Screen last)
