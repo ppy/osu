@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.Profile
         private readonly RankChartLineGraph graph;
 
         private readonly int[] ranks;
+        private readonly int rankedDays;
 
         private const float primary_textsize = 25, secondary_textsize = 13, padding = 10;
 
@@ -32,6 +33,10 @@ namespace osu.Game.Overlays.Profile
         public RankChart(User user)
         {
             this.user = user;
+
+            int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
+            ranks = userRanks.SkipWhile(x => x == 0).ToArray();
+            rankedDays = ranks.Length;
 
             Padding = new MarginPadding { Vertical = padding };
             Children = new Drawable[]
@@ -64,13 +69,12 @@ namespace osu.Game.Overlays.Profile
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
                     Y = -secondary_textsize,
-                    DefaultValueCount = 90,
-                    BallRelease = updateRankTexts,
-                    BallMove = showHistoryRankTexts
+                    DefaultValueCount = rankedDays,
                 }
             };
 
-            ranks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
+            graph.OnBallMove += showHistoryRankTexts;
+            graph.OnReset += updateRankTexts;
         }
 
         private void updateRankTexts()
@@ -82,8 +86,8 @@ namespace osu.Game.Overlays.Profile
 
         private void showHistoryRankTexts(int dayIndex)
         {
-            rankText.Text = ranks[dayIndex] > 0 ? $"#{ranks[dayIndex]:#,0}" : "no rank";
-            relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
+            rankText.Text = $"#{ranks[dayIndex]:#,0}";
+            relativeText.Text = dayIndex == rankedDays ? "Now" : $"{rankedDays - dayIndex} days ago";
             //plural should be handled in a general way
         }
 
@@ -96,7 +100,8 @@ namespace osu.Game.Overlays.Profile
             {
                 // use logarithmic coordinates
                 graph.Values = ranks.Select(x => -(float)Math.Log(x));
-                graph.ResetBall();
+                graph.SetStaticBallPosition();
+                updateRankTexts();
             }
         }
 
@@ -110,67 +115,90 @@ namespace osu.Game.Overlays.Profile
             return base.Invalidate(invalidation, source, shallPropagate);
         }
 
+        protected override bool OnHover(InputState state)
+        {
+            graph.ShowBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
+            return base.OnHover(state);
+        }
+
+        protected override bool OnMouseMove(InputState state)
+        {
+            graph.MoveBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
+            return base.OnMouseMove(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            graph.HideBall();
+            updateRankTexts();
+            base.OnHoverLost(state);
+        }
+
         private class RankChartLineGraph : LineGraph
         {
-            private readonly CircularContainer ball;
-            private bool ballShown;
+            private const double fade_duration = 300;
+            private const double move_duration = 100;
 
-            private const double transform_duration = 100;
+            private readonly CircularContainer staticBall;
+            private readonly CircularContainer movingBall;
 
-            public Action<int> BallMove;
-            public Action BallRelease;
+            public Action<int> OnBallMove;
+            public Action OnReset;
 
             public RankChartLineGraph()
             {
-                Add(ball = new CircularContainer
+                Add(staticBall = new CircularContainer
                 {
+                    Origin = Anchor.Centre,
                     Size = new Vector2(8),
                     Masking = true,
-                    Origin = Anchor.Centre,
-                    Alpha = 0,
                     RelativePositionAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box { RelativeSizeAxes = Axes.Both }
-                    }
+                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                });
+                Add(movingBall = new CircularContainer
+                {
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(8),
+                    Alpha = 0,
+                    Masking = true,
+                    RelativePositionAxes = Axes.Both,
+                    Child = new Box { RelativeSizeAxes = Axes.Both }
                 });
             }
 
-            public void ResetBall()
+            public void SetStaticBallPosition()
             {
-                ball.MoveTo(new Vector2(1, GetYPosition(Values.Last())), ballShown ? transform_duration : 0, Easing.OutQuint);
-                ball.Show();
-                BallRelease();
-                ballShown = true;
+                staticBall.Position = new Vector2(1, GetYPosition(Values.Last()));
+                OnReset.Invoke();
             }
 
-            protected override bool OnMouseMove(InputState state)
+            public void ShowBall(float mouseXPosition)
             {
-                if (ballShown)
-                {
-                    var values = (IList<float>)Values;
-                    var position = ToLocalSpace(state.Mouse.NativeState.Position);
-                    int count = Math.Max(values.Count, DefaultValueCount);
-                    int index = (int)Math.Round(position.X / DrawWidth * (count - 1));
-                    if (index >= count - values.Count)
-                    {
-                        int i = index + values.Count - count;
-                        float y = GetYPosition(values[i]);
-                        if (Math.Abs(y * DrawHeight - position.Y) <= 8f)
-                        {
-                            ball.MoveTo(new Vector2(index / (float)(count - 1), y), transform_duration, Easing.OutQuint);
-                            BallMove(i);
-                        }
-                    }
-                }
-                return base.OnMouseMove(state);
+                int index = calculateIndex(mouseXPosition);
+                movingBall.Position = calculateBallPosition(mouseXPosition, index);
+                movingBall.FadeIn(fade_duration);
+                OnBallMove.Invoke(index);
             }
 
-            protected override void OnHoverLost(InputState state)
+            public void MoveBall(float mouseXPosition)
             {
-                if (ballShown)
-                    ResetBall();
-                base.OnHoverLost(state);
+                int index = calculateIndex(mouseXPosition);
+                movingBall.MoveTo(calculateBallPosition(mouseXPosition, index), move_duration, Easing.OutQuint);
+                OnBallMove.Invoke(index);
+            }
+
+            public void HideBall()
+            {
+                movingBall.FadeOut(fade_duration);
+                OnReset.Invoke();
+            }
+
+            private int calculateIndex(float mouseXPosition) => (int)Math.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
+
+            private Vector2 calculateBallPosition(float mouseXPosition, int index)
+            {
+                float y = GetYPosition(Values.ElementAt(index));
+                return new Vector2(index / (float)(DefaultValueCount - 1), y);
             }
         }
     }
