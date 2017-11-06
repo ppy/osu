@@ -101,7 +101,6 @@ namespace osu.Game.Overlays.Profile
                 // use logarithmic coordinates
                 graph.Values = ranks.Select(x => -(float)Math.Log(x));
                 graph.SetStaticBallPosition();
-                updateRankTexts();
             }
         }
 
@@ -130,7 +129,6 @@ namespace osu.Game.Overlays.Profile
         protected override void OnHoverLost(InputState state)
         {
             graph.HideBall();
-            updateRankTexts();
             base.OnHoverLost(state);
         }
 
