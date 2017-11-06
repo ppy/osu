@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Container coverContainer;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
-        private readonly Details details;
+        public Details Details;
 
         private DelayedLoadWrapper cover;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                Picker.BeatmapSet = author.BeatmapSet = details.BeatmapSet = BeatmapSet;
+                Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = BeatmapSet;
                 title.Text = BeatmapSet.Metadata.Title;
                 artist.Text = BeatmapSet.Metadata.Artist;
 
@@ -192,7 +192,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 },
                             },
                         },
-                        details = new Details
+                        Details = new Details
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
@@ -204,7 +204,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Picker.Beatmap.ValueChanged += b =>
             {
-                details.Beatmap = b;
+                Details.Beatmap = b;
 
                 if (b.OnlineInfo.HasVideo)
                 {

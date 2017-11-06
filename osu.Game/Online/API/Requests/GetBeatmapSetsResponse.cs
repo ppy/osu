@@ -9,7 +9,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetBeatmapSetsResponse : BeatmapMetadata
+    public class GetBeatmapSetsResponse : BeatmapMetadata // todo: this is a bit wrong...
     {
         [JsonProperty(@"covers")]
         private BeatmapSetOnlineCovers covers { get; set; }
@@ -23,9 +23,6 @@ namespace osu.Game.Online.API.Requests
         [JsonProperty(@"favourite_count")]
         private int favouriteCount { get; set; }
 
-        [JsonProperty(@"id")]
-        private int onlineId { get; set; }
-
         [JsonProperty(@"user_id")]
         private long creatorId {
             set { Author.Id = value; }
@@ -38,7 +35,7 @@ namespace osu.Game.Online.API.Requests
         {
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = onlineId,
+                OnlineBeatmapSetID = OnlineBeatmapSetID,
                 Metadata = this,
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
