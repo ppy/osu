@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game", "osu.Game\osu.Game.csproj", "{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}"
 EndProject
@@ -34,8 +34,8 @@ Global
 		{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}.VisualTests|Any CPU.ActiveCfg = VisualTests|Any CPU
-		{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}.VisualTests|Any CPU.Build.0 = VisualTests|Any CPU
+		{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}.VisualTests|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}.VisualTests|Any CPU.Build.0 = Debug|Any CPU
 		{C76BF5B3-985E-4D39-95FE-97C9C879B83A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C76BF5B3-985E-4D39-95FE-97C9C879B83A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C76BF5B3-985E-4D39-95FE-97C9C879B83A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -85,11 +85,14 @@ Global
 		{419659FD-72EA-4678-9EB8-B22A746CED70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{419659FD-72EA-4678-9EB8-B22A746CED70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{419659FD-72EA-4678-9EB8-B22A746CED70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{419659FD-72EA-4678-9EB8-B22A746CED70}.VisualTests|Any CPU.ActiveCfg = Debug|Any CPU
-		{419659FD-72EA-4678-9EB8-B22A746CED70}.VisualTests|Any CPU.Build.0 = Debug|Any CPU
+		{419659FD-72EA-4678-9EB8-B22A746CED70}.VisualTests|Any CPU.ActiveCfg = VisualTests|Any CPU
+		{419659FD-72EA-4678-9EB8-B22A746CED70}.VisualTests|Any CPU.Build.0 = VisualTests|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {671B0BEC-2403-45B0-9357-2C97CC517668}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
