@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Profile.Sections
             Children = new[]
             {
                 new PaginatedBeatmapContainer(BeatmapSetType.Favourite, User, "Favourite Beatmaps", "None... yet."),
-                new PaginatedBeatmapContainer(BeatmapSetType.Ranked_And_Approved, User, "Ranked & Approved Beatmaps", "None... yet."),
+                new PaginatedBeatmapContainer(BeatmapSetType.RankedAndApproved, User, "Ranked & Approved Beatmaps", "None... yet."),
             };
         }
     }

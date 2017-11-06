@@ -8,23 +8,35 @@ namespace osu.Game.Online.API.Requests
     public class GetUserBeatmapsRequest : APIRequest<List<GetBeatmapSetsResponse>>
     {
         private readonly long userId;
-        private readonly BeatmapSetType type;
         private readonly int offset;
+        private readonly string type;
 
         public GetUserBeatmapsRequest(long userId, BeatmapSetType type, int offset = 0)
         {
             this.userId = userId;
-            this.type = type;
             this.offset = offset;
+
+            switch (type)
+            {
+                case BeatmapSetType.Favourite:
+                    this.type = type.ToString().ToLower();
+                    break;
+                case BeatmapSetType.MostPlayed:
+                    this.type = "most_played";
+                    break;
+                case BeatmapSetType.RankedAndApproved:
+                    this.type = "ranked_and_approved";
+                    break;
+            }
         }
 
-        protected override string Target => $@"users/{userId}/beatmapsets/{type.ToString().ToLower()}?offset={offset}";
+        protected override string Target => $@"users/{userId}/beatmapsets/{type}?offset={offset}";
     }
 
     public enum BeatmapSetType
     {
-        Most_Played,
+        MostPlayed,
         Favourite,
-        Ranked_And_Approved
+        RankedAndApproved
     }
 }
