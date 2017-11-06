@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual
                 }
             });
 
-            AddStep("Show cookiezi", () => ranks.User = new User { Id = 124493 });
+            AddStep("Show cookiezi", () => ranks.User.Value = new User { Id = 124493 });
         }
     }
 }

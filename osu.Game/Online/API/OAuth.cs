@@ -27,6 +27,9 @@ namespace osu.Game.Online.API
 
         internal bool AuthenticateWithLogin(string username, string password)
         {
+            if (string.IsNullOrEmpty(username)) return false;
+            if (string.IsNullOrEmpty(password)) return false;
+
             using (var req = new AccessTokenRequestPassword(username, password)
             {
                 Url = $@"{endpoint}/oauth/token",
@@ -127,7 +130,8 @@ namespace osu.Game.Online.API
 
             protected override void PrePerform()
             {
-                Parameters[@"refresh_token"] = RefreshToken;
+                AddParameter("refresh_token", RefreshToken);
+
                 base.PrePerform();
             }
         }
@@ -146,8 +150,9 @@ namespace osu.Game.Online.API
 
             protected override void PrePerform()
             {
-                Parameters[@"username"] = Username;
-                Parameters[@"password"] = Password;
+                AddParameter("username", Username);
+                AddParameter("password", Password);
+
                 base.PrePerform();
             }
         }
@@ -161,9 +166,10 @@ namespace osu.Game.Online.API
 
             protected override void PrePerform()
             {
-                Parameters[@"grant_type"] = GrantType;
-                Parameters[@"client_id"] = ClientId;
-                Parameters[@"client_secret"] = ClientSecret;
+                AddParameter("grant_type", GrantType);
+                AddParameter("client_id", ClientId);
+                AddParameter("client_secret", ClientSecret);
+
                 base.PrePerform();
             }
         }
