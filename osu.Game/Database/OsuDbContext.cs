@@ -48,16 +48,18 @@ namespace osu.Game.Database
         /// <param name="connectionString">A valid SQLite connection string.</param>
         public OsuDbContext(string connectionString)
         {
-            this.connectionString = connectionString;
+            this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
 
             Database.SetCommandTimeout(new TimeSpan(TimeSpan.TicksPerSecond * 10));
 
-            var connection = Database.GetDbConnection();
-            connection.Open();
-            using (var cmd = connection.CreateCommand())
+            using (var connection = Database.GetDbConnection())
             {
-                cmd.CommandText = "PRAGMA journal_mode=WAL;";
-                cmd.ExecuteNonQuery();
+                connection.Open();
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "PRAGMA journal_mode=WAL;";
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
