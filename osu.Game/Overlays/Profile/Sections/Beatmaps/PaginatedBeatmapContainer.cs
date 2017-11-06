@@ -47,6 +47,9 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
                 foreach (var s in sets)
                 {
+                    if (!s.OnlineBeatmapSetID.HasValue)
+                        continue;
+
                     var subReq = new GetBeatmapSetRequest(s.OnlineBeatmapSetID.Value);
                     subReq.Success += b =>
                     {
