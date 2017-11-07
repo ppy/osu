@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using osu.Framework.Allocation;
@@ -173,7 +172,7 @@ namespace osu.Game.Overlays.Profile
             public void ShowBall(float mouseXPosition)
             {
                 int index = calculateIndex(mouseXPosition);
-                movingBall.Position = calculateBallPosition(mouseXPosition, index);
+                movingBall.Position = calculateBallPosition(index);
                 movingBall.FadeIn(fade_duration);
                 OnBallMove.Invoke(index);
             }
@@ -181,7 +180,7 @@ namespace osu.Game.Overlays.Profile
             public void MoveBall(float mouseXPosition)
             {
                 int index = calculateIndex(mouseXPosition);
-                movingBall.MoveTo(calculateBallPosition(mouseXPosition, index), move_duration, Easing.OutQuint);
+                movingBall.MoveTo(calculateBallPosition(index), move_duration, Easing.OutQuint);
                 OnBallMove.Invoke(index);
             }
 
@@ -193,7 +192,7 @@ namespace osu.Game.Overlays.Profile
 
             private int calculateIndex(float mouseXPosition) => (int)Math.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
 
-            private Vector2 calculateBallPosition(float mouseXPosition, int index)
+            private Vector2 calculateBallPosition(int index)
             {
                 float y = GetYPosition(Values.ElementAt(index));
                 return new Vector2(index / (float)(DefaultValueCount - 1), y);
