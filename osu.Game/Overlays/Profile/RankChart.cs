@@ -119,15 +119,13 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnHover(InputState state)
         {
-            if (graph != null)
-                graph.ShowBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
+            graph?.ShowBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
             return base.OnHover(state);
         }
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (graph != null)
-                graph.MoveBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
+            graph?.MoveBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
             return base.OnMouseMove(state);
         }
 
