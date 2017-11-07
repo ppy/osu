@@ -246,6 +246,9 @@ namespace osu.Game.Beatmaps.Formats
         /// <param name="line">The line which may contains variables.</param>
         private void decodeVariables(ref string line)
         {
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             while (line.IndexOf('$') >= 0)
             {
                 string origLine = line;
@@ -622,6 +625,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleVariables(string line)
         {
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var pair = splitKeyVal(line, '=');
             variables[pair.Key] = pair.Value;
         }
