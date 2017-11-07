@@ -644,6 +644,11 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseFile(StreamReader stream, Beatmap beatmap)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
             beatmap.BeatmapInfo.BeatmapVersion = beatmapVersion;
 
             Section section = Section.None;
