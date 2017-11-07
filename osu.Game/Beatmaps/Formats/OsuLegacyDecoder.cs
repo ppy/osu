@@ -70,6 +70,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleGeneral(Beatmap beatmap, string line)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var pair = splitKeyVal(line, ':');
 
             var metadata = beatmap.BeatmapInfo.Metadata;
