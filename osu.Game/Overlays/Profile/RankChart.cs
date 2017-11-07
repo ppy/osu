@@ -62,25 +62,28 @@ namespace osu.Game.Overlays.Profile
                     Font = @"Exo2.0-RegularItalic",
                     TextSize = secondary_textsize
                 },
-                graph = new RankChartLineGraph
+            };
+
+            if (rankedDays > 0)
+            {
+                Add(graph = new RankChartLineGraph
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
                     Y = -secondary_textsize,
                     DefaultValueCount = rankedDays,
-                }
-            };
+                });
 
-            graph.OnBallMove += showHistoryRankTexts;
-            graph.OnReset += updateRankTexts;
+                graph.OnBallMove += showHistoryRankTexts;
+            }
         }
 
         private void updateRankTexts()
         {
-            rankText.Text = user.Statistics.Rank > 0 ? $"#{user.Statistics.Rank:#,0}" : "no rank";
-            performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
-            relativeText.Text = $"{user.Country?.FullName} #{user.CountryRank:#,0}";
+            rankText.Text = rankedDays > 0 ? $"#{user.Statistics.Rank:#,0}" : "no rank";
+            performanceText.Text = rankedDays > 0 ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
+            relativeText.Text = rankedDays > 0 ? $"{user.Country?.FullName} #{user.CountryRank:#,0}" : string.Empty;
         }
 
         private void showHistoryRankTexts(int dayIndex)
@@ -93,14 +96,15 @@ namespace osu.Game.Overlays.Profile
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            graph.Colour = colours.Yellow;
-
-            if (user.Statistics.Rank > 0)
+            if (graph != null)
             {
+                graph.Colour = colours.Yellow;
                 // use logarithmic coordinates
                 graph.Values = ranks.Select(x => -(float)Math.Log(x));
                 graph.SetStaticBallPosition();
             }
+
+            updateRankTexts();
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
@@ -115,19 +119,25 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnHover(InputState state)
         {
-            graph.ShowBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
+            if (graph != null)
+                graph.ShowBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
             return base.OnHover(state);
         }
 
         protected override bool OnMouseMove(InputState state)
         {
-            graph.MoveBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
+            if (graph != null)
+                graph.MoveBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
             return base.OnMouseMove(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            graph.HideBall();
+            if (graph != null)
+            {
+                graph.HideBall();
+                updateRankTexts();
+            }
             base.OnHoverLost(state);
         }
 
@@ -140,7 +150,6 @@ namespace osu.Game.Overlays.Profile
             private readonly CircularContainer movingBall;
 
             public Action<int> OnBallMove;
-            public Action OnReset;
 
             public RankChartLineGraph()
             {
@@ -163,11 +172,7 @@ namespace osu.Game.Overlays.Profile
                 });
             }
 
-            public void SetStaticBallPosition()
-            {
-                staticBall.Position = new Vector2(1, GetYPosition(Values.Last()));
-                OnReset.Invoke();
-            }
+            public void SetStaticBallPosition() => staticBall.Position = new Vector2(1, GetYPosition(Values.Last()));
 
             public void ShowBall(float mouseXPosition)
             {
@@ -187,7 +192,6 @@ namespace osu.Game.Overlays.Profile
             public void HideBall()
             {
                 movingBall.FadeOut(fade_duration);
-                OnReset.Invoke();
             }
 
             private int calculateIndex(float mouseXPosition) => (int)Math.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
