@@ -134,6 +134,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEditor(Beatmap beatmap, string line)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var pair = splitKeyVal(line, ':');
 
             switch (pair.Key)
