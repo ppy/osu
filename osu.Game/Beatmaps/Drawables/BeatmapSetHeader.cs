@@ -160,6 +160,9 @@ namespace osu.Game.Beatmaps.Drawables
 
         public void AddDifficultyIcons(IEnumerable<BeatmapPanel> panels)
         {
+            if (panels == null)
+                throw new ArgumentNullException(nameof(panels));
+
             foreach (var p in panels)
                 difficultyIcons.Add(new DifficultyIcon(p.Beatmap));
         }
