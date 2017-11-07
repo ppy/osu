@@ -91,6 +91,9 @@ namespace osu.Game.Beatmaps.Drawables
         [BackgroundDependencyLoader]
         private void load(LocalisationEngine localisation)
         {
+            if (localisation == null)
+                throw new ArgumentNullException(nameof(localisation));
+
             title.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
             artist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
         }
