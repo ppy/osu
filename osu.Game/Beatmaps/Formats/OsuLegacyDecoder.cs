@@ -585,6 +585,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleColours(Beatmap beatmap, string line, ref bool hasCustomColours)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var pair = splitKeyVal(line, ':');
 
             string[] split = pair.Value.Split(',');
