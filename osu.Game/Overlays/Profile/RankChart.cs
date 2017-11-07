@@ -87,6 +87,7 @@ namespace osu.Game.Overlays.Profile
         private void showHistoryRankTexts(int dayIndex)
         {
             rankText.Text = $"#{ranks[dayIndex]:#,0}";
+            dayIndex++;
             relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
             //plural should be handled in a general way
         }
