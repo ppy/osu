@@ -36,6 +36,9 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapSetHeader(WorkingBeatmap beatmap)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+
             this.beatmap = beatmap;
 
             Children = new Drawable[]
