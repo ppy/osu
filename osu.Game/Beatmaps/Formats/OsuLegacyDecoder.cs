@@ -725,6 +725,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private KeyValuePair<string, string> splitKeyVal(string line, char separator)
         {
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var split = line.Trim().Split(new[] { separator }, 2);
 
             return new KeyValuePair<string, string>
