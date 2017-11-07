@@ -264,6 +264,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(Beatmap beatmap, string line, ref StoryboardSprite storyboardSprite, ref CommandTimelineGroup timelineGroup)
         {
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+
             var depth = 0;
             while (line.StartsWith(" ") || line.StartsWith("_"))
             {
