@@ -494,6 +494,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingPoints(Beatmap beatmap, string line)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             string[] split = line.Split(',');
 
             double time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo);
