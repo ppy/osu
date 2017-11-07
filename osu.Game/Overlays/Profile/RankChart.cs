@@ -23,7 +23,6 @@ namespace osu.Game.Overlays.Profile
         private readonly RankChartLineGraph graph;
 
         private readonly int[] ranks;
-        private readonly int rankedDays;
 
         private const float primary_textsize = 25, secondary_textsize = 13, padding = 10;
 
@@ -35,7 +34,6 @@ namespace osu.Game.Overlays.Profile
 
             int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Rank };
             ranks = userRanks.SkipWhile(x => x == 0).ToArray();
-            rankedDays = ranks.Length;
 
             Padding = new MarginPadding { Vertical = padding };
             Children = new Drawable[]
@@ -64,7 +62,7 @@ namespace osu.Game.Overlays.Profile
                 },
             };
 
-            if (rankedDays > 0)
+            if (ranks.Length > 0)
             {
                 Add(graph = new RankChartLineGraph
                 {
@@ -72,7 +70,7 @@ namespace osu.Game.Overlays.Profile
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
                     Y = -secondary_textsize,
-                    DefaultValueCount = rankedDays,
+                    DefaultValueCount = ranks.Length,
                 });
 
                 graph.OnBallMove += showHistoryRankTexts;
@@ -89,7 +87,7 @@ namespace osu.Game.Overlays.Profile
         private void showHistoryRankTexts(int dayIndex)
         {
             rankText.Text = $"#{ranks[dayIndex]:#,0}";
-            relativeText.Text = dayIndex == rankedDays ? "Now" : $"{rankedDays - dayIndex} days ago";
+            relativeText.Text = dayIndex == ranks.Length ? "Now" : $"{ranks.Length - dayIndex} days ago";
             //plural should be handled in a general way
         }
 
@@ -119,13 +117,13 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnHover(InputState state)
         {
-            graph?.ShowBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
+            graph?.ShowBall(state.Mouse.Position.X);
             return base.OnHover(state);
         }
 
         protected override bool OnMouseMove(InputState state)
         {
-            graph?.MoveBall(ToLocalSpace(state.Mouse.NativeState.Position).X);
+            graph?.MoveBall(state.Mouse.Position.X);
             return base.OnMouseMove(state);
         }
 
