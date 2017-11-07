@@ -33,9 +33,9 @@ namespace osu.Game.Screens.Menu
         private SampleChannel welcome;
         private SampleChannel seeya;
 
-        internal override bool HasLocalCursorDisplayed => true;
+        public override bool HasLocalCursorDisplayed => true;
 
-        internal override bool ShowOverlays => false;
+        public override bool ShowOverlays => false;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
 
@@ -99,7 +99,9 @@ namespace osu.Game.Screens.Menu
 
             welcome = audio.Sample.Get(@"welcome");
             seeya = audio.Sample.Get(@"seeya");
-            beatmaps.Delete(setInfo);
+
+            if (setInfo.Protected)
+                beatmaps.Delete(setInfo);
         }
 
         protected override void OnEntering(Screen last)
