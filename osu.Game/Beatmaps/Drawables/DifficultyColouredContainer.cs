@@ -43,6 +43,9 @@ namespace osu.Game.Beatmaps.Drawables
 
         private DifficultyRating getDifficultyRating(BeatmapInfo beatmap)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+
             var rating = beatmap.StarDifficulty;
 
             if (rating < 1.5) return DifficultyRating.Easy;
