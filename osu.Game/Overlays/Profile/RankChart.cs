@@ -81,9 +81,9 @@ namespace osu.Game.Overlays.Profile
 
         private void updateRankTexts()
         {
-            rankText.Text = rankedDays > 0 ? $"#{user.Statistics.Rank:#,0}" : "no rank";
-            performanceText.Text = rankedDays > 0 ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
-            relativeText.Text = rankedDays > 0 ? $"{user.Country?.FullName} #{user.CountryRank:#,0}" : string.Empty;
+            rankText.Text = user.Statistics.Rank > 0 ? $"#{user.Statistics.Rank:#,0}" : "no rank";
+            performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
+            relativeText.Text = $"{user.Country?.FullName} #{user.CountryRank:#,0}";
         }
 
         private void showHistoryRankTexts(int dayIndex)
