@@ -13,6 +13,9 @@ namespace osu.Game.Graphics
 
         public static Color4 FromHex(string hex)
         {
+            if (hex == null)
+                throw new ArgumentNullException(nameof(hex));
+
             if (hex[0] == '#')
                 hex = hex.Substring(1);
 

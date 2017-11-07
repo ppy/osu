@@ -44,7 +44,7 @@ namespace osu.Game.Input.Bindings
         [BackgroundDependencyLoader]
         private void load(KeyBindingStore keyBindings)
         {
-            store = keyBindings;
+            store = keyBindings ?? throw new ArgumentNullException(nameof(keyBindings));
             store.KeyBindingChanged += ReloadMappings;
         }
 

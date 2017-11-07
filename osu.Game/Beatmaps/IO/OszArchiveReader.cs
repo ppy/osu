@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,6 +22,9 @@ namespace osu.Game.Beatmaps.IO
 
         public override Stream GetStream(string name)
         {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+
             ZipEntry entry = archive.Entries.SingleOrDefault(e => e.FileName == name);
             if (entry == null)
                 throw new FileNotFoundException();
