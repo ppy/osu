@@ -117,13 +117,14 @@ namespace osu.Game.Overlays.Profile
 
         protected override bool OnHover(InputState state)
         {
-            graph?.ShowBall(state.Mouse.Position.X);
+            graph?.UpdateBallPosition(state.Mouse.Position.X);
+            graph?.ShowBall();
             return base.OnHover(state);
         }
 
         protected override bool OnMouseMove(InputState state)
         {
-            graph?.MoveBall(state.Mouse.Position.X);
+            graph?.UpdateBallPosition(state.Mouse.Position.X);
             return base.OnMouseMove(state);
         }
 
@@ -139,8 +140,7 @@ namespace osu.Game.Overlays.Profile
 
         private class RankChartLineGraph : LineGraph
         {
-            private const double fade_duration = 300;
-            private const double move_duration = 100;
+            private const double fade_duration = 200;
 
             private readonly CircularContainer staticBall;
             private readonly CircularContainer movingBall;
@@ -170,25 +170,16 @@ namespace osu.Game.Overlays.Profile
 
             public void SetStaticBallPosition() => staticBall.Position = new Vector2(1, GetYPosition(Values.Last()));
 
-            public void ShowBall(float mouseXPosition)
+            public void UpdateBallPosition(float mouseXPosition)
             {
                 int index = calculateIndex(mouseXPosition);
                 movingBall.Position = calculateBallPosition(index);
-                movingBall.FadeIn(fade_duration);
                 OnBallMove.Invoke(index);
             }
 
-            public void MoveBall(float mouseXPosition)
-            {
-                int index = calculateIndex(mouseXPosition);
-                movingBall.MoveTo(calculateBallPosition(index), move_duration, Easing.OutQuint);
-                OnBallMove.Invoke(index);
-            }
+            public void ShowBall() => movingBall.FadeIn(fade_duration);
 
-            public void HideBall()
-            {
-                movingBall.FadeOut(fade_duration);
-            }
+            public void HideBall() => movingBall.FadeOut(fade_duration);
 
             private int calculateIndex(float mouseXPosition) => (int)Math.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
 
