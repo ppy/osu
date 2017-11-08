@@ -20,12 +20,12 @@ namespace osu.Game.Screens.Menu
 
         private readonly OsuSpriteText welcomeText;
 
-        private readonly Container barsContainer;
+        private readonly Container linesContainer;
 
-        private readonly Container barTopLeft;
-        private readonly Container barBottomLeft;
-        private readonly Container barTopRight;
-        private readonly Container barBottomRight;
+        private readonly Container lineTopLeft;
+        private readonly Container lineBottomLeft;
+        private readonly Container lineTopRight;
+        private readonly Container lineBottomRight;
 
         private readonly Ring smallRing;
         private readonly Ring mediumRing;
@@ -45,14 +45,14 @@ namespace osu.Game.Screens.Menu
             Children = new Drawable[]
             {
                 mediumRing = new Ring(Color4.White.Opacity(130)),
-                barsContainer = new Container
+                linesContainer = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        barTopLeft = new Container
+                        lineTopLeft = new Container
                         {
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.Centre,
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Menu
                                 Colour = Color4.White.Opacity(180),
                             }
                         },
-                        barTopRight = new Container
+                        lineTopRight = new Container
                         {
                             Origin = Anchor.CentreRight,
                             Anchor = Anchor.Centre,
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Menu
                                 Colour = Color4.White.Opacity(80),
                             }
                         },
-                        barBottomLeft = new Container
+                        lineBottomLeft = new Container
                         {
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.Centre,
@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Menu
                                 Colour = Color4.White.Opacity(230),
                             }
                         },
-                        barBottomRight = new Container
+                        lineBottomRight = new Container
                         {
                             Origin = Anchor.CentreRight,
                             Anchor = Anchor.Centre,
@@ -202,20 +202,20 @@ namespace osu.Game.Screens.Menu
                 welcomeText.FadeIn(700);
                 welcomeText.TransformSpacingTo(new Vector2(20, 0), remainingTime(), Easing.Out);
 
-                const int bar_duration = 700;
-                const int bar_resize = 150;
+                const int line_duration = 700;
+                const int line_resize = 150;
 
-                foreach (var bar in barsContainer)
+                foreach (var line in linesContainer)
                 {
-                    bar.FadeIn();
-                    bar.Delay(bar_resize).ResizeWidthTo(0, bar_duration - bar_resize, Easing.OutQuint);
+                    line.FadeIn();
+                    line.Delay(line_resize).ResizeWidthTo(0, line_duration - line_resize, Easing.OutQuint);
                 }
 
-                const int bar_end_offset = 120;
-                barTopLeft.MoveTo(new Vector2(-bar_end_offset, -bar_end_offset), bar_duration, Easing.OutQuint);
-                barTopRight.MoveTo(new Vector2(bar_end_offset, -bar_end_offset), bar_duration, Easing.OutQuint);
-                barBottomLeft.MoveTo(new Vector2(-bar_end_offset, bar_end_offset), bar_duration, Easing.OutQuint);
-                barBottomRight.MoveTo(new Vector2(bar_end_offset, bar_end_offset), bar_duration, Easing.OutQuint);
+                const int line_end_offset = 120;
+                lineTopLeft.MoveTo(new Vector2(-line_end_offset, -line_end_offset), line_duration, Easing.OutQuint);
+                lineTopRight.MoveTo(new Vector2(line_end_offset, -line_end_offset), line_duration, Easing.OutQuint);
+                lineBottomLeft.MoveTo(new Vector2(-line_end_offset, line_end_offset), line_duration, Easing.OutQuint);
+                lineBottomRight.MoveTo(new Vector2(line_end_offset, line_end_offset), line_duration, Easing.OutQuint);
 
                 using (BeginDelayedSequence(1640, true)) // 2000
                 {
@@ -278,14 +278,14 @@ namespace osu.Game.Screens.Menu
             smallRing.Foreground.Size = Vector2.One - new Vector2(0.4f);
             bigRing.Foreground.Size = Vector2.One - new Vector2(0.15f);
 
-            barTopLeft.Size = barTopRight.Size = barBottomLeft.Size = barBottomRight.Size = new Vector2(105, 1.5f);
-            barTopLeft.Alpha = barTopRight.Alpha = barBottomLeft.Alpha = barBottomRight.Alpha = 0;
+            lineTopLeft.Size = lineTopRight.Size = lineBottomLeft.Size = lineBottomRight.Size = new Vector2(105, 1.5f);
+            lineTopLeft.Alpha = lineTopRight.Alpha = lineBottomLeft.Alpha = lineBottomRight.Alpha = 0;
 
-            const int bar_offset = 80;
-            barTopLeft.Position = new Vector2(-bar_offset, -bar_offset);
-            barTopRight.Position = new Vector2(bar_offset, -bar_offset);
-            barBottomLeft.Position = new Vector2(-bar_offset, bar_offset);
-            barBottomRight.Position = new Vector2(bar_offset, bar_offset);
+            const int line_offset = 80;
+            lineTopLeft.Position = new Vector2(-line_offset, -line_offset);
+            lineTopRight.Position = new Vector2(line_offset, -line_offset);
+            lineBottomLeft.Position = new Vector2(-line_offset, line_offset);
+            lineBottomRight.Position = new Vector2(line_offset, line_offset);
 
             backgroundFill.Rotation = foregroundFill.Rotation = 0;
             backgroundFill.Alpha = foregroundFill.Alpha = 1;
