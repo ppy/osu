@@ -297,8 +297,8 @@ namespace osu.Game.Screens.Menu
 
         public void PlayIntro()
         {
-            const double length = 2950;
-            const double fade = 300;
+            const double length = 3150;
+            const double fade = 200;
 
             logoHoverContainer.FadeOut().Delay(length).FadeIn(fade);
             intro.Show();

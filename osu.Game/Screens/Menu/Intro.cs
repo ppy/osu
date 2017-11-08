@@ -117,8 +117,8 @@ namespace osu.Game.Screens.Menu
 
             logo.RelativePositionAxes = Axes.Both;
 
-            logo.Triangles = false;
-            logo.Colour = Color4.DarkGray;
+            logo.Triangles = true;
+            logo.Colour = Color4.White;
             logo.Ripple = false;
 
             const int quick_appear = 350;
@@ -129,11 +129,9 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                logo.ScaleTo(0.4f);
-                logo.FadeOut();
-
-                logo.ScaleTo(1, delay_step_one + delay_step_two, Easing.OutQuint);
-                logo.FadeIn(delay_step_one + delay_step_two, Easing.OutQuint);
+                logo.ScaleTo(1);
+                logo.FadeIn();
+                logo.PlayIntro();
             }
             else
             {
