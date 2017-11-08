@@ -41,9 +41,11 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 ShowMoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
                 ShowMoreLoading.Hide();
 
-                if (!sets.Any()) return;
-
-                MissingText.Hide();
+                if (!sets.Any())
+                {
+                    MissingText.Show();
+                    return;
+                }
 
                 foreach (var s in sets)
                 {
