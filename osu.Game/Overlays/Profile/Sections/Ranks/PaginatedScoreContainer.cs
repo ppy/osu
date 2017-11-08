@@ -41,7 +41,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 ShowMoreButton.FadeTo(scores.Count == ItemsPerPage ? 1 : 0);
                 ShowMoreLoading.Hide();
 
-                if (!scores.Any()) return;
+                if (!scores.Any())
+                {
+                    MissingText.Show();
+                    return;
+                }
 
                 MissingText.Hide();
 

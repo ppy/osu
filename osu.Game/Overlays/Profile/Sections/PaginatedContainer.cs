@@ -74,7 +74,8 @@ namespace osu.Game.Overlays.Profile.Sections
                 MissingText = new OsuSpriteText
                 {
                     TextSize = 14,
-                    Text = missing
+                    Text = missing,
+                    Alpha = 0,
                 },
             };
         }
@@ -94,7 +95,6 @@ namespace osu.Game.Overlays.Profile.Sections
             VisiblePages = 0;
             ItemsContainer.Clear();
             ShowMoreButton.Hide();
-            MissingText.Show();
 
             if (newUser != null)
                 ShowMore();
