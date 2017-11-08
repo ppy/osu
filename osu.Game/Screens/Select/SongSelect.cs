@@ -311,9 +311,9 @@ namespace osu.Game.Screens.Select
 
         private const double logo_transition = 250;
 
-        protected override void LogoSetup(OsuLogo logo, bool resuming)
+        protected override void OnArrivedLogo(OsuLogo logo, bool resuming)
         {
-            base.LogoSetup(logo, resuming);
+            base.OnArrivedLogo(logo, resuming);
 
             logo.ClearTransforms();
             logo.RelativePositionAxes = Axes.Both;
@@ -337,9 +337,9 @@ namespace osu.Game.Screens.Select
             logo.Action = () => carouselRaisedStart();
         }
 
-        protected override void LogoOnExiting(OsuLogo logo)
+        protected override void OnExitingLogo(OsuLogo logo)
         {
-            base.LogoOnExiting(logo);
+            base.OnExitingLogo(logo);
             logo.ScaleTo(0.2f, logo_transition, Easing.OutQuint);
             logo.FadeOut(logo_transition, Easing.OutQuint);
         }

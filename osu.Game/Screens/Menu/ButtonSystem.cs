@@ -326,8 +326,6 @@ namespace osu.Game.Screens.Menu
 
         private bool trackingPosition;
 
-        public void SetLogoTracking(bool value) => trackingPosition = value;
-
         protected override void Update()
         {
             //if (OsuGame.IdleTime > 6000 && State != MenuState.Exit)
