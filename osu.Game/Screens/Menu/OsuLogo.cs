@@ -224,27 +224,6 @@ namespace osu.Game.Screens.Menu
             ripple.Texture = textures.Get(@"Menu/logo");
         }
 
-        private double? reservationEndTime;
-        private Action<OsuLogo> reservationCallback;
-
-        private bool canFulfillReservation => !reservationEndTime.HasValue || reservationEndTime <= Time.Current;
-
-        public void RequestUsage(Action<OsuLogo> callback)
-        {
-            reservationCallback = callback;
-        }
-
-        private void fulfillReservation()
-        {
-            reservationCallback(this);
-            reservationCallback = null;
-        }
-
-        public void ReserveFor(float duration)
-        {
-            reservationEndTime = Time.Current + duration;
-        }
-
         private int lastBeatIndex;
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
@@ -311,9 +290,6 @@ namespace osu.Game.Screens.Menu
             {
                 triangles.Velocity = paused_velocity;
             }
-
-            if (reservationCallback != null && canFulfillReservation)
-                fulfillReservation();
         }
 
         private bool interactive => Action != null && Alpha > 0.2f;
