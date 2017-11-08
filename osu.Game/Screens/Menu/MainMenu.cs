@@ -59,13 +59,16 @@ namespace osu.Game.Screens.Menu
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame game = null)
         {
             LoadComponentAsync(background);
 
-            buttons.OnSettings = game.ToggleSettings;
-            buttons.OnDirect = game.ToggleDirect;
+            if (game != null)
+            {
+                buttons.OnSettings = game.ToggleSettings;
+                buttons.OnDirect = game.ToggleDirect;
+            }
 
             preloadSongSelect();
         }
