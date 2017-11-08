@@ -20,12 +20,12 @@ namespace osu.Game.Screens.Menu
 
         private readonly OsuSpriteText welcomeText;
 
-        private readonly Container linesContainer;
+        private readonly Container<Box> lines;
 
-        private readonly Container lineTopLeft;
-        private readonly Container lineBottomLeft;
-        private readonly Container lineTopRight;
-        private readonly Container lineBottomRight;
+        private readonly Box lineTopLeft;
+        private readonly Box lineBottomLeft;
+        private readonly Box lineTopRight;
+        private readonly Box lineBottomRight;
 
         private readonly Ring smallRing;
         private readonly Ring mediumRing;
@@ -45,56 +45,40 @@ namespace osu.Game.Screens.Menu
             Children = new Drawable[]
             {
                 mediumRing = new Ring(Color4.White.Opacity(130)),
-                linesContainer = new Container
+                lines = new Container<Box>
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    Children = new []
                     {
-                        lineTopLeft = new Container
+                        lineTopLeft = new Box
                         {
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.Centre,
                             Rotation = 45,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White.Opacity(180),
-                            }
+                            Colour = Color4.White.Opacity(180),
                         },
-                        lineTopRight = new Container
+                        lineTopRight = new Box
                         {
                             Origin = Anchor.CentreRight,
                             Anchor = Anchor.Centre,
                             Rotation = -45,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White.Opacity(80),
-                            }
+                            Colour = Color4.White.Opacity(80),
                         },
-                        lineBottomLeft = new Container
+                        lineBottomLeft = new Box
                         {
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.Centre,
                             Rotation = -45,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White.Opacity(230),
-                            }
+                            Colour = Color4.White.Opacity(230),
                         },
-                        lineBottomRight = new Container
+                        lineBottomRight = new Box
                         {
                             Origin = Anchor.CentreRight,
                             Anchor = Anchor.Centre,
                             Rotation = 45,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White.Opacity(130),
-                            }
+                            Colour = Color4.White.Opacity(130),
                         },
                     }
                 },
@@ -198,7 +182,7 @@ namespace osu.Game.Screens.Menu
             mediumRing.Foreground.Size = new Vector2(0.7f);
             smallRing.Foreground.Size = new Vector2(0.6f);
 
-            foreach (var line in linesContainer)
+            foreach (var line in lines)
             {
                 line.Size = new Vector2(105, 1.5f);
                 line.Alpha = 0;
@@ -244,7 +228,7 @@ namespace osu.Game.Screens.Menu
                 const int line_duration = 700;
                 const int line_resize = 150;
 
-                foreach (var line in linesContainer)
+                foreach (var line in lines)
                 {
                     line.FadeIn(40).ResizeWidthTo(0, line_duration - line_resize, Easing.OutQuint);
                 }
