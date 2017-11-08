@@ -17,9 +17,9 @@ namespace osu.Game.Screens
             ValidForResume = false;
         }
 
-        protected override void LogoSetup(OsuLogo logo, bool resuming)
+        protected override void OnArrivedLogo(OsuLogo logo, bool resuming)
         {
-            base.LogoSetup(logo, resuming);
+            base.OnArrivedLogo(logo, resuming);
 
             logo.RelativePositionAxes = Axes.Both;
             logo.Triangles = false;

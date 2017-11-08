@@ -76,14 +76,14 @@ namespace osu.Game.Screens
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
-            logo.DelayUntilTransformsFinished().Schedule(() => LogoSetup(logo, true));
+            logo.DelayUntilTransformsFinished().Schedule(() => OnArrivedLogo(logo, true));
             sampleExit?.Play();
         }
 
         protected override void OnSuspending(Screen next)
         {
             base.OnSuspending(next);
-            logoOnSuspending();
+            onSuspendingLogo();
         }
 
         protected override void OnEntering(Screen last)
@@ -122,13 +122,13 @@ namespace osu.Game.Screens
 
             base.OnEntering(last);
 
-            logo.DelayUntilTransformsFinished().Schedule(() => LogoSetup(logo, false));
+            logo.DelayUntilTransformsFinished().Schedule(() => OnArrivedLogo(logo, false));
         }
 
         protected override bool OnExiting(Screen next)
         {
             if (ValidForResume && logo != null)
-                logoOnExiting();
+                onExitingLogo();
 
             OsuScreen nextOsu = next as OsuScreen;
 
@@ -148,29 +148,38 @@ namespace osu.Game.Screens
             return false;
         }
 
-        protected virtual void LogoSetup(OsuLogo logo, bool resuming)
+        /// <summary>
+        /// Fired when this screen was entered or resumed and the logo state is required to be adjusted.
+        /// </summary>
+        protected virtual void OnArrivedLogo(OsuLogo logo, bool resuming)
         {
             logo.Action = null;
             logo.FadeOut(300, Easing.OutQuint);
         }
 
-        private void logoOnExiting()
+        private void onExitingLogo()
         {
             logo.ClearTransforms();
-            LogoOnExiting(logo);
+            OnExitingLogo(logo);
         }
 
-        protected virtual void LogoOnExiting(OsuLogo logo)
+        /// <summary>
+        /// Fired when this screen was exited to add any outwards transition to the logo.
+        /// </summary>
+        protected virtual void OnExitingLogo(OsuLogo logo)
         {
         }
 
-        private void logoOnSuspending()
+        private void onSuspendingLogo()
         {
             logo.ClearTransforms();
-            LogoOnSuspending(logo);
+            OnSuspendingLogo(logo);
         }
 
-        protected virtual void LogoOnSuspending(OsuLogo logo)
+        /// <summary>
+        /// Fired when this screen was suspended to add any outwards transition to the logo.
+        /// </summary>
+        protected virtual void OnSuspendingLogo(OsuLogo logo)
         {
         }
     }
