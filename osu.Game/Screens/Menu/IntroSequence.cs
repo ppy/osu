@@ -117,49 +117,33 @@ namespace osu.Game.Screens.Menu
                         },
                     }
                 },
-                purpleCircle = new CircularContainer
+                purpleCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
                     Masking = true,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex(@"AA92FF"),
-                    }
+                    Colour = OsuColour.FromHex(@"AA92FF"),
                 },
-                yellowCircle = new CircularContainer
+                yellowCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.BottomCentre,
                     Masking = true,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex(@"FFD64C"),
-                    }
+                    Colour = OsuColour.FromHex(@"FFD64C"),
                 },
-                blueCircle = new CircularContainer
+                blueCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     Masking = true,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex(@"8FE5FE"),
-                    }
+                    Colour = OsuColour.FromHex(@"8FE5FE"),
                 },
-                pinkCircle = new CircularContainer
+                pinkCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
                     Masking = true,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex(@"e967a1"),
-                    }
+                    Colour = OsuColour.FromHex(@"e967a1"),
                 },
             };
         }
