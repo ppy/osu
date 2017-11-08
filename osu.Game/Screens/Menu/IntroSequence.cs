@@ -187,17 +187,56 @@ namespace osu.Game.Screens.Menu
             };
         }
 
+        private void setDefaults()
+        {
+            welcomeText.Spacing = new Vector2(5);
+            welcomeText.Alpha = 0;
+
+            smallRing.Size = mediumRing.Size = bigRing.Size = Vector2.Zero;
+
+            bigRing.Foreground.Size = new Vector2(0.85f);
+            mediumRing.Foreground.Size = new Vector2(0.7f);
+            smallRing.Foreground.Size = new Vector2(0.6f);
+
+            foreach (var line in linesContainer)
+            {
+                line.Size = new Vector2(105, 1.5f);
+                line.Alpha = 0;
+            }
+
+            const int line_offset = 80;
+            lineTopLeft.Position = new Vector2(-line_offset, -line_offset);
+            lineTopRight.Position = new Vector2(line_offset, -line_offset);
+            lineBottomLeft.Position = new Vector2(-line_offset, line_offset);
+            lineBottomRight.Position = new Vector2(line_offset, line_offset);
+
+            backgroundFill.Rotation = foregroundFill.Rotation = 0;
+            backgroundFill.Alpha = foregroundFill.Alpha = 1;
+            backgroundFill.Height = foregroundFill.Width = 0;
+
+            yellowCircle.Size = purpleCircle.Size = blueCircle.Size = pinkCircle.Size = Vector2.Zero;
+            yellowCircle.Rotation = purpleCircle.Rotation = blueCircle.Rotation = pinkCircle.Rotation = 0;
+
+            const int circle_offset = 250;
+            yellowCircle.Position = new Vector2(0, -circle_offset);
+            purpleCircle.Position = new Vector2(0, circle_offset);
+            blueCircle.Position = new Vector2(-circle_offset, 0);
+            pinkCircle.Position = new Vector2(circle_offset, 0);
+        }
+
         public void Start(double length)
         {
             FinishTransforms(true);
             setDefaults();
 
-            mediumRing.ResizeTo(130, 360, Easing.InExpo).OnComplete(r => r.Foreground.ResizeTo(1, 420, Easing.OutQuad));
-            smallRing.ResizeTo(logo_size * 0.086f, 250, Easing.InExpo).OnComplete(r => r.Foreground.ResizeTo(1, 650, Easing.OutQuad));
+            smallRing.ResizeTo(logo_size * 0.086f, 400, Easing.InOutQuint);
+
+            mediumRing.ResizeTo(130, 340, Easing.OutQuad);
+            mediumRing.Foreground.ResizeTo(1, 880, Easing.Out);
 
             Func<double> remainingTime = () => length - TransformDelay;
 
-            using (BeginDelayedSequence(360, true))
+            using (BeginDelayedSequence(250, true))
             {
                 welcomeText.FadeIn(700);
                 welcomeText.TransformSpacingTo(new Vector2(20, 0), remainingTime(), Easing.Out);
@@ -207,11 +246,13 @@ namespace osu.Game.Screens.Menu
 
                 foreach (var line in linesContainer)
                 {
-                    line.FadeIn();
-                    line.Delay(line_resize).ResizeWidthTo(0, line_duration - line_resize, Easing.OutQuint);
+                    line.FadeIn(40).ResizeWidthTo(0, line_duration - line_resize, Easing.OutQuint);
                 }
 
                 const int line_end_offset = 120;
+
+                smallRing.Foreground.ResizeTo(1, line_duration, Easing.OutQuint);
+
                 lineTopLeft.MoveTo(new Vector2(-line_end_offset, -line_end_offset), line_duration, Easing.OutQuint);
                 lineTopRight.MoveTo(new Vector2(line_end_offset, -line_end_offset), line_duration, Easing.OutQuint);
                 lineBottomLeft.MoveTo(new Vector2(-line_end_offset, line_end_offset), line_duration, Easing.OutQuint);
@@ -267,40 +308,6 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private void setDefaults()
-        {
-            welcomeText.Spacing = new Vector2(5);
-            welcomeText.Alpha = 0;
-
-            smallRing.Size = mediumRing.Size = bigRing.Size = Vector2.Zero;
-
-            mediumRing.Foreground.Size = Vector2.One - new Vector2(0.7f);
-            smallRing.Foreground.Size = Vector2.One - new Vector2(0.4f);
-            bigRing.Foreground.Size = Vector2.One - new Vector2(0.15f);
-
-            lineTopLeft.Size = lineTopRight.Size = lineBottomLeft.Size = lineBottomRight.Size = new Vector2(105, 1.5f);
-            lineTopLeft.Alpha = lineTopRight.Alpha = lineBottomLeft.Alpha = lineBottomRight.Alpha = 0;
-
-            const int line_offset = 80;
-            lineTopLeft.Position = new Vector2(-line_offset, -line_offset);
-            lineTopRight.Position = new Vector2(line_offset, -line_offset);
-            lineBottomLeft.Position = new Vector2(-line_offset, line_offset);
-            lineBottomRight.Position = new Vector2(line_offset, line_offset);
-
-            backgroundFill.Rotation = foregroundFill.Rotation = 0;
-            backgroundFill.Alpha = foregroundFill.Alpha = 1;
-            backgroundFill.Height = foregroundFill.Width = 0;
-
-            yellowCircle.Size = purpleCircle.Size = blueCircle.Size = pinkCircle.Size = Vector2.Zero;
-            yellowCircle.Rotation = purpleCircle.Rotation = blueCircle.Rotation = pinkCircle.Rotation = 0;
-
-            const int circle_offset = 250;
-            yellowCircle.Position = new Vector2(0, -circle_offset);
-            purpleCircle.Position = new Vector2(0, circle_offset);
-            blueCircle.Position = new Vector2(-circle_offset, 0);
-            pinkCircle.Position = new Vector2(circle_offset, 0);
-        }
-
         private class Ring : Container<CircularContainer>
         {
             public readonly CircularContainer Foreground;
@@ -317,6 +324,7 @@ namespace osu.Game.Screens.Menu
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
+                        Scale = new Vector2(0.98f),
                         Child = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
