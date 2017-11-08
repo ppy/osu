@@ -31,8 +31,8 @@ namespace osu.Game.Screens.Menu
         private readonly Ring mediumRing;
         private readonly Ring bigRing;
 
-        private readonly Container backgroundFill;
-        private readonly Container foregroundFill;
+        private readonly Box backgroundFill;
+        private readonly Box foregroundFill;
 
         private readonly CircularContainer pinkCircle;
         private readonly CircularContainer blueCircle;
@@ -44,7 +44,6 @@ namespace osu.Game.Screens.Menu
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
             {
-                mediumRing = new Ring(Color4.White.Opacity(130)),
                 lines = new Container<Box>
                 {
                     Anchor = Anchor.Centre,
@@ -82,8 +81,9 @@ namespace osu.Game.Screens.Menu
                         },
                     }
                 },
-                smallRing = new Ring(Color4.White),
                 bigRing = new Ring(OsuColour.FromHex(@"B6C5E9")),
+                mediumRing = new Ring(Color4.White.Opacity(130)),
+                smallRing = new Ring(Color4.White),
                 new CircularContainer
                 {
                     Anchor = Anchor.Centre,
@@ -92,16 +92,12 @@ namespace osu.Game.Screens.Menu
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        backgroundFill = new Container
+                        backgroundFill = new Box
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.FromHex(@"C6D8FF").Opacity(160),
-                            }
+                            Colour = OsuColour.FromHex(@"C6D8FF").Opacity(160),
                         },
                         welcomeText = new OsuSpriteText
                         {
@@ -111,16 +107,12 @@ namespace osu.Game.Screens.Menu
                             Font = @"Exo2.0-Light",
                             TextSize = 42,
                         },
-                        foregroundFill = new Container
+                        foregroundFill = new Box
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.White,
-                            }
+                            Colour = Color4.White,
                         },
                     }
                 },
