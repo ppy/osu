@@ -8,7 +8,7 @@ using OpenTK;
 
 namespace osu.Game.Screens
 {
-    internal class Loader : OsuScreen
+    public class Loader : OsuScreen
     {
         public override bool ShowOverlays => false;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        private void load(OsuGameBase game)
         {
             if (game.IsDeployedBuild)
                 LoadComponentAsync(new Disclaimer(), d => Push(d));
