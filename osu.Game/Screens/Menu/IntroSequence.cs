@@ -210,12 +210,12 @@ namespace osu.Game.Screens.Menu
                 lineBottomLeft.MoveTo(new Vector2(-line_end_offset, line_end_offset), line_duration, Easing.OutQuint);
                 lineBottomRight.MoveTo(new Vector2(line_end_offset, line_end_offset), line_duration, Easing.OutQuint);
 
-                using (BeginDelayedSequence(1640, true)) // 2000
+                using (BeginDelayedSequence(length * 0.56, true))
                 {
                     bigRing.ResizeTo(logo_size * 0.86f, 500, Easing.InOutQuint);
                     bigRing.Foreground.Delay(250).ResizeTo(1, 450, Easing.OutExpo);
 
-                    using (BeginDelayedSequence(250, true)) // 2250
+                    using (BeginDelayedSequence(250, true))
                     {
                         backgroundFill.ResizeHeightTo(1, remainingTime(), Easing.InOutQuart);
                         backgroundFill.RotateTo(-90, remainingTime(), Easing.InOutQuart);
