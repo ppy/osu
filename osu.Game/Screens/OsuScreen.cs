@@ -76,7 +76,7 @@ namespace osu.Game.Screens
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
-            logo.DelayUntilTransformsFinished().Schedule(() => logoSetup(true));
+            logo.DelayUntilTransformsFinished().Schedule(() => LogoSetup(logo, true));
             sampleExit?.Play();
         }
 
@@ -122,7 +122,7 @@ namespace osu.Game.Screens
 
             base.OnEntering(last);
 
-            logo.DelayUntilTransformsFinished().Schedule(() => logoSetup(false));
+            logo.DelayUntilTransformsFinished().Schedule(() => LogoSetup(logo, false));
         }
 
         protected override bool OnExiting(Screen next)
@@ -147,8 +147,6 @@ namespace osu.Game.Screens
             Beatmap.UnbindAll();
             return false;
         }
-
-        private void logoSetup(bool resuming) => LogoSetup(logo, resuming);
 
         protected virtual void LogoSetup(OsuLogo logo, bool resuming)
         {
