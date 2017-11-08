@@ -104,6 +104,7 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Text = "welcome",
+                            Padding = new MarginPadding { Bottom = 10 },
                             Font = @"Exo2.0-Light",
                             TextSize = 42,
                         },
