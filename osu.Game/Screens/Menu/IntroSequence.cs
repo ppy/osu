@@ -2,8 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,33 +17,40 @@ namespace osu.Game.Screens.Menu
 {
     public class IntroSequence : Container
     {
-        //Size
         private const float logo_size = 460; //todo: this should probably be 480
 
-        private readonly OsuSpriteText welcomeText;
+        private OsuSpriteText welcomeText;
 
-        private readonly Container<Box> lines;
+        private Container<Box> lines;
 
-        private readonly Box lineTopLeft;
-        private readonly Box lineBottomLeft;
-        private readonly Box lineTopRight;
-        private readonly Box lineBottomRight;
+        private Box lineTopLeft;
+        private Box lineBottomLeft;
+        private Box lineTopRight;
+        private Box lineBottomRight;
 
-        private readonly Ring smallRing;
-        private readonly Ring mediumRing;
-        private readonly Ring bigRing;
+        private Ring smallRing;
+        private Ring mediumRing;
+        private Ring bigRing;
 
-        private readonly Box backgroundFill;
-        private readonly Box foregroundFill;
+        private Box backgroundFill;
+        private Box foregroundFill;
 
-        private readonly CircularContainer pinkCircle;
-        private readonly CircularContainer blueCircle;
-        private readonly CircularContainer yellowCircle;
-        private readonly CircularContainer purpleCircle;
+        private CircularContainer pinkCircle;
+        private CircularContainer blueCircle;
+        private CircularContainer yellowCircle;
+        private CircularContainer purpleCircle;
 
         public IntroSequence()
         {
             RelativeSizeAxes = Axes.Both;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            const int line_offset = 80;
+            const int circle_offset = 250;
+
             Children = new Drawable[]
             {
                 lines = new Container<Box>
@@ -55,6 +64,7 @@ namespace osu.Game.Screens.Menu
                         {
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.Centre,
+                            Position = new Vector2(-line_offset, -line_offset),
                             Rotation = 45,
                             Colour = Color4.White.Opacity(180),
                         },
@@ -62,6 +72,7 @@ namespace osu.Game.Screens.Menu
                         {
                             Origin = Anchor.CentreRight,
                             Anchor = Anchor.Centre,
+                            Position = new Vector2(line_offset, -line_offset),
                             Rotation = -45,
                             Colour = Color4.White.Opacity(80),
                         },
@@ -69,6 +80,7 @@ namespace osu.Game.Screens.Menu
                         {
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.Centre,
+                            Position = new Vector2(-line_offset, line_offset),
                             Rotation = -45,
                             Colour = Color4.White.Opacity(230),
                         },
@@ -76,14 +88,26 @@ namespace osu.Game.Screens.Menu
                         {
                             Origin = Anchor.CentreRight,
                             Anchor = Anchor.Centre,
+                            Position = new Vector2(line_offset, line_offset),
                             Rotation = 45,
                             Colour = Color4.White.Opacity(130),
                         },
                     }
                 },
-                bigRing = new Ring(OsuColour.FromHex(@"B6C5E9")),
-                mediumRing = new Ring(Color4.White.Opacity(130)),
-                smallRing = new Ring(Color4.White),
+                bigRing = new Ring(OsuColour.FromHex(@"B6C5E9"), 0.85f),
+                mediumRing = new Ring(Color4.White.Opacity(130), 0.7f),
+                smallRing = new Ring(Color4.White, 0.6f),
+                welcomeText = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Text = "welcome",
+                    Padding = new MarginPadding { Bottom = 10 },
+                    Font = @"Exo2.0-Light",
+                    Alpha = 0,
+                    TextSize = 42,
+                    Spacing = new Vector2(5),
+                },
                 new CircularContainer
                 {
                     Anchor = Anchor.Centre,
@@ -97,98 +121,65 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
+                            Height = 0,
                             Colour = OsuColour.FromHex(@"C6D8FF").Opacity(160),
-                        },
-                        welcomeText = new OsuSpriteText
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Text = "welcome",
-                            Padding = new MarginPadding { Bottom = 10 },
-                            Font = @"Exo2.0-Light",
-                            TextSize = 42,
                         },
                         foregroundFill = new Box
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            Size = Vector2.Zero,
                             RelativeSizeAxes = Axes.Both,
+                            Width = 0,
                             Colour = Color4.White,
                         },
                     }
-                },
-                purpleCircle = new Circle
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.TopCentre,
-                    Masking = true,
-                    Colour = OsuColour.FromHex(@"AA92FF"),
                 },
                 yellowCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.BottomCentre,
-                    Masking = true,
+                    Position = new Vector2(0, -circle_offset),
                     Colour = OsuColour.FromHex(@"FFD64C"),
-                },
-                blueCircle = new Circle
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreRight,
-                    Masking = true,
-                    Colour = OsuColour.FromHex(@"8FE5FE"),
                 },
                 pinkCircle = new Circle
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
-                    Masking = true,
+                    Position = new Vector2(circle_offset, 0),
                     Colour = OsuColour.FromHex(@"e967a1"),
                 },
+                purpleCircle = new Circle
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.TopCentre,
+                    Position = new Vector2(0, circle_offset),
+                    Colour = OsuColour.FromHex(@"AA92FF"),
+                },
+                blueCircle = new Circle
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.CentreRight,
+                    Position = new Vector2(-circle_offset, 0),
+                    Colour = OsuColour.FromHex(@"8FE5FE"),
+                },
             };
-        }
-
-        private void setDefaults()
-        {
-            welcomeText.Spacing = new Vector2(5);
-            welcomeText.Alpha = 0;
-
-            smallRing.Size = mediumRing.Size = bigRing.Size = Vector2.Zero;
-
-            bigRing.Foreground.Size = new Vector2(0.85f);
-            mediumRing.Foreground.Size = new Vector2(0.7f);
-            smallRing.Foreground.Size = new Vector2(0.6f);
 
             foreach (var line in lines)
             {
                 line.Size = new Vector2(105, 1.5f);
                 line.Alpha = 0;
             }
-
-            const int line_offset = 80;
-            lineTopLeft.Position = new Vector2(-line_offset, -line_offset);
-            lineTopRight.Position = new Vector2(line_offset, -line_offset);
-            lineBottomLeft.Position = new Vector2(-line_offset, line_offset);
-            lineBottomRight.Position = new Vector2(line_offset, line_offset);
-
-            backgroundFill.Rotation = foregroundFill.Rotation = 0;
-            backgroundFill.Alpha = foregroundFill.Alpha = 1;
-            backgroundFill.Height = foregroundFill.Width = 0;
-
-            yellowCircle.Size = purpleCircle.Size = blueCircle.Size = pinkCircle.Size = Vector2.Zero;
-            yellowCircle.Rotation = purpleCircle.Rotation = blueCircle.Rotation = pinkCircle.Rotation = 0;
-
-            const int circle_offset = 250;
-            yellowCircle.Position = new Vector2(0, -circle_offset);
-            purpleCircle.Position = new Vector2(0, circle_offset);
-            blueCircle.Position = new Vector2(-circle_offset, 0);
-            pinkCircle.Position = new Vector2(circle_offset, 0);
         }
 
         public void Start(double length)
         {
-            FinishTransforms(true);
-            setDefaults();
+            if (Children.Any())
+            {
+                // restart if we were already run previously.
+                FinishTransforms(true);
+                load();
+            }
 
             smallRing.ResizeTo(logo_size * 0.086f, 400, Easing.InOutQuint);
 
@@ -269,40 +260,31 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private class Ring : Container<CircularContainer>
+        private class Ring : Container<Circle>
         {
-            public readonly CircularContainer Foreground;
+            public readonly Circle Foreground;
 
-            public Ring(Color4 ringColour)
+            public Ring(Color4 ringColour, float foregroundSize)
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
                 Children = new[]
                 {
-                    new CircularContainer
+                    new Circle
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Masking = true,
                         Scale = new Vector2(0.98f),
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ringColour,
-                        }
+                        Colour = ringColour,
                     },
-                    Foreground = new CircularContainer
+                    Foreground = new Circle
                     {
+                        Size = new Vector2(foregroundSize),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                        }
+                        Colour = Color4.Black,
                     }
                 };
             }
