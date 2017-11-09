@@ -72,6 +72,11 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapGroup(BeatmapSetInfo beatmapSet, BeatmapManager manager)
         {
+            if (beatmapSet == null)
+                throw new ArgumentNullException(nameof(beatmapSet));
+            if (manager == null)
+                throw new ArgumentNullException(nameof(manager));
+
             BeatmapSet = beatmapSet;
             WorkingBeatmap beatmap = manager.GetWorkingBeatmap(BeatmapSet.Beatmaps.FirstOrDefault());
 
