@@ -58,6 +58,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 ApproachCircle = new ApproachCircle
                 {
+                    Alpha = 0,
+                    Scale = new Vector2(4),
                     Colour = AccentColour,
                 }
             };
@@ -80,25 +82,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Result = HitObject.ScoreResultForOffset(Math.Abs(timeOffset)),
                 PositionOffset = Vector2.Zero //todo: set to correct value
             });
-        }
-
-        protected override void UpdateInitialState()
-        {
-            base.UpdateInitialState();
-
-            // Hide() cannot be used here, because when rewinding, we need these to be the final values
-
-            ring.Alpha = 1;
-            circle.Alpha = 1;
-            number.Alpha = 1;
-            glow.Alpha = 1;
-
-            ApproachCircle.Alpha = 0;
-            ApproachCircle.Scale = new Vector2(4);
-            explode.Alpha = 0;
-            flash.Alpha = 0;
-
-            Scale = new Vector2(HitObject.Scale);
         }
 
         protected override void UpdatePreemptState()

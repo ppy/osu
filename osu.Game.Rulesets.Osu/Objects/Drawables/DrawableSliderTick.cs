@@ -28,10 +28,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Size = new Vector2(16) * sliderTick.Scale;
 
-            // The containing DrawableSlider is updated before us and clears our transforms, so we need to be
-            // present to get updated and have UpdateState correctly called when rewinding.
-            AlwaysPresent = true;
-
             Masking = true;
             CornerRadius = Size.X / 2;
 

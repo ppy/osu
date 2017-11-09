@@ -24,13 +24,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             this.repeatPoint = repeatPoint;
             this.drawableSlider = drawableSlider;
 
-            // The containing DrawableSlider is updated before us and clears our transforms, so we need to be
-            // present to get updated and have UpdateState correctly called when rewinding.
-            AlwaysPresent = true;
-
             AutoSizeAxes = Axes.Both;
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
+            Scale = new Vector2(0.5f);
 
             Children = new Drawable[]
             {
@@ -48,13 +45,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (repeatPoint.StartTime <= Time.Current)
                 AddJudgement(new OsuJudgement { Result = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss });
-        }
-
-        protected override void UpdateInitialState()
-        {
-            base.UpdateInitialState();
-
-            Scale = new Vector2(0.5f);
         }
 
         protected override void UpdatePreemptState()

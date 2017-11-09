@@ -43,7 +43,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ball = new SliderBall(s)
                 {
                     Scale = new Vector2(s.Scale),
-                    AccentColour = AccentColour
+                    AccentColour = AccentColour,
+                    AlwaysPresent = true,
+                    Alpha = 0
                 },
                 initialCircle = new DrawableHitCircle(new HitCircle
                 {
@@ -146,16 +148,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 else
                     AddJudgement(new OsuJudgement { Result = HitResult.Miss });
             }
-        }
-
-        protected override void UpdateInitialState()
-        {
-            base.UpdateInitialState();
-            body.Alpha = 1;
-
-            //we need to be present to handle input events. note that we still don't get enough events (we don't get a position if the mouse hasn't moved since the slider appeared).
-            ball.AlwaysPresent = true;
-            ball.Alpha = 0;
         }
 
         protected override void UpdateCurrentState(ArmedState state)
