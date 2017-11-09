@@ -16,12 +16,12 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Ruleset, 0, 0, int.MaxValue);
             Set(OsuSetting.BeatmapDetailTab, BeatmapDetailTab.Details);
 
-            Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10);
-            Set(OsuSetting.DisplayStarsMaximum, 10.0, 0, 10);
+            Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
+            Set(OsuSetting.DisplayStarsMaximum, 10.0, 0, 10, 0.1);
 
             Set(OsuSetting.SelectionRandomType, SelectionRandomType.RandomPermutation);
 
-            Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1);
+            Set(OsuSetting.ChatDisplayHeight, ChatOverlay.DEFAULT_HEIGHT, 0.2, 1, 0.01);
 
             // Online settings
             Set(OsuSetting.Username, string.Empty);
@@ -41,11 +41,11 @@ namespace osu.Game.Configuration
             Set(OsuSetting.MenuVoice, true);
             Set(OsuSetting.MenuMusic, true);
 
-            Set(OsuSetting.AudioOffset, 0, -500.0, 500.0);
+            Set(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
             // Input
-            Set(OsuSetting.MenuCursorSize, 1.0, 0.5f, 2);
-            Set(OsuSetting.GameplayCursorSize, 1.0, 0.5f, 2);
+            Set(OsuSetting.MenuCursorSize, 1.0, 0.5f, 2, 0.01);
+            Set(OsuSetting.GameplayCursorSize, 1.0, 0.5f, 2, 0.01);
             Set(OsuSetting.AutoCursorSize, false);
 
             Set(OsuSetting.MouseDisableButtons, false);
@@ -63,13 +63,13 @@ namespace osu.Game.Configuration
             Set(OsuSetting.SnakingOutSliders, true);
 
             // Gameplay
-            Set(OsuSetting.DimLevel, 0.3, 0, 1);
+            Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
 
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.KeyOverlay, false);
 
             Set(OsuSetting.FloatingComments, false);
-            Set(OsuSetting.PlaybackSpeed, 1.0, 0.5f, 2);
+            Set(OsuSetting.PlaybackSpeed, 1.0, 0.5f, 2, 0.01);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
