@@ -263,17 +263,15 @@ namespace osu.Game.Screens.Menu
                                     logo.ScaleTo(0.5f, 200, Easing.In);
 
                                     trackingPosition = false;
+
                                     logo
                                         .MoveTo(iconTrackingPosition, lastState == MenuState.EnteringMode ? 0 : 200, Easing.In)
                                         .OnComplete(o =>
                                         {
                                             trackingPosition = true;
 
-                                            if (logo.Scale.X > 0.5f)
-                                            {
-                                                o.Impact();
-                                                toolbar?.Show();
-                                            }
+                                            o.Impact();
+                                            toolbar?.Show();
                                         });
                                     break;
                                 default:
