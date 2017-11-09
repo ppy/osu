@@ -109,9 +109,9 @@ namespace osu.Game.Screens.Menu
 
         public const int EXIT_DELAY = 3000;
 
-        protected override void OnArrivedLogo(OsuLogo logo, bool resuming)
+        protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
-            base.OnArrivedLogo(logo, resuming);
+            base.LogoArriving(logo, resuming);
 
             logo.RelativePositionAxes = Axes.Both;
 
