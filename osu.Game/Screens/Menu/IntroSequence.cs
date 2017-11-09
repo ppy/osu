@@ -214,8 +214,8 @@ namespace osu.Game.Screens.Menu
 
                 using (BeginDelayedSequence(length * 0.56, true))
                 {
-                    bigRing.ResizeTo(logo_size * 0.86f, 500, Easing.InOutQuint);
-                    bigRing.Foreground.Delay(250).ResizeTo(1, 450, Easing.OutExpo);
+                    bigRing.ResizeTo(logo_size, 500, Easing.InOutQuint);
+                    bigRing.Foreground.Delay(250).ResizeTo(1, 850, Easing.OutQuint);
 
                     using (BeginDelayedSequence(250, true))
                     {
