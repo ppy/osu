@@ -25,8 +25,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             double transformTime = HitObject.StartTime - TIME_PREEMPT;
 
-            TransformStateTo(transformTime, true);
-            ClearTransformsAfter(transformTime, true);
+            base.ApplyTransformsAt(transformTime, true);
+            base.ClearTransformsAfter(transformTime, true);
 
             using (BeginAbsoluteSequence(transformTime, true))
             {
@@ -45,6 +45,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected virtual void UpdateCurrentState(ArmedState state)
         {
         }
+
+        // Todo: At some point we need to move these to DrawableHitObject after ensuring that all other Rulesets apply
+        // transforms in the same way and don't rely on them not being cleared
+        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null) { }
+        public override void ApplyTransformsAt(double time, bool propagateChildren = false) { }
 
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);

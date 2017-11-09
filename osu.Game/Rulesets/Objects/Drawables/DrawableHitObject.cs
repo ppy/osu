@@ -215,9 +215,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             nestedHitObjects.Add(h);
         }
 
-        protected override bool AllowStateTransformByParent => false;
-        protected override bool AllowTransformClearByParent => false;
-
         protected abstract void UpdateState(ArmedState state);
     }
 }
