@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Menu
 {
     public class Intro : OsuScreen
     {
+        private readonly IntroSequence introSequence;
+
         private const string menu_music_beatmap_hash = "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
         /// <summary>
@@ -114,9 +116,7 @@ namespace osu.Game.Screens.Menu
             base.LogoArriving(logo, resuming);
 
             logo.RelativePositionAxes = Axes.Both;
-
-            logo.Triangles = false;
-            logo.Colour = Color4.DarkGray;
+            logo.Colour = Color4.White;
             logo.Ripple = false;
 
             const int quick_appear = 350;
@@ -127,14 +127,16 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                logo.ScaleTo(0.4f);
-                logo.FadeOut();
+                logo.Triangles = true;
 
-                logo.ScaleTo(1, delay_step_one + delay_step_two, Easing.OutQuint);
-                logo.FadeIn(delay_step_one + delay_step_two, Easing.OutQuint);
+                logo.ScaleTo(1);
+                logo.FadeIn();
+                logo.PlayIntro();
             }
             else
             {
+                logo.Triangles = false;
+
                 logo
                     .ScaleTo(1, initialMovementTime, Easing.OutQuint)
                     .FadeIn(quick_appear, Easing.OutQuint)
