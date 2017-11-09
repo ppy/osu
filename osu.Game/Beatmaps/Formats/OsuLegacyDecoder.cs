@@ -70,6 +70,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleGeneral(Beatmap beatmap, string line)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var pair = splitKeyVal(line, ':');
 
             var metadata = beatmap.BeatmapInfo.Metadata;
@@ -129,6 +134,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEditor(Beatmap beatmap, string line)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var pair = splitKeyVal(line, ':');
 
             switch (pair.Key)
@@ -153,6 +163,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleMetadata(Beatmap beatmap, string line)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var pair = splitKeyVal(line, ':');
 
             var metadata = beatmap.BeatmapInfo.Metadata;
@@ -194,6 +209,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleDifficulty(Beatmap beatmap, string line)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var pair = splitKeyVal(line, ':');
 
             var difficulty = beatmap.BeatmapInfo.BaseDifficulty;
@@ -226,6 +246,9 @@ namespace osu.Game.Beatmaps.Formats
         /// <param name="line">The line which may contains variables.</param>
         private void decodeVariables(ref string line)
         {
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             while (line.IndexOf('$') >= 0)
             {
                 string origLine = line;
@@ -244,6 +267,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(Beatmap beatmap, string line, ref StoryboardSprite storyboardSprite, ref CommandTimelineGroup timelineGroup)
         {
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+
             var depth = 0;
             while (line.StartsWith(" ") || line.StartsWith("_"))
             {
@@ -469,6 +497,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingPoints(Beatmap beatmap, string line)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             string[] split = line.Split(',');
 
             double time = double.Parse(split[0].Trim(), NumberFormatInfo.InvariantInfo);
@@ -555,6 +588,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleColours(Beatmap beatmap, string line, ref bool hasCustomColours)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var pair = splitKeyVal(line, ':');
 
             string[] split = pair.Value.Split(',');
@@ -587,6 +625,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleVariables(string line)
         {
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var pair = splitKeyVal(line, '=');
             variables[pair.Key] = pair.Value;
         }
@@ -603,6 +644,11 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseFile(StreamReader stream, Beatmap beatmap)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
             beatmap.BeatmapInfo.BeatmapVersion = beatmapVersion;
 
             Section section = Section.None;
@@ -679,6 +725,9 @@ namespace osu.Game.Beatmaps.Formats
 
         private KeyValuePair<string, string> splitKeyVal(string line, char separator)
         {
+            if (line == null)
+                throw new ArgumentNullException(nameof(line));
+
             var split = line.Trim().Split(new[] { separator }, 2);
 
             return new KeyValuePair<string, string>
