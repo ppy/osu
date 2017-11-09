@@ -2,11 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Screens.Menu;
+using OpenTK;
 
 namespace osu.Game.Screens
 {
-    internal class Loader : OsuScreen
+    public class Loader : OsuScreen
     {
         public override bool ShowOverlays => false;
 
@@ -15,8 +17,20 @@ namespace osu.Game.Screens
             ValidForResume = false;
         }
 
+        protected override void LogoArriving(OsuLogo logo, bool resuming)
+        {
+            base.LogoArriving(logo, resuming);
+
+            logo.RelativePositionAxes = Axes.Both;
+            logo.Triangles = false;
+            logo.Position = new Vector2(0.9f);
+            logo.Scale = new Vector2(0.2f);
+
+            logo.FadeInFromZero(5000, Easing.OutQuint);
+        }
+
         [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        private void load(OsuGameBase game)
         {
             if (game.IsDeployedBuild)
                 LoadComponentAsync(new Disclaimer(), d => Push(d));
