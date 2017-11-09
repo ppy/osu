@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -45,6 +46,9 @@ namespace osu.Game.Users
         [BackgroundDependencyLoader]
         private void load(TextureStore ts)
         {
+            if (ts == null)
+                throw new ArgumentNullException(nameof(ts));
+
             textures = ts;
             sprite.Texture = textures.Get($@"Flags/{flagName}");
         }

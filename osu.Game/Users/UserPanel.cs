@@ -38,6 +38,9 @@ namespace osu.Game.Users
 
         public UserPanel(User user)
         {
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+
             this.user = user;
 
             Height = height - status_height;
@@ -173,6 +176,9 @@ namespace osu.Game.Users
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuColour colours, UserProfileOverlay profile)
         {
+            if (colours == null)
+                throw new ArgumentNullException(nameof(colours));
+
             Status.ValueChanged += displayStatus;
             Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
 
