@@ -95,9 +95,9 @@ namespace osu.Game.Screens.Play
             this.Delay(2150).Schedule(pushWhenLoaded);
         }
 
-        protected override void OnArrivedLogo(OsuLogo logo, bool resuming)
+        protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
-            base.OnArrivedLogo(logo, resuming);
+            base.LogoArriving(logo, resuming);
 
             logo.ClearTransforms(targetMember: nameof(Position));
             logo.RelativePositionAxes = Axes.Both;

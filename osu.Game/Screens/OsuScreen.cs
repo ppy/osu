@@ -76,7 +76,7 @@ namespace osu.Game.Screens
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
-            logo.DelayUntilTransformsFinished().Schedule(() => OnArrivedLogo(logo, true));
+            logo.DelayUntilTransformsFinished().Schedule(() => LogoArriving(logo, true));
             sampleExit?.Play();
         }
 
@@ -122,7 +122,7 @@ namespace osu.Game.Screens
 
             base.OnEntering(last);
 
-            logo.DelayUntilTransformsFinished().Schedule(() => OnArrivedLogo(logo, false));
+            logo.DelayUntilTransformsFinished().Schedule(() => LogoArriving(logo, false));
         }
 
         protected override bool OnExiting(Screen next)
@@ -151,7 +151,7 @@ namespace osu.Game.Screens
         /// <summary>
         /// Fired when this screen was entered or resumed and the logo state is required to be adjusted.
         /// </summary>
-        protected virtual void OnArrivedLogo(OsuLogo logo, bool resuming)
+        protected virtual void LogoArriving(OsuLogo logo, bool resuming)
         {
             logo.Action = null;
             logo.FadeOut(300, Easing.OutQuint);
@@ -160,26 +160,26 @@ namespace osu.Game.Screens
         private void onExitingLogo()
         {
             logo.ClearTransforms();
-            OnExitingLogo(logo);
+            LogoExiting(logo);
         }
 
         /// <summary>
         /// Fired when this screen was exited to add any outwards transition to the logo.
         /// </summary>
-        protected virtual void OnExitingLogo(OsuLogo logo)
+        protected virtual void LogoExiting(OsuLogo logo)
         {
         }
 
         private void onSuspendingLogo()
         {
             logo.ClearTransforms();
-            OnSuspendingLogo(logo);
+            LogoSuspending(logo);
         }
 
         /// <summary>
         /// Fired when this screen was suspended to add any outwards transition to the logo.
         /// </summary>
-        protected virtual void OnSuspendingLogo(OsuLogo logo)
+        protected virtual void LogoSuspending(OsuLogo logo)
         {
         }
     }
