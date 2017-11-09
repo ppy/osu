@@ -140,9 +140,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             break;
                     }
 
-                    drawableScore.RelativeSizeAxes = Axes.X;
-                    drawableScore.Height = 60;
-
                     scoreContainer.Add(drawableScore);
                 }
             };
