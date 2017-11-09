@@ -79,6 +79,7 @@ namespace osu.Game.Screens.Menu
 
         public OsuLogo()
         {
+            // Required to make Schedule calls run in OsuScreen even when we are not visible.
             AlwaysPresent = true;
 
             EarlyActivationMilliseconds = early_activation;

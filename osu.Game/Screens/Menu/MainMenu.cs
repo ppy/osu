@@ -106,9 +106,9 @@ namespace osu.Game.Screens.Menu
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
-        protected override void OnArrivedLogo(OsuLogo logo, bool resuming)
+        protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
-            base.OnArrivedLogo(logo, resuming);
+            base.LogoArriving(logo, resuming);
 
             buttons.SetOsuLogo(logo);
 
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Menu
                 buttons.State = MenuState.TopLevel;
         }
 
-        protected override void OnSuspendingLogo(OsuLogo logo)
+        protected override void LogoSuspending(OsuLogo logo)
         {
             logo.FadeOut(300, Easing.InSine)
                 .ScaleTo(0.2f, 300, Easing.InSine)
