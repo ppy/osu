@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Menu
     {
         public readonly Color4 OsuPink = OsuColour.FromHex(@"e967a1");
 
+        private const double transition_length = 300;
+
         private readonly Sprite logo;
         private readonly CircularContainer logoContainer;
         private readonly Container logoBounceContainer;
@@ -54,7 +56,7 @@ namespace osu.Game.Screens.Menu
 
         public bool Triangles
         {
-            set { colourAndTriangles.Alpha = value ? 1 : 0; }
+            set { colourAndTriangles.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
         }
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => logoContainer.ReceiveMouseInputAt(screenSpacePos);
@@ -62,10 +64,9 @@ namespace osu.Game.Screens.Menu
         public bool Ripple
         {
             get { return rippleContainer.Alpha > 0; }
-            set { rippleContainer.Alpha = value ? 1 : 0; }
+            set { rippleContainer.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
         }
 
-        public bool Interactive = true;
         private readonly Box flashLayer;
 
         private readonly Container impactContainer;
@@ -76,11 +77,13 @@ namespace osu.Game.Screens.Menu
 
         public OsuLogo()
         {
+            // Required to make Schedule calls run in OsuScreen even when we are not visible.
+            AlwaysPresent = true;
+
             EarlyActivationMilliseconds = early_activation;
 
             Size = new Vector2(default_size);
 
-            Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
             AutoSizeAxes = Axes.Both;
@@ -290,9 +293,11 @@ namespace osu.Game.Screens.Menu
             }
         }
 
+        private bool interactive => Action != null && Alpha > 0.2f;
+
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (!Interactive) return false;
+            if (!interactive) return false;
 
             logoBounceContainer.ScaleTo(0.9f, 1000, Easing.Out);
             return true;
@@ -306,7 +311,7 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnClick(InputState state)
         {
-            if (!Interactive) return false;
+            if (!interactive) return false;
 
             sampleClick.Play();
 
@@ -320,7 +325,7 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnHover(InputState state)
         {
-            if (!Interactive) return false;
+            if (!interactive) return false;
 
             logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
             return true;
