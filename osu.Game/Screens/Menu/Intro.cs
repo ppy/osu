@@ -116,8 +116,6 @@ namespace osu.Game.Screens.Menu
             base.LogoArriving(logo, resuming);
 
             logo.RelativePositionAxes = Axes.Both;
-
-            logo.Triangles = true;
             logo.Colour = Color4.White;
             logo.Ripple = false;
 
@@ -129,12 +127,16 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
+                logo.Triangles = true;
+
                 logo.ScaleTo(1);
                 logo.FadeIn();
                 logo.PlayIntro();
             }
             else
             {
+                logo.Triangles = false;
+
                 logo
                     .ScaleTo(1, initialMovementTime, Easing.OutQuint)
                     .FadeIn(quick_appear, Easing.OutQuint)
