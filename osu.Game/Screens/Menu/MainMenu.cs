@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -58,13 +59,16 @@ namespace osu.Game.Screens.Menu
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame game = null)
         {
             LoadComponentAsync(background);
 
-            buttons.OnSettings = game.ToggleSettings;
-            buttons.OnDirect = game.ToggleDirect;
+            if (game != null)
+            {
+                buttons.OnSettings = game.ToggleSettings;
+                buttons.OnDirect = game.ToggleDirect;
+            }
 
             preloadSongSelect();
         }
@@ -102,6 +106,29 @@ namespace osu.Game.Screens.Menu
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
+        protected override void LogoArriving(OsuLogo logo, bool resuming)
+        {
+            base.LogoArriving(logo, resuming);
+
+            buttons.SetOsuLogo(logo);
+
+            logo.Triangles = true;
+            logo.Ripple = false;
+
+            logo.FadeColour(Color4.White, 100, Easing.OutQuint);
+            logo.FadeIn(100, Easing.OutQuint);
+
+            if (resuming)
+                buttons.State = MenuState.TopLevel;
+        }
+
+        protected override void LogoSuspending(OsuLogo logo)
+        {
+            logo.FadeOut(300, Easing.InSine)
+                .ScaleTo(0.2f, 300, Easing.InSine)
+                .OnComplete(l => buttons.SetOsuLogo(null));
+        }
+
         private void beatmap_ValueChanged(WorkingBeatmap newValue)
         {
             if (!IsCurrentScreen)
@@ -134,8 +161,6 @@ namespace osu.Game.Screens.Menu
             preloadSongSelect();
 
             const float length = 300;
-
-            buttons.State = MenuState.TopLevel;
 
             Content.FadeIn(length, Easing.OutQuint);
             Content.MoveTo(new Vector2(0, 0), length, Easing.OutQuint);
