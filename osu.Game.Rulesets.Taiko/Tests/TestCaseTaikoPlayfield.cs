@@ -24,7 +24,6 @@ using OpenTK;
 namespace osu.Game.Rulesets.Taiko.Tests
 {
     [TestFixture]
-    [Ignore("getting CI working")]
     internal class TestCaseTaikoPlayfield : OsuTestCase
     {
         private const double default_duration = 1000;
