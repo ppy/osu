@@ -121,14 +121,14 @@ namespace osu.Game.Screens.Play.BreaksOverlay
 
                 using (BeginAbsoluteSequence(b.StartTime))
                 {
-                    Schedule(() => showBreak(b));
+                    Schedule(showBreak);
                     using (BeginDelayedSequence(b.Duration - fade_duration))
                         Schedule(hideBreak);
                 }
             }
         }
 
-        private void showBreak(BreakPeriod b)
+        private void showBreak()
         {
             if (letterboxing)
                 letterboxOverlay.Show();
