@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DialogButton : OsuClickableContainer, IHandleOnHoverLost
+    public class DialogButton : OsuClickableContainer, IHandleHover
     {
         private const float hover_width = 0.9f;
         private const float hover_duration = 500;

@@ -20,7 +20,7 @@ using osu.Framework.Audio;
 
 namespace osu.Game.Screens.Menu
 {
-    public class ButtonSystem : Container, IStateful<MenuState>, IHandleOnKeyDown
+    public class ButtonSystem : Container, IStateful<MenuState>, IHandleKeys
     {
         public event Action<MenuState> StateChanged;
 
@@ -161,6 +161,8 @@ namespace osu.Game.Screens.Menu
 
             return false;
         }
+
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
 
         private void onPlay()
         {

@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(1, HEIGHT);
         }
 
-        public class ToolbarBackground : Container, IHandleOnHover, IHandleOnHoverLost
+        public class ToolbarBackground : Container, IHandleHover
         {
             private readonly Box solidBackground;
             private readonly Box gradientBackground;

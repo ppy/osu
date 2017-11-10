@@ -23,7 +23,7 @@ using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Screens.Select
 {
-    internal class BeatmapCarousel : OsuScrollContainer, IHandleOnKeyDown
+    internal class BeatmapCarousel : OsuScrollContainer, IHandleKeys
     {
         public BeatmapInfo SelectedBeatmap => selectedPanel?.Beatmap;
 
@@ -519,6 +519,8 @@ namespace osu.Game.Screens.Select
             SelectNext(direction, skipDifficulties);
             return true;
         }
+
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
 
         protected override void Update()
         {

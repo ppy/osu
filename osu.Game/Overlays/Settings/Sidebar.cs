@@ -15,7 +15,7 @@ using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>, IHandleOnHover, IHandleOnHoverLost, IHandleOnMouseMove
+    public class Sidebar : Container<SidebarButton>, IStateful<ExpandedState>, IHandleHover, IHandleMouseMove
     {
         private readonly FillFlowContainer<SidebarButton> content;
         internal const float DEFAULT_WIDTH = ToolbarButton.WIDTH;

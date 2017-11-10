@@ -28,7 +28,7 @@ using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer, IOnlineComponent, IHandleOnDrag, IHandleOnDragEnd, IHandleOnFocus
+    public class ChatOverlay : OsuFocusedOverlayContainer, IOnlineComponent, IHandleDrag, IHandleFocus
     {
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
@@ -246,6 +246,10 @@ namespace osu.Game.Overlays
         {
             //this is necessary as textbox is masked away and therefore can't get focus :(
             GetContainingInputManager().ChangeFocus(textbox);
+        }
+
+        public void OnFocusLost(InputState state)
+        {
         }
 
         protected override void PopIn()

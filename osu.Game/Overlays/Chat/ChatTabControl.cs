@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Chat
             OnRequestLeave?.Invoke(tab.Value);
         }
 
-        private class ChannelTabItem : TabItem<Channel>, IHandleOnHover, IHandleOnHoverLost
+        private class ChannelTabItem : TabItem<Channel>, IHandleHover
         {
             private Color4 backgroundInactive;
             private Color4 backgroundHover;
@@ -259,7 +259,7 @@ namespace osu.Game.Overlays.Chat
                 };
             }
 
-            public class CloseButton : ClickableContainer, IHandleOnMouseDown, IHandleOnMouseUp, IHandleOnHover, IHandleOnHoverLost
+            public class CloseButton : ClickableContainer, IHandleMouseButtons, IHandleHover
             {
                 private readonly SpriteIcon icon;
 

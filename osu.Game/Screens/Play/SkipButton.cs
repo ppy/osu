@@ -20,7 +20,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipButton : Container, IHandleOnMouseMove, IHandleOnKeyDown
+    public class SkipButton : Container, IHandleMouseMove, IHandleKeys
     {
         private readonly double startTime;
         public IAdjustableClock AudioClock;
@@ -131,6 +131,8 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
+
         private class FadeContainer : Container, IStateful<Visibility>
         {
             public event Action<Visibility> StateChanged;
@@ -180,7 +182,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class Button : OsuClickableContainer, IHandleOnHoverLost, IHandleOnMouseDown, IHandleOnMouseUp
+        private class Button : OsuClickableContainer, IHandleHover, IHandleMouseButtons
         {
             private Color4 colourNormal;
             private Color4 colourHover;

@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// The part of the timeline that displays the current position of the song.
     /// </summary>
-    internal class MarkerPart : TimelinePart, IHandleOnDragStart, IHandleOnDrag, IHandleOnDragEnd, IHandleOnMouseDown
+    internal class MarkerPart : TimelinePart, IHandleDrag, IHandleMouseButtons
     {
         private readonly Drawable marker;
 
@@ -37,6 +37,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             seekToPosition(state.Mouse.NativeState.Position);
             return true;
         }
+
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
+
+        public virtual bool OnClick(InputState state) => false;
+
+        public virtual bool OnDoubleClick(InputState state) => false;
 
         /// <summary>
         /// Seeks the <see cref="SummaryTimeline"/> to the time closest to a position on the screen relative to the <see cref="SummaryTimeline"/>.

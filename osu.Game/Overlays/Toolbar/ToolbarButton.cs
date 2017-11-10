@@ -16,7 +16,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarButton : OsuClickableContainer, IHandleOnMouseDown, IHandleOnHoverLost
+    public class ToolbarButton : OsuClickableContainer, IHandleMouseButtons, IHandleHover
     {
         public const float WIDTH = Toolbar.HEIGHT * 1.4f;
 

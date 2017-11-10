@@ -18,7 +18,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuButton : Button, IFilterable, IHandleOnHover, IHandleOnHoverLost, IHandleOnMouseDown, IHandleOnMouseUp
+    public class OsuButton : Button, IFilterable, IHandleHover, IHandleMouseButtons
     {
         private Box hover;
 

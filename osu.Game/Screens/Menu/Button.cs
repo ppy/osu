@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Menu
     /// Button designed specifically for the osu!next main menu.
     /// In order to correctly flow, we have to use a negative margin on the parent container (due to the parallelogram shape).
     /// </summary>
-    public class Button : BeatSyncedContainer, IStateful<ButtonState>, IHandleOnHover, IHandleOnHoverLost, IHandleOnMouseDown, IHandleOnMouseUp, IHandleOnClick, IHandleOnKeyDown
+    public class Button : BeatSyncedContainer, IStateful<ButtonState>, IHandleHover, IHandleMouseButtons, IHandleKeys
     {
         public event Action<ButtonState> StateChanged;
 
@@ -197,6 +197,8 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
+        public virtual bool OnDoubleClick(InputState state) => false;
+
         public virtual bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat || state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
@@ -210,6 +212,8 @@ namespace osu.Game.Screens.Menu
 
             return false;
         }
+
+        public virtual bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
 
         private void trigger()
         {

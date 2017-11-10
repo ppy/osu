@@ -27,7 +27,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
 {
-    public class MusicController : OsuFocusedOverlayContainer, IHandleOnDrag, IHandleOnDragEnd
+    public class MusicController : OsuFocusedOverlayContainer, IHandleDrag
     {
         private const float player_height = 130;
 

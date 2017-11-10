@@ -10,7 +10,7 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuClickableContainer : ClickableContainer, IHandleOnHover
+    public class OsuClickableContainer : ClickableContainer, IHandleHover
     {
         protected SampleChannel SampleClick, SampleHover;
 
@@ -25,6 +25,10 @@ namespace osu.Game.Graphics.Containers
         {
             SampleHover?.Play();
             return false;
+        }
+
+        public void OnHoverLost(InputState state)
+        {
         }
 
         public override bool OnClick(InputState state)

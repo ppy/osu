@@ -17,7 +17,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A Checkbox styled to be placed in line with an <see cref="OsuTabControl{T}"/>
     /// </summary>
-    public class OsuTabControlCheckbox : Checkbox, IHandleOnHover, IHandleOnHoverLost
+    public class OsuTabControlCheckbox : Checkbox, IHandleHover
     {
         private readonly Box box;
         private readonly SpriteText text;

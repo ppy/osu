@@ -9,7 +9,7 @@ using OpenTK;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class DownloadButton : OsuClickableContainer, IHandleOnMouseDown, IHandleOnMouseUp, IHandleOnHoverLost
+    public class DownloadButton : OsuClickableContainer, IHandleMouseButtons, IHandleHover
     {
         private readonly SpriteIcon icon;
 

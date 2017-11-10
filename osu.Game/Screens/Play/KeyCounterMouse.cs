@@ -8,7 +8,7 @@ using OpenTK;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterMouse : KeyCounter, IHandleOnMouseDown, IHandleOnMouseUp
+    public class KeyCounterMouse : KeyCounter, IHandleMouseButtons
     {
         public MouseButton Button { get; }
 
@@ -43,5 +43,9 @@ namespace osu.Game.Screens.Play
             if (args.Button == Button) IsLit = false;
             return false;
         }
+
+        public virtual bool OnClick(InputState state) => false;
+
+        public virtual bool OnDoubleClick(InputState state) => false;
     }
 }

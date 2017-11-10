@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Mods
 {
-    public abstract class ModSection : Container,IHandleOnKeyDown
+    public abstract class ModSection : Container, IHandleKeys
     {
         private readonly OsuSpriteText headerLabel;
 
@@ -87,6 +87,8 @@ namespace osu.Game.Overlays.Mods
 
             return false;
         }
+
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
 
         public void DeselectAll()
         {

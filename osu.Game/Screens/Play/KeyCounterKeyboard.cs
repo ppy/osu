@@ -7,7 +7,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterKeyboard : KeyCounter, IHandleOnKeyDown, IHandleOnKeyUp
+    public class KeyCounterKeyboard : KeyCounter, IHandleKeys
     {
         public Key Key { get; }
         public KeyCounterKeyboard(Key key) : base(key.ToString())

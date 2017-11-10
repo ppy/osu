@@ -17,7 +17,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelListItem : OsuClickableContainer, IFilterable, IHandleOnHoverLost
+    public class ChannelListItem : OsuClickableContainer, IFilterable, IHandleHover
     {
         private const float width_padding = 5;
         private const float channel_width = 150;

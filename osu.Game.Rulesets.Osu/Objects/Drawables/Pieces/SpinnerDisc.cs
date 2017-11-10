@@ -11,7 +11,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SpinnerDisc : CircularContainer, IHasAccentColour, IHandleOnMouseMove
+    public class SpinnerDisc : CircularContainer, IHasAccentColour, IHandleMouseMove
     {
         private readonly Spinner spinner;
 

@@ -8,7 +8,7 @@ using osu.Framework.Input;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuHoverContainer : OsuClickableContainer, IHandleOnHoverLost
+    public class OsuHoverContainer : OsuClickableContainer, IHandleHover
     {
         private Color4 hoverColour;
 

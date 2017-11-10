@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Menu
     /// <summary>
     /// osu! logo and its attachments (pulsing, visualiser etc.)
     /// </summary>
-    public class OsuLogo : BeatSyncedContainer, IHandleOnMouseDown, IHandleOnMouseUp, IHandleOnClick, IHandleOnHover, IHandleOnHoverLost
+    public class OsuLogo : BeatSyncedContainer, IHandleMouseButtons, IHandleHover
     {
         public readonly Color4 OsuPink = OsuColour.FromHex(@"e967a1");
 
@@ -317,6 +317,8 @@ namespace osu.Game.Screens.Menu
             Action?.Invoke();
             return true;
         }
+
+        public bool OnDoubleClick(InputState state) => false;
 
         public virtual bool OnHover(InputState state)
         {

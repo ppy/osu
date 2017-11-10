@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
             Height = 30;
         }
 
-        public class PageTabItem : TabItem<T>, IHandleOnHover, IHandleOnHoverLost
+        public class PageTabItem : TabItem<T>, IHandleHover
         {
             private const float transition_duration = 100;
 

@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuCheckbox : Checkbox, IHandleOnHover, IHandleOnHoverLost
+    public class OsuCheckbox : Checkbox, IHandleHover
     {
         private Bindable<bool> bindable;
 

@@ -16,7 +16,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
 {
-    public abstract class Notification : Container, IHandleOnHover, IHandleOnHoverLost, IHandleOnClick
+    public abstract class Notification : Container, IHandleHover, IHandleMouseButtons
     {
         /// <summary>
         /// User requested close.
@@ -125,6 +125,10 @@ namespace osu.Game.Overlays.Notifications
             closeButton.FadeOut(75);
         }
 
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => false;
+
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
+
         public virtual bool OnClick(InputState state)
         {
             if (Activated?.Invoke() ?? true)
@@ -132,6 +136,8 @@ namespace osu.Game.Overlays.Notifications
 
             return true;
         }
+
+        public virtual bool OnDoubleClick(InputState state) => false;
 
         protected override void LoadComplete()
         {
@@ -153,7 +159,7 @@ namespace osu.Game.Overlays.Notifications
             Expire();
         }
 
-        private class CloseButton : OsuClickableContainer, IHandleOnHoverLost
+        private class CloseButton : OsuClickableContainer, IHandleHover
         {
             private Color4 hoverColour;
 

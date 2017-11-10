@@ -96,7 +96,7 @@ namespace osu.Game.Overlays
             });
         }
 
-        private class BackButton : OsuClickableContainer, IHandleOnMouseDown, IHandleOnMouseUp
+        private class BackButton : OsuClickableContainer, IHandleMouseButtons
         {
             private AspectContainer aspect;
 

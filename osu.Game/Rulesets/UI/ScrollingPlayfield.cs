@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.UI
     /// <summary>
     /// A type of <see cref="Playfield"/> specialized towards scrolling <see cref="DrawableHitObject"/>s.
     /// </summary>
-    public class ScrollingPlayfield : Playfield,IHandleOnKeyDown
+    public class ScrollingPlayfield : Playfield, IHandleKeys
     {
         /// <summary>
         /// The default span of time visible by the length of the scrolling axes.
@@ -109,6 +109,8 @@ namespace osu.Game.Rulesets.UI
 
             return false;
         }
+
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
 
         private void transformVisibleTimeRangeTo(double newTimeRange, double duration = 0, Easing easing = Easing.None)
         {

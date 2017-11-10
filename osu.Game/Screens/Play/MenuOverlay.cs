@@ -16,7 +16,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class MenuOverlay : OverlayContainer, IRequireHighFrequencyMousePosition, IHandleOnMouseUp, IHandleOnMouseMove
+    public abstract class MenuOverlay : OverlayContainer, IRequireHighFrequencyMousePosition, IHandleMouseButtons, IHandleMouseMove
     {
         private const int transition_duration = 200;
         private const int button_height = 70;

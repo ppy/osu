@@ -56,7 +56,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public class OsuTabItem : TabItem<T>, IHasAccentColour, IHandleOnHover, IHandleOnHoverLost
+        public class OsuTabItem : TabItem<T>, IHasAccentColour, IHandleHover
         {
             protected readonly SpriteText Text;
             protected readonly Box Bar;

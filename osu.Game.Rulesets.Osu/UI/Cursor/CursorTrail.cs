@@ -18,7 +18,7 @@ using OpenTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    internal class CursorTrail : Drawable, IHandleOnMouseMove
+    internal class CursorTrail : Drawable, IHandleMouseMove
     {
         public override bool HandleInput => true;
 

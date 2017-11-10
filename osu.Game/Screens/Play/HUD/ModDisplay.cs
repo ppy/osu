@@ -16,7 +16,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class ModDisplay : Container, IHasCurrentValue<IEnumerable<Mod>>, IHandleOnHover, IHandleOnHoverLost
+    public class ModDisplay : Container, IHasCurrentValue<IEnumerable<Mod>>, IHandleHover
     {
         private const int fade_duration = 1000;
 

@@ -14,7 +14,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
-    public class FooterButton : OsuClickableContainer, IHandleOnHoverLost, IHandleOnMouseDown, IHandleOnMouseUp, IHandleOnKeyDown
+    public class FooterButton : OsuClickableContainer, IHandleHover, IHandleMouseButtons, IHandleKeys
     {
         private static readonly Vector2 shearing = new Vector2(0.15f, 0);
 
@@ -131,5 +131,7 @@ namespace osu.Game.Screens.Select
 
             return false;
         }
+
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
     }
 }

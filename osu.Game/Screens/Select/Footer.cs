@@ -17,7 +17,7 @@ using osu.Game.Screens.Menu;
 
 namespace osu.Game.Screens.Select
 {
-    public class Footer : Container, IHandleOnMouseDown, IHandleOnClick, IHandleOnDragStart
+    public class Footer : Container, IHandleMouseButtons, IHandleDrag
     {
         private readonly Box modeLight;
 
@@ -146,9 +146,14 @@ namespace osu.Game.Screens.Select
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || StartButton.ReceiveMouseInputAt(screenSpacePos);
 
         public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
 
         public virtual bool OnClick(InputState state) => true;
+        public virtual bool OnDoubleClick(InputState state) => false;
 
         public virtual bool OnDragStart(InputState state) => true;
+        public virtual bool OnDrag(InputState state) => false;
+
+        public virtual bool OnDragEnd(InputState state) => false;
     }
 }

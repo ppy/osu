@@ -20,7 +20,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer, IStateful<Visibility>, IHandleOnHoverLost
+    public class LeaderboardScore : OsuClickableContainer, IStateful<Visibility>, IHandleHover
     {
         public static readonly float HEIGHT = 60;
 

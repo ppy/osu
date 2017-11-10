@@ -25,7 +25,7 @@ using osu.Framework.MathUtils;
 
 namespace osu.Game.Overlays
 {
-    public class MedalOverlay : FocusedOverlayContainer, IHandleOnFocusLost
+    public class MedalOverlay : FocusedOverlayContainer, IHandleFocus
     {
         public const float DISC_SIZE = 400;
 
@@ -180,6 +180,10 @@ namespace osu.Game.Overlays
         {
             dismiss();
             return true;
+        }
+
+        public void OnFocus(InputState state)
+        {
         }
 
         public virtual void OnFocusLost(InputState state)

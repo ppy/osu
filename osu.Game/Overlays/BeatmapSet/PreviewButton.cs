@@ -18,7 +18,7 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class PreviewButton : OsuClickableContainer, IHandleOnHoverLost
+    public class PreviewButton : OsuClickableContainer, IHandleHover
     {
         private const float transition_duration = 500;
 

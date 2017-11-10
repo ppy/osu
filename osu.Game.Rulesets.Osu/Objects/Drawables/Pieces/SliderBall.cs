@@ -11,7 +11,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SliderBall : CircularContainer, ISliderProgress, IHandleOnMouseDown, IHandleOnMouseUp, IHandleOnMouseMove
+    public class SliderBall : CircularContainer, ISliderProgress, IHandleMouseButtons, IHandleMouseMove
     {
         private const float width = 128;
 
@@ -91,6 +91,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             lastState = state;
             return false;
         }
+
+        public virtual bool OnClick(InputState state) => false;
+
+        public virtual bool OnDoubleClick(InputState state) => false;
 
         public virtual bool OnMouseMove(InputState state)
         {

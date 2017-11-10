@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select.Options
 {
-    public class BeatmapOptionsButton : OsuClickableContainer, IHandleOnMouseDown, IHandleOnMouseUp, IHandleOnKeyDown
+    public class BeatmapOptionsButton : OsuClickableContainer, IHandleMouseButtons, IHandleKeys
     {
         private const float width = 130;
 
@@ -83,6 +83,8 @@ namespace osu.Game.Screens.Select.Options
 
             return false;
         }
+
+        public bool OnKeyUp(InputState state, KeyUpEventArgs args) => false;
 
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
 

@@ -157,17 +157,16 @@ namespace osu.Game.Overlays.BeatmapSet
             difficulties.Children.ToList().ForEach(diff => diff.State = diff.Beatmap == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
         }
 
-        private class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>, IHandleOnHoverLost
+        private class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>, IHandleHover
         {
             public Action OnLostHover;
 
-            public virtual void OnHoverLost(InputState state)
-            {
-                OnLostHover?.Invoke();
-            }
+            public virtual bool OnHover(InputState state) => false;
+
+            public virtual void OnHoverLost(InputState state) => OnLostHover?.Invoke();
         }
 
-        private class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>, IHandleOnHoverLost
+        private class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>, IHandleHover
         {
             private const float transition_duration = 100;
             private const float size = 52;

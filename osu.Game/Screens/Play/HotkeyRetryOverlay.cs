@@ -12,7 +12,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class HotkeyRetryOverlay : Container, IHandleOnKeyDown, IHandleOnKeyUp
+    public class HotkeyRetryOverlay : Container, IHandleKeys
     {
         public Action Action;
 

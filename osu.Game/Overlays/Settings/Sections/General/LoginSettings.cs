@@ -23,7 +23,7 @@ using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Game.Overlays.Settings.Sections.General
 {
-    public class LoginSettings : FillFlowContainer, IOnlineComponent, IHandleOnClick, IHandleOnFocus
+    public class LoginSettings : FillFlowContainer, IOnlineComponent, IHandleMouseButtons, IHandleFocus
     {
         private bool bounding = true;
         private LoginForm form;
@@ -176,14 +176,23 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         public override bool AcceptsFocus => true;
 
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => false;
+
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
+
         public virtual bool OnClick(InputState state) => true;
+        public virtual bool OnDoubleClick(InputState state) => false;
 
         public virtual void OnFocus(InputState state)
         {
             if (form != null) GetContainingInputManager().ChangeFocus(form);
         }
 
-        private class LoginForm : FillFlowContainer, IHandleOnClick, IHandleOnFocus
+        public virtual void OnFocusLost(InputState state)
+        {
+        }
+
+        private class LoginForm : FillFlowContainer, IHandleMouseButtons, IHandleFocus
         {
             private TextBox username;
             private TextBox password;
@@ -244,11 +253,20 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             public override bool AcceptsFocus => true;
 
+            public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => false;
+
+            public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
+
             public virtual bool OnClick(InputState state) => true;
+            public virtual bool OnDoubleClick(InputState state) => false;
 
             public virtual void OnFocus(InputState state)
             {
                 Schedule(() => { GetContainingInputManager().ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
+            }
+
+            public virtual void OnFocusLost(InputState state)
+            {
             }
         }
 

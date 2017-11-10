@@ -18,7 +18,7 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Overlays
 {
-    public abstract class SettingsOverlay : OsuFocusedOverlayContainer, IHandleOnFocus
+    public abstract class SettingsOverlay : OsuFocusedOverlayContainer, IHandleFocus
     {
         internal const float CONTENT_MARGINS = 10;
 
@@ -179,9 +179,10 @@ namespace osu.Game.Overlays
 
         public override bool OnClick(InputState state) => true;
 
-        public virtual void OnFocus(InputState state)
+        public virtual void OnFocus(InputState state) => GetContainingInputManager().ChangeFocus(searchTextBox);
+
+        public void OnFocusLost(InputState state)
         {
-            GetContainingInputManager().ChangeFocus(searchTextBox);
         }
 
         protected override void UpdateAfterChildren()

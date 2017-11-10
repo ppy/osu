@@ -441,7 +441,7 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(state, args);
         }
 
-        private class ResetScrollContainer : Container, IHandleOnHover
+        private class ResetScrollContainer : Container, IHandleHover
         {
             private readonly Action onHoverAction;
 
@@ -454,6 +454,10 @@ namespace osu.Game.Screens.Select
             {
                 onHoverAction?.Invoke();
                 return false;
+            }
+
+            public void OnHoverLost(InputState state)
+            {
             }
         }
     }

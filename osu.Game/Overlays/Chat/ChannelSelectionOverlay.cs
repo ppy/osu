@@ -20,7 +20,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChannelSelectionOverlay : OsuFocusedOverlayContainer, IHandleOnFocus
+    public class ChannelSelectionOverlay : OsuFocusedOverlayContainer, IHandleFocus
     {
         public static readonly float WIDTH_PADDING = 170;
 
@@ -150,9 +150,10 @@ namespace osu.Game.Overlays.Chat
             headerBg.Colour = colours.Gray2.Opacity(0.75f);
         }
 
-        public virtual void OnFocus(InputState state)
+        public virtual void OnFocus(InputState state) => GetContainingInputManager().ChangeFocus(search);
+
+        public void OnFocusLost(InputState state)
         {
-            GetContainingInputManager().ChangeFocus(search);
         }
 
         protected override void PopIn()

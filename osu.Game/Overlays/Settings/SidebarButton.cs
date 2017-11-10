@@ -15,7 +15,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SidebarButton : Container, IHandleOnClick, IHandleOnHover, IHandleOnHoverLost
+    public class SidebarButton : Container, IHandleMouseButtons, IHandleHover
     {
         private readonly SpriteIcon drawableIcon;
         private readonly SpriteText headerText;
@@ -110,12 +110,18 @@ namespace osu.Game.Overlays.Settings
             selectionIndicator.Colour = colours.Yellow;
         }
 
+        public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => false;
+
+        public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => false;
+
         public virtual bool OnClick(InputState state)
         {
             Action?.Invoke(section);
             backgroundBox.FlashColour(Color4.White, 400);
             return true;
         }
+
+        public virtual bool OnDoubleClick(InputState state) => false;
 
         public virtual bool OnHover(InputState state)
         {

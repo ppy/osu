@@ -30,7 +30,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class Player : OsuScreen, IHandleOnWheel
+    public class Player : OsuScreen, IHandleWheel
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 

@@ -13,7 +13,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class IconButton : OsuClickableContainer, IHandleOnHoverLost, IHandleOnMouseDown, IHandleOnMouseUp
+    public class IconButton : OsuClickableContainer, IHandleMouseButtons, IHandleHover
     {
         private const float button_size = 30;
 

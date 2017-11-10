@@ -17,7 +17,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class TwoLayerButton : OsuClickableContainer, IHandleOnHoverLost, IHandleOnMouseDown
+    public class TwoLayerButton : OsuClickableContainer, IHandleHover, IHandleMouseButtons
     {
         private readonly BouncingIcon bouncingIcon;
 

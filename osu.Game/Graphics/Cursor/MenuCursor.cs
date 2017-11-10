@@ -16,7 +16,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Graphics.Cursor
 {
-    public class MenuCursor : CursorContainer, IHandleOnMouseUp
+    public class MenuCursor : CursorContainer, IHandleMouseButtons
     {
         protected override Drawable CreateCursor() => new Cursor();
 

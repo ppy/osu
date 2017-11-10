@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
             this.receptor = receptor;
         }
 
-        public class Receptor : Drawable, IHandleOnKeyDown, IHandleOnKeyUp, IHandleOnMouseDown, IHandleOnMouseUp
+        public class Receptor : Drawable, IHandleKeys, IHandleMouseButtons
         {
             protected readonly KeyCounterCollection Target;
 
@@ -150,6 +150,9 @@ namespace osu.Game.Screens.Play
             public virtual bool OnMouseDown(InputState state, MouseDownEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseDown(state, args));
 
             public virtual bool OnMouseUp(InputState state, MouseUpEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseUp(state, args));
+            public virtual bool OnClick(InputState state) => false;
+
+            public virtual bool OnDoubleClick(InputState state) => false;
         }
     }
 }

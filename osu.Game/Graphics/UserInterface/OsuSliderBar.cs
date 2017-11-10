@@ -16,7 +16,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour, IHandleOnHover, IHandleOnHoverLost, IHandleOnMouseUp, IHandleOnMouseDown
+    public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour, IHandleHover, IHandleMouseButtons
         where T : struct, IEquatable<T>
     {
         private SampleChannel sample;
