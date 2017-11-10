@@ -655,6 +655,7 @@
     <Compile Include="Screens\Menu\Disclaimer.cs" />
     <Compile Include="Screens\Menu\FlowContainerWithOrigin.cs" />
     <Compile Include="Screens\Menu\Intro.cs" />
+    <Compile Include="Screens\Menu\IntroSequence.cs" />
     <Compile Include="Screens\Menu\LogoVisualisation.cs" />
     <Compile Include="Screens\Menu\MainMenu.cs" />
     <Compile Include="Screens\Menu\MenuSideFlashes.cs" />
