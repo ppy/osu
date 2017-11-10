@@ -17,6 +17,8 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -142,14 +144,21 @@ namespace osu.Game.Screens.Play
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
-            Schedule(() =>
+            Task.Run(() =>
             {
                 adjustableSourceClock.Reset();
 
-                foreach (var mod in working.Mods.Value.OfType<IApplicableToClock>())
-                    mod.ApplyToClock(adjustableSourceClock);
+                // this is temporary until we have blocking (async.Wait()) audio component methods.
+                // then we can call ResetAsync().Wait() or the blocking version above.
+                while (adjustableSourceClock.IsRunning)
+                    Thread.Sleep(1);
 
-                decoupledClock.ChangeSource(adjustableSourceClock);
+                Schedule(() =>
+                {
+                    decoupledClock.ChangeSource(adjustableSourceClock);
+                    foreach (var mod in working.Mods.Value.OfType<IApplicableToClock>())
+                        mod.ApplyToClock(adjustableSourceClock);
+                });
             });
 
             Children = new Drawable[]
