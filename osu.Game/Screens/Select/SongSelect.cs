@@ -340,8 +340,8 @@ namespace osu.Game.Screens.Select
         protected override void LogoExiting(OsuLogo logo)
         {
             base.LogoExiting(logo);
-            logo.ScaleTo(0.2f, logo_transition, Easing.OutQuint);
-            logo.FadeOut(logo_transition, Easing.OutQuint);
+            logo.ScaleTo(0.2f, logo_transition / 2, Easing.Out);
+            logo.FadeOut(logo_transition / 2, Easing.Out);
         }
 
         private void beatmap_ValueChanged(WorkingBeatmap beatmap)
