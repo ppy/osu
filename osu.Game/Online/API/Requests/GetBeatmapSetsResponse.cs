@@ -50,6 +50,9 @@ namespace osu.Game.Online.API.Requests
 
         private class GetBeatmapSetsBeatmapResponse : BeatmapMetadata
         {
+            [JsonProperty(@"id")]
+            private int onlineBeatmapID { get; set; }
+
             [JsonProperty(@"playcount")]
             private int playCount { get; set; }
 
@@ -69,6 +72,7 @@ namespace osu.Game.Online.API.Requests
                     Metadata = this,
                     Ruleset = rulesets.GetRuleset(ruleset),
                     StarDifficulty = starDifficulty,
+                    OnlineBeatmapID = onlineBeatmapID,
                     OnlineInfo = new BeatmapOnlineInfo
                     {
                         PlayCount = playCount,
