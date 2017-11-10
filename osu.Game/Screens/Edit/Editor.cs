@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
-        internal override bool ShowOverlays => false;
+        public override bool ShowOverlays => false;
 
         private readonly Box bottomBackground;
         private readonly Container screenContainer;

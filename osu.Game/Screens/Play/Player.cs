@@ -17,6 +17,8 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Backgrounds;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -34,13 +36,13 @@ namespace osu.Game.Screens.Play
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
 
-        internal override bool ShowOverlays => false;
+        public override bool ShowOverlays => false;
 
-        internal override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && RulesetContainer.ProvidingUserCursor;
+        public override bool HasLocalCursorDisplayed => !pauseContainer.IsPaused && !HasFailed && RulesetContainer.ProvidingUserCursor;
 
         public Action RestartRequested;
 
-        internal override bool AllowBeatmapRulesetChange => false;
+        public override bool AllowBeatmapRulesetChange => false;
 
         public bool HasFailed { get; private set; }
 
@@ -143,16 +145,23 @@ namespace osu.Game.Screens.Play
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
-            Schedule(() =>
+            Task.Run(() =>
             {
                 adjustableSourceClock.Reset();
 
-                foreach (var mod in working.Mods.Value.OfType<IApplicableToClock>())
-                    mod.ApplyToClock(adjustableSourceClock);
+                // this is temporary until we have blocking (async.Wait()) audio component methods.
+                // then we can call ResetAsync().Wait() or the blocking version above.
+                while (adjustableSourceClock.IsRunning)
+                    Thread.Sleep(1);
 
-                clockRate = adjustableSourceClock.Rate;
+                Schedule(() =>
+                {
+                    decoupledClock.ChangeSource(adjustableSourceClock);
+                    foreach (var mod in working.Mods.Value.OfType<IApplicableToClock>())
+                        mod.ApplyToClock(adjustableSourceClock);
 
-                decoupledClock.ChangeSource(adjustableSourceClock);
+                    clockRate = adjustableSourceClock.Rate;
+                });
             });
 
             Children = new Drawable[]
