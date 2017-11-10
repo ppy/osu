@@ -19,7 +19,7 @@ using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Menu
 {
-    internal class LogoVisualisation : Drawable, IHasAccentColour
+    public class LogoVisualisation : Drawable, IHasAccentColour
     {
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 

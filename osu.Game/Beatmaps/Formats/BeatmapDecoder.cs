@@ -18,6 +18,9 @@ namespace osu.Game.Beatmaps.Formats
 
         public static BeatmapDecoder GetDecoder(StreamReader stream)
         {
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
             string line;
             do { line = stream.ReadLine()?.Trim(); }
             while (line != null && line.Length == 0);

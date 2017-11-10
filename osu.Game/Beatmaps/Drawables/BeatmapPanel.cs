@@ -73,6 +73,9 @@ namespace osu.Game.Beatmaps.Drawables
 
         public BeatmapPanel(BeatmapInfo beatmap)
         {
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap));
+
             Beatmap = beatmap;
             Height *= 0.60f;
 
