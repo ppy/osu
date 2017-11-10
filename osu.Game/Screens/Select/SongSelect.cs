@@ -20,6 +20,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Menu;
 using osu.Game.Screens.Select.Options;
 
 namespace osu.Game.Screens.Select
@@ -153,7 +154,6 @@ namespace osu.Game.Screens.Select
                 Add(Footer = new Footer
                 {
                     OnBack = Exit,
-                    OnStart = () => carouselRaisedStart(),
                 });
 
                 FooterPanels.Add(BeatmapOptions = new BeatmapOptionsOverlay());
@@ -309,6 +309,41 @@ namespace osu.Game.Screens.Select
             FilterControl.Activate();
         }
 
+        private const double logo_transition = 250;
+
+        protected override void LogoArriving(OsuLogo logo, bool resuming)
+        {
+            base.LogoArriving(logo, resuming);
+
+            logo.ClearTransforms();
+            logo.RelativePositionAxes = Axes.Both;
+
+            Vector2 position = new Vector2(0.95f, 0.96f);
+
+            if (logo.Alpha > 0.8f)
+            {
+                logo.MoveTo(position, 500, Easing.OutQuint);
+            }
+            else
+            {
+                logo.Hide();
+                logo.ScaleTo(0.2f);
+                logo.MoveTo(position);
+            }
+
+            logo.FadeIn(logo_transition, Easing.OutQuint);
+            logo.ScaleTo(0.4f, logo_transition, Easing.OutQuint);
+
+            logo.Action = () => carouselRaisedStart();
+        }
+
+        protected override void LogoExiting(OsuLogo logo)
+        {
+            base.LogoExiting(logo);
+            logo.ScaleTo(0.2f, logo_transition, Easing.OutQuint);
+            logo.FadeOut(logo_transition, Easing.OutQuint);
+        }
+
         private void beatmap_ValueChanged(WorkingBeatmap beatmap)
         {
             if (!IsCurrentScreen) return;
@@ -350,6 +385,7 @@ namespace osu.Game.Screens.Select
             Content.FadeOut(100);
 
             FilterControl.Deactivate();
+
             return base.OnExiting(next);
         }
 
