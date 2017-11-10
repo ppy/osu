@@ -10,7 +10,9 @@ using osu.Game.Graphics.Containers;
 using OpenTK;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
+using osu.Framework.Graphics;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Menu;
 
 namespace osu.Game.Screens
 {
@@ -29,6 +31,8 @@ namespace osu.Game.Screens
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         public virtual bool HasLocalCursorDisplayed => false;
+
+        private OsuLogo logo;
 
         /// <summary>
         /// Whether the beatmap or ruleset should be allowed to be changed by the user or game.
@@ -72,7 +76,14 @@ namespace osu.Game.Screens
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
+            logo.DelayUntilTransformsFinished().Schedule(() => LogoArriving(logo, true));
             sampleExit?.Play();
+        }
+
+        protected override void OnSuspending(Screen next)
+        {
+            base.OnSuspending(next);
+            onSuspendingLogo();
         }
 
         protected override void OnEntering(Screen last)
@@ -106,11 +117,19 @@ namespace osu.Game.Screens
                 });
             }
 
+            if ((logo = lastOsu?.logo) == null)
+                AddInternal(logo = new OsuLogo());
+
             base.OnEntering(last);
+
+            logo.DelayUntilTransformsFinished().Schedule(() => LogoArriving(logo, false));
         }
 
         protected override bool OnExiting(Screen next)
         {
+            if (ValidForResume && logo != null)
+                onExitingLogo();
+
             OsuScreen nextOsu = next as OsuScreen;
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
@@ -127,6 +146,41 @@ namespace osu.Game.Screens
 
             Beatmap.UnbindAll();
             return false;
+        }
+
+        /// <summary>
+        /// Fired when this screen was entered or resumed and the logo state is required to be adjusted.
+        /// </summary>
+        protected virtual void LogoArriving(OsuLogo logo, bool resuming)
+        {
+            logo.Action = null;
+            logo.FadeOut(300, Easing.OutQuint);
+        }
+
+        private void onExitingLogo()
+        {
+            logo.ClearTransforms();
+            LogoExiting(logo);
+        }
+
+        /// <summary>
+        /// Fired when this screen was exited to add any outwards transition to the logo.
+        /// </summary>
+        protected virtual void LogoExiting(OsuLogo logo)
+        {
+        }
+
+        private void onSuspendingLogo()
+        {
+            logo.ClearTransforms();
+            LogoSuspending(logo);
+        }
+
+        /// <summary>
+        /// Fired when this screen was suspended to add any outwards transition to the logo.
+        /// </summary>
+        protected virtual void LogoSuspending(OsuLogo logo)
+        {
         }
     }
 }
