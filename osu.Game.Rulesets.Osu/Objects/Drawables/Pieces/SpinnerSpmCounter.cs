@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -61,6 +62,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public void SetRotation(float currentRotation)
         {
+            // If we've gone back in time, it's fine to work with a fresh set of records for now
+            if (records.Count > 0 && Time.Current < records.Last().Time)
+                records.Clear();
+
             if (records.Count > 0)
             {
                 var record = records.Peek();
