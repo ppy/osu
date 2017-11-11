@@ -51,7 +51,6 @@ namespace osu.Game.Screens.Play
         private IAdjustableClock adjustableSourceClock;
         private FramedOffsetClock offsetClock;
         private DecoupleableInterpolatingFramedClock decoupledClock;
-        private double clockRate;
 
         private PauseContainer pauseContainer;
 
@@ -157,10 +156,7 @@ namespace osu.Game.Screens.Play
                 Schedule(() =>
                 {
                     decoupledClock.ChangeSource(adjustableSourceClock);
-                    foreach (var mod in working.Mods.Value.OfType<IApplicableToClock>())
-                        mod.ApplyToClock(adjustableSourceClock);
-
-                    clockRate = adjustableSourceClock.Rate;
+                    applyRateFromMods();
                 });
             });
 
@@ -247,6 +243,13 @@ namespace osu.Game.Screens.Play
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
+        }
+
+        private void applyRateFromMods()
+        {
+            adjustableSourceClock.Rate = 1;
+            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
+                mod.ApplyToClock(adjustableSourceClock);
         }
 
         private void initializeStoryboard(bool asyncLoad)
@@ -346,8 +349,9 @@ namespace osu.Game.Screens.Play
         {
             if (HasFailed || !ValidForResume || pauseContainer?.AllowExit != false || RulesetContainer?.HasReplayLoaded != false)
             {
-                // We want to make sure we restore the clock rate
-                adjustableSourceClock.Rate = clockRate;
+                // In the case of replays, we may have changed the playback rate.
+                applyRateFromMods();
+
                 fadeOut();
                 return base.OnExiting(next);
             }
