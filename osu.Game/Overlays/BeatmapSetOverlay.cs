@@ -27,7 +27,6 @@ namespace osu.Game.Overlays
 
         private readonly Header header;
         private readonly Info info;
-        private readonly ScoresContainer scores;
 
         private APIAccess api;
         private RulesetStore rulesets;
@@ -37,6 +36,8 @@ namespace osu.Game.Overlays
 
         public BeatmapSetOverlay()
         {
+            ScoresContainer scores;
+
             FirstWaveColour = OsuColour.Gray(0.4f);
             SecondWaveColour = OsuColour.Gray(0.3f);
             ThirdWaveColour = OsuColour.Gray(0.2f);

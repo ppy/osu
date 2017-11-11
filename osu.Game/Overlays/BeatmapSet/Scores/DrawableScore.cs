@@ -21,13 +21,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class DrawableScore : Container
     {
         private const int fade_duration = 100;
-        private const int height = 30;
+        private const float height = 30;
 
         private readonly Box background;
-        private readonly ScoreModsContainer modsContainer;
 
         public DrawableScore(int index, OnlineScore score)
         {
+            ScoreModsContainer modsContainer;
+
             RelativeSizeAxes = Axes.X;
             Height = height;
             CornerRadius = 3;
@@ -88,7 +89,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
-                    Text = score.TotalScore.ToString(),
+                    Text = $@"{score.TotalScore}",
                     Font = @"Exo2.0-MediumItalic",
                     RelativePositionAxes = Axes.X,
                     X = 0.7f
