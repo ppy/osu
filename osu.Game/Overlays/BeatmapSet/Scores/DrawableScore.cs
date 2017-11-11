@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Height = 20,
                     FillMode = FillMode.Fit,
                     RelativePositionAxes = Axes.X,
-                    X = 0.55f
+                    X = 0.57f
                 },
                 new OsuSpriteText
                 {
