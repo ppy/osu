@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             request?.Cancel();
 
-            if (!beatmap?.OnlineBeatmapID.HasValue ?? false)
+            if (!beatmap?.OnlineBeatmapID.HasValue ?? true)
             {
                 clearAllScores();
                 return;
