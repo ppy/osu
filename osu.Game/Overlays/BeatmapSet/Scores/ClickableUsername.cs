@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
         }
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(UserProfileOverlay profile)
         {
             this.profile = profile;
