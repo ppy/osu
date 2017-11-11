@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         protected readonly FillFlowContainer<OsuSpriteText> Stats;
         private readonly FillFlowContainer metadata;
-        private readonly ModContainer modContainer;
+        private readonly ScoreModsContainer modsContainer;
         protected readonly Score Score;
 
         protected DrawableScore(Score score)
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         Depth = -1,
                     },
                 },
-                modContainer = new ModContainer
+                modsContainer = new ScoreModsContainer
                 {
                     AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.CentreRight,
@@ -119,21 +119,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             });
 
             foreach (Mod mod in Score.Mods)
-                modContainer.Add(new ModIcon(mod)
+                modsContainer.Add(new ModIcon(mod)
                 {
                     AutoSizeAxes = Axes.Both,
                     Scale = new Vector2(0.5f),
                 });
-        }
-
-        private class ModContainer : FlowContainer<ModIcon>
-        {
-            protected override IEnumerable<Vector2> ComputeLayoutPositions()
-            {
-                int count = FlowingChildren.Count();
-                for (int i = 0; i < count; i++)
-                    yield return new Vector2(DrawWidth * i * (count == 1 ? 0 : 1f / (count - 1)), 0);
-            }
         }
     }
 }
