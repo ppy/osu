@@ -688,7 +688,7 @@
     <Compile Include="Screens\Play\Player.cs" />
     <Compile Include="Screens\Play\PlayerLoader.cs" />
     <Compile Include="Screens\Play\ReplayPlayer.cs" />
-    <Compile Include="Screens\Play\ReplaySettingsOverlay.cs" />
+    <Compile Include="Screens\Play\HUD\ReplaySettingsOverlay.cs" />
     <Compile Include="Screens\Play\ReplaySettings\CollectionSettings.cs" />
     <Compile Include="Screens\Play\ReplaySettings\DiscussionSettings.cs" />
     <Compile Include="Screens\Play\ReplaySettings\PlaybackSettings.cs" />

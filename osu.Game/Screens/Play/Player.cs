@@ -156,8 +156,7 @@ namespace osu.Game.Screens.Play
                 Schedule(() =>
                 {
                     decoupledClock.ChangeSource(adjustableSourceClock);
-                    foreach (var mod in working.Mods.Value.OfType<IApplicableToClock>())
-                        mod.ApplyToClock(adjustableSourceClock);
+                    applyRateFromMods();
                 });
             });
 
@@ -239,9 +238,18 @@ namespace osu.Game.Screens.Play
 
             breakOverlay.BindProcessor(scoreProcessor);
 
+            hudOverlay.ReplaySettingsOverlay.PlaybackSettings.AdjustableClock = adjustableSourceClock;
+
             // Bind ScoreProcessor to ourselves
             scoreProcessor.AllJudged += onCompletion;
             scoreProcessor.Failed += onFail;
+        }
+
+        private void applyRateFromMods()
+        {
+            adjustableSourceClock.Rate = 1;
+            foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToClock>())
+                mod.ApplyToClock(adjustableSourceClock);
         }
 
         private void initializeStoryboard(bool asyncLoad)
@@ -341,6 +349,9 @@ namespace osu.Game.Screens.Play
         {
             if (HasFailed || !ValidForResume || pauseContainer?.AllowExit != false || RulesetContainer?.HasReplayLoaded != false)
             {
+                // In the case of replays, we may have changed the playback rate.
+                applyRateFromMods();
+
                 fadeOut();
                 return base.OnExiting(next);
             }
