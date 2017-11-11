@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile.Sections.Ranks;
@@ -58,10 +57,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     RelativePositionAxes = Axes.X,
                     X = 0.06f
                 },
-                new ClickableUsername(score.User.Username)
+                new ClickableUsername
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
+                    User = score.User,
                     RelativePositionAxes = Axes.X,
                     X = 0.1f
                 },
@@ -140,18 +140,5 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         protected override bool OnClick(InputState state) => true;
-
-        private class ClickableUsername : OsuHoverContainer
-        {
-            public ClickableUsername(string username)
-            {
-                AutoSizeAxes = Axes.Both;
-                Child = new OsuSpriteText
-                {
-                    Text = username,
-                    Font = @"Exo2.0-BoldItalic",
-                };
-            }
-        }
     }
 }
