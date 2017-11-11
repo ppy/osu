@@ -23,10 +23,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 {
     public class DrawableTopScore : Container
     {
-        private const int fade_duration = 100;
-        private const int height = 200;
-        private const int avatar_size = 80;
-        private const int margin = 10;
+        private const float fade_duration = 100;
+        private const float height = 200;
+        private const float avatar_size = 80;
+        private const float margin = 10;
 
         private readonly Box background;
         private readonly Box bottomBackground;
@@ -179,10 +179,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             avatar.User = username.User = score.User;
             flag.FlagName = score.User.Country?.FlagName;
-            date.Text = $"achieved {score.Date:MMM d, yyyy}";
+            date.Text = $@"achieved {score.Date:MMM d, yyyy}";
             rank.UpdateRank(score.Rank);
 
-            totalScore.Value = score.TotalScore.ToString();
+            totalScore.Value = $@"{score.TotalScore}";
             accuracy.Value = $@"{score.Accuracy:P2}";
             statistics.Value = $"{score.Statistics["300"]}/{score.Statistics["100"]}/{score.Statistics["50"]}";
 
